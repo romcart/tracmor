@@ -1,0 +1,964 @@
+<?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ *
+ * This file is part of Tracmor.  
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version. 
+ *	
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+?>
+
+<?php
+
+class QAssetEditComposite extends QControl {
+
+	public $objAsset;
+	public $strTitleVerb;
+	public $blnEditMode;
+	public $objParentObject;
+
+	// Labels
+	protected $lblHeaderAssetCode;
+	protected $lblAssetModel;
+	protected $lblLocation;
+	protected $lblAssetModelCode;
+	protected $lblManufacturer;
+	protected $lblCategory;
+	protected $lblReservedBy;
+	protected $lblAssetCode;
+	protected $lblCreationDate;
+	protected $lblModifiedDate;
+	
+	// Inputs
+	protected $lstAssetModel;
+	protected $txtAssetCode;
+	protected $lstLocation;
+	protected $lstCreatedByObject;
+	protected $lstModifiedByObject;
+	
+	// Buttons
+	protected $btnSave;
+	protected $btnDelete;
+	protected $btnEdit;
+	protected $btnCancel;		
+	protected $btnClone;
+	protected $btnMove;
+	protected $btnCheckOut;
+	protected $btnCheckIn;
+	protected $btnReserve;
+	protected $btnUnreserve;
+	protected $btnShip;
+	protected $btnReceive;
+	
+	// Transaction History Datagrid
+	public $dtgAssetTransaction;
+	
+	// Custom Field Objects
+	// protected $objCustomFieldArray;
+	public $arrCustomFields;
+	
+	// We want to override the constructor in order to setup the subcontrols
+	public function __construct($objParentObject, $strControlId = null) {
+	    // First, call the parent to do most of the basic setup
+    try {
+        parent::__construct($objParentObject, $strControlId);
+    } catch (QCallerException $objExc) {
+        $objExc->IncrementOffset();
+        throw $objExc;
+    }
+    
+    $this->objParentObject = $objParentObject;
+    $this->objParentObject->SetupAsset($this);
+    
+    // Create Labels
+    $this->lblHeaderAssetCode_Create();
+		$this->lblAssetModel_Create();
+		$this->lblLocation_Create();
+		$this->lblAssetModelCode_Create();
+		$this->lblManufacturer_Create();
+		$this->lblCategory_Create();
+		$this->lblReservedBy_Create();
+		$this->lblAssetCode_Create();
+		$this->lblCreationDate_Create();
+		$this->lblModifiedDate_Create();
+		$this->UpdateAssetLabels();
+		
+		// Create Inputs
+		$this->lstAssetModel_Create();
+		$this->txtAssetCode_Create();
+		$this->lstLocation_Create();
+		$this->UpdateAssetControls();
+
+		// Create all custom asset fields
+		$this->customFields_Create();
+		
+		// Create Buttons
+		$this->btnSave_Create();
+		$this->btnDelete_Create();
+		$this->btnEdit_Create();
+		$this->btnCancel_Create();
+		$this->btnClone_Create();
+		// Only create transaction buttons if editing an existing asset
+		if ($this->blnEditMode) {
+			$this->btnMove_Create();
+			$this->btnCheckOut_Create();
+			$this->btnCheckIn_Create();
+			$this->btnReserve_Create();
+			$this->btnUnreserve_Create();
+			$this->btnShip_Create();
+			$this->btnReceive_Create();
+			$this->UpdateAssetControls();
+			$this->EnableTransactionButtons();
+		}
+		
+		// Display labels for the existing asset
+		if ($this->blnEditMode) {
+			// Create the transaction history datagrid
+			$this->dtgAssetTransaction_Create();
+			$this->displayLabels();
+		}
+		// Display empty inputs to create a new asset
+		else {
+			$this->displayInputs();
+		}
+	}
+	
+	// Every composite control must have this function declared
+	public function ParsePostData() {
+	}
+	
+	public function GetJavaScriptAction() {return "onchange";}
+	
+	public function Validate() {return true;}
+	
+	protected function GetControlHtml() {
+		
+		$strStyle = $this->GetStyleAttributes();
+		if ($strStyle) {
+			$strStyle = sprintf('style="%s"', $strStyle);
+		}
+		$strAttributes = $this->GetAttributes();
+		
+		// Store the Output Buffer locally
+		$strAlreadyRendered = ob_get_contents();
+		ob_clean();
+
+		// Evaluate the template
+		require('asset_edit_control.inc.php');
+		$strTemplateEvaluated = ob_get_contents();
+		ob_clean();
+
+		// Restore the output buffer and return evaluated template
+		print($strAlreadyRendered);
+		
+		$strToReturn =  sprintf('<span id="%s" %s%s>%s</span>',
+		$this->strControlId,
+		$strStyle,
+		$strAttributes,
+		$strTemplateEvaluated);
+		
+		return $strToReturn;
+	}
+	
+	// Generate tab indexes
+	protected $intNextTabIndex = 1;
+	protected function getNextTabIndex() {
+		return ++$this->intNextTabIndex;
+	}
+	
+	// Create all Custom Asset Fields
+	protected function customFields_Create() {
+		
+		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
+		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
+		
+		// Create the Custom Field Controls - labels and inputs (text or list) for each
+		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this, true, true);
+		
+		foreach ($this->arrCustomFields as $objCustomField) {
+			$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
+		}
+			
+		
+	}
+	
+	// Create the Asset Code text input
+	protected function txtAssetCode_Create() {
+		$this->txtAssetCode = new QTextBox($this);
+		$this->txtAssetCode->Name = 'Asset Code';
+		$this->txtAssetCode->Required = true;
+		$this->txtAssetCode->CausesValidation = true;
+		$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
+   	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+   	$this->txtAssetCode->TabIndex=2;
+   	$this->intNextTabIndex++;
+	}
+	
+	// Create and Setup lstAssetModel
+	protected function lstAssetModel_Create() {
+		$this->lstAssetModel = new QListBox($this);
+		$this->lstAssetModel->Name = 'Asset Model';
+		$this->lstAssetModel->Required = true;
+		
+		if (!$this->blnEditMode)
+			$this->lstAssetModel->AddItem('- Select One -', null);
+		$objAssetModelArray = AssetModel::LoadAll(QQ::Clause(QQ::OrderBy(QQN::AssetModel()->ShortDescription)));
+		if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
+			$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
+			$this->lstAssetModel->AddItem($objListItem);
+		}
+		$this->lstAssetModel->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstAssetModel_Select'));
+		QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->lstAssetModel->ControlId));
+		$this->lstAssetModel->TabIndex=1;
+   		$this->intNextTabIndex++;
+	}
+	
+	// Create and Setup lstLocation
+	protected function lstLocation_Create() {
+		$this->lstLocation = new QListBox($this);
+		$this->lstLocation->Name = 'Location';
+		$this->lstLocation->Required = true;
+		if (!$this->blnEditMode)
+			$this->lstLocation->AddItem('- Select One -', null);
+		$objLocationArray = Location::LoadAllLocations(true);
+		if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
+			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
+			$this->lstLocation->AddItem($objListItem);
+		}
+		$this->lstLocation->TabIndex=3;
+		$this->intNextTabIndex++;
+	}
+
+	// Create The Header Asset Code label
+	protected function lblHeaderAssetCode_Create() {
+		$this->lblHeaderAssetCode = new QLabel($this);
+	}
+	
+	// Create The Asset Model label (Asset Name)
+	protected function lblAssetModel_Create() {
+		$this->lblAssetModel = new QLabel($this);
+	  $this->lblAssetModel->Name = 'Asset Model';
+	}
+	
+	// Create the Location label
+	protected function lblLocation_Create() {
+		$this->lblLocation = new QLabel($this);
+		$this->lblLocation->Name = 'Location';
+	}
+	
+	// Create the Asset Model Code label (Part Number)
+	protected function lblAssetModelCode_Create() {
+		// It is better to use late-binding here because we are only getting one record
+		$this->lblAssetModelCode = new QLabel($this);
+		$this->lblAssetModelCode->Name = 'Part Number';		
+	}
+	
+	// Create the Manufacturer Label
+	protected function lblManufacturer_Create() {
+		$this->lblManufacturer = new QLabel($this);
+		$this->lblManufacturer->Name = 'Manufacturer';
+	}
+	
+	// Create the Category Label
+	protected function lblCategory_Create() {
+		$this->lblCategory = new QLabel($this);
+		$this->lblCategory->Name = 'Category';
+	}
+	
+	// Create the Reserved By Label
+	protected function lblReservedBy_Create() {
+		$this->lblReservedBy = new QLabel($this);
+		$this->lblReservedBy->Name = 'Reserved By';
+		if ($this->objAsset->ReservedFlag) {
+			$objUserAccount = $this->objAsset->GetLastTransactionUser();
+			$this->lblReservedBy->Text = $objUserAccount->__toString();
+			$this->lblReservedBy->Visible = true;
+		}
+		else {
+			$this->lblReservedBy->Visible = false;
+		}
+	}
+	
+	// Create the Asset Code label
+	protected function lblAssetCode_Create() {
+		$this->lblAssetCode = new QLabel($this);
+		$this->lblAssetCode->Name = 'Asset Code';
+	}
+	
+	// Create the Creation Date Label
+	protected function lblCreationDate_Create() {
+		$this->lblCreationDate = new QLabel($this);
+		$this->lblCreationDate->Name = 'Date Created';
+		if ($this->blnEditMode) {
+			$this->lblCreationDate->Text = $this->objAsset->CreationDate->PHPDate('Y-m-d H:i:s') . ' by ' . $this->objAsset->CreatedByObject->__toStringFullName();
+		}
+		else {
+			$this->lblCreationDate->Visible = false;
+		}
+	}
+	
+	// Create the Modified Date Label
+	protected function lblModifiedDate_Create() {
+		$this->lblModifiedDate = new QLabel($this);
+		$this->lblModifiedDate->Name = 'Last Modified';
+		if (!$this->blnEditMode) {
+			$this->lblModifiedDate->Visible = false;
+		}
+	}
+
+	// Setup Delete Button
+	// This still doesn't delete CustomAssetFieldValues for text selections
+	protected function btnDelete_Create() {
+		$this->btnDelete = new QButton($this);
+		$this->btnDelete->Text = 'Delete';
+		$this->btnDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you SURE you want to DELETE this Asset?'));
+		$this->btnDelete->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnDelete_Click'));
+		$this->btnDelete->AddAction(new QEnterKeyEvent(), new QConfirmAction('Are you SURE you want to DELETE this Asset?'));
+		$this->btnDelete->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnDelete_Click'));
+		$this->btnDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnDelete->CausesValidation = false;
+		if (!$this->blnEditMode) {
+			$this->btnDelete->Display = false;
+		}
+		QApplication::AuthorizeControl($this->objAsset, $this->btnDelete, 3);
+	}
+  
+  // Setup Save Button
+	protected function btnSave_Create() {
+		$this->btnSave = new QButton($this);
+		$this->btnSave->Text = 'Save';
+		$this->btnSave->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
+		$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
+		$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnSave->CausesValidation = true;
+		QApplication::AuthorizeControl($this->objAsset, $this->btnSave, 2);
+		$this->btnSave->TabIndex=$this->GetNextTabIndex();
+	}
+	
+	// Setup Cancel Button
+	protected function btnCancel_Create() {
+		$this->btnCancel = new QButton($this);
+		$this->btnCancel->Text = 'Cancel';
+		$this->btnCancel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnCancel_Click'));
+		$this->btnCancel->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnCancel_Click'));
+		$this->btnCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnCancel->CausesValidation = false;
+	}		
+	
+	// Setup Edit Button
+	protected function btnEdit_Create() {
+	  $this->btnEdit = new QButton($this);
+    $this->btnEdit->Text = 'Edit';
+    $this->btnEdit->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnEdit_Click'));
+    $this->btnEdit->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnEdit_Click'));
+    $this->btnEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+    $this->btnEdit->CausesValidation = false;
+    QApplication::AuthorizeControl($this->objAsset, $this->btnEdit, 2);
+	}
+	
+	// Setup Clone Button
+	protected function btnClone_Create() {
+		$this->btnClone = new QButton($this);
+		$this->btnClone->Text = 'Clone';
+		$this->btnClone->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnClone_Click'));
+		$this->btnClone->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnClone_Click'));
+		$this->btnClone->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnClone->CausesValidation = false;
+		QApplication::AuthorizeControl($this->objAsset, $this->btnClone, 2);
+	}
+	
+	// Setup Move Button
+	protected function btnMove_Create() {
+		$this->btnMove = new QButton($this);
+		$this->btnMove->Text = 'Move';
+		$this->btnMove->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnMove_Click'));
+		$this->btnMove->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnMove_Click'));
+		$this->btnMove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnMove->CausesValidation = false;
+		QApplication::AuthorizeControl($this->objAsset, $this->btnMove, 2);
+	}
+	
+	// Setup Checkout Button
+	protected function btnCheckOut_Create() {
+		$this->btnCheckOut = new QButton($this);
+		$this->btnCheckOut->Text = 'Check Out';
+		$this->btnCheckOut->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnCheckOut_Click'));
+		$this->btnCheckOut->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnCheckOut_Click'));
+		$this->btnCheckOut->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnCheckOut->CausesValidation = false;
+		// If the asset is already checked out, you cannot check it out, so the check out button is not displayed
+		if ($this->objAsset->CheckedOutFlag) {
+			$this->btnCheckOut->Display = false;
+		}
+		QApplication::AuthorizeControl($this->objAsset, $this->btnCheckOut, 2);
+	}
+	
+	// Setup Check In Button
+	protected function btnCheckIn_Create() {
+		$this->btnCheckIn = new QButton($this);
+		$this->btnCheckIn->Text = 'Check In';
+		$this->btnCheckIn->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnCheckIn_Click'));
+		$this->btnCheckIn->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnCheckIn_Click'));
+		$this->btnCheckIn->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnCheckIn->CausesValidation = false;
+		// If the asset is not checked out, you cannot check it in, so the check in button is not displayed
+		// You can only check it in if you are the one that checked it out
+		if (!$this->objAsset->CheckedOutFlag) {
+			$this->btnCheckIn->Display = false;
+		}
+		QApplication::AuthorizeControl($this->objAsset, $this->btnCheckIn, 2);
+	}
+	
+	// Setup Reserve Button
+	protected function btnReserve_Create() {
+		$this->btnReserve = new QButton($this);
+		$this->btnReserve->Text = 'Reserve';
+		$this->btnReserve->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnReserve_Click'));
+		$this->btnReserve->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnReserve_Click'));
+		$this->btnReserve->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnReserve->CausesValidation = false;
+		// If the asset is reserved already, you cannot reserve it, so the reserve button is not displayed.
+		if ($this->objAsset->ReservedFlag) {
+			$this->btnReserve->Display = false;
+		}
+		QApplication::AuthorizeControl($this->objAsset, $this->btnReserve, 2);
+	}
+	
+	// Setup Reserve Button
+	protected function btnUnreserve_Create() {
+		$this->btnUnreserve = new QButton($this);
+		$this->btnUnreserve->Text = 'Unreserve';
+		$this->btnUnreserve->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnUnreserve_Click'));
+		$this->btnUnreserve->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnUnreserve_Click'));
+		$this->btnUnreserve->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnUnreserve->CausesValidation = false;
+		// If the asset is not reserved, you cannot unreserve it, so the Unreserve button is not displayed
+		// You can only unreserve it if you are the one that resrved it
+		if (!$this->objAsset->ReservedFlag) {
+			$this->btnUnreserve->Display = false;
+		}
+		QApplication::AuthorizeControl($this->objAsset, $this->btnUnreserve, 2);
+	}
+	
+	// Setup Ship Button
+	protected function btnShip_Create() {
+		$this->btnShip = new QButton($this);
+		$this->btnShip->Text = 'Ship';
+		$this->btnShip->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnShip_Click'));
+		$this->btnShip->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnShip_Click'));
+		$this->btnShip->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnShip->CausesValidation = false;
+		// Do not display the button if the asset is Shipped or To Be Received
+		if ($this->objAsset->LocationId == 2 || $this->objAsset->LocationId == 5) {
+			$this->btnShip->Display = false;
+		}
+		QApplication::AuthorizeControl($this->objAsset, $this->btnShip, 2);
+	}
+	
+	// Setup Receive Button
+	protected function btnReceive_Create() {
+		$this->btnReceive = new QButton($this);
+		$this->btnReceive->Text = 'Receive';
+		$this->btnReceive->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnReceive_Click'));
+		$this->btnReceive->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnReceive_Click'));
+		$this->btnReceive->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnReceive->CausesValidation = false;
+		// Asset must be Shipped or To Be Received to display the Receive Button
+		if ($this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5) {
+			$this->btnReceive->Display = false;
+		}
+		QApplication::AuthorizeControl($this->objAsset, $this->btnReceive, 2);
+	}
+	
+	protected function dtgAssetTransaction_Create() {
+		$this->dtgAssetTransaction = new QDataGrid($this);
+		$this->dtgAssetTransaction->Name = 'Transactions';
+		$this->dtgAssetTransaction->CellPadding = 5;
+		$this->dtgAssetTransaction->CellSpacing = 0;
+		$this->dtgAssetTransaction->CssClass = "datagrid";
+		
+    // Enable AJAX - this won't work while using the DB profiler
+    $this->dtgAssetTransaction->UseAjax = false;
+
+    // Enable Pagination, and set to 20 items per page
+    $objPaginator = new QPaginator($this->dtgAssetTransaction);
+    $this->dtgAssetTransaction->Paginator = $objPaginator;
+    $this->dtgAssetTransaction->ItemsPerPage = 20;
+    
+    $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('Transaction Type', '<?= $_ITEM->Transaction->__toStringWithLink() ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Transaction->TransactionType->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Transaction->TransactionType->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('From', '<?= $_ITEM->__toStringSourceLocation() ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->SourceLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->SourceLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
+    $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('To', '<?= $_ITEM->__toStringDestinationLocation() ?>', array('OrderByClause' => QQ::Orderby(QQN::AssetTransaction()->DestinationLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->DestinationLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
+    $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('User', '<?= $_ITEM->Transaction->CreatedByObject->__toStringFullName() ?>', array('CssClass' => "dtg_column")));
+    $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('Date', '<?= $_ITEM->Transaction->CreationDate->PHPDate("Y-m-d H:i:s"); ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false), 'CssClass' => "dtg_column")));
+
+    $this->dtgAssetTransaction->SortColumnIndex = 4;
+    $this->dtgAssetTransaction->SortDirection = 1;
+    
+    $objStyle = $this->dtgAssetTransaction->RowStyle;
+    $objStyle->ForeColor = '#000000';
+    $objStyle->BackColor = '#FFFFFF';
+    $objStyle->FontSize = 12;
+
+    $objStyle = $this->dtgAssetTransaction->AlternateRowStyle;
+    $objStyle->BackColor = '#EFEFEF';
+
+    $objStyle = $this->dtgAssetTransaction->HeaderRowStyle;
+    $objStyle->ForeColor = '#000000';
+    $objStyle->BackColor = '#EFEFEF';
+    $objStyle->CssClass = 'dtg_header';		
+	}
+	
+	// Asset Model List Selection Action
+	// Display the AssetModelCode for the given AssetModel once it is chosen
+	public function lstAssetModel_Select($strFormId, $strControlId, $strParameter) {
+		$objAssetModel = AssetModel::Load($this->lstAssetModel->SelectedValue);
+		if ($objAssetModel) {
+			if ($objAssetModel->AssetModelCode) {
+				$this->lblAssetModelCode->Text = $objAssetModel->AssetModelCode;
+			}
+			else {
+				$this->lblAssetModelCode->Text = 'None';
+			}
+			if ($objAssetModel->Manufacturer) {
+				$this->lblManufacturer->Text = $objAssetModel->Manufacturer->ShortDescription;
+			}
+			else {
+				$this->lblManufactuerer->Text = 'None';
+			}
+			if ($objAssetModel->Category) {
+				$this->lblCategory->Text = $objAssetModel->Category->ShortDescription;
+			}
+		}
+	}
+	
+	// Edit Button Click
+	public function btnEdit_Click($strFormId, $strControlId, $strParameter) {
+
+		// Hide labels and display inputs where appropriate
+		$this->displayInputs();
+		
+		// Deactivate the transaction buttons
+		$this->disableTransactionButtons();
+	}
+	
+	// Save Button Click Actions
+	public function btnSave_Click($strFormId, $strControlId, $strParameter) {
+		
+		try {
+			// Get an instance of the database
+			$objDatabase = QApplication::$Database[1];
+			// Begin a MySQL Transaction to be either committed or rolled back
+			$objDatabase->TransactionBegin();
+			
+			// This happens whether or not they are creating a new one or editing an existing one
+			$this->objAsset->AssetCode = $this->txtAssetCode->Text;
+	
+			// If a new asset is being created
+			if (!$this->blnEditMode) {
+				
+				$blnError = false;
+				
+				// Check to see if the asset code already exists
+				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
+				if ($AssetDuplicate) {
+					$blnError = true;
+					$this->txtAssetCode->Warning = "That asset code is already in use. Please try another.";
+				}
+				
+				if (!$blnError) {
+				
+					// AssetModel can only be selected for new Assets
+					$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
+					
+					// Location can only be decided when creating an asset. Otherwise they must conduct a transaction.
+					$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
+		
+					// Object should be saved only if it is new, to obtain the proper AssetId to add to the custom field tables
+					$this->objAsset->Save();
+				}
+			}
+			
+			// Assign input values to custom fields
+			if ($this->arrCustomFields) {
+				
+				// Save the values from all of the custom field controls to save the asset
+				CustomField::SaveControls($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objAsset->AssetId, 1);
+			}
+			
+			if ($this->blnEditMode) {
+				
+				// Update the values of all fields for an Ajax reload
+				$this->UpdateAssetFields();
+				
+				// If asset is not new, it must be saved after updating the assetfields
+				$this->objAsset->Save();
+				
+				// This is called to retrieve the new Modified Date and User
+				$this->objParentObject->SetupAsset($this);
+	
+				// Give the labels their appropriate values before display
+				$this->UpdateAssetLabels();
+				
+				// This was necessary because it was not saving the changes of a second edit/save in a row
+				// Reload all custom fields
+				$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
+				// Hide inputs and display labels
+				$this->displayLabels();
+				// Enable the appropriate transaction buttons
+				$this->EnableTransactionButtons();
+				
+			}
+			elseif (!$blnError) {
+				
+				// Commit the above transactions to the database
+				$objDatabase->TransactionCommit();
+				
+				// Reload the edit asset page with the newly created asset
+				$strRedirect = "asset_edit.php?intAssetId=" . $this->objAsset->AssetId;
+				QApplication::Redirect($strRedirect);
+			}
+			
+			// Commit the above transactions to the database
+			$objDatabase->TransactionCommit();
+		}
+		catch (QOptimisticLockingException $objExc) {
+			
+			// Rollback the database
+			$objDatabase->TransactionRollback();
+			
+			// Output the error
+			$this->btnCancel->Warning = sprintf('This asset has been updated by another user. You must <a href="asset_edit.php?intAssetId=%s">Refresh</a> to edit this Asset.', $this->objAsset->AssetId);
+		}
+	}
+
+	// Cancel Button Click Actions
+	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
+		if ($this->blnEditMode) {
+			$this->displayLabels();
+			$this->EnableTransactionButtons();
+			$this->UpdateAssetControls();
+		}
+		else {
+			QApplication::Redirect('asset_list.php');
+		}
+	}
+	
+	// Clone Button Click Actions
+	public function btnClone_Click($strFormId, $strControlId, $strParameter) {
+		// Creating a new asset
+		$this->blnEditMode = false;
+		// Instantiate new Asset object
+		$this->objAsset = new Asset();
+		// Load custom fields for asset with values from original asset
+		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
+		// Set the asset_code to null because they are unique
+		$this->lblHeaderAssetCode->Text = 'New Asset';
+		$this->txtAssetCode->Text = '';
+		// Set the creation and modification fields to null because it hasn't been created or modified yet.
+		$this->lblModifiedDate->Text = '';
+		$this->lblCreationDate->Text = '';
+		// Show the inputs so the user can change any information and add the asset code
+		$this->displayInputs();
+	}
+	
+	// Delete Button Click Actions
+	public function btnDelete_Click($strFormId, $strControlId, $strParameter) {
+
+		// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
+		// The values do not get deleted for select values
+		CustomField::DeleteTextValues($this->objAsset->objCustomFieldArray);
+
+		$this->objAsset->Delete();
+
+		QApplication::Redirect('asset_list.php');
+	}
+	
+	// Move Button Click Actions
+	public function btnMove_Click($strFormId, $strControlId, $strParameter) {
+		$this->objParentObject->DisplayEdit(false);
+		// 1 is the transaction_type_id for the move transaction
+		$this->objParentObject->DisplayTransaction(true, 1);
+	}
+	
+	// Check In Button Click Actions
+	public function btnCheckIn_Click($strFormId, $strControlId, $strParameter) {
+		$this->objParentObject->DisplayEdit(false);
+		// 2 is the transaction_type_id for the check in transaction
+		$this->objParentObject->DisplayTransaction(true, 2);
+	}	
+	
+	// Check Out Button Click Actions
+	public function btnCheckOut_Click($strFormId, $strControlId, $strParameter) {
+		$this->objParentObject->DisplayEdit(false);
+		// 3 is the transaction_type_id for the check out transaction
+		$this->objParentObject->DisplayTransaction(true, 3);
+	}
+	
+	// Reserve Button Click Actions
+	public function btnReserve_Click($strFormId, $strControlId, $strParameter) {
+		$this->objParentObject->DisplayEdit(false);
+		// 8 is the thransaction_type_id for the reserve transaction
+		$this->objParentObject->DisplayTransaction(true, 8);
+	}
+	
+	// Unreserve Button Click Actions
+	public function btnUnreserve_Click($strFormId, $strControlId, $strParameter) {
+		$this->objParentObject->DisplayEdit(false);
+		// 9 is the thransaction_type_id for the unreserve transaction
+		$this->objParentObject->DisplayTransaction(true, 9);
+	}
+	
+	// Ship Button Click Actions
+	public function btnShip_Click($strFormId, $strControlId, $strParameter) {
+		QApplication::Redirect(sprintf('../shipping/shipment_edit.php?intAssetId=%s', $this->objAsset->AssetId));
+	}
+	
+	// Receive Button Click Actions
+	public function btnReceive_Click($strFormId, $strControlId, $strParameter) {
+		QApplication::Redirect(sprintf('../receiving/receipt_edit.php?intAssetId=%s', $this->objAsset->AssetId));
+	}
+	
+	// Display the labels and buttons for Asset Viewing mode
+	public function displayLabels() {
+
+		// Do not display inputs
+		$this->lstAssetModel->Display = false;
+		$this->lstLocation->Display = false;
+		$this->txtAssetCode->Display = false;
+		
+		// Do not display Cancel and Save buttons
+		$this->btnCancel->Display = false;
+		$this->btnSave->Display = false;		
+		
+		// Display Labels for Viewing mode
+		$this->lblAssetModelCode->Display = true;
+		$this->lblLocation->Display = true;
+		$this->lblAssetCode->Display = true;
+
+		// Display Edit and Delete buttons
+		$this->btnEdit->Display = true;
+		$this->btnDelete->Display = true;
+		$this->btnClone->Display = true;
+		
+		// Display custom field labels
+		if ($this->arrCustomFields) {
+			CustomField::DisplayLabels($this->arrCustomFields);
+		}
+	}
+		
+	// Display the inputs and buttons for Edit or Create mode
+	public function displayInputs() {
+		
+		// Do not display labels
+    
+    $this->lblAssetCode->Display = false;
+    // Only display the Asset Model list if creating a new asset
+    // Only display location list if creating a new asset
+    if (!$this->blnEditMode) {
+   		$this->lblAssetModelCode->Display = false;      	
+   		$this->lstAssetModel->Display = true;
+   		$this->lblLocation->Display = false;
+   		$this->lstLocation->Display = true;
+    }
+    else {
+      $this->lblAssetModelCode->Display = true;
+    	$this->lstAssetModel->Display = false;
+   		$this->lblLocation->Display = true;
+   		$this->lstLocation->Display = false;
+    }
+    
+    // Always display the label, never input, because it is associated with the AssetModelId
+    $this->lblAssetModelCode->Display = true;
+    
+    // Do not display Edit and Delete buttons
+    $this->btnEdit->Display = false;
+    $this->btnDelete->Display = false;
+    $this->btnClone->Display = false;
+    
+    // Display Asset Code input for edit mode
+		$this->txtAssetCode->Display = true;      
+		
+    // Display Cancel and Save butons    
+    $this->btnCancel->Display = true;
+    $this->btnSave->Display = true;
+    
+    // Display custom field inputs
+    if ($this->arrCustomFields) {
+    	CustomField::DisplayInputs($this->arrCustomFields);
+    } 
+	}
+	
+	// Disable all transaction buttons while editing
+	public function DisableTransactionButtons() {
+		if ($this->blnEditMode) {
+			$this->btnMove->Enabled = false;
+			$this->btnCheckIn->Enabled = false;
+			$this->btnCheckOut->Enabled = false;
+			$this->btnReserve->Enabled = false;
+			$this->btnUnreserve->Enabled = false;
+			$this->btnShip->Enabled = false;
+			$this->btnReceive->Enabled = false;
+		}
+	}
+	
+	// Enable the transaction buttons where appropriate, depending on the status of the asset
+	public function EnableTransactionButtons() {
+		if ($this->blnEditMode) {
+			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+				$this->btnMove->Enabled = true;
+			}
+			else {
+				$this->btnMove->Enabled = false;
+			}
+			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+				$this->btnCheckIn->Enabled = true;
+				$this->btnCheckOut->Enabled = true;
+			}
+			elseif ($this->objAsset->CheckedOutFlag) {
+				$objUserAccount = $this->objAsset->GetLastTransactionUser();
+				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
+					$this->btnCheckIn->Enabled = true;
+					$this->btnCheckOut->Enabled = true;
+				}
+				else {
+					$this->btnCheckIn->Enabled = false;
+					$this->btnCheckOut->Enabled = false;
+				}
+			}
+			else {
+				$this->btnCheckIn->Enabled = false;
+				$this->btnCheckOut->Enabled = false;
+			}
+			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+				$this->btnUnreserve->Enabled = true;
+				$this->btnReserve->Enabled = true;
+			}
+			elseif ($this->objAsset->ReservedFlag) {
+				$objUserAccount = $this->objAsset->GetLastTransactionUser();
+				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
+					$this->btnUnreserve->Enabled = true;
+					$this->btnReserve->Enabled = true;
+				}
+				else {
+					$this->btnUnreserve->Enabled = false;
+					$this->btnReserve->Enabled = false;
+				}
+			}			
+			else {
+				$this->btnUnreserve->Enabled = false;
+				$this->btnReserve->Enabled = false;
+			}
+			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+				$this->btnShip->Enabled = true;
+				$this->btnReceive->Enabled = true;
+			}
+			else {
+				$this->btnShip->Enabled = false;
+				$this->btnReceive->Enabled = false;
+			}
+		}
+	}
+		
+	// Update the Asset labels with the values from the asset inputs
+	public function UpdateAssetLabels() {
+
+		if ($this->objAsset->AssetModelId) {
+			$this->lblAssetModel->Text = $this->objAsset->AssetModel->__toString();
+			$this->lblAssetModelCode->Text = $this->objAsset->AssetModel->AssetModelCode;
+			if ($this->objAsset->AssetModel->CategoryId) {
+				$this->lblCategory->Text = $this->objAsset->AssetModel->Category->__toString();
+			}
+			if ($this->objAsset->AssetModel->ManufacturerId) {
+				$this->lblManufacturer->Text = $this->objAsset->AssetModel->Manufacturer->__toString();
+			}
+		}
+		if ($this->objAsset->LocationId) {
+			$this->lblLocation->Text = $this->objAsset->Location->__toString();
+		}
+		$this->lblAssetCode->Text = $this->objAsset->AssetCode;
+		$this->lblHeaderAssetCode->Text = $this->objAsset->AssetCode;
+		if ($this->objAsset->ModifiedDate) {
+			$this->lblModifiedDate->Text = $this->objAsset->ModifiedDate . ' by ' . $this->objAsset->ModifiedByObject->__toStringFullName();
+		}
+		
+		// Update custom labels
+		if ($this->arrCustomFields) {
+			CustomField::UpdateLabels($this->arrCustomFields);
+		}							
+	}
+	
+	// Protected Update Methods
+	protected function UpdateAssetFields() {
+		$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
+		$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
+		$this->objAsset->AssetCode = $this->txtAssetCode->Text;
+	}
+	
+	// Assign the original values to all Asset Controls
+	protected function UpdateAssetControls() {
+		
+		$this->lstAssetModel->SelectedValue = $this->objAsset->AssetModelId;
+		$this->lstLocation->SelectedValue = $this->objAsset->LocationId;
+		$this->txtAssetCode->Text = $this->objAsset->AssetCode;
+		$this->arrCustomFields = CustomField::UpdateControls($this->objAsset->objCustomFieldArray, $this->arrCustomFields);
+	}
+
+  // And our public getter/setters
+  public function __get($strName) {
+	  switch ($strName) {
+	  	case "objAsset": return $this->objAsset;
+	  		break;
+	  	case "blnEditMode": return $this->blnEditMode;
+	  		break;
+	  	case "dtgAssetTransaction": return $this->dtgAssetTransaction;
+	  		break;
+      default:
+        try {
+            return parent::__get($strName);
+        } catch (QCallerException $objExc) {
+            $objExc->IncrementOffset();
+            throw $objExc;
+        }
+	  }
+  }
+  
+	/////////////////////////
+	// Public Properties: SET
+	/////////////////////////
+	public function __set($strName, $mixValue) {
+		$this->blnModified = true;
+
+		switch ($strName) {
+	    case "objAsset": $this->objAsset = $mixValue;
+	    	break;
+	    case "blnEditMode": $this->blnEditMode = $mixValue;
+	    	break;
+	    case "strTitleVerb": $this->strTitleVerb = $mixValue;
+	    	break;
+	    case "dtgAssetTransaction": $this->dtgAssetTransaction = $mixValue;
+	    	break;
+			default:
+				try {
+					parent::__set($strName, $mixValue);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+				break;
+		}
+	}  
+}
+
+?>

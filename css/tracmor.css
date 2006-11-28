@@ -1,0 +1,87 @@
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ *
+ * This file is part of Tracmor.  
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version. 
+ *	
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+		
+TH, TD, BODY { font: 10px verdana; text-align: left; }
+.title { font: 14px verdana; color:darkblue; font-weight: bold; margin-left: -2px;}			
+.title_action { font: 12px verdana; font-weight: bold; margin-bottom: -4px; }
+.warning { color: #ff0000; }
+.instructions { font: 9px verdana; font-style: italic; }
+.item_divider { line-height: 16px; }
+.item_label { font: 12px verdana; padding-bottom: 4px; vertical-align: top; }
+.item_label_disabled { font: 12px verdana; padding-bottom: 4px; color: #999999; vertical-align: top; }
+.scrollBox { height:48px; overflow:auto; border: 1px solid #AAAAAA; background-color: #DDDDDD; }
+
+.button { font: 10px verdana; font-weight: bold; }
+.listbox { font: 12px verdana; width: 250px; border: 1px solid #999999; }
+.textbox { font: 12px verdana; width: 250px; border: 1px solid #999999; }
+.bluelink { color:blue; }
+.graylink { color:#555555; text-decoration:none; }
+.greentext { color:green; }
+.redtext { color:red; }
+.spinner { vertical-align: middle; position:absolute; }
+
+.paginator_inactive_step { font-weight: bold; color: #aaaaaa; }
+.paginator_active_step { font-weight: bold; color: #000000; text-decoration: none; }
+.paginator_page { text-decoration: none; color: #000000; padding: 0px 3px 0px 3px; }
+.paginator_selected_page { font-weight: bold; background-color: #ffba00; padding: 0px 3px 0px 3px; border: 1px; border-style: solid; }
+			
+.dtg_column { border-bottom: 1px solid #CCCCCC; }
+
+.dtg_header { 
+	font-weight:bold;
+	background-color:#FFFFFF;
+	border-top: 1px solid #CCCCCC; 
+	border-bottom: 1px solid #a2b6ff; 
+	background-image: url(../images/listing_header_bg.png);
+	background-repeat: repeat-x;
+	background-position: bottom;
+}
+.datagrid { width:99%;border:1px solid #CCCCCC; }
+.record_header {
+	font-weight:bold;
+	background-color:#FFFFFF;
+	background-image: url(../images/record_header_bg.png);
+	background-repeat: repeat-x;
+	background-position: bottom;
+}
+.record_field_value { font-size:12px;border:1px solid #000000;background-color:#EEEEEE;width:280px;padding:3px;empty-cells:show;vertical-align:top; }
+.record_field_name { color:#615c5c; font-size:12px; width:120px;text-align:right;padding-right:5;vertical-align:top;white-space:nowrap; }
+.record_field_edit { font-size:12px;width:280px;padding:3px;vertical-align:top; }
+.record_field_spacer { width: 75px;}
+
+.role_table_header { background-color:#DDDDDD;font-weight:bold;font-size:11px;font-family:verdana;width:80px;text-align:center;empty-cells:show; }
+.role_table_left { background-color:#DDDDDD;font-weight:bold;font-size:11px;font-family:verdana;width:80px;text-align:right; }
+.role_table_cell { background-color:#EEEEEE;width:80px; }
+
+.packing_slip_field { font-size:12px;font-weight:bold;font-family:verdana;width:150px;vertical-align:top }
+.packing_slip_value { font-size:12px;font-family:verdana;width:150px;white-space:nowrap; }
+.current_tab_left {	width:12px;	background-image: url(../images/currentTab_left2.gif); background-repeat:no-repeat; }
+.current_tab_middle { background-image: url(../images/currentTab_middle2.gif); background-repeat:repeat-x; text-align: center; }
+.current_tab_right { width:12px; background-image: url(../images/currentTab_right2.gif); background-repeat:no-repeat; }
+.current_tab_label { font-family:arial;	font-size:14px; font-weight:bold;	text-decoration:none; color:#111111; }
+.other_tab_label { font-family:arial; font-size:14px;	font-weight:bold; text-decoration:none;	color:#777777; }
+.current_tab_label:hover { color: #444444; }
+.other_tab_label:hover { color: #444444; }
+.empty_tab_space { background-image: url(../images/emptyTabSpace.gif); }
+.other_tab_left { width:12px; background-image: url(../images/otherTab_left2.gif); background-repeat:no-repeat; }
+.other_tab_middle {	background-image: url(../images/otherTab_middle2.gif); background-repeat:repeat-x; text-align:center; }
+.other_tab_right { width:12px; background-image: url(../images/otherTab_right2.gif); background-repeat:no-repeat; }
+
+.disclaimer { font-size:10px;font-family:arial; }
