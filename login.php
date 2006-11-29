@@ -1,5 +1,5 @@
 <?php
-/*
+  /*
 	 * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
 	 *
 	 * This file is part of Tracmor.  
@@ -18,9 +18,7 @@
 	 * along with Tracmor; if not, write to the Free Software
 	 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	 */
-?>
 
-<?php
 	require_once('./includes/prepend.inc.php');
 	
 	class LoginForm extends QForm {
