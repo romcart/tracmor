@@ -18,9 +18,7 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-?>
-
-<?php
+ 
 	// Include prepend.inc to load Qcodo
 	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
 	// require('prepend.inc');				/* if you DO have "includes/" in your include_path */
