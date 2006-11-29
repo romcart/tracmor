@@ -18,9 +18,7 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-?>
 
-<?php	
 	require_once('prepend.inc');
 	$curModule = "home";
 	require_once('../includes/header_main.inc');
