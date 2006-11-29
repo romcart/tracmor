@@ -18,9 +18,7 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-?>
 
-<?php
 		$arrCompanyFields[] = array('name' => 'Name:',  'value' => $this->txtCompanyShortDescription->RenderWithError(false));
 		$arrCompanyFields[] = array('name' => 'Description:',  'value' => $this->txtCompanyLongDescription->RenderWithError(false));		
 		$arrCompanyFields[] = array('name' => 'Website:',  'value' => $this->txtCompanyWebsite->RenderWithError(false));
