@@ -18,9 +18,7 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-?>
 
-<?php
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(2);
 	require_once(__FORMBASE_CLASSES__ . '/AssetModelListFormBase.class.php');
