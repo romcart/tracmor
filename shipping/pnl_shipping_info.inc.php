@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,9 +18,7 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-?>
-
-<?php
+ 
 	// Build array of all fields to display
 	$arrShipmentFields[] = array('name' => 'Shipment Number:',  'value' => $this->lblShipmentNumber->Render(false));
 	$arrShipmentFields[] = array('name' => 'Ship Date:', 'value' => $this->calShipDate->RenderWithError(false) . $this->lblShipDate->Render(false));
@@ -42,7 +40,27 @@
 <table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
 	<tr>
 		<td class="record_header">
-			<?php 
+			<?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  
 				$this->btnEdit->Render();
 				$this->btnSave->RenderWithError();
 				echo('&nbsp;');
@@ -57,6 +75,26 @@
 					<td style="vertical-align:top;">
 						<table cellpadding="0" cellspacing="0">
 						<?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+ 
 							for ($i=0;$i<ceil(count($arrShipmentFields)/2);$i++) {
 								echo('<tr>');
 								echo('<td class="record_field_name">'. $arrShipmentFields[$i]['name'] .'&nbsp;</td>');
@@ -69,6 +107,26 @@
 					<td style="vertical-align:top;">
 						<table cellpadding="0" cellspacing="0">
 						<?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+ 
 							for ($i=ceil(count($arrShipmentFields)/2);$i<count($arrShipmentFields);$i++) {
 								echo('<tr>');
 								echo('<td class="record_field_name">'. $arrShipmentFields[$i]['name'] .'&nbsp;</td>');
@@ -87,27 +145,207 @@
 <div class="title">Assets to Ship</div>
 <table>
 	<tr>
-		<td><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
-		<td><?php $this->btnAddAsset->Render(); ?></td>
+		<td><?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->txtNewAssetCode->RenderDesigned(); ?></td>
+		<td><?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->btnAddAsset->Render(); ?></td>
 	</tr>
 </table>
-<?php $this->dtgAssetTransact->Render(); ?>
+<?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->dtgAssetTransact->Render(); ?>
 <br class="item_divider" />
 	
 <div class="title">Inventory to Ship</div>	
 <table>
 	<tr>
-		<td><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
-		<td><?php $this->btnLookup->Render(); ?></td>
+		<td><?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
+		<td><?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->btnLookup->Render(); ?></td>
 	</tr>
 	<tr>
-		<td><?php $this->lstSourceLocation->RenderDesigned(); ?></td>
+		<td><?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->lstSourceLocation->RenderDesigned(); ?></td>
 		<td></td>
 	</tr>
 	<tr>
-		<td><?php $this->txtQuantity->RenderDesigned(); ?></td>
-		<td><?php $this->btnAddInventory->Render(); ?></td>
+		<td><?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->txtQuantity->RenderDesigned(); ?></td>
+		<td><?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->btnAddInventory->Render(); ?></td>
 	</tr>
 </table>	
-<?php $this->dtgInventoryTransact->Render(); ?>
+<?php
+/*
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ *
+ * This file is part of Tracmor.
+ *
+ * Tracmor is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Tracmor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Tracmor; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+  $this->dtgInventoryTransact->Render(); ?>
 
