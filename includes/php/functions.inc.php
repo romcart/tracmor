@@ -31,10 +31,10 @@
 	function BooleanImage($blnValue = true) {
 				
 		if ($blnValue) {
-			$strToReturn = sprintf('<img src="%s">', '../images/check.png');
+			$strToReturn = sprintf('<img src="%s">', '../images/icons/check.png');
 		}
 		else {
-			$strToReturn = sprintf('<img src="%s">', '../images/x.png');
+			$strToReturn = sprintf('<img src="%s">', '../images/icons/x.png');
 		}
 		
 		return $strToReturn;
