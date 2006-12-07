@@ -31,7 +31,7 @@ class QInventoryEditComposite extends QControl {
 	
 	// Labels
 	protected $lblShortDescription;
-	protected $lblHeaderInventoryModel;
+	protected $lblHeaderInventoryModelCode;
 	protected $lblInventoryModelCode;
 	protected $lblManufacturer;
 	protected $lblCategory;
@@ -87,7 +87,7 @@ class QInventoryEditComposite extends QControl {
     
     // Create Labels
 		$this->lblShortDescription_Create();
-		$this->lblHeaderInventoryModel_Create();
+		$this->lblHeaderInventoryModelCode_Create();
 		$this->lblCategory_Create();
 		$this->lblManufacturer_Create();
 		$this->lblInventoryModelCode_Create();
@@ -200,8 +200,8 @@ class QInventoryEditComposite extends QControl {
 		$this->lblShortDescription->Name = 'Inventory Model';
 	}
 	
-	protected function lblHeaderInventoryModel_Create() {
-		$this->lblHeaderInventoryModel = new QLabel($this);
+	protected function lblHeaderInventoryModelCode_Create() {
+		$this->lblHeaderInventoryModelCode = new QLabel($this);
 	}
 	
 	// Create Category Label
@@ -737,6 +737,7 @@ class QInventoryEditComposite extends QControl {
 	// Update the Inventory labels with the values from the inventory inputs
 	public function UpdateInventoryLabels() {
 
+		$this->lblHeaderInventoryModelCode->Text = $this->objInventoryModel->InventoryModelCode;
 		$this->lblShortDescription->Text = $this->objInventoryModel->ShortDescription;
 		if ($this->objInventoryModel->CategoryId) {
 			$this->lblCategory->Text = $this->objInventoryModel->Category->__toString();
