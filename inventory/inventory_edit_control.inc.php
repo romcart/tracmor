@@ -43,7 +43,7 @@
 ?>
 
 
-<div class="title">Inventory: <?php $this->lblHeaderInventoryModel->Render(); ?> </div>
+<div class="title">Inventory: <?php $this->lblHeaderInventoryModelCode->Render(); ?> </div>
 <table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
 	<tr>
 		<td class="record_header">
