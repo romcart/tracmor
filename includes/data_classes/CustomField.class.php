@@ -195,8 +195,12 @@
 	 						$arrCustomFields[$i]['input']->TextMode = QTextMode::MultiLine;
 	 					}
 	 					// This is so that the browser doesn't form.submit() when the user presses the enter key on a text input
-	 					if (!$blnSearch && !CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'textarea') {
+	 					if (!$blnSearch && CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) != 'textarea') {
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($objForm, 'btnSave_Click'));
+	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	 					}
+	 					elseif ($blnSearch) {
+	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	      		
