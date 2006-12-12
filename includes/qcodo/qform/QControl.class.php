@@ -74,7 +74,7 @@
 						$this->GetControlHtml(),
 						$this->strHtmlAfter);
 				} else {
-					$strToReturn = sprintf('<span class="%s">%s</span><br/>%s%s%s',
+					$strToReturn = sprintf('<span class="%s">%s</span>%s%s%s',
 						$strClass,
 						$strName,
 						$this->strHtmlBefore,
