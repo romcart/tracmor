@@ -98,7 +98,7 @@
 				foreach ($objCustomFields as $objCustomField) {
 					$strAlias = $objCustomField->CustomFieldId;
 					$arrCustomFieldSql['strSelect'] .= sprintf(', `cfv_%s`.`short_description` AS `%s`', $strAlias, '__' . $strAlias);
-					$arrCustomFieldSql['strFrom'] .= sprintf('\nLEFT JOIN (`custom_field_selection` AS `cfs_%s` JOIN `custom_field_value` AS `cfv_%s` ON `cfv_%s`.`custom_field_id` = %s AND `cfs_%s`.`custom_field_value_id` = `cfv_%s`.`custom_field_value_id` AND `cfs_%s`.`entity_qtype_id` = %s) ON `cfs_%s`.`entity_id` = `asset_id`', $strAlias, $strAlias, $strAlias, $objCustomField->CustomFieldId, $strAlias, $strAlias, $strAlias, $intEntityQtypeId, $strAlias);
+					$arrCustomFieldSql['strFrom'] .= sprintf('LEFT JOIN (`custom_field_selection` AS `cfs_%s` JOIN `custom_field_value` AS `cfv_%s` ON `cfv_%s`.`custom_field_id` = %s AND `cfs_%s`.`custom_field_value_id` = `cfv_%s`.`custom_field_value_id` AND `cfs_%s`.`entity_qtype_id` = %s) ON `cfs_%s`.`entity_id` = `asset_id`', $strAlias, $strAlias, $strAlias, $objCustomField->CustomFieldId, $strAlias, $strAlias, $strAlias, $intEntityQtypeId, $strAlias);
 				}
 			}
 			
