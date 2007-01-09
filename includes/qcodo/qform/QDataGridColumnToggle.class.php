@@ -58,7 +58,7 @@
 			$this->pnlColumnToggleMenu->Display = false;
 			
 			// Render the Column Toggle Menu
-			$strToReturn = $this->pnlColumnToggleMenu->Render(false, 'BorderWidth=1');
+			$strToReturn = $this->pnlColumnToggleMenu->Render(false);
 			
 			return $strToReturn;
 		}
@@ -69,7 +69,9 @@
 			// but does not get rid of the original labels.
 			$this->pnlColumnToggleMenu = new QPanel($this);
 			$this->pnlColumnToggleMenu->Name = 'Toggle Menu';
-			$this->pnlColumnToggleMenu->Width = 130;
+			// The ColumnToggleMenu requires that a width be set, and that it be set in pixels only
+			$this->pnlColumnToggleMenu->Width = '130px';
+			$this->pnlColumnToggleMenu->BorderWidth = '1px';
 			$this->pnlColumnToggleMenu->SetCustomStyle('padding', '2px');
 			$this->pnlColumnToggleMenu->BackColor = 'white';
 			$this->pnlColumnToggleMenu->Template = __INCLUDES__.'/qcodo/qform/pnl_column_toggle.tpl.php';
