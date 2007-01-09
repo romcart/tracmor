@@ -89,18 +89,29 @@
   		$this->dtgAsset->CssClass = "datagrid";
       		
       // Enable AJAX - this won't work while using the DB profiler
-      $this->dtgAsset->UseAjax = true;
+      // $this->dtgAsset->UseAjax = true;
+      
+      // Allow for column toggling
+      $this->dtgAsset->ShowColumnToggle = true;
       
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgAsset);
       $this->dtgAsset->Paginator = $objPaginator;
       $this->dtgAsset->ItemsPerPage = 20;
-          
-      $this->dtgAsset->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'Width=200', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumn('Category', '<?= $_ITEM->AssetModel->Category->__toString() ?>', 'SortByCommand="asset__asset_model_id__category_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__category_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumn('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', 'Width=200', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
+      
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'Width=200', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->AssetModel->Category->__toString() ?>', 'SortByCommand="asset__asset_model_id__category_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__category_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'Width=200', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
+      
+      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
+      if ($objCustomFieldArray) {
+      	foreach ($objCustomFieldArray as $objCustomField) {
+      		$this->dtgAsset->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+      	}
+      }
       
       // Column to originally sort by (defaults to asset_id, which is what we want
       $this->dtgAsset->SortColumnIndex = 1;
@@ -156,7 +167,7 @@
 			$arrCustomFields = $this->arrCustomFields;
 					
 			// Enable Profiling
-      // QApplication::$Database[1]->EnableProfiling();
+      //QApplication::$Database[1]->EnableProfiling();
       
 
       // Expand the Asset object to include the AssetModel, Category, Manufacturer, and Location Objects
@@ -173,13 +184,13 @@
 				$this->dtgAsset->ShowHeader = true;
 			}
 			$this->blnSearch = false;
-    }  	
+    }
   	
-  	// protected function Form_Exit() {
+  	 // protected function Form_Exit() {
   	  // Output database profiling - it shows you the queries made to create this page
   	  // This will not work on pages with the AJAX Pagination
       // QApplication::$Database[1]->OutputProfiling();
-  	// }
+  	 // }
   	
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {

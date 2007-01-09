@@ -78,7 +78,32 @@
 		public function __toStringRequiredFlag() {
 			
 			return BooleanImage($this->RequiredFlag);
-		}		
+		}
+		
+		/**
+		 * Generate the SQL for a lsit page to include custom fields as virtual attributes (add __ before an alias to make a virutal attribute)
+		 * The virtual attributes can then be accessed by $objAsset->GetVirtualAttribute('name_of_attribute') where the name doesn't include the __
+		 * This method was added so that custom fields can be added to the customizable datagrids as hidden columns
+		 *
+		 * @param integer $intEntityQtypeId
+		 * @return array $arrCustomFieldSql - with two elements: strSelect and strFrom which are to be included in a SQL statement
+		 */
+		public static function GenerateSql($intEntityQtypeId) {
+			$arrCustomFieldSql = array();
+			$arrCustomFieldSql['strSelect'] = '';
+			$arrCustomFieldSql['strFrom'] = '';
+			$objCustomFields = CustomField::LoadObjCustomFieldArray($intEntityQtypeId, false);
+			
+			if ($objCustomFields) {
+				foreach ($objCustomFields as $objCustomField) {
+					$strAlias = $objCustomField->CustomFieldId;
+					$arrCustomFieldSql['strSelect'] .= sprintf(', `cfv_%s`.`short_description` AS `%s`', $strAlias, '__' . $strAlias);
+					$arrCustomFieldSql['strFrom'] .= sprintf('\nLEFT JOIN (`custom_field_selection` AS `cfs_%s` JOIN `custom_field_value` AS `cfv_%s` ON `cfv_%s`.`custom_field_id` = %s AND `cfs_%s`.`custom_field_value_id` = `cfv_%s`.`custom_field_value_id` AND `cfs_%s`.`entity_qtype_id` = %s) ON `cfs_%s`.`entity_id` = `asset_id`', $strAlias, $strAlias, $strAlias, $objCustomField->CustomFieldId, $strAlias, $strAlias, $strAlias, $intEntityQtypeId, $strAlias);
+				}
+			}
+			
+			return $arrCustomFieldSql;
+		}
 		
 		/**
 		 * This loads the array of custom fields, and their selections and values if an existing entity

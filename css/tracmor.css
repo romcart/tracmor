@@ -62,7 +62,7 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 	background-position: bottom;
 }
 .record_field_value { font-size:12px;border:1px solid #000000;background-color:#EEEEEE;width:280px;padding:3px;empty-cells:show;vertical-align:top; }
-.record_field_name { color:#615c5c; font-size:12px; width:120px;text-align:right;padding-right:5;vertical-align:top;white-space:nowrap; }
+.record_field_name { color:#615c5c;font-size:12px;width:120px;text-align:right;padding-right:5px;vertical-align:top;white-space:nowrap; }
 .record_field_edit { font-size:12px;width:280px;padding:3px;vertical-align:top; }
 .record_field_spacer { width: 75px;}
 

@@ -3055,7 +3055,7 @@
 </INDEX>
 </INDICES>
 </TABLE>
-<TABLE ID="2873" Tablename="admin_setting" PrevTableName="Table_38" XPos="1163" YPos="1515" TableType="1" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="INSERT INTO `admin_setting` (setting_id, short_description) VALUES (1, \acompany_id\a);\nINSERT INTO `admin_setting` (setting_id, short_description) VALUES (2, \afedex_meter_number\a);\nINSERT INTO `admin_setting` (setting_id, short_description) VALUES (3, \aimage_upload_prefix\a);\nINSERT INTO `admin_setting` (setting_id, short_description) VALUES (4, \afedex_gateway_URI\a);\nINSERT INTO `admin_setting` (setting_id, short_description, value) VALUES (5, \acompany_logo\a, \aempty.gif\a);\nINSERT INTO `admin_setting` (setting_id, short_description, value) VALUES (6, \aform_state_path\a, \a/tmp\a);\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="125" >
+<TABLE ID="2873" Tablename="admin_setting" PrevTableName="Table_38" XPos="1163" YPos="1515" TableType="1" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="INSERT INTO `admin_setting` (setting_id, short_description) VALUES (1, \acompany_id\a);\nINSERT INTO `admin_setting` (setting_id, short_description) VALUES (2, \afedex_meter_number\a);\nINSERT INTO `admin_setting` (setting_id, short_description) VALUES (3, \aimage_upload_prefix\a);\nINSERT INTO `admin_setting` (setting_id, short_description) VALUES (4, \afedex_gateway_URI\a);\nINSERT INTO `admin_setting` (setting_id, short_description, value) VALUES (5, \acompany_logo\a, \aempty.gif\a);\nINSERT INTO `admin_setting` (setting_id, short_description, value) VALUES (6, \aform_state_path\a, \a/tmp\a);\nINSERT INTO `admin_setting` (setting_id, short_description) VALUES (7, \apacking_list_terms\a);\nINSERT INTO `admin_setting` (setting_id, short_description) VALUES (8, \apacking_list_logo\a);\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="125" >
 <COLUMNS>
 <COLUMN ID="2878" ColName="setting_id" PrevColName="" Pos="0" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="1" NotNull="1" AutoInc="1" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
@@ -3068,9 +3068,8 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="2881" ColName="value" PrevColName="" Pos="2" idDatatype="20" DatatypeParams="(255)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="2881" ColName="value" PrevColName="" Pos="2" idDatatype="28" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
-<OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
 </COLUMNS>

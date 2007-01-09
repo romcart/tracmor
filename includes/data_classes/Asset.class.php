@@ -85,13 +85,18 @@
 				$this->AssetId, $cssClass, $this->AssetCode);
 		}
 		
+		public static function __toStringCustomField($intCustomFieldId, $intAssetId) {
+			
+			$strValue = CustomField::__toStringCustomFieldValue($intCustomFieldId, $intAssetId, 1);
+			return $strValue;
+		}
+		
 		/**
 		 * Returns an Account object the created the most recent transaction for this asset
 		 *
 		 * @return Object Account
 		 */
 		public function GetLastTransactionUser() {
-			
 			
 			$objClauses = array();
 			$objExpansionClause = QQ::Expand(QQN::AssetTransaction()->Transaction->CreatedByObject);
@@ -156,7 +161,7 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strCustomFieldsFromSql'],
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strCustomFieldsFromSql'], 
 			$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
@@ -198,6 +203,7 @@
 			}
 					
 			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrCustomFieldSql = CustomField::GenerateSql(1);
 
 			$strQuery = sprintf('
 				SELECT
@@ -212,8 +218,10 @@
 					`asset`.`modified_by` AS `modified_by`,
 					`asset`.`modified_date` AS `modified_date`
 					%s
+					%s
 				FROM
 					`asset` AS `asset`
+					%s
 					%s
 					%s
 				WHERE
@@ -231,8 +239,8 @@
 				%s
 				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"),
-				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strCustomFieldsFromSql'],
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strCustomFieldsFromSql'], $arrCustomFieldSql['strFrom'], 
 				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
