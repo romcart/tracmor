@@ -89,7 +89,7 @@
   		$this->dtgAsset->CssClass = "datagrid";
       		
       // Enable AJAX - this won't work while using the DB profiler
-      // $this->dtgAsset->UseAjax = true;
+      $this->dtgAsset->UseAjax = true;
       
       // Allow for column toggling
       $this->dtgAsset->ShowColumnToggle = true;
