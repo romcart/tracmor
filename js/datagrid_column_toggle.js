@@ -18,6 +18,12 @@ function resizeWindow(toggleMenuId, toggleButtonId) {
 // Positions and Displays the column toggle menu
 function toggleColumnToggleDisplay(e, toggleMenuId, toggleButtonId) {
 	
+	// Set the position of the toggle menu based on the location of the menu button
+	setPosition(toggleButtonId, toggleMenuId);
+	
+	// Display/Hide the column toggle menu
+	qc.getW(toggleMenuId).toggleDisplay();
+	
 	var objToggleMenu = document.getElementById(toggleMenuId);
 	// Set the onresize and onclick event handlers only when the menu is being displayed to avoid unnecessarily running the function
 	if (objToggleMenu.parentNode.style.display != 'none') {
@@ -29,12 +35,6 @@ function toggleColumnToggleDisplay(e, toggleMenuId, toggleButtonId) {
 		window.onresize = null;
 		window.document.onclick = null;
 	}
-	
-	// Set the position of the toggle menu based on the location of the menu button
-	setPosition(toggleButtonId, toggleMenuId);
-	
-	// Display/Hide the column toggle menu
-	qc.getW(toggleMenuId).toggleDisplay();
 	
 	// Stop bubbling up and propagation down in events so that functions don't get run more than once
 	// This was specifically because setPosition was getting run from the window.onClick() event and from clicking on the button
