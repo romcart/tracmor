@@ -88,17 +88,28 @@
       		
       // Enable AJAX - this won't work while using the DB profiler
       $this->dtgInventoryModel->UseAjax = true;
+      
+      // Allow for column toggling
+      $this->dtgInventoryModel->ShowColumnToggle = true;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgInventoryModel);
       $this->dtgInventoryModel->Paginator = $objPaginator;
       $this->dtgInventoryModel->ItemsPerPage = 20;
           
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumn('Inventory Code', '<?= $_ITEM->__toStringWithLink("bluelink"); ?>', 'SortByCommand="inventory_model_code ASC"', 'ReverseSortByCommand="inventory_model_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->ShortDescription ?>', 'Width=200', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumn('Category', '<?= $_ITEM->Category->__toString(); ?>', 'SortByCommand="inventory_model__category_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumn('Manufacturer', '<?= $_ITEM->Manufacturer->__toString(); ?>', 'SortByCommand="inventory_model__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->__toStringQuantity(); ?>', 'SortByCommand="inventory_model_quantity ASC"', 'ReverseSortByCommand="inventory_model_quantity DESC"', 'CssClass="dtg_column"'));
+      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Inventory Code', '<?= $_ITEM->__toStringWithLink("bluelink"); ?>', 'SortByCommand="inventory_model_code ASC"', 'ReverseSortByCommand="inventory_model_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM->ShortDescription ?>', 'Width=200', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->Category->__toString(); ?>', 'SortByCommand="inventory_model__category_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->Manufacturer->__toString(); ?>', 'SortByCommand="inventory_model__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Quantity', '<?= $_ITEM->__toStringQuantity(); ?>', 'SortByCommand="inventory_model_quantity ASC"', 'ReverseSortByCommand="inventory_model_quantity DESC"', 'CssClass="dtg_column"'));
+      
+      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, false);
+      if ($objCustomFieldArray) {
+      	foreach ($objCustomFieldArray as $objCustomField) {
+      		$this->dtgInventoryModel->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+      	}
+      }
 
       $this->dtgInventoryModel->SortColumnIndex = 1;
     	$this->dtgInventoryModel->SortDirection = 0;

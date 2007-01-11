@@ -64,7 +64,7 @@
 				$this->dtgManufacturer->ShowHeader = false;
 			}
 			else {
-				$objClauses = array();
+/*				$objClauses = array();
 				if ($objClause = $this->dtgManufacturer->OrderByClause)
 					array_push($objClauses, $objClause);
 				if ($objClause = $this->dtgManufacturer->LimitClause)
@@ -72,6 +72,9 @@
 				if ($objClause = QQ::Expand(QQN::Manufacturer()->CreatedByObject))
 					array_push($objClauses, $objClause);
 				$this->dtgManufacturer->DataSource = Manufacturer::LoadAll($objClauses);
+				$this->dtgManufacturer->ShowHeader = true;*/
+
+				$this->dtgManufacturer->DataSource = Manufacturer::LoadAllWithCustomFields($this->dtgManufacturer->SortInfo, $this->dtgManufacturer->LimitInfo, $objExpansionMap);
 				$this->dtgManufacturer->ShowHeader = true;
 			}
 		}
@@ -99,15 +102,27 @@
       		
       // Enable AJAX - this won't work while using the DB profiler
       $this->dtgManufacturer->UseAjax = true;
+      
+      // Allow for column toggling
+      $this->dtgManufacturer->ShowColumnToggle = true;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgManufacturer);
       $this->dtgManufacturer->Paginator = $objPaginator;
       $this->dtgManufacturer->ItemsPerPage = 20;
           
-      $this->dtgManufacturer->AddColumn(new QDataGridColumn('Manufacturer', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Manufacturer()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Manufacturer()->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-      $this->dtgManufacturer->AddColumn(new QDataGridColumn('Description', '<?= $_ITEM->LongDescription ?>', array('Width' => "200", 'OrderByClause' => QQ::OrderBy(QQN::Manufacturer()->LongDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Manufacturer()->LongDescription, false), 'CssClass' => "dtg_column")));
-      $this->dtgManufacturer->AddColumn(new QDataGridColumn('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', array('OrderByClause' => QQ::OrderBy(QQN::Manufacturer()->CreatedByObject->LastName, false, QQN::Manufacturer()->CreatedByObject->FirstName, false), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Manufacturer()->CreatedByObject->LastName, QQN::Manufacturer()->CreatedByObject->FirstName), 'CssClass' => "dtg_column")));
+      $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Manufacturer()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Manufacturer()->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+      $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Description', '<?= $_ITEM->LongDescription ?>', array('Width' => "200", 'OrderByClause' => QQ::OrderBy(QQN::Manufacturer()->LongDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Manufacturer()->LongDescription, false), 'CssClass' => "dtg_column")));
+/*      $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', array('OrderByClause' => QQ::OrderBy(QQN::Manufacturer()->CreatedByObject->LastName, false, QQN::Manufacturer()->CreatedByObject->FirstName, false), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Manufacturer()->CreatedByObject->LastName, QQN::Manufacturer()->CreatedByObject->FirstName), 'CssClass' => "dtg_column")));*/
+      $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', array('SortByCommand' => 'manufacturer__created_by__last_name DESC, manufacturer__created_by__first_name DESC', 'ReverseSortByCommand' => 'manufacturer__created_by__last_name ASC, manufacturer__created_by__first_name ASC', 'CssClass' => "dtg_column")));
+
+      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(6, false);
+      if ($objCustomFieldArray) {
+      	foreach ($objCustomFieldArray as $objCustomField) {
+      		$this->dtgManufacturer->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+      	}
+      }
       
       $this->dtgManufacturer->SortColumnIndex = 0;
     	$this->dtgManufacturer->SortDirection = 0;

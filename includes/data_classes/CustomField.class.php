@@ -70,13 +70,11 @@
 		
 		// Return the <IMG> tag (either a check or an X based on the boolean value
 		public function __toStringActiveFlag() {
-			
 			return BooleanImage($this->ActiveFlag);
 		}
 		
 		// Return the <IMG> tag (either a check or an X based on the boolean value
 		public function __toStringRequiredFlag() {
-			
 			return BooleanImage($this->RequiredFlag);
 		}
 		
@@ -93,12 +91,28 @@
 			$arrCustomFieldSql['strSelect'] = '';
 			$arrCustomFieldSql['strFrom'] = '';
 			$objCustomFields = CustomField::LoadObjCustomFieldArray($intEntityQtypeId, false);
+			// This could be better. This will have to be updated if we want to add custom fields.
+			switch ($intEntityQtypeId) {
+				case 1: $strId = 'asset`.`asset_id';
+					break;
+				case 2: $strId = 'inventory_model`.`inventory_model_id';
+					break;
+				case 4: $strId = 'asset_model`.`asset_model_id';
+					break;
+				case 5: $strId = 'manufacturer`.`manufacturer_id';
+					break;
+				case 6: $strId = 'category`.`category_id';
+					break;
+				
+				default:
+					throw new Exception('Not a valid EntityQtypeId.');
+			}
 			
 			if ($objCustomFields) {
 				foreach ($objCustomFields as $objCustomField) {
 					$strAlias = $objCustomField->CustomFieldId;
 					$arrCustomFieldSql['strSelect'] .= sprintf(', `cfv_%s`.`short_description` AS `%s`', $strAlias, '__' . $strAlias);
-					$arrCustomFieldSql['strFrom'] .= sprintf('LEFT JOIN (`custom_field_selection` AS `cfs_%s` JOIN `custom_field_value` AS `cfv_%s` ON `cfv_%s`.`custom_field_id` = %s AND `cfs_%s`.`custom_field_value_id` = `cfv_%s`.`custom_field_value_id` AND `cfs_%s`.`entity_qtype_id` = %s) ON `cfs_%s`.`entity_id` = `asset_id`', $strAlias, $strAlias, $strAlias, $objCustomField->CustomFieldId, $strAlias, $strAlias, $strAlias, $intEntityQtypeId, $strAlias);
+					$arrCustomFieldSql['strFrom'] .= sprintf('LEFT JOIN (`custom_field_selection` AS `cfs_%s` JOIN `custom_field_value` AS `cfv_%s` ON `cfv_%s`.`custom_field_id` = %s AND `cfs_%s`.`custom_field_value_id` = `cfv_%s`.`custom_field_value_id` AND `cfs_%s`.`entity_qtype_id` = %s) ON `cfs_%s`.`entity_id` = `%s`', $strAlias, $strAlias, $strAlias, $objCustomField->CustomFieldId, $strAlias, $strAlias, $strAlias, $intEntityQtypeId, $strAlias, $strId);
 				}
 			}
 			
@@ -208,7 +222,7 @@
 	 					$arrCustomFields[$i]['lbl']->Text = 'None';
 	 				}
 				}
- 				
+				
 				if ($blnInputs) {
 	 				// Create input for each custom field (either text or list)
 	 				// Create text inputs
@@ -221,7 +235,8 @@
 	 					}
 	 					// This is so that the browser doesn't form.submit() when the user presses the enter key on a text input
 	 					if (!$blnSearch && CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) != 'textarea') {
-	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($objForm, 'btnSave_Click'));
+	 						//$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($objForm, 'btnSave_Click'));
+	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	 					elseif ($blnSearch) {

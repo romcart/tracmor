@@ -67,5 +67,55 @@
 			}
 			parent::Save($blnForceInsert, $blnForceUpdate);
 		}
+		
+		public static function LoadAllWithCustomFields($strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+			
+			Manufacturer::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
+			
+			// Setup QueryExpansion
+			$objQueryExpansion = new QQueryExpansion();
+			if ($objExpansionMap) {
+				try {
+					Manufacturer::ExpandQuery('manufacturer', null, $objExpansionMap, $objQueryExpansion);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+			}
+					
+			$arrCustomFieldSql = CustomField::GenerateSql(5);
+
+			$strQuery = sprintf('
+				SELECT
+					%s
+					`manufacturer`.`manufacturer_id` AS `manufacturer_id`,
+					`manufacturer`.`short_description` AS `short_description`,
+					`manufacturer`.`long_description` AS `long_description`,
+					`manufacturer`.`image_path` AS `image_path`,
+					`manufacturer`.`created_by` AS `created_by`,
+					`manufacturer`.`creation_date` AS `creation_date`,
+					`manufacturer`.`modified_by` AS `modified_by`,
+					`manufacturer`.`modified_date` AS `modified_date`
+					%s
+					%s
+				FROM
+					`manufacturer` AS `manufacturer`
+					%s
+					%s
+				WHERE
+				1=1
+				%s
+				%s
+			', $strLimitPrefix,
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], 
+				$strOrderBy, $strLimitSuffix);
+				
+				//echo($strQuery); exit;
+
+			$objDbResult = $objDatabase->Query($strQuery);				
+			return Manufacturer::InstantiateDbResult($objDbResult);			
+		
+		}		
 	}
 ?>

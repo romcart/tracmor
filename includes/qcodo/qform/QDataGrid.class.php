@@ -266,6 +266,15 @@
 						throw $objExc;
 					}
 					
+				case "blnModified":
+					try {
+						$this->blnModified = QType::Cast($mixValue, QType::Boolean);
+						break;
+					} catch (QInvalidCastException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+					
 				default:
 					try {
 						parent::__set($strName, $mixValue);

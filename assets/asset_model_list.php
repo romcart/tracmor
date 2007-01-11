@@ -69,17 +69,28 @@
       		
       // Enable AJAX - this won't work while using the DB profiler
       $this->dtgAssetModel->UseAjax = true;
+      
+      // Allow for column toggling
+      $this->dtgAssetModel->ShowColumnToggle = true;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgAssetModel);
       $this->dtgAssetModel->Paginator = $objPaginator;
       $this->dtgAssetModel->ItemsPerPage = 20;
       
-      $this->dtgAssetModel->AddColumn(new QDataGridColumn('Assets', '<?= $_ITEM->__toStringWithAssetCountLink($_ITEM,"bluelink"); ?>', 'SortByCommand="asset_count ASC"', 'ReverseSortByCommand="asset_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgAssetModel->AddColumn(new QDataGridColumn('Name', '<?= $_ITEM->__toStringWithLink($_ITEM,"bluelink"); ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-      $this->dtgAssetModel->AddColumn(new QDataGridColumn('Category', '<?= $_FORM->dtgAssetModel_Category_Render($_ITEM); ?>', 'SortByCommand="asset_model__category_id__short_description ASC"', 'ReverseSortByCommand="asset_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgAssetModel->AddColumn(new QDataGridColumn('Manufacturer', '<?= $_FORM->dtgAssetModel_Manufacturer_Render($_ITEM); ?>', 'SortByCommand="asset_model__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset_model__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgAssetModel->AddColumn(new QDataGridColumn('Asset Model Code', '<?= htmlentities(QString::Truncate($_ITEM->AssetModelCode, 200)); ?>', 'FontBold=true', 'SortByCommand="asset_model_code ASC"', 'ReverseSortByCommand="asset_model_code DESC"', 'CssClass="dtg_column"'));
+      $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Assets', '<?= $_ITEM->__toStringWithAssetCountLink($_ITEM,"bluelink"); ?>', 'SortByCommand="asset_count ASC"', 'ReverseSortByCommand="asset_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Name', '<?= $_ITEM->__toStringWithLink($_ITEM,"bluelink"); ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+      $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Category', '<?= $_FORM->dtgAssetModel_Category_Render($_ITEM); ?>', 'SortByCommand="asset_model__category_id__short_description ASC"', 'ReverseSortByCommand="asset_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_FORM->dtgAssetModel_Manufacturer_Render($_ITEM); ?>', 'SortByCommand="asset_model__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset_model__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?= htmlentities(QString::Truncate($_ITEM->AssetModelCode, 200)); ?>', 'FontBold=true', 'SortByCommand="asset_model_code ASC"', 'ReverseSortByCommand="asset_model_code DESC"', 'CssClass="dtg_column"'));
+      
+      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(4, false);
+      if ($objCustomFieldArray) {
+      	foreach ($objCustomFieldArray as $objCustomField) {
+      		$this->dtgAssetModel->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+      	}
+      }
       
       $this->dtgAssetModel->SortColumnIndex = 1;
     	$this->dtgAssetModel->SortDirection = 0;

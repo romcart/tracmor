@@ -228,6 +228,7 @@
 			}
 					
 			$arrSearchSql = AssetModel::GenerateSearchSql($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode);
+			$arrCustomFieldSql = CustomField::GenerateSql(1);
 
 			$strQuery = sprintf('
 				SELECT
@@ -245,9 +246,11 @@
 					`asset_model`.`modified_by` AS `modified_by`,
 					`asset_model`.`modified_date` AS `modified_date`
 					%s
+					%s
 				FROM
 					`asset_model` AS `asset_model`
 					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id`
+					%s
 					%s
 				WHERE
 				1=1
@@ -260,8 +263,8 @@
 				%s
 				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"),
-				$objQueryExpansion->GetFromSql("", "\n					"),
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], 
 				$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'],
 				$arrSearchSql['strAuthorizationSql'], 
 				$strOrderBy, $strLimitSuffix);

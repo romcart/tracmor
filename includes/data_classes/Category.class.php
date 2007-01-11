@@ -164,5 +164,57 @@
 			$strDbRow = $objDbResult->FetchRow();
 			return QType::Cast($strDbRow[0], QType::Integer);
 		}
+		
+		public static function LoadAllWithCustomFields($strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+			
+			Category::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
+			
+			// Setup QueryExpansion
+			$objQueryExpansion = new QQueryExpansion();
+			if ($objExpansionMap) {
+				try {
+					Category::ExpandQuery('category', null, $objExpansionMap, $objQueryExpansion);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+			}
+					
+			$arrCustomFieldSql = CustomField::GenerateSql(6);
+
+			$strQuery = sprintf('
+				SELECT
+					%s
+					`category`.`category_id` AS `category_id`,
+					`category`.`short_description` AS `short_description`,
+					`category`.`long_description` AS `long_description`,
+					`category`.`image_path` AS `image_path`,
+					`category`.`asset_flag` AS `asset_flag`,
+					`category`.`inventory_flag` AS `inventory_flag`,
+					`category`.`created_by` AS `created_by`,
+					`category`.`creation_date` AS `creation_date`,
+					`category`.`modified_by` AS `modified_by`,
+					`category`.`modified_date` AS `modified_date`
+					%s
+					%s
+				FROM
+					`category` AS `category`
+					%s
+					%s
+				WHERE
+				1=1
+				%s
+				%s
+			', $strLimitPrefix,
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], 
+				$strOrderBy, $strLimitSuffix);
+				
+				//echo($strQuery); exit;
+
+			$objDbResult = $objDatabase->Query($strQuery);				
+			return Category::InstantiateDbResult($objDbResult);			
+		
+		}		
 	}
 ?>

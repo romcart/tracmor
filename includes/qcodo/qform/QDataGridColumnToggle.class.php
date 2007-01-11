@@ -82,6 +82,7 @@
 		
 		// Toggle whether a column is being displayed or not
 		public function lblColumn_Click($strFormId, $strControlId, $strParameter) {
+			$this->objParentControl->blnModified = true;
 			$objColumn = $this->objParentControl->GetColumnByName($strParameter);
 			if (!$objColumn->Display) {
 				$objColumn->Display = true;

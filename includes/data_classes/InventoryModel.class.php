@@ -242,6 +242,7 @@
 			}
 					
 			$strSearchSql = InventoryModel::GenerateSearchSql($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrCustomFieldSql = CustomField::GenerateSql(2);
 
 			$strQuery = sprintf('
 				SELECT
@@ -260,9 +261,11 @@
 					`inventory_model`.`modified_by` AS `modified_by`,
 					`inventory_model`.`modified_date` AS `modified_date`
 					%s
+					%s
 				FROM
 					`inventory_model` AS `inventory_model`
 					LEFT JOIN `inventory_location` AS `inventory_location` ON `inventory_model` . `inventory_model_id` = `inventory_location` . `inventory_model_id`
+					%s
 					%s
 					%s
 				WHERE
@@ -280,8 +283,8 @@
 				%s
 				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"),
-				$objQueryExpansion->GetFromSql("", "\n					"), $strSearchSql['strCustomFieldsFromSql'],
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
+				$objQueryExpansion->GetFromSql("", "\n					"), $strSearchSql['strCustomFieldsFromSql'], $arrCustomFieldSql['strFrom'],
 				$strSearchSql['strInventoryModelCodeSql'], $strSearchSql['strLocationSql'], $strSearchSql['strInventoryModelSql'], $strSearchSql['strCategorySql'], $strSearchSql['strManufacturerSql'], $strSearchSql['strShortDescriptionSql'], $strSearchSql['strCustomFieldsSql'], $strSearchSql['strDateModifiedSql'],
 				$strSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
