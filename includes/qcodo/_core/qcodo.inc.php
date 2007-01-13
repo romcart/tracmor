@@ -31,7 +31,7 @@
 	 */
 
 	// Versioning Information
-	define('QCODO_VERSION', '0.3.11 (Qcodo Beta 3)');
+	define('QCODO_VERSION', '0.3.21 (Qcodo Beta 3)');
 
 	// Preload Required Framework Classes
 	require(__QCODO_CORE__ . '/framework/QBaseClass.class.php');
@@ -58,8 +58,12 @@
 
 	// Preload Other Framework Classes
 	require(__QCODO_CORE__ . '/framework/QDatabaseBase.class.php');
-	require(__QCODO_CORE__ . '/framework/QDateTime.class.php');
-
+	if (version_compare(PHP_VERSION, '5.2.0', '<'))
+		// Use the Legacy (Pre-5.2.0) QDateTime class
+		require(__QCODO_CORE__ . '/framework/QDateTime.legacy.class.php');
+	else
+		// Use the New QDateTime class (which extends PHP DateTime)
+		require(__QCODO_CORE__ . '/framework/QDateTime.class.php');
 
 	// Define Classes to be Preloaded on QApplication::Initialize()
 	QApplicationBase::$PreloadedClassFile['_enumerations'] = __QCODO_CORE__ . '/qform/_enumerations.inc.php';
@@ -93,13 +97,14 @@
 	QApplicationBase::$ClassFile['QQueryExpansion'] = __QCODO_CORE__ . '/framework/QQueryExpansion.class.php';
 
 	QApplicationBase::$ClassFile['QCache'] = __QCODO_CORE__ . '/framework/QCache.class.php';
+	QApplicationBase::$ClassFile['QDateTimeSpan'] = __QCODO_CORE__ . '/framework/QDateTimeSpan.class.php';
 
 	// Define ClassFile Locations for Qform Classes
 	QApplicationBase::$ClassFile['QFontFamily'] = __QCODO_CORE__ . '/qform/QFontFamily.class.php';
 
 	QApplicationBase::$ClassFile['QCalendar'] = __QCODO_CORE__ . '/qform/QCalendar.class.php';
 	QApplicationBase::$ClassFile['QDateTimePicker'] = __QCODO_CORE__ . '/qform/QDateTimePicker.class.php';
-	
+
 	QApplicationBase::$ClassFile['QCheckBox'] = __QCODO_CORE__ . '/qform/QCheckBox.class.php';
 	QApplicationBase::$ClassFile['QFileControl'] = __QCODO_CORE__ . '/qform/QFileControl.class.php';
 	QApplicationBase::$ClassFile['QRadioButton'] = __QCODO_CORE__ . '/qform/QRadioButton.class.php';
@@ -107,6 +112,8 @@
 	QApplicationBase::$ClassFile['QBlockControl'] = __QCODO_CORE__ . '/qform/QBlockControl.class.php';
 	QApplicationBase::$ClassFile['QLabel'] = __QCODO_CORE__ . '/qform/QLabel.class.php';
 	QApplicationBase::$ClassFile['QPanel'] = __QCODO_CORE__ . '/qform/QPanel.class.php';
+	QApplicationBase::$ClassFile['QControlProxy'] = __QCODO_CORE__ . '/qform/QControlProxy.class.php';
+	QApplicationBase::$ClassFile['QDialogBox'] = __QCODO_CORE__ . '/qform/QDialogBox.class.php';
 
 	QApplicationBase::$ClassFile['QImageLabelBase'] = __QCODO_CORE__ . '/qform/QImageLabelBase.class.php';
 	QApplicationBase::$ClassFile['QImageLabel'] = __QCODO__ . '/qform/QImageLabel.class.php';
