@@ -600,7 +600,6 @@
 			// Finish Up
 			$strToReturn .= '</table>';
 			$this->objDataSource = null;
-			
 			return $strToReturn;
 		}
 

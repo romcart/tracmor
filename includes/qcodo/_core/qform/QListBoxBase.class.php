@@ -16,7 +16,6 @@
 		protected $strLabelForRequired;
 		protected $strLabelForRequiredUnnamed;
 		protected $objItemStyle = null;
-		protected $intCurrentItemIndex;
 
 		// BEHAVIOR
 		protected $strSelectionMode = QSelectionMode::Single;
@@ -80,23 +79,22 @@
 			return $strToReturn;
 
 		}
-		protected function GetItemHtml($objItem) {
-			
+		protected function GetItemHtml($objItem, $intIndex) {
+			// The Default Item Style
 			$objStyle = $this->objItemStyle;
+
 			// Apply any Style Override (if applicable)
 			if ($objItem->ItemStyle) {
 				$objStyle = $objStyle->ApplyOverride($objItem->ItemStyle);
 			}
-			
+
 			$strToReturn = sprintf('<option value="%s" %s%s>%s</option>',
-				$this->intCurrentItemIndex,
+				$intIndex,
 				($objItem->Selected) ? 'selected="selected"' : "",
 				$objStyle->GetAttributes(),
-				htmlentities($objItem->Name, ENT_COMPAT, QApplication::$EncodingType)
+				QApplication::HtmlEntities($objItem->Name)
 			);
-			
-			$this->intCurrentItemIndex++;
-			
+
 			return $strToReturn;
 		}
 
@@ -111,16 +109,40 @@
 						$this->strControlId,
 						$this->GetAttributes(),
 						$strStyle);
-			
-			$this->intCurrentItemIndex = 0;						
+
+			$strCurrentGroup = null;
 			if (is_array($this->objItemsArray)) {
 				for ($intIndex = 0; $intIndex < $this->ItemCount; $intIndex++) {
 					$objItem = $this->objItemsArray[$intIndex];
-					$strToReturn .= $this->GetItemHtml($objItem);
+					// Figure Out Groups (if applicable)
+					if (!is_null($objItem->ItemGroup)) {
+						// We've got grouping -- are we in a new or same group?
+						if (is_null($strCurrentGroup))
+							// New Group
+							$strToReturn .= '<optgroup label="' . QApplication::HtmlEntities($objItem->ItemGroup) . '">';							
+							
+						else if ($strCurrentGroup != $objItem->ItemGroup)
+							// Different Group
+							$strToReturn .= '</optgroup><optgroup label="' . QApplication::HtmlEntities($objItem->ItemGroup) . '">';
+
+						$strCurrentGroup = $objItem->ItemGroup;
+						
+					// We've got no (or no more) grouping
+					} else {
+						if (!is_null($strCurrentGroup)) {
+							// End the current group
+							$strToReturn .= '</optgroup>';
+							$strCurrentGroup = null;
+						}
+					}
+					$strToReturn .= $this->GetItemHtml($objItem, $intIndex);
 				}
+				
+				if (!is_null($strCurrentGroup))
+					$strToReturn .= '</optgroup>';
 			}
-			$strToReturn .= "</select>";
-			
+			$strToReturn .= '</select>';
+
 			// If MultiSelect and if NOT required, add a "Reset" button to deselect everything
 			if (($this->strSelectionMode == QSelectionMode::Multiple) && (!$this->blnRequired) && ($this->blnEnabled) && ($this->blnVisible))
 				$strToReturn .= $this->GetResetButtonHtml();
@@ -164,7 +186,6 @@
 				case "LabelForRequired": return $this->strLabelForRequired;
 				case "LabelForRequiredUnnamed": return $this->strLabelForRequiredUnnamed;
 				case "ItemStyle": return $this->objItemStyle;
-				case "CurrentItemIndex": return $this->intCurrentItemIndex;
 				
 				// BEHAVIOR
 				case "SelectionMode": return $this->strSelectionMode;

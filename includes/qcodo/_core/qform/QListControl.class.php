@@ -35,20 +35,20 @@
 		//	* Name of the ListItem (string)
 		//	* Value of the ListItem (string, optional)
 		//	* Selected flag for the ListItem (bool, optional)
-		public function AddItem($mixListItemOrName, $strValue = null, $blnSelected = null, $strOverrideParameters = null) {
+		//  * OverrideParameters for ListItemStyle (optional)
+		public function AddItem($mixListItemOrName, $strValue = null, $blnSelected = null, $strItemGroup = null, $strOverrideParameters = null) {
 			$this->blnModified = true;
 			if (gettype($mixListItemOrName) == QType::Object)
 				$objListItem = QType::Cast($mixListItemOrName, "QListItem");
-			// The OverrideParameters can only be included if they are not null, because OverrideAttributes in QBaseClass can't except a NULL Value
 			elseif ($strOverrideParameters)			
-				$objListItem = new QListItem($mixListItemOrName, $strValue, $blnSelected, $strOverrideParameters);
+				// The OverrideParameters can only be included if they are not null, because OverrideAttributes in QBaseClass can't except a NULL Value
+				$objListItem = new QListItem($mixListItemOrName, $strValue, $blnSelected, $strItemGroup, $strOverrideParameters);
 			else 
-				$objListItem = new QListItem($mixListItemOrName, $strValue, $blnSelected);
+				$objListItem = new QListItem($mixListItemOrName, $strValue, $blnSelected, $strItemGroup);
 
 			array_push($this->objItemsArray, $objListItem);
-//			$this->objItemsArray[count($this->objItemsArray)] = $objListItem;
 		}
-		
+
 		// Used if you want to add a LIstItem at a specific location in objItemsArray
 		public function AddItemAt($intIndex, QListItem $objListItem) {
 			$this->blnModified = true;

@@ -11,24 +11,24 @@
 		protected $strName = null;
 		protected $strValue = null;
 		protected $blnSelected = false;
+		protected $strItemGroup = null;
 		protected $objItemStyle;
-		
-		// MISC
-		protected $strHtml;
-		
+
 		/////////////////////////
 		// Methods
 		/////////////////////////
-		public function __construct($strName, $strValue, $blnSelected = false, $strOverrideParameters = null) {
+		public function __construct($strName, $strValue, $blnSelected = false, $strItemGroup = null, $strOverrideParameters = null) {
 			$this->strName = $strName;
 			$this->strValue = $strValue;
 			$this->blnSelected = $blnSelected;
-			
+			$this->strItemGroup = $strItemGroup;
+
 			// Override parameters get applied here
 			$strOverrideArray = func_get_args();
-			if (count($strOverrideArray) > 3)	{
+			if (count($strOverrideArray) > 4)	{
 				try {
 					$strOverrideArray = array_reverse($strOverrideArray);
+					array_pop($strOverrideArray);
 					array_pop($strOverrideArray);
 					array_pop($strOverrideArray);
 					array_pop($strOverrideArray);
@@ -43,12 +43,10 @@
 		}
 		
 		public function GetAttributes($blnIncludeCustom = true, $blnIncludeAction = true) {
-
 			$strToReturn = $this->objItemStyle->GetAttributes();
-			
 			return $strToReturn;
 		}
-		
+
 		/////////////////////////
 		// Public Properties: GET
 		/////////////////////////
@@ -57,11 +55,9 @@
 				case "Name": return $this->strName;
 				case "Value": return $this->strValue;
 				case "Selected": return $this->blnSelected;
+				case "ItemGroup": return $this->strItemGroup;
 				case "ItemStyle": return $this->objItemStyle;
-				
-				// MISC
-				case "Html": return $this->strHtml;				
-				
+
 				default:
 					try {
 						return parent::__get($strName);
@@ -101,28 +97,23 @@
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
-				case "ItemStyle":
+				case "ItemGroup":
 					try {
-						if (!$this->objItemStyle) {
-							$this->objItemStyle = new QListItemStyle();
-						}
-						$this->objItemStyle = QType::Cast($mixValue, "QListItemStyle");
-						break;
-					} catch (QInvalidCastException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}					
-
-				// MISC
-				case "Html":
-					try {
-						$this->strHtml = QType::Cast($mixValue, QType::String);
+						$this->strItemGroup = QType::Cast($mixValue, QType::String);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
-										
+				case "ItemStyle":
+					try {
+						$this->objItemStyle = QType::Cast($mixValue, "QListItemStyle");
+						break;
+					} catch (QInvalidCastException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 				default:
 					try {
 						parent::__set($strName, $mixValue);
