@@ -1612,10 +1612,14 @@
 						$objInventoryTransaction->InventoryLocation->Save();
 					}
 				}
-
-				$this->objReceipt->Delete();
+				
+				// Load the Transaction
+				$this->objTransaction = Transaction::Load($this->objReceipt->TransactionId);
+				// Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
+				$this->objTransaction->Delete();
 
 				$this->RedirectToListPage();
+
 			}
 		}
 		
