@@ -73,26 +73,30 @@ class QAdvancedSearchComposite extends QControl {
 		
 		$strAttributes = $this->GetAttributes();
 		
-		$strMessage = $this->txtAssetModelCode->RenderWithNameLeft(false);
-		$strMessage .= $this->lstDateModified->RenderWithNameLeft(false);
-		$strMessage .= $this->dtpDateModifiedFirst->RenderWithNameLeft(false);
-		$strMessage .= $this->dtpDateModifiedLast->RenderWithNameLeft(false);
-		foreach ($this->arrCustomFields as $field) {
-			$strMessage .= $field['input']->RenderWithNameLeft(false);
-		}
+		// Store the Output Buffer locally
+		$strAlreadyRendered = ob_get_contents();
+		ob_clean();
+
+		// Evaluate the template
+		require('../common/advanced_search_composite.tpl.php');
+		$strTemplateEvaluated = ob_get_contents();
+		ob_clean();
+
+		// Restore the output buffer and return evaluated template
+		print($strAlreadyRendered);
 		
 		$strToReturn =  sprintf('<span id="%s" %s%s>%s</span>',
 		$this->strControlId,
 		$strStyle,
 		$strAttributes,
-		$strMessage);
+		$strTemplateEvaluated);
 		
-		return $strToReturn;
+		return $strToReturn;		
 	}
 	
   protected function txtAssetModelCode_Create() {
     $this->txtAssetModelCode = new QTextBox($this);
-		$this->txtAssetModelCode->Name = 'Part Number';
+		$this->txtAssetModelCode->Name = 'Asset Model Code';
     $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
     $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
     // if ($this->objParentObject instanceof AssetListFormBase) {
