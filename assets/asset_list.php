@@ -51,6 +51,7 @@
 		protected $lstLocation;
 		protected $txtShortDescription;
 		protected $txtAssetCode;
+		protected $chkOffsite;
 		protected $lblAssetModelId;
 		protected $arrCustomFields;
 		
@@ -73,6 +74,7 @@
 		protected $strAssetCode;
 		protected $intCategoryId;
 		protected $intManufacturerId;
+		protected $blnOffsite;
 		protected $strAssetModelCode;
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
@@ -135,6 +137,7 @@
       $this->lstLocation_Create();
       $this->txtShortDescription_Create();
       $this->txtAssetCode_Create();
+      $this->chkOffsite_Create();
       $this->lblAssetModelId_Create();
       $this->btnSearch_Create();
       $this->btnClear_Create();
@@ -159,6 +162,7 @@
 			$intAssetModelId = $this->intAssetModelId;
 			$intCategoryId = $this->intCategoryId;
 			$intManufacturerId = $this->intManufacturerId;
+			$blnOffsite = $this->blnOffsite;
 			$strAssetModelCode = $this->strAssetModelCode;
 			$strShortDescription = $this->strShortDescription;
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
@@ -175,12 +179,12 @@
       $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandManufacturer] = true;
       $objExpansionMap[Asset::ExpandLocation] = true;
 
-			$this->dtgAsset->TotalItemCount = Asset::CountBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgAsset->TotalItemCount = Asset::CountBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
 			if ($this->dtgAsset->TotalItemCount == 0) {
 				$this->dtgAsset->ShowHeader = false;
 			}
 			else {
-				$this->dtgAsset->DataSource = Asset::LoadArrayBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap);
+				$this->dtgAsset->DataSource = Asset::LoadArrayBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap);
 				$this->dtgAsset->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -217,7 +221,7 @@
   		$this->lstLocation = new QListBox($this);
   		$this->lstLocation->Name = 'Location';
   		$this->lstLocation->AddItem('- ALL -', null);
-  		foreach (Location::LoadAllLocations(true) as $objLocation) {
+  		foreach (Location::LoadAllLocations(true, true) as $objLocation) {
   			$this->lstLocation->AddItem($objLocation->ShortDescription, $objLocation->LocationId);
   		}
       $this->lstLocation->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
@@ -258,6 +262,11 @@
 	  	$this->txtAssetCode->Name = 'Asset Code';
 	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
 	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	  }
+	  
+	  protected function chkOffsite_Create() {
+	  	$this->chkOffsite = new QCheckBox($this);
+	  	$this->chkOffsite->Text = 'Show Offsite Assets';
 	  }
 	  
 	  protected function lblAssetModelId_Create() {
@@ -341,6 +350,7 @@
 		  	$this->lstManufacturer->SelectedIndex = 0;
 		  	$this->txtShortDescription->Text = '';
 		  	$this->txtAssetCode->Text = '';
+		  	$this->chkOffsite->Checked = false;
 		  	$this->lstLocation->SelectedIndex = 0;
 		  	$this->ctlAdvanced->ClearControls();
 		  	
@@ -351,6 +361,7 @@
 		  	$this->intAssetModelId = null;
 		  	$this->strShortDescription = null;
 		  	$this->strAssetCode = null;
+		  	$this->blnOffsite = false;
 		  	$this->strAssetModelCode = null;
 		  	$this->strDateModified = null;
 		  	$this->strDateModifiedFirst = null;
@@ -387,6 +398,7 @@
 			$this->intManufacturerId = $this->lstManufacturer->SelectedValue;
 			$this->strShortDescription = $this->txtShortDescription->Text;
 			$this->strAssetCode = $this->txtAssetCode->Text;
+			$this->blnOffsite = $this->chkOffsite->Checked;
 			$this->intLocationId = $this->lstLocation->SelectedValue;
 			$this->intAssetModelId = $this->lblAssetModelId->Text;
 			$this->strAssetModelCode = $this->ctlAdvanced->AssetModelCode;

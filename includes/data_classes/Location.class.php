@@ -105,10 +105,18 @@
 		 * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
 		 * @return Location[]
 		*/
-		public static function LoadAllLocations($blnShowTBR = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadAllLocations($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
 			Location::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
+			// Location #2 = 'Shipped'
+			if (!$blnShowShipped) {
+				$ShippedQuery = "AND `location_id` != 2";
+			}
+			else {
+				$ShippedQuery = "";
+			}
+			
 			// Location #5 = 'To Be Received' (TBR)
 			if (!$blnShowTBR) {
 				$TBRQuery = "AND `location_id` != 5";
@@ -134,12 +142,12 @@
 					%s
 				WHERE
 					`location_id` != 1
-					AND `location_id` != 2
 					AND `location_id` != 3
 					AND `location_id` != 4
 					%s
+					%s
 				%s
-				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, 
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery, 
 				$strOrderBy, $strLimitSuffix);
 
 			// Perform the Query and Instantiate the Result

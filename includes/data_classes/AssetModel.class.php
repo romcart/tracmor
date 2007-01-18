@@ -101,7 +101,7 @@
 					`modified_date`
 				FROM
 					`asset_model`
-					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id`
+					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5
 				WHERE
 					`asset_model_id` = %s
 				GROUP BY `asset_model_id`', $intAssetModelId);
@@ -141,9 +141,9 @@
 					%s
 				FROM
 					`asset_model` AS `asset_model`
-					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id`=`asset`.`asset_model_id`
+					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id`=`asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5
 					%s
-					GROUP BY `asset_model_id`
+				GROUP BY `asset_model_id`
 				%s
 				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom,
 				$strOrderBy, $strLimitSuffix);
@@ -164,7 +164,9 @@
 				FROM
 					`asset` AS `asset`
 				WHERE
-					`asset` . `asset_model_id` %s
+					`asset` . `asset_model_id` %s AND
+					`asset`.`location_id` != 2 AND
+					`asset`.`location_id` != 5
 			', $intAssetModelId);
 			
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -249,7 +251,7 @@
 					%s
 				FROM
 					`asset_model` AS `asset_model`
-					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id`
+					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5
 					%s
 					%s
 				WHERE
