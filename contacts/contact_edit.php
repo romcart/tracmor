@@ -223,6 +223,7 @@
 		protected function lblAddress_Create() {
 			$this->lblAddress = new QLabel($this);
 			$this->lblAddress->Name = 'Primary Address';
+			$this->lblAddress->HtmlEntities = false;
 		}
 		
 		// Setup the Office Phone Label
