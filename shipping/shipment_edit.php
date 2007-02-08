@@ -2507,7 +2507,9 @@
 				$this->rblAssetType->Display = true;
 				if ($this->rblAssetType->SelectedValue == 'new') {
 					$this->txtReceiptAssetCode->Display = true;
-					$this->chkAutoGenerateAssetCode->Display = true;
+					if (QApplication::$TracmorSettings->MinAssetCode) {
+						$this->chkAutoGenerateAssetCode->Display = true;
+					}
 				}
 				$this->lblAdvanced->Text = 'Hide Advanced';
 			}
