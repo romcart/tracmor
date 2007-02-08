@@ -38,5 +38,46 @@
 	 * @subpackage DataObjects
 	 */
 	abstract class EntityQtype extends EntityQtypeGen {
+		
+		/**
+		 * This function returns the SQL necessary to select an entitie's primary key based on the EntityQtypeId
+		 * This will not work for the GenerateSql function in CustomField.class.php because of the difference in the ``
+		 *
+		 * @param integer $intEntityQtypeId
+		 * @return sting $strPrimaryKeySql
+		 */
+		public static function ToStringPrimaryKeySql($intEntityQtypeId) {
+			
+			$strTable = EntityQtype::ToStringTable($intEntityQtypeId);
+			$strToReturn = sprintf('`%s`.`%s_id`', $strTable, $strTable);
+			
+			return $strToReturn;
+		}
+		
+		/**
+		 * This function returns the name of the table based on the EntityQtypeId
+		 *
+		 * @param integer $intEntityQtypeId
+		 * @return string $strToReturn table name
+		 */
+		public static function ToStringTable($intEntityQtypeId) {
+			
+			$strToReturn = '';
+			
+			switch ($intEntityQtypeId) {
+				case 1: $strToReturn = 'asset';
+					break;
+				case 2: $strToReturn = 'inventory_model';
+					break;
+				case 4: $strToReturn = 'asset_model';
+					break;
+				case 5: $strToReturn = 'manufacturer';
+					break;
+				case 6: $strToReturn = 'category';
+					break;
+			}
+			
+			return $strToReturn;
+		}
 	}
 ?>

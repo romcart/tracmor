@@ -99,8 +99,20 @@
 	<div class="title">Assets to Receive</div>
 	<table>
 		<tr>
+			<td><?php $this->rblAssetType->RenderDesigned('DisplayName=false'); ?></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><?php $this->lstAssetModel->RenderDesigned(); ?></td>
+			<td></td>
+		</tr>
+		<tr>
 			<td><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
 			<td><?php $this->btnAddAsset->Render(); ?></td>
+		</tr>
+		<tr>
+			<td><?php $this->chkAutoGenerateAssetCode->RenderDesigned('DisplayName=false'); ?></td>
+			<td></td>
 		</tr>
 	</table>
 		<?php $this->dtgAssetTransact->RenderWithError(); ?>

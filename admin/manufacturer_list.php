@@ -117,7 +117,7 @@
       $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', array('SortByCommand' => 'manufacturer__created_by__last_name DESC, manufacturer__created_by__first_name DESC', 'ReverseSortByCommand' => 'manufacturer__created_by__last_name ASC, manufacturer__created_by__first_name ASC', 'CssClass' => "dtg_column")));
 
       // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
-      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(6, false);
+      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(5, false);
       if ($objCustomFieldArray) {
       	foreach ($objCustomFieldArray as $objCustomField) {
       		$this->dtgManufacturer->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));

@@ -170,9 +170,8 @@
 				$this->lstCompany->Warning = "The Shipping/Receiving company must have a valid telephone number.";
 			}
 			else {
-				$objSetting = AdminSetting::Load(1);
-				$objSetting->Value = $intCompanyId;
-				$objSetting->Save();
+			  // Altered $TracmorSettings __set() method so that just setting a value will save it in the database.
+				QApplication::$TracmorSettings->CompanyId = $intCompanyId;
 				// Not really a warning, just need to display that it has been saved without changing pages.
 				$this->lstCompany->Warning = "Saved";
 			}

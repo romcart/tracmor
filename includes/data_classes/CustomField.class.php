@@ -79,6 +79,90 @@
 		}
 		
 		/**
+		 * When creating a new entity, this static method assigns all of the CustomFieldSelections and CustomFieldValues
+		 * for all required custom fields.
+		 *
+		 * @param integer $intEntityQtypeId
+		 * @param integer $intEntityId
+		 */
+		public static function AssignNewEntityDefaultValues($intEntityQtypeId, $intEntityId) {
+			$objExpansionMap[CustomField::ExpandDefaultCustomFieldValue] = true;
+			$objCustomFieldArray = CustomField::LoadArrayByActiveFlagEntity(true, $intEntityQtypeId, null, null, $objExpansionMap);
+			if ($objCustomFieldArray) {
+				foreach ($objCustomFieldArray as $objCustomField) {
+					if ($objCustomField->RequiredFlag && $objCustomField->DefaultCustomFieldValueId) {
+						if ($objCustomField->CustomFieldQtypeId != 2) {
+							$objCustomFieldValue = new CustomFieldValue();
+							$objCustomFieldValue->CustomFieldId = $objCustomField->CustomFieldId;
+							$objCustomFieldValue->ShortDescription = $objCustomField->DefaultCustomFieldValue->ShortDescription;
+							$objCustomFieldValue->Save();
+							$intCustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
+						}
+						else {
+							$intCustomFieldValueId = $objCustomField->DefaultCustomFieldValueId;
+						}
+							
+						$objCustomFieldSelection = new CustomFieldSelection();
+						$objCustomFieldSelection->CustomFieldValueId = $intCustomFieldValueId;
+						$objCustomFieldSelection->EntityQtypeId = $intEntityQtypeId;
+						$objCustomFieldSelection->EntityId = $intEntityId;
+						$objCustomFieldSelection->Save();
+					}
+				}
+			}
+		}
+		
+		/**
+		 * This method will update the CustomFieldSelections for one Required Custom Field
+		 *
+		 */
+		public function UpdateRequiredFieldSelections() {
+			
+			$objEntityQtypeCustomFieldArray = EntityQtypeCustomField::LoadArrayByCustomFieldId($this->CustomFieldId);
+			if ($objEntityQtypeCustomFieldArray) {
+				
+				foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
+					
+					$strEntity = EntityQtype::ToStringPrimaryKeySql($objEntityQtypeCustomField->EntityQtypeId);
+					$strEntityTable = EntityQtype::ToStringTable($objEntityQtypeCustomField->EntityQtypeId);
+					
+					// This query returns entities which do not have a custom_field_selection for this specific Custom Field/Entity QType combination
+					$strQuery = sprintf("
+					SELECT %s AS entity_id
+					FROM %s
+					LEFT JOIN (custom_field_selection JOIN custom_field_value ON custom_field_selection.custom_field_value_id = custom_field_value.custom_field_value_id AND custom_field_value.custom_field_id = %s) ON %s = custom_field_selection.entity_id AND custom_field_selection.entity_qtype_id = %s
+					WHERE custom_field_selection.custom_field_selection_id IS NULL"
+					, $strEntity, $strEntityTable, $this->CustomFieldId, $strEntity, $objEntityQtypeCustomField->EntityQtypeId);
+					
+					$objDatabase = QApplication::$Database[1];
+					$objDbResult = $objDatabase->Query($strQuery);
+					while ($mixRow = $objDbResult->FetchArray()) {
+						
+						// If it is not a SELECT custom field, then create a new CustomFieldValue
+						if ($this->CustomFieldQtypeId != 2) {
+							$objCustomFieldValue = new CustomFieldValue();
+							$objCustomFieldValue->CustomFieldId = $this->CustomFieldId;
+							$objCustomFieldValue->ShortDescription = $this->DefaultCustomFieldValue->ShortDescription;
+							$objCustomFieldValue->Save();
+							$intCustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
+						}
+						// If it is a SELECT custom field, the CustomFieldValue is already created, so just assign the CustomFieldValueId to intCustomFieldValueId
+						else {
+							$intCustomFieldValueId = $this->DefaultCustomFieldValueId;
+						}
+						
+						// Create the new CustomFieldSelection for this Entity Qtype/Entity Id/Custom Field Id
+						$objCustomFieldSelection = new CustomFieldSelection();
+						$objCustomFieldSelection->CustomFieldValueId = $intCustomFieldValueId;
+						$objCustomFieldSelection->EntityQtypeId = $objEntityQtypeCustomField->EntityQtypeId;
+						$objCustomFieldSelection->EntityId = $mixRow['entity_id'];
+						$objCustomFieldSelection->Save();
+					}
+				}
+			}
+		}		
+		
+		/**
 		 * Generate the SQL for a lsit page to include custom fields as virtual attributes (add __ before an alias to make a virutal attribute)
 		 * The virtual attributes can then be accessed by $objAsset->GetVirtualAttribute('name_of_attribute') where the name doesn't include the __
 		 * This method was added so that custom fields can be added to the customizable datagrids as hidden columns
@@ -129,7 +213,8 @@
 		 * @return Array $objCustomFieldArray of CustomField objects
 		 */
 		public static function LoadObjCustomFieldArray($intEntityQtypeId, $blnEditMode, $intEntityId = null) {
-			$objCustomFieldArray = CustomField::LoadArrayByActiveFlagEntity(true, $intEntityQtypeId);
+			$objExpansionMap[CustomField::ExpandDefaultCustomFieldValue] = true;
+			$objCustomFieldArray = CustomField::LoadArrayByActiveFlagEntity(true, $intEntityQtypeId, null, null, $objExpansionMap);
 			if ($objCustomFieldArray && $blnEditMode) {
 				foreach ($objCustomFieldArray as $objCustomField) {
 					$objCustomField->LoadExpandedArrayByEntity($intEntityQtypeId, $intEntityId);
@@ -174,8 +259,8 @@
 					`custom_field`.*
 					%s
 				FROM
-					`custom_field` AS `custom_field`,
-					`entity_qtype_custom_field` AS `entity_qtype_custom_field`
+					`entity_qtype_custom_field` AS `entity_qtype_custom_field`,
+					`custom_field` AS `custom_field`
 					%s
 				WHERE
 					`custom_field`.`active_flag` %s AND
@@ -247,6 +332,10 @@
 	 					if ($blnEditMode && $objCustomFieldArray[$i]->CustomFieldSelection) {
 	 						$arrCustomFields[$i]['input']->Text = $objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription;
 	 					}
+	 					// If it is a required text field, then assign the default text for a new entity only
+	 					elseif (!$blnEditMode && !$blnSearch && $objCustomFieldArray[$i]->RequiredFlag && $objCustomFieldArray[$i]->DefaultCustomFieldValueId) {
+	 						$arrCustomFields[$i]['input']->Text = $objCustomFieldArray[$i]->DefaultCustomFieldValue->ShortDescription;
+	 					}
 	 				}
 	 				// Create list inputs
 	 				elseif (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'select') {
@@ -260,7 +349,11 @@
 							$arrCustomFields[$i]['input']->AddItem('- Select One -', null);
 							foreach ($objCustomFieldValueArray as $objCustomFieldValue) {
 								$objListItem = new QListItem($objCustomFieldValue->__toString(), $objCustomFieldValue->CustomFieldValueId);
-								if (($objCustomFieldArray[$i]->CustomFieldSelection) && ($objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValueId == $objCustomFieldValue->CustomFieldValueId)) {
+								if ($blnEditMode &&($objCustomFieldArray[$i]->CustomFieldSelection) && ($objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValueId == $objCustomFieldValue->CustomFieldValueId)) {
+									$objListItem->Selected = true;
+								}
+								// If it is a required field, then select the value on new entities by default
+								elseif (!$blnEditMode && !$blnSearch && $objCustomFieldArray[$i]->RequiredFlag && $objCustomFieldArray[$i]->DefaultCustomFieldValueId && $objCustomFieldArray[$i]->DefaultCustomFieldValueId == $objCustomFieldValue->CustomFieldValueId) {
 									$objListItem->Selected = true;
 								}
 								$arrCustomFields[$i]['input']->AddItem($objListItem);

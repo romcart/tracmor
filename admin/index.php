@@ -27,15 +27,98 @@
 		// Header Menu
 		protected $ctlHeaderMenu;
 		
+		// Inputs
+		protected $txtMinAssetCode;
+		protected $txtFedexMeterNumber;
+		protected $txtImageUploadPrefix;
+		protected $txtFedexGatewayUri;
+		protected $txtFormStatePath;
+		protected $txtPackingListTerms;
+		
+		// Buttons
+		protected $btnSave;
+		
 		protected function Form_Create() {
 			// Create the Header Menu
-			$this->ctlHeaderMenu_Create();			
+			$this->ctlHeaderMenu_Create();
+			
+			// Create Inputs
+			$this->txtMinAssetCode_Create();
+			$this->txtFedexMeterNumber_Create();
+			$this->txtImageUploadPrefix_Create();
+			$this->txtFedexGatewayUri_Create();
+			$this->txtFormStatePath_Create();
+			$this->txtPackingListTerms_Create();
+			
+			// Create Buttons
+			$this->btnSave_Create();
 		}
 		
 		// Create and Setup the Header Composite Control
-  		protected function ctlHeaderMenu_Create() {
-  			$this->ctlHeaderMenu = new QHeaderMenu($this);
-  		}	
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+		}
+		
+		// Create and Setup the MinAssetCode Text Field
+		protected function txtMinAssetCode_Create() {
+			$this->txtMinAssetCode = new QTextBox($this);
+			$this->txtMinAssetCode->Name = 'Minimum Asset Code';
+			$this->txtMinAssetCode->Text = QApplication::$TracmorSettings->MinAssetCode;
+		}
+		
+		// Create and Setup the MinAssetCode Text Field
+		protected function txtFedexMeterNumber_Create() {
+			$this->txtFedexMeterNumber = new QTextBox($this);
+			$this->txtFedexMeterNumber->Name = 'Fedex Meter Number';
+			$this->txtFedexMeterNumber->Text = QApplication::$TracmorSettings->FedexMeterNumber;
+		}
+		
+		// Create and Setup the MinAssetCode Text Field
+		protected function txtImageUploadPrefix_Create() {
+			$this->txtImageUploadPrefix = new QTextBox($this);
+			$this->txtImageUploadPrefix->Name = 'Image Upload Prefix';
+			$this->txtImageUploadPrefix->Text = QApplication::$TracmorSettings->ImageUploadPrefix;
+		}
+		
+		// Create and Setup the MinAssetCode Text Field
+		protected function txtFedexGatewayUri_Create() {
+			$this->txtFedexGatewayUri = new QTextBox($this);
+			$this->txtFedexGatewayUri->Name = 'Fedex Gateway URI';
+			$this->txtFedexGatewayUri->Text = QApplication::$TracmorSettings->FedexGatewayUri;
+		}
+		
+		// Create and Setup the MinAssetCode Text Field
+		protected function txtFormStatePath_Create() {
+			$this->txtFormStatePath = new QTextBox($this);
+			$this->txtFormStatePath->Name = 'Formstate Path';
+			$this->txtFormStatePath->Text = QApplication::$TracmorSettings->FormStatePath;
+		}
+		
+		// Create and Setup the MinAssetCode Text Field
+		protected function txtPackingListTerms_Create() {
+			$this->txtPackingListTerms = new QTextBox($this);
+			$this->txtPackingListTerms->Name = 'Packing List Terms';
+			$this->txtPackingListTerms->TextMode = QTextMode::MultiLine;
+			$this->txtPackingListTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
+		}				
+		
+		// Create and Setup the Save Buttons
+		protected function btnSave_Create() {
+			$this->btnSave = new QButton($this);
+			$this->btnSave->Text = 'Save';
+			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
+		}
+		
+		// Save button click action
+		// Setting a TracmorSetting saves it to the database automagically because the __set() method has been altered
+		protected function btnSave_Click() {
+			QApplication::$TracmorSettings->MinAssetCode = $this->txtMinAssetCode->Text;
+			QApplication::$TracmorSettings->FedexMeterNumber = $this->txtFedexMeterNumber->Text;
+			QApplication::$TracmorSettings->ImageUploadPrefix = $this->txtImageUploadPrefix->Text;
+			QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
+			QApplication::$TracmorSettings->FormStatePath = $this->txtFormStatePath->Text;
+			QApplication::$TracmorSettings->PackingListTerms = $this->txtPackingListTerms->Text;
+		}
 	}
 
   	// Go ahead and run this form object to generate the page

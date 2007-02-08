@@ -33,6 +33,9 @@
 	 * Please note: All custom render methods should start with a RenderHelper call and end with a RenderOUtput call.
 	 */
 	abstract class QControl extends QControlBase {
+		
+		protected $blnDisplayName = true;
+		
 		// This will call GetControlHtml() for the bulk of the work, but will add layout html as well.  It will include
 		// the rendering of the Controls' name label, any errors or warnings, instructions, and html before/after (if specified).
 		// 
@@ -159,7 +162,7 @@
 			////////////////////
 
 			// Custom Render Functionality Here
-			if ($this->strName) {
+			if ($this->strName && $this->blnDisplayName) {
 				if ($this->blnRequired)
 					$strName = sprintf('<b>%s</b>', strtoupper($this->strName));
 				else
@@ -242,5 +245,30 @@
 			return $this->RenderOutput($strToReturn, $blnDisplayOutput);
 			////////////////////////////////////////////
 		}
+		
+    public function __get($strName) {
+      switch ($strName) {
+        case 'DisplayName': return $this->blnDisplayName;
+        default:
+          try {
+              return parent::__get($strName);
+          } catch (QCallerException $objExc) {
+              $objExc->IncrementOffset();
+              throw $objExc;
+          }
+      }
+  }
+  public function __set($strName, $mixValue) {
+    switch ($strName) {
+	    case 'DisplayName': return ($this->blnDisplayName = QType::Cast($mixValue, QType::Boolean));
+	    default:
+	      try {
+	          return parent::__set($strName, $mixValue);
+	      } catch (QCallerException $objExc) {
+	          $objExc->IncrementOffset();
+	          throw $objExc;
+	      }
+		  }
+    }		
 	}
 ?>

@@ -40,6 +40,7 @@ class QAssetEditComposite extends QControl {
 	protected $lblAssetCode;
 	protected $lblCreationDate;
 	protected $lblModifiedDate;
+	protected $chkAutoGenerateAssetCode;
 	
 	// Inputs
 	protected $lstAssetModel;
@@ -99,6 +100,7 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel_Create();
 		$this->txtAssetCode_Create();
 		$this->lstLocation_Create();
+		$this->chkAutoGenerateAssetCode_Create();
 		$this->UpdateAssetControls();
 
 		// Create all custom asset fields
@@ -230,8 +232,13 @@ class QAssetEditComposite extends QControl {
 		$this->lstLocation = new QListBox($this);
 		$this->lstLocation->Name = 'Location';
 		$this->lstLocation->Required = true;
-		if (!$this->blnEditMode)
+		if (!$this->blnEditMode) {
 			$this->lstLocation->AddItem('- Select One -', null);
+			$objLocationArray = Location::LoadAllLocations(true);
+		}
+		else {
+			$objLocationArray = Location::LoadAllLocations(true, true);
+		}
 		$objLocationArray = Location::LoadAllLocations(true);
 		if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
 			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
@@ -315,6 +322,17 @@ class QAssetEditComposite extends QControl {
 		$this->lblModifiedDate->Name = 'Last Modified';
 		if (!$this->blnEditMode) {
 			$this->lblModifiedDate->Visible = false;
+		}
+	}
+	
+	// Create the Auto Generate Asset Code Checkbox
+	protected function chkAutoGenerateAssetCode_Create() {
+		$this->chkAutoGenerateAssetCode = new QCheckBox($this);
+		$this->chkAutoGenerateAssetCode->Name = 'Auto Generate';
+		$this->chkAutoGenerateAssetCode->Text = 'Auto Generate';
+		$this->chkAutoGenerateAssetCode->AddAction(new QClickEvent(), new QToggleEnableAction($this->txtAssetCode));
+		if (!QApplication::$TracmorSettings->MinAssetCode) {
+			$this->chkAutoGenerateAssetCode->Visible = false;
 		}
 	}
 
@@ -561,8 +579,13 @@ class QAssetEditComposite extends QControl {
 			$objDatabase = QApplication::$Database[1];
 			// Begin a MySQL Transaction to be either committed or rolled back
 			$objDatabase->TransactionBegin();
-			
+
+			// Generate a new AssetCode based on the MinAssetCode value
 			// This happens whether or not they are creating a new one or editing an existing one
+			if ($this->chkAutoGenerateAssetCode->Checked) {
+				$this->txtAssetCode->Text = Asset::GenerateAssetCode();
+			}
+			
 			$this->objAsset->AssetCode = $this->txtAssetCode->Text;
 	
 			// If a new asset is being created
@@ -730,6 +753,11 @@ class QAssetEditComposite extends QControl {
 		QApplication::Redirect(sprintf('../receiving/receipt_edit.php?intAssetId=%s', $this->objAsset->AssetId));
 	}
 	
+	// Auto Generate Label Click Action
+	public function chkAutoGenerateAssetCode_Click($strFormId, $strControlId, $strParameter) {
+		$this->txtAssetCode->Enabled = false;
+	}
+	
 	// Display the labels and buttons for Asset Viewing mode
 	public function displayLabels() {
 
@@ -737,6 +765,7 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel->Display = false;
 		$this->lstLocation->Display = false;
 		$this->txtAssetCode->Display = false;
+		$this->chkAutoGenerateAssetCode->Display = false;
 		
 		// Do not display Cancel and Save buttons
 		$this->btnCancel->Display = false;
@@ -771,12 +800,14 @@ class QAssetEditComposite extends QControl {
    		$this->lstAssetModel->Display = true;
    		$this->lblLocation->Display = false;
    		$this->lstLocation->Display = true;
+   		$this->chkAutoGenerateAssetCode->Display = true;
     }
     else {
       $this->lblAssetModelCode->Display = true;
     	$this->lstAssetModel->Display = false;
    		$this->lblLocation->Display = true;
    		$this->lstLocation->Display = false;
+   		$this->chkAutoGenerateAssetCode->Display = false;
     }
     
     // Always display the label, never input, because it is associated with the AssetModelId
@@ -788,7 +819,7 @@ class QAssetEditComposite extends QControl {
     $this->btnClone->Display = false;
     
     // Display Asset Code input for edit mode
-		$this->txtAssetCode->Display = true;      
+		$this->txtAssetCode->Display = true;
 		
     // Display Cancel and Save butons    
     $this->btnCancel->Display = true;
@@ -903,7 +934,8 @@ class QAssetEditComposite extends QControl {
 	protected function UpdateAssetFields() {
 		$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
 		$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
-		$this->objAsset->AssetCode = $this->txtAssetCode->Text;
+		// This is set in the btnSave method so doesn't need to be set again here.
+		// $this->objAsset->AssetCode = $this->txtAssetCode->Text;
 	}
 	
 	// Assign the original values to all Asset Controls

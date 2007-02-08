@@ -41,6 +41,8 @@
 		// I'm not sure this needs to be here ... it is also declared in asset_edit.php
 		public $objCustomFieldArray;
 		
+		protected $intTempId;
+		
 		/**
 		 * Default "to string" handler
 		 * Allows pages to _p()/echo()/print() this object, and to define the default
@@ -90,6 +92,33 @@
 			$strValue = CustomField::__toStringCustomFieldValue($intCustomFieldId, $intAssetId, 1);
 			return $strValue;
 		}
+		
+		/**
+		 * This returns an auto-generated asset code based on the minimum asset code value in the AdminSettings and the highest asset code in the assets table
+		 * It will ignore any values that aren't strict integers
+		 * 
+		 * @return integer
+		 */
+		public static function GenerateAssetCode() {
+			$intMinAssetCode = QApplication::$TracmorSettings->MinAssetCode;
+			
+			$strQuery = "SELECT MAX(CAST(asset_code AS UNSIGNED)) AS max_asset_code FROM asset WHERE asset_code > $intMinAssetCode AND asset_code REGEXP '^[0-9]+$'";
+			
+			$objDatabase = QApplication::$Database[1];
+	
+	    // Perform the Query
+	    $objDbResult = $objDatabase->Query($strQuery);
+	    
+	    $mixRow = $objDbResult->FetchRow();
+	    if ($mixRow[0]) {
+	    	$intAssetCode = $mixRow[0] + 1;
+	    }
+	    else {
+	    	$intAssetCode = $intMinAssetCode;
+	    }
+			
+			return $intAssetCode;
+		}		
 		
 		/**
 		 * Returns an Account object the created the most recent transaction for this asset
@@ -246,6 +275,7 @@
 				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
+				
 
 			$objDbResult = $objDatabase->Query($strQuery);				
 			return Asset::InstantiateDbResult($objDbResult);			
@@ -372,6 +402,80 @@
 			    AND `custom_field_value_5` . `custom_field_id` = 5
 			    AND `custom_field_value_5` . `custom_field_value_id` = 6
 			*/			
+		}
+		
+		/**
+		 * Override method to perform a property "Set"
+		 * This will set the property $strName to be $mixValue
+		 *
+		 * @param string $strName Name of the property to set
+		 * @param string $mixValue New value of the property
+		 * @return mixed
+		 */
+		public function __set($strName, $mixValue) {
+			switch ($strName) {
+				///////////////////
+				// Member Variables
+				///////////////////
+				// AssetId was added so that it can be set to 0 in receipt_edit.php when creating new assets
+				// It provides a manner of creating a new, assignable asset (like AssetTransaction->Asset) without saving it to the db
+				case 'AssetId':
+					/**
+					 * Sets the value for intAssetId (Not Null)
+					 * @param integer $mixValue
+					 * @return integer
+					 */
+					try {
+						return ($this->intAssetId = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+					
+				// TempId is used as a unique identifier in receipt_edit.php (and possible shipment_edit.php) when AssetId is set to 0
+				case 'TempId':
+					/**
+					 * Sets the value for intTempId (Not Null)
+					 * @param integer $mixValue
+					 * @return integer
+					 */
+					try {
+						return ($this->intTempId = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}					
+					
+				default:
+					try {
+						return parent::__set($strName, $mixValue);
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+			}
+		}
+		
+		public function __get($strName) {
+			switch ($strName) {
+				///////////////////
+				// Member Variables
+				///////////////////
+				case 'TempId':
+					/**
+					 * Gets the value for intAssetId (Read-Only PK)
+					 * @return integer
+					 */
+					return $this->intTempId;
+					
+				default:
+					try {
+						return parent::__get($strName);
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+			}
 		}
 	}
 ?>

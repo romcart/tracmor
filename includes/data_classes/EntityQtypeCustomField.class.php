@@ -48,5 +48,18 @@
 		public function __toString() {
 			return sprintf('EntityQtypeCustomField Object %s',  $this->intEntityQtypeCustomFieldId);
 		}
+		
+		/**
+		 * Load a single EntityQtypeCustomField object,
+		 * by EntityQtypeId and CustomFieldId index(es)
+		 * This assumes that there is only one object per combination of these two parameters, which is the case but not enforced
+		 * @param integer $intEntityQtypeCustomFieldId
+		 * @return EntityQtypeCustomField
+		*/
+		public static function LoadByEntityQtypeIdCustomFieldId($intEntityQtypeId, $intCustomFieldId) {
+			return EntityQtypeCustomField::QuerySingle(
+				QQ::AndCondition(QQ::Equal(QQN::EntityQtypeCustomField()->EntityQtypeId, $intEntityQtypeId), QQ::Equal(QQN::EntityQtypeCustomField()->CustomFieldId, $intCustomFieldId))
+			);
+		}
 	}
 ?>

@@ -53,6 +53,30 @@
 					}
 			}
 		}
+		
+		// The public setter here actually saves the value to the database, so all you have to do is set a TracmorSettings to save it.
+		public function __set($strName, $mixValue) {
+			
+			// These are included here because this class is constructed before code generation
+			// include_once(__INCLUDES__ . '/qcodo/_core/codegen/QConvertNotationBase.class.php');
+			include_once(__INCLUDES__ .'/qcodo/codegen/QConvertNotation.class.php');
+			
+			switch ($strName) {
+				///////////////////
+				// Member Variables
+				///////////////////
+				
+				default:
+					try {
+						$objAdminSetting = AdminSetting::LoadByShortDescription(QConvertNotation::UnderscoreFromCamelCase($strName));
+						$objAdminSetting->Value = $mixValue;
+						return ($objAdminSetting->Save());
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+			}
+		}
 	}
 
 

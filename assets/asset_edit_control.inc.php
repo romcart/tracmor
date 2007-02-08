@@ -22,10 +22,10 @@
 	// Build array of all fields to display
 	$arrAssetViewFields = array();
 	$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lblAssetModel->Render(false) . $this->lstAssetModel->RenderWithError(false));	
-	$arrAssetFields[] = array('name' => 'Asset Code:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->lblAssetCode->Render(false));
-	$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false));
-	$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false));
-	$arrAssetFields[] = array('name' => 'Part Number:',  'value' => $this->lblAssetModelCode->Render(false));
+	$arrAssetFields[] = array('name' => 'Asset Code:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
+	$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false) . '&nbsp;');
+	$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . '&nbsp;');
+	$arrAssetFields[] = array('name' => 'Part Number:',  'value' => $this->lblAssetModelCode->Render(false) . '&nbsp;');
 	$arrAssetFields[] = array('name' => 'Location:',     'value' => $this->lstLocation->RenderWithError(false) . $this->lblLocation->Render(false));
 	
 	// Only display 'Reserved By' if the asset is reserved
@@ -73,7 +73,7 @@
 							for ($i=0;$i<ceil(count($arrAssetFields)/2);$i++) {
 								echo('<tr>');
 								echo('<td class="record_field_name">'. $arrAssetFields[$i]['name'] .'&nbsp;</td>');
-								echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'&nbsp;</td>');
+								echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'</td>');
 								echo('</tr>');
 							}
 						?>

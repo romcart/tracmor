@@ -62,6 +62,9 @@
 		protected $txtNewAssetCode;
 		protected $txtNewInventoryModelCode;
 		protected $txtQuantity;
+		protected $rblAssetType;
+		protected $lstAssetModel;
+		protected $chkAutoGenerateAssetCode;
 		
 		// Buttons
 		protected $btnEdit;
@@ -80,6 +83,9 @@
 		protected $objAssetTransactionArray;
 		protected $objInventoryTransactionArray;
 		protected $objTransaction;
+		
+		// Integers
+		protected $intNewTempId = 1;
 		
 		protected function Form_Create() {
 			
@@ -109,6 +115,9 @@
 			$this->txtNewAssetCode_Create();
 			$this->txtNewInventoryModelCode_Create();
 			$this->txtQuantity_Create();
+			$this->rblAssetType_Create();
+			$this->lstAssetModel_Create();
+			$this->chkAutoGenerateAssetCode_Create();
 			
 			// Create the buttons
 			$this->btnSave_Create();
@@ -231,7 +240,7 @@
 				$this->lblReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
 			}
 			else {
-				$this->lblReceiptNumber->Text = 'Provided Upon Save';
+				$this->lblReceiptNumber->Text = '';
 			}
 		}
 		
@@ -406,7 +415,37 @@
 			$this->txtQuantity->CausesValidation = false;
 			$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddInventory_Click'));
 			$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		}			
+		}
+		
+		// Create the Asset Type Radio Button List (new or existing)
+		protected function rblAssetType_Create() {
+			$this->rblAssetType = new QRadioButtonList($this);
+			$this->rblAssetType->AddItem(new QListItem('Existing Asset', 'existing', true));
+			$this->rblAssetType->AddItem(new QListItem('New Asset', 'new'));
+			$this->rblAssetType->AddAction(new QChangeEvent(), new QAjaxAction('rblAssetType_Change'));
+		}
+		
+		// Create the Asset Model List for creating new assets
+		protected function lstAssetModel_Create() {
+			$this->lstAssetModel = new QListBox($this);
+			$this->lstAssetModel->Name = 'Asset Model';
+			$this->lstAssetModel->AddItem('- Select One -', null, true);
+			$objAssetModelArray = AssetModel::LoadAll(QQ::Clause(QQ::OrderBy(QQN::AssetModel()->ShortDescription)));
+			if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
+				$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
+				$this->lstAssetModel->AddItem($objListItem);
+			}
+			$this->lstAssetModel->Display = false;
+		}
+		
+		// Create the Auto Generate Asset Code Checkbox
+		protected function chkAutoGenerateAssetCode_Create() {
+			$this->chkAutoGenerateAssetCode = new QCheckBox($this);
+			$this->chkAutoGenerateAssetCode->Name = 'Auto Generate';
+			$this->chkAutoGenerateAssetCode->Text = 'Auto Generate';
+			$this->chkAutoGenerateAssetCode->AddAction(new QClickEvent(), new QToggleEnableAction($this->txtNewAssetCode));
+			$this->chkAutoGenerateAssetCode->Display = false;
+		}
 		
 		//*******************
 		// CREATE BUTTONS
@@ -441,7 +480,7 @@
 		protected function btnDelete_Create() {
 			$this->btnDelete = new QButton($this);
 			$this->btnDelete->Text = QApplication::Translate('Delete');
-			$this->btnDelete->AddAction(new QClickEvent(), new QConfirmAction(sprintf(QApplication::Translate('Are you SURE you want to DELETE this %s?'), 'Receipt')));
+			$this->btnDelete->AddAction(new QClickEvent(), new QConfirmAction(sprintf(QApplication::Translate('All assets that were created while scheduling this receipt will also be deleted. Are you SURE you want to DELETE this %s?'), 'Receipt')));
 			$this->btnDelete->AddAction(new QClickEvent(), new QAjaxAction('btnDelete_Click'));
 			$this->btnDelete->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objReceipt, $this->btnDelete, 3);
@@ -554,14 +593,23 @@
 				return '';
 			}
 			else {
-	      $strControlId = 'btnRemoveAsset' . $objAssetTransaction->Asset->AssetId;
+				// Assign the asset a TempId and increment it by one
+	      $objAssetTransaction->Asset->TempId = $this->intNewTempId++;
+	      $strControlId = 'btnRemoveAsset' . $objAssetTransaction->Asset->TempId;
+	      // I don't know why this line is here. I guess it is to make sure the control hasn't already been created
 	      $btnRemove = $this->GetControl($strControlId);
 	      if (!$btnRemove) {
 	          // Create the Remove button for this row in the DataGrid
-	          // Use ActionParameter to specify the ID of the asset
 	          $btnRemove = new QButton($this->dtgAssetTransact, $strControlId);
-	          $btnRemove->Text = 'Remove';
-	          $btnRemove->ActionParameter = $objAssetTransaction->Asset->AssetId;
+	          if ($objAssetTransaction->NewAssetFlag) {
+	          	$btnRemove->Text = 'Remove and Delete';
+	          }
+	          else {
+	          	$btnRemove->Text = 'Remove';
+	          }
+	          // Use ActionParameter to specify the TempId of the asset
+	          // Using TempId because newly created (but not yet saved to the db) assets all have an AssetId of 0, so we needed another unique identifier	          
+	          $btnRemove->ActionParameter = $objAssetTransaction->Asset->TempId;
 	          $btnRemove->AddAction(new QClickEvent(), new QAjaxAction('btnRemoveAssetTransaction_Click'));
 	          $btnRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnRemoveAssetTransaction_Click'));
 	          $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -598,7 +646,8 @@
 		}
 		
 		// Render the cancel receipt button in the AssetTransact datagrid
-		public function btnCancelAssetTransaction_Render(AssetTransaction $objAssetTransaction) {
+		// We are not using this button at all anymore
+/*		public function btnCancelAssetTransaction_Render(AssetTransaction $objAssetTransaction) {
 			
 			if ($objAssetTransaction->blnReturnReceivedStatus()) {
 				$strControlId = 'btnCancelAssetTransaction' . $objAssetTransaction->AssetTransactionId;
@@ -619,7 +668,7 @@
 				
 				return $btnCancelAsset->Render(false);
 			}
-		}
+		}*/
 		
 		// Render the location received list in the AssetTransact datagrid
 		public function lstLocationAssetReceived_Render(AssetTransaction $objAssetTransaction) {
@@ -739,7 +788,7 @@
 		}
 		
 		// Render the cancel button in the InventoryTransact datagrid
-		public function btnCancelInventoryTransaction_Render(InventoryTransaction $objInventoryTransaction) {
+/*		public function btnCancelInventoryTransaction_Render(InventoryTransaction $objInventoryTransaction) {
 			
 			if ($objInventoryTransaction->blnReturnReceivedStatus()) {
 				$strControlId = 'btnCancelInventoryTransaction' . $objInventoryTransaction->InventoryTransactionId;
@@ -759,7 +808,7 @@
 				QApplication::AuthorizeControl($this->objReceipt, $btnCancelInventory, 2);
 				return $btnCancelInventory->Render(false);
 			}
-		}
+		}*/
 		
 		// Render the quantity textbox in the InventoryTransact datagrid
 		public function txtQuantityReceived_Render(InventoryTransaction $objInventoryTransaction) {
@@ -832,64 +881,137 @@
 			$this->DisplayInputs();
 		}
 		
+		// This triggers any time the Asset Type Radio Button List is changed (not clicked)
+		protected function rblAssetType_Change($strFormId, $strControlId, $strParameter) {
+			
+			$this->txtNewAssetCode->Text = '';
+			
+			// If adding an existing asset to the receipt
+			if ($this->rblAssetType->SelectedValue == 'existing') {
+				$this->lstAssetModel->Display = false;
+				$this->chkAutoGenerateAssetCode->Checked = false;
+				$this->chkAutoGenerateAssetCode->Display = false;
+				$this->txtNewAssetCode->Enabled = true;
+			}
+			// If adding a new receipt to the receipt
+			elseif ($this->rblAssetType->SelectedValue == 'new') {
+				// Display the list of possible asset models
+				$this->lstAssetModel->Display = true;
+				// Display the Auto Generate Asset Code checkbox if a minimum value exists
+				if (QApplication::$TracmorSettings->MinAssetCode) {
+					$this->chkAutoGenerateAssetCode->Display = true;
+				}
+			}
+		}
+		
 		// AddAsset Button Click
 		public function btnAddAsset_Click($strFormId, $strControlId, $strParameter) {
 			
-			$strAssetCode = $this->txtNewAssetCode->Text;
-			$blnDuplicate = false;
-			$blnError = false;
-			
-			if ($strAssetCode) {
-				// Begin error checking
-				if ($this->objAssetTransactionArray) {
-					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-						if ($objAssetTransaction && $objAssetTransaction->Asset->AssetCode == $strAssetCode) {
-							$blnError = true;
-							$this->txtNewAssetCode->Warning = "That asset has already been added.";
-						}
+			if ($this->rblAssetType->SelectedValue == 'new') {
+				$blnError = false;
+				// Assign an empty string to the asset code for now (NULL won't work to render properly in the datagrid
+				if ($this->chkAutoGenerateAssetCode->Checked == true) {
+					$strAssetCode = '';
+				}
+				else {
+					$strAssetCode = $this->txtNewAssetCode->Text;
+					if (!$strAssetCode) {
+						$blnError = true;
+						$this->txtNewAssetCode->Warning = 'You must enter an asset code.';
 					}
 				}
-				
+				// Generate an error if that asset code already exists
+				if ($objDuplicate = Asset::LoadByAssetCode($strAssetCode)) {
+					$blnError = true;
+					$this->txtNewAssetCode->Warning = 'That asset code already exists. Choose another.';
+				}
 				if (!$blnError) {
-					$objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
-					if (!($objNewAsset instanceof Asset)) {
-						$blnError = true;
-						$this->txtNewAssetCode->Warning = "That asset code does not exist.";
+					$objNewAsset = new Asset();
+					$objNewAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
+					$objNewAsset->LocationId = 5; // To Be Received
+					$objNewAsset->AssetCode = $strAssetCode;
+					// Set the AssetId to 0. This is so that it can be assigned to an AssetTransaction object without being saved to the db
+					// We don't want to save this until btnSave_Click, because we don't want to create new assets that could get orphaned
+					$objNewAsset->AssetId = 0;
+					
+					// This can be combined with the code below it
+					$this->txtNewAssetCode->Text = null;
+					$this->txtNewAssetCode->Enabled = true;
+					$this->chkAutoGenerateAssetCode->Checked = false;
+					$this->lstAssetModel->SelectedValue = null;
+					$objNewAssetTransaction = new AssetTransaction();
+					// The source location can either be 'Shipped'(2) or 'To Be Received'(5)
+					$objNewAssetTransaction->SourceLocationId = $objNewAsset->LocationId;
+					// $objNewAssetTransaction->AssetId = $objNewAsset->AssetId;
+					$objNewAssetTransaction->Asset = $objNewAsset;
+					$this->objAssetTransactionArray[] = $objNewAssetTransaction;
+					// Set this boolean to true so that the datagrid updates
+					$this->blnModifyAssets = true;
+				}
+			}
+			
+			elseif ($this->rblAssetType->SelectedValue == 'existing') {
+			
+				$strAssetCode = $this->txtNewAssetCode->Text;
+				$blnDuplicate = false;
+				$blnError = false;
+				
+				if ($strAssetCode) {
+					// Begin error checking
+					if ($this->objAssetTransactionArray) {
+						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+							if ($objAssetTransaction && $objAssetTransaction->Asset->AssetCode == $strAssetCode) {
+								$blnError = true;
+								$this->txtNewAssetCode->Warning = "That asset has already been added.";
+							}
+						}
 					}
-					elseif ($objNewAsset->CheckedOutFlag) {
-						$blnError = true;
-						$this->txtNewAssetCode->Warning = "That asset is checked out.";
-					}
-					elseif ($objNewAsset->ReservedFlag) {
-						$blnError = true;
-						$this->txtNewAssetCode->Warning = "That asset is reserved.";
-					}
-					// Asset must either be 'To Be Received' or 'Shipped'
-					elseif (!($objNewAsset->LocationId == 5 || $objNewAsset->LocationId == 2)) {
-						$blnError = true;
-						$this->txtNewAssetCode->Warning = "That asset has already been received.";
-					}
-					// Check that the asset isn't already in another pending receipt
-					elseif ($objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
-						$blnError = true;
-						$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
-					}
-					// Check that the asset isn't in a pending shipment. This should be impossible, as you can not add items to a shipment that are TBR (to be received) or shipped.
-					// This means that they will be caught be the error checker above where LocationId must be 5 or 2
-					elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
-						$blnError = true;
-						$this->txtNewAssetCode->Warning = 'That asset is in a pending shipment.';
-					}
-					// Create a new, but incomplete AssetTransaction
+					
 					if (!$blnError) {
-						$this->txtNewAssetCode->Text = null;
-						$objNewAssetTransaction = new AssetTransaction();
-						// $objNewAssetTransaction->Asset = $objNewAsset;
-						$objNewAssetTransaction->AssetId = $objNewAsset->AssetId;
-						// The source location can either be 'Shipped'(2) or 'To Be Received'(5)
-						$objNewAssetTransaction->SourceLocationId = $objNewAsset->LocationId;
-						$this->objAssetTransactionArray[] = $objNewAssetTransaction;
-						$this->blnModifyAssets = true;
+						$objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
+						if (!($objNewAsset instanceof Asset)) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = "That asset code does not exist.";
+						}
+						elseif ($objNewAsset->CheckedOutFlag) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = "That asset is checked out.";
+						}
+						elseif ($objNewAsset->ReservedFlag) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = "That asset is reserved.";
+						}
+						// Asset must either be 'To Be Received' or 'Shipped'
+						elseif (!($objNewAsset->LocationId == 5 || $objNewAsset->LocationId == 2)) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = "That asset has already been received.";
+						}
+						// Check that the asset isn't already in another pending receipt
+						elseif ($objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
+						}
+						// Check that the asset isn't in a pending shipment. This should be impossible, as you can not add items to a shipment that are TBR (to be received) or shipped.
+						// This means that they will be caught be the error checker above where LocationId must be 5 or 2
+						elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = 'That asset is in a pending shipment.';
+						}
+						// Create a new, but incomplete AssetTransaction
+						if (!$blnError) {
+							$this->txtNewAssetCode->Text = null;
+							$this->txtNewAssetCode->Enabled = true;
+							$this->chkAutoGenerateAssetCode->Checked = false;
+							$this->lstAssetModel->SelectedValue = null;
+							$objNewAssetTransaction = new AssetTransaction();
+							// We can assign the AssetId for existing assets because they have already been saved to the db
+							$objNewAssetTransaction->AssetId = $objNewAsset->AssetId;
+							// The source location can either be 'Shipped'(2) or 'To Be Received'(5)
+							$objNewAssetTransaction->SourceLocationId = $objNewAsset->LocationId;
+							$this->objAssetTransactionArray[] = $objNewAssetTransaction;
+							// Set this boolean to true so that the datagrid updates
+							$this->blnModifyAssets = true;
+						}
 					}
 				}
 			}
@@ -960,10 +1082,10 @@
 		// Item is added to an array 'ToDelete', and then deleted when the Save button is clicked
 		public function btnRemoveAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
 
-			$intAssetId = $strParameter;
+			$intTempId = $strParameter;
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $key => $value) {
-					if ($value->Asset->AssetId == $intAssetId) {
+					if ($value->Asset->TempId == $intTempId) {
 						// Prepare to delete from the database when the Save button is clicked
 						if ($this->blnEditMode) {
 							$this->arrAssetTransactionToDelete[] = $value->AssetTransactionId;
@@ -995,7 +1117,9 @@
 		}
 		
 		// Cancel Asset Click
-		public function btnCancelAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
+		// We are not using this method anymore.
+		// We cannot allow people to reverse transactions, because other users could have conducted a transaction on this asset after it was received
+/*		public function btnCancelAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
 			
 			$intAssetTransactionId = $strParameter;
 			if ($this->objAssetTransactionArray) {
@@ -1004,6 +1128,8 @@
 					$objDatabase = QApplication::$Database[1];
 					// Begin a MySQL Transaction to be either committed or rolled back
 					$objDatabase->TransactionBegin();
+					
+					$blnError = false;
 					
 					foreach ($this->objAssetTransactionArray as &$objAssetTransaction) {
 						if ($objAssetTransaction->AssetTransactionId == $intAssetTransactionId) {
@@ -1044,7 +1170,7 @@
 					}
 				}
 			}
-		}
+		}*/
 		
 		// Receive asset click
 		public function btnReceiveAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
@@ -1132,7 +1258,7 @@
 		}
 		
 		// Cancel Inventory Click
-		public function btnCancelInventoryTransaction_Click($strFormId, $strControlId, $strParameter) {
+/*		public function btnCancelInventoryTransaction_Click($strFormId, $strControlId, $strParameter) {
 			
 			$intInventoryTransactionId = $strParameter;
 			if ($this->objInventoryTransactionArray) {
@@ -1188,7 +1314,7 @@
 					}
 				}
 			}
-		}
+		}*/
 		
 		// Receive Inventory Click - Holy Shit
 		public function btnReceiveInventoryTransaction_Click($strFormId, $strControlId, $strParameter) {
@@ -1346,6 +1472,23 @@
 				$this->btnCancel->Warning = 'There are no assets nor inventory in this receipt.';
 			}
 			
+			if (!$this->lstFromCompany->SelectedValue) {
+				$blnError = true;
+				$this->lstFromCompany->Warning = 'You must select a From Company';
+			}
+			if (!$this->lstFromContact->SelectedValue) {
+				$blnError = true;
+				$this->lstFromContact->Warning = 'You must select a From Contact';
+			}
+			if (!$this->lstToContact->SelectedValue) {
+				$blnError = true;
+				$this->lstToContact->Warning = 'You must select a To Contact';
+			}
+			if (!$this->lstToAddress->SelectedValue) {
+				$blnError = true;
+				$this->lstToAddress->Warning = 'You must select a To Address';
+			}
+			
 			if (!$blnError) {
 				if (!$this->blnEditMode) {
 					
@@ -1370,11 +1513,37 @@
 									// Save the asset to update the modified_date field so it can trigger an Optimistic Locking Exception when appropriate
 									// Also set the location to 5 (TBR). This is in case the current LocationId is 2 (Shipped), because they can be received.
 									$objAssetTransaction->Asset->LocationId = 5;
-									$objAssetTransaction->Asset->Save();
+									// If the AssetId==0, then it is a newly created asset that hasn't been saved to the db yet
+									// We have to create a new asset object and assign it to the AssetTransaction
+									// Just resetting the values for the existing asset object won't work for some reason (not sure why).
+									if ($objAssetTransaction->Asset->AssetId == 0) {
+										$objNewAsset = new Asset();
+										$objNewAsset->AssetModelId = $objAssetTransaction->Asset->AssetModelId;
+										$objNewAsset->TempId = $objAssetTransaction->Asset->TempId;
+										$objNewAsset->LocationId = $objAssetTransaction->Asset->LocationId;
+										// If the asset was selected for autogeneration, it will be blank, so create the asset code here (right before save)
+										if ($objAssetTransaction->Asset->AssetCode == '') {
+											$objAssetTransaction->Asset->AssetCode = Asset::GenerateAssetCode();
+										}
+										$objNewAsset->AssetCode = $objAssetTransaction->Asset->AssetCode;
+										// Save the new asset
+										$objNewAsset->Save();
+										
+										// Assign any default custom field values
+										CustomField::AssignNewEntityDefaultValues(1, $objNewAsset->AssetId);
+										
+										// Assign the new asset to the AssetTransaction
+										$objAssetTransaction->Asset = $objNewAsset;
+										
+										$objAssetTransaction->NewAssetFlag = true;
+									}
+									else {
+										$objAssetTransaction->NewAssetFlag = false;
+										$objAssetTransaction->Asset->Save();
+									}									
 									// Create the new assettransaction object and save it
 									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
 									$objAssetTransaction->Save();
-									
 								}
 							}
 						}
@@ -1405,7 +1574,9 @@
 						$objDatabase->TransactionRollback();
 						
 						if ($objExc->Class == 'Asset') {
-							$this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
+							// $this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
+							$this->btnRemoveAssetTransaction_Click($this->FormId, null, $objExc->EntityId);
+							
 							$objAsset = Asset::Load($objExc->EntityId);
 							if ($objAsset) {
 								$this->btnCancel->Warning = sprintf('The Asset %s has been modified by another user and removed from this shipment. You may add the asset again or save the transaction without it.', $objAsset->AssetCode);
@@ -1446,9 +1617,16 @@
 								$objAssetTransactionToDelete = AssetTransaction::Load($intAssetTransactionId);
 								// Make sure that it wasn't added and then removed
 								if ($objAssetTransactionToDelete) {
-									// Change back location
-									$objAssetTransactionToDelete->Asset->LocationId = $objAssetTransactionToDelete->SourceLocationId;
-									$objAssetTransactionToDelete->Asset->Save();
+									// If a new asset was created in this receipt, it needs to be deleted
+									if ($objAssetTransactionToDelete->NewAssetFlag) {
+										$objAssetTransactionToDelete->Asset->Delete();
+									}
+									// Otherwise, just revert to it's old location
+									else {
+										// Change back location
+										$objAssetTransactionToDelete->Asset->LocationId = $objAssetTransactionToDelete->SourceLocationId;
+										$objAssetTransactionToDelete->Asset->Save();
+									}
 									// Delete the asset transaction
 									$objAssetTransactionToDelete->Delete();
 									unset($objAssetTransactionToDelete);
@@ -1464,7 +1642,33 @@
 									// This is done in case the original location is 'Shipped'(2), not 'To Be Received'(5)
 									$objAssetTransaction->SourceLocationId = $objAssetTransaction->Asset->LocationId;
 									$objAssetTransaction->Asset->LocationId = 5; // To Be Received
-									$objAssetTransaction->Asset->Save();
+									// If the AssetId is 0 (it hasn't been saved to the database yet), then create a new Asset in the conventional way
+									// We have to create a new asset object and assign it to the AssetTransaction
+									// Just resetting the values for the existing asset object won't work for some reason (not sure why).
+									if ($objAssetTransaction->Asset->AssetId == 0) {
+										$objNewAsset = new Asset();
+										$objNewAsset->AssetModelId = $objAssetTransaction->Asset->AssetModelId;
+										$objNewAsset->TempId = $objAssetTransaction->Asset->TempId;
+										$objNewAsset->LocationId = $objAssetTransaction->Asset->LocationId;
+										// If the asset was selected for autogeneration, it will be blank, so create the asset code here (right before save)
+										if ($objAssetTransaction->Asset->AssetCode == '') {
+											$objAssetTransaction->Asset->AssetCode = Asset::GenerateAssetCode();
+										}
+										$objNewAsset->AssetCode = $objAssetTransaction->Asset->AssetCode;
+										// Save the new asset
+										$objNewAsset->Save();
+										
+										// Assign any default custom field values
+										CustomField::AssignNewEntityDefaultValues(1, $objNewAsset->AssetId);
+										
+										// Associate the new asset with the AssetTransaction
+										$objAssetTransaction->Asset = $objNewAsset;
+										$objAssetTransaction->NewAssetFlag = true;
+									}
+									else {
+										$objAssetTransaction->NewAssetFlag = false;
+										$objAssetTransaction->Asset->Save();
+									}
 								}
 								// Always save the asset transaction, to generate an Optimistic Locking Exception when appropriate
 								$objAssetTransaction->Save();
@@ -1554,7 +1758,8 @@
 						}
 						// This shouldn't be possible. What if they are on the same receipt?
 						elseif ($objExc->Class == 'Asset') {
-							$this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
+							// $this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
+							$this->btnRemoveAssetTransaction_Click($this->FormId, null, $objExc->EntityId);
 							$objAsset = Asset::Load($objExc->EntityId);
 							if ($objAsset) {
 								$this->btnCancel->Warning = sprintf('The Asset %s has been modified by another user and removed from this shipment. You may add the asset again or save the transaction without it.', $objAsset->AssetCode);
@@ -1610,6 +1815,15 @@
 					foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
 						$objInventoryTransaction->InventoryLocation->Quantity -= $objInventoryTransaction->Quantity;
 						$objInventoryTransaction->InventoryLocation->Save();
+					}
+				}
+				
+				// Delete any assets that were created while scheduling this receipt
+				if ($this->objAssetTransactionArray) {
+					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+						if ($objAssetTransaction->NewAssetFlag) {
+							$objAssetTransaction->Asset->Delete();
+						}
 					}
 				}
 				
@@ -1688,7 +1902,10 @@
 			}
 			$this->btnSave->Display = false;
 			$this->btnCancel->Display = false;
+			$this->rblAssetType->Display = false;
 			$this->txtNewAssetCode->Display = false;
+			$this->lstAssetModel->Display = false;
+			$this->chkAutoGenerateAssetCode->Display = false;
 			$this->btnAddAsset->Display = false;
 			$this->txtNewInventoryModelCode->Display = false;
 			$this->txtQuantity->Display = false;
@@ -1702,15 +1919,10 @@
 			$this->pnlNote->Display = true;
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
-			// if ($this->blnEditMode && !$this->objReceipt->ReceivedFlag) {
 			if ($this->blnEditMode) {
-				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationAssetReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveAssetTransaction_Render($_ITEM) ?> <?= $_FORM->btnCancelAssetTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
-				$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationInventoryReceived_Render($_ITEM) ?> <?= $_FORM->txtQuantityReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveInventoryTransaction_Render($_ITEM) ?> <?= $_FORM->btnCancelInventoryTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
+				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationAssetReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveAssetTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
+				$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationInventoryReceived_Render($_ITEM) ?> <?= $_FORM->txtQuantityReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveInventoryTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
 			}
-/*			elseif ($this->blnEditMode && $this->objReceipt->ReceivedFlag) {
-				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->btnCancelAssetTransaction_Render($_ITEM) ?>', 'CssClass=dtgcolumn'));
-				$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->btnCancelInventoryTransaction_Render($_ITEM) ?>', 'CssClass=dtgcolumn'));				
-			}*/
 		}
 		
 		protected function DisplayInputs() {
@@ -1737,7 +1949,15 @@
 			$this->btnSave->Display = true;
 			$this->btnCancel->Display = true;
 			if (!$this->objReceipt->ReceivedFlag) {
+				$this->rblAssetType->SelectedIndex = 0;
+				$this->rblAssetType->Display = true;
+				$this->txtNewAssetCode->Text = '';
+				$this->txtNewAssetCode->Enabled = true;
 				$this->txtNewAssetCode->Display = true;
+				$this->lstAssetModel->SelectedIndex = 0;
+				$this->lstAssetModel->Display = false;
+				$this->chkAutoGenerateAssetCode->Checked = false;
+				$this->chkAutoGenerateAssetCode->Display = false;
 				$this->btnAddAsset->Display = true;
 				$this->txtNewInventoryModelCode->Display = true;
 				$this->txtQuantity->Display = true;

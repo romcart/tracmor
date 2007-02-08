@@ -62,6 +62,10 @@
 		protected $lstSourceLocation;
 		protected $txtQuantity;
 		protected $lstFxServiceType;
+		protected $chkScheduleReceipt;
+		protected $rblAssetType;
+		protected $txtReceiptAssetCode;
+		protected $chkAutoGenerateAssetCode;
 		
 		// Buttons
 		protected $btnEdit;
@@ -70,7 +74,8 @@
 		protected $btnAddInventory;
 		protected $btnCompleteShipment;
 		protected $btnCancelShipment;
-		protected $btnCancelCompleteShipment;
+		// We are not allowing users to cancel complete shipments any longer. Creates a problem if transactions are conducted on assets/inventory after they are shipped.
+		// protected $btnCancelCompleteShipment;
 		
 		// Labels
 		protected $lblHeaderShipment;
@@ -86,7 +91,6 @@
 		protected $lblNotificationFlag;
 		protected $lblTrackingNumber;
 		protected $lblShipmentNumber;
-		// protected $lblHeaderCompleteShipment;
 		protected $lblShipDate;
 		protected $lblFromContact;
 		protected $lblFromAddress;
@@ -102,6 +106,7 @@
 		protected $pnlNote;
 		protected $lblPackingListLink;
 		protected $lblFedexShippingLabelLink;
+		protected $lblAdvanced;
 		
 		// Datagrids
 		protected $dtgAssetTransact;
@@ -117,6 +122,9 @@
 		protected $objTransaction;
 		protected $dttNow;
 		protected $dttFiveDaysFromNow;
+		
+		// Integers
+		protected $intNewTempId = 1;
 
 		protected function Form_Create() {
 			
@@ -206,6 +214,12 @@
 				$this->lstCurrencyUnit_Create();
 				$this->chkNotificationFlag_Create();
 				$this->txtTrackingNumber_Create();
+				$this->lblAdvanced_Create();
+				$this->txtReceiptAssetCode_Create();
+				
+				$this->chkAutoGenerateAssetCode_Create();
+				$this->rblAssetType_Create();
+				$this->chkScheduleReceipt_Create();
 			
 				// Shipping Info Panel Buttons
 				$this->btnSave_Create();
@@ -220,7 +234,7 @@
 			// Complete Shipment Buttons
 			$this->btnCompleteShipment_Create();
 			$this->btnCancelShipment_Create();
-			$this->btnCancelCompleteShipment_Create();
+			//$this->btnCancelCompleteShipment_Create();
 			
 			// Shipping Info Panel Datagrids
 			$this->dtgAssetTransact_Create();
@@ -500,7 +514,7 @@
 			$this->lblShipmentNumber = new QLabel($this->pnlShippingInfo);
 			$this->lblShipmentNumber->Name = 'Shipment Number';
 			if (!$this->blnEditMode) {
-				$this->lblShipmentNumber->Text = 'Provided Upon Save';
+				$this->lblShipmentNumber->Text = '';
 			}
 			elseif ($this->blnEditMode) {
 				$this->lblShipmentNumber->Text = $this->objShipment->ShipmentNumber;
@@ -631,6 +645,20 @@
 			$this->lblReference->Name = 'Reference';
 			if ($this->blnEditMode) {
 				$this->lblReference->Text = $this->objShipment->Reference;
+			}
+		}
+		
+		// Create and Setup lblAdvanced
+		protected function lblAdvanced_Create() {
+			$this->lblAdvanced = new QLabel($this);
+			$this->lblAdvanced->Name = 'Advanced';
+			$this->lblAdvanced->Text = 'Show Advanced';
+			$this->lblAdvanced->HtmlEntities = false;
+			$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
+	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
+			$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
+			if ($this->blnEditMode) {
+				$this->lblAdvanced->Display = false;
 			}
 		}
 		
@@ -1121,7 +1149,42 @@
 			$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddInventory_Click'));
 			$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtQuantity->Enabled = false;
-		}		
+		}
+		
+		protected function chkScheduleReceipt_Create() {
+			$this->chkScheduleReceipt = new QCheckBox($this->pnlShippingInfo);
+			$this->chkScheduleReceipt->Name = 'Schedule Receipt';
+			$this->chkScheduleReceipt->Text = 'Schedule a Receipt for:';
+			$this->chkScheduleReceipt->Display = false;
+			$this->chkScheduleReceipt->AddAction(new QClickEvent(), new QAjaxAction('chkScheduleReceipt_Click'));
+		}
+		
+		protected function rblAssetType_Create() {
+			$this->rblAssetType = new QRadioButtonList($this->pnlShippingInfo);
+			$this->rblAssetType->AddItem(new QListItem('This Asset', 'this', true));
+			$this->rblAssetType->AddItem(new QListItem('New Asset', 'new'));
+			$this->rblAssetType->Enabled = false;
+			$this->rblAssetType->Display = false;
+			// $this->rblAssetType->AddAction(new QChangeEvent(), new QAjaxAction('rblAssetType_Change'));
+			$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->txtReceiptAssetCode));
+			$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->chkAutoGenerateAssetCode));
+			
+		}
+		
+		protected function txtReceiptAssetCode_Create() {
+			$this->txtReceiptAssetCode = new QTextBox($this->pnlShippingInfo);
+			$this->txtReceiptAssetCode->Name = 'Asset Code';
+			$this->txtReceiptAssetCode->Display = false;
+			
+		}
+		
+		protected function chkAutoGenerateAssetCode_Create() {
+			$this->chkAutoGenerateAssetCode = new QCheckBox($this->pnlShippingInfo);
+			$this->chkAutoGenerateAssetCode->Name = 'Auto Generate';
+			$this->chkAutoGenerateAssetCode->Text = 'Auto Generate';
+			$this->chkAutoGenerateAssetCode->AddAction(new QClickEvent(), new QToggleEnableAction($this->txtReceiptAssetCode));
+			$this->chkAutoGenerateAssetCode->Display = false;
+		}
 		
 		//******************
 		// CREATE DATAGRIDS
@@ -1169,14 +1232,18 @@
 		// Render the remove button column in the AssetTransact datagrid
 		public function RemoveAssetColumn_Render(AssetTransaction $objAssetTransaction) {
 			
-      $strControlId = 'btnRemoveAsset' . $objAssetTransaction->Asset->AssetId;
+			// Assign the asset a TempId and increment it by one
+	    $objAssetTransaction->Asset->TempId = $this->intNewTempId++;
+      //$strControlId = 'btnRemoveAsset' . $objAssetTransaction->Asset->AssetId;
+      $strControlId = 'btnRemoveAsset' . $objAssetTransaction->Asset->TempId;
       $btnRemove = $this->GetControl($strControlId);
       if (!$btnRemove) {
           // Create the Remove button for this row in the DataGrid
           // Use ActionParameter to specify the ID of the asset
           $btnRemove = new QButton($this->dtgAssetTransact, $strControlId);
           $btnRemove->Text = 'Remove';
-          $btnRemove->ActionParameter = $objAssetTransaction->Asset->AssetId;
+          // $btnRemove->ActionParameter = $objAssetTransaction->Asset->AssetId;
+          $btnRemove->ActionParameter = $objAssetTransaction->Asset->TempId;
           $btnRemove->AddAction(new QClickEvent(), new QAjaxAction('btnRemoveAssetTransaction_Click'));
           $btnRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnRemoveAssetTransaction_Click'));
           $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -1269,13 +1336,13 @@
 		}
 		
 		// Create and Setup btnCancelCompleteShipment
-		protected function btnCancelCompleteShipment_Create() {
+/*		protected function btnCancelCompleteShipment_Create() {
 			$this->btnCancelCompleteShipment = new QButton($this->pnlCompleteShipmentLabels);
 			$this->btnCancelCompleteShipment->Text = 'Cancel Shipment';
 			$this->btnCancelCompleteShipment->AddAction(new QClickEvent(), new QAjaxAction('btnCancelCompleteShipment_Click'));
 			$this->btnCancelCompleteShipment->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objShipment, $this->btnCancelCompleteShipment, 2);
-		}
+		}*/
 		
 		// Setup btnSave
 		protected function btnSave_Create() {
@@ -1571,7 +1638,7 @@
 			
 			$strAssetCode = $this->txtNewAssetCode->Text;
 			$blnDuplicate = false;
-			$blnError = false;
+			$blnError = false;	
 			
 			if ($strAssetCode) {
 				// Begin error checking
@@ -1617,13 +1684,43 @@
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset was already scheduled for shipment.";
 					}
+					elseif ($this->lblAdvanced->Text == 'Hide Advanced' && $this->chkScheduleReceipt->Checked && $this->rblAssetType->SelectedValue == 'new' && !$this->chkAutoGenerateAssetCode->Checked && $this->txtReceiptAssetCode->Text == '') {
+						$blnError = true;
+						$this->txtReceiptAssetCode->Warning = "You must provide an asset code for the new asset.";
+					}
 						// Create a new, but incomplete AssetTransaction
 					if (!$blnError) {
+						// Clear out the AssetCode field
 						$this->txtNewAssetCode->Text = null;
 						$objNewAssetTransaction = new AssetTransaction();
 						// $objNewAssetTransaction->Asset = $objNewAsset;
 						$objNewAssetTransaction->AssetId = $objNewAsset->AssetId;
 						$objNewAssetTransaction->SourceLocationId = $objNewAsset->LocationId;
+						// If scheduling a receipt for this asset
+						if ($this->lblAdvanced->Text == "Hide Advanced" && $this->chkScheduleReceipt->Checked) {
+							// If creating a new asset
+							if ($this->rblAssetType->SelectedValue == 'new') {
+								$objReceiptAsset = new Asset();
+								// AssetId must be set so that it can be assigned to the AssetTransaction
+								$objReceiptAsset->AssetId = 0;
+								// The new receipt asset will be the same AssetModel as the asset being shipped (but a new asset)
+								$objReceiptAsset->AssetModelId = $objNewAsset->AssetModelId;
+								// Set Location to TBR
+								$objReceiptAsset->LocationId = 5;
+								// Set the asset code to empty so that we'll know to auto generate later
+								if ($this->chkAutoGenerateAssetCode->Checked) {
+									$strAssetCode = '';
+								}
+								else {
+									$strAssetCode = $this->txtReceiptAssetCode->Text;
+								}
+								$objReceiptAsset->AssetCode = $strAssetCode;
+								$objNewAssetTransaction->NewAsset = $objReceiptAsset;
+							}
+							// Set this flag so that it will schedule this asset for receipt once the shipment is completed
+							$objNewAssetTransaction->ScheduleReceiptFlag = true;
+							$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
+						}
 						$this->objAssetTransactionArray[] = $objNewAssetTransaction;
 						$this->blnModifyAssets = true;
 					}
@@ -1638,10 +1735,10 @@
 		// Remove button click action for each asset in the datagrid
 		public function btnRemoveAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
 
-			$intAssetId = $strParameter;
+			$intTempId = $strParameter;
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $key => $value) {
-					if ($value->Asset->AssetId == $intAssetId) {
+					if ($value->Asset->TempId == $intTempId) {
 						// Prepare to delete from the database when the Save button is clicked
 						if ($this->blnEditMode) {
 							$this->arrAssetTransactionToDelete[] = $value->AssetTransactionId;
@@ -1862,7 +1959,11 @@
 					$objDatabase->TransactionBegin();
 				
 					if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
-					// Assign a destinationLocation to the AssetTransaction, and change the Location of the asset
+						
+						$objTransaction = '';
+						$objReceipt = '';
+						
+						// Assign a destinationLocation to the AssetTransaction, and change the Location of the asset
 						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 							if ($objAssetTransaction->Asset instanceof Asset) {
 							
@@ -1874,6 +1975,44 @@
 								
 								$objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 								$objAssetTransaction->Save();
+								
+								if ($objAssetTransaction->ScheduleReceiptFlag) {
+									// If it doesn't exist, create a new transaction object and receipt object
+									if (!($objTransaction instanceof Transaction) && !($objReceipt instanceof Receipt)) {
+										$objTransaction = new Transaction();
+										// Transaction is asset only
+										$objTransaction->EntityQtypeId = 1;
+										// Transaction is a receipt
+										$objTransaction->TransactionTypeId = 7;
+										// Set a note showing how this receipt was created
+										$objTransaction->Note = sprintf('This receipt was automatically created when creating Shipment Number %s.', $this->objShipment->ShipmentNumber);
+										// Save the transaction
+										$objTransaction->Save();
+										// Create a new receipt
+										$objReceipt = new Receipt();
+										$objReceipt->TransactionId = $objTransaction->TransactionId;
+										// The receipt will be coming from the company that was shipped to
+										$objReceipt->FromCompanyId = $this->objShipment->ToCompanyId;
+										$objReceipt->FromContactId = $this->objShipment->ToContactId;
+										$objReceipt->ToContactId = $this->objShipment->FromContactId;
+										$objReceipt->ToAddressId = $this->objShipment->FromAddressId;
+										$objReceipt->ReceiptNumber = Receipt::LoadNewReceiptNumber();
+										
+										$objReceipt->Save();
+									}
+									
+									$objReceiptAssetTransaction = new AssetTransaction();
+									if (!$objAssetTransaction->NewAssetId) {
+										$objReceiptAssetTransaction->AssetId = $objAssetTransaction->AssetId;
+									}
+									else {
+										$objReceiptAssetTransaction->AssetId = $objAssetTransaction->NewAssetId;
+									}
+									$objReceiptAssetTransaction->TransactionId = $objTransaction->TransactionId;
+									$objReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->DestinationLocationId;
+									$objReceiptAssetTransaction->NewAssetFlag = true;
+									$objReceiptAssetTransaction->Save();
+								}
 							}
 						}
 					}
@@ -1927,7 +2066,7 @@
 		}
 		
 		// Cancel/Delete Completed Shipment
-		protected function btnCancelCompleteShipment_Click($strFormId, $strControlId, $strParameter) {
+/*		protected function btnCancelCompleteShipment_Click($strFormId, $strControlId, $strParameter) {
 			
 			// Determine the entity type(s) of this transaction
 			if ($this->objAssetTransactionArray && $this->objInventoryTransactionArray) {
@@ -2023,7 +2162,7 @@
 					throw new QOptimisticLockingException($objExc->Class);
 				}
 			}
-		}
+		}*/
 		
 		// Save new or existing shipment
 		// This does not complete a shipment
@@ -2132,6 +2271,25 @@
 									$objAssetTransaction->Asset->Save();
 									// Assign the TransactionId
 									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
+									// Create the new asset if it was scheduled for receipt
+									if ($objAssetTransaction->ScheduleReceiptFlag && $objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset) {
+										$objReceiptAsset = new Asset();
+										$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
+										$objReceiptAsset->LocationId = $objAssetTransaction->NewAsset->LocationId;
+										if ($objReceiptAsset->AssetCode == '') {
+											$objReceiptAsset->AssetCode = Asset::GenerateAssetCode();
+										}
+										else {
+											$objReceiptAsset->AssetCode = $objAssetTransaction->NewAsset->AssetCode;
+										}
+										$objReceiptAsset->Save();
+										
+										// Assign any default custom field values
+										CustomField::AssignNewEntityDefaultValues(1, $objReceiptAsset->AssetId);
+										
+										// Associate the new Asset with the AssetTransaction
+										$objAssetTransaction->NewAsset = $objReceiptAsset;
+									}
 									// $objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 									$objAssetTransaction->Save();
 								}
@@ -2163,7 +2321,8 @@
 						$objDatabase->TransactionRollback();
 						
 						if ($objExc->Class == 'Asset') {
-							$this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
+							// $this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
+							$this->btnRemoveAssetTransaction_Click($this->FormId, null, $objExc->EntityId);
 							$objAsset = Asset::Load($objExc->EntityId);
 							if ($objAsset) {
 								$this->btnCancel->Warning = sprintf('The Asset %s has been modified by another user and removed from this shipment. You may add the asset again or save the transaction without it.', $objAsset->AssetCode);
@@ -2206,6 +2365,10 @@
 									// Change back location
 									$objAssetTransactionToDelete->Asset->LocationId = $objAssetTransactionToDelete->SourceLocationId;
 									$objAssetTransactionToDelete->Asset->Save();
+									// Delete the asset that was created for a new receipt
+									if ($objAssetTransactionToDelete->NewAsset && $objAssetTransactionToDelete->NewAsset instanceof Asset && $objAssetTransactionToDelete->ScheduleReceiptFlag) {
+										$objAssetTransactionToDelete->NewAsset->Delete();
+									}
 									// Delete the asset transaction
 									$objAssetTransactionToDelete->Delete();
 									unset($objAssetTransactionToDelete);
@@ -2213,13 +2376,32 @@
 							}
 						}
 						
-						// Save existing AssetTransactions
+						// Save new AssetTransactions
 						if ($this->objAssetTransactionArray) {
 							foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 								if (!$objAssetTransaction->AssetTransactionId) {
 									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
 									// Save the asset just to update the modified_date field so it can trigger an Optimistic Locking Exception when appropriate
-										$objAssetTransaction->Asset->Save();
+									$objAssetTransaction->Asset->Save();
+									// Create the new asset if it was scheduled for receipt
+									if ($objAssetTransaction->ScheduleReceiptFlag && $objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset) {
+										$objReceiptAsset = new Asset();
+										$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
+										$objReceiptAsset->LocationId = $objAssetTransaction->NewAsset->LocationId;
+										if ($objAssetTransaction->NewAsset->AssetCode == '') {
+											$objReceiptAsset->AssetCode = Asset::GenerateAssetCode();
+										}
+										else {
+											$objReceiptAsset->AssetCode = $objAssetTransaction->NewAsset->AssetCode;
+										}
+										$objReceiptAsset->Save();
+										
+										// Assign any default custom field values
+										CustomField::AssignNewEntityDefaultValues(1, $objReceiptAsset->AssetId);
+										
+										// Associate the new Asset with the AssetTransaction
+										$objAssetTransaction->NewAsset = $objReceiptAsset;
+									}						
 									// $DestinationLocationId = 2; // Shipped
 									// $objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 									// $objAssetTransaction->Asset->LocationId = $DestinationLocationId;
@@ -2293,7 +2475,8 @@
 						}
 						// This shouldn't be possible. What if they are on the same shipment?
 						elseif ($objExc->Class == 'Asset') {
-							$this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
+							//$this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
+							$this->btnRemoveAssetTransaction_Click($this->FormId, null, $objExc->EntityId);
 							$objAsset = Asset::Load($objExc->EntityId);
 							if ($objAsset) {
 								$this->btnCancel->Warning = sprintf('The Asset %s has been modified by another user and removed from this shipment. You may add the asset again or save the transaction without it.', $objAsset->AssetCode);
@@ -2314,6 +2497,40 @@
 						}
 					}
 				}
+			}
+		}
+		
+		// This method triggers if the Advanced label gets clicked. It shows or hides the advanced fields for scheduling receipts
+		protected function lblAdvanced_Click($strFormId, $strControlId, $strParameter) {
+			if ($this->lblAdvanced->Text == 'Show Advanced') {
+				$this->chkScheduleReceipt->Display = true;
+				$this->rblAssetType->Display = true;
+				if ($this->rblAssetType->SelectedValue == 'new') {
+					$this->txtReceiptAssetCode->Display = true;
+					$this->chkAutoGenerateAssetCode->Display = true;
+				}
+				$this->lblAdvanced->Text = 'Hide Advanced';
+			}
+			elseif ($this->lblAdvanced->Text == 'Hide Advanced') {
+				$this->chkScheduleReceipt->Display = false;
+				$this->rblAssetType->Display = false;
+				$this->txtReceiptAssetCode->Display = false;
+				$this->chkAutoGenerateAssetCode->Display = false;
+				$this->lblAdvanced->Text = 'Show Advanced';
+			}
+		}
+		
+		// This method triggers when the Schedule Receipt checkbox gets clicked
+		protected function chkScheduleReceipt_Click($strFormId, $strControlId, $strParameter) {
+			if ($this->chkScheduleReceipt->Checked) {
+				$this->rblAssetType->Enabled = true;
+				$this->txtReceiptAssetCode->Enabled = true;
+				$this->chkAutoGenerateAssetCode->Enabled = true;
+			}
+			else {
+				$this->rblAssetType->Enabled = false;
+				$this->txtReceiptAssetCode->Enabled = false;
+				$this->chkAutoGenerateAssetCode->Enabled = false;
 			}
 		}
 		
@@ -2623,6 +2840,10 @@
 			$this->txtReference->Display = false;
 			$this->txtNote->Display = false;
 			$this->txtNewAssetCode->Display = false;
+			if ($this->lblAdvanced->Text == 'Hide Advanced') {
+				$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
+			}
+			$this->lblAdvanced->Display = false;
 			$this->btnAddAsset->Display = false;
 			$this->txtNewInventoryModelCode->Display = false;
 			$this->btnLookup->Display = false;
@@ -2726,6 +2947,7 @@
 			$this->txtReference->Display = true;
 			$this->txtNote->Display = true;
 			$this->txtNewAssetCode->Display = true;
+			$this->lblAdvanced->Display = true;
 			$this->btnAddAsset->Display = true;
 			$this->txtNewInventoryModelCode->Display = true;
 			$this->btnLookup->Display = true;

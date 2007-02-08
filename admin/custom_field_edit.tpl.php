@@ -61,7 +61,7 @@
 						</tr>
 						<tr>
 							<td class="record_field_name">Field Type: </td>
-							<td class="record_field_edit"><?php $this->lstCustomFieldQtype->RenderWithError(); ?></td>
+							<td class="record_field_edit"><?php $this->lstCustomFieldQtype->RenderWithError(); $this->lblCustomFieldQtype->RenderWithError(); ?></td>
 						</tr>
 						<tr>
 							<td class="record_field_name">Apply To: </td>
@@ -75,6 +75,10 @@
 							<td class="record_field_name">Required: </td>
 							<td class="record_field_edit"><?php $this->chkRequiredFlag->RenderWithError(); ?></td>
 						</tr>
+						<tr>
+							<td class="record_field_name">Default Value: </td>
+							<td class="record_field_edit"><?php $this->txtDefaultValue->RenderWithError(); $this->lstDefaultValue->RenderWithError(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>
@@ -82,12 +86,12 @@
 		<br />
 		<table>
 			<tr>
-				<td class="record_field_name">Selection Option: </td>
+				<td class="record_field_name"><?php $this->lblSelectionOption->Render(); ?> </td>
 				<td><?php $this->txtValue->RenderWithError(); ?></td>
 				<td><?php $this->btnAdd->Render(); ?></td>
 			</tr>
 		</table>
-		<?php $this->dtgValue->Render(); ?>
+		<?php $this->dtgValue->RenderWithError(); ?>
 
 
 	<?php $this->RenderEnd() ?>
