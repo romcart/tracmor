@@ -1154,7 +1154,7 @@
 		protected function chkScheduleReceipt_Create() {
 			$this->chkScheduleReceipt = new QCheckBox($this->pnlShippingInfo);
 			$this->chkScheduleReceipt->Name = 'Schedule Receipt';
-			$this->chkScheduleReceipt->Text = 'Schedule a Receipt for:';
+			$this->chkScheduleReceipt->Text = 'Schedule a Corresponding Receipt for:';
 			$this->chkScheduleReceipt->Display = false;
 			$this->chkScheduleReceipt->AddAction(new QClickEvent(), new QAjaxAction('chkScheduleReceipt_Click'));
 		}
