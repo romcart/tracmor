@@ -1167,7 +1167,10 @@
 			$this->rblAssetType->Display = false;
 			// $this->rblAssetType->AddAction(new QChangeEvent(), new QAjaxAction('rblAssetType_Change'));
 			$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->txtReceiptAssetCode));
-			$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->chkAutoGenerateAssetCode));
+			if (QApplication::$TracmorSettings->MinAssetCode) {
+				$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->chkAutoGenerateAssetCode));
+			}
+			
 			
 		}
 		
