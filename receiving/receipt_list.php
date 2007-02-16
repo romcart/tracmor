@@ -75,6 +75,10 @@
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;		
+		
+		// HoverTip Arrays
+		public $objAssetTransactionArray;
+		public $objInventoryTransactionArray;
 
 		protected function Form_Create() {
 			
@@ -248,7 +252,7 @@
       $this->dtgReceipt->Paginator = $objPaginator;
       $this->dtgReceipt->ItemsPerPage = 20;
           
-      $this->dtgReceipt->AddColumn(new QDataGridColumn('Receipt Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="receipt_number ASC"', 'ReverseSortByCommand="receipt_number DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumn('Receipt Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="receipt_number ASC"', 'ReverseSortByCommand="receipt_number DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgReceipt->AddColumn(new QDataGridColumn('Receive From Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="receipt__from_company_id__short_description ASC"', 'ReverseSortByCommand="receipt__from_company_id__short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumn('Receive From Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="receipt__from_contact_id__last_name ASC"', 'ReverseSortByCommand="receipt__from_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="receipt__created_by__last_name ASC"', 'ReverseSortByCommand="receipt__created_by__last_name DESC"', 'CssClass="dtg_column"'));

@@ -89,6 +89,71 @@
 		 */
 		public function __toStringWithLink($CssClass = null) {
 			return sprintf('<a href="../receiving/receipt_edit.php?intReceiptId=%s" class="%s">%s</a>', $this->intReceiptId, $CssClass, $this->__toString());
+		}
+		
+		/**
+		 * Returns the HTML needed for a receipt datagrid to show asset and inventory icons, with hovertips.
+		 *
+		 * @param QDatagrid Object $objControl
+		 * @return string
+		 */
+		public function __toStringHoverTips($objControl) {
+			
+			// Create the Asset Image label, with corresponding assets hovertip
+			if ($this->Transaction->EntityQtypeId == EntityQtype::AssetInventory || $this->Transaction->EntityQtypeId == EntityQtype::Asset) {
+				$lblAssetImage = new QLabelExt($objControl);
+				$lblAssetImage->HtmlEntities = false;
+				$lblAssetImage->Text = sprintf('<img src="%s/icons/asset_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
+				
+				// create
+				$objHoverTip = new QHoverTip($lblAssetImage);
+				$objHoverTip->Template = 'hovertip_assets.tpl.php';
+				$lblAssetImage->HoverTip = $objHoverTip;
+				
+				// Load the AssetTransaction Array on the form so that it can be used by the hovertip panel
+				$objClauses = array();
+				if ($objClause = QQ::LimitInfo(11, 0))
+					array_push($objClauses, $objClause);
+				if ($objClause = QQ::Expand(QQN::AssetTransaction()->Asset->AssetModel))
+					array_push($objClauses, $objClause);
+				if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation));
+					array_push($objClauses, $objClause);
+				$objControl->Form->objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($this->TransactionId, $objClauses);
+				$objClauses = null;
+			}
+			
+			// Create the Inventory Image label with corresponding inventory hovertip
+			if ($this->Transaction->EntityQtypeId == EntityQtype::AssetInventory || $this->Transaction->EntityQtypeId == EntityQtype::Inventory) {
+				$lblInventoryImage = new QLabelExt($objControl);
+				$lblInventoryImage->HtmlEntities = false;
+				$lblInventoryImage->Text = sprintf('<img src="%s/icons/inventory_datagrid.png" style="vertical-align:middle;"', __IMAGE_ASSETS__);
+				
+				// Create the inventory hovertip
+				$objHoverTip = new QHoverTip($lblInventoryImage);
+				$objHoverTip->Template = 'hovertip_inventory.tpl.php';
+				$lblInventoryImage->HoverTip = $objHoverTip;
+				
+				// Load the InventoryTransaction Array on the form so that it can be used by the hovertip panel
+				$objClauses = array();
+				if ($objClause = QQ::LimitInfo(11, 0))
+					array_push($objClauses, $objClause);
+				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->InventoryLocation->InventoryModel));
+					array_push($objClauses, $objClause);
+				$objControl->Form->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->TransactionId, $objClauses);
+				$objClauses = null;
+			}
+			
+			// Display the appropriate images
+			if ($this->Transaction->EntityQtypeId == EntityQtype::AssetInventory) {
+				$strToReturn = $lblAssetImage->Render(false) . '&nbsp;' . $lblInventoryImage->Render(false);
+			}
+			elseif ($this->Transaction->EntityQtypeId == EntityQtype::Asset) {
+				$strToReturn = $lblAssetImage->Render(false);
+			}
+			elseif ($this->Transaction->EntityQtypeId == EntityQtype::Inventory) {
+				$strToReturn = $lblInventoryImage->Render(false);
+			}
+			return $strToReturn;
 		}		
 
 		/**
