@@ -23,9 +23,17 @@
 
 	// Build array of all fields to display
 	$arrAdvancedSearchFields = array();
+	
+	// Show Asset Model Code for Asset Search
 	if (get_class($this->objParentObject) == 'AssetListForm') {
 		$arrAdvancedSearchFields[] = array('name' => 'Asset Model Code:',  'value' => $this->txtAssetModelCode->RenderWithError(false));	
 	}
+	
+	// Show Tracking Number for Shipment Search
+	if (get_class($this->objParentObject) == 'ShipmentListForm') {
+		$arrAdvancedSearchFields[] = array('name' => 'Tracking Number:', 'value' => $this->txtTrackingNumber->RenderWithError(false));
+	}
+	
 	$arrAdvancedSearchFields[] = array('name' => 'Date Modified:',   'value' => $this->lstDateModified->RenderWithError(false));
 	$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->dtpDateModifiedFirst->RenderWithError(false));
 	$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->dtpDateModifiedLast->RenderWithError(false));

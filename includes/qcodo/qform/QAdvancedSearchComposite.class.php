@@ -25,10 +25,12 @@
 class QAdvancedSearchComposite extends QControl {
 
 	protected $txtAssetModelCode;
+	protected $txtTrackingNumber;
 	protected $lstDateModified;
 	protected $dtpDateModifiedFirst;
 	protected $dtpDateModifiedLast;
 	protected $strAssetModelCode;
+	protected $strTrackingNumber;
 	protected $objCustomFieldArray;
 	protected $arrCustomFields;
 	protected $intEntityQtypeId;
@@ -48,6 +50,7 @@ class QAdvancedSearchComposite extends QControl {
 	    $this->intEntityQtypeId = $intEntityQtypeId;
 	    
 	    $this->txtAssetModelCode_Create();
+	    $this->txtTrackingNumber_Create();
 	    $this->lstDateModified_Create();
       $this->dtpDateModifiedFirst_Create();
       $this->dtpDateModifiedLast_Create();
@@ -56,6 +59,7 @@ class QAdvancedSearchComposite extends QControl {
 	}
 	public function ParsePostData() {
 		$this->strAssetModelCode = $this->txtAssetModelCode->Text;
+		$this->strTrackingNumber = $this->txtTrackingNumber->Text;
 	}
 	
 	public function GetJavaScriptAction() {
@@ -106,6 +110,14 @@ class QAdvancedSearchComposite extends QControl {
     else {
     	$this->txtAssetModelCode->Visible = false;
     }
+  }
+  
+  protected function txtTrackingNumber_Create() {
+		$this->txtTrackingNumber = new QTextBox($this);
+		$this->txtTrackingNumber->Name = 'Tracking Number';
+		$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+		$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtTrackingNumber->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
   }
   
   protected function dtpDateModifiedFirst_Create() {
@@ -168,6 +180,7 @@ class QAdvancedSearchComposite extends QControl {
 	
 	public function ClearControls() {
 		$this->txtAssetModelCode->Text = '';
+		$this->txtTrackingNumber->Text = '';
 		$this->lstDateModified->SelectedIndex = 0;
 		$this->dtpDateModifiedFirst->DateTime = new QDateTime(QDateTime::Now);
 		$this->dtpDateModifiedLast->DateTime = new QDateTime(QDateTime::Now);
@@ -187,6 +200,8 @@ class QAdvancedSearchComposite extends QControl {
   public function __get($strName) {
 	  switch ($strName) {
 			case "AssetModelCode": return $this->txtAssetModelCode->Text;
+				break;
+			case "TrackingNumber": return $this->txtTrackingNumber->Text;
 				break;
 			case "DateModified": return $this->lstDateModified->SelectedValue;
 				break;
