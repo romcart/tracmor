@@ -39,6 +39,10 @@
 		protected $ctlInventoryEdit;
 		protected $ctlInventoryTransact;
 		protected $intTransactionTypeId;
+		
+		// These are needed for the hovertips in the Shipping/Receiving datagrid
+		public $objAssetTransactionArray;
+		public $objInventoryTransactionArray;
 
 		// Override the Form_Create method in InventoryEditFormBase.inc
 		protected function Form_Create() {
@@ -92,22 +96,13 @@
 					$this->ctlInventoryEdit->dtgInventoryQuantities->DataSource = InventoryLocation::LoadArrayByInventoryModelIdLocations($this->ctlInventoryEdit->objInventoryModel->InventoryModelId, $this->ctlInventoryEdit->dtgInventoryQuantities->SortInfo, $this->ctlInventoryEdit->dtgInventoryQuantities->LimitInfo, $objExpansionMap);
 				}
 				$objExpansionMap = null;
-				
-				// Render the Transaction History datagrid if editing existing inventory
-				$objExpansionMap[InventoryTransaction::ExpandTransaction][Transaction::ExpandTransactionType] = true;
-				$objExpansionMap[InventoryTransaction::ExpandSourceLocation] = true;
-				$objExpansionMap[InventoryTransaction::ExpandDestinationLocation] = true;
-				$this->ctlInventoryEdit->dtgInventoryTransaction->TotalItemCount = InventoryTransaction::CountByInventoryModelId($this->ctlInventoryEdit->objInventoryModel->InventoryModelId);
-				$this->ctlInventoryEdit->dtgInventoryTransaction->DataSource = InventoryTransaction::LoadArrayByInventoryModelId($this->ctlInventoryEdit->objInventoryModel->InventoryModelId, $this->ctlInventoryEdit->dtgInventoryTransaction->SortInfo, $this->ctlInventoryEdit->dtgInventoryTransaction->LimitInfo, $objExpansionMap);
-				// If there are no rows in the datagrid, do not show the header column
-				if ($this->ctlInventoryEdit->dtgInventoryTransaction->TotalItemCount == 0) {
-					$this->ctlInventoryEdit->dtgInventoryTransaction->ShowHeader = false;
-				}
-				else {
-					$this->ctlInventoryEdit->dtgInventoryTransaction->ShowHeader = true;
-				}
-				$objExpansionMap = null;
 
+			// Specify the local databind method this datagrid will use
+			$this->ctlInventoryEdit->dtgInventoryTransaction->SetDataBinder('dtgInventoryTransaction_Bind');
+			
+			// Specify the local databind method this datagrid will use
+			$this->ctlInventoryEdit->dtgShipmentReceipt->SetDataBinder('dtgShipmentReceipt_Bind');
+			
 			}
 
 			// If InventoryLocations are in the array, finish setting up the datagrid of InventorieLocations prepared for a transaction
@@ -123,6 +118,75 @@
 				$this->ctlInventoryTransact->dtgInventoryTransact->ShowHeader = false;
 			}
 		}
+		
+		protected function dtgInventoryTransaction_Bind() {
+
+			$this->ctlInventoryEdit->dtgInventoryTransaction->TotalItemCount = InventoryTransaction::CountShipmentReceiptByInventoryModelId($this->ctlInventoryEdit->objInventoryModel->InventoryModelId, false);
+			if ($this->ctlInventoryEdit->dtgInventoryTransaction->TotalItemCount === 0) {
+				$this->ctlInventoryEdit->dtgInventoryTransaction->ShowHeader = false;
+			}
+			else {
+				$this->ctlInventoryEdit->dtgInventoryTransaction->ShowHeader = true;
+			}
+
+			$objClauses = array();
+			if ($objClause = $this->ctlInventoryEdit->dtgInventoryTransaction->OrderByClause) {
+				array_push($objClauses, $objClause);
+			}
+			if ($objClause = $this->ctlInventoryEdit->dtgInventoryTransaction->LimitClause) {
+				array_push($objClauses, $objClause);
+			}
+			if ($objClause = QQ::Expand(QQN::InventoryTransaction()->Transaction->TransactionType))
+				array_push($objClauses, $objClause);
+			if ($objClause = QQ::Expand(QQN::InventoryTransaction()->SourceLocation))
+				array_push($objClauses, $objClause);
+			if ($objClause = QQ::Expand(QQN::InventoryTransaction()->DestinationLocation))
+				array_push($objClauses, $objClause);
+				
+			$objCondition = QQ::AndCondition(QQ::Equal(QQN::InventoryTransaction()->InventoryLocation->InventoryModelId, $this->ctlInventoryEdit->objInventoryModel->InventoryModelId), QQ::NotEqual(QQN::InventoryTransaction()->Transaction->TransactionTypeId, 6), QQ::NotEqual(QQN::InventoryTransaction()->Transaction->TransactionTypeId, 7));				
+				
+			$this->ctlInventoryEdit->dtgInventoryTransaction->DataSource = InventoryTransaction::QueryArray($objCondition, $objClauses);
+			
+		}
+		
+		protected function dtgShipmentReceipt_Bind() {
+			// Get Total Count for Pagination
+			
+			$objClauses = array();
+			
+			$this->ctlInventoryEdit->dtgShipmentReceipt->TotalItemCount = InventoryTransaction::CountShipmentReceiptByInventoryModelId($this->ctlInventoryEdit->objInventoryModel->InventoryModelId);
+			
+			if ($this->ctlInventoryEdit->dtgShipmentReceipt->TotalItemCount === 0) {
+				$this->ctlInventoryEdit->lblShipmentReceipt->Display = false;
+				$this->ctlInventoryEdit->dtgShipmentReceipt->ShowHeader = false;
+			}
+			else {
+			
+				$objClauses = array();
+				if ($objClause = QQ::OrderBy(QQN::InventoryTransaction()->Transaction->CreationDate, false)) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = $this->ctlInventoryEdit->dtgShipmentReceipt->LimitClause) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->Transaction->Shipment)) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->Transaction->Receipt)) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->SourceLocation)) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->DestinationLocation)) {
+					array_push($objClauses, $objClause);			
+				}
+				
+				$objCondition = QQ::AndCondition(QQ::Equal(QQN::InventoryTransaction()->InventoryLocation->InventoryModelId, $this->ctlInventoryEdit->objInventoryModel->InventoryModelId), QQ::OrCondition(QQ::Equal(QQN::InventoryTransaction()->Transaction->TransactionTypeId, 6), QQ::Equal(QQN::InventoryTransaction()->Transaction->TransactionTypeId, 7)));
+				
+				$this->ctlInventoryEdit->dtgShipmentReceipt->DataSource = InventoryTransaction::QueryArray($objCondition, $objClauses);
+			}
+		}		
 		
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {

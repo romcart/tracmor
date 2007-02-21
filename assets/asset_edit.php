@@ -48,6 +48,10 @@
 		protected $ctlAssetTransact;
 		protected $intTransactionTypeId;
 		
+		// These are needed for the hovertips in the Shipping/Receiving datagrid
+		public $objAssetTransactionArray;
+		public $objInventoryTransactionArray;
+		
 		// Override the Form_Create method in AssetEditFormBase.inc
 		protected function Form_Create() {
 			
@@ -85,6 +89,9 @@
 				
 				// Specify the local databind method this datagrid will use
 				$this->ctlAssetEdit->dtgAssetTransaction->SetDataBinder('dtgAssetTransaction_Bind');
+				
+				// Specify the local databind method this datagrid will use
+				$this->ctlAssetEdit->dtgShipmentReceipt->SetDataBinder('dtgShipmentReceipt_Bind');
 			}
 
 			// If assets are in the array, finish setting up the datagrid of assets prepared for a transaction
@@ -101,7 +108,7 @@
 		
 		protected function dtgAssetTransaction_Bind() {
 			// Get Total Count b/c of Pagination
-			$this->ctlAssetEdit->dtgAssetTransaction->TotalItemCount = AssetTransaction::CountByAssetId($this->ctlAssetEdit->objAsset->AssetId);
+			$this->ctlAssetEdit->dtgAssetTransaction->TotalItemCount = AssetTransaction::CountShipmentReceiptByAssetId($this->ctlAssetEdit->objAsset->AssetId, false);
 			if ($this->ctlAssetEdit->dtgAssetTransaction->TotalItemCount === 0) {
 				$this->ctlAssetEdit->dtgAssetTransaction->ShowHeader = false;
 			}
@@ -116,12 +123,53 @@
 				array_push($objClauses, $objClause);
 			if ($objClause = QQ::Expand(QQN::AssetTransaction()->Transaction->TransactionType))
 				array_push($objClauses, $objClause);
-			if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation));
+			if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation))
 				array_push($objClauses, $objClause);
-			if ($obJClause = QQ::Expand(QQN::AssetTransaction()->DestinationLocation));
+			if ($objClause = QQ::Expand(QQN::AssetTransaction()->DestinationLocation))
 				array_push($objClauses, $objClause);
 				
-			$this->ctlAssetEdit->dtgAssetTransaction->DataSource = AssetTransaction::LoadArrayByAssetId($this->ctlAssetEdit->objAsset->AssetId, $objClauses);
+			$objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::NotEqual(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6), QQ::NotEqual(QQN::AssetTransaction()->Transaction->TransactionTypeId, 7));				
+				
+			$this->ctlAssetEdit->dtgAssetTransaction->DataSource = AssetTransaction::QueryArray($objCondition, $objClauses);
+		}
+		
+		protected function dtgShipmentReceipt_Bind() {
+			// Get Total Count for Pagination
+			
+			$objClauses = array();
+			
+			$this->ctlAssetEdit->dtgShipmentReceipt->TotalItemCount = AssetTransaction::CountShipmentReceiptByAssetId($this->ctlAssetEdit->objAsset->AssetId);
+			
+			if ($this->ctlAssetEdit->dtgShipmentReceipt->TotalItemCount === 0) {
+				$this->ctlAssetEdit->lblShipmentReceipt->Display = false;
+				$this->ctlAssetEdit->dtgShipmentReceipt->ShowHeader = false;
+			}
+			else {
+			
+				$objClauses = array();
+				if ($objClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false)) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = $this->ctlAssetEdit->dtgShipmentReceipt->LimitClause) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = QQ::Expand(QQN::AssetTransaction()->Transaction->Shipment)) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = QQ::Expand(QQN::AssetTransaction()->Transaction->Receipt)) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation)) {
+					array_push($objClauses, $objClause);
+				}
+				if ($objClause = QQ::Expand(QQN::AssetTransaction()->DestinationLocation)) {
+					array_push($objClauses, $objClause);			
+				}
+				
+				$objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6), QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 7)));
+				
+				$this->ctlAssetEdit->dtgShipmentReceipt->DataSource = AssetTransaction::QueryArray($objCondition, $objClauses);
+			}
 		}
 		
 /*		protected function Form_Exit() {

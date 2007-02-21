@@ -76,6 +76,94 @@
 			return $strToReturn;
 		}
 		
+		public function ToStringNumberWithLink() {
+			
+			$strToReturn = '';
+			
+			if ($this->objShipment) {
+				$strToReturn = sprintf('%s', $this->objShipment->__toStringWithLink());
+			}
+			elseif ($this->objReceipt) {
+				$strToReturn = sprintf('%s', $this->objReceipt->__toStringWithLink());
+			}
+			
+			return $strToReturn;
+		}
+		
+		public function ToStringHoverTips($objControl) {
+			
+			$strToReturn = '';
+			
+			if ($this->objShipment) {
+				$strToReturn = sprintf('%s', $this->objShipment->__toStringHoverTips($objControl));
+			}
+			elseif ($this->objReceipt) {
+				$strToReturn = sprintf('%s', $this->objReceipt->__toStringHoverTips($objControl));
+			}
+			
+			return $strToReturn;
+		}
+		
+		public function ToStringCompany() {
+			
+			$strToReturn = '';
+			
+			if ($this->objShipment) {
+				$strToReturn = $this->objShipment->ToCompany->__toString();
+			}
+			elseif ($this->objReceipt) {
+				$strToReturn = $this->objReceipt->FromCompany->__toString();
+			}
+			
+			return $strToReturn;
+		}
+		
+		public function ToStringContact() {
+
+			$strToReturn = '';
+			
+			if ($this->objShipment) {
+				$strToReturn = $this->objShipment->ToContact->__toString();
+			}
+			elseif ($this->objReceipt) {
+				$strToReturn = $this->objReceipt->FromContact->__toString();
+			}
+			
+			return $strToReturn;			
+			
+		}
+
+		
+		public function ToStringStatusStyled() {
+			
+			$strToReturn = '';
+			
+			if ($this->objShipment) {
+				$strToReturn = $this->objShipment->__toStringStatusStyled();
+			}
+			elseif ($this->objReceipt) {
+				$strToReturn = $this->objReceipt->__toStringStatusStyled();
+			}
+			
+			return $strToReturn;			
+			
+		}
+				
+		public function ToStringTrackingNumber() {
+			
+			$strToReturn = '';
+			
+			if ($this->objShipment) {
+				$strToReturn = $this->objShipment->__toStringTrackingNumber();
+			}
+			elseif ($this->objReceipt) {
+				
+			}
+			
+			return $strToReturn;			
+			
+		}
+		
 		// This adds the created by and creation date before saving a new transaction
 		public function Save($blnForceInsert = false, $blnForceUpdate = false) {
 			if ((!$this->__blnRestored) || ($blnForceInsert)) {

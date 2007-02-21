@@ -142,7 +142,7 @@
 				
 				// create
 				$objHoverTip = new QHoverTip($lblAssetImage);
-				$objHoverTip->Template = 'hovertip_assets.tpl.php';
+				$objHoverTip->Template = __DOCROOT__ . __SUBDIRECTORY__ . '/shipping/hovertip_assets.tpl.php';
 				$lblAssetImage->HoverTip = $objHoverTip;
 				
 				// Load the AssetTransaction Array on the form so that it can be used by the hovertip panel
@@ -165,7 +165,7 @@
 				
 				// Create the inventory hovertip
 				$objHoverTip = new QHoverTip($lblInventoryImage);
-				$objHoverTip->Template = 'hovertip_inventory.tpl.php';
+				$objHoverTip->Template = __DOCROOT__ . __SUBDIRECTORY__ . '/shipping/hovertip_inventory.tpl.php';
 				$lblInventoryImage->HoverTip = $objHoverTip;
 				
 				// Load the InventoryTransaction Array on the form so that it can be used by the hovertip panel

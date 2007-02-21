@@ -197,5 +197,37 @@
 			return QType::Cast($strDbRow[0], QType::Integer);
 		}		
 		
-	}
+		/**
+		 * Count InventoryTransactions
+		 * by InventoryModelId Index(es), but only those transactions that are Shipments or Receipts
+		 * @param integer $intAssetId
+		 * @param boolean $blnInclude - include only shipments and receipts or all other transactions
+		 * @return int
+		*/
+		public static function CountShipmentReceiptByInventoryModelId($intInventoryModelId, $blnInclude = true) {
+			// Call AssetTransaction::QueryCount to perform the CountByAssetId query
+			if ($blnInclude) {
+				$arrToReturn = InventoryTransaction::QueryCount(
+					QQ::AndCondition(
+						QQ::Equal(QQN::InventoryTransaction()->InventoryLocation->InventoryModelId, $intInventoryModelId),
+						QQ::OrCondition(
+							QQ::Equal(QQN::InventoryTransaction()->Transaction->TransactionTypeId, 6),
+							QQ::Equal(QQN::InventoryTransaction()->Transaction->TransactionTypeId, 7)
+						)
+					)
+				);
+			}
+			else {
+				$arrToReturn = InventoryTransaction::QueryCount(
+					QQ::AndCondition(
+						QQ::Equal(QQN::InventoryTransaction()->InventoryLocation->InventoryModelId, $intInventoryModelId),
+						QQ::NotEqual(QQN::InventoryTransaction()->Transaction->TransactionTypeId, 6),
+						QQ::NotEqual(QQN::InventoryTransaction()->Transaction->TransactionTypeId, 7)
+					)
+				);
+			}
+			
+			return $arrToReturn;
+		}
+	}		
 ?>

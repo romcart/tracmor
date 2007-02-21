@@ -203,5 +203,38 @@
 			$objDbResult = $objDatabase->Query($strQuery);
 			return AssetTransaction::InstantiateDbRow($objDbResult->GetNextRow());
 		}
+		
+		/**
+		 * Count AssetTransactions
+		 * by AssetId Index(es), but only those transactions that are Shipments or Receipts
+		 * @param integer $intAssetId
+		 * @param boolean $blnInclude - include only shipments and receipts or all other transactions
+		 * @return int
+		*/
+		public static function CountShipmentReceiptByAssetId($intAssetId, $blnInclude = true) {
+			// Call AssetTransaction::QueryCount to perform the CountByAssetId query
+			if ($blnInclude) {
+				$arrToReturn = AssetTransaction::QueryCount(
+					QQ::AndCondition(
+						QQ::Equal(QQN::AssetTransaction()->AssetId, $intAssetId),
+						QQ::OrCondition(
+							QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6),
+							QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 7)
+						)
+					)
+				);
+			}
+			else {
+				$arrToReturn = AssetTransaction::QueryCount(
+					QQ::AndCondition(
+						QQ::Equal(QQN::AssetTransaction()->AssetId, $intAssetId),
+						QQ::NotEqual(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6),
+						QQ::NotEqual(QQN::AssetTransaction()->Transaction->TransactionTypeId, 7)
+					)
+				);
+			}
+			
+			return $arrToReturn;
+		}
 	}
 ?>

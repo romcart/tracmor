@@ -41,6 +41,7 @@ class QAssetEditComposite extends QControl {
 	protected $lblCreationDate;
 	protected $lblModifiedDate;
 	protected $chkAutoGenerateAssetCode;
+	public $lblShipmentReceipt;
 	
 	// Inputs
 	protected $lstAssetModel;
@@ -65,6 +66,7 @@ class QAssetEditComposite extends QControl {
 	
 	// Transaction History Datagrid
 	public $dtgAssetTransaction;
+	public $dtgShipmentReceipt;
 	
 	// Custom Field Objects
 	// protected $objCustomFieldArray;
@@ -129,6 +131,8 @@ class QAssetEditComposite extends QControl {
 		if ($this->blnEditMode) {
 			// Create the transaction history datagrid
 			$this->dtgAssetTransaction_Create();
+			$this->lblShipmentReceipt_Create();
+			$this->dtgShipmentReceipt_Create();
 			$this->displayLabels();
 		}
 		// Display empty inputs to create a new asset
@@ -508,7 +512,7 @@ class QAssetEditComposite extends QControl {
 		$this->dtgAssetTransaction->CssClass = "datagrid";
 		
     // Enable AJAX - this won't work while using the DB profiler
-    $this->dtgAssetTransaction->UseAjax = false;
+    $this->dtgAssetTransaction->UseAjax = true;
 
     // Enable Pagination, and set to 20 items per page
     $objPaginator = new QPaginator($this->dtgAssetTransaction);
@@ -518,7 +522,7 @@ class QAssetEditComposite extends QControl {
     $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('Transaction Type', '<?= $_ITEM->Transaction->__toStringWithLink() ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Transaction->TransactionType->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Transaction->TransactionType->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
     $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('From', '<?= $_ITEM->__toStringSourceLocation() ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->SourceLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->SourceLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
     $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('To', '<?= $_ITEM->__toStringDestinationLocation() ?>', array('OrderByClause' => QQ::Orderby(QQN::AssetTransaction()->DestinationLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->DestinationLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
-    $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('User', '<?= $_ITEM->Transaction->CreatedByObject->__toStringFullName() ?>', array('CssClass' => "dtg_column")));
+    $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('User', '<?= $_ITEM->Transaction->CreatedByObject->__toStringFullName() ?>', array('OrderByClause' => QQ::Orderby(QQN::AssetTransaction()->CreatedByObject->LastName), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->CreatedByObject->LastName, false), 'CssClass' => "dtg_column")));
     $this->dtgAssetTransaction->AddColumn(new QDataGridColumn('Date', '<?= $_ITEM->Transaction->CreationDate->PHPDate("Y-m-d H:i:s"); ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false), 'CssClass' => "dtg_column")));
 
     $this->dtgAssetTransaction->SortColumnIndex = 4;
@@ -533,6 +537,50 @@ class QAssetEditComposite extends QControl {
     $objStyle->BackColor = '#EFEFEF';
 
     $objStyle = $this->dtgAssetTransaction->HeaderRowStyle;
+    $objStyle->ForeColor = '#000000';
+    $objStyle->BackColor = '#EFEFEF';
+    $objStyle->CssClass = 'dtg_header';		
+	}
+	
+	protected function lblShipmentReceipt_Create() {
+		$this->lblShipmentReceipt = new QLabel($this);
+		$this->lblShipmentReceipt->Name = 'Shipping/Receiving History';
+		$this->lblShipmentReceipt->Text = 'Shipping/Receiving History';
+		$this->lblShipmentReceipt->CssClass = 'title';
+	}
+	
+	protected function dtgShipmentReceipt_Create() {
+		$this->dtgShipmentReceipt = new QDataGrid($this);
+		$this->dtgShipmentReceipt->Name = 'Shipping/Receiving History';
+		$this->dtgShipmentReceipt->CellPadding = 5;
+		$this->dtgShipmentReceipt->CellSpacing = 0;
+		$this->dtgShipmentReceipt->CssClass = "datagrid";
+		$this->dtgShipmentReceipt->UseAjax = true;
+		
+		$objPaginator = new QPaginator($this->dtgShipmentReceipt);
+		$this->dtgShipmentReceipt->Paginator = $objPaginator;
+		$this->dtgShipmentReceipt->ItemsPerPage = 20;
+		
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Type', '<?= $_ITEM->Transaction->TransactionType->__toString() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Number', '<?= $_ITEM->Transaction->ToStringNumberWithLink() ?> <?= $_ITEM->Transaction->ToStringHoverTips($_CONTROL); ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Company', '<?= $_ITEM->Transaction->ToStringCompany() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Contact', '<?= $_ITEM->Transaction->ToStringContact() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->Transaction->CreatedByObject->__toString() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->Transaction->ToStringStatusStyled() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Tracking', '<?= $_ITEM->Transaction->ToStringTrackingNumber() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		
+		//$this->dtgShipmentReceipt->SortColumnIndex = 4;
+    //$this->dtgShipmentReceipt->SortDirection = 1;
+    
+    $objStyle = $this->dtgShipmentReceipt->RowStyle;
+    $objStyle->ForeColor = '#000000';
+    $objStyle->BackColor = '#FFFFFF';
+    $objStyle->FontSize = 12;
+
+    $objStyle = $this->dtgShipmentReceipt->AlternateRowStyle;
+    $objStyle->BackColor = '#EFEFEF';
+
+    $objStyle = $this->dtgShipmentReceipt->HeaderRowStyle;
     $objStyle->ForeColor = '#000000';
     $objStyle->BackColor = '#EFEFEF';
     $objStyle->CssClass = 'dtg_header';		

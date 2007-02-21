@@ -38,6 +38,7 @@ class QInventoryEditComposite extends QControl {
 	protected $lblTotalQuantity;
 	protected $lblCreationDate;
 	protected $lblModifiedDate;
+	public $lblShipmentReceipt;
 	
 	protected $pnlLongDescription;
 	
@@ -64,6 +65,7 @@ class QInventoryEditComposite extends QControl {
 	
 	// Transaction History Datagrid
 	public $dtgInventoryTransaction;
+	public $dtgShipmentReceipt;
 	
 	// Custom Field Objects
 	// protected $objCustomFieldArray;
@@ -129,6 +131,8 @@ class QInventoryEditComposite extends QControl {
 			$this->dtgInventoryQuantities_Create();
 			// Create the transaction history datagrid
 			$this->dtgInventoryTransaction_Create();
+			$this->lblShipmentReceipt_Create();
+			$this->dtgShipmentReceipt_Create();
 			// Display Labels
 			$this->displayLabels();
 		}
@@ -470,13 +474,13 @@ class QInventoryEditComposite extends QControl {
     $objPaginator = new QPaginator($this->dtgInventoryTransaction);
     $this->dtgInventoryTransaction->Paginator = $objPaginator;
     $this->dtgInventoryTransaction->ItemsPerPage = 20;
-    
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Transaction Type', '<?= $_ITEM->Transaction->__toStringWithLink() ?>', 'SortByCommand="inventory_transaction__transaction_id__transaction_type_id__short_description ASC"', 'ReverseSortByCommand="inventory_transaction__transaction_id__transaction_type_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', 'SortByCommand="quantity ASC"', 'ReverseSortByCommand="quantity DESC"', 'CssClass="dtg_column"'));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('From', '<?= $_ITEM->__toStringSourceLocation() ?>', 'SortByCommand="inventory_transaction__source_location_id__short_description ASC"', 'ReverseSortByCommand="inventory_transaction__source_location_id__short_description DESC"', 'CssClass="dtg_column"'));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('To', '<?= $_ITEM->__toStringDestinationLocation() ?>', 'SortByCommand="inventory_transaction__destination_location_id__short_description ASC"', 'ReverseSortByCommand="inventory_transaction__destination_location_id__short_description DESC"', 'CssClass="dtg_column"'));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('User', '<?= $_ITEM->Transaction->CreatedByObject->__toStringFullName() ?>', 'CssClass="dtg_column"'));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Date', '<?= $_ITEM->Transaction->CreationDate->PHPDate("Y-m-d H:i:s"); ?>', 'SortByCommand="Inventory_transaction__transaction_id__creation_date ASC"', 'ReverseSortByCommand="Inventory_transaction__transaction_id__creation_date DESC"', 'CssClass="dtg_column"'));
+
+    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Transaction Type', '<?= $_ITEM->Transaction->__toStringWithLink() ?>',  array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->TransactionType->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->TransactionType->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Quantity), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Quantity, false), 'CssClass' => "dtg_column")));
+    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('From', '<?= $_ITEM->__toStringSourceLocation() ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->SourceLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->SourceLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
+    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('To', '<?= $_ITEM->__toStringDestinationLocation() ?>', array('OrderByClause' => QQ::Orderby(QQN::InventoryTransaction()->DestinationLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->DestinationLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
+    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('User', '<?= $_ITEM->Transaction->CreatedByObject->__toStringFullName() ?>', array('OrderByClause' => QQ::Orderby(QQN::InventoryTransaction()->CreatedByObject->LastName), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->CreatedByObject->LastName, false), 'CssClass' => "dtg_column")));
+    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Date', '<?= $_ITEM->Transaction->CreationDate->PHPDate("Y-m-d H:i:s"); ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->CreationDate), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->CreationDate, false), 'CssClass' => "dtg_column")));
     
     $this->dtgInventoryTransaction->SortColumnIndex = 5;
     $this->dtgInventoryTransaction->SortDirection = 1;
@@ -494,6 +498,50 @@ class QInventoryEditComposite extends QControl {
     $objStyle->BackColor = '#EFEFEF';
     $objStyle->CssClass = 'dtg_header';		
 	}
+	
+	protected function lblShipmentReceipt_Create() {
+		$this->lblShipmentReceipt = new QLabel($this);
+		$this->lblShipmentReceipt->Name = 'Shipping/Receiving History';
+		$this->lblShipmentReceipt->Text = 'Shipping/Receiving History';
+		$this->lblShipmentReceipt->CssClass = 'title';
+	}
+	
+	protected function dtgShipmentReceipt_Create() {
+		$this->dtgShipmentReceipt = new QDataGrid($this);
+		$this->dtgShipmentReceipt->Name = 'Shipping/Receiving History';
+		$this->dtgShipmentReceipt->CellPadding = 5;
+		$this->dtgShipmentReceipt->CellSpacing = 0;
+		$this->dtgShipmentReceipt->CssClass = "datagrid";
+		$this->dtgShipmentReceipt->UseAjax = true;
+		
+		$objPaginator = new QPaginator($this->dtgShipmentReceipt);
+		$this->dtgShipmentReceipt->Paginator = $objPaginator;
+		$this->dtgShipmentReceipt->ItemsPerPage = 20;
+		
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Type', '<?= $_ITEM->Transaction->TransactionType->__toString() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Number', '<?= $_ITEM->Transaction->ToStringNumberWithLink() ?> <?= $_ITEM->Transaction->ToStringHoverTips($_CONTROL); ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Company', '<?= $_ITEM->Transaction->ToStringCompany() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Contact', '<?= $_ITEM->Transaction->ToStringContact() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->Transaction->CreatedByObject->__toString() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->Transaction->ToStringStatusStyled() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Tracking', '<?= $_ITEM->Transaction->ToStringTrackingNumber() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		
+		//$this->dtgShipmentReceipt->SortColumnIndex = 4;
+    //$this->dtgShipmentReceipt->SortDirection = 1;
+    
+    $objStyle = $this->dtgShipmentReceipt->RowStyle;
+    $objStyle->ForeColor = '#000000';
+    $objStyle->BackColor = '#FFFFFF';
+    $objStyle->FontSize = 12;
+
+    $objStyle = $this->dtgShipmentReceipt->AlternateRowStyle;
+    $objStyle->BackColor = '#EFEFEF';
+
+    $objStyle = $this->dtgShipmentReceipt->HeaderRowStyle;
+    $objStyle->ForeColor = '#000000';
+    $objStyle->BackColor = '#EFEFEF';
+    $objStyle->CssClass = 'dtg_header';		
+	}	
 	
 	// Edit Button Click
 	public function btnEdit_Click($strFormId, $strControlId, $strParameter) {

@@ -93,15 +93,24 @@
 
 <?php 
 		if ($this->blnEditMode) {
-			echo('<div class="title">Quantity by Location</div>');
-			$this->dtgInventoryQuantities->RenderWithError(); 
-			echo('<br class="item_divider" />');
-			echo('<div class="title">Transactions</div>');
 			$this->btnMove->Render();
 			$this->btnTakeOut->Render();
 			$this->btnRestock->Render();
 			$this->btnShip->Render();
 			$this->btnReceive->Render();
+			echo '<br class="item_divider />';
+			echo '<br class="item_divider />';
+			echo('<div class="title">Quantity by Location</div>');
+			$this->dtgInventoryQuantities->RenderWithError(); 
+			echo '<br class="item_divider" />';
+			echo '<div class="title">Transactions</div>';
 			$this->dtgInventoryTransaction->RenderWithError();
 		}
-?>	
+?>
+<br class="item_divider">
+<?php $this->lblShipmentReceipt->Render(); ?>
+<?php
+if ($this->blnEditMode) {
+	$this->dtgShipmentReceipt->RenderWithError();
+}
+?>

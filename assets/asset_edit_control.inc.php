@@ -88,7 +88,7 @@
 								echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'&nbsp;</td>');
 								echo('</tr>');
 							}
-						?>				
+						?>
 						</table>
 					</td>
 				</tr>
@@ -96,8 +96,6 @@
 		</td>
 	</tr>
 </table>
-<br class="item_divider">
-<div class="title">Transactions</div>
 
 <?php
 	if ($this->blnEditMode) {
@@ -108,6 +106,16 @@
 		$this->btnUnreserve->Render();
 		$this->btnShip->Render();
 		$this->btnReceive->Render();
+		echo '<br class="item_divider">';
+		echo '<br class="item_divider">';
+		echo '<div class="title">Transactions</div>';
 		$this->dtgAssetTransaction->RenderWithError();
 	}
+?>
+<br class="item_divider">
+<?php $this->lblShipmentReceipt->Render(); ?>
+<?php
+if ($this->blnEditMode) {
+	$this->dtgShipmentReceipt->RenderWithError();
+}
 ?>
