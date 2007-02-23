@@ -92,6 +92,7 @@
 		protected $lblTrackingNumber;
 		protected $lblShipmentNumber;
 		protected $lblShipDate;
+		protected $lblFromCompany;
 		protected $lblFromContact;
 		protected $lblFromAddress;
 		protected $lblToCompany;
@@ -153,6 +154,7 @@
 			$this->lblHeaderShipment_Create();
 			// $this->lblHeaderCompleteShipment_Create();
 			$this->lblShipDate_Create();
+			$this->lblFromCompany_Create();
 			$this->lblFromContact_Create();
 			$this->lblFromAddress_Create();
 			$this->lblToCompany_Create();
@@ -169,6 +171,7 @@
 			if (!$this->objShipment->ShippedFlag) {
 			  // Shipping Info Panel Inputs
 				$this->calShipDate_Create();
+				$this->lstFromCompany_Create();
 				$this->lstFromContact_Create();
 				$this->lstFromAddress_Create();
 				$this->lstToCompany_Create();
@@ -540,6 +543,15 @@
 			}
 		}
 		
+		// Create and Setup lblFromCompany
+		protected function lblFromCompany_Create() {
+			$this->lblFromCompany = new QLabel($this->pnlShippingInfo);
+			$this->lblFromCompany->Name = 'From Company';
+			if ($this->blnEditMode && $this->objShipment->FromCompanyId) {
+				$this->lblFromCompany->Text = $this->objShipment->FromCompany->__toString();
+			}
+		}	
+		
 		// Create and Setup lblFromContact
 		protected function lblFromContact_Create() {
 			$this->lblFromContact = new QLabel($this->pnlShippingInfo);
@@ -858,6 +870,28 @@
  			$this->calShipDate->TabIndex=1;
 		}
 		
+		// Create and Setup lstFromCompany
+		protected function lstFromCompany_Create() {
+			$this->lstFromCompany = new QListBox($this->pnlShippingInfo);
+			$this->lstFromCompany->Name = QApplication::Translate('From Company');
+			$this->lstFromCompany->Required = true;
+			if (!$this->blnEditMode)
+				$this->lstFromCompany->AddItem('- Select One -', null);
+			$objFromCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
+			if ($objFromCompanyArray) foreach ($objFromCompanyArray as $objFromCompany) {
+				$objListItem = new QListItem($objFromCompany->__toString(), $objFromCompany->CompanyId);
+				if (($this->objShipment->FromCompanyId && $this->objShipment->FromCompanyId == $objFromCompany->CompanyId) || (QApplication::$TracmorSettings->CompanyId && QApplication::$TracmorSettings->CompanyId == $objFromCompany->CompanyId))
+					$objListItem->Selected = true;
+				$this->lstFromCompany->AddItem($objListItem);
+			}
+			if (QApplication::$TracmorSettings->CompanyId) {
+					
+			}
+			$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFromCompany_Select'));
+			$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
+			$this->lstFromCompany->TabIndex=2;
+		}
+		
 		// Create and Setup lstFromContact
 		protected function lstFromContact_Create() {
 			$this->lstFromContact = new QListBox($this->pnlShippingInfo);
@@ -874,7 +908,7 @@
 				$this->lstFromContact->AddItem($objListItem);
 			}
 			$this->lstFromContact->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
-			$this->lstFromContact->TabIndex=2;
+			$this->lstFromContact->TabIndex=3;
 		}
 		
 		// Create and Setup lstFromAddress
@@ -893,7 +927,7 @@
 			}
 			
 			$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
-			$this->lstFromAddress->TabIndex=3;
+			$this->lstFromAddress->TabIndex=4;
 		}
 		
 		// Create and Setup lstToCompany
@@ -911,7 +945,7 @@
 				$this->lstToCompany->AddItem($objListItem);
 			}
 			$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstToCompany_Select'));
-			$this->lstToCompany->TabIndex=4;
+			$this->lstToCompany->TabIndex=5;
 		}
 		
 		// Create and Setup lstToContact
@@ -939,7 +973,7 @@
 			}
 			
 			$this->lstToContact->AddAction(new QChangeEvent(), new QAjaxAction('lstToContact_Select'));
-			$this->lstToContact->TabIndex=5;
+			$this->lstToContact->TabIndex=6;
 		}
 		
 		// Create and Setup txtToPhone
@@ -952,7 +986,7 @@
 			$this->txtToPhone->CausesValidation = true;
 			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtToPhone->TabIndex=7;
+			$this->txtToPhone->TabIndex=8;
 		}		
 		
 		// Create and Setup lstToAddress
@@ -978,7 +1012,7 @@
 				}
 			}
 			$this->lstToAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstToAddress_Select'));		
-			$this->lstToAddress->TabIndex=6;
+			$this->lstToAddress->TabIndex=7;
 		}
 		
 		// Create and Setup lstCourier
@@ -1002,7 +1036,7 @@
 				$this->lstCourier->AddItem('Other', null);
 			}
 			$this->lstCourier->AddAction(new QChangeEvent(), new QAjaxAction('lstCourier_Select'));
-			$this->lstCourier->TabIndex=8;
+			$this->lstCourier->TabIndex=9;
 		}
 		
 		// Create and Setup lstFxServiceType
@@ -1018,7 +1052,7 @@
 				$this->lstFxServiceType->Enabled = true;
 				$this->lstFxServiceType->Required = true;
 			}
-			$this->lstFxServiceType->TabIndex=12;
+			$this->lstFxServiceType->TabIndex=13;
 		}
 		
 		// Create and Setup txtCourier
@@ -1040,7 +1074,7 @@
 			$this->txtCourierOther->CausesValidation = true;
 			$this->txtCourierOther->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtCourierOther->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtCourierOther->TabIndex=9;
+			$this->txtCourierOther->TabIndex=10;
 		}
 		
 		// Create and Setup lstShippingAccount
@@ -1067,7 +1101,7 @@
 				$this->lstShippingAccount->AddItem('Other', null, true);
 			}
 			$this->lstShippingAccount->AddAction(new QChangeEvent(), new QAjaxAction('lstShippingAccount_Select'));
-			$this->lstShippingAccount->TabIndex=10;
+			$this->lstShippingAccount->TabIndex=11;
 		}
 		
 		// Create and Setup txtShippingAccount
@@ -1084,7 +1118,7 @@
 			$this->txtShippingAccountOther->CausesValidation = true;
 			$this->txtShippingAccountOther->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShippingAccountOther->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtShippingAccountOther->TabIndex=11;
+			$this->txtShippingAccountOther->TabIndex=12;
 		}
 		
 		// Create and Setup txtReference
@@ -1097,7 +1131,7 @@
 			$this->txtReference->CausesValidation = true;
 			$this->txtReference->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtReference->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtReference->TabIndex=13;
+			$this->txtReference->TabIndex=14;
 		}
 		
 		// Create and Setup txtNote
@@ -1108,7 +1142,7 @@
 			if ($this->blnEditMode) {
 				$this->txtNote->Text = $this->objShipment->Transaction->Note;
 			}
-			$this->txtNote->TabIndex=14;
+			$this->txtNote->TabIndex=15;
 		}
 		
 		// Create the text field to enter new asset codes to add to the transaction
@@ -1119,7 +1153,7 @@
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtNewAssetCode->CausesValidation = false;
-			$this->txtNewAssetCode->TabIndex=15;
+			$this->txtNewAssetCode->TabIndex=16;
 		}
 		
 		// Create the text field to enter new inventory_model codes to add to the transaction
@@ -1410,6 +1444,67 @@
 		// ONSELECT METHODS
 		// These methods are run every time a value is selected in their respective inputs
 		//******************
+		
+		// This is run every time a 'From Company' is selected
+		// It loads the values for the 'From Address' and 'From Contact' drop-downs for the selected company 
+		protected function lstFromCompany_Select() {
+			if ($this->lstFromCompany->SelectedValue) {
+				$objCompany = Company::Load($this->lstFromCompany->SelectedValue);
+				if ($objCompany) {
+					// Load the values for the 'From Contact' List
+					if ($this->lstFromContact) {
+						$objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
+						if ($this->lstFromContact->SelectedValue) {
+							$SelectedContactId = $this->lstFromContact->SelectedValue;
+						}
+						elseif ($this->objShipment->FromContactId) {
+							$SelectedContactId = $this->objShipment->FromContactId;
+						}
+						else {
+							$SelectedContactId = null;
+						}
+						$this->lstFromContact->RemoveAllItems();
+						$this->lstFromContact->AddItem('- Select One -', null);
+						if ($objFromContactArray) {
+							foreach ($objFromContactArray as $objFromContact) {
+								$objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
+								if ($SelectedContactId == $objFromContact->ContactId) {
+									$objListItem->Selected = true;
+								}
+								$this->lstFromContact->AddItem($objListItem);
+							}
+							$this->lstFromContact->Enabled = true;
+						}
+					}
+					// Load the values for the 'From Address' List
+					if ($this->lstFromAddress) {
+						$objFromAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+						
+						if ($this->lstFromAddress->SelectedValue) {
+							$SelectedAddressId = $this->lstFromAddress->SelectedValue;
+						}
+						elseif ($this->objShipment->FromAddressId) {
+							$SelectedAddressId = $this->objShipment->FromAddressId;
+						}
+						else {
+							$SelectedAddressId = null;
+						}
+						$this->lstFromAddress->RemoveAllItems();
+						$this->lstFromAddress->AddItem('- Select One -', null);
+						if ($objFromAddressArray) {
+							foreach ($objFromAddressArray as $objFromAddress) {
+								$objListItem = new QListItem($objFromAddress->__toString(), $objFromAddress->AddressId);
+								if ($SelectedAddressId == $objFromAddress->AddressId) {
+									$objListItem->Selected = true;
+								}
+								$this->lstFromAddress->AddItem($objListItem);
+							}
+							$this->lstFromAddress->Enabled = true;
+						}
+					}
+				}
+			}
+		}
 		
 		// This is run every time a 'To Company' is selected
 		// It loads the values for the 'To Address' and 'To Contact' drop-downs for the selected company 
@@ -2199,13 +2294,13 @@
 					$blnError = true;
 					$this->lstFxServiceType->Warning = "Not a valid From Address.";
 				}
-
+				
 				$objfromFxContact = Contact::Load($this->lstFromContact->SelectedValue);
 				if (!$objfromFxContact) {
 					$blnError = true;
 					$this->lstFxServiceType->Warning = "Not a valid From Contact.";
 				}
-				$objfromFxCompany = Company::Load(QApplication::$TracmorSettings->CompanyId);
+				$objfromFxCompany = Company::Load($this->lstFromCompany->SelectedValue);
 				if (!$objfromFxCompany) {
 					$blnError = true;
 					$this->lstFxServiceType->Warning = "Not a valid From Company.";
@@ -2554,6 +2649,7 @@
 				$this->objShipment->ShipmentNumber = Shipment::LoadNewShipmentNumber();
 			}
 			$this->objShipment->ToContactId = $this->lstToContact->SelectedValue;
+			$this->objShipment->FromCompanyId = $this->lstFromCompany->SelectedValue;
 			$this->objShipment->FromContactId = $this->lstFromContact->SelectedValue;
 			$this->objShipment->ShipDate = $this->calShipDate->DateTime;
 			$this->objShipment->FromAddressId = $this->lstFromAddress->SelectedValue;
@@ -2584,6 +2680,7 @@
 		protected function UpdateShipmentControls() {
 			$this->lstToContact->SelectedValue = $this->objShipment->ToContactId;
 			$this->lstToContact_Select();
+			$this->lstFromCompany->SelectedValue = $this->objShipment->FromCompanyId;
 			$this->lstFromContact->SelectedValue = $this->objShipment->FromContactId;
 			$this->calShipDate->DateTime = $this->objShipment->ShipDate;
 			$this->lstFromAddress->SelectedValue = $this->objShipment->FromAddressId;
@@ -2689,27 +2786,27 @@
 			
 			if(($this->objShipment->FromAddress->__toStringCountryAbbreviation() != $this->objShipment->ToAddress->__toStringCountryAbbreviation()) && ($this->objShipment->FromAddress->__toStringCountryAbbreviation() <> 'US' || $this->objShipment->ToAddress->__toStringCountryAbbreviation() != 'CA') && ($this->objShipment->ToAddress->__toStringCountryAbbreviation() != 'US' || $this->objShipment->FromAddress->__toStringCountryAbbreviation() != 'CA'))
 			{
-				$fxIntlSSN = ''; //$this->objShipment->FromContact->Social							//Sender's SSN				
+				$fxIntlSSN = ''; //$this->objShipment->FromContact->Social								//Sender's SSN				
 				$fxCurrencyUnit = CurrencyUnit::Load($this->lstCurrencyUnit->SelectedValue);
-				$fxIntlCurrencyUnit = $fxCurrencyUnit->ShortDescription;							//Recipient Currency				
-				$fxIntlCustomsValue = number_format(round($this->txtValue->Text,2), 2, '.', '');	//Total Customs Value
-				$fxIntlDutiesPayType = '1';															//Duties Pay Type
-				$fxIntlTermsofSale = '1';															//Terms of Sale
-				$fxIntlPartiestoTransation = 'N';													//Parties to Transaction
+				$fxIntlCurrencyUnit = $fxCurrencyUnit->ShortDescription;								//Recipient Currency				
+				$fxIntlCustomsValue = number_format(round($this->txtValue->Text,2), 2, '.', '');		//Total Customs Value
+				$fxIntlDutiesPayType = '1';																//Duties Pay Type
+				$fxIntlTermsofSale = '1';																//Terms of Sale
+				$fxIntlPartiestoTransation = 'N';														//Parties to Transaction
 			}
 			else
 			{
-				$fxIntlSSN = '';																	//Sender's SSN				
-				$fxIntlCurrencyUnit = '';															//Recipient Currency			
-				$fxIntlCustomsValue = '';															//Total Customs Value
-				$fxIntlDutiesPayType = '';															//Duties Pay Type
-				$fxIntlTermsofSale = '';															//Terms of Sale
+				$fxIntlSSN = '';																		//Sender's SSN				
+				$fxIntlCurrencyUnit = '';																//Recipient Currency			
+				$fxIntlCustomsValue = '';																//Total Customs Value
+				$fxIntlDutiesPayType = '';																//Duties Pay Type
+				$fxIntlTermsofSale = '';																//Terms of Sale
 				$fxIntlPartiestoTransation = '';														//Parties to Transaction			
 			}
 
 				$fdx_arr = array(
 						1 => $this->lblShipmentNumber->Text,											//Shipment #
-						4 => $this->objShipment->FromContact->Company->__toString(),					//Sender Company
+						4 => $this->objShipment->FromCompany->__toString(),								//Sender Company
 						32 => $this->objShipment->FromContact->__toString(),							//Sender Contact
 						5 => $this->objShipment->FromAddress->Address1,									//Sender Address1
 						6 => $this->objShipment->FromAddress->Address2,									//Sender Address2
@@ -2717,7 +2814,7 @@
 						8 => $this->objShipment->FromAddress->__toStringStateProvinceAbbreviation(),	//Sender State
 						9 => $this->objShipment->FromAddress->PostalCode,								//Sender Zip
 						117 => $this->objShipment->FromAddress->__toStringCountryAbbreviation(), 		//Sender Country
-						183 => $this->FxStrip($this->objShipment->FromContact->Company->Telephone),		//Sender Phone
+						183 => $this->FxStrip($this->objShipment->FromCompany->Telephone),				//Sender Phone
 						11 => $this->objShipment->ToCompany->__toString(),								//Recipient Company
 						12 => $this->objShipment->ToContact->__toString(),								//Recipient Contact
 						13 => $this->objShipment->ToAddress->Address1,									//Recipient Address1
@@ -2830,6 +2927,7 @@
 			
 			// Hide Inputs
 			$this->calShipDate->Display = false;
+			$this->lstFromCompany->Display = false;
 			$this->lstFromContact->Display = false;
 			$this->lstFromAddress->Display = false;
 			$this->lstToCompany->Display = false;
@@ -2864,6 +2962,7 @@
 			
 			// Display Labels
 			$this->lblShipDate->Display = true;
+			$this->lblFromCompany->Display = true;
 			$this->lblFromContact->Display = true;
 			$this->lblFromAddress->Display = true;
 			$this->lblToCompany->Display = true;
@@ -2890,6 +2989,7 @@
 		// Update the 'Text' values for all shipment labels for an ajax reload
 		protected function UpdateShipmentLabels() {
 			$this->lblShipDate->Text = $this->objShipment->ShipDate->__toString();
+			$this->lblFromCompany->Text = $this->objShipment->FromCompany->__toString();
 			$this->lblFromContact->Text = $this->objShipment->FromContact->__toString();
 			$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toString();
 			$this->lblToCompany->Text = $this->objShipment->ToCompany->__toString();
@@ -2918,6 +3018,7 @@
 			
 			// Hide Labels
 			$this->lblShipDate->Display = false;
+			$this->lblFromCompany->Display = false;
 			$this->lblFromContact->Display = false;
 			$this->lblFromAddress->Display = false;
 			$this->lblToCompany->Display = false;
@@ -2936,6 +3037,7 @@
 			
 			// Show Inputs
 			$this->calShipDate->Display = true;
+			$this->lstFromCompany->Display = true;
 			$this->lstFromContact->Display = true;
 			$this->lstFromAddress->Display = true;
 			$this->lstToCompany->Display = true;

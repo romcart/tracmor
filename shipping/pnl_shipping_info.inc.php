@@ -22,6 +22,7 @@
 	// Build array of all fields to display
 	$arrShipmentFields[] = array('name' => 'Shipment Number:',  'value' => $this->lblShipmentNumber->Render(false));
 	$arrShipmentFields[] = array('name' => 'Ship Date:', 'value' => $this->calShipDate->RenderWithError(false) . $this->lblShipDate->Render(false));
+	$arrShipmentFields[] = array('name' => 'Ship From Company:', 'value' => $this->lstFromCompany->RenderWithError(false) . $this->lblFromCompany->Render(false));
 	$arrShipmentFields[] = array('name' => 'Ship From Contact:', 'value' => $this->lstFromContact->RenderWithError(false) . $this->lblFromContact->Render(false));
 	$arrShipmentFields[] = array('name' => 'Ship From Address:', 'value' => $this->lstFromAddress->RenderWithError(false) . $this->lblFromAddress->Render(false));
 	$arrShipmentFields[] = array('name' => 'Ship To Company:', 'value' => $this->lstToCompany->RenderWithError(false) . $this->lblToCompany->Render(false));

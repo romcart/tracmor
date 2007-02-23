@@ -21,18 +21,19 @@
 
 	// Build array of all fields to display
 	$arrShipmentFields[] = array('name' => 'Shipment Number:',  'value' => $this->lblShipmentNumber->Render(false));
-	$arrShipmentFields[] = array('name' => 'Shipping Courier:',  'value' => $this->lblCourier->Render(false));
-	$arrShipmentFields[] = array('name' => 'Ship Date:',  'value' => $this->lblShipDate->Render(false));
-	$arrShipmentFields[] = array('name' => 'Bill Transportation To:',  'value' => $this->lblShippingAccount->Render(false));
-	$arrShipmentFields[] = array('name' => 'From Contact:',  'value' => $this->lblFromContact->Render(false));
-	$arrShipmentFields[] = array('name' => 'Service Type:',  'value' => $this->lblFxServiceType->Render(false));
-	$arrShipmentFields[] = array('name' => 'From Address:',  'value' => $this->lblFromAddress->Render(false));
-	$arrShipmentFields[] = array('name' => 'Reference:',  'value' => $this->lblReference->Render(false));	
-	$arrShipmentFields[] = array('name' => 'To Company:',  'value' => $this->lblToCompany->Render(false));
-	$arrShipmentFields[] = array('name' => 'Note:',  'value' => $this->pnlNote->Render(false));
-	$arrShipmentFields[] = array('name' => 'To Contact:',  'value' => $this->lblToContact->Render(false));
 	$arrShipmentFields[] = array('name' => 'To Address:',  'value' => $this->lblToAddress->Render(false));
+	$arrShipmentFields[] = array('name' => 'Ship Date:',  'value' => $this->lblShipDate->Render(false));
 	$arrShipmentFields[] = array('name' => 'To Telphone:', 'value' => $this->lblToPhone->Render(false));
+	$arrShipmentFields[] = array('name' => 'From Company:',  'value' => $this->lblFromCompany->Render(false));
+	$arrShipmentFields[] = array('name' => 'Shipping Courier:',  'value' => $this->lblCourier->Render(false));
+	$arrShipmentFields[] = array('name' => 'From Contact:',  'value' => $this->lblFromContact->Render(false));
+	$arrShipmentFields[] = array('name' => 'Bill Transportation To:',  'value' => $this->lblShippingAccount->Render(false));
+	$arrShipmentFields[] = array('name' => 'From Address:',  'value' => $this->lblFromAddress->Render(false));
+	$arrShipmentFields[] = array('name' => 'Service Type:',  'value' => $this->lblFxServiceType->Render(false));
+	$arrShipmentFields[] = array('name' => 'To Company:',  'value' => $this->lblToCompany->Render(false));
+	$arrShipmentFields[] = array('name' => 'Reference:',  'value' => $this->lblReference->Render(false));	
+	$arrShipmentFields[] = array('name' => 'To Contact:',  'value' => $this->lblToContact->Render(false));
+	$arrShipmentFields[] = array('name' => 'Note:',  'value' => $this->pnlNote->Render(false));
 	
 
 	$newRow = true;
