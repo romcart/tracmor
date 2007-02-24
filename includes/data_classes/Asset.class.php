@@ -57,6 +57,42 @@
 			return $this->AssetModel->ShortDescription;
 		}
 		
+		/**
+		 * Returns the HTML needed for the asset list datagrid to show reserved and checked out by icons, with hovertips with the username.
+		 * If the asset is neither reserved nor checked out, it returns an empty string.
+		 *
+		 * @param QDatagrid Object $objControl
+		 * @return string
+		 */
+		public function ToStringHoverTips($objControl) {
+			if ($this->blnReservedFlag) {
+				$lblReservedImage = new QLabelExt($objControl);
+				$lblReservedImage->HtmlEntities = false;
+				$lblReservedImage->Text = sprintf('<img src="%s/icons/reserved_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
+				
+				$objHoverTip = new QHoverTip($lblReservedImage);
+				$objHoverTip->Text = 'Reserved By ' . $this->GetLastTransactionUser()->__toString();
+				$lblReservedImage->HoverTip = $objHoverTip;
+				$strToReturn = $lblReservedImage->Render(false);
+			}
+			
+			elseif ($this->blnCheckedOutFlag) {
+				$lblCheckedOutImage = new QLabelExt($objControl);
+				$lblCheckedOutImage->HtmlEntities = false;
+				$lblCheckedOutImage->Text = sprintf('<img src="%s/icons/checked_out_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
+				
+				$objHoverTip = new QHoverTip($lblCheckedOutImage);
+				$objHoverTip->Text = 'Checked Out By ' . $this->GetLastTransactionUser()->__toString();
+				$lblCheckedOutImage->HoverTip = $objHoverTip;
+				$strToReturn = $lblCheckedOutImage->Render(false);				
+			}
+			else {
+				$strToReturn = '';
+			}
+
+			return $strToReturn;
+		}		
+		
 		// This adds the created by and creation date before saving a new asset
 		public function Save($blnForceInsert = false, $blnForceUpdate = false) {
 			if ((!$this->__blnRestored) || ($blnForceInsert)) {
@@ -153,7 +189,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearch($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			Asset::QueryHelper($objDatabase);
@@ -169,7 +205,7 @@
 				}
 			}
 
-			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
 
 			$strQuery = sprintf('
 				SELECT
@@ -191,8 +227,10 @@
 				  %s
 				  %s
 				  %s
+				  %s
+				  %s
 			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strCustomFieldsFromSql'], 
-			$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
+			$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -217,7 +255,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Asset[]
      */
-		public static function LoadArrayBySearch($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			
 			Asset::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			
@@ -232,7 +270,7 @@
 				}
 			}
 					
-			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
 			$arrCustomFieldSql = CustomField::GenerateSql(1);
 
 			$strQuery = sprintf('
@@ -243,6 +281,8 @@
 					`asset`.`location_id` AS `location_id`,
 					`asset`.`asset_code` AS `asset_code`,
 					`asset`.`image_path` AS `image_path`,
+					`asset`.`checked_out_flag` AS `checked_out_flag`,
+					`asset`.`reserved_flag` AS `reserved_flag`,
 					`asset`.`created_by` AS `created_by`,
 					`asset`.`creation_date` AS `creation_date`,
 					`asset`.`modified_by` AS `modified_by`,
@@ -269,10 +309,12 @@
 				%s
 				%s
 				%s
+				%s
+				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strCustomFieldsFromSql'], $arrCustomFieldSql['strFrom'], 
-				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
+				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
 				
@@ -300,10 +342,10 @@
 		 * @param string $strShortDescription
 		 * @return array with seven keys, strAssetCodeSql, strLocationSql, strAssetModelSql, strCategorySql, strManufacturerSql, strAssetModelCodeSql, strShortDescriptionSql
 		 */
-	  protected static function GenerateSearchSql ($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
 			
 	  	// Define all indexes for the array to be returned
-			$arrSearchSql = array("strAssetCodeSql" => "", "strLocationSql" => "", "strAssetModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strOffsiteSql" => "", "strAssetModelCodeSql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strCustomFieldsFromSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
+			$arrSearchSql = array("strAssetCodeSql" => "", "strLocationSql" => "", "strAssetModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strOffsiteSql" => "", "strAssetModelCodeSql" => "", "strReservedBySql" => "", "strCheckedOutBySql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strCustomFieldsFromSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
 
 			if ($strAssetCode) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -337,6 +379,22 @@
 				$strAssetModelCode = QApplication::$Database[1]->SqlVariable("%" . $strAssetModelCode . "%", false);
 				$arrSearchSql['strAssetModelCodeSql'] = "AND `asset__asset_model_id`.`asset_model_code` LIKE $strAssetModelCode";
 			}
+			if ($intReservedBy) {
+				$arrSearchSql['strReservedBySql'] = sprintf("AND `asset` . `reserved_flag` = true", $intReservedBy);
+				if ($intReservedBy != 'any') {
+					$intReservedBy = QApplication::$Database[1]->SqlVariable($intReservedBy, true);
+					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
+					$arrSearchSql['strReservedBySql'] .= sprintf("\nAND (SELECT `created_by` FROM `transaction` WHERE `transaction_type_id` = 8 ORDER BY creation_date DESC LIMIT 0,1)%s", $intReservedBy);
+				}
+			}
+			if ($intCheckedOutBy) {
+				$arrSearchSql['strCheckedOutBySql'] = sprintf("AND `asset` . `checked_out_flag` = true", $intCheckedOutBy);
+				if ($intCheckedOutBy != 'any') {
+					$intCheckedOutBy = QApplication::$Database[1]->SqlVariable($intCheckedOutBy, true);
+					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
+					$arrSearchSql['strCheckedOutBySql'] .= sprintf("\nAND (SELECT `created_by` FROM `transaction` WHERE `transaction_type_id` = 3 ORDER BY creation_date DESC LIMIT 0,1)%s", $intCheckedOutBy);
+				}
+			}			
 			if ($strDateModified) {
 				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {
 					$strDateModifiedFirst = QApplication::$Database[1]->SqlVariable($strDateModifiedFirst->Timestamp, false);

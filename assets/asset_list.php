@@ -76,6 +76,8 @@
 		protected $intManufacturerId;
 		protected $blnOffsite;
 		protected $strAssetModelCode;
+		protected $intReservedBy;
+		protected $intCheckedOutBy;
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;		
@@ -101,7 +103,7 @@
       $this->dtgAsset->Paginator = $objPaginator;
       $this->dtgAsset->ItemsPerPage = 20;
       
-      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHoverTips($_CONTROL) ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgAsset->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'Width=200', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgAsset->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->AssetModel->Category->__toString() ?>', 'SortByCommand="asset__asset_model_id__category_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__category_id__short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
@@ -164,6 +166,8 @@
 			$intManufacturerId = $this->intManufacturerId;
 			$blnOffsite = $this->blnOffsite;
 			$strAssetModelCode = $this->strAssetModelCode;
+			$intReservedBy = $this->intReservedBy;
+			$intCheckedOutBy = $this->intCheckedOutBy;
 			$strShortDescription = $this->strShortDescription;
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
@@ -179,12 +183,12 @@
       $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandManufacturer] = true;
       $objExpansionMap[Asset::ExpandLocation] = true;
 
-			$this->dtgAsset->TotalItemCount = Asset::CountBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgAsset->TotalItemCount = Asset::CountBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
 			if ($this->dtgAsset->TotalItemCount == 0) {
 				$this->dtgAsset->ShowHeader = false;
 			}
 			else {
-				$this->dtgAsset->DataSource = Asset::LoadArrayBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap);
+				$this->dtgAsset->DataSource = Asset::LoadArrayBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap);
 				$this->dtgAsset->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -363,6 +367,8 @@
 		  	$this->strAssetCode = null;
 		  	$this->blnOffsite = false;
 		  	$this->strAssetModelCode = null;
+		  	$this->intReservedBy = null;
+		  	$this->intCheckedOutBy = null;
 		  	$this->strDateModified = null;
 		  	$this->strDateModifiedFirst = null;
 		  	$this->strDateModifiedLast = null;
@@ -402,6 +408,8 @@
 			$this->intLocationId = $this->lstLocation->SelectedValue;
 			$this->intAssetModelId = $this->lblAssetModelId->Text;
 			$this->strAssetModelCode = $this->ctlAdvanced->AssetModelCode;
+			$this->intReservedBy = $this->ctlAdvanced->ReservedBy;
+			$this->intCheckedOutBy = $this->ctlAdvanced->CheckedOutBy;
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;

@@ -25,6 +25,8 @@
 class QAdvancedSearchComposite extends QControl {
 
 	protected $txtAssetModelCode;
+	protected $lstReservedBy;
+	protected $lstCheckedOutBy;
 	protected $txtTrackingNumber;
 	protected $lstDateModified;
 	protected $dtpDateModifiedFirst;
@@ -49,7 +51,11 @@ class QAdvancedSearchComposite extends QControl {
 	    $this->objParentObject = $objParentObject;
 	    $this->intEntityQtypeId = $intEntityQtypeId;
 	    
-	    $this->txtAssetModelCode_Create();
+	    if ($objParentObject instanceof AssetListForm) {
+	    	$this->txtAssetModelCode_Create();
+	    	$this->lstReservedBy_Create();
+	    	$this->lstCheckedOutBy_Create();
+	    }
 	    $this->txtTrackingNumber_Create();
 	    $this->lstDateModified_Create();
       $this->dtpDateModifiedFirst_Create();
@@ -110,6 +116,32 @@ class QAdvancedSearchComposite extends QControl {
     else {
     	$this->txtAssetModelCode->Visible = false;
     }
+  }
+  
+  protected function lstReservedBy_Create() {
+  	$this->lstReservedBy = new QListBox($this);
+  	$this->lstReservedBy->Name = 'Reserved By';
+  	$this->lstReservedBy->AddItem('- Select One -', null, true);
+  	$this->lstReservedBy->AddItem('Any', 'any');
+  	$objUserAccountArray = UserAccount::LoadAll();
+  	if ($objUserAccountArray) {
+  		foreach ($objUserAccountArray as $objUserAccount) {
+  			$this->lstReservedBy->AddItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);
+  		}
+  	}
+  }
+  
+  protected function lstCheckedOutBy_Create() {
+  	$this->lstCheckedOutBy = new QListBox($this);
+  	$this->lstCheckedOutBy->Name = 'Checked Out By';
+		$this->lstCheckedOutBy->AddItem('- Select One -', null, true);
+  	$this->lstCheckedOutBy->AddItem('Any', 'any');
+  	$objUserAccountArray = UserAccount::LoadAll();
+  	if ($objUserAccountArray) {
+  		foreach ($objUserAccountArray as $objUserAccount) {
+  			$this->lstCheckedOutBy->AddItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);
+  		}
+  	}
   }
   
   protected function txtTrackingNumber_Create() {
@@ -201,6 +233,10 @@ class QAdvancedSearchComposite extends QControl {
 	  switch ($strName) {
 			case "AssetModelCode": return $this->txtAssetModelCode->Text;
 				break;
+			case "ReservedBy": return $this->lstReservedBy->SelectedValue;
+				break;
+			case "CheckedOutBy": return $this->lstCheckedOutBy->SelectedValue;
+				break;				
 			case "TrackingNumber": return $this->txtTrackingNumber->Text;
 				break;
 			case "DateModified": return $this->lstDateModified->SelectedValue;
