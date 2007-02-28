@@ -113,9 +113,9 @@
 	}
 ?>
 <br class="item_divider">
-<?php $this->lblShipmentReceipt->Render(); ?>
 <?php
 if ($this->blnEditMode) {
+	$this->lblShipmentReceipt->Render();
 	$this->dtgShipmentReceipt->RenderWithError();
 }
 ?>
