@@ -56,7 +56,10 @@ class QAdvancedSearchComposite extends QControl {
 	    	$this->lstReservedBy_Create();
 	    	$this->lstCheckedOutBy_Create();
 	    }
-	    $this->txtTrackingNumber_Create();
+	    
+	    if ($objParentObject instanceof ShipmentListForm) {
+	    	$this->txtTrackingNumber_Create();
+	    }
 	    $this->lstDateModified_Create();
       $this->dtpDateModifiedFirst_Create();
       $this->dtpDateModifiedLast_Create();
@@ -64,8 +67,12 @@ class QAdvancedSearchComposite extends QControl {
       
 	}
 	public function ParsePostData() {
-		$this->strAssetModelCode = $this->txtAssetModelCode->Text;
-		$this->strTrackingNumber = $this->txtTrackingNumber->Text;
+		if ($this->objParentObject instanceof AssetListForm) {
+			$this->strAssetModelCode = $this->txtAssetModelCode->Text;
+		}
+		if ($this->objParentObject instanceof ShipmentListForm) {
+			$this->strTrackingNumber = $this->txtTrackingNumber->Text;
+		}
 	}
 	
 	public function GetJavaScriptAction() {
@@ -184,7 +191,6 @@ class QAdvancedSearchComposite extends QControl {
 		
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 		$this->objCustomFieldArray = CustomField::LoadObjCustomFieldArray($this->intEntityQtypeId, false, null);
-		
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCustomFieldArray, false, $this, false, true, true);
 
@@ -211,8 +217,12 @@ class QAdvancedSearchComposite extends QControl {
 	}
 	
 	public function ClearControls() {
-		$this->txtAssetModelCode->Text = '';
-		$this->txtTrackingNumber->Text = '';
+		if ($this->objParentObject instanceof AssetListForm) {
+			$this->txtAssetModelCode->Text = '';
+		}
+		if ($this->objParentObject instanceof ShipmentListForm) {
+			$this->txtTrackingNumber->Text = '';
+		}
 		$this->lstDateModified->SelectedIndex = 0;
 		$this->dtpDateModifiedFirst->DateTime = new QDateTime(QDateTime::Now);
 		$this->dtpDateModifiedLast->DateTime = new QDateTime(QDateTime::Now);
