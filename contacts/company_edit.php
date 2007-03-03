@@ -44,6 +44,10 @@
 		// Shortcut Menu
 		protected $ctlShortcutMenu;
 		
+		// Custom Field Objects
+		public $arrCustomFields;		
+		public $arrAddressCustomFields;
+		
 		// Address Object
 		protected $objAddress;
 		
@@ -77,7 +81,14 @@
 		protected $dtgContact;
 		protected $dtgAddress;
 		
+		// Tab Index
+		protected $intTabIndex;
+		
 		protected function Form_Create() {
+			
+			// Tab Index
+			$this->intTabIndex = 1;
+			
 			// Call SetupCompany to either Load/Edit Existing or Create New
 			$this->SetupCompany();
 			
@@ -98,25 +109,31 @@
 			$this->lblCreationDate_Create();
 			$this->lblModifiedDate_Create();
 			$this->UpdateCompanyLabels();
-
+			
 			// Create/Setup Controls for Company's Data Fields
 			$this->txtShortDescription_Create();
+			$this->txtLongDescription_Create();
 			$this->txtWebsite_Create();
 			$this->txtEmail_Create();
-			$this->txtLongDescription_Create();
-			$this->lstAddress_Create();
 			$this->txtTelephone_Create();
 			$this->txtFax_Create();
+			
+			// Create all custom asset fields
+			$this->customFields_Create();
+			
+			$this->lstAddress_Create();
+			$this->UpdateCompanyControls();
+			
 			if (!$this->blnEditMode) {
 				$this->txtAddressShortDescription_Create();
-				$this->lstCountry_Create();
 				$this->txtAddress1_Create();
 				$this->txtAddress2_Create();
 				$this->txtCity_Create();
 				$this->lstStateProvince_Create();
 				$this->txtPostalCode_Create();
+				$this->lstCountry_Create();
+				$this->arrAddressCustomFields_Create();
 			}
-			$this->UpdateCompanyControls();
 
 			// Create/Setup Button Action controls
 			$this->btnEdit_Create();
@@ -265,7 +282,7 @@
 			$this->txtShortDescription->CausesValidation = true;
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtShortDescription->TabIndex=1;
+			$this->txtShortDescription->TabIndex = $this->intTabIndex++;
 			QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->txtShortDescription->ControlId));
 		}
 		
@@ -275,13 +292,13 @@
 			$this->txtWebsite->CausesValidation = true;
 			$this->txtWebsite->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtWebsite->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtWebsite->TabIndex=3;
+			$this->txtWebsite->TabIndex = $this->intTabIndex++;
 		}
 		
 		// Create the LongDescription Text Field
 		protected function txtLongDescription_Create() {
 			parent::txtLongDescription_Create();
-			$this->txtLongDescription->TabIndex=2;
+			$this->txtLongDescription->TabIndex = $this->intTabIndex++;
 			
 		}
 		
@@ -296,7 +313,7 @@
 					$this->txtTelephone->Required = true;
 				}
 			}
-			$this->txtTelephone->TabIndex=5;
+			$this->txtTelephone->TabIndex = $this->intTabIndex++;
 		}		
 		
 		// Create the Email Text Field
@@ -305,7 +322,7 @@
 			$this->txtEmail->CausesValidation = true;
 			$this->txtEmail->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtEmail->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtEmail->TabIndex=4;		
+			$this->txtEmail->TabIndex = $this->intTabIndex++;		
 		}
 		
 		// Create the Telephone Fax Field
@@ -314,7 +331,7 @@
 			$this->txtFax->CausesValidation = true;
 			$this->txtFax->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtFax->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtFax->TabIndex=6;	
+			$this->txtFax->TabIndex = $this->intTabIndex++;	
 		}
 		
 		// Create and Setup lstAddress
@@ -327,7 +344,7 @@
 				$objListItem = new QListItem($objAddress->__toString(), $objAddress->AddressId);
 				$this->lstAddress->AddItem($objListItem);
 			}
-			$this->lstAddress->TabIndex=7;
+			$this->lstAddress->TabIndex = $this->intTabIndex++;
 		}
 		
 		// Create and Setup txtShortDescription
@@ -337,7 +354,7 @@
 			$this->txtAddressShortDescription->CausesValidation = true;
 			$this->txtAddressShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtAddressShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtAddressShortDescription->TabIndex = 8;
+			$this->txtAddressShortDescription->TabIndex = $this->intTabIndex++;
 		}
 
 		// Create the Country Input
@@ -354,7 +371,7 @@
 				$this->lstCountry->AddItem($objListItem);
 			}
 			$this->lstCountry->AddAction(new QChangeEvent(), new QAjaxAction('lstCountry_Select'));
-			$this->lstCountry->TabIndex = 14;
+			$this->lstCountry->TabIndex = $this->intTabIndex++;
 		}
 
 		// Create and Setup txtAddress1
@@ -364,7 +381,7 @@
 			$this->txtAddress1->CausesValidation = true;
 			$this->txtAddress1->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtAddress1->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
-			$this->txtAddress1->TabIndex = 9;
+			$this->txtAddress1->TabIndex = $this->intTabIndex++;
 		}
 
 		// Create and Setup txtAddress2
@@ -374,7 +391,7 @@
 			$this->txtAddress2->CausesValidation = true;
 			$this->txtAddress2->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtAddress2->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
-			$this->txtAddress2->TabIndex = 10;
+			$this->txtAddress2->TabIndex = $this->intTabIndex++;
 		}
 
 		// Create and Setup txtCity
@@ -384,7 +401,7 @@
 			$this->txtCity->CausesValidation = true;
 			$this->txtCity->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtCity->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
-			$this->txtCity->TabIndex = 11;
+			$this->txtCity->TabIndex = $this->intTabIndex++;
 		}
 
 		// Create and Setup lstStateProvince
@@ -397,7 +414,7 @@
 				$objListItem = new QListItem($objStateProvince->__toString(), $objStateProvince->StateProvinceId);
 				$this->lstStateProvince->AddItem($objListItem);
 			}
-			$this->lstStateProvince->TabIndex = 12;
+			$this->lstStateProvince->TabIndex = $this->intTabIndex++;
 		}
 
 		// Create and Setup txtPostalCode
@@ -407,8 +424,44 @@
 			$this->txtPostalCode->CausesValidation = true;
 			$this->txtPostalCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtPostalCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());		
-			$this->txtPostalCode->TabIndex = 13;
-		}		
+			$this->txtPostalCode->TabIndex = $this->intTabIndex++;
+		}
+		
+		// Create all Custom Company Fields
+		protected function customFields_Create() {
+		
+			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
+			$this->objCompany->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(7, $this->blnEditMode, $this->objCompany->CompanyId);
+			
+			// Create the Custom Field Controls - labels and inputs (text or list) for each
+			if ($this->objCompany->objCustomFieldArray) {
+				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCompany->objCustomFieldArray, $this->blnEditMode, $this, true, true);
+				if ($this->arrCustomFields) {
+					foreach ($this->arrCustomFields as $field) {
+						$field['input']->TabIndex = $this->intTabIndex++;
+					}
+				}
+			}
+			
+			
+		}
+		
+		// Create all custom fields for addresses (only when creating a new company
+		protected function arrAddressCustomFields_Create() {
+			
+			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
+			$this->objAddress = new Address();
+			$this->objAddress->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(9, $this->blnEditMode);
+			
+			if ($this->objAddress->objCustomFieldArray) {
+				$this->arrAddressCustomFields = CustomField::CustomFieldControlsCreate($this->objAddress->objCustomFieldArray, $this->blnEditMode, $this, false, true);
+				if ($this->arrAddressCustomFields) {
+					foreach ($this->arrAddressCustomFields as $field) {
+						$field['input']->TabIndex = $this->intTabIndex++;
+					}
+				}
+			}
+		}
 		
 		// Setup Edit Button
 		protected function btnEdit_Create() {
@@ -428,7 +481,7 @@
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->btnSave->TabIndex=15;
+			$this->btnSave->TabIndex = $this->intTabIndex++;
 		}
 		
 		// Setup Cancel Button
@@ -625,9 +678,13 @@
 					}
 				}
 				
-				
 				$this->UpdateCompanyFields();
 				$this->objCompany->Save();
+				// Assign input values to custom fields
+				if ($this->arrCustomFields) {
+					// Save the values from all of the custom field controls to save the asset
+					CustomField::SaveControls($this->objCompany->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objCompany->CompanyId, 7);
+				}				
 				$this->SaveNewAddress();
 	
 				if ($this->blnEditMode) {
@@ -657,6 +714,10 @@
 		
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
+			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
+			// The values should not get deleted for select values
+			CustomField::DeleteTextValues($this->objCompany->objCustomFieldArray);
+						
 			// $this->objCompany->AddressId = null;
 			// $this->objCompany->Save();
 			parent::btnDelete_Click($strFormId, $strControlId, $strParameter);
@@ -685,6 +746,10 @@
 		protected function SaveNewAddress() {
 			
 			if (!$this->blnEditMode && $this->txtAddressShortDescription->Text) {
+				
+				if ($this->objAddress->objCustomFieldArray) {
+					$objAddressCustomFieldArray = $this->objAddress->objCustomFieldArray;
+				}
 				$this->objAddress = new Address();
 				$this->objAddress->CompanyId = $this->objCompany->CompanyId;
 				$this->objAddress->ShortDescription = $this->txtAddressShortDescription->Text;
@@ -697,6 +762,10 @@
 				$this->objAddress->Save();
 				$this->objCompany->AddressId = $this->objAddress->AddressId;
 				$this->objCompany->Save();
+				
+				if ($this->arrAddressCustomFields) {
+					CustomField::SaveControls($objAddressCustomFieldArray, $this->blnEditMode, $this->arrAddressCustomFields, $this->objCompany->Address->AddressId, 9);
+				}
 			}
 		}
 		
@@ -709,6 +778,7 @@
 			$this->txtFax->Text = $this->objCompany->Fax;
 			$this->txtEmail->Text = $this->objCompany->Email;
 			$this->txtLongDescription->Text = $this->objCompany->LongDescription;
+			$this->arrCustomFields = CustomField::UpdateControls($this->objCompany->objCustomFieldArray, $this->arrCustomFields);
 		}
 		
 		// Update the Company Labels
@@ -737,6 +807,10 @@
 			if ($this->objCompany->ModifiedDate) {
 				$this->lblModifiedDate->Text = $this->objCompany->ModifiedDate . ' by ' . $this->objCompany->ModifiedByObject->__toStringFullName();
 			}
+			// Update custom labels
+			if ($this->arrCustomFields) {
+				CustomField::UpdateLabels($this->arrCustomFields);
+			}					
 
 		}
 		
@@ -764,6 +838,11 @@
 			$this->lblAddress->Display = true;
 			$this->lblTelephone->Display = true;
 			$this->lblFax->Display = true;
+			
+			// Display custom field labels
+			if ($this->arrCustomFields) {
+				CustomField::DisplayLabels($this->arrCustomFields);
+			}			
 	
 			// Display Edit and Delete buttons
 			$this->btnEdit->Display = true;
@@ -798,6 +877,11 @@
 			// Display the Save and Cancel buttons
 			$this->btnSave->Display = true;
 			$this->btnCancel->Display = true;
+			
+	    // Display custom field inputs
+	    if ($this->arrCustomFields) {
+	    	CustomField::DisplayInputs($this->arrCustomFields);
+	    } 			
 		}
 		
 	}

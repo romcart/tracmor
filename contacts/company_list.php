@@ -62,6 +62,8 @@
 		protected $blnAdvanced;
 		// Advanced Search Composite control
 		protected $ctlAdvanced;
+		// Custom Fields array
+		protected $arrCustomFields;
 
 		// Search Values
 		protected $strShortDescription;
@@ -105,17 +107,18 @@
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
+			$arrCustomFields = $this->arrCustomFields;
 			
 			// Expand to include the primary address, State/Province, and Country
 			$objExpansionMap[Company::ExpandAddress][Address::ExpandStateProvince] = true;
 			$objExpansionMap[Company::ExpandAddress][Address::ExpandCountry] = true;
 			
-			$this->dtgCompany->TotalItemCount = Company::CountBySearch($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgCompany->TotalItemCount = Company::CountBySearch($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
 			if ($this->dtgCompany->TotalItemCount == 0) {
 				$this->dtgCompany->ShowHeader = false;
 			}
 			else {
-				$this->dtgCompany->DataSource = Company::LoadArrayBySearch($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgCompany->SortInfo, $this->dtgCompany->LimitInfo, $objExpansionMap);
+				$this->dtgCompany->DataSource = Company::LoadArrayBySearch($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgCompany->SortInfo, $this->dtgCompany->LimitInfo, $objExpansionMap);
 				$this->dtgCompany->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -207,7 +210,7 @@
 	  
 	  // Create the Advanced Search Composite Control
   	protected function ctlAdvanced_Create() {
-  		$this->ctlAdvanced = new QAdvancedSearchComposite($this);
+  		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 7);
   		$this->ctlAdvanced->Display = false;
   	}
 	  
@@ -220,16 +223,27 @@
       		
       // Enable AJAX - this won't work while using the DB profiler
       $this->dtgCompany->UseAjax = true;
+      
+      // Allow for column toggling
+      $this->dtgCompany->ShowColumnToggle = true;      
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgCompany);
       $this->dtgCompany->Paginator = $objPaginator;
       $this->dtgCompany->ItemsPerPage = 20;
           
-      $this->dtgCompany->AddColumn(new QDataGridColumn('Company Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgCompany->AddColumn(new QDataGridColumn('City', '<?= $_ITEM->__toStringCity() ?>', 'Width=200', 'SortByCommand="company__address_id__city ASC"', 'ReverseSortByCommand="company__address_id__city DESC"', 'CssClass="dtg_column"'));
-      $this->dtgCompany->AddColumn(new QDataGridColumn('State/Province', '<?= $_ITEM->__toStringStateProvince() ?>', 'SortByCommand="company__address_id__state_province_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__state_province_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgCompany->AddColumn(new QDataGridColumn('Country', '<?= $_ITEM->__toStringCountry() ?>', 'SortByCommand="company__address_id__country_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__country_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgCompany->AddColumn(new QDataGridColumnExt('Company Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgCompany->AddColumn(new QDataGridColumnExt('City', '<?= $_ITEM->__toStringCity() ?>', 'Width=200', 'SortByCommand="company__address_id__city ASC"', 'ReverseSortByCommand="company__address_id__city DESC"', 'CssClass="dtg_column"'));
+      $this->dtgCompany->AddColumn(new QDataGridColumnExt('State/Province', '<?= $_ITEM->__toStringStateProvince() ?>', 'SortByCommand="company__address_id__state_province_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__state_province_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgCompany->AddColumn(new QDataGridColumnExt('Country', '<?= $_ITEM->__toStringCountry() ?>', 'SortByCommand="company__address_id__country_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__country_id__short_description DESC"', 'CssClass="dtg_column"'));
+      
+      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(7, false);
+      if ($objCustomFieldArray) {
+      	foreach ($objCustomFieldArray as $objCustomField) {
+      		$this->dtgCompany->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+      	}
+      }
       
       $this->dtgCompany->SortColumnIndex = 0;
     	$this->dtgCompany->SortDirection = 0;
@@ -270,6 +284,11 @@
 	  	$this->strDateModified = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
+  		if ($this->arrCustomFields) {
+	  		foreach ($this->arrCustomFields as $field) {
+	  			$field['value'] = null;
+	  		}
+	  	}
 	  	$this->blnSearch = false;
   	}
   	
@@ -328,6 +347,18 @@
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
+			
+			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
+			if ($this->arrCustomFields) {
+				foreach ($this->arrCustomFields as &$field) {
+					if ($field['input'] instanceof QListBox) {
+						$field['value'] = $field['input']->SelectedValue;
+					}
+					elseif ($field['input'] instanceof QTextBox) {
+						$field['value'] = $field['input']->Text;
+					}
+				}
+			}
 	  }	   	
 	}
 

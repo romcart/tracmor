@@ -40,7 +40,13 @@
 		$arrCompanyFields[] = array('name' => 'Website:',  'value' => $this->lblWebsite->Render(false) . $this->txtWebsite->RenderWithError(false));
 		$arrCompanyFields[] = array('name' => 'Email:',  'value' => $this->lblEmail->Render(false) . $this->txtEmail->RenderWithError(false));		
 		$arrCompanyFields[] = array('name' => 'Telephone:',  'value' => $this->lblTelephone->Render(false) . $this->txtTelephone->RenderWithError(false));	
-		$arrCompanyFields[] = array('name' => 'Fax:',  'value' => $this->lblFax->Render(false) . $this->txtFax->RenderWithError(false));	
+		$arrCompanyFields[] = array('name' => 'Fax:',  'value' => $this->lblFax->Render(false) . $this->txtFax->RenderWithError(false));
+		// Custom Fields
+		if ($this->arrCustomFields) {
+			foreach ($this->arrCustomFields as $field) {
+				$arrCompanyFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+			}
+		}
 		
 		// Only display Primary Address field if this is not a new company
 		if ($this->blnEditMode) {
@@ -55,6 +61,12 @@
 			$arrCompanyFields[] = array('name' => 'State/Province:', 'value' => $this->lstStateProvince->RenderWithError(false));
 			$arrCompanyFields[] = array('name' => 'Postal Code:', 'value' => $this->txtPostalCode->RenderWithError(false));
 			$arrCompanyFields[] = array('name' => 'Country:', 'value' => $this->lstCountry->RenderWithError(false));
+			
+			if ($this->arrAddressCustomFields) {
+				foreach ($this->arrAddressCustomFields as $field) {
+					$arrCompanyFields[] = array('name' => $field['input']->Name . ":", 'value' => $field['input']->RenderWithError(false));
+				}
+			}
 		}
 
 		// Display Metadata fields if this is not a new company

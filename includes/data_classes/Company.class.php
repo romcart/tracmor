@@ -36,6 +36,9 @@
 	 * 
 	 */
 	class Company extends CompanyGen {
+		
+		public $objCustomFieldArray;
+		
 		/**
 		 * Default "to string" handler
 		 * Allows pages to _p()/echo()/print() this object, and to define the default
@@ -116,7 +119,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearch($strShortDescription = null, $strCity = null, $intStateProvinceId = null, $intCountryId = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strShortDescription = null, $strCity = null, $intStateProvinceId = null, $intCountryId = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			Company::QueryHelper($objDatabase);
@@ -133,13 +136,15 @@
 			}
 			
 			// Generate the search SQL used
-			$arrSearchSql = Company::GenerateSearchSql($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Company::GenerateSearchSql($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrCustomFieldSql = CustomField::GenerateSql(7);
 			
 			$strQuery = sprintf('
 				SELECT
 					COUNT(company.company_id) AS row_count
 				FROM
 					`company` AS `company`
+					%s
 					%s
 				WHERE
 				  1=1
@@ -149,8 +154,9 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"),
-			$arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCitySql'], $arrSearchSql['strStateProvinceSql'], $arrSearchSql['strCountrySql'], $arrSearchSql['strDateModifiedSql'],
+				  %s
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
+			$arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCitySql'], $arrSearchSql['strStateProvinceSql'], $arrSearchSql['strCountrySql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -175,7 +181,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Company[]
      */
-		public static function LoadArrayBySearch($strShortDescription = null, $strCity = null, $intStateProvinceId = null, $intCountryId = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strShortDescription = null, $strCity = null, $intStateProvinceId = null, $intCountryId = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			
 			Company::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			
@@ -191,7 +197,8 @@
 			}
 			
 			// Generate an array of SQL strings to be used in the search query
-			$arrSearchSql = Company::GenerateSearchSql($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Company::GenerateSearchSql($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrCustomFieldSql = CustomField::GenerateSql(7);
 
 			$strQuery = sprintf('
 				SELECT
@@ -209,8 +216,10 @@
 					`company`.`modified_by` AS `modified_by`,
 					`company`.`modified_date` AS `modified_date`
 					%s
+					%s
 				FROM
 					`company` AS `company`
+					%s
 					%s
 				WHERE
 				1=1
@@ -222,22 +231,23 @@
 				%s
 				%s
 				%s
+				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"),
-				$objQueryExpansion->GetFromSql("", "\n					"),
-				$arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCitySql'], $arrSearchSql['strStateProvinceSql'], $arrSearchSql['strCountrySql'], $arrSearchSql['strDateModifiedSql'],
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'],
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
+				$arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCitySql'], $arrSearchSql['strStateProvinceSql'], $arrSearchSql['strCountrySql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
 
 			$objDbResult = $objDatabase->Query($strQuery);				
 			return Company::InstantiateDbResult($objDbResult);			
 		
-		}		
+		}
 		
 		// Generate SQL strings to be used in both the Count and Load BySearch Queries
-	  protected static function GenerateSearchSql ($strShortDescription = null, $strCity = null, $intStateProvinceId = null, $intCountryId = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strShortDescription = null, $strCity = null, $intStateProvinceId = null, $intCountryId = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
 
-	  	$arrSearchSql = array("strShortDescriptionSql" => "", "strCitySql" => "", "strStateProvinceSql" => "", "strCountrySql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
+	  	$arrSearchSql = array("strShortDescriptionSql" => "", "strCitySql" => "", "strStateProvinceSql" => "", "strCountrySql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
 	  	
 			if ($strShortDescription) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -275,6 +285,23 @@
 					$strDateModifiedLast = QApplication::$Database[1]->SqlVariable($strDateModifiedLast->Timestamp, false) + 86399;
 					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`company`.`modified_date`) > %s", $strDateModifiedFirst);
 					$arrSearchSql['strDateModifiedSql'] .= sprintf("\nAND UNIX_TIMESTAMP(`company`.`modified_date`) < %s", $strDateModifiedLast);
+				}
+			}
+			
+			if ($arrCustomFields) {
+				foreach ($arrCustomFields as $field) {
+					if (isset($field['value']) && !empty($field['value'])) {
+						$field['CustomFieldId'] = QApplication::$Database[1]->SqlVariable($field['CustomFieldId'], false);
+						
+						if ($field['input'] instanceof QTextBox) {
+							$field['value'] = QApplication::$Database[1]->SqlVariable("%" . $field['value'] . "%", false);
+							$arrSearchSql['strCustomFieldsSql'] .= "\nAND `cfv_".$field['CustomFieldId']."` . `short_description` LIKE ".$field['value'];
+						}
+						elseif ($field['input'] instanceof QListBox) {
+							$field['value'] = QApplication::$Database[1]->SqlVariable($field['value'], true);
+							$arrSearchSql['strCustomFieldsSql'] .= sprintf("\nAND `cfv_%s` . `custom_field_value_id`%s", $field['CustomFieldId'], $field['value']);
+						}
+					}
 				}
 			}
 			

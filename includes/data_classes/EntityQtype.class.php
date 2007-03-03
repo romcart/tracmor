@@ -75,6 +75,11 @@
 					break;
 				case 6: $strToReturn = 'category';
 					break;
+				case 7: $strToReturn = 'company';
+					break;
+				case 8: $strToReturn = 'contact';
+					break;
+				case 9: $strToReturn = 'address';
 			}
 			
 			return $strToReturn;

@@ -163,7 +163,7 @@
 		}		
 		
 		/**
-		 * Generate the SQL for a lsit page to include custom fields as virtual attributes (add __ before an alias to make a virutal attribute)
+		 * Generate the SQL for a list page to include custom fields as virtual attributes (add __ before an alias to make a virutal attribute)
 		 * The virtual attributes can then be accessed by $objAsset->GetVirtualAttribute('name_of_attribute') where the name doesn't include the __
 		 * This method was added so that custom fields can be added to the customizable datagrids as hidden columns
 		 *
@@ -176,6 +176,7 @@
 			$arrCustomFieldSql['strFrom'] = '';
 			$objCustomFields = CustomField::LoadObjCustomFieldArray($intEntityQtypeId, false);
 			// This could be better. This will have to be updated if we want to add custom fields.
+			// IMPORTANT - LOOK CAREFULLY BELOW - SOME ARE BACKTICKS AND SOME ARE SINGLE QUOTES
 			switch ($intEntityQtypeId) {
 				case 1: $strId = 'asset`.`asset_id';
 					break;
@@ -186,6 +187,12 @@
 				case 5: $strId = 'manufacturer`.`manufacturer_id';
 					break;
 				case 6: $strId = 'category`.`category_id';
+					break;
+				case 7: $strId = 'company`.`company_id';
+					break;
+				case 8: $strId = 'contact`.`contact_id';
+					break;
+				case 9: $strId = 'address`.`address_id';
 					break;
 				
 				default:
@@ -349,7 +356,7 @@
 							$arrCustomFields[$i]['input']->AddItem('- Select One -', null);
 							foreach ($objCustomFieldValueArray as $objCustomFieldValue) {
 								$objListItem = new QListItem($objCustomFieldValue->__toString(), $objCustomFieldValue->CustomFieldValueId);
-								if ($blnEditMode &&($objCustomFieldArray[$i]->CustomFieldSelection) && ($objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValueId == $objCustomFieldValue->CustomFieldValueId)) {
+								if ($blnEditMode && ($objCustomFieldArray[$i]->CustomFieldSelection) && ($objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValueId == $objCustomFieldValue->CustomFieldValueId)) {
 									$objListItem->Selected = true;
 								}
 								// If it is a required field, then select the value on new entities by default
@@ -464,8 +471,11 @@
 									$arrCustomFields[$i]['input']->SelectedIndex = $j+1;
 								}
 							}*/
-							
-							
+					}
+					// I'm not so sure that this isn't going to cause a problem.
+					// It does allow for me to set the tab index correctly because I can create the custom fields, then run UpdateControls, and the default value still gets selected 
+					elseif ($objCustomFieldArray[$i]->RequiredFlag && $objCustomFieldArray[$i]->DefaultCustomFieldValueId) {
+						$arrCustomFields[$i]['input']->SelectedValue = $objCustomFieldArray[$i]->DefaultCustomFieldValueId;
 					}
 					else {
 						$arrCustomFields[$i]['input']->SelectedIndex = 0;

@@ -36,6 +36,9 @@
 	 * 
 	 */
 	class Address extends AddressGen {
+		
+		public $objCustomFieldArray;
+		
 		/**
 		 * Default "to string" handler
 		 * Allows pages to _p()/echo()/print() this object, and to define the default

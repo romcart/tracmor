@@ -156,6 +156,9 @@
 			$objAssetModelListItem = new QListItem('Asset Model', 4);
 			$objManufacturerListItem = new QListItem('Manufacturer', 5);
 			$objCategoryListItem = new QListItem('Category', 6);
+			$objCompanyListItem = new QListItem('Company', 7);
+			$objContactListItem = new QListItem('Contact', 8);
+			$objAddressListItem = new QListItem('Address', 9);
 			if ($objEntityQtypeCustomFieldArray) {
 				foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
 					if ($objEntityQtypeCustomField->EntityQtypeId == 1) {
@@ -173,6 +176,15 @@
 					if ($objEntityQtypeCustomField->EntityQtypeId == 6) {
 						$objCategoryListItem->Selected = true;
 					}
+					if ($objEntityQtypeCustomField->EntityQtypeId == 7) {
+						$objCompanyListItem->Selected = true;
+					}
+					if ($objEntityQtypeCustomField->EntityQtypeId == 8) {
+						$objContactListItem->Selected = true;
+					}
+					if ($objEntityQtypeCustomField->EntityQtypeId == 9) {
+						$objAddressListItem->Selected = true;
+					}					
 				}
 			}
 			$this->lstEntityQtype->AddItem($objAssetListItem);
@@ -180,6 +192,9 @@
 			$this->lstEntityQtype->AddItem($objAssetModelListItem);
 			$this->lstEntityQtype->AddItem($objManufacturerListItem);
 			$this->lstEntityQtype->AddItem($objCategoryListItem);
+			$this->lstEntityQtype->AddItem($objCompanyListItem);
+			$this->lstEntityQtype->AddItem($objContactListItem);
+			$this->lstEntityQtype->AddItem($objAddressListItem);
 		}
 		
 		// Create/Setup the Value textbox
@@ -207,7 +222,7 @@
 			if ($this->blnEditMode && $this->objCustomField->CustomFieldQtypeId == 2) {
 				$this->txtDefaultValue->Display = false;
 			}
-			$this->txtDefaultValue->AddAction(new QClickEvent(), new QAjaxAction('chkRequiredFlag_Click'));
+			
 			$this->txtDefaultValue->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtDefaultValue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
