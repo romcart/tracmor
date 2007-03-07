@@ -26,6 +26,13 @@
 		$arrCompanyFields[] = array('name' => 'Telephone:',  'value' => $this->txtCompanyTelephone->RenderWithError(false));	
 		$arrCompanyFields[] = array('name' => 'Fax:',  'value' => $this->txtCompanyFax->RenderWithError(false));	
 		
+		// Custom Fields
+		if ($this->arrCompanyCustomFields) {
+			foreach ($this->arrCompanyCustomFields as $field) {
+				$arrCompanyFields[] = array('name' => $field['input']->Name . ":", 'value' => $field['input']->RenderWithError(false));
+			}
+		}
+		
 ?>
 <br class="item_divider">
 <div class="title">New Company</div><br />
