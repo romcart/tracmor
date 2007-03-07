@@ -336,7 +336,7 @@ class QAssetEditComposite extends QControl {
 		$this->chkAutoGenerateAssetCode->Text = 'Auto Generate';
 		$this->chkAutoGenerateAssetCode->AddAction(new QClickEvent(), new QToggleEnableAction($this->txtAssetCode));
 		if (!QApplication::$TracmorSettings->MinAssetCode) {
-			$this->chkAutoGenerateAssetCode->Visible = false;
+			$this->chkAutoGenerateAssetCode->Display = false;
 		}
 	}
 
