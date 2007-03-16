@@ -67,10 +67,10 @@
 			$this->lstCustomFieldQtype_Create();
 			$this->lblCustomFieldQtype_Create();
 			$this->txtShortDescription_Create();
-			$this->chkActiveFlag_Create();
 			$this->lstEntityQtype_Create();
 			$this->txtDefaultValue_Create();
 			$this->lstDefaultValue_Create();
+			$this->chkActiveFlag_Create();
 			$this->chkRequiredFlag_Create();
 			$this->lblHeaderCustomField_Create();
 			$this->lblSelectionOption_Create();
@@ -261,6 +261,12 @@
 		// Create/Setup the active flag checkbox
 		protected function chkActiveFlag_Create() {
 			parent::chkActiveFlag_Create();
+			
+			// Select fields cannot be active unless they have selections
+			if ($this->blnEditMode && $this->objCustomField->CustomFieldQtypeId == 2 && $this->lstDefaultValue->ItemCount == 0) {
+				$this->chkActiveFlag->Enabled = false;
+			}
+			
 			$this->chkActiveFlag->CausesValidation = true;
 			$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -411,8 +417,10 @@
 				// If there are no selections for this custom field
 				elseif ($this->lstDefaultValue->ItemCount == 0) {
 					$this->lstDefaultValue->Enabled = false;
-					$this->chkRequiredFlag->Checked = false;
+					$this->chkActiveFlag->Enabled = false;
+					$this->chkActiveFlag->Checked = false;
 					$this->chkRequiredFlag->Enabled = false;
+					$this->chkRequiredFlag->Checked = false;
 				}
 				else {
 					$this->lstDefaultValue->Enabled = false;
@@ -461,7 +469,18 @@
 				}
 				// Disable fields if there are no selections
 				if ($this->lstDefaultValue->ItemCount == 0 && $this->chkRequiredFlag->Enabled == true) {
+					
 					$this->chkRequiredFlag->Enabled = false;
+					$this->chkRequiredFlag->Checked = false;
+					$this->chkActiveFlag->Enabled = false;
+					$this->chkActiveFlag->Checked = false;
+					
+					// Save these flags in case the administrator clicks away without saving these two changes
+					// Otherwise you could have a required and active Custom Field that doesn't have any selections
+					$this->objCustomField->RequiredFlag = false;
+					$this->objCustomField->ActiveFlag = false;
+					$this->objCustomField->Save();
+					
 					$this->lstDefaultValue->Enabled = false;
 				}
 			}
@@ -479,6 +498,7 @@
 			$this->txtValue->Text = '';
 			
 			if ($this->lstDefaultValue->ItemCount > 0 && $this->chkRequiredFlag->Enabled == false) {
+				$this->chkActiveFlag->Enabled = true;
 				$this->chkRequiredFlag->Enabled = true;
 			}
 		}

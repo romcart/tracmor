@@ -393,11 +393,24 @@
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 			$this->ifcImage->Delete($this->objAssetModel->ImagePath);
 			
-			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
-			// The values should not get deleted for select values
-			CustomField::DeleteTextValues($this->objAssetModel->objCustomFieldArray);
-			
-			parent::btnDelete_Click($strFormId, $strControlId, $strParameter);
+			try {
+				$strImagePath = $this->objAssetModel->ImagePath;
+				$objCustomFieldArray = $this->objAssetModel->objCustomFieldArray;
+				$this->objAssetModel->Delete();
+				$this->ifcImage->Delete($strImagePath);
+				// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
+				// The values should not get deleted for select values
+				CustomField::DeleteTextValues($objCustomFieldArray);
+				$this->RedirectToListPage();
+			}
+			catch (QDatabaseExceptionBase $objExc) {
+				if ($objExc->ErrorNumber == 1451) {
+					$this->btnDelete->Warning = 'This asset model cannot be deleted because it is associated with one or more assets.';
+				}
+				else {
+					throw new QDatabaseExceptionBase();
+				}
+			}
 		}
 		
 		// Protected Update Methods

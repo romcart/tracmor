@@ -107,6 +107,8 @@ class QHeaderMenu extends QControl {
 	
 	protected function objDefaultWaitIcon_Create() {
 		$this->objParentObject->objDefaultWaitIcon = new QWaitIcon($this->objParentObject);
+		$this->objParentObject->objDefaultWaitIcon->TagName = 'div';
+		$this->objParentObject->objDefaultWaitIcon->Padding = '0px 20px 14px 0px';
 		$this->objParentObject->objDefaultWaitIcon->Text = sprintf('<img class="spinner" src="%s/spinner_14.gif" width="16" height="16" alt="Please Wait..."/>', __VIRTUAL_DIRECTORY__ . __IMAGE_ASSETS__);
 	}
 	

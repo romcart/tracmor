@@ -165,11 +165,22 @@
 		
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 			
-			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
-			// The values should not get deleted for select values
-			CustomField::DeleteTextValues($this->objCategory->objCustomFieldArray);
-			
-			parent::btnDelete_Click($strFormId, $strControlId, $strParameter);
+			try {
+				$objCustomFieldArray = $this->objCategory->objCustomFieldArray;
+				$this->objCategory->Delete();
+				// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
+				// The values should not get deleted for select values
+				CustomField::DeleteTextValues($objCustomFieldArray);
+				$this->RedirectToListPage();
+			}
+			catch (QDatabaseExceptionBase $objExc) {
+				if ($objExc->ErrorNumber == 1451) {
+					$this->btnCancel->Warning = 'This category cannot be deleted because it is associated with one or more models.';
+				}
+				else {
+					throw new QDatabaseExceptionBase();
+				}
+			}
 		}
 	}
 

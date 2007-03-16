@@ -205,7 +205,7 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), 
+			', $objQueryExpansion->GetFromSql("", "\n					"),
 			$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
@@ -230,7 +230,7 @@
 			}
 					
 			$arrSearchSql = AssetModel::GenerateSearchSql($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode);
-			$arrCustomFieldSql = CustomField::GenerateSql(1);
+			$arrCustomFieldSql = CustomField::GenerateSql(4);
 
 			$strQuery = sprintf('
 				SELECT

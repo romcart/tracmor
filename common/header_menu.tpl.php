@@ -85,7 +85,7 @@
 									<?php 
 										echo(sprintf('<td width="100%%" style="padding-left:10px;font-family:arial;color:#FFFFFF;font-size:12px;font-weight:bold;">Welcome %s</td>', QApplication::$objUserAccount->FirstName));
 									?>
-									<td style="padding-right:20px; padding-bottom:14px;"><?php $this->objParentObject->DefaultWaitIcon->Render(); ?></td>
+									<td><?php $this->objParentObject->DefaultWaitIcon->Render(); ?></td>
 									<td><img src="../images/searchSeparator.gif"></td>
 									<td style="padding-left:5px;padding-right:5px;font-family:arial;color:#FFFFFF;font-size:12px;font-weight:bold;">Search</td>
 									<td style="padding-left:5px;padding-right:5px;"><input type="text" style="border:1px solid #000000;font-size:12px;font-family:arial;"></td>

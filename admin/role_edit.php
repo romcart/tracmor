@@ -67,7 +67,8 @@
 			$this->lblHeaderRole_Create();
 			
 			// Load an array of all modules
-			$this->objModuleArray = Module::LoadAll();
+			//$this->objModuleArray = Module::LoadAll();
+			$this->objModuleArray = Module::LoadAllButHome();
 			// Load an array of all Authorization types
 			$this->objAuthorizationArray = Authorization::LoadAll();
 			// Create/Setup Controls for Authorizations
@@ -96,13 +97,14 @@
 			
 			if ($this->objModuleArray) {
 				foreach ($this->objModuleArray as $objModule) {
+								
 					// Create Access List Controls
 					$objAccessControl = new QListBox($this);
 					$objAccessControl->ActionParameter = $objModule->ModuleId;
 					$objAccessControl->Width=100;
 					$objAccessControl->CssClass="greentext";
-					$objEnabledItem = new QListItem('Enabled', 1, false, 'CssClass="greentext"');
-					$objDisabledItem = new QListItem('Disabled', 0, false, 'CssClass="redtext"');
+					$objEnabledItem = new QListItem('Enabled', 1, false, null, 'CssClass="greentext"');
+					$objDisabledItem = new QListItem('Disabled', 0, false, null, 'CssClass="redtext"');
 					if ($this->blnEditMode) {
 						$objRoleModule = RoleModule::LoadByRoleIdModuleId($this->objRole->RoleId, $objModule->ModuleId);
 						if ($objRoleModule) {
@@ -163,7 +165,12 @@
 							}
 							$objControl->AddItem($objAllItem);
 							$objControl->AddItem($objOwnerItem);
-							$objControl->AddItem($objNoneItem);
+							// Do not include the 'None' List Item for View
+							// If an administrator does not want to allow for viewing, they should disable access. This eliminates the problem of setting View: None, but Edit: All
+							// The problem with View: Owner and Edit: All still exists
+							if ($objAuthorization->AuthorizationId != 1) {
+								$objControl->AddItem($objNoneItem);
+							}
 							$objAllItem = null;
 							$objOwnerItem = null;
 							$objNoneItem = null;
@@ -280,6 +287,28 @@
 						}
 					}
 				}
+			}
+			
+			// If creating a new Role, manually give access to the Home module
+			if (!$this->blnEditMode) {
+				$objRoleModule = new RoleModule();
+				$objRoleModule->ModuleId = 1;
+				$objRoleModule->RoleId = $this->objRole->RoleId;
+				$objRoleModule->AccessFlag = true;
+				$objRoleModule->Save();
+				
+				/*
+				// Give view, edit, and delete access for ALL for the home module
+				if ($this->objAuthorizationArray) {
+					foreach ($this->objAuthorizationArray as $objAuthorization) {
+						$objRoleModuleAuthorization = new RoleModuleAuthorization();
+						$objRoleModuleAuthorization->RoleModuleId = $objRoleModule->RoleModuleId;
+						$objRoleModuleAuthorization->AuthorizationId = $objAuthorization->AuthorizationId;
+						$objRoleModuleAuthorization->AuthorizationLevelId = 3;
+						$objRoleModuleAuthorization->Save();
+					}
+				}
+				*/
 			}
 /*
 			// Delete all RoleModules - this will cascade to all RoleModuleAuthorizations also

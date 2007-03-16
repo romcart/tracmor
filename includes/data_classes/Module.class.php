@@ -48,5 +48,18 @@
 		public function __toString() {
 			return sprintf('%s',  $this->strShortDescription);
 		}
+		
+		/**
+		 * This returns all Module objects except for the Home module
+		 * It is intended to use for the role_edit page because the home module always grants full authorization
+		 *
+		 * @return Array Module Objects
+		 */
+		public static function LoadAllButHome() {
+			
+			$objModuleArray = Module::QueryArray(QQ::NotEqual(QQN::Module()->ModuleId, 1));
+			
+			return $objModuleArray;
+		}
 	}
 ?>

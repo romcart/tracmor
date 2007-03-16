@@ -206,6 +206,7 @@
 			}
 
 			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Asset);
 
 			$strQuery = sprintf('
 				SELECT
@@ -229,7 +230,7 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strCustomFieldsFromSql'], 
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
 			$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
@@ -293,7 +294,6 @@
 					`asset` AS `asset`
 					%s
 					%s
-					%s
 				WHERE
 				1=1
 				%s
@@ -313,7 +313,7 @@
 				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
-				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strCustomFieldsFromSql'], $arrCustomFieldSql['strFrom'], 
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], 
 				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
@@ -345,7 +345,7 @@
 	  protected static function GenerateSearchSql ($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
 			
 	  	// Define all indexes for the array to be returned
-			$arrSearchSql = array("strAssetCodeSql" => "", "strLocationSql" => "", "strAssetModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strOffsiteSql" => "", "strAssetModelCodeSql" => "", "strReservedBySql" => "", "strCheckedOutBySql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strCustomFieldsFromSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
+			$arrSearchSql = array("strAssetCodeSql" => "", "strLocationSql" => "", "strAssetModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strOffsiteSql" => "", "strAssetModelCodeSql" => "", "strReservedBySql" => "", "strCheckedOutBySql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
 
 			if ($strAssetCode) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -412,27 +412,10 @@
 					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`asset`.`modified_date`) > %s", $strDateModifiedFirst);
 					$arrSearchSql['strDateModifiedSql'] .= sprintf("\nAND UNIX_TIMESTAMP(`asset`.`modified_date`) < %s", $strDateModifiedLast);
 				}
-			}			
+			}
+			
 			if ($arrCustomFields) {
-				foreach ($arrCustomFields as $field) {
-					if (isset($field['value']) && !empty($field['value'])) {
-						// echo("test");
-						$field['CustomFieldId'] = QApplication::$Database[1]->SqlVariable($field['CustomFieldId'], false);
-						
-						$arrSearchSql['strCustomFieldsFromSql'] .= sprintf("\nLEFT JOIN `custom_field_selection` AS `custom_field_selection_%s` ON `asset` . `asset_id` = `custom_field_selection_%s` . `entity_id`", $field['CustomFieldId'], $field['CustomFieldId']);
-						$arrSearchSql['strCustomFieldsFromSql'] .= sprintf("\nLEFT JOIN `custom_field_value` AS `custom_field_value_%s` ON `custom_field_selection_%s` . `custom_field_value_id` = `custom_field_value_%s` . `custom_field_value_id`", $field['CustomFieldId'], $field['CustomFieldId'], $field['CustomFieldId']);
-						
-						$arrSearchSql['strCustomFieldsSql'] .= sprintf("\nAND `custom_field_value_%s` . `custom_field_id` = %s", $field['CustomFieldId'], $field['CustomFieldId']);
-						if ($field['input'] instanceof QTextBox) {
-							$field['value'] = QApplication::$Database[1]->SqlVariable("%" . $field['value'] . "%", false);
-							$arrSearchSql['strCustomFieldsSql'] .= "\nAND `custom_field_value_".$field['CustomFieldId']."` . `short_description` LIKE ".$field['value'];
-						}
-						elseif ($field['input'] instanceof QListBox) {
-							$field['value'] = QApplication::$Database[1]->SqlVariable($field['value'], true);
-							$arrSearchSql['strCustomFieldsSql'] .= sprintf("\nAND `custom_field_value_%s` . `custom_field_value_id`%s", $field['CustomFieldId'], $field['value']);
-						}
-					}
-				}
+				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchSql($arrCustomFields);
 			}
 			
 			// Generate Authorization SQL based on the QApplication::$objRoleModule

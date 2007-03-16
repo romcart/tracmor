@@ -59,7 +59,7 @@
 				$this->btnCancel->RenderWithError();
 				$this->btnClone->Render();
 				echo('&nbsp;');
-				$this->btnDelete->Render();
+				$this->btnDelete->RenderWithError();
 			?>
 		</td>
 	</tr>

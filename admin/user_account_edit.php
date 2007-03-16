@@ -187,6 +187,22 @@
 					$this->btnCancel->Warning = sprintf('This user account has been updated by another user. You must <a href="user_account_edit.php?intUserAccountId=%s">Refresh</a> to edit this user account.', $this->objUserAccount->UserAccountId);
 				}
 			}
+		}
+		
+		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
+			
+			try {
+				$this->objUserAccount->Delete();
+				$this->RedirectToListPage();
+			}
+			catch (QDatabaseExceptionBase $objExc) {
+				if ($objExc->ErrorNumber == 1451) {
+					$this->btnCancel->Warning = 'This user cannot be deleted because it is associated with one or more entities or transactions.';
+				}
+				else {
+					throw new QDatabaseExceptionBase();
+				}
+			}
 		}		
 		
 		// Protected Update Methods

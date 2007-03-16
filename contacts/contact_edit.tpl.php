@@ -74,7 +74,7 @@
 						$this->btnSave->Render();
 						echo('&nbsp;');
 						$this->btnCancel->RenderWithError();
-						$this->btnDelete->Render();
+						$this->btnDelete->RenderWithError();
 					?>
 				</td>
 			</tr>

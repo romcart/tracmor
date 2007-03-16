@@ -283,7 +283,9 @@
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtShortDescription->TabIndex = $this->intTabIndex++;
+			$this->txtShortDescription->Required = true;
 			QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->txtShortDescription->ControlId));
+			
 		}
 		
 		// Create the Website Text Field
@@ -482,6 +484,7 @@
 			$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnSave->TabIndex = $this->intTabIndex++;
+			$this->btnSave->CausesValidation = true;
 		}
 		
 		// Setup Cancel Button
@@ -714,13 +717,22 @@
 		
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
-			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
-			// The values should not get deleted for select values
-			CustomField::DeleteTextValues($this->objCompany->objCustomFieldArray);
-						
-			// $this->objCompany->AddressId = null;
-			// $this->objCompany->Save();
-			parent::btnDelete_Click($strFormId, $strControlId, $strParameter);
+			try {
+				$objCustomFieldArray = $this->objCompany->objCustomFieldArray;
+				$this->objCompany->Delete();
+				// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
+				// The values should not get deleted for select values
+				CustomField::DeleteTextValues($objCustomFieldArray);
+				$this->RedirectToListPage();
+			}
+			catch (QDatabaseExceptionBase $objExc) {
+				if ($objExc->ErrorNumber == 1451) {
+					$this->btnDelete->Warning = 'This company cannot be deleted because it is associated with one or more shipments or receipts.';
+				}
+				else {
+					throw new QDatabaseExceptionBase();
+				}
+			}
 		}		
 		
 		protected function btnCreateAddress_Click($strFormId, $strControlId, $strParameter) {

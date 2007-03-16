@@ -365,7 +365,6 @@ class QAssetEditComposite extends QControl {
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnSave->CausesValidation = true;
-		QApplication::AuthorizeControl($this->objAsset, $this->btnSave, 2);
 		$this->btnSave->TabIndex=$this->GetNextTabIndex();
 	}
 	
@@ -733,13 +732,18 @@ class QAssetEditComposite extends QControl {
 		// Instantiate new Asset object
 		$this->objAsset = new Asset();
 		// Load custom fields for asset with values from original asset
-		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
+		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode);
 		// Set the asset_code to null because they are unique
 		$this->lblHeaderAssetCode->Text = 'New Asset';
 		$this->txtAssetCode->Text = '';
+		
+		$this->dtgAssetTransaction->MarkAsModified();
+		$this->dtgShipmentReceipt->MarkAsModified();
+		
 		// Set the creation and modification fields to null because it hasn't been created or modified yet.
 		$this->lblModifiedDate->Text = '';
 		$this->lblCreationDate->Text = '';
+		
 		// Show the inputs so the user can change any information and add the asset code
 		$this->displayInputs();
 	}
@@ -747,13 +751,22 @@ class QAssetEditComposite extends QControl {
 	// Delete Button Click Actions
 	public function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
-		// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
-		// The values do not get deleted for select values
-		CustomField::DeleteTextValues($this->objAsset->objCustomFieldArray);
-
-		$this->objAsset->Delete();
-
-		QApplication::Redirect('asset_list.php');
+		try {
+			$objCustomFieldArray = $this->objAsset->objCustomFieldArray;
+			$this->objAsset->Delete();
+			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
+			// The values do not get deleted for select values
+			CustomField::DeleteTextValues($objCustomFieldArray);
+			QApplication::Redirect('asset_list.php');
+		}
+		catch (QDatabaseExceptionBase $objExc) {
+			if ($objExc->ErrorNumber == 1451) {
+				$this->btnDelete->Warning = 'This asset cannot be deleted because it is associated with one or more transactions.';
+			}
+			else {
+				throw new QDatabaseExceptionBase();
+			}
+		}
 	}
 	
 	// Move Button Click Actions
@@ -844,14 +857,18 @@ class QAssetEditComposite extends QControl {
     // Only display the Asset Model list if creating a new asset
     // Only display location list if creating a new asset
     if (!$this->blnEditMode) {
-   		$this->lblAssetModelCode->Display = false;      	
+   		$this->lblAssetModelCode->Display = false;
+   		$this->lblAssetModel->Display = false;
    		$this->lstAssetModel->Display = true;
    		$this->lblLocation->Display = false;
    		$this->lstLocation->Display = true;
-   		$this->chkAutoGenerateAssetCode->Display = true;
+   		if (QApplication::$TracmorSettings->MinAssetCode) {
+   			$this->chkAutoGenerateAssetCode->Display = true;
+   		}
     }
     else {
       $this->lblAssetModelCode->Display = true;
+      $this->lblAssetModel->Display = true;
     	$this->lstAssetModel->Display = false;
    		$this->lblLocation->Display = true;
    		$this->lstLocation->Display = false;

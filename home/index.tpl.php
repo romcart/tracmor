@@ -19,24 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
-	QApplication::Authenticate(1);
-	
-	class HomeIndexForm extends QForm {
-		// Header Menu
-		protected $ctlHeaderMenu;
-		
-		protected function Form_Create() {
-			// Create the Header Menu
-			$this->ctlHeaderMenu_Create();
-		}
-		
-		// Create and Setup the Header Composite Control
-		protected function ctlHeaderMenu_Create() {
-			$this->ctlHeaderMenu = new QHeaderMenu($this);
-		}
-	}
-	
-	// Go ahead and run this form object to generate the page
-	HomeIndexForm::Run('HomeIndexForm', 'index.tpl.php');	
+	include('../includes/header.inc.php');
+	$this->RenderBegin();
 ?>
+<!-- Begin Header Menu -->
+<?php 
+	$this->ctlHeaderMenu->Render();
+?>
+<!-- End Header Menu -->
+
+		
+<?php $this->RenderEnd() ?>		
+<?php require_once('../includes/footer.inc.php'); ?>

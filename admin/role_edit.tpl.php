@@ -76,13 +76,15 @@
 							<th class="role_table_header">Edit</th>
 							<th class="role_table_header">Delete</th>
 						</tr>
+						<!--
 						<tr>
 							<td class="role_table_left">Home</td>
-							<td class="role_table_cell"><?php $this->arrControls['home']['access']->RenderWithName(); ?></td>
-							<td class="role_table_cell"><?php $this->arrControls['home']['view']->RenderWithName(); ?></td>
-							<td class="role_table_cell"><?php $this->arrControls['home']['edit']->RenderWithName(); ?></td>
-							<td class="role_table_cell"><?php $this->arrControls['home']['delete']->RenderWithName(); ?></td>
+							<td class="role_table_cell"><?php //$this->arrControls['home']['access']->RenderWithName(); ?></td>
+							<td class="role_table_cell"><?php //$this->arrControls['home']['view']->RenderWithName(); ?></td>
+							<td class="role_table_cell"><?php //$this->arrControls['home']['edit']->RenderWithName(); ?></td>
+							<td class="role_table_cell"><?php //$this->arrControls['home']['delete']->RenderWithName(); ?></td>
 						</tr>
+						-->
 						<tr>
 							<td class="role_table_left">Assets</td>
 							<td class="role_table_cell"><?php $this->arrControls['assets']['access']->RenderWithName(); ?></td>

@@ -244,20 +244,7 @@
 			}
 			
 			if ($arrCustomFields) {
-				foreach ($arrCustomFields as $field) {
-					if (isset($field['value']) && !empty($field['value'])) {
-						$field['CustomFieldId'] = QApplication::$Database[1]->SqlVariable($field['CustomFieldId'], false);
-						
-						if ($field['input'] instanceof QTextBox) {
-							$field['value'] = QApplication::$Database[1]->SqlVariable("%" . $field['value'] . "%", false);
-							$arrSearchSql['strCustomFieldsSql'] .= "\nAND `cfv_".$field['CustomFieldId']."` . `short_description` LIKE ".$field['value'];
-						}
-						elseif ($field['input'] instanceof QListBox) {
-							$field['value'] = QApplication::$Database[1]->SqlVariable($field['value'], true);
-							$arrSearchSql['strCustomFieldsSql'] .= sprintf("\nAND `cfv_%s` . `custom_field_value_id`%s", $field['CustomFieldId'], $field['value']);
-						}
-					}
-				}
+				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchSql($arrCustomFields);
 			}
 			
 			// Generate Authorization SQL based on the QApplication::$objRoleModule

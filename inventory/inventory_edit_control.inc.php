@@ -52,7 +52,7 @@
 				$this->btnSave->RenderWithError();
 				echo('&nbsp;');
 				$this->btnCancel->RenderWithError();
-				$this->btnDelete->Render();
+				$this->btnDelete->RenderWithError();
 			?>
 		</td>
 	</tr>
@@ -108,9 +108,9 @@
 		}
 ?>
 <br class="item_divider">
-<?php $this->lblShipmentReceipt->Render(); ?>
 <?php
 if ($this->blnEditMode) {
+	$this->lblShipmentReceipt->Render();
 	$this->dtgShipmentReceipt->RenderWithError();
 }
 ?>

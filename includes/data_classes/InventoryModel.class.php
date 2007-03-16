@@ -180,10 +180,11 @@
 			}
 
 			$strSearchSql = InventoryModel::GenerateSearchSql($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrCustomFieldSql = CustomField::GenerateSql(2);
 
 			$strQuery = sprintf('
 				SELECT
-					COUNT(inventory_model.inventory_model_id) AS row_count
+					COUNT(DISTINCT inventory_model.inventory_model_id)  AS row_count
 				FROM
 					`inventory_model` AS `inventory_model`
 					LEFT JOIN `inventory_location` AS `inventory_location` ON `inventory_model` . `inventory_model_id` = `inventory_location` . `inventory_model_id`
@@ -200,10 +201,10 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), $strSearchSql['strCustomFieldsFromSql'],
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
 			$strSearchSql['strInventoryModelCodeSql'], $strSearchSql['strLocationSql'], $strSearchSql['strInventoryModelSql'], $strSearchSql['strCategorySql'], $strSearchSql['strManufacturerSql'], $strSearchSql['strShortDescriptionSql'], $strSearchSql['strCustomFieldsSql'], $strSearchSql['strDateModifiedSql'],
 			$strSearchSql['strAuthorizationSql']);
-
+			
 			$objDbResult = $objDatabase->Query($strQuery);
 			$strDbRow = $objDbResult->FetchRow();
 			return QType::Cast($strDbRow[0], QType::Integer);
@@ -267,7 +268,6 @@
 					LEFT JOIN `inventory_location` AS `inventory_location` ON `inventory_model` . `inventory_model_id` = `inventory_location` . `inventory_model_id`
 					%s
 					%s
-					%s
 				WHERE
 				1=1
 				%s
@@ -284,11 +284,11 @@
 				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
-				$objQueryExpansion->GetFromSql("", "\n					"), $strSearchSql['strCustomFieldsFromSql'], $arrCustomFieldSql['strFrom'],
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
 				$strSearchSql['strInventoryModelCodeSql'], $strSearchSql['strLocationSql'], $strSearchSql['strInventoryModelSql'], $strSearchSql['strCategorySql'], $strSearchSql['strManufacturerSql'], $strSearchSql['strShortDescriptionSql'], $strSearchSql['strCustomFieldsSql'], $strSearchSql['strDateModifiedSql'],
 				$strSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
-
+				
 			$objDbResult = $objDatabase->Query($strQuery);				
 			return InventoryModel::InstantiateDbResult($objDbResult);			
 		
@@ -350,7 +350,7 @@
 	  protected static function GenerateSearchSql ($strInventoryModelCode = null, $intLocationId = null, $intInventoryModelId = null, $intCategoryId = null, $intManufacturerId = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
 			
 	  	// Define all indexes for the array to be returned
-			$arrSearchSql = array("strInventoryModelCodeSql" => "", "strLocationSql" => "", "strLocationsFromSql" => "", "strInventoryModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strCustomFieldsFromSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
+			$arrSearchSql = array("strInventoryModelCodeSql" => "", "strLocationSql" => "", "strLocationsFromSql" => "", "strInventoryModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
 
 			if ($strInventoryModelCode) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -397,26 +397,9 @@
 					$arrSearchSql['strDateModifiedSql'] .= sprintf("\nAND UNIX_TIMESTAMP(`inventory_model`.`modified_date`) < %s", $strDateModifiedLast);
 				}
 			}			
+			
 			if ($arrCustomFields) {
-				foreach ($arrCustomFields as $field) {
-					if (isset($field['value']) && !empty($field['value'])) {
-						// echo("test");
-						$field['CustomFieldId'] = QApplication::$Database[1]->SqlVariable($field['CustomFieldId'], false);
-						
-						$arrSearchSql['strCustomFieldsFromSql'] .= sprintf("\nLEFT JOIN `custom_field_selection` AS `custom_field_selection_%s` ON `inventory_model` . `inventory_model_id` = `custom_field_selection_%s` . `entity_id`", $field['CustomFieldId'], $field['CustomFieldId']);
-						$arrSearchSql['strCustomFieldsFromSql'] .= sprintf("\nLEFT JOIN `custom_field_value` AS `custom_field_value_%s` ON `custom_field_selection_%s` . `custom_field_value_id` = `custom_field_value_%s` . `custom_field_value_id`", $field['CustomFieldId'], $field['CustomFieldId'], $field['CustomFieldId']);
-						
-						$arrSearchSql['strCustomFieldsSql'] .= sprintf("\nAND `custom_field_value_%s` . `custom_field_id` = %s", $field['CustomFieldId'], $field['CustomFieldId']);
-						if ($field['input'] instanceof QTextBox) {
-							$field['value'] = QApplication::$Database[1]->SqlVariable("%" . $field['value'] . "%", false);
-							$arrSearchSql['strCustomFieldsSql'] .= "\nAND `custom_field_value_".$field['CustomFieldId']."` . `short_description` LIKE ".$field['value'];
-						}
-						elseif ($field['input'] instanceof QListBox) {
-							$field['value'] = QApplication::$Database[1]->SqlVariable($field['value'], true);
-							$arrSearchSql['strCustomFieldsSql'] .= sprintf("\nAND `custom_field_value_%s` . `custom_field_value_id`%s", $field['CustomFieldId'], $field['value']);
-						}
-					}
-				}
+				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchSql($arrCustomFields);
 			}
 			
 			// Generate Authorization SQL based on the QApplication::$objRoleModule

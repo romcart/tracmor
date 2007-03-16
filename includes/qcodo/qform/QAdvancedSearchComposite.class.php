@@ -219,6 +219,8 @@ class QAdvancedSearchComposite extends QControl {
 	public function ClearControls() {
 		if ($this->objParentObject instanceof AssetListForm) {
 			$this->txtAssetModelCode->Text = '';
+			$this->lstCheckedOutBy->SelectedIndex = 0;
+			$this->lstReservedBy->SelectedIndex = 0;
 		}
 		if ($this->objParentObject instanceof ShipmentListForm) {
 			$this->txtTrackingNumber->Text = '';

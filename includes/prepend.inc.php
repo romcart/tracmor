@@ -152,7 +152,7 @@
 				if ($blnEditMode) {
 					$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, 1);
 					// If the user doesn't have an 'All' Authorization Level, or an 'Owner' Authorization Level and owns this entity, redirect
-					if ($objRoleModuleAuthorization->AuthorizationLevelId != 1 && !($objRoleModuleAuthorization->AuthorizationLevelId == 2 && $objEntity->CreatedBy == QApplication::$intUserAccountId)) {
+					if ($objRoleModuleAuthorization->AuthorizationLevelId != 1 && !($objRoleModuleAuthorization->AuthorizationLevelId == 2 && $objEntity->CreatedBy == QApplication::$objUserAccount->UserAccountId)) {
 						QApplication::Redirect('../common/trespass.php');
 					}
 				}
@@ -237,7 +237,9 @@
 		/////////////////////////////
 		// Start Session Handler (if required)
 		/////////////////////////////
+		//session_set_cookie_params(2);
 		session_start();
+		
 
 
 		//////////////////////////////////////////////

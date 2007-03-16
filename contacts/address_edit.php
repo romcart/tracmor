@@ -319,6 +319,7 @@
 			$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnSave->TabIndex = $this->intTabIndex++;
+			$this->btnSave->CausesValidation = true;
 		}
 		
 		// Setup Cancel Button
@@ -426,14 +427,24 @@
 		
 		// Delete Button Click Action
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
-			$strRedirect = 'company_edit.php?intCompanyId='.$this->objAddress->CompanyId;
-			$this->objAddress->Delete();
 			
-			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
-			// The values should not get deleted for select values
-			CustomField::DeleteTextValues($this->objContact->objCustomFieldArray);
-			
-			QApplication::Redirect($strRedirect);
+			try {
+				$strRedirect = 'company_edit.php?intCompanyId='.$this->objAddress->CompanyId;
+				$objCustomFieldArray = $this->objAddress->objCustomFieldArray;
+				$this->objAddress->Delete();
+				// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
+				// The values should not get deleted for select values
+				CustomField::DeleteTextValues($objCustomFieldArray);
+				QApplication::Redirect($strRedirect);
+			}
+			catch (QDatabaseExceptionBase $objExc) {
+				if ($objExc->ErrorNumber == 1451) {
+					$this->btnDelete->Warning = 'This address cannot be deleted because it is associated with one or more shipments or receipts.';
+				}
+				else {
+					throw new QDatabaseExceptionBase();
+				}
+			}
 		}
 		
 		// Protected Update Methods

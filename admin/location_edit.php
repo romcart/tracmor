@@ -79,7 +79,7 @@
 			$this->btnSave->Text = QApplication::Translate('Save');
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->PrimaryButton = true;
-		}		
+		}
 		
 		// Control ServerActions
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
@@ -95,7 +95,23 @@
 				
 				$this->btnCancel->Warning = sprintf('This location has been updated by another user. You must <a href="location_edit.php?intLocationId=%s">Refresh</a> to edit this location.', $this->objLocation->LocationId);
 			}
-		}				
+		}
+		
+		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
+
+			try {
+				$this->objLocation->Delete();
+				$this->RedirectToListPage();
+			}
+			catch (QDatabaseExceptionBase $objExc) {
+				if ($objExc->ErrorNumber == 1451) {
+					$this->btnCancel->Warning = 'This location cannot be deleted because it is either not empty or associated with one or more transactions.';
+				}
+				else {
+					throw new QDatabaseExceptionBase();
+				}
+			}
+		}		
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using
