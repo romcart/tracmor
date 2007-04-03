@@ -88,6 +88,7 @@
 			$this->ctlShortcutMenu_Create();
 			
 			$this->dtgAsset = new QDataGrid($this);
+			$this->dtgAsset->Name = 'asset_list';
   		$this->dtgAsset->CellPadding = 5;
   		$this->dtgAsset->CellSpacing = 0;
   		$this->dtgAsset->CssClass = "datagrid";

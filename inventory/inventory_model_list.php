@@ -82,6 +82,7 @@
 			$this->ctlShortcutMenu_Create();			
 			
 			$this->dtgInventoryModel = new QDataGrid($this);
+			$this->dtgInventoryModel->Name = 'inventory_model_list';
   		$this->dtgInventoryModel->CellPadding = 5;
   		$this->dtgInventoryModel->CellSpacing = 0;
   		$this->dtgInventoryModel->CssClass = "datagrid";

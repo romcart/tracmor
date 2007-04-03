@@ -202,6 +202,7 @@
 	  // Create the Contact datagrid
   	protected function dtgContact_Create() {
 			$this->dtgContact = new QDataGrid($this);
+			$this->dtgContact->Name = 'contact_list';
   		$this->dtgContact->CellPadding = 5;
   		$this->dtgContact->CellSpacing = 0;
   		$this->dtgContact->CssClass = "datagrid";

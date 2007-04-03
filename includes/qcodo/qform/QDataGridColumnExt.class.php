@@ -128,6 +128,25 @@
 			return $strToReturn;
 		}
 		
+		public function SaveDisplayPreference($strDatagridName) {
+			
+			$objDatagridColumnPreference = DatagridColumnPreference::LoadByDatagridShortDescriptionColumnNameUserAccountId($strDatagridName, $this->Name, QApplication::$objUserAccount->UserAccountId);
+			if (!$objDatagridColumnPreference) {
+				$objDatagridColumnPreference = new DatagridColumnPreference();
+				$objDatagrid = Datagrid::LoadByShortDescription($strDatagridName);
+				if ($objDatagrid) {
+					$objDatagridColumnPreference->DatagridId = $objDatagrid->DatagridId;
+				}
+				else {
+					throw new Exception(sprintf("The datagrid %s is not represented in the database", $strDatagridName));
+				}
+				$objDatagridColumnPreference->ColumnName = $this->Name;
+				$objDatagridColumnPreference->UserAccountId = QApplication::$objUserAccount->UserAccountId;
+			}
+			$objDatagridColumnPreference->DisplayFlag = $this->Display;
+			$objDatagridColumnPreference->Save();
+		}
+		
 		public function __get($strName) {
 			switch ($strName) {
 				// APPEARANCE

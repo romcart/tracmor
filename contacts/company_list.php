@@ -217,6 +217,7 @@
 	  // Create the Company Datagrid
   	protected function dtgCompany_Create() {
 			$this->dtgCompany = new QDataGrid($this);
+			$this->dtgCompany->Name = 'company_list';
   		$this->dtgCompany->CellPadding = 5;
   		$this->dtgCompany->CellSpacing = 0;
   		$this->dtgCompany->CssClass = "datagrid";

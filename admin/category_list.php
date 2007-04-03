@@ -80,6 +80,7 @@
 		protected function dtgCategory_Create() {
 
 			$this->dtgCategory = new QDataGrid($this);
+			$this->dtgCategory->Name = 'category_list';
   		$this->dtgCategory->CellPadding = 5;
   		$this->dtgCategory->CellSpacing = 0;
   		$this->dtgCategory->CssClass = "datagrid";

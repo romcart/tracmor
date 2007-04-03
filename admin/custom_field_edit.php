@@ -508,6 +508,8 @@
 			
 			try {
 				
+				$arrRestrictedFields = array('asset code', 'model', 'category', 'manufacturer', 'location', 'assets', 'name', 'asset model code', 'inventory code', 'quantity', 'company name', 'city', 'state/province', 'country', 'title', 'company', 'email', 'address', 'shipment number', 'ship date', 'ship to company', 'ship to contact', 'ship to address', 'scheduled by', 'status', 'tracking', 'receipt number', 'receive from company', 'receive from contact', 'description', 'account', 'courier', 'account number', 'field name', 'type', 'enabled', 'required', 'role', 'username', 'user role', 'active', 'admin');
+				
 				$blnError = false;
 				
 				if ($this->chkRequiredFlag->Checked) {
@@ -519,6 +521,22 @@
 				if (count($this->lstEntityQtype->SelectedItems) == 0) {
 					$blnError = true;
 					$this->btnCancel->Warning = 'You must select at least one field in the Apply To list box.';
+				}
+				
+				if (in_array(strtolower($this->txtShortDescription->Text), $arrRestrictedFields, false)) {
+					$blnError = true;
+					$this->btnCancel->Warning = sprintf("'%s' is a Tracmor restricted word. Please choose another name for this custom field", $this->txtShortDescription->Text);
+				}
+				
+				if ($this->blnEditMode) {
+					$objCustomFieldDuplicate = CustomField::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::CustomField()->ShortDescription, $this->txtShortDescription->Text), QQ::NotEqual(QQN::CustomField()->CustomFieldId, $this->objCustomField->CustomFieldId)));
+				}
+				else {
+					$objCustomFieldDuplicate = CustomField::QuerySingle(QQ::Equal(QQN::CustomField()->ShortDescription, $this->txtShortDescription->Text));
+				}
+				if ($objCustomFieldDuplicate) {
+					$blnError = true;
+					$this->btnCancel->Warning = 'A custom field already exists with that name. Please choose another.';
 				}
 				
 				if (!$blnError) {
@@ -578,6 +596,16 @@
 			}
 		}
 		
+		// Control AjaxActions
+		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
+			
+			$strQuery = sprintf("DELETE FROM datagrid_column_preference WHERE column_name = '%s'", $this->objCustomField->ShortDescription);
+			$objDatabase = QApplication::$Database[1];
+			$objDatabase->NonQuery($strQuery);
+			
+			parent::btnDelete_Click($strFormId, $strControlId, $strParameter);
+		}
+		
 		// Protected Update Methods
 		protected function UpdateCustomFieldFields() {
 			
@@ -589,6 +617,12 @@
 						$objCustomFieldValue->Delete();
 					}
 				}
+			}
+			// If changing the short_description, we need to change all of the values in the DatagridColumnPreference table
+			if ($this->blnEditMode && ($this->objCustomField->ShortDescription != $this->txtShortDescription->Text)) {
+				$strQuery = sprintf("UPDATE datagrid_column_preference SET column_name = '%s' WHERE column_name = '%s'", $this->txtShortDescription->Text, $this->objCustomField->ShortDescription);
+				$objDatabase = QApplication::$Database[1];
+				$objDatabase->NonQuery($strQuery);
 			}
 			
 			// Assign the object variables from the form controls

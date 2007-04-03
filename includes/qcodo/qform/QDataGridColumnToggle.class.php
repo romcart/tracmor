@@ -90,6 +90,8 @@
 			else {
 				$objColumn->Display = false;
 			}
+			// Save this display reference so that the columns are sticky and will always display the same for each user
+			$objColumn->SaveDisplayPreference($this->objParentControl->Name);
 		}
 		
 		/////////////////////////

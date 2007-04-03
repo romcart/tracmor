@@ -95,6 +95,7 @@
 		protected function dtgManufacturer_Create() {
 
 			$this->dtgManufacturer = new QDataGrid($this);
+			$this->dtgManufacturer->Name = 'manufacturer_list';
   		$this->dtgManufacturer->CellPadding = 5;
   		$this->dtgManufacturer->CellSpacing = 0;
   		$this->dtgManufacturer->CssClass = "datagrid";
