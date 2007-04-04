@@ -33,6 +33,16 @@
 			$strToReturn = sprintf('<tr %s>', $objHeaderStyle->GetAttributes());
 			$intColumnIndex = 0;
 			if ($this->objColumnArray) foreach ($this->objColumnArray as $objColumn) {
+				
+				// For Extended DatagridColumns only
+				if ($this->ShowColumnToggle && $objColumn instanceof QDataGridColumnExt) {
+					// Check if this user has a display preference for this particular column
+					if ($objDatagridColumnPreference = DatagridColumnPreference::LoadByDatagridShortDescriptionColumnNameUserAccountId($this->Name, $objColumn->Name, QApplication::$objUserAccount->UserAccountId)) {
+						// Set the columns display attribute only if this user has a display preference set for this column
+						$objColumn->Display = $objDatagridColumnPreference->DisplayFlag;
+					}
+				}
+				
 				if ($objColumn->OrderByClause) {						
 					// This Column is Sortable
 					$strArrowImage = "";
@@ -83,15 +93,19 @@
 			$strColumnsHtml = '';
 			foreach ($this->objColumnArray as $objColumn) {
 				try {
+					
 					$strHtml = $this->ParseColumnHtml($objColumn, $objObject);
 
 					if ($objColumn->HtmlEntities)
 						$strHtml = QApplication::HtmlEntities($strHtml);
 
-					 // For IE
+					// For IE
 					if (QApplication::IsBrowser(QBrowserType::InternetExplorer) &&
 						($strHtml == ''))
 							$strHtml = '&nbsp;';
+					
+					
+
 				} catch (QCallerException $objExc) {
 					$objExc->IncrementOffset();
 					throw $objExc;
