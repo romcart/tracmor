@@ -17,7 +17,7 @@ if ($this->objAssetTransactionArray) {
 				<td>%s</td>
 				<td>%s</td>
 			</tr>
-			", $objAssetTransaction->Asset->__toString(), $objAssetTransaction->Asset->AssetModel->__toString(), $objAssetTransaction->__toStringStatus());
+			", $objAssetTransaction->Asset->AssetCode, $objAssetTransaction->Asset->AssetModel->__toString(), $objAssetTransaction->__toStringStatus());
 		}
 		else {
 			echo '<tr><td colspan="3">More ...</td></tr>';

@@ -163,7 +163,7 @@
 					`asset_transaction`
 				WHERE
 					`asset_id` = %s
-					AND `source_location_id` = 5
+					AND (`source_location_id` = 5 OR `source_location_id` = 2)
 					AND `destination_location_id` IS NULL', $intAssetId);
 
 			// Perform the Query and Instantiate the Row
