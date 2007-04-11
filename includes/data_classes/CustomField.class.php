@@ -382,7 +382,7 @@
 						$arrCustomFields[$i]['input']->Name = $objCustomFieldArray[$i]->ShortDescription;
 						$arrCustomFields[$i]['input']->Required = false;
 						
-						$objCustomFieldValueArray = CustomFieldValue::LoadArrayByCustomFieldId($objCustomFieldArray[$i]->CustomFieldId);
+						$objCustomFieldValueArray = CustomFieldValue::LoadArrayByCustomFieldId($objCustomFieldArray[$i]->CustomFieldId, QQ::Clause(QQ::OrderBy(QQN::CustomFieldValue()->ShortDescription)));
 						if ($objCustomFieldValueArray) {
 						
 							// The - Select One - item cannot be removed without also updating CustomField::UpdateControls()

@@ -295,7 +295,7 @@
 				$this->lstCompany->AddItem('New Company', -1, false);
 			}
 			
-			$objCompanyArray = Company::LoadAll();
+			$objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
 			if ($objCompanyArray) foreach ($objCompanyArray as $objCompany) {
 				$objListItem = new QListItem($objCompany->__toString(), $objCompany->CompanyId);
 				if (($this->objContact->Company) && ($this->objContact->Company->CompanyId == $objCompany->CompanyId))
@@ -394,7 +394,7 @@
 				$objAddressArray = $this->objContact->Company->GetAddressArray();
 			}
 			else {
-				$objAddressArray = Address::LoadAll();
+				$objAddressArray = Address::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
 			}
 			if ($objAddressArray) foreach ($objAddressArray as $objAddress) {
 				$objListItem = new QListItem($objAddress->__toString(), $objAddress->AddressId);
@@ -564,7 +564,7 @@
 			}
 			else {
 				// Or load all addresses for all companies
-				$objAddressArray = Address::LoadAll();
+				$objAddressArray = Address::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
 				$this->lstAddress->Enabled = true;
 			}
 			$this->lstAddress->AddItem('- Select One -', null);

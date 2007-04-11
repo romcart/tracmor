@@ -87,8 +87,8 @@
 			$this->lstCountry_Create();
 			$this->btnSearch_Create();
 			$this->btnClear_Create();
-			$this->lblAdvanced_Create();
 			$this->ctlAdvanced_Create();
+			$this->lblAdvanced_Create();
 			$this->dtgCompany_Create();
 		}
 		
@@ -202,6 +202,7 @@
 	  	$this->lblAdvanced = new QLabel($this);
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
 	  	// Make it appear like a link even though it is actually a control
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
@@ -299,13 +300,11 @@
 	  		$this->blnAdvanced = false;
 	  		$this->lblAdvanced->Text = 'Advanced Search';
 	  		
-	  		$this->ctlAdvanced->Display = false;
 	  		$this->ctlAdvanced->ClearControls();
 	  	}
 	  	else {
 	  		$this->blnAdvanced = true;
 	  		$this->lblAdvanced->Text = 'Hide Advanced';
-	  		$this->ctlAdvanced->Display = true;
 	  	}
 	  }
 	  

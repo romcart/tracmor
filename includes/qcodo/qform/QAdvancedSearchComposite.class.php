@@ -130,7 +130,7 @@ class QAdvancedSearchComposite extends QControl {
   	$this->lstReservedBy->Name = 'Reserved By';
   	$this->lstReservedBy->AddItem('- Select One -', null, true);
   	$this->lstReservedBy->AddItem('Any', 'any');
-  	$objUserAccountArray = UserAccount::LoadAll();
+  	$objUserAccountArray = UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->Username)));
   	if ($objUserAccountArray) {
   		foreach ($objUserAccountArray as $objUserAccount) {
   			$this->lstReservedBy->AddItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);
@@ -143,7 +143,7 @@ class QAdvancedSearchComposite extends QControl {
   	$this->lstCheckedOutBy->Name = 'Checked Out By';
 		$this->lstCheckedOutBy->AddItem('- Select One -', null, true);
   	$this->lstCheckedOutBy->AddItem('Any', 'any');
-  	$objUserAccountArray = UserAccount::LoadAll();
+  	$objUserAccountArray = UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->Username)));
   	if ($objUserAccountArray) {
   		foreach ($objUserAccountArray as $objUserAccount) {
   			$this->lstCheckedOutBy->AddItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);

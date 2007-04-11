@@ -683,7 +683,7 @@
 					$lstLocationAssetReceived->Name = 'Location To Receive';
 					$lstLocationAssetReceived->ActionParameter = $objAssetTransaction->AssetTransactionId;
 					$lstLocationAssetReceived->AddItem('- Select One -', null);
-					$objLocationArray = Location::LoadAllLocations();
+					$objLocationArray = Location::LoadAllLocations(false, false, 'short_description');
 					if ($objLocationArray) {
 						foreach ($objLocationArray as $objLocation) {
 							$lstLocationAssetReceived->AddItem($objLocation->__toString(), $objLocation->LocationId);
@@ -844,7 +844,7 @@
 					$lstLocationInventoryReceived->Name = 'Location To Receive';
 					$lstLocationInventoryReceived->ActionParameter = $objInventoryTransaction->InventoryTransactionId;
 					$lstLocationInventoryReceived->AddItem('- Select One -', null);
-					$objLocationArray = Location::LoadAllLocations();
+					$objLocationArray = Location::LoadAllLocations(false, false, 'short_description');
 					if ($objLocationArray) {
 						foreach ($objLocationArray as $objLocation) {
 							$lstLocationInventoryReceived->AddItem($objLocation->__toString(), $objLocation->LocationId);

@@ -57,7 +57,7 @@
 		protected $btnSearch;
 		protected $blnSearch;
 		protected $btnClear;
-
+		
 		// Advanced Label/Link
 		protected $lblAdvanced;
 		// Boolean that toggles Advanced Search display
@@ -135,10 +135,8 @@
       $this->txtInventoryModelCode_Create();
       $this->btnSearch_Create();
       $this->btnClear_Create();
+      $this->ctlAdvanced_Create();
       $this->lblAdvanced_Create();
-			
-			$this->ctlAdvanced_Create();
-      
   	}
   	
 		protected function Form_PreRender() {
@@ -202,7 +200,7 @@
   		$this->lstLocation = new QListBox($this);
   		$this->lstLocation->Name = 'Location';
   		$this->lstLocation->AddItem('- ALL -', null);
-  		foreach (Location::LoadAllLocations() as $objLocation) {
+  		foreach (Location::LoadAllLocations(false, false, 'short_description') as $objLocation) {
   			$this->lstLocation->AddItem($objLocation->ShortDescription, $objLocation->LocationId);
   		}
       $this->lstLocation->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
@@ -213,7 +211,7 @@
 	  	$this->lstCategory = new QListBox($this);
 			$this->lstCategory->Name = 'Category';
 			$this->lstCategory->AddItem('- ALL -', null);
-			foreach (Category::LoadAllWithFlags(false, true) as $objCategory) {
+			foreach (Category::LoadAllWithFlags(false, true, 'short_description') as $objCategory) {
 				$this->lstCategory->AddItem($objCategory->ShortDescription, $objCategory->CategoryId);
 			}
 	  }
@@ -222,7 +220,7 @@
       $this->lstManufacturer = new QListBox($this);
 			$this->lstManufacturer->Name = 'Manufacturer';
 			$this->lstManufacturer->AddItem('- ALL -', null);
-			foreach (Manufacturer::LoadAll() as $objManufacturer) {
+			foreach (Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription))) as $objManufacturer) {
 				$this->lstManufacturer->AddItem($objManufacturer->ShortDescription, $objManufacturer->ManufacturerId);
 			}
 	  }
@@ -267,6 +265,7 @@
 	  	$this->lblAdvanced = new QLabel($this);
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
@@ -310,14 +309,12 @@
 	  		$this->blnAdvanced = false;
 	  		$this->lblAdvanced->Text = 'Advanced Search';
 	  		
-	  		$this->ctlAdvanced->Display = false;
 	  		$this->ctlAdvanced->ClearControls();
 	  		
 	  	}
 	  	else {
 	  		$this->blnAdvanced = true;
 	  		$this->lblAdvanced->Text = 'Hide Advanced';
-	  		$this->ctlAdvanced->Display = true;
 	  	}
 	  }
 

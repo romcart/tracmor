@@ -97,8 +97,8 @@
 			$this->lstStatus_Create();
 			$this->btnSearch_Create();
 			$this->btnClear_Create();
-			$this->lblAdvanced_Create();
 			$this->ctlAdvanced_Create();
+			$this->lblAdvanced_Create();
 			$this->dtgShipment_Create();
 		}
 		
@@ -228,6 +228,7 @@
 	  	$this->lblAdvanced = new QLabel($this);
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
@@ -317,13 +318,11 @@
 	  		$this->blnAdvanced = false;
 	  		$this->lblAdvanced->Text = 'Advanced Search';
 	  		
-	  		$this->ctlAdvanced->Display = false;
 	  		$this->ctlAdvanced->ClearControls();
 	  	}
 	  	else {
 	  		$this->blnAdvanced = true;
 	  		$this->lblAdvanced->Text = 'Hide Advanced';
-	  		$this->ctlAdvanced->Display = true;
 	  	}
 	  }
 

@@ -280,7 +280,7 @@ class QInventoryEditComposite extends QControl {
 		$this->lstCategory->Required = true;
 		if (!$this->blnEditMode)
 			$this->lstCategory->AddItem('- Select One -', null);
-		$objCategoryArray = Category::LoadAllWithFlags(false, true);
+		$objCategoryArray = Category::LoadAllWithFlags(false, true, 'short_description');
 		if ($objCategoryArray) foreach ($objCategoryArray as $objCategory) {
 			$objListItem = new QListItem($objCategory->__toString(), $objCategory->CategoryId);
 			$this->lstCategory->AddItem($objListItem);
@@ -296,7 +296,7 @@ class QInventoryEditComposite extends QControl {
 		$this->lstManufacturer->Required = true;
 		if (!$this->blnEditMode)
 			$this->lstManufacturer->AddItem('- Select One -', null);
-		$objManufacturerArray = Manufacturer::LoadAll();
+		$objManufacturerArray = Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription)));
 		if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
 			$objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
 			$this->lstManufacturer->AddItem($objListItem);

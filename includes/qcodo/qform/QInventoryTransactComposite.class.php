@@ -118,7 +118,7 @@ class QInventoryTransactComposite extends QControl {
 		$this->lstDestinationLocation->Name = 'Location';
 		$this->lstDestinationLocation->Required = false;
 		$this->lstDestinationLocation->AddItem('- Select One -', null);
-		$objLocationArray = Location::LoadAllLocations();
+		$objLocationArray = Location::LoadAllLocations(false, false, 'short_description');
 		if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
 			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
 			$this->lstDestinationLocation->AddItem($objListItem);
