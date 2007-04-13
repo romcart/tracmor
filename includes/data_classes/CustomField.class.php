@@ -358,8 +358,12 @@
 	 					}
 	 					// This is so that the browser doesn't form.submit() when the user presses the enter key on a text input
 	 					if (!$blnSearch && CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) != 'textarea') {
-	 						//$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($objForm, 'btnSave_Click'));
-	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($objForm, 'btnSave_Click'));
+	 						if ($objForm instanceof QControl) {
+	 							$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($objForm, 'btnSave_Click'));
+	 						}
+	 						else {
+	 							$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+	 						}
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	 					elseif ($blnSearch) {

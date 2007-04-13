@@ -615,7 +615,7 @@
 				}								
 				
 				if ($this->blnEditMode) {
-					$this->SetupContact();
+					//$this->SetupContact();
 					$this->UpdateContactLabels();
 					$this->DisplayLabels();
 				}

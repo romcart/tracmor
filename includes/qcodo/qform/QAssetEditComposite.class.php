@@ -236,17 +236,15 @@ class QAssetEditComposite extends QControl {
 		$this->lstLocation = new QListBox($this);
 		$this->lstLocation->Name = 'Location';
 		$this->lstLocation->Required = true;
-		if (!$this->blnEditMode) {
-			$this->lstLocation->AddItem('- Select One -', null);
-			$objLocationArray = Location::LoadAllLocations(true);
-			if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
-				$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
-				if ($objLocation->LocationId == 5) {
-					$this->lstLocation->AddItemAt(1, $objListItem);
-				}
-				else {
-					$this->lstLocation->AddItem($objListItem);
-				}
+		$this->lstLocation->AddItem('- Select One -', null);
+		$objLocationArray = Location::LoadAllLocations(true);
+		if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
+			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
+			if ($objLocation->LocationId == 5) {
+				$this->lstLocation->AddItemAt(1, $objListItem);
+			}
+			else {
+				$this->lstLocation->AddItem($objListItem);
 			}
 		}
 		$this->lstLocation->TabIndex=3;
@@ -623,6 +621,7 @@ class QAssetEditComposite extends QControl {
 	public function btnSave_Click($strFormId, $strControlId, $strParameter) {
 		
 		try {
+			
 			// Get an instance of the database
 			$objDatabase = QApplication::$Database[1];
 			// Begin a MySQL Transaction to be either committed or rolled back
@@ -703,6 +702,7 @@ class QAssetEditComposite extends QControl {
 			
 			// Commit the above transactions to the database
 			$objDatabase->TransactionCommit();
+			
 		}
 		catch (QOptimisticLockingException $objExc) {
 			

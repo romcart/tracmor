@@ -401,7 +401,6 @@
 				}					
 	
 				if ($this->blnEditMode) {
-					$this->SetupAddress();
 					$this->UpdateAddressLabels();
 					$this->DisplayLabels();
 				}

@@ -691,7 +691,7 @@
 				$this->SaveNewAddress();
 	
 				if ($this->blnEditMode) {
-					$this->SetupCompany();
+					//$this->SetupCompany();
 					$this->UpdateCompanyLabels();
 					$this->DisplayLabels();
 				}
