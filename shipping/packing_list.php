@@ -29,9 +29,13 @@
 		// Labels
 		protected $lblShipmentNumber;
 		protected $lblShipDate;
+		protected $lblToCompany;
 		protected $lblToContact;
 		protected $lblToAddress;
+		protected $lblFromAddress;
 		protected $lblCourier;
+		protected $lblLogo;
+		protected $lblTerms;
 		
 		// Datagrid
 		protected $dtgItem;
@@ -41,11 +45,14 @@
 			$this->SetupShipment();
 			$this->lblShipmentNumber_Create();
 			$this->lblShipDate_Create();
+			$this->lblToCompany_Create();
 			$this->lblToContact_Create();
 			$this->lblToAddress_Create();
+			$this->lblFromAddress_Create();
 			$this->lblCourier_Create();
 			$this->dtgItem_Create();
-
+			$this->lblLogo_Create();
+			$this->lblTerms_Create();
 		}
 		
 		protected function SetupShipment() {
@@ -80,6 +87,15 @@
 			}
 		}
 		
+		// Create and Setup lblToCompany
+		protected function lblToCompany_Create() {
+			$this->lblToCompany = new QLabel($this);
+			$this->lblToCompany->Name = '';
+			if ($this->objShipment->ToCompanyId) {
+				$this->lblToCompany->Text = $this->objShipment->ToCompany->__toString();
+			}
+		}
+		
 		// Create and Setup lblToContact
 		protected function lblToContact_Create() {
 			$this->lblToContact = new QLabel($this);
@@ -92,23 +108,29 @@
 		// Create and Setp lblToAddress
 		protected function lblToAddress_Create() {
 			$this->lblToAddress = new QLabel($this);
-			$this->lblToAddress->HtmlEntities = false;
+			$this->lblToAddress->HtmlEntities=false;
 			$this->lblToAddress->Name = '';
 			if ($this->objShipment->ToAddressId) {
 				$this->lblToAddress->Text = $this->objShipment->ToAddress->__toStringFullAddress();
 			}
 		}
 
+		// Create and Setup lblFromAddress
+		protected function lblFromAddress_Create() {
+			$this->lblFromAddress = new QLabel($this);
+			$this->lblFromAddress->HtmlEntities=false;
+			$this->lblFromAddress->Name = '';
+			if ($this->objShipment->FromAddressId) {
+				$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toStringFullAddressWithWebsite();
+			}
+		}
+		
 		// Create and Setup lblCourier
 		protected function lblCourier_Create() {
 			$this->lblCourier = new QLabel($this);
+			$this->lblCourier->HtmlEntities=false;
 			$this->lblCourier->Name = 'Via';
-			if ($this->objShipment->CourierId) {
-				$this->lblCourier->Text = $this->objShipment->Courier->__toString();
-			}
-			elseif ($this->objShipment->CourierOther) {
-				$this->lblCourier->Text = $this->objShipment->CourierOther;
-			}
+			$this->lblCourier->Text = ($this->objShipment->CourierId) ? $this->lblCourier->Text = $this->objShipment->Courier->__toString() : 'Other';
 		}
 		
 		// Create and Setup dtgItem
@@ -117,11 +139,11 @@
 			$this->dtgItem = new QDataGrid($this);
 			$this->dtgItem->CellPadding = 5;
 			$this->dtgItem->CellSpacing = 0;
-			$this->dtgItem->CssClass = "datagrid";
+			$this->dtgItem->CssClass = "datagrid_print";
 
-    	$this->dtgItem->AddColumn(new QDataGridColumn('Item', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"'));
-			$this->dtgItem->AddColumn(new QDataGridColumn('Code', '<?= $_ITEM->RenderBarcode() ?>', 'Width=200', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-	    $this->dtgItem->AddColumn(new QDataGridColumn('Qty', '<?= $_ITEM->Quantity ?>', 'CssClass=dtg_column'));
+    	$this->dtgItem->AddColumn(new QDataGridColumn('Item', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column_print"'));
+		$this->dtgItem->AddColumn(new QDataGridColumn('Code', '<?= $_ITEM->RenderBarcode() ?>', 'Width=200', 'CssClass="dtg_column_print"', 'HtmlEntities=false'));
+	    $this->dtgItem->AddColumn(new QDataGridColumn('Qty', '<?= $_ITEM->Quantity ?>', 'CssClass=dtg_column_print'));
 	    
 	    $objStyle = $this->dtgItem->RowStyle;
 	    $objStyle->ForeColor = '#000000';
@@ -133,10 +155,23 @@
 	
 	    $objStyle = $this->dtgItem->HeaderRowStyle;
 	    $objStyle->ForeColor = '#000000';
-	    $objStyle->BackColor = '#EFEFEF';
-	    $objStyle->CssClass = 'dtg_header';	    
+	    $objStyle->BackColor = '#DDDDDD';
+	    $objStyle->CssClass = 'dtg_header_print';	    
 		}
 		
+		// Create and Setup lblLogo
+		protected function lblLogo_Create() {
+			$this->lblLogo = new QLabel($this);
+			$this->lblLogo->HtmlEntities=false;
+			$this->lblLogo->Text = sprintf('<img src="../images/%s" style="padding:4px;">', QApplication::$TracmorSettings->PackingListLogo);
+		}
+		
+		// Create and Setup lblTerms
+		protected function lblTerms_Create() {
+			$this->lblTerms = new QPanel($this);
+			$this->lblTerms->HtmlEntities=false;
+			$this->lblTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
+		}	
 	}
 	
 	PackingListForm::Run('PackingListForm', __DOCROOT__ . __SUBDIRECTORY__ . '/shipping/packing_list.tpl.php');

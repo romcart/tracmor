@@ -65,7 +65,11 @@
 						</tr>
 						<tr>
 							<td class="record_field_name">Account Number: </td>
-							<td class="record_field_edit"><?php $this->txtValue->RenderWithError(); ?></td>
+							<td class="record_field_edit"><?php $this->txtAccessId->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Meter Number: </td>
+							<td class="record_field_edit"><?php $this->txtAccessCode->RenderWithError(); ?></td>
 						</tr>
 					</table>
 				</td>

@@ -61,6 +61,13 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 	background-repeat: repeat-x;
 	background-position: bottom;
 }
+.record_subheader {
+	color:darkblue;
+	font-weight:bold;
+	font-size:9pt;
+	border-top:1px solid #AAAAAA;
+	padding-bottom:4px;
+}
 .record_field_value { font-size:12px;border:1px solid #000000;background-color:#EEEEEE;width:280px;padding:3px;empty-cells:show;vertical-align:top; }
 .record_field_name { color:#615c5c;font-size:12px;width:120px;text-align:right;padding-right:5px;vertical-align:top;white-space:nowrap; }
 .record_field_edit { font-size:12px;width:280px;padding:3px;vertical-align:top; }
@@ -85,3 +92,12 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 .other_tab_right { width:12px; background-image: url(../images/otherTab_right2.gif); background-repeat:no-repeat; }
 
 .disclaimer { font-size:10px;font-family:arial; }
+
+.fedex_masthead { background-color:#660099;color:#FFFFFF;padding:0;font-weight:bold;font-size:12pt;height:36px; }
+.fedex_subheader {
+	color:#FF6600;
+	font-weight:bold;
+	font-size:9pt;
+	border-top:1px solid #FF6600;
+	padding-bottom:4px;
+}

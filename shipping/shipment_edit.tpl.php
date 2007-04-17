@@ -38,9 +38,129 @@
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
-	<div class="title">Shipping: <?php $this->lblHeaderShipment->Render(); ?></div>
-		<?php $this->pnlCompleteShipment->Render(); ?>
-		<?php $this->pnlShippingInfo->Render();	?>
-		<br class="item_divider" />
 
-	<?php $this->RenderEnd() ?>
+	<div class="title">Shipping: <?php $this->lblHeaderShipment->Render(); ?></div>
+	<table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
+		<tr>
+			<td class="record_header">
+				<?php $this->lblFedexShippingLabelLink->Render(); ?>
+				&nbsp;
+				<?php $this->lblPackingListLink->Render(); ?>
+				<?php
+					if (!$this->objShipment->ShippedFlag) { 
+						$this->btnEdit->Render();
+						$this->btnSave->RenderWithError();
+						echo('&nbsp;');
+						$this->btnCompleteShipment->RenderWithError();
+						echo('&nbsp;');
+						$this->btnDelete->RenderWithError();
+						$this->btnCancel->RenderWithError();
+					}
+				?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table cellpadding="0" cellspacing="0">
+					<tr>
+						<td style="vertical-align:top;">
+							<table cellpadding="0" cellspacing="0">
+								<tr>
+									<td colspan="2" class="record_subheader">Sender Information</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Company:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); ?>&nbsp;</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Contact:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); ?>&nbsp;</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Address:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromAddress->RenderWithError();$this->lblFromAddress->Render(); ?>&nbsp;</td>
+								</tr>
+							</table>
+							<br class="item_divider" />
+							<table cellpadding="0" cellspacing="0">
+								<tr>
+									<td colspan="2" class="record_subheader">Recipient Information</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Company:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToCompany->RenderWithError();$this->lblToCompany->Render(); ?>&nbsp;</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Contact:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render(); ?>&nbsp;</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Address:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); ?>&nbsp;<br><?php $this->lblToAddressFull->Render(); ?></td>
+								</tr>						
+							</table>
+						</td>
+						<td style="width:16px">&nbsp;</td>
+						<td style="vertical-align:top;">
+							<table cellpadding="0" cellspacing="0">
+								<tr>
+									<td colspan="2" class="record_subheader">Shipment Information</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Shipping Courier:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstCourier->RenderWithError();$this->lblCourier->Render(); ?>&nbsp;</td>
+								</tr>
+								<?php $tnDisplay = ($this->blnEditMode && $this->objShipment->CourierId===1 && !$this->objShipment->ShippedFlag) ? "display:none;" : ""; ?>
+								<tr id="trackingNumber" style="<?php echo($tnDisplay); ?>">
+									<td class="record_field_name">Tracking Number:&nbsp;</td>
+									<td class="record_field_value"><?php $this->txtTrackingNumber->RenderWithError();$this->lblTrackingNumber->Render(); ?>&nbsp;</td>
+								</tr>								
+								<tr>
+									<td class="record_field_name">Note:&nbsp;</td>
+									<td class="record_field_value"><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?>&nbsp;</td>
+								</tr>									
+								<tr>
+									<td class="record_field_name">Ship Date:&nbsp;</td>
+									<td class="record_field_value"><?php $this->calShipDate->RenderWithError();$this->lblShipDate->Render(); ?>&nbsp;</td>
+								</tr>									
+							</table>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>	
+
+<br class="item_divider" />
+<?php $this->pnlFedExShipment->Render(); ?>
+<br class="item_divider" />
+<div class="title">Assets to Ship</div>
+<table>
+	<tr>
+		<td><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
+		<td><?php $this->btnAddAsset->Render(); $this->lblAdvanced->Render(); ?></td>
+	</tr>
+	<tr>
+		<td colspan="2"><?php $this->chkScheduleReceipt->RenderDesigned('DisplayName=false'); $this->rblAssetType->RenderDesigned(); $this->txtReceiptAssetCode->RenderDesigned(); $this->chkAutoGenerateAssetCode->RenderDesigned('DisplayName=false'); ?></td>
+	</tr>
+</table>
+<?php $this->dtgAssetTransact->Render(); ?>
+<br class="item_divider" />
+	
+<div class="title">Inventory to Ship</div>	
+<table>
+	<tr>
+		<td><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
+		<td><?php $this->btnLookup->Render(); ?></td>
+	</tr>
+	<tr>
+		<td><?php $this->lstSourceLocation->RenderDesigned(); ?></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><?php $this->txtQuantity->RenderDesigned(); ?></td>
+		<td><?php $this->btnAddInventory->Render(); ?></td>
+	</tr>
+</table>
+<?php $this->dtgInventoryTransact->Render(); ?>
+<?php $this->RenderEnd() ?>

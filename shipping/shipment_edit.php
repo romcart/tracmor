@@ -42,14 +42,12 @@
 		
 		// Header Tabs
 		protected $ctlHeaderMenu;
+		
 		// Shortcut Menu
-		protected $ctlShortcutMenu;		
-
+		protected $ctlShortcutMenu;
+		
 		// Qpanel
-		protected $pnlShippingInfo;
-		protected $pnlCompleteShipmentInputs;
-		protected $pnlCompleteShipmentLabels;
-		protected $pnlCompleteShipment;
+		protected $pnlFedExShipment;
 		
 		// Booleans
 		protected $blnModifyAssets = false;
@@ -61,11 +59,26 @@
 		protected $txtNewInventoryModelCode;
 		protected $lstSourceLocation;
 		protected $txtQuantity;
-		protected $lstFxServiceType;
 		protected $chkScheduleReceipt;
 		protected $rblAssetType;
 		protected $txtReceiptAssetCode;
 		protected $chkAutoGenerateAssetCode;
+		protected $txtToPhone;
+		protected $lstBillTransportationTo;
+		protected $lstShippingAccount;
+		protected $txtRecipientThirdPartyAccount;
+		protected $txtReference;
+		protected $lstFxServiceType;
+		protected $lstPackageType;
+		protected $txtPackageWeight;
+		protected $lstWeightUnit;
+		protected $txtPackageLength;
+		protected $txtPackageWidth;
+		protected $txtPackageHeight;
+		protected $lstLengthUnit;
+		protected $txtValue;
+		protected $lstCurrencyUnit;
+		protected $chkNotificationFlag;
 		
 		// Buttons
 		protected $btnEdit;
@@ -79,16 +92,6 @@
 		
 		// Labels
 		protected $lblHeaderShipment;
-		protected $lblPackageType;
-		protected $lblPackageWeight;
-		protected $lblWeightUnit;
-		protected $lblPackageLength;
-		protected $lblPackageWidth;
-		protected $lblPackageHeight;
-		protected $lblLengthUnit;
-		protected $lblValue;
-		protected $lblCurrencyUnit;
-		protected $lblNotificationFlag;
 		protected $lblTrackingNumber;
 		protected $lblShipmentNumber;
 		protected $lblShipDate;
@@ -98,16 +101,27 @@
 		protected $lblToCompany;
 		protected $lblToContact;
 		protected $lblToAddress;
-		protected $lblToPhone;
 		protected $lblToAddressFull;
 		protected $lblCourier;
-		protected $lblShippingAccount;
-		protected $lblFxServiceType;
+		protected $lblToPhone;
+		protected $lblBillTransportationTo;
 		protected $lblReference;
 		protected $pnlNote;
 		protected $lblPackingListLink;
 		protected $lblFedexShippingLabelLink;
 		protected $lblAdvanced;
+		protected $lblSenderLabel;
+		protected $lblPayerAccount;
+		protected $lblFxServiceType;
+		protected $lblPackageType;
+		protected $lblPackageWeight;
+		protected $lblPackageLength;
+		protected $lblPackageWidth;
+		protected $lblPackageHeight;
+		protected $lblValue;
+		protected $lblWeightUnit;
+		protected $lblLengthUnit;
+		protected $lblCurrencyUnit;
 		
 		// Datagrids
 		protected $dtgAssetTransact;
@@ -123,6 +137,7 @@
 		protected $objTransaction;
 		protected $dttNow;
 		protected $dttFiveDaysFromNow;
+		protected $objFedexShipment;
 		
 		// Integers
 		protected $intNewTempId = 1;
@@ -132,24 +147,26 @@
 			// Call SetupShipment to either Load/Edit Existing or Create New
 			$this->SetupShipment();
 			
+			// If the courier is FedEx, load the FedexShipment object
+			if ($this->blnEditMode) {
+				if ($this->objShipment->CourierId === 1) {
+					$this->objFedexShipment = FedexShipment::LoadByShipmentId($this->objShipment->ShipmentId);
+				}
+			}
+			
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
 			$this->ctlShortcutMenu_Create();			
 			
-			// QPanel for shipping info
-			$this->pnlShippingInfo_Create();
-			
-			// QPanels for completing shipment
-			$this->pnlCompleteShipmentLabels_Create();
-			$this->pnlCompleteShipmentInputs_Create();
-			$this->pnlCompleteShipment_Create();
+			// FedEx Shipment Panel
+			$this->pnlFedExShipment_Create();
 			
 			// Packing List Link
 			$this->lblPackingListLink_Create();
 			$this->lblFedexShippingLabelLink_Create();
 			
-			// Shipping Info Panel Labels
+			// Shipping Labels
 			$this->lblShipmentNumber_Create();
 			$this->lblHeaderShipment_Create();
 			// $this->lblHeaderCompleteShipment_Create();
@@ -159,79 +176,73 @@
 			$this->lblFromAddress_Create();
 			$this->lblToCompany_Create();
 			$this->lblToContact_Create();
-			$this->lblToPhone_Create();
 			$this->lblToAddress_Create();
 			$this->lblToAddressFull_Create();
 			$this->lblCourier_Create();
-			$this->lblShippingAccount_Create();
-			$this->lblFxServiceType_Create();
+			$this->lblToPhone_Create();
+			$this->lblBillTransportationTo_Create();
 			$this->lblReference_Create();
 			$this->pnlNote_Create();
-			
-			if (!$this->objShipment->ShippedFlag) {
-			  // Shipping Info Panel Inputs
-				$this->calShipDate_Create();
-				$this->lstFromCompany_Create();
-				$this->lstFromContact_Create();
-				$this->lstFromAddress_Create();
-				$this->lstToCompany_Create();
-				$this->lstToContact_Create();
-				$this->txtToPhone_Create();
-				$this->lstToAddress_Create();
-				$this->lstCourier_Create();
-				$this->lstFxServiceType_Create();				
-				$this->txtCourierOther_Create();
-				$this->lstShippingAccount_Create();
-				$this->txtShippingAccountOther_Create();
-				$this->txtReference_Create();
-				$this->txtNote_Create();
-				$this->txtNewAssetCode_Create();
-				$this->txtNewInventoryModelCode_Create();
-				$this->lstSourceLocation_Create();
-				$this->txtQuantity_Create();
-			}
-			
-			// Complete Shipment Panel Labels
+			$this->lblTrackingNumber_Create();
+			$this->lblSenderLabel_Create();
+			$this->lblPayerAccount_Create();
+			$this->lblFxServiceType_Create();
 			$this->lblPackageType_Create();
 			$this->lblPackageWeight_Create();
-			$this->lblWeightUnit_Create();
 			$this->lblPackageLength_Create();
 			$this->lblPackageWidth_Create();
 			$this->lblPackageHeight_Create();
-			$this->lblLengthUnit_Create();
 			$this->lblValue_Create();
+			$this->lblWeightUnit_Create();
+			$this->lblLengthUnit_Create();
 			$this->lblCurrencyUnit_Create();
-			$this->lblNotificationFlag_Create();
-			$this->lblTrackingNumber_Create();
+			
+			// Shipping Inputs
+			$this->calShipDate_Create();
+			$this->lstFromCompany_Create();
+			$this->lstFromContact_Create();
+			$this->lstFromAddress_Create();
+			$this->lstToCompany_Create();
+			$this->lstToContact_Create();
+			$this->txtToPhone_Create();
+			$this->lstBillTransportationTo_Create();
+			$this->lstShippingAccount_Create();
+			$this->txtReference_Create();
+			$this->lstFxServiceType_Create();
+			$this->txtRecipientThirdPartyAccount_Create();
+			$this->lstPackageType_Create();
+			$this->txtPackageWeight_Create();
+			$this->lstWeightUnit_Create();
+			$this->txtPackageLength_Create();
+			$this->txtPackageWidth_Create();
+			$this->txtPackageHeight_Create();
+			$this->lstLengthUnit_Create();
+			$this->txtValue_Create();
+			$this->lstCurrencyUnit_Create();
+			$this->chkNotificationFlag_Create();
+			$this->lstToAddress_Create();
+			$this->lstCourier_Create();
+			$this->txtNote_Create();
+			$this->txtNewAssetCode_Create();
+			$this->txtNewInventoryModelCode_Create();
+			$this->lstSourceLocation_Create();
+			$this->txtQuantity_Create();
+			$this->txtTrackingNumber_Create();
+			$this->lblAdvanced_Create();
+			$this->txtReceiptAssetCode_Create();
+			$this->chkAutoGenerateAssetCode_Create();
+			$this->rblAssetType_Create();
+			$this->chkScheduleReceipt_Create();
+			$this->btnAddAsset_Create();
+			$this->btnLookup_Create();
+			$this->btnAddInventory_Create();
 			
 			if (!$this->objShipment->ShippedFlag) {
-				// Complete Shipment Panel Inputs
-				$this->lstPackageType_Create();
-				$this->txtPackageWeight_Create();
-				$this->lstWeightUnit_Create();
-				$this->txtPackageLength_Create();
-				$this->txtPackageWidth_Create();
-				$this->txtPackageHeight_Create();
-				$this->lstLengthUnit_Create();
-				$this->txtValue_Create();
-				$this->lstCurrencyUnit_Create();
-				$this->chkNotificationFlag_Create();
-				$this->txtTrackingNumber_Create();
-				$this->lblAdvanced_Create();
-				$this->txtReceiptAssetCode_Create();
-				
-				$this->chkAutoGenerateAssetCode_Create();
-				$this->rblAssetType_Create();
-				$this->chkScheduleReceipt_Create();
-			
-				// Shipping Info Panel Buttons
+				// Shipping Buttons
 				$this->btnSave_Create();
 				$this->btnCancel_Create();
 				$this->btnEdit_Create();
-				$this->btnDelete_Create();
-				$this->btnAddAsset_Create();
-				$this->btnLookup_Create();
-				$this->btnAddInventory_Create();
+				$this->btnDelete_Create();		
 			}
 			
 			// Complete Shipment Buttons
@@ -239,13 +250,9 @@
 			$this->btnCancelShipment_Create();
 			//$this->btnCancelCompleteShipment_Create();
 			
-			// Shipping Info Panel Datagrids
+			// Shipping Datagrids
 			$this->dtgAssetTransact_Create();
 			$this->dtgInventoryTransact_Create();
-			
-			if (!$this->blnEditMode) {
-				$this->pnlCompleteShipment->Visible = false;
-			}
 			
 			// Load the objAssetTransactionArray and objInventoryTransactionArray for the first time
 			if ($this->blnEditMode) {
@@ -280,9 +287,9 @@
 				$this->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->objShipment->TransactionId, $objClauses);
 				
 				// If shipped, display labels. Otherwise, we don't need to call DisplayLabels because only labels are on the QPanel.
-				if (!$this->objShipment->ShippedFlag) {
-					$this->DisplayLabels();
-				}
+				//if (!$this->objShipment->ShippedFlag) {
+				$this->DisplayLabels();
+				//}
 			}
 			// For a new shipment, display the inputs
 			elseif (!$this->blnEditMode) {
@@ -361,47 +368,15 @@
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
   	}		
-		
-		// Create and Setup either Complete Shipment inputs or labels
-		// Assign one of those panels to pnlCompleteShipment
-		protected function pnlCompleteShipment_Create() {
-			if ($this->objShipment->ShippedFlag) {
-				$this->pnlCompleteShipment = $this->pnlCompleteShipmentLabels;
-			}
-			else {
-				$this->pnlCompleteShipment = $this->pnlCompleteShipmentInputs;
-			}
-		}
-		
-		// Create and Setup pnlShippingInfo
-		protected function pnlShippingInfo_Create() {
-			$this->pnlShippingInfo = new QPanel($this);
-			$this->pnlShippingInfo->AutoRenderChildren = false;
-			// Use template with only labels if it has been shipped
-			if ($this->objShipment->ShippedFlag) {
-				$this->pnlShippingInfo->Template = 'pnl_shipping_info_labels.inc.php';
-			}
-			// Use template with labels and inputs
-			else {
-				$this->pnlShippingInfo->Template = 'pnl_shipping_info.inc.php';
-			}
-		}
-		
-		// Create and Setup pnlCompleteShipmentInputs
-		protected function pnlCompleteShipmentInputs_Create() {
-			$this->pnlCompleteShipmentInputs = new QPanel($this);
-			$this->pnlCompleteShipmentInputs->Template = 'pnl_complete_shipment_inputs.inc.php';
-			$this->pnlCompleteShipmentInputs->AutoRenderChildren = false;
-			QApplication::AuthorizeControl($this->objShipment, $this->pnlCompleteShipmentInputs, 2);
-		}
-		
-		// Create and Setup pnlCompleteShipmentLabels
-		protected function pnlCompleteShipmentLabels_Create() {
-			$this->pnlCompleteShipmentLabels = new QPanel($this);
-			$this->pnlCompleteShipmentLabels->Template = 'pnl_complete_shipment_labels.inc.php';
-			$this->pnlCompleteShipmentLabels->AutoRenderChildren = false;
-		}
-		
+  	
+  	// Create and Setup the FedEx Shipment Panel
+  	protected function pnlFedExShipment_Create() {
+  		$this->pnlFedExShipment = new QPanel($this);
+  		$this->pnlFedExShipment->AutoRenderChildren = false;
+  		$this->pnlFedExShipment->Template = 'pnl_fedex_shipment.inc.php';
+  		$this->pnlFedExShipment->Display = ($this->blnEditMode && $this->objShipment->CourierId===1) ? true : false;
+  	}
+  	
 		//**************
 		// CREATE LABELS
 		//**************
@@ -423,98 +398,18 @@
 				$this->lblFedexShippingLabelLink->Text = $this->objShipment->__toStringFedexShippingLabelLink("bluelink");
 			}
 		}
-
-		// Create and Setup lblPackageType
-		protected function lblPackageType_Create() {
-			$this->lblPackageType = new QLabel($this->pnlCompleteShipmentLabels);
-			$this->lblPackageType->Name = 'Package Type';
-			if ($this->objShipment->PackageTypeId) {
-				$this->lblPackageType->Text = $this->objShipment->PackageType->__toString();
-			}
-		}
-		
-		// Create and Setup lblPackageWeight
-		protected function lblPackageWeight_Create() {
-			$this->lblPackageWeight = new QLabel($this->pnlCompleteShipmentLabels);
-			$this->lblPackageWeight->Name = 'Estimated Weight';
-			$this->lblPackageWeight->Text = $this->objShipment->PackageWeight;
-		}
-		
-		// Create and Setup lblWeightUnit
-		protected function lblWeightUnit_Create() {
-			$this->lblWeightUnit = new QLabel($this->pnlCompleteShipmentLabels);
-			if ($this->objShipment->WeightUnitId) {
-				$this->lblWeightUnit->Text = $this->objShipment->WeightUnit->__toString();
-			}
-		}
-		
-		// Create and Setup lblPackageLength
-		protected function lblPackageLength_Create() {
-			$this->lblPackageLength = new QLabel($this->pnlCompleteShipmentLabels);
-			$this->lblPackageLength->Name = 'L';
-			$this->lblPackageLength->Text = $this->objShipment->PackageLength;
-		}
-		
-		// Create and Setup lblPackageWidth
-		protected function lblPackageWidth_Create() {
-			$this->lblPackageWidth = new QLabel($this->pnlCompleteShipmentLabels);
-			$this->lblPackageWidth->Name = 'W';
-			$this->lblPackageWidth->Text = $this->objShipment->PackageWidth;
-		}
-		
-		// Create and Setup lblPackageHeight
-		protected function lblPackageHeight_Create() {
-			$this->lblPackageHeight = new QLabel($this->pnlCompleteShipmentLabels);
-			$this->lblPackageHeight->Name = 'H';
-			$this->lblPackageHeight->Text = $this->objShipment->PackageHeight;
-		}
-		
-		// Create and Setup lblLengthUnit
-		protected function lblLengthUnit_Create() {
-			$this->lblLengthUnit = new QLabel($this->pnlCompleteShipmentLabels);
-			if ($this->objShipment->LengthUnitId) {
-				$this->lblLengthUnit->Text = $this->objShipment->LengthUnit->__toString();
-			}
-		}
-		
-		// Create and Setup lblValue 
-		protected function lblValue_Create() {
-			$this->lblValue = new QLabel($this->pnlCompleteShipmentLabels);
-			$this->lblValue->Name = 'Declared Value';
-			$this->lblValue->Text = $this->objShipment->Value;
-		}
-		
-		// Create and Setup lblCurrencyUnit
-		protected function lblCurrencyUnit_Create() {
-			$this->lblCurrencyUnit = new QLabel($this->pnlCompleteShipmentLabels);
-			if ($this->objShipment->CurrencyUnitId) {
-				$this->lblCurrencyUnit->Text = $this->objShipment->CurrencyUnit->__toString();
-			}
-		}
-		
-		// Create and Setup lblNotificationFlag
-		protected function lblNotificationFlag_Create() {
-			$this->lblNotificationFlag = new QLabel($this->pnlCompleteShipmentLabels);
-			$this->lblNotificationFlag->Name = 'Sent Shipment Notification: ';
-			if ($this->objShipment->NotificationFlag) {
-				$this->lblNotificationFlag->Text = 'YES';
-			}
-			else {
-				$this->lblNotificationFlag->Text = 'NO';
-			}
-		}
 		
 		// Create and Setup lblTrackingNumber
 		protected function lblTrackingNumber_Create() {
-			$this->lblTrackingNumber = new QLabel($this->pnlCompleteShipmentLabels);
+			$this->lblTrackingNumber = new QLabel($this);
 			$this->lblTrackingNumber->Name = 'Tracking Number';
 			$this->lblTrackingNumber->HtmlEntities = false;
 			$this->lblTrackingNumber->Text = $this->objShipment->__toStringTrackingNumber();
-		}
+		}		
 		
 		// Create and Setup lblShipmentNumber
 		protected function lblShipmentNumber_Create() {
-			$this->lblShipmentNumber = new QLabel($this->pnlShippingInfo);
+			$this->lblShipmentNumber = new QLabel($this);
 			$this->lblShipmentNumber->Name = 'Shipment Number';
 			if (!$this->blnEditMode) {
 				$this->lblShipmentNumber->Text = '';
@@ -536,7 +431,7 @@
 		
 		// Create and Setup lblShipDate
 		protected function lblShipDate_Create() {
-			$this->lblShipDate = new QLabel($this->pnlShippingInfo);
+			$this->lblShipDate = new QLabel($this);
 			$this->lblShipDate->Name = QApplication::Translate('Ship Date');
 			if ($this->blnEditMode && $this->objShipment->ShipDate) {
 				$this->lblShipDate->Text = $this->objShipment->ShipDate->__toString();
@@ -545,7 +440,7 @@
 		
 		// Create and Setup lblFromCompany
 		protected function lblFromCompany_Create() {
-			$this->lblFromCompany = new QLabel($this->pnlShippingInfo);
+			$this->lblFromCompany = new QLabel($this);
 			$this->lblFromCompany->Name = 'From Company';
 			if ($this->blnEditMode && $this->objShipment->FromCompanyId) {
 				$this->lblFromCompany->Text = $this->objShipment->FromCompany->__toString();
@@ -554,7 +449,7 @@
 		
 		// Create and Setup lblFromContact
 		protected function lblFromContact_Create() {
-			$this->lblFromContact = new QLabel($this->pnlShippingInfo);
+			$this->lblFromContact = new QLabel($this);
 			$this->lblFromContact->Name = 'From Contact';
 			if ($this->blnEditMode && $this->objShipment->FromContactId) {
 				$this->lblFromContact->Text = $this->objShipment->FromContact->__toString();
@@ -563,7 +458,7 @@
 		
 		// Create and Setup lblFrom Address
 		protected function lblFromAddress_Create() {
-			$this->lblFromAddress = new QLabel($this->pnlShippingInfo);
+			$this->lblFromAddress = new QLabel($this);
 			$this->lblFromAddress->Name = 'From Address';
 			if ($this->blnEditMode && $this->objShipment->FromAddressId) {
 				$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toString();
@@ -572,7 +467,7 @@
 		
 		// Create and Setup lblToCompany
 		protected function lblToCompany_Create() {
-			$this->lblToCompany = new QLabel($this->pnlShippingInfo);
+			$this->lblToCompany = new QLabel($this);
 			$this->lblToCompany->Name = 'To Company';
 			if ($this->blnEditMode && $this->objShipment->ToCompanyId) {
 				$this->lblToCompany->Text = $this->objShipment->ToCompany->__toString();
@@ -581,25 +476,16 @@
 		
 		// Create and Setup lblToContact
 		protected function lblToContact_Create() {
-			$this->lblToContact = new QLabel($this->pnlShippingInfo);
+			$this->lblToContact = new QLabel($this);
 			$this->lblToContact->Name = 'To Contact';
 			if ($this->blnEditMode && $this->objShipment->ToContactId) {
 				$this->lblToContact->Text = $this->objShipment->ToContact->__toString();
 			}
 		}
 		
-		// Create and Setup lblToPhone
-		protected function lblToPhone_Create() {
-			$this->lblToPhone = new QLabel($this->pnlShippingInfo);
-			$this->lblToPhone->Name = 'To Phone';
-			if ($this->blnEditMode) {
-				$this->lblToPhone->Text = $this->objShipment->ToPhone;
-			}
-		}
-
 		// Create and Setp lblToAddress
 		protected function lblToAddress_Create() {
-			$this->lblToAddress = new QLabel($this->pnlShippingInfo);
+			$this->lblToAddress = new QLabel($this);
 			$this->lblToAddress->Name = 'To Address';
 			if ($this->blnEditMode && $this->objShipment->ToAddressId) {
 				$this->lblToAddress->Text = $this->objShipment->ToAddress->__toString();
@@ -608,7 +494,7 @@
 		
 		// Create and Setup lblToAddressFull
 		protected function lblToAddressFull_Create() {
-			$this->lblToAddressFull = new QLabel($this->pnlShippingInfo);
+			$this->lblToAddressFull = new QLabel($this);
 			$this->lblToAddressFull->HtmlEntities = false;
 			$this->lblToAddressFull->Name = 'Full Address';
 			$this->lblToAddressFull->Text = '<br><br>';
@@ -616,47 +502,36 @@
 		
 		// Create and Setup lblCourier
 		protected function lblCourier_Create() {
-			$this->lblCourier = new QLabel($this->pnlShippingInfo);
+			$this->lblCourier = new QLabel($this);
 			$this->lblCourier->Name = 'Courier';
-			if ($this->objShipment->CourierId) {
-				$this->lblCourier->Text = $this->objShipment->Courier->__toString();
-			}
-			elseif ($this->objShipment->CourierOther) {
-				$this->lblCourier->Text = $this->objShipment->CourierOther;
+			$this->lblCourier->Text = ($this->objShipment->CourierId) ? $this->objShipment->Courier->__toString() : 'Other';
+		}
+		
+		// Create and Setup lblToPhone
+		protected function lblToPhone_Create() {
+			$this->lblToPhone = new QLabel($this->pnlFedExShipment);
+			$this->lblToPhone->Name = 'To Phone';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblToPhone->Text = $this->objFedexShipment->ToPhone;
 			}
 		}
 		
-		// Create and Setup lblShippingAccount
-		protected function lblShippingAccount_Create() {
-			$this->lblShippingAccount = new QLabel($this->pnlShippingInfo);
-			$this->lblShippingAccount->Name = 'Shipping Account';
-			if ($this->blnEditMode) {
-				if ($this->objShipment->ShippingAccountId) {
-					$this->lblShippingAccount->Text = $this->objShipment->ShippingAccount->__toString();
-				}
-				elseif ($this->objShipment->ShippingAccountOther) {
-					$this->lblShippingAccount->Text = $this->objShipment->ShippingAccountOther;
-				}
-			}
-		}
-		
-		// Create and Setup lblFxServiceType
-		protected function lblFxServiceType_Create() {
-			$this->lblFxServiceType = new QLabel($this->pnlShippingInfo);
-			$this->lblFxServiceType->Name = 'Fedex Service Type';
-			if ($this->blnEditMode) {
-				if ($this->objShipment->FedexServiceType) {
-					$this->lblFxServiceType->Text = $this->objShipment->FedexServiceType->__toString();
-				}
+		// Create and Setup lblBillTransportationTo
+		protected function lblBillTransportationTo_Create() {
+			$this->lblBillTransportationTo = new QLabel($this->pnlFedExShipment);
+			$this->lblBillTransportationTo->Name = 'Bill Transportation To';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				// FedexServiceTypeId 6 = 'FedEx Ground'
+				$this->lblBillTransportationTo->Text = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::ground_pay_type($this->objFedexShipment->PayType) : FedExDC::express_pay_type($this->objFedexShipment->PayType);
 			}
 		}
 		
 		// Create and Setup lblReference
 		protected function lblReference_Create() {
-			$this->lblReference = new QLabel($this->pnlShippingInfo);
+			$this->lblReference = new QLabel($this->pnlFedExShipment);
 			$this->lblReference->Name = 'Reference';
-			if ($this->blnEditMode) {
-				$this->lblReference->Text = $this->objShipment->Reference;
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblReference->Text = $this->objFedexShipment->Reference;
 			}
 		}
 		
@@ -667,11 +542,133 @@
 			$this->lblAdvanced->Text = 'Show Advanced';
 			$this->lblAdvanced->HtmlEntities = false;
 			$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
-	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
+			$this->lblAdvanced->SetCustomStyle('padding-left', '5px');
+	  		$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
 			$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
 			if ($this->blnEditMode) {
 				$this->lblAdvanced->Display = false;
 			}
+			$this->lblAdvanced->TabIndex = 29;
+		}
+		
+		// Create and Setup lblSenderLabel
+		protected function lblSenderLabel_Create() {
+			$this->lblSenderLabel = new QLabel($this->pnlFedExShipment);
+			$this->lblSenderLabel->Name = 'Sender';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				if ($this->objFedexShipment->PayType === 1) {
+					$this->lblSenderLabel->Text = 'Sender Account';
+				} else {
+					$this->lblSenderLabel->Text = 'Recipient/third party<br>account';
+				}
+			} else {
+				$this->lblSenderLabel->Text = 'Sender Account';
+			}
+			$this->lblSenderLabel->HtmlEntities=false;
+		}
+		
+		// Create and Setup lblPayerAccount
+		protected function lblPayerAccount_Create() {
+			$this->lblPayerAccount = new QLabel($this->pnlFedExShipment);
+			$this->lblPayerAccount->Name = 'Payer Account';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				// If Pay Type === 1 (Sender) then display the account name, otherwise display the account number input by the user
+				if ($this->objFedexShipment->PayType === 1 && $this->objFedexShipment->ShippingAccountId) {
+					$this->lblPayerAccount->Text = $this->objFedexShipment->ShippingAccount->__toString();
+				} else {
+					$this->lblPayerAccount->Text = $this->objFedexShipment->PayerAccountNumber;
+				}
+			}
+		}
+		
+		// Create and Setup lblFxServiceType
+		protected function lblFxServiceType_Create() {
+			$this->lblFxServiceType = new QLabel($this->pnlFedExShipment);
+			$this->lblFxServiceType->Name = 'Service Type';
+			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->FedexServiceType) {
+				$this->lblFxServiceType->Text = $this->objFedexShipment->FedexServiceType->__toString();
+			}
+		}
+		
+		// Create and Setup lblPackageType
+		protected function lblPackageType_Create() {
+			$this->lblPackageType = new QLabel($this->pnlFedExShipment);
+			$this->lblPackageType->Name = 'Package Type';
+			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->PackageType) {
+				$this->lblPackageType->Text = $this->objFedexShipment->PackageType->__toString();
+			}
+		}
+		
+		// Create and Setup lblPackageWeight
+		protected function lblPackageWeight_Create() {
+			$this->lblPackageWeight = new QLabel($this->pnlFedExShipment);
+			$this->lblPackageWeight->Name = 'Package Weight';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblPackageWeight->Text = $this->objFedexShipment->PackageWeight;
+			}
+		}
+
+		// Create and Setup lblPackageLength
+		protected function lblPackageLength_Create() {
+			$this->lblPackageLength = new QLabel($this->pnlFedExShipment);
+			$this->lblPackageLength->Name = 'Package Length';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblPackageLength->Text = $this->objFedexShipment->PackageLength;
+			}
+		}		
+
+		// Create and Setup lblPackageWidth
+		protected function lblPackageWidth_Create() {
+			$this->lblPackageWidth = new QLabel($this->pnlFedExShipment);
+			$this->lblPackageWidth->Name = 'Package Width';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblPackageWidth->Text = $this->objFedexShipment->PackageWidth;
+			}
+		}		
+		
+		// Create and Setup lblPackageHeight
+		protected function lblPackageHeight_Create() {
+			$this->lblPackageHeight = new QLabel($this->pnlFedExShipment);
+			$this->lblPackageHeight->Name = 'Package Height';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblPackageHeight->Text = $this->objFedexShipment->PackageHeight;
+			}
+		}	
+
+		// Create and Setup lblValue
+		protected function lblValue_Create() {
+			$this->lblValue = new QLabel($this->pnlFedExShipment);
+			$this->lblValue->Name = 'Declared Value';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblValue->Text = $this->objFedexShipment->DeclaredValue;
+			}
+		}
+		
+		// Create and Setup lblWeightUnit
+		protected function lblWeightUnit_Create() {
+			$this->lblWeightUnit = new QLabel ($this->pnlFedExShipment);
+			$this->lblWeightUnit->Name = 'Weight Unit';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblWeightUnit->Text = $this->objFedexShipment->WeightUnit->__toString();
+			}
+		}
+		
+		// Create and Setup lblLengthUnit
+		protected function lblLengthUnit_Create() {
+			$this->lblLengthUnit = new QLabel ($this->pnlFedExShipment);
+			$this->lblLengthUnit->Name = 'Length Unit';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblLengthUnit->Text = $this->objFedexShipment->LengthUnit->__toString();
+			}			
+		}
+		
+		// Create and Setup lblCurrencyUnit
+		protected function lblCurrencyUnit_Create() {
+			$this->lblCurrencyUnit = new QLabel ($this->pnlFedExShipment);
+			$this->lblCurrencyUnit->Name = 'Currency Unit';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
+			}				
 		}
 		
 		// Create and Setup pnlNote
@@ -688,144 +685,24 @@
 		// CREATE INPUTS
 		//**************
 		
-		// Create and Setup lstPackageType
-		protected function lstPackageType_Create() {
-			$this->lstPackageType = new QListBox($this->pnlCompleteShipmentInputs);
-			$this->lstPackageType->Name = QApplication::Translate('Package Type');
-							
-			$this->LoadPackageTypes();
-
-			// Disable Package type selection if not using FedEx
-			if ($this->objShipment->CourierId !== 1) {
-				$this->lstPackageType->Enabled = false;
-			}
-			$this->lstPackageType->Required = false;
-		}
-		
-		// Create and Setup txtPackageWeight
-		protected function txtPackageWeight_Create() {
-			$this->txtPackageWeight = new QFloatTextBox($this->pnlCompleteShipmentInputs);
-			$this->txtPackageWeight->Name = QApplication::Translate('Weight');
-			$this->txtPackageWeight->Text = $this->objShipment->PackageWeight;
-			$this->txtPackageWeight->SetCustomStyle('Width','50px');
-			$this->txtPackageWeight->CausesValidation = true;
-			$this->txtPackageWeight->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageWeight->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		}
-
-		// Create and Setup lstWeightUnit
-		protected function lstWeightUnit_Create() {
-			$this->lstWeightUnit = new QListBox($this->pnlCompleteShipmentInputs);
-			$this->lstWeightUnit->Name = QApplication::Translate('Weight Unit');
-			$this->lstWeightUnit->AddItem('- Select One -', null);
-			$objWeightUnitArray = WeightUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::WeightUnit()->ShortDescription)));
-			if ($objWeightUnitArray) foreach ($objWeightUnitArray as $objWeightUnit) {
-				$objListItem = new QListItem($objWeightUnit->__toString(), $objWeightUnit->WeightUnitId);
-				if (($this->objShipment->WeightUnit) && ($this->objShipment->WeightUnit->WeightUnitId == $objWeightUnit->WeightUnitId))
-					$objListItem->Selected = true;
-				$this->lstWeightUnit->AddItem($objListItem);
-			}
-			$this->lstWeightUnit->SetCustomStyle('Width','120px');
-		}
-
-		// Create and Setup txtPackageLength
-		protected function txtPackageLength_Create() {
-			$this->txtPackageLength = new QFloatTextBox($this->pnlCompleteShipmentInputs);
-			$this->txtPackageLength->Name = QApplication::Translate('L');
-			$this->txtPackageLength->Text = $this->objShipment->PackageLength;
-			$this->txtPackageLength->CausesValidation = true;
-			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QTerminateAction());	
-			$this->txtPackageLength->SetCustomStyle('Width','30px');				
-		}
-
-		// Create and Setup txtPackageWidth
-		protected function txtPackageWidth_Create() {
-			$this->txtPackageWidth = new QFloatTextBox($this->pnlCompleteShipmentInputs);
-			$this->txtPackageWidth->Name = QApplication::Translate('W');
-			$this->txtPackageWidth->Text = $this->objShipment->PackageWidth;
-			$this->txtPackageWidth->CausesValidation = true;
-			$this->txtPackageWidth->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageWidth->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtPackageWidth->SetCustomStyle('Width','30px');		
-		}
-
-		// Create and Setup txtPackageHeight
-		protected function txtPackageHeight_Create() {
-			$this->txtPackageHeight = new QFloatTextBox($this->pnlCompleteShipmentInputs);
-			$this->txtPackageHeight->Name = QApplication::Translate('H');
-			$this->txtPackageHeight->Text = $this->objShipment->PackageHeight;
-			$this->txtPackageHeight->CausesValidation = true;
-			$this->txtPackageHeight->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageHeight->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtPackageHeight->SetCustomStyle('Width','30px');	
-		}
-
-		// Create and Setup lstLengthUnit
-		protected function lstLengthUnit_Create() {
-			$this->lstLengthUnit = new QListBox($this->pnlCompleteShipmentInputs);
-			$this->lstLengthUnit->Name = QApplication::Translate('Length Unit');
-			$this->lstLengthUnit->AddItem('- Select One -', null);
-			$objLengthUnitArray = LengthUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::LengthUnit()->ShortDescription)));
-			if ($objLengthUnitArray) foreach ($objLengthUnitArray as $objLengthUnit) {
-				$objListItem = new QListItem($objLengthUnit->__toString(), $objLengthUnit->LengthUnitId);
-				if (($this->objShipment->LengthUnit) && ($this->objShipment->LengthUnit->LengthUnitId == $objLengthUnit->LengthUnitId))
-					$objListItem->Selected = true;
-				$this->lstLengthUnit->AddItem($objListItem);
-			}
-			$this->lstLengthUnit->SetCustomStyle('Width','120px');	
-		}
-
-		// Create and Setup txtValue
-		protected function txtValue_Create() {
-			$this->txtValue = new QFloatTextBox($this->pnlCompleteShipmentInputs);
-			$this->txtValue->Name = QApplication::Translate('Value');
-			$this->txtValue->Text = $this->objShipment->Value;
-			$this->txtValue->CausesValidation = true;
-			$this->txtValue->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtValue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtValue->SetCustomStyle('Width','50px');
-		}
-
-		// Create and Setup lstCurrencyUnit
-		protected function lstCurrencyUnit_Create() {
-			$this->lstCurrencyUnit = new QListBox($this->pnlCompleteShipmentInputs);
-			$this->lstCurrencyUnit->Name = QApplication::Translate('Currency Unit');
-			$this->lstCurrencyUnit->AddItem('- Select One -', null);
-			$objCurrencyUnitArray = CurrencyUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::CurrencyUnit()->ShortDescription)));
-			if ($objCurrencyUnitArray) foreach ($objCurrencyUnitArray as $objCurrencyUnit) {
-				$objListItem = new QListItem($objCurrencyUnit->__toString(), $objCurrencyUnit->CurrencyUnitId);
-				if (($this->objShipment->CurrencyUnit) && ($this->objShipment->CurrencyUnit->CurrencyUnitId == $objCurrencyUnit->CurrencyUnitId))
-					$objListItem->Selected = true;
-				$this->lstCurrencyUnit->AddItem($objListItem);
-			}
-			$this->lstCurrencyUnit->SetCustomStyle('Width','120px');
-		}
-
-		// Create and Setup chkNotificationFlag
-		protected function chkNotificationFlag_Create() {
-			$this->chkNotificationFlag = new QCheckBox($this->pnlCompleteShipmentInputs);
-			$this->chkNotificationFlag->Name = QApplication::Translate('Shipment Notification');
-			$this->chkNotificationFlag->Checked = $this->objShipment->NotificationFlag;
-		}
-
 		// Create and Setup txtTrackingNumber
 		protected function txtTrackingNumber_Create() {
-			$this->txtTrackingNumber = new QTextBox($this->pnlCompleteShipmentInputs);
+			$this->txtTrackingNumber = new QTextBox($this);
 			$this->txtTrackingNumber->Name = QApplication::Translate('Tracking Number');
 			$this->txtTrackingNumber->Text = $this->objShipment->TrackingNumber;
 			$this->txtTrackingNumber->CausesValidation = true;
 			$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
 			$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			// Do not show the tracking number field if this is a FedEx shipment
-			if ($this->objShipment->CourierId == 1) {
-				$this->txtTrackingNumber->Enabled = false;
-			}
+			//if ($this->objShipment->CourierId == 1) {
+				//$this->txtTrackingNumber->Enabled = false;
+			//}
+			$this->txtTrackingNumber->TabIndex = 8;
 		}
 		
 		// Create and Setup calShipDate
 		protected function calShipDate_Create() {
-			$this->calShipDate = new QDateTimePickerExt($this->pnlShippingInfo);
+			$this->calShipDate = new QDateTimePickerExt($this);
 			$this->calShipDate->Name = QApplication::Translate('Ship Date');
 			$this->calShipDate->DateTimePickerType = QDateTimePickerType::Date;
 			if ($this->blnEditMode) {
@@ -867,12 +744,12 @@
  			if (!$this->blnEditMode) {
  				QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->calShipDate->ControlId));
  			}
- 			$this->calShipDate->TabIndex=1;
+ 			$this->calShipDate->TabIndex=10;
 		}
 		
 		// Create and Setup lstFromCompany
 		protected function lstFromCompany_Create() {
-			$this->lstFromCompany = new QListBox($this->pnlShippingInfo);
+			$this->lstFromCompany = new QListBox($this);
 			$this->lstFromCompany->Name = QApplication::Translate('From Company');
 			$this->lstFromCompany->Required = true;
 			if (!$this->blnEditMode)
@@ -888,13 +765,13 @@
 					
 			}
 			$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFromCompany_Select'));
-			$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
-			$this->lstFromCompany->TabIndex=2;
+			//$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
+			$this->lstFromCompany->TabIndex=1;
 		}
 		
 		// Create and Setup lstFromContact
 		protected function lstFromContact_Create() {
-			$this->lstFromContact = new QListBox($this->pnlShippingInfo);
+			$this->lstFromContact = new QListBox($this);
 			$this->lstFromContact->Name = QApplication::Translate('From Contact');
 			$this->lstFromContact->Required = true;
 			if (!$this->blnEditMode)
@@ -907,13 +784,13 @@
 					$objListItem->Selected = true;
 				$this->lstFromContact->AddItem($objListItem);
 			}
-			$this->lstFromContact->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
-			$this->lstFromContact->TabIndex=3;
+			//$this->lstFromContact->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
+			$this->lstFromContact->TabIndex=2;
 		}
 		
 		// Create and Setup lstFromAddress
 		protected function lstFromAddress_Create() {
-			$this->lstFromAddress = new QListBox($this->pnlShippingInfo);
+			$this->lstFromAddress = new QListBox($this);
 			$this->lstFromAddress->Name = QApplication::Translate('From Address');
 			$this->lstFromAddress->Required = true;
 			if (!$this->blnEditMode)
@@ -926,13 +803,13 @@
 				$this->lstFromAddress->AddItem($objListItem);
 			}
 			
-			$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
-			$this->lstFromAddress->TabIndex=4;
+			//$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
+			$this->lstFromAddress->TabIndex=3;
 		}
 		
 		// Create and Setup lstToCompany
 		protected function lstToCompany_Create() {
-			$this->lstToCompany = new QListBox($this->pnlShippingInfo);
+			$this->lstToCompany = new QListBox($this);
 			$this->lstToCompany->Name = QApplication::Translate('To Company');
 			$this->lstToCompany->Required = true;
 			if (!$this->blnEditMode)
@@ -945,12 +822,12 @@
 				$this->lstToCompany->AddItem($objListItem);
 			}
 			$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstToCompany_Select'));
-			$this->lstToCompany->TabIndex=5;
+			$this->lstToCompany->TabIndex=4;
 		}
 		
 		// Create and Setup lstToContact
 		protected function lstToContact_Create() {
-			$this->lstToContact = new QListBox($this->pnlShippingInfo);
+			$this->lstToContact = new QListBox($this);
 			$this->lstToContact->Name = QApplication::Translate('To Contact');
 			$this->lstToContact->Required = true;
 			
@@ -973,25 +850,12 @@
 			}
 			
 			$this->lstToContact->AddAction(new QChangeEvent(), new QAjaxAction('lstToContact_Select'));
-			$this->lstToContact->TabIndex=6;
-		}
-		
-		// Create and Setup txtToPhone
-		protected function txtToPhone_Create() {
-			$this->txtToPhone = new QTextBox($this->pnlShippingInfo);
-			$this->txtToPhone->Name = QApplication::Translate('To Phone');
-			if ($this->blnEditMode) {
-				$this->txtToPhone->Text = $this->objShipment->ToPhone;
-			}
-			$this->txtToPhone->CausesValidation = true;
-			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtToPhone->TabIndex=8;
+			$this->lstToContact->TabIndex=5;
 		}		
 		
 		// Create and Setup lstToAddress
 		protected function lstToAddress_Create() {
-			$this->lstToAddress = new QListBox($this->pnlShippingInfo);
+			$this->lstToAddress = new QListBox($this);
 			$this->lstToAddress->Name = QApplication::Translate('To Address');
 			$this->lstToAddress->Required = true;
 			if (!$this->blnEditMode) {
@@ -1012,14 +876,14 @@
 				}
 			}
 			$this->lstToAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstToAddress_Select'));		
-			$this->lstToAddress->TabIndex=7;
+			$this->lstToAddress->TabIndex=6;
 		}
 		
 		// Create and Setup lstCourier
 		protected function lstCourier_Create() {
-			$this->lstCourier = new QListBox($this->pnlShippingInfo);
+			$this->lstCourier = new QListBox($this);
 			$this->lstCourier->Name = QApplication::Translate('Courier');
-			$this->lstCourier->Required = false;
+			$this->lstCourier->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstCourier->AddItem('- Select One -', null);
 			$objCourierArray = Courier::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Courier()->ShortDescription)));				
@@ -1036,15 +900,118 @@
 				$this->lstCourier->AddItem('Other', null);
 			}
 			$this->lstCourier->AddAction(new QChangeEvent(), new QAjaxAction('lstCourier_Select'));
-			$this->lstCourier->TabIndex=9;
+			$this->lstCourier->TabIndex=7;
+		}
+				
+		// Create and Setup txtNote
+		protected function txtNote_Create() {
+			$this->txtNote = new QTextBox($this);
+			$this->txtNote->Name = QApplication::Translate('Note');
+			$this->txtNote->TextMode = QTextMode::MultiLine;
+			$this->txtNote->Height=80;
+			if ($this->blnEditMode) {
+				$this->txtNote->Text = $this->objShipment->Transaction->Note;
+			}
+			$this->txtNote->TabIndex=9;
+		}
+		
+		// Create and Setup txtToPhone
+		protected function txtToPhone_Create() {
+			$this->txtToPhone = new QTextBox($this->pnlFedExShipment);
+			$this->txtToPhone->Name = QApplication::Translate('To Phone');
+			if ($this->blnEditMode && $this->objShipment->CourierId === 1 && $this->objFedexShipment) {
+				$this->txtToPhone->Text = $this->objFedexShipment->ToPhone;
+			}
+			$this->txtToPhone->CausesValidation = true;
+			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->txtToPhone->TabIndex=11;
+		}
+		
+		// Create and Setup lstBillTransportationTo
+		protected function lstBillTransportationTo_Create() {
+			$this->lstBillTransportationTo = new QListBox($this->pnlFedExShipment);
+			$this->lstBillTransportationTo->Name = QApplication::Translate('Bill Transportation To');
+			$this->lstBillTransportationTo->Required = false;
+			//if (!$this->blnEditMode)
+			//	$this->lstBillTransportationTo->AddItem('- Select One -', null);
+			
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				// FedexServiceTypeId 6 is FedEx Ground
+				$objPayTypeArray = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::get_ground_pay_types() : FedExDC::get_express_pay_types();
+				if ($objPayTypeArray) foreach ($objPayTypeArray as $key => $value) {
+					$objListItem = new QListItem($value, $key);
+					$this->lstBillTransportationTo->AddItem($objListItem);
+				}
+				$this->lstBillTransportationTo->SelectedValue = $this->objFedexShipment->PayType;
+			} else {
+				$objPayTypeArray = FedExDC::get_express_pay_types();				
+				if ($objPayTypeArray) foreach ($objPayTypeArray as $key => $value) {
+					$objListItem = new QListItem($value, $key);
+					$this->lstBillTransportationTo->AddItem($objListItem);
+				}
+			}
+		
+			$this->lstBillTransportationTo->AddAction(new QChangeEvent(), new QAjaxAction('lstBillTransportationTo_Select'));
+			$this->lstBillTransportationTo->TabIndex=12;
+		}
+		
+		// Create and Setup lstShippingAccount
+		protected function lstShippingAccount_Create() {
+			$this->lstShippingAccount = new QListBox($this->pnlFedExShipment);
+			$this->lstShippingAccount->Name = QApplication::Translate('Sender Account');
+			$this->lstShippingAccount->Required = false;
+			if (!$this->blnEditMode)
+				$this->lstShippingAccount->AddItem('- Select One -', null);
+			$objShippingAccountArray = ShippingAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::ShippingAccount()->ShortDescription)));				
+			if ($objShippingAccountArray) foreach ($objShippingAccountArray as $objShippingAccount) {
+				$objListItem = new QListItem($objShippingAccount->__toString(), $objShippingAccount->ShippingAccountId);			
+				$this->lstShippingAccount->AddItem($objListItem);
+				if (!$this->blnEditMode && count($objShippingAccountArray) === 1)
+					$objListItem->Selected = true;
+			}
+
+			//$this->lstShippingAccount->AddAction(new QChangeEvent(), new QAjaxAction('lstShippingAccount_Select'));
+			$this->lstShippingAccount->TabIndex=13;
+		}
+		
+		// Create and Setup txtRecipientThirdPartyAccount
+		protected function txtRecipientThirdPartyAccount_Create() {
+			$this->txtRecipientThirdPartyAccount = new QTextBox($this->pnlFedExShipment);
+			$this->txtRecipientThirdPartyAccount->Name = QApplication::Translate('Recipient/third party account number:');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtRecipientThirdPartyAccount->Text = $this->objFedexShipment->PayerAccountNumber;
+			}
+			$this->txtRecipientThirdPartyAccount->Display=false;
+			$this->txtRecipientThirdPartyAccount->TabIndex = 14;
+		}
+		
+		// Create and Setup txtReference
+		protected function txtReference_Create() {
+			$this->txtReference = new QTextBox($this->pnlFedExShipment);
+			$this->txtReference->Name = QApplication::Translate('Your reference');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtReference->Text = $this->objFedexShipment->Reference;
+			}
+			$this->txtReference->TabIndex = 15;
 		}
 		
 		// Create and Setup lstFxServiceType
 		protected function lstFxServiceType_Create() {
-			$this->lstFxServiceType = new QListBox($this->pnlShippingInfo);
+			$this->lstFxServiceType = new QListBox($this->pnlFedExShipment);
 			$this->lstFxServiceType->Name = QApplication::Translate('FedEx Service Type');
+			$this->lstFxServiceType->AddItem('- Select One -', null);
 			
-			if (!$this->blnEditMode) {
+			$objFedexServiceTypeArr = FedexServiceType::LoadAll(QQ::Clause(QQ::OrderBy(QQN::FedexServiceType()->ShortDescription)));
+			if ($objFedexServiceTypeArr) foreach ($objFedexServiceTypeArr as $objFedexServiceType) {
+				$objListItem = new QListItem($objFedexServiceType->ShortDescription, $objFedexServiceType->FedexServiceTypeId);
+				if (($this->blnEditMode && $this->objFedexShipment) && $this->objFedexShipment->FedexServiceTypeId == $objFedexServiceType->FedexServiceTypeId) {
+					$objListItem->Selected = true;
+				}
+				
+				$this->lstFxServiceType->AddItem($objListItem);
+			}			
+			/*if (!$this->blnEditMode) {
 				$this->lstFxServiceType->Required = false;
 				$this->lstFxServiceType->Enabled = false;
 			}
@@ -1052,114 +1019,175 @@
 				$this->lstFxServiceType->Enabled = true;
 				$this->lstFxServiceType->Required = true;
 			}
-			$this->lstFxServiceType->TabIndex=13;
+			*/
+			$this->lstFxServiceType->TabIndex=16;
+			
+			$this->lstFxServiceType->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Select'));
 		}
 		
-		// Create and Setup txtCourier
-		protected function txtCourierOther_Create() {
-			$this->txtCourierOther = new QTextBox($this->pnlShippingInfo);
-			$this->txtCourierOther->Name = QApplication::Translate('Courier');
-			if ($this->blnEditMode) {
-				if ($this->objShipment->CourierOther) {
-					$this->txtCourierOther->Enabled = true;
-					$this->txtCourierOther->Text = $this->objShipment->CourierOther;
+		// Create and Setup lstPackageType
+		protected function lstPackageType_Create() {
+			$this->lstPackageType = new QListBox($this->pnlFedExShipment);
+			$this->lstPackageType->Name = QApplication::Translate('Package Type');
+			
+			$this->LoadPackageTypes();
+			$this->lstPackageType->TabIndex = 17;
+		}
+		
+		// Create and Setup txtPackageWeight
+		protected function txtPackageWeight_Create() {
+			$this->txtPackageWeight = new QFloatTextBox($this->pnlFedExShipment);
+			$this->txtPackageWeight->Name = QApplication::Translate('Weight');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtPackageWeight->Text = $this->objFedexShipment->PackageWeight;
+			}
+			$this->txtPackageWeight->SetCustomStyle('Width','50px');
+			$this->txtPackageWeight->CausesValidation = true;
+			$this->txtPackageWeight->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
+			$this->txtPackageWeight->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->txtPackageWeight->TabIndex = 18;
+		}
+
+		// Create and Setup lstWeightUnit
+		protected function lstWeightUnit_Create() {
+			$this->lstWeightUnit = new QListBox($this->pnlFedExShipment);
+			$this->lstWeightUnit->Name = QApplication::Translate('Weight Unit');
+			//$this->lstWeightUnit->AddItem('- Select One -', null);
+			$objWeightUnitArray = WeightUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::WeightUnit()->ShortDescription)));
+			if ($objWeightUnitArray) foreach ($objWeightUnitArray as $objWeightUnit) {
+				$objListItem = new QListItem($objWeightUnit->__toString(), $objWeightUnit->WeightUnitId);
+				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->WeightUnit) && ($this->objFedexShipment->WeightUnit->WeightUnitId == $objWeightUnit->WeightUnitId)) {
+					$objListItem->Selected = true;
+				} else if (!$this->objFedexShipment && $objWeightUnit->WeightUnitId === 1) {
+					// Default to LBS (WeightUnitId 1)
+					$objListItem->Selected = true;
 				}
-				else {
-					$this->txtCourierOther->Enabled = false;
+				$this->lstWeightUnit->AddItem($objListItem);
+			}
+			$this->lstWeightUnit->SetCustomStyle('Width','120px');
+			$this->lstWeightUnit->TabIndex = 19;
+		}		
+		
+		// Create and Setup txtPackageLength
+		protected function txtPackageLength_Create() {
+			$this->txtPackageLength = new QFloatTextBox($this->pnlFedExShipment);
+			$this->txtPackageLength->Name = QApplication::Translate('L');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtPackageLength->Text = $this->objFedexShipment->PackageLength;
+			}
+			$this->txtPackageLength->CausesValidation = true;
+			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
+			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QTerminateAction());	
+			$this->txtPackageLength->SetCustomStyle('Width','30px');				
+			$this->txtPackageLength->TabIndex = 20;
+		}
+
+		// Create and Setup txtPackageWidth
+		protected function txtPackageWidth_Create() {
+			$this->txtPackageWidth = new QFloatTextBox($this->pnlFedExShipment);
+			$this->txtPackageWidth->Name = QApplication::Translate('W');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtPackageWidth->Text = $this->objFedexShipment->PackageWidth;
+			}
+			$this->txtPackageWidth->CausesValidation = true;
+			$this->txtPackageWidth->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
+			$this->txtPackageWidth->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->txtPackageWidth->SetCustomStyle('Width','30px');
+			$this->txtPackageWidth->TabIndex = 21;
+		}
+
+		// Create and Setup txtPackageHeight
+		protected function txtPackageHeight_Create() {
+			$this->txtPackageHeight = new QFloatTextBox($this->pnlFedExShipment);
+			$this->txtPackageHeight->Name = QApplication::Translate('H');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtPackageHeight->Text = $this->objFedexShipment->PackageHeight;
+			}
+			$this->txtPackageHeight->CausesValidation = true;
+			$this->txtPackageHeight->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
+			$this->txtPackageHeight->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->txtPackageHeight->SetCustomStyle('Width','30px');	
+			$this->txtPackageHeight->TabIndex = 22;
+		}
+
+		// Create and Setup lstLengthUnit
+		protected function lstLengthUnit_Create() {
+			$this->lstLengthUnit = new QListBox($this->pnlFedExShipment);
+			$this->lstLengthUnit->Name = QApplication::Translate('Length Unit');
+			//$this->lstLengthUnit->AddItem('- Select One -', null);
+			$objLengthUnitArray = LengthUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::LengthUnit()->ShortDescription)));
+			if ($objLengthUnitArray) foreach ($objLengthUnitArray as $objLengthUnit) {
+				$objListItem = new QListItem($objLengthUnit->__toString(), $objLengthUnit->LengthUnitId);
+				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LengthUnit) && ($this->objFedexShipment->LengthUnit->LengthUnitId == $objLengthUnit->LengthUnitId)) {
+					$objListItem->Selected = true;
+				} else if (!$this->objFedexShipment && $objLengthUnit->LengthUnitId === 1) {
+					// Default to IN (LengthUnitId 1)
+					$objListItem->Selected = true;
 				}
+				$this->lstLengthUnit->AddItem($objListItem);
 			}
-			elseif (!$this->blnEditMode) {
-				$this->txtCourierOther->Enabled = false;
-			}
-			$this->txtCourierOther->CausesValidation = true;
-			$this->txtCourierOther->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtCourierOther->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtCourierOther->TabIndex=10;
-		}
+			$this->lstLengthUnit->SetCustomStyle('Width','120px');	
+			$this->lstLengthUnit->TabIndex = 23;
+		}		
 		
-		// Create and Setup lstShippingAccount
-		protected function lstShippingAccount_Create() {
-			$this->lstShippingAccount = new QListBox($this->pnlShippingInfo);
-			$this->lstShippingAccount->Name = QApplication::Translate('Shipping Account');
-			$this->lstShippingAccount->Required = false;
-			if (!$this->blnEditMode) {
-				$this->lstShippingAccount->Enabled = false;
+		// Create and Setup txtValue
+		protected function txtValue_Create() {
+			$this->txtValue = new QFloatTextBox($this->pnlFedExShipment);
+			$this->txtValue->Name = QApplication::Translate('Value');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtValue->Text = $this->objFedexShipment->DeclaredValue;
 			}
-			elseif ($this->blnEditMode && $this->objShipment->CourierId) {
-			$objShippingAccountArray = ShippingAccount::LoadArrayByCourierId($this->lstCourier->SelectedValue, QQ::Clause(QQ::Orderby(QQN::ShippingAccount()->ShortDescription)));
-				if ($objShippingAccountArray) foreach ($objShippingAccountArray as $objShippingAccount) {
-					$objListItem = new QListItem($objShippingAccount->__toString(), $objShippingAccount->ShippingAccountId);
-					if ($this->objShipment->ShippingAccountId && $this->objShipment->ShippingAccountId == $objShippingAccount->ShippingAccountId) {
-						$objListItem->Selected = true;
-					}
-					$this->lstShippingAccount->AddItem($objListItem);
+			$this->txtValue->CausesValidation = true;
+			$this->txtValue->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
+			$this->txtValue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->txtValue->SetCustomStyle('Width','50px');
+			$this->txtValue->TabIndex = 24;
+		}
+
+		// Create and Setup lstCurrencyUnit
+		protected function lstCurrencyUnit_Create() {
+			$this->lstCurrencyUnit = new QListBox($this->pnlFedExShipment);
+			$this->lstCurrencyUnit->Name = QApplication::Translate('Currency Unit');
+			//$this->lstCurrencyUnit->AddItem('- Select One -', null);
+			$objCurrencyUnitArray = CurrencyUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::CurrencyUnit()->ShortDescription)));
+			if ($objCurrencyUnitArray) foreach ($objCurrencyUnitArray as $objCurrencyUnit) {
+				$objListItem = new QListItem($objCurrencyUnit->__toString(), $objCurrencyUnit->CurrencyUnitId);
+				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->CurrencyUnit) && ($this->objFedexShipment->CurrencyUnit->CurrencyUnitId == $objCurrencyUnit->CurrencyUnitId)) {
+					$objListItem->Selected = true;
+				} else if (!$this->objFedexShipment && $objCurrencyUnit->CurrencyUnitId === 1) {
+					$objListItem->Selected = true;
 				}
-				// Removed choice of 'Other' for Beta1 - too buggy
-				// $this->lstShippingAccount->AddItem('Other', null);
+				$this->lstCurrencyUnit->AddItem($objListItem);
 			}
-			elseif ($this->blnEditMode && !$this->objShipment->CourierId) {
-				$this->lstShippingAccount->AddItem('Other', null, true);
+			$this->lstCurrencyUnit->SetCustomStyle('Width','120px');
+			$this->lstCurrencyUnit->TabIndex = 25;
+		}		
+
+		// Create and Setup chkNotificationFlag
+		protected function chkNotificationFlag_Create() {
+			$this->chkNotificationFlag = new QCheckBox($this->pnlFedExShipment);
+			$this->chkNotificationFlag->Name = QApplication::Translate('Shipment Notification');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->chkNotificationFlag->Checked = $this->objFedexShipment->NotificationFlag;
 			}
-			$this->lstShippingAccount->AddAction(new QChangeEvent(), new QAjaxAction('lstShippingAccount_Select'));
-			$this->lstShippingAccount->TabIndex=11;
-		}
-		
-		// Create and Setup txtShippingAccount
-		protected function txtShippingAccountOther_Create() {
-			$this->txtShippingAccountOther = new QTextBox($this->pnlShippingInfo);
-			$this->txtShippingAccountOther->Name = QApplication::Translate('Shipping Account');
-			if ($this->blnEditMode && $this->objShipment->ShippingAccountOther) {
-				$this->txtShippingAccountOther->Enabled = true;
-				$this->txtShippingAccountOther->Text = $this->objShipment->ShippingAccountOther;
-			}
-			elseif (!$this->blnEditMode) {
-				$this->txtShippingAccountOther->Enabled = false;
-			}
-			$this->txtShippingAccountOther->CausesValidation = true;
-			$this->txtShippingAccountOther->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtShippingAccountOther->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtShippingAccountOther->TabIndex=12;
-		}
-		
-		// Create and Setup txtReference
-		protected function txtReference_Create() {
-			$this->txtReference = new QTextBox($this->pnlShippingInfo);
-			$this->txtReference->Name = QApplication::Translate('Reference');
-			if ($this->blnEditMode) {
-				$this->txtReference->Text = $this->objShipment->Reference;
-			}
-			$this->txtReference->CausesValidation = true;
-			$this->txtReference->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtReference->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtReference->TabIndex=14;
-		}
-		
-		// Create and Setup txtNote
-		protected function txtNote_Create() {
-			$this->txtNote = new QTextBox($this->pnlShippingInfo);
-			$this->txtNote->Name = QApplication::Translate('Note');
-			$this->txtNote->TextMode = QTextMode::MultiLine;
-			if ($this->blnEditMode) {
-				$this->txtNote->Text = $this->objShipment->Transaction->Note;
-			}
-			$this->txtNote->TabIndex=15;
+			$this->chkNotificationFlag->TabIndex = 26;
 		}
 		
 		// Create the text field to enter new asset codes to add to the transaction
 		// Eventually this field will receive information from the AML
 		protected function txtNewAssetCode_Create() {
-			$this->txtNewAssetCode = new QTextBox($this->pnlShippingInfo);
+			$this->txtNewAssetCode = new QTextBox($this);
 			$this->txtNewAssetCode->Name = 'Asset Code';
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtNewAssetCode->CausesValidation = false;
-			$this->txtNewAssetCode->TabIndex=16;
+			$this->txtNewAssetCode->TabIndex=27;
 		}
 		
 		// Create the text field to enter new inventory_model codes to add to the transaction
 		// Eventually this field will receive information from the AML
 		protected function txtNewInventoryModelCode_Create() {
-			$this->txtNewInventoryModelCode = new QTextBox($this->pnlShippingInfo);
+			$this->txtNewInventoryModelCode = new QTextBox($this);
 			$this->txtNewInventoryModelCode->Name = 'Inventory Code';
 			$this->txtNewInventoryModelCode->CausesValidation = false;
 			$this->txtNewInventoryModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnLookup_Click'));
@@ -1168,7 +1196,7 @@
 		
 		// Create and Setup lstSourceLocation
 		protected function lstSourceLocation_Create() {
-			$this->lstSourceLocation = new QListBox($this->pnlShippingInfo);
+			$this->lstSourceLocation = new QListBox($this);
 			$this->lstSourceLocation->Name = 'Location';
 			$this->lstSourceLocation->Required = false;
 			$this->lstSourceLocation->AddItem('- Select One -', null);
@@ -1177,7 +1205,7 @@
 		}
 		
 		protected function txtQuantity_Create() {
-			$this->txtQuantity = new QTextBox($this->pnlShippingInfo);
+			$this->txtQuantity = new QTextBox($this);
 			$this->txtQuantity->Name = 'Quantity';
 			$this->txtQuantity->CausesValidation = false;
 			$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddInventory_Click'));
@@ -1186,7 +1214,7 @@
 		}
 		
 		protected function chkScheduleReceipt_Create() {
-			$this->chkScheduleReceipt = new QCheckBox($this->pnlShippingInfo);
+			$this->chkScheduleReceipt = new QCheckBox($this);
 			$this->chkScheduleReceipt->Name = 'Schedule Receipt';
 			$this->chkScheduleReceipt->Text = 'Schedule a Corresponding Receipt for:';
 			$this->chkScheduleReceipt->Display = false;
@@ -1194,7 +1222,7 @@
 		}
 		
 		protected function rblAssetType_Create() {
-			$this->rblAssetType = new QRadioButtonList($this->pnlShippingInfo);
+			$this->rblAssetType = new QRadioButtonList($this);
 			$this->rblAssetType->AddItem(new QListItem('This Asset', 'this', true));
 			$this->rblAssetType->AddItem(new QListItem('New Asset', 'new'));
 			$this->rblAssetType->Enabled = false;
@@ -1203,20 +1231,17 @@
 			$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->txtReceiptAssetCode));
 			if (QApplication::$TracmorSettings->MinAssetCode) {
 				$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->chkAutoGenerateAssetCode));
-			}
-			
-			
+			}		
 		}
 		
 		protected function txtReceiptAssetCode_Create() {
-			$this->txtReceiptAssetCode = new QTextBox($this->pnlShippingInfo);
+			$this->txtReceiptAssetCode = new QTextBox($this);
 			$this->txtReceiptAssetCode->Name = 'Asset Code';
 			$this->txtReceiptAssetCode->Display = false;
-			
 		}
 		
 		protected function chkAutoGenerateAssetCode_Create() {
-			$this->chkAutoGenerateAssetCode = new QCheckBox($this->pnlShippingInfo);
+			$this->chkAutoGenerateAssetCode = new QCheckBox($this);
 			$this->chkAutoGenerateAssetCode->Name = 'Auto Generate';
 			$this->chkAutoGenerateAssetCode->Text = 'Auto Generate';
 			$this->chkAutoGenerateAssetCode->AddAction(new QClickEvent(), new QToggleEnableAction($this->txtReceiptAssetCode));
@@ -1230,7 +1255,7 @@
 		// Setup the AssetTransact datagrid
 		protected function dtgAssetTransact_Create() {
 			
-			$this->dtgAssetTransact = new QDataGrid($this->pnlShippingInfo);
+			$this->dtgAssetTransact = new QDataGrid($this);
 			$this->dtgAssetTransact->CellPadding = 5;
 			$this->dtgAssetTransact->CellSpacing = 0;
 			$this->dtgAssetTransact->CssClass = "datagrid";
@@ -1293,7 +1318,7 @@
 		// Setup the InventoryTransact datagrid
 		protected function dtgInventoryTransact_Create() {
 			
-			$this->dtgInventoryTransact = new QDataGrid($this->pnlShippingInfo);
+			$this->dtgInventoryTransact = new QDataGrid($this);
 			$this->dtgInventoryTransact->CellPadding = 5;
 			$this->dtgInventoryTransact->CellSpacing = 0;
 			$this->dtgInventoryTransact->CssClass = "datagrid";
@@ -1355,16 +1380,16 @@
 		
 		// Create and Setup btnCompleteShipment
 		protected function btnCompleteShipment_Create() {
-			$this->btnCompleteShipment = new QButton($this->pnlCompleteShipmentInputs);
+			$this->btnCompleteShipment = new QButton($this);
 			$this->btnCompleteShipment->Text = 'Complete Shipment';
 			$this->btnCompleteShipment->AddAction(new QClickEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->btnCompleteShipment->CausesValidation = false;
+			$this->btnCompleteShipment->CausesValidation = true;
 			QApplication::AuthorizeControl($this->objShipment, $this->btnCompleteShipment, 2);
 		}
 		
 		// Create and Setup btnCancelShipment
 		protected function btnCancelShipment_Create() {
-			$this->btnCancelShipment = new QButton($this->pnlCompleteShipment);
+			$this->btnCancelShipment = new QButton($this);
 			$this->btnCancelShipment->Text = 'Cancel Shipment';
 			$this->btnCancelShipment->AddAction(new QClickEvent(), new QConfirmAction(sprintf(QApplication::Translate('Are you SURE you want to CANCEL this %s?'), 'Shipment')));
 			$this->btnCancelShipment->AddAction(new QClickEvent(), new QServerAction('btnCancelShipment_Click'));
@@ -1383,7 +1408,7 @@
 		
 		// Setup btnSave
 		protected function btnSave_Create() {
-			$this->btnSave = new QButton($this->pnlShippingInfo);
+			$this->btnSave = new QButton($this);
 			$this->btnSave->Text = QApplication::Translate('Save');
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->PrimaryButton = true;
@@ -1393,7 +1418,7 @@
 		
 		// Setup btnEdit
 		protected function btnEdit_Create() {
-			$this->btnEdit = new Qbutton($this->pnlShippingInfo);
+			$this->btnEdit = new Qbutton($this);
 			$this->btnEdit->Text = 'Edit';
 			$this->btnEdit->AddAction(new QClickEvent(), new QAjaxAction('btnEdit_Click'));
 			$this->btnEdit->CausesValidation = false;
@@ -1402,7 +1427,7 @@
 
 		// Setup btnCancel
 		protected function btnCancel_Create() {
-			$this->btnCancel = new QButton($this->pnlShippingInfo);
+			$this->btnCancel = new QButton($this);
 			$this->btnCancel->Text = QApplication::Translate('Cancel');
 			$this->btnCancel->AddAction(new QClickEvent(), new QAjaxAction('btnCancel_Click'));
 			$this->btnCancel->CausesValidation = false;
@@ -1411,18 +1436,18 @@
 		
 		// Setup AddAsset Button
 		protected function btnAddAsset_Create() {
-			$this->btnAddAsset = new QButton($this->pnlShippingInfo);
+			$this->btnAddAsset = new QButton($this);
 			$this->btnAddAsset->Text = 'AddAsset';
 			$this->btnAddAsset->AddAction(new QClickEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->btnAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->btnAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnAddAsset->CausesValidation = false;
-			$this->btnAddAsset->TabIndex=16;
+			$this->btnAddAsset->TabIndex=28;
 		}
 		
 		// Create the lookup button
 		protected function btnLookup_Create() {
-			$this->btnLookup = new QButton($this->pnlShippingInfo);
+			$this->btnLookup = new QButton($this);
 			$this->btnLookup->Text = 'Lookup';
 			$this->btnLookup->AddAction(new QClickEvent(), new QAjaxAction('btnLookup_Click'));
 			$this->btnLookup->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnLookup_Click'));
@@ -1432,7 +1457,7 @@
 		
 		// Setup Add Inventory Button
 		protected function btnAddInventory_Create() {
-			$this->btnAddInventory = new QButton($this->pnlShippingInfo);
+			$this->btnAddInventory = new QButton($this);
 			$this->btnAddInventory->Text = 'Add';
 			$this->btnAddInventory->AddAction(new QClickEvent(), new QAjaxAction('btnAddInventory_Click'));
 			$this->btnAddInventory->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddInventory_Click'));
@@ -1569,50 +1594,54 @@
 		}
 		
 		// This method is run when a Courier is selected
-		// Decides whether to enable the courier text box, loads the ShippingAccount list or enables the ShippingAccount text box.
+		// Decides whether to display tracking number text box and display the FedEx shipment panel
 		protected function lstCourier_Select() {
-			// If a value is selected (not including 'Other', where the value is null)
-			if ($this->lstCourier->SelectedValue) {
-				// Do not enable custom courier text box
-				$this->txtCourierOther->Text = '';
-				$this->txtCourierOther->Enabled = false;
-				// Reload the shipping account list box for only accounts for this courier
-				$SelectedShippingAccountId = $this->lstShippingAccount->SelectedValue;
-				$this->lstShippingAccount->RemoveAllItems();
-				if (!$this->blnEditMode) {
-					$this->lstShippingAccount->AddItem('- Select One -', null);
-				}
-				$objShippingAccountArray = ShippingAccount::LoadArrayByCourierId($this->lstCourier->SelectedValue, QQ::Clause(QQ::OrderBy(QQN::ShippingAccount()->ShortDescription)));
-				if ($objShippingAccountArray) foreach ($objShippingAccountArray as $objShippingAccount) {
-					$objListItem = new QListItem($objShippingAccount->__toString(), $objShippingAccount->ShippingAccountId);
-					if (($this->objShipment->ShippingAccount) && ($this->objShipment->ShippingAccount->ShippingAccountId == $objShippingAccount->ShippingAccountId))
-						$objListItem->Selected = true;
-					$this->lstShippingAccount->AddItem($objListItem);
-				}
-				// Setting the third parameter to true makes the item selected
-				// If 'Other' was already selected as the Shipping Account
-				if (!$SelectedShippingAccountId && $this->blnEditMode) {
-					$this->lstShippingAccount->AddItem('Other', null, true);
-				}
-				else {
-					$this->lstShippingAccount->AddItem('Other', null);
-				}
+			// If FedEx is selected (currently the only other choice is 'Other', where the value is null)
+			if ($this->lstCourier->SelectedValue === 1) {
+				// make sure tracking number text box is not displayed 
+				// FIXME: this is not currently done the "Qcodo way"
+				QApplication::ExecuteJavascript('document.getElementById("trackingNumber").style.display="none";');
+				
+				// Set the recipient phone if necessary
+				$this->lstToContact_Select();
+				
+				// Show the FedEx shipment panel
+				$this->pnlFedExShipment->Display = true;
+				
+			} else {
+				// Not FedEx so hide FedEx shipment panel and display tracking number text box
+				// FIXME: this is not currently done the "Qcodo way"
+				QApplication::ExecuteJavascript('document.getElementById("trackingNumber").style.display="";');
+				
+				// Hide FedEx shipment panel
+				$this->pnlFedExShipment->Display = false;
 			}
-			elseif ($this->lstCourier->SelectedName == 'Other') {
-				$this->txtCourierOther->Enabled = true;
-				$this->lstShippingAccount->RemoveAllItems();
-				if (!$this->blnEditMode) {
-					$this->lstShippingAccount->AddItem('- Select One -', null);
-				}
-				$this->lstShippingAccount->AddItem('Other', null, true);
-				$this->lstFxServiceType->RemoveAllItems();
-				$this->lstFxServiceType->Enabled = false;
-				$this->lstFxServiceType->Required = false;
-			}
-			$this->lstShippingAccount->Enabled = true;
-			$this->lstShippingAccount_Select();
 		}
-
+		
+		protected function lstFxServiceType_Select() {
+			// Reload lstPackageType
+			$strSelectedPackageType = ($this->lstPackageType->SelectedValue) ? $this->lstPackageType->SelectedValue : null;
+			$this->lstPackageType->RemoveAllItems();
+			$this->LoadPackageTypes();
+			if ($strSelectedPackageType)
+				$this->lstPackageType->SelectedValue = $strSelectedPackageType;
+			
+			
+			//Reload lstBillTransportationTo
+			$strSelectedBillTransportationTo = ($this->lstBillTransportationTo->SelectedName) ? $this->lstBillTransportationTo->SelectedName : null;
+			$this->lstBillTransportationTo->RemoveAllItems();
+			$this->LoadPayTypes();
+			if ($strSelectedBillTransportationTo) {
+				// FIXME: when Qcodo supports setting SelectedName, we can simplify this code
+				for ($i=0; $i < $this->lstBillTransportationTo->ItemCount; $i++) {
+					$objListItem = $this->lstBillTransportationTo->GetItem($i);
+					if ($objListItem->Name == $strSelectedBillTransportationTo) {
+						$objListItem->Selected = true;
+					}
+				}
+			}
+		}
+		
 		protected function lstFxServiceType_Update() {
 			
 			$this->lstFxServiceType->RemoveAllItems();
@@ -1658,7 +1687,7 @@
 			else {
 				$this->lblToAddressFull->Text = '';
 			}
-			$this->lstFxServiceType_Update();
+			//$this->lstFxServiceType_Update();
 		}
 		
 		// Enables/Disables the ShippingAccountOther text box when a choice is selected from the listbox
@@ -1705,6 +1734,21 @@
 			  $this->calShipDate->MinimumYear = $this->dttNow->Year;
 			  $this->calShipDate->MinimumMonth = $this->dttNow->Month;
 			  $this->calShipDate->MinimumDay = $this->dttNow->Day;
+			}
+		}
+		
+		// Switches between displaying Sender Account or Recipient/third party account inputs
+		protected function lstBillTransportationTo_Select() {
+			if ($this->lstBillTransportationTo->SelectedValue) {
+				if ($this->lstBillTransportationTo->SelectedValue === 1) {
+					$this->lstShippingAccount->Display=TRUE;
+					$this->txtRecipientThirdPartyAccount->Display=FALSE;
+					$this->lblSenderLabel->Text = 'Sender Account';
+				} else {
+					$this->lstShippingAccount->Display=FALSE;
+					$this->txtRecipientThirdPartyAccount->Display=TRUE;
+					$this->lblSenderLabel->Text = 'Recipient/third party<br>account #';					
+				}
 			}
 		}
 		
@@ -2017,35 +2061,32 @@
 				$blnError = true;
 				$this->btnCompleteShipment->Warning = 'There are no assets or inventory in this shipment.';
 			}
-
-			//if (!$this->lstPackageType->SelectedValue) {
-			//	$blnError = true;
-			//	$this->lstPackageType->Warning = "Please select a package type.";
-			//}
-			if (!$this->txtPackageWeight->Text) {
-				$blnError = true;
-				$this->txtPackageWeight->Warning = "Please enter a weight for this package.";
-			}
-			if (!$this->lstWeightUnit->SelectedValue) {
-				$blnError = true;
-				$this->lstWeightUnit->Warning = "Please select a weight unit.";
-			}
-			if (!$this->txtValue->Text) {
-				$blnError = true;
-				$this->txtValue->Warning = "Please enter a value.";
-			}
-			if (!$this->lstCurrencyUnit->SelectedValue) {
-				$blnError = true;
-				$this->lstCurrencyUnit->Warning = "Please select a currency type.";
-			}
 			
-			if(!$blnError && $this->objShipment->CourierId == 1) {
-				if ($this->FedEx()) {
-					$blnError = false;
-				}
-				else {
+			// If Courier is Fedex, validate Fedex inputs
+			if ($this->objShipment->CourierId === 1) {
+				if (!$this->lstPackageType->SelectedValue) {
 					$blnError = true;
+					$this->lblPackageType->Warning = "Please select a package type.";
+					$this->lstPackageType->Warning = "Please select a package type.";
 				}
+				if (!$this->txtPackageWeight->Text) {
+					$blnError = true;
+					$this->lblPackageWeight->Warning = "Please enter a weight for this package.";
+					$this->txtPackageWeight->Warning = "Please enter a weight for this package.";
+				}
+				
+				//if (!$this->lstWeightUnit->SelectedValue) {
+				//	$blnError = true;
+				//	$this->lstWeightUnit->Warning = "Please select a weight unit.";
+				//}
+				//if (!$this->txtValue->Text) {
+				//	$blnError = true;
+				//	$this->txtValue->Warning = "Please enter a value.";
+				//}
+				//if (!$this->lstCurrencyUnit->SelectedValue) {
+				//	$blnError = true;
+				//	$this->lstCurrencyUnit->Warning = "Please select a currency type.";
+				//}
 			}
 			
 			if (!$blnError) {
@@ -2055,7 +2096,41 @@
 					$objDatabase = QApplication::$Database[1];
 					// Begin a MySQL Transaction to be either committed or rolled back
 					$objDatabase->TransactionBegin();
-				
+					
+					if (!$this->blnEditMode) {
+						// this is a new shipment so save the transaction & shipment before completing
+						
+						// Create the new transaction object and save it
+						$this->objTransaction = new Transaction();
+						$this->objTransaction->EntityQtypeId = $intEntityQtypeId;
+						$this->objTransaction->TransactionTypeId = 6;
+						$this->objTransaction->Note = $this->txtNote->Text;
+						$this->objTransaction->Save();
+					
+						$this->UpdateShipmentFields();
+						$this->objShipment->Save();
+						
+						// If the courier is FedEx, create new fedexShipment
+						if ($this->lstCourier->SelectedValue === 1) {
+							$this->objFedexShipment = new FedexShipment();
+							$this->objFedexShipment->Shipment = $this->objShipment;
+							$this->UpdateFedexFields();
+							$this->objFedexShipment->Save();
+						}					
+					}
+					
+					// If courier is FedEx, initiate communication with FedEx
+					if(!$blnError && $this->objShipment->CourierId == 1) {
+						if ($this->FedEx()) {
+							$blnError = false;
+						}
+						else {
+							$blnError = true;
+							$objDatabase->TransactionRollback();
+							return;
+						}	
+					}
+							
 					if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
 						
 						$objTransaction = '';
@@ -2070,7 +2145,10 @@
 								
 								$objAssetTransaction->Asset->LocationId = $DestinationLocationId;
 								$objAssetTransaction->Asset->Save();
-								
+								if (!$this->blnEditMode) {
+									// Assign the TransactionId
+									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
+								}
 								$objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 								$objAssetTransaction->Save();
 								
@@ -2132,7 +2210,15 @@
 						}
 					}
 					
-					$this->UpdateCompleteShipmentFields();
+					if ($this->blnEditMode) {
+						$this->UpdateShipmentFields();
+						if ($this->objShipment->CourierId === 1)
+							$this->UpdateFedexFields();
+					} else if ($this->objShipment->CourierId === 1) {
+						// Update $this->objShipment with FedEx tracking number
+						$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
+					}
+					
 					$this->objShipment->ShippedFlag = true;
 					// $this->objShipment->Save(false, true);
 					$this->objShipment->Save();
@@ -2409,7 +2495,15 @@
 						$this->UpdateShipmentFields();
 						$this->objShipment->ShippedFlag = false;
 						$this->objShipment->Save();
-						
+				
+						// If the courier is FedEx, create new fedexShipment
+						if ($this->lstCourier->SelectedValue === 1) {
+							$this->objFedexShipment = new FedexShipment();
+							$this->objFedexShipment->Shipment = $this->objShipment;
+							$this->UpdateFedexFields();
+							$this->objFedexShipment->Save();
+						}
+								
 						$objDatabase->TransactionCommit();
 						QApplication::Redirect('shipment_list.php');
 					}
@@ -2546,6 +2640,26 @@
 						$this->UpdateShipmentFields();
 						// $this->objShipment->Save(false, true);
 						$this->objShipment->Save();
+						
+						// If the courier is FedEx, save the fedexShipment
+						if ($this->lstCourier->SelectedValue === 1) {
+							if ($this->objFedexShipment) {
+								// FedexShipment already exists, so update it
+								$this->UpdateFedexFields();
+								$this->objFedexShipment->Save();
+							} else {
+								// FedexShipment doesn't exist yet, so create it
+								$this->objFedexShipment = new FedexShipment();
+								$this->objFedexShipment->Shipment = $this->objShipment;
+								$this->UpdateFedexFields();
+								$this->objFedexShipment->Save();
+							}
+						} else if ($this->objFedexShipment) {
+							// FedexShipment exists - delete it because the selected courier is no longer FedEx
+							$this->objFedexShipment->Delete();
+							$this->objFedexShipment = null;
+						}
+						
 						$objDatabase->TransactionCommit();
 						$this->UpdateShipmentLabels();
 						$this->SetupShipment();
@@ -2641,8 +2755,15 @@
 		// Protected Update Methods
 		// This assigns the new values to the Shipment Object
 		protected function UpdateShipmentFields() {
-			$this->objShipment->TransactionId = $this->objTransaction->TransactionId;
+			if (!$this->blnEditMode) {
+				$this->objShipment->TransactionId = $this->objTransaction->TransactionId;
+			}
+			
 			if ($this->blnEditMode) {
+				if (!$this->objTransaction) {
+					$this->objTransaction = Transaction::Load($this->objShipment->TransactionId);
+				}
+				$this->objShipment->Transaction = $this->objTransaction;
 				$this->objShipment->ShipmentNumber = $this->lblShipmentNumber->Text;
 			}
 			else {
@@ -2655,13 +2776,10 @@
 			$this->objShipment->FromAddressId = $this->lstFromAddress->SelectedValue;
 			$this->objShipment->ToCompanyId = $this->lstToCompany->SelectedValue;
 			$this->objShipment->ToAddressId = $this->lstToAddress->SelectedValue;
-			$this->objShipment->ToPhone = $this->txtToPhone->Text;
 			$this->objShipment->CourierId = $this->lstCourier->SelectedValue;
-			$this->objShipment->CourierOther = $this->txtCourierOther->Text;
-			$this->objShipment->ShippingAccountId = $this->lstShippingAccount->SelectedValue;
-			$this->objShipment->ShippingAccountOther = $this->txtShippingAccountOther->Text;
-			$this->objShipment->Reference = $this->txtReference->Text;
-			$this->objShipment->FedexServiceTypeId = $this->lstFxServiceType->SelectedValue;
+			//if (!$this->lstCourier->SelectedValue) {
+				$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
+			//}
 			
 			// Reload the Assets and inventory locations so that they don't trigger an OLE if completing the shipment without reloading after adding an asset or inventory.
 			if ($this->objAssetTransactionArray) {
@@ -2688,33 +2806,56 @@
 			$this->lstToCompany_Select();
 			$this->lstToAddress->SelectedValue = $this->objShipment->ToAddressId;
 			$this->lstToAddress_Select();
-			$this->txtToPhone->Text = $this->objShipment->ToPhone;
 			$this->lstCourier->SelectedValue = $this->objShipment->CourierId;
 			$this->lstCourier_Select();
-			$this->txtCourierOther->Text = $this->objShipment->CourierOther;
-			$this->lstShippingAccount->SelectedValue = $this->objShipment->ShippingAccountId;
-			$this->lstShippingAccount_Select();
-			$this->txtShippingAccountOther->Text = $this->objShipment->ShippingAccountOther;
-			$this->txtReference->Text = $this->objShipment->Reference;
+			$this->txtTrackingNumber->Text = $this->objShipment->TrackingNumber;
 			$this->txtNote->Text = $this->objShipment->Transaction->Note;
-			$this->lstFxServiceType->SelectedValue = $this->objShipment->FedexServiceTypeId;
+			if ($this->objFedexShipment) {
+				$this->txtToPhone->Text = $this->objFedexShipment->ToPhone;
+				$this->lstBillTransportationTo->SelectedValue = $this->objFedexShipment->PayType;
+				$this->lstShippingAccount->SelectedValue = $this->objFedexShipment->ShippingAccountId;
+				$this->txtRecipientThirdPartyAccount->Text = $this->objFedexShipment->PayerAccountNumber;
+				$this->txtReference->Text = $this->objFedexShipment->Reference;
+				$this->lstFxServiceType->SelectedValue = $this->objFedexShipment->FedexServiceTypeId;
+				$this->lstPackageType->SelectedValue = $this->objFedexShipment->PackageTypeId;
+				$this->txtPackageWeight->Text = $this->objFedexShipment->PackageWeight;
+				$this->lstWeightUnit->SelectedValue = $this->objFedexShipment->WeightUnitId;
+				$this->txtPackageLength->Text = $this->objFedexShipment->PackageLength;
+				$this->txtPackageWidth->Text = $this->objFedexShipment->PackageWidth;
+				$this->txtPackageHeight->Text = $this->objFedexShipment->PackageHeight;
+				$this->lstLengthUnit->SelectedValue = $this->objFedexShipment->LengthUnitId;
+				$this->txtValue->Text = $this->objFedexShipment->DeclaredValue;
+				$this->lstCurrencyUnit->SelectedValue = $this->objFedexShipment->CurrencyUnitId;
+				$this->chkNotificationFlag->Checked = $this->objFedexShipment->NotificationFlag;
+			}
 		}
 		
-		// Update Complete Shipment Information
-		// Assigns Complete Shipment values to the Shipment Object
-		protected function UpdateCompleteShipmentFields() {
-			$this->objShipment->PackageTypeId = $this->lstPackageType->SelectedValue;
-			$this->objShipment->PackageWeight = $this->txtPackageWeight->Text;
-			$this->objShipment->WeightUnitId = $this->lstWeightUnit->SelectedValue;
-			$this->objShipment->PackageLength = $this->txtPackageLength->Text;
-			$this->objShipment->PackageWidth = $this->txtPackageWidth->Text;
-			$this->objShipment->PackageHeight = $this->txtPackageHeight->Text;
-			$this->objShipment->LengthUnitId = $this->lstLengthUnit->SelectedValue;
-			// Strip any commas or dollar signs from the declared value field
-			$this->objShipment->Value = str_ireplace("$", "", str_ireplace(",", "", $this->txtValue->Text));
-			$this->objShipment->CurrencyUnitId = $this->lstCurrencyUnit->SelectedValue;
-			$this->objShipment->NotificationFlag = $this->chkNotificationFlag->Checked;
-			$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
+		// Update FedEx Shipment Information
+		// Assigns new values to the fedexShipment object
+		protected function UpdateFedexFields() {
+			$this->objFedexShipment->ToPhone = $this->txtToPhone->Text;
+			$this->objFedexShipment->PayType = $this->lstBillTransportationTo->SelectedValue;
+			
+			if ($this->lstBillTransportationTo->SelectedValue === 1) {
+				$this->objFedexShipment->ShippingAccountId = $this->lstShippingAccount->SelectedValue;
+				$this->objFedexShipment->PayerAccountNumber = null;
+			} else {
+				$this->objFedexShipment->PayerAccountNumber = $this->txtRecipientThirdPartyAccount->Text;
+				$this->objFedexShipment->ShippingAccountId = null;
+			}
+			
+			$this->objFedexShipment->Reference = $this->txtReference->Text;
+			$this->objFedexShipment->FedexServiceTypeId = $this->lstFxServiceType->SelectedValue;
+			$this->objFedexShipment->PackageTypeId = $this->lstPackageType->SelectedValue;
+			$this->objFedexShipment->PackageWeight = $this->txtPackageWeight->Text;
+			$this->objFedexShipment->WeightUnitId = $this->lstWeightUnit->SelectedValue;
+			$this->objFedexShipment->PackageLength = $this->txtPackageLength->Text;
+			$this->objFedexShipment->PackageWidth = $this->txtPackageWidth->Text;
+			$this->objFedexShipment->PackageHeight = $this->txtPackageHeight->Text;
+			$this->objFedexShipment->LengthUnitId = $this->lstLengthUnit->SelectedValue;
+			$this->objFedexShipment->DeclaredValue = $this->txtValue->Text;
+			$this->objFedexShipment->CurrencyUnitId = $this->lstCurrencyUnit->SelectedValue;
+			$this->objFedexShipment->NotificationFlag = $this->chkNotificationFlag->Checked;
 		}
 		
 		// Load the Package Type options for the Shipment
@@ -2725,13 +2866,23 @@
 		
 				// FedexServiceTypeId 6 = 'FedEx Ground', PackageTypeId 1 = 'Other Packaging'
 				// For FedEx Ground shipments, allow only 'Other Packaging'
-				if ($this->objShipment->FedexServiceTypeId == 6 && $objPackageType->PackageTypeId !== 1) {
+				if ($this->lstFxServiceType->SelectedValue == 6 && $objPackageType->PackageTypeId !== 1) {
 					continue;
 				}
 				$objListItem = new QListItem($objPackageType->__toString(), $objPackageType->PackageTypeId);
-				if (($this->objShipment->PackageType) && ($this->objShipment->PackageType->PackageTypeId == $objPackageType->PackageTypeId))
+				
+				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->PackageType) && ($this->objFedexShipment->PackageType->PackageTypeId == $objPackageType->PackageTypeId))
 					$objListItem->Selected = true;
 				$this->lstPackageType->AddItem($objListItem);
+			}
+		}
+		
+		// Load the Pay Type options for the Shipment
+		protected function LoadPayTypes() {
+			$objPayTypeArray = ($this->lstFxServiceType->SelectedValue == 6) ? FedExDC::get_ground_pay_types() : FedExDC::get_express_pay_types();
+			if ($objPayTypeArray) foreach ($objPayTypeArray as $key => $value) {
+				$objListItem = new QListItem($value, $key);
+				$this->lstBillTransportationTo->AddItem($objListItem);
 			}
 		}
 		
@@ -2760,15 +2911,17 @@
 			
 			// create new FedExDC object
 			// $fed = new FedExDC($this->objShipment->ShippingAccount->Value, $this->objShipment->FedexMeterNumber);
-			if ($this->objShipment->ShippingAccountId) {
-				$fed = new FedExDC($this->objShipment->ShippingAccount->Value, QApplication::$TracmorSettings->FedexMeterNumber);
+			if ($this->objFedexShipment->ShippingAccountId) {
+				$fed = new FedExDC($this->objFedexShipment->ShippingAccount->AccessId, $this->objFedexShipment->ShippingAccount->AccessCode);
 			}
 			else {
-				$fed = new FedExDC($this->objShipment->ShippingAccountOther, QApplication::$TracmorSettings->FedexMeterNumber);
+				// if not billing to a sender account, use the default fedex account from admin_setting for FedEx communication
+				$objFedexAccount = ShippingAccount::Load(QApplication::$TracmorSettings->FedexAccountId);
+				$fed = new FedExDC($objFedexAccount->AccessId, $objFedexAccount->AccessCode);
 			}
 			
-			if ($this->objShipment->ToPhone) {
-				$strRecipientPhone = $this->objShipment->ToPhone;
+			if ($this->objFedexShipment->ToPhone) {
+				$strRecipientPhone = $this->objFedexShipment->ToPhone;
 			}
 			else {
 				$strRecipientPhone = '';
@@ -2827,11 +2980,14 @@
 						57 => round($this->txtPackageHeight->Text,0),									//Package Height
 						58 => round($this->txtPackageWidth->Text,0),									//Package Width
 						59 => round($this->txtPackageLength->Text,0),									//Package Length
-						23 => '1',																		//Recipient Pay Type ; 1 = Bill Sender (prepaid)
+						23 => $this->lstBillTransportationTo->SelectedValue,							//Recipient Pay Type
+						20 => ($this->lstBillTransportationTo->SelectedValue !== 1) ? 					//Payer Account Number
+							  $this->txtRecipientThirdPartyAccount->Text : 
+							  '', 
 						75 => strtoupper($fxWeightUnit->ShortDescription),								//Weight Units
 						1116 => strtoupper(substr($fxLengthUnitShortDescription,0,1)),					//Volume Units
 						1273 => $fxPackageType->Value,													//Packaging Type ; 01 = Customer Packaging
-						1274 => $this->objShipment->FedexServiceType->Value,							//Service Type ; 01 = Fedex Priority
+						1274 => $this->objFedexShipment->FedexServiceType->Value,						//Service Type ; 01 = Fedex Priority
 						1333 => '1',																	//Drop off Type ; 1 = Regular Pickup
 						1368 => 2,																		//Label Type ; 2 = 2D Common
 						1369 => 1,																		//Label Printer Type ; 1 = Laser Printer
@@ -2849,11 +3005,11 @@
 						79 => '',																		//Description of Contents
 						80 => '',																		//Country of Manufacture
 						24 => $shipdate,																//Ship Date
-						1119 => 'Y',																		//Future Shipment Date Flag
-						25 => $this->objShipment->Reference					// Customer Reference
+						1119 => 'Y',																	//Future Shipment Date Flag
+						25 => $this->objFedexShipment->Reference										// Customer Reference
 				);
 
-			if($this->objShipment->FedexServiceType->Value	== '92')
+			if($this->objFedexShipment->FedexServiceType->Value	== '92')
 			{	
 				$ship_Ret = $fed->ground_ship($fdx_arr);
 			}
@@ -2932,29 +3088,46 @@
 			$this->lstFromAddress->Display = false;
 			$this->lstToCompany->Display = false;
 			$this->lstToContact->Display = false;
-			$this->txtToPhone->Display = false;
 			$this->lstToAddress->Display = false;
 			$this->lblToAddressFull->Display = false;
 			$this->lstCourier->Display = false;
-			$this->lstFxServiceType->Display = false;
-			$this->txtCourierOther->Display = false;
-			$this->lstShippingAccount->Display = false;
-			$this->txtShippingAccountOther->Display = false;
-			$this->txtReference->Display = false;
 			$this->txtNote->Display = false;
+			$this->txtTrackingNumber->Display = false;
 			$this->txtNewAssetCode->Display = false;
+			$this->btnAddAsset->Display = false;
+			$this->btnLookup->Display = false;
+			$this->btnAddInventory->Display = false;
+			$this->txtNewInventoryModelCode->Display = false;
+			$this->lstSourceLocation->Display = false;
+			$this->txtQuantity->Display = false;
+			$this->txtToPhone->Display = false;
+			$this->lstBillTransportationTo->Display = false;
+			$this->lstShippingAccount->Display = false;
+			$this->txtRecipientThirdPartyAccount->Display = false;
+			$this->txtReference->Display = false;
+			$this->lstFxServiceType->Display = false;
+			$this->lstPackageType->Display = false;
+			$this->txtPackageWeight->Display = false;
+			$this->lstWeightUnit->Display = false;
+			$this->txtPackageLength->Display = false;
+			$this->txtPackageWidth->Display = false;
+			$this->txtPackageHeight->Display = false;
+			$this->lstLengthUnit->Display = false;
+			$this->txtValue->Display = false;
+			$this->lstCurrencyUnit->Display = false;
+			
+			// Disable (instead of hiding) chkNotificationFlag
+			$this->chkNotificationFlag->Enabled = false;
+			
 			if ($this->lblAdvanced->Text == 'Hide Advanced') {
 				$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
 			}
-			$this->lblAdvanced->Display = false;
-			$this->btnAddAsset->Display = false;
-			$this->txtNewInventoryModelCode->Display = false;
-			$this->btnLookup->Display = false;
-			$this->lstSourceLocation->Display = false;
-			$this->txtQuantity->Display = false;
-			$this->btnAddInventory->Display = false;
-			$this->btnSave->Display = false;
-			$this->btnCancel->Display = false;
+			
+			if (!$this->objShipment->ShippedFlag) {
+				$this->lblAdvanced->Display = false;
+				$this->btnSave->Display = false;
+				$this->btnCancel->Display = false;
+			}
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->RemoveColumnByName('Action');
 				$this->dtgInventoryTransact->RemoveColumnByName('Action');
@@ -2967,19 +3140,28 @@
 			$this->lblFromAddress->Display = true;
 			$this->lblToCompany->Display = true;
 			$this->lblToContact->Display = true;
-			$this->lblToPhone->Display = true;
 			$this->lblToAddress->Display = true;
 			$this->lblCourier->Display = true;
-			$this->lblShippingAccount->Display = true;
-			if ($this->lblFxServiceType->Text != '') {
-				$this->lblFxServiceType->Display = true;
-			}
-			else {
-				$this->lblFxServiceType->Display = false;
-			}
-			$this->lblReference->Display = true;
 			$this->pnlNote->Display = true;
-			$this->btnEdit->Display = true;
+			$this->lblTrackingNumber->Display = true;
+			$this->lblToPhone->Display = true;
+			$this->lblBillTransportationTo->Display = true;
+			$this->lblPayerAccount->Display = true;
+			$this->lblReference->Display = true;
+			$this->lblFxServiceType->Display = true;
+			$this->lblPackageType->Display = true;
+			$this->lblPackageWeight->Display = true;
+			$this->lblPackageLength->Display = true;
+			$this->lblPackageWidth->Display = true;
+			$this->lblPackageHeight->Display = true;
+			$this->lblValue->Display = true;
+			$this->lblWeightUnit->Display = true;
+			$this->lblLengthUnit->Display = true;
+			$this->lblCurrencyUnit->Display = true;
+			
+			if (!$this->objShipment->ShippedFlag) {
+				$this->btnEdit->Display = true;
+			}
 			// This is not necessary, because this method is only being called in EditMode
 			if ($this->blnEditMode) {
 				$this->btnCompleteShipment->Enabled = true;
@@ -2994,24 +3176,28 @@
 			$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toString();
 			$this->lblToCompany->Text = $this->objShipment->ToCompany->__toString();
 			$this->lblToContact->Text = $this->objShipment->ToContact->__toString();
-			$this->lblToPhone->Text = $this->objShipment->ToPhone;
 			$this->lblToAddress->Text = $this->objShipment->ToAddress->__toString();
-			if ($this->objShipment->CourierId) {
-				$this->lblCourier->Text = $this->objShipment->Courier->__toString();
-			}
-			$this->lblCourier->Text = $this->objShipment->CourierOther;
-			if ($this->objShipment->ShippingAccountId) {
-				$this->lblShippingAccount->Text = $this->objShipment->ShippingAccount->__toString();
-			}
-			$this->lblShippingAccount->Text = $this->objShipment->ShippingAccountOther;
-			if ($this->objShipment->FedexServiceTypeId) {
-				$this->lblFxServiceType->Text = $this->objShipment->FedexServiceType->__toString();
-			}
-			else {
-				$this->lblFxServiceType->Text = '';
-			}
-			$this->lblReference->Text = $this->objShipment->Reference;
+			$this->lblCourier->Text = ($this->objShipment->CourierId) ? $this->objShipment->Courier->__toString() : "Other";
+			$this->lblTrackingNumber->Text = $this->objShipment->__toStringTrackingNumber();
 			$this->pnlNote->Text = nl2br($this->objShipment->Transaction->Note);
+			
+			if ($this->objFedexShipment) {
+				$this->lblToPhone->Text = $this->objFedexShipment->ToPhone;
+				$this->lblBillTransportationTo->Text = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::ground_pay_type($this->objFedexShipment->PayType) : FedExDC::express_pay_type($this->objFedexShipment->PayType);
+				$this->lblPayerAccount->Text = ($this->objFedexShipment->PayType === 1) ? $this->objFedexShipment->ShippingAccount->__toString() : $this->objFedexShipment->PayerAccountNumber;
+				$this->lblReference->Text = $this->objFedexShipment->Reference;
+				$this->lblFxServiceType->Text = ($this->objFedexShipment->FedexServiceType) ? $this->objFedexShipment->FedexServiceType->__toString() : '';
+				$this->lblPackageType->Text = ($this->objFedexShipment->PackageType) ? $this->objFedexShipment->PackageType->__toString() : '';
+				$this->lblPackageWeight->Text = $this->objFedexShipment->PackageWeight;
+				$this->lblPackageLength->Text = $this->objFedexShipment->PackageLength;
+				$this->lblPackageWidth->Text = $this->objFedexShipment->PackageWidth;
+				$this->lblPackageHeight->Text = $this->objFedexShipment->PackageHeight;
+				$this->lblValue->Text = $this->objFedexShipment->DeclaredValue;
+				$this->lblWeightUnit->Text = $this->objFedexShipment->WeightUnit->__toString();
+				$this->lblLengthUnit->Text = $this->objFedexShipment->LengthUnit->__toString();
+				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
+			}
+			
 		}		
 		
 		protected function DisplayInputs() {
@@ -3023,17 +3209,28 @@
 			$this->lblFromAddress->Display = false;
 			$this->lblToCompany->Display = false;
 			$this->lblToContact->Display = false;
-			$this->lblToPhone->Display = false;
 			$this->lblToAddress->Display = false;
 			$this->lblCourier->Display = false;
-			$this->lblShippingAccount->Display = false;
-			$this->lblFxServiceType->Display = false;
-			$this->lblReference->Display = false;
 			$this->pnlNote->Display = false;
+			$this->lblTrackingNumber->Display = false;
 			$this->btnEdit->Display = false;
+			$this->lblToPhone->Display = false;
+			$this->lblBillTransportationTo->Display = false;
+			$this->lblPayerAccount->Display = false;
+			$this->lblReference->Display = false;
+			$this->lblFxServiceType->Display = false;
+			$this->lblPackageType->Display = false;
+			$this->lblPackageWeight->Display = false;
+			$this->lblPackageLength->Display = false;
+			$this->lblPackageWidth->Display = false;
+			$this->lblPackageHeight->Display = false;
+			$this->lblValue->Display = false;
+			$this->lblWeightUnit->Display = false;
+			$this->lblLengthUnit->Display = false;
+			$this->lblCurrencyUnit->Display = false;
 			if ($this->blnEditMode) {
 				$this->btnCompleteShipment->Enabled = false;
-			}			
+			}
 			
 			// Show Inputs
 			$this->calShipDate->Display = true;
@@ -3042,17 +3239,11 @@
 			$this->lstFromAddress->Display = true;
 			$this->lstToCompany->Display = true;
 			$this->lstToContact->Display = true;
-			$this->txtToPhone->Display = true;
 			$this->lstToAddress->Display = true;
 			$this->lblToAddressFull->Display = true;
 			$this->lstCourier->Display = true;
-			$this->lstFxServiceType_Update();
-			$this->lstFxServiceType->Display = true;			
-			$this->txtCourierOther->Display = true;
-			$this->lstShippingAccount->Display = true;
-			$this->txtShippingAccountOther->Display = true;
-			$this->txtReference->Display = true;
 			$this->txtNote->Display = true;
+			$this->txtTrackingNumber->Display = true;
 			$this->txtNewAssetCode->Display = true;
 			$this->lblAdvanced->Display = true;
 			$this->btnAddAsset->Display = true;
@@ -3063,6 +3254,28 @@
 			$this->btnAddInventory->Display = true;
 			$this->btnSave->Display = true;
 			$this->btnCancel->Display = true;
+			$this->txtToPhone->Display = true;
+			if ($this->lstBillTransportationTo->SelectedValue === 1) {
+				$this->lstShippingAccount->Display = true;
+			} else if ($this->blnEditMode) {
+				$this->txtRecipientThirdPartyAccount->Display = true;
+			}
+			$this->lstBillTransportationTo->Display = true;
+			$this->txtReference->Display = true;
+			$this->lstFxServiceType->Display = true;
+			$this->lstPackageType->Display = true;
+			$this->txtPackageWeight->Display = true;
+			$this->lstWeightUnit->Display = true;
+			$this->txtPackageLength->Display = true;
+			$this->txtPackageWidth->Display = true;
+			$this->txtPackageHeight->Display = true;
+			$this->lstLengthUnit->Display = true;
+			$this->txtValue->Display = true;
+			$this->lstCurrencyUnit->Display = true;
+			
+			// Enable chkNotificationFlag (because it's disabled, not hidden)
+			$this->chkNotificationFlag->Enabled = true;
+			
 			if ($this->blnEditMode) {
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));

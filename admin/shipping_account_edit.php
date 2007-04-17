@@ -71,18 +71,38 @@
 			$this->txtShortDescription->CausesValidation = true;
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		}		
+		}
 		
-		// Create and Setup txtValue
+		// Create and Setup lstCourier
+		// (modified to select FedEx when it's the only available option)
+		protected function lstCourier_Create() {
+			parent::lstCourier_Create();
+			if (!$this->blnEditMode && $this->lstCourier->ItemCount == 2)
+				$this->lstCourier->GetItem(1)->Selected = TRUE;
+		}
+		
+		// Create and Setup txtAccessId
 		// Overridden because we want to name it 'Account Number' 
-		protected function txtValue_Create() {
-			$this->txtValue = new QTextBox($this);
-			$this->txtValue->Name = QApplication::Translate('Account Number');
-			$this->txtValue->Text = $this->objShippingAccount->Value;
-			$this->txtValue->Required = true;
-			$this->txtValue->CausesValidation = true;
-			$this->txtValue->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtValue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		protected function txtAccessId_Create() {
+			$this->txtAccessId = new QTextBox($this);
+			$this->txtAccessId->Name = QApplication::Translate('Account Number');
+			$this->txtAccessId->Text = $this->objShippingAccount->AccessId;
+			$this->txtAccessId->Required = true;
+			$this->txtAccessId->CausesValidation = true;
+			$this->txtAccessId->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->txtAccessId->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		// Create and Setup txtAccessCode
+		// Overridden because we want to name it 'Meter Number' 
+		protected function txtAccessCode_Create() {
+			$this->txtAccessCode = new QTextBox($this);
+			$this->txtAccessCode->Name = QApplication::Translate('Meter Number');
+			$this->txtAccessCode->Text = $this->objShippingAccount->AccessCode;
+			$this->txtAccessCode->Required = true;
+			$this->txtAccessCode->CausesValidation = true;
+			$this->txtAccessCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->txtAccessCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
 		// Setup btnSave

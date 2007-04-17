@@ -89,7 +89,32 @@ class FedExTags {
         '90' => 'Ground Home Delivery',
         '92' => 'Ground Business Delivery'
     );
+    
+    /**
+    *  A List of FedEx Express Pay Types
+    *
+    * @var      FE_PT
+    * @access   public
+    */
+    static protected $FE_PT = array (
+        '1' => 'Sender',
+        '2' => 'Recipient',
+        '3' => 'Third Party',
+    );    
 
+    /**
+    *  A List of FedEx Ground Pay Types
+    *
+    * @var      FG_PT
+    * @access   public
+    */
+    static protected $FG_PT = array (
+        '1' => 'Sender',
+        '2' => 'Collect',
+        '3' => 'Third Party',
+		'5' => 'Recipient'
+    );    
+    
     /**
     *  A list of all the FedEx tags.  An attempt to make items more human readable
     *
@@ -636,5 +661,54 @@ class FedExTags {
         }
     }
 
+    /**
+    * get array of Express pay types
+    *
+    * @return   string
+    * @access   public
+    */
+    static public function get_express_pay_types() {
+        return self::$FE_PT;
+    }    
+    
+    /**
+    * get array of Ground pay types
+    *
+    * @return   string
+    * @access   public
+    */
+    static public function get_ground_pay_types() {
+        return self::$FG_PT;
+    }
+    
+    /**
+    * get Ground pay type
+    *
+    * @param    string $tag
+    * @return   string
+    * @access   public
+    */
+    static public function ground_pay_type($in) {
+        foreach (self::$FG_PT as $key => $value) {
+            if ($key==$in) {
+                return $value;
+            }
+        }
+    }
+    
+    /**
+    * get Express pay type
+    *
+    * @param    string $tag
+    * @return   string
+    * @access   public
+    */
+    static public function express_pay_type($in) {
+        foreach (self::$FE_PT as $key => $value) {
+            if ($key==$in) {
+                return $value;
+            }
+        }
+    }
 }
 ?>

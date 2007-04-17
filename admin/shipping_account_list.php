@@ -48,6 +48,8 @@
 		protected $lstCompany;
 		protected $btnSave;
 		protected $btnNew;
+		protected $lstFedexAccount;
+		protected $btnFedexSave;
 		
 		protected function Form_Create() {
 			
@@ -60,6 +62,10 @@
 			
 			$this->btnNew_Create();
 			$this->dtgShippingAccount_Create();
+			
+			// Create FedEx Shipping Account Fields
+			$this->lstFedexAccount_Create();
+			$this->btnFedexSave_Create();
 		}
 		
 		protected function Form_PreRender() {
@@ -97,7 +103,7 @@
 		// Create and Setup lstCompany
 		protected function lstCompany_Create() {
 			$this->lstCompany = new QListBox($this);
-			$this->lstCompany->Name = QApplication::Translate('Shipping & Receiving Company:');
+			$this->lstCompany->Name = QApplication::Translate('Default Shipping & Receiving Company:');
 			$this->lstCompany->Required = false;
 			$this->lstCompany->AddItem('- Select One -', null);
 			$objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
@@ -111,6 +117,50 @@
 			$this->lstCompany->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->lstCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}		
+		
+		// Create and Setup lstFedexAccount
+		protected function lstFedexAccount_Create() {
+			$this->lstFedexAccount = new QListBox($this);
+			$this->lstFedexAccount->Name = QApplication::Translate('Default FedEx&reg; Integration Account:');
+			$this->lstFedexAccount->Required = false;
+			$this->lstFedexAccount->AddItem('- Select One -', null);
+			$objAccountArray = ShippingAccount::LoadArrayByCourierId(1);
+			if ($objAccountArray) foreach ($objAccountArray as $objAccount) {
+				$objListItem = new QListItem($objAccount->__toString(), $objAccount->ShippingAccountId);
+				if ((QApplication::$TracmorSettings->FedexAccountId) && (QApplication::$TracmorSettings->FedexAccountId == $objAccount->ShippingAccountId))
+					$objListItem->Selected = true;
+				$this->lstFedexAccount->AddItem($objListItem);
+			}
+			$this->lstFedexAccount->AddAction(new QChangeEvent(), new QAjaxAction('lstFedexAccount_Change'));
+			$this->lstFedexAccount->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnFedexSave_Click'));
+			$this->lstFedexAccount->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		// Create and Setup the Fedex Save button
+		protected function btnFedexSave_Create() {
+			$this->btnFedexSave = new QButton($this);
+			$this->btnFedexSave->Text = 'Save';
+			$this->btnFedexSave->AddAction(new QClickEvent(), new QAjaxAction('btnFedexSave_Click'));
+		}
+		
+		// Create and Setup btnFedexSave_Click
+		// Sets the FedEx Account setting in the AdminSetting table
+		protected function btnFedexSave_Click() {
+			$intAccountId = $this->lstFedexAccount->SelectedValue;
+			$objAccount = ShippingAccount::Load($intAccountId);
+			if (!$objAccount) {
+				$this->lstFedexAccount->Warning = "Not a valid FedEx Account.";
+			}
+			elseif (!$objAccount->AccessId || !$objAccount->AccessCode) {
+				$this->lstFedexAccount->Warning = "The FedEx Account must have a valid account number and meter number.";
+			}
+			else {
+			  // Altered $TracmorSettings __set() method so that just setting a value will save it in the database.
+				QApplication::$TracmorSettings->FedexAccountId = $intAccountId;
+				// Not really a warning, just need to display that it has been saved without changing pages.
+				$this->lstFedexAccount->Warning = "Saved";
+			}
+		}
 		
 		// Create/Setup the New button
 		protected function btnNew_Create() {
@@ -138,7 +188,7 @@
           
       $this->dtgShippingAccount->AddColumn(new QDataGridColumn('Account', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
       $this->dtgShippingAccount->AddColumn(new QDataGridColumn('Courier', '<?= $_ITEM->Courier->__toString() ?>', array('Width' => "200", 'OrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->Courier->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->Courier->ShortDescription, false), 'CssClass' => "dtg_column")));
-      $this->dtgShippingAccount->AddColumn(new QDataGridColumn('Account Number', '<?= $_ITEM->Value ?>', array('OrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->Value), 'ReverseOrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->Value, false), 'CssClass' => "dtg_column")));
+      $this->dtgShippingAccount->AddColumn(new QDataGridColumn('Account Number', '<?= $_ITEM->AccessId ?>', array('OrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->AccessId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->AccessId, false), 'CssClass' => "dtg_column")));
       
       $this->dtgShippingAccount->SortColumnIndex = 0;
     	$this->dtgShippingAccount->SortDirection = 0;
@@ -179,8 +229,12 @@
 		
 		// Erase the 'Saved' warning if a new company is selected
 		protected function lstCompany_Change() {
-			
 			$this->lstCompany->Warning = "";
+		}
+		
+		// Erase the 'Saved' warning if a new FedEx Account is selected
+		protected function lstFedexAccount_Change() {
+			$this->lstFedexAccount->Warning = "";
 		}
 		
 		protected function btnNew_Click() {

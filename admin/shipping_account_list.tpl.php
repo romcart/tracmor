@@ -42,9 +42,17 @@
 		<div class="title">Shipping/Receiving</div>	
 		<table>
 			<tr>
-				<td><?php $this->lstCompany->RenderDesigned() ?></td>
-				<td><?php $this->btnSave->Render() ?></td>
+				<td><?php $this->lstCompany->RenderDesigned(); ?></td>
+				<td><?php $this->btnSave->Render(); ?></td>
 			</tr>
+		</table>
+		<br class="item_divider" />
+		<div class="title">FedEx&reg; Shipping</div>	
+		<table>
+			<tr>
+				<td><?php $this->lstFedexAccount->RenderDesigned(); ?></td>
+				<td><?php $this->btnFedexSave->Render(); ?></td>
+			</tr>		
 		</table>
 		<br class="item_divider" />		
 		<div class="title"><?php _t('Shipping Accounts'); ?></div>		

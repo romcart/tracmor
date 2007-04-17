@@ -75,6 +75,20 @@
 			return $strToReturn;
 		}
 		
+		// Return the full address and company website URL in HTML format
+		// on four lines, e.g.:
+		// 4501 Mission Bay Dr.
+		// Suite 3G
+		// San Diego, CA 92109
+		// http://www.website.com
+		public function __toStringFullAddressWithWebsite($cssClass = null) {
+			$objCompany = Company::Load($this->CompanyId);
+			$strWebsite = $objCompany->Website;
+			$strToReturn = sprintf('%s<br>%s',$this->__toStringFullAddress(),$strWebsite);
+			
+			return $strToReturn;
+		}		
+		
 		public function __toStringStateProvinceAbbreviation() {
 			if ($this->StateProvinceId) {
 				$strToReturn = $this->StateProvince->Abbreviation;

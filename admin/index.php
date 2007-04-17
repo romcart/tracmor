@@ -29,7 +29,6 @@
 		
 		// Inputs
 		protected $txtMinAssetCode;
-		protected $txtFedexMeterNumber;
 		protected $txtImageUploadPrefix;
 		protected $txtFedexGatewayUri;
 		protected $txtFormStatePath;
@@ -44,7 +43,6 @@
 			
 			// Create Inputs
 			$this->txtMinAssetCode_Create();
-			$this->txtFedexMeterNumber_Create();
 			$this->txtImageUploadPrefix_Create();
 			$this->txtFedexGatewayUri_Create();
 			$this->txtFormStatePath_Create();
@@ -64,13 +62,6 @@
 			$this->txtMinAssetCode = new QTextBox($this);
 			$this->txtMinAssetCode->Name = 'Minimum Asset Code';
 			$this->txtMinAssetCode->Text = QApplication::$TracmorSettings->MinAssetCode;
-		}
-		
-		// Create and Setup the MinAssetCode Text Field
-		protected function txtFedexMeterNumber_Create() {
-			$this->txtFedexMeterNumber = new QTextBox($this);
-			$this->txtFedexMeterNumber->Name = 'Fedex Meter Number';
-			$this->txtFedexMeterNumber->Text = QApplication::$TracmorSettings->FedexMeterNumber;
 		}
 		
 		// Create and Setup the MinAssetCode Text Field
@@ -113,7 +104,6 @@
 		// Setting a TracmorSetting saves it to the database automagically because the __set() method has been altered
 		protected function btnSave_Click() {
 			QApplication::$TracmorSettings->MinAssetCode = $this->txtMinAssetCode->Text;
-			QApplication::$TracmorSettings->FedexMeterNumber = $this->txtFedexMeterNumber->Text;
 			QApplication::$TracmorSettings->ImageUploadPrefix = $this->txtImageUploadPrefix->Text;
 			QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
 			QApplication::$TracmorSettings->FormStatePath = $this->txtFormStatePath->Text;

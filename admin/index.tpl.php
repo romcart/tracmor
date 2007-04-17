@@ -59,10 +59,6 @@
 							<td class="record_field_edit"><?php $this->txtMinAssetCode->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Fedex Meter Number: </td>
-							<td class="record_field_edit"><?php $this->txtFedexMeterNumber->RenderWithError(); ?></td>
-						</tr>
-						<tr>
 							<td class="record_field_name">Image Upload Prefix: </td>
 							<td class="record_field_edit"><?php $this->txtImageUploadPrefix->RenderWithError(); ?></td>
 						</tr>
