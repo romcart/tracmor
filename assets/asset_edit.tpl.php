@@ -42,8 +42,6 @@
 		
 		<br class="item_divider" />
 		<br class="item_divider" />
-		<a href="asset_list.php">Asset List</a>
-		
 
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>

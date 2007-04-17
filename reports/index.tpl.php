@@ -27,22 +27,7 @@
 	$this->ctlHeaderMenu->Render();
 ?>
 <!-- End Header Menu -->
-<!-- Begin Shortcut Menu -->
-<?php
-	$this->ctlShortcutMenu->Render();
-?>
-<!-- End Shortcut Menu -->
-		</td>
-		<td>
-			<img src="../images/empty.gif" width="10">
-		</td>
-		<td width="100%" valign="top">
-		
-		<?php $this->ctlInventoryEdit->Render(); ?>
-		<?php $this->ctlInventoryTransact->Render(); ?>
-		
-		<br class="item_divider" />
-		<br class="item_divider" />
 
-	<?php $this->RenderEnd() ?>
-	<?php require_once('../includes/footer.inc.php'); ?>
+		
+<?php $this->RenderEnd() ?>		
+<?php require_once('../includes/footer.inc.php'); ?>

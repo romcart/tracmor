@@ -19,7 +19,24 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
  	
-	require_once('prepend.inc');
-	$curModule = "reports";
-	require_once('../includes/header_main.inc');
+	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
+	QApplication::Authenticate(7);
+	
+	class ReportIndexForm extends QForm {
+		// Header Menu
+		protected $ctlHeaderMenu;
+		
+		protected function Form_Create() {
+			// Create the Header Menu
+			$this->ctlHeaderMenu_Create();
+		}
+		
+		// Create and Setup the Header Composite Control
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+		}
+	}
+	
+	// Go ahead and run this form object to generate the page
+	ReportIndexForm::Run('ReportIndexForm', 'index.tpl.php');	
 ?>

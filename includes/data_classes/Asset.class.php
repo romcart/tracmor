@@ -71,7 +71,7 @@
 				$lblReservedImage->Text = sprintf('<img src="%s/icons/reserved_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
 				
 				$objHoverTip = new QHoverTip($lblReservedImage);
-				$objHoverTip->Text = 'Reserved By ' . $this->GetLastTransactionUser()->__toString();
+				$objHoverTip->Text = 'Reserved by ' . $this->GetLastTransactionUser()->__toString();
 				$lblReservedImage->HoverTip = $objHoverTip;
 				$strToReturn = $lblReservedImage->Render(false);
 			}
@@ -82,10 +82,31 @@
 				$lblCheckedOutImage->Text = sprintf('<img src="%s/icons/checked_out_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
 				
 				$objHoverTip = new QHoverTip($lblCheckedOutImage);
-				$objHoverTip->Text = 'Checked Out By ' . $this->GetLastTransactionUser()->__toString();
+				$objHoverTip->Text = 'Checked Out by ' . $this->GetLastTransactionUser()->__toString();
 				$lblCheckedOutImage->HoverTip = $objHoverTip;
 				$strToReturn = $lblCheckedOutImage->Render(false);				
 			}
+			
+			elseif ($objPendingShipment = AssetTransaction::PendingShipment($this->AssetId)) {
+				$lblShipmentImage = new QLabelExt($objControl);
+				$lblShipmentImage->HtmlEntities = false;
+				$lblShipmentImage->Text = sprintf('<img src="%s/icons/shipment_datagrid.png" style="Vertical-align:middle;">', __IMAGE_ASSETS__);
+				
+				$objHoverTip = new QHoverTip($lblShipmentImage);
+				$objHoverTip->Text = 'Scheduled for Shipment by ' . $this->GetLastTransactionUser()->__toString();
+				$lblShipmentImage->HoverTip = $objHoverTip;
+				$strToReturn = $lblShipmentImage->Render(false);
+			}
+			elseif ($objPendingReceipt = AssetTransaction::PendingReceipt($this->AssetId)) {
+				$lblReceiptImage = new QLabelExt($objControl);
+				$lblReceiptImage->HtmlEntities = false;
+				$lblReceiptImage->Text = sprintf('<img src="%s/icons/receipt_datagrid.png" style="Vertical-align:middle;">', __IMAGE_ASSETS__);
+				
+				$objHoverTip = new QHoverTip($lblReceiptImage);
+				$objHoverTip->Text = 'Scheduled for Receipt by ' . $this->GetLastTransactionUser()->__toString();
+				$lblReceiptImage->HoverTip = $objHoverTip;
+				$strToReturn = $lblReceiptImage->Render(false);
+			}			
 			else {
 				$strToReturn = '';
 			}
