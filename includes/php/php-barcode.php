@@ -69,7 +69,7 @@ $text_color=Array(0,0,0);
     $font_loc=$_ENV['windir']."\Fonts\arialbd.ttf";
 }*/
 
-$font_loc = __INCLUDES__ . "/fonts/Vera.ttf";
+$font_loc = "../fonts/Vera.ttf";
 
 /* ******************************************************************** */
 /*                          GENBARCODE                                  */
