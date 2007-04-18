@@ -988,14 +988,30 @@
 						}
 						// Check that the asset isn't already in another pending receipt
 						elseif ($objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
-							$blnError = true;
-							$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
+							if ($this->blnEditMode && $objPendingReceipt->TransactionId != $this->objReceipt->TransactionId) {
+								$blnError = true;
+								$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
+							}
+							// If an asset was removed, and then added again in the same 'Edit', without saving in between, it needs to be removed from the ToDelete array
+							// This seems totally absurd, but it is indeed the best way I could come up with to avoid a bug that wouldn't allow you to add an asset that was just removed.
+							// This is also in shipment_edit.php - if you change one, change the other.
+							else {
+								if ($this->arrAssetTransactionToDelete) {
+									foreach ($this->arrAssetTransactionToDelete as $key => $value) {
+										$objOffendingAssetTransaction = AssetTransaction::Load($value);
+										if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
+											unset($this->arrAssetTransactionToDelete[$key]);
+										}
+									}
+								}
+							}
 						}
 						// Check that the asset isn't in a pending shipment. This should be impossible, as you can not add items to a shipment that are TBR (to be received) or shipped.
 						// This means that they will be caught be the error checker above where LocationId must be 5 or 2
 						elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = 'That asset is in a pending shipment.';
+
 						}
 						// Create a new, but incomplete AssetTransaction
 						if (!$blnError) {

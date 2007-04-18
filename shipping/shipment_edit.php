@@ -648,7 +648,7 @@
 		protected function lblWeightUnit_Create() {
 			$this->lblWeightUnit = new QLabel ($this->pnlFedExShipment);
 			$this->lblWeightUnit->Name = 'Weight Unit';
-			if ($this->blnEditMode && $this->objFedexShipment) {
+			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->WeightUnitId) {
 				$this->lblWeightUnit->Text = $this->objFedexShipment->WeightUnit->__toString();
 			}
 		}
@@ -657,7 +657,7 @@
 		protected function lblLengthUnit_Create() {
 			$this->lblLengthUnit = new QLabel ($this->pnlFedExShipment);
 			$this->lblLengthUnit->Name = 'Length Unit';
-			if ($this->blnEditMode && $this->objFedexShipment) {
+			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LengthUnitId) {
 				$this->lblLengthUnit->Text = $this->objFedexShipment->LengthUnit->__toString();
 			}			
 		}
@@ -666,7 +666,7 @@
 		protected function lblCurrencyUnit_Create() {
 			$this->lblCurrencyUnit = new QLabel ($this->pnlFedExShipment);
 			$this->lblCurrencyUnit->Name = 'Currency Unit';
-			if ($this->blnEditMode && $this->objFedexShipment) {
+			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->CurrencyUnitId) {
 				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
 			}				
 		}
@@ -1822,9 +1822,25 @@
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset is reserved.";
 					}
-					elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
-						$blnError = true;
-						$this->txtNewAssetCode->Warning = "That asset was already scheduled for shipment.";
+					
+					if ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
+						if ($this->blnEditMode && $objPendingShipment->TransactionId != $this->objShipment->TransactionId) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = "That asset was already scheduled for shipment.";
+						}
+						// If an asset was removed, and then added again in the same 'Edit', without saving in between, it needs to be removed from the ToDelete array
+						// This seems totally absurd, but it is indeed the best way I could come up with to avoid a bug that wouldn't allow you to add an asset that was just removed.
+						// This is also in receipt_edit.php. If you change one, change the other.
+						else {
+							if ($this->arrAssetTransactionToDelete) {
+								foreach ($this->arrAssetTransactionToDelete as $key => $value) {
+									$objOffendingAssetTransaction = AssetTransaction::Load($value);
+									if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
+										unset($this->arrAssetTransactionToDelete[$key]);
+									}
+								}
+							}
+						}
 					}
 					elseif ($this->lblAdvanced->Text == 'Hide Advanced' && $this->chkScheduleReceipt->Checked && $this->rblAssetType->SelectedValue == 'new' && !$this->chkAutoGenerateAssetCode->Checked && $this->txtReceiptAssetCode->Text == '') {
 						$blnError = true;
@@ -2240,7 +2256,7 @@
 		}
 		
 		// Cancel/Delete entire incomplete shipment
-		protected function btnCancelShipment_Click($strFormId, $strControlId, $strParameter) {
+		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 			
 			// Just delete the transaction and MySQL CASCADE down to shipment, asset_transaction, and inventory_transaction
 			$this->objTransaction = Transaction::Load($this->objShipment->TransactionId);
