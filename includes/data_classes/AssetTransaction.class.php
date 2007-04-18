@@ -50,6 +50,42 @@
 		}
 		
 		/**
+		 * Returns the HTML needed for the shipment asset transaction datagrid to show icons marking transactions with scheduled returns or exchanges
+		 * It will return an empty string if it does not meet any of the specifications above.
+		 *
+		 * @param QDatagrid Object $objControl
+		 * @return string
+		 */
+		public function ToStringHoverTips($objControl) {
+			if ($this->blnScheduleReceiptFlag && $this->intNewAssetId) {
+				$lblExchangeImage = new QLabelExt($objControl);
+				$lblExchangeImage->HtmlEntities = false;
+				$lblExchangeImage->Text = sprintf('<img src="%s/icons/receipt_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
+				
+				$objHoverTip = new QHoverTip($lblExchangeImage);
+				$objHoverTip->Text = 'Exchange Scheduled';
+				$lblExchangeImage->HoverTip = $objHoverTip;
+				$strToReturn = $lblExchangeImage->Render(false);
+			}
+			
+			elseif ($this->blnScheduleReceiptFlag && $this->intNewAssetId == null) {
+				$lblReturnImage = new QLabelExt($objControl);
+				$lblReturnImage->HtmlEntities = false;
+				$lblReturnImage->Text = sprintf('<img src="%s/icons/receipt_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
+				
+				$objHoverTip = new QHoverTip($lblReturnImage);
+				$objHoverTip->Text = 'Return Scheduled';
+				$lblReturnImage->HoverTip = $objHoverTip;
+				$strToReturn = $lblReturnImage->Render(false);		
+			}	
+			else {
+				$strToReturn = '';
+			}
+
+			return $strToReturn;
+		}		
+		
+		/**
 		 * Returns a string denoting status of AssetTransaction
 		 *
 		 * @return string either 'Received' or 'Pending'

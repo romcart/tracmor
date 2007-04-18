@@ -1216,15 +1216,16 @@
 		protected function chkScheduleReceipt_Create() {
 			$this->chkScheduleReceipt = new QCheckBox($this);
 			$this->chkScheduleReceipt->Name = 'Schedule Receipt';
-			$this->chkScheduleReceipt->Text = 'Schedule a Corresponding Receipt for:';
+			$this->chkScheduleReceipt->Text = 'Schedule an Exchange or Return:';
 			$this->chkScheduleReceipt->Display = false;
 			$this->chkScheduleReceipt->AddAction(new QClickEvent(), new QAjaxAction('chkScheduleReceipt_Click'));
 		}
 		
 		protected function rblAssetType_Create() {
 			$this->rblAssetType = new QRadioButtonList($this);
-			$this->rblAssetType->AddItem(new QListItem('This Asset', 'this', true));
-			$this->rblAssetType->AddItem(new QListItem('New Asset', 'new'));
+			$this->rblAssetType->HtmlEntities = false;
+			$this->rblAssetType->AddItem(new QListItem('<img src="../images/icons/receipt_datagrid.png"> Return', 'this', true));
+			$this->rblAssetType->AddItem(new QListItem('<img src="../images/icons/receipt_datagrid.png"> New Asset', 'new'));
 			$this->rblAssetType->Enabled = false;
 			$this->rblAssetType->Display = false;
 			// $this->rblAssetType->AddAction(new QChangeEvent(), new QAjaxAction('rblAssetType_Change'));
@@ -1268,7 +1269,7 @@
 	    $this->dtgAssetTransact->Paginator = $objPaginator;
 	    $this->dtgAssetTransact->ItemsPerPage = 20;
 	    
-    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHovertips($_CONTROL) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => "200", 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->SourceLocation->__toString() ?>', array('CssClass' => "dtg_column")));
 	    if (!$this->blnEditMode) {
