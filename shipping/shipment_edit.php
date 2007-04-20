@@ -1225,7 +1225,7 @@
 			$this->rblAssetType = new QRadioButtonList($this);
 			$this->rblAssetType->HtmlEntities = false;
 			$this->rblAssetType->AddItem(new QListItem('<img src="../images/icons/receipt_datagrid.png"> Return', 'this', true));
-			$this->rblAssetType->AddItem(new QListItem('<img src="../images/icons/receipt_datagrid.png"> New Asset', 'new'));
+			$this->rblAssetType->AddItem(new QListItem('<img src="../images/icons/receipt_datagrid.png"> Exchange', 'new'));
 			$this->rblAssetType->Enabled = false;
 			$this->rblAssetType->Display = false;
 			// $this->rblAssetType->AddAction(new QChangeEvent(), new QAjaxAction('rblAssetType_Change'));

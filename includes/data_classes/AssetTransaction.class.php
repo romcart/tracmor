@@ -57,7 +57,7 @@
 		 * @return string
 		 */
 		public function ToStringHoverTips($objControl) {
-			if ($this->blnScheduleReceiptFlag && $this->intNewAssetId) {
+			if ($this->blnScheduleReceiptFlag && $this->NewAsset) {
 				$lblExchangeImage = new QLabelExt($objControl);
 				$lblExchangeImage->HtmlEntities = false;
 				$lblExchangeImage->Text = sprintf('<img src="%s/icons/receipt_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
