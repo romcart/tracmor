@@ -1824,7 +1824,7 @@
 						$this->txtNewAssetCode->Warning = "That asset is reserved.";
 					}
 					
-					if ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
+					if ($objNewAsset && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
 						if ($this->blnEditMode && $objPendingShipment->TransactionId != $this->objShipment->TransactionId) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "That asset was already scheduled for shipment.";
@@ -1835,9 +1835,11 @@
 						else {
 							if ($this->arrAssetTransactionToDelete) {
 								foreach ($this->arrAssetTransactionToDelete as $key => $value) {
-									$objOffendingAssetTransaction = AssetTransaction::Load($value);
-									if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
-										unset($this->arrAssetTransactionToDelete[$key]);
+									if ($value) {
+										$objOffendingAssetTransaction = AssetTransaction::Load($value);
+										if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
+											unset($this->arrAssetTransactionToDelete[$key]);
+										}
 									}
 								}
 							}

@@ -987,7 +987,7 @@
 							$this->txtNewAssetCode->Warning = "That asset has already been received.";
 						}
 						// Check that the asset isn't already in another pending receipt
-						elseif ($objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
+						elseif ($objNewAsset && $objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
 							if ($this->blnEditMode && $objPendingReceipt->TransactionId != $this->objReceipt->TransactionId) {
 								$blnError = true;
 								$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
@@ -998,9 +998,11 @@
 							else {
 								if ($this->arrAssetTransactionToDelete) {
 									foreach ($this->arrAssetTransactionToDelete as $key => $value) {
-										$objOffendingAssetTransaction = AssetTransaction::Load($value);
-										if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
-											unset($this->arrAssetTransactionToDelete[$key]);
+										if ($value) {
+											$objOffendingAssetTransaction = AssetTransaction::Load($value);
+											if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
+												unset($this->arrAssetTransactionToDelete[$key]);
+											}
 										}
 									}
 								}
