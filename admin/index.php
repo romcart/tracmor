@@ -31,7 +31,6 @@
 		protected $txtMinAssetCode;
 		protected $txtImageUploadPrefix;
 		protected $txtFedexGatewayUri;
-		protected $txtFormStatePath;
 		protected $txtPackingListTerms;
 		
 		// Buttons
@@ -45,7 +44,6 @@
 			$this->txtMinAssetCode_Create();
 			$this->txtImageUploadPrefix_Create();
 			$this->txtFedexGatewayUri_Create();
-			$this->txtFormStatePath_Create();
 			$this->txtPackingListTerms_Create();
 			
 			// Create Buttons
@@ -79,13 +77,6 @@
 		}
 		
 		// Create and Setup the MinAssetCode Text Field
-		protected function txtFormStatePath_Create() {
-			$this->txtFormStatePath = new QTextBox($this);
-			$this->txtFormStatePath->Name = 'Formstate Path';
-			$this->txtFormStatePath->Text = QApplication::$TracmorSettings->FormStatePath;
-		}
-		
-		// Create and Setup the MinAssetCode Text Field
 		protected function txtPackingListTerms_Create() {
 			$this->txtPackingListTerms = new QTextBox($this);
 			$this->txtPackingListTerms->Name = 'Packing List Terms';
@@ -106,7 +97,6 @@
 			QApplication::$TracmorSettings->MinAssetCode = $this->txtMinAssetCode->Text;
 			QApplication::$TracmorSettings->ImageUploadPrefix = $this->txtImageUploadPrefix->Text;
 			QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
-			QApplication::$TracmorSettings->FormStatePath = $this->txtFormStatePath->Text;
 			QApplication::$TracmorSettings->PackingListTerms = $this->txtPackingListTerms->Text;
 		}
 	}

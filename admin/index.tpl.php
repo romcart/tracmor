@@ -67,10 +67,6 @@
 							<td class="record_field_edit"><?php $this->txtFedexGatewayUri->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Form State Path: </td>
-							<td class="record_field_edit"><?php $this->txtFormStatePath->RenderWithError(); ?></td>
-						</tr>
-						<tr>
 							<td class="record_field_name">Packing List Terms: </td>
 							<td class="record_field_edit"><?php $this->txtPackingListTerms->RenderWithError("Rows=10"); ?></td>
 						</tr>
