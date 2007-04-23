@@ -596,25 +596,37 @@ class QInventoryEditComposite extends QControl {
 			
 			if ($this->blnEditMode) {
 				
-				// Update the values of all fields for an Ajax reload
-				$this->UpdateInventoryFields();
+				// Check to see if the InventoryModelCode already exists and it is not the code for the inventory model that you are currently working with
+				$InventoryModelDuplicate = InventoryModel::LoadbyInventoryModelCode($this->objInventoryModel->InventoryModelCode);
+				if ($InventoryModelDuplicate && $InventoryModelDuplicate->InventoryModelId != $this->objInventoryModel->InventoryModelId) {
+					$blnError = true;
+					$this->txtInventoryModelCode->Warning = "That inventory code is already in use. Please try another.";
+				}
 				
-				// If inventory model is not new, it must be saved after updating the inventoryfields
-				$this->objInventoryModel->Save();
-				
-				// Setup the InventoryModel again to retrieve the latest Modified information
-				$this->objParentObject->SetupInventoryModel($this);
-				
-				// Give the labels their appropriate values before display
-				$this->UpdateInventoryLabels();
-				
-				// This was necessary because it was not saving the changes of a second edit/save in a row
-				// Reload all custom fields
-				$this->objInventoryModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, $this->blnEditMode, $this->objInventoryModel->InventoryModelId);
-				// Hide inputs and display labels
-				$this->displayLabels();
-				// Enable the appropriate transaction buttons
-				$this->EnableTransactionButtons();
+				if (!$blnError) {
+					// Update the values of all fields for an Ajax reload
+					$this->UpdateInventoryFields();
+					
+					// If inventory model is not new, it must be saved after updating the inventoryfields
+					$this->objInventoryModel->Save();
+					
+					// Setup the InventoryModel again to retrieve the latest Modified information
+					$this->objParentObject->SetupInventoryModel($this);
+					
+					// Give the labels their appropriate values before display
+					$this->UpdateInventoryLabels();
+					
+					// This was necessary because it was not saving the changes of a second edit/save in a row
+					// Reload all custom fields
+					$this->objInventoryModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, $this->blnEditMode, $this->objInventoryModel->InventoryModelId);
+					// Hide inputs and display labels
+					$this->displayLabels();
+					// Enable the appropriate transaction buttons
+					$this->EnableTransactionButtons();
+					
+					// Commit the above transactions to the database
+					$objDatabase->TransactionCommit();
+				}
 				
 			}
 			elseif (!$blnError) {
@@ -627,8 +639,7 @@ class QInventoryEditComposite extends QControl {
 				QApplication::Redirect($strRedirect);
 			}
 			
-			// Commit the above transactions to the database
-			$objDatabase->TransactionCommit();
+			
 		}
 		catch (QOptimisticLockingException $objExc) {
 			

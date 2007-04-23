@@ -635,10 +635,10 @@ class QAssetEditComposite extends QControl {
 			
 			$this->objAsset->AssetCode = $this->txtAssetCode->Text;
 	
+			
+			$blnError = false;
 			// If a new asset is being created
 			if (!$this->blnEditMode) {
-				
-				$blnError = false;
 				
 				// Check to see if the asset code already exists
 				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
@@ -669,25 +669,39 @@ class QAssetEditComposite extends QControl {
 			
 			if ($this->blnEditMode) {
 				
-				// Update the values of all fields for an Ajax reload
-				$this->UpdateAssetFields();
+				// Check to see if the asset code already exists (and is not the asset code of the asset that the user is currently editing
+				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
+				if ($AssetDuplicate && $AssetDuplicate->AssetId != $this->objAsset->AssetId) {
+					$blnError = true;
+					$this->txtAssetCode->Warning = "That asset code is already in use. Please try another.";
+				}
 				
-				// If asset is not new, it must be saved after updating the assetfields
-				$this->objAsset->Save();
+				if (!$blnError) {
 				
-				// This is called to retrieve the new Modified Date and User
-				$this->objParentObject->SetupAsset($this);
-	
-				// Give the labels their appropriate values before display
-				$this->UpdateAssetLabels();
-				
-				// This was necessary because it was not saving the changes of a second edit/save in a row
-				// Reload all custom fields
-				$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
-				// Hide inputs and display labels
-				$this->displayLabels();
-				// Enable the appropriate transaction buttons
-				$this->EnableTransactionButtons();
+					// Update the values of all fields for an Ajax reload
+					$this->UpdateAssetFields();
+					
+					// If asset is not new, it must be saved after updating the assetfields
+					$this->objAsset->Save();
+					
+					// This is called to retrieve the new Modified Date and User
+					$this->objParentObject->SetupAsset($this);
+		
+					// Give the labels their appropriate values before display
+					$this->UpdateAssetLabels();
+					
+					// This was necessary because it was not saving the changes of a second edit/save in a row
+					// Reload all custom fields
+					$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
+					
+					// Commit the above transactions to the database
+					$objDatabase->TransactionCommit();
+					
+					// Hide inputs and display labels
+					$this->displayLabels();
+					// Enable the appropriate transaction buttons
+					$this->EnableTransactionButtons();
+				}
 				
 			}
 			elseif (!$blnError) {
@@ -699,9 +713,6 @@ class QAssetEditComposite extends QControl {
 				$strRedirect = "asset_edit.php?intAssetId=" . $this->objAsset->AssetId;
 				QApplication::Redirect($strRedirect);
 			}
-			
-			// Commit the above transactions to the database
-			$objDatabase->TransactionCommit();
 			
 		}
 		catch (QOptimisticLockingException $objExc) {
