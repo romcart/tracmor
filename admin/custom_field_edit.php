@@ -430,6 +430,8 @@
 			elseif ($this->lstCustomFieldQtype->SelectedValue != 2) {
 				$this->lstDefaultValue->Display = false;
 				$this->txtDefaultValue->Display = true;
+				$this->chkActiveFlag->Enabled = true;
+				$this->chkRequiredFlag->Enabled = true;
 				if ($this->chkRequiredFlag->Checked == true) {
 					$this->txtDefaultValue->Enabled = true;
 				}
