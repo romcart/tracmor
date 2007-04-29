@@ -164,6 +164,27 @@
 			
 		}
 		
+		/**
+		 * Returns a bool that determines whether or not this transaction has any AssetTransactions or InventoryTransactions associated with it
+		 *
+		 * @return bool
+		 */
+		public function IsEmpty() {
+			$objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($this->TransactionId);
+			if (empty($objAssetTransactionArray)) {
+				$objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->TransactionId);
+				if (empty($objInventoryTransactionArray)) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		
 		// This adds the created by and creation date before saving a new transaction
 		public function Save($blnForceInsert = false, $blnForceUpdate = false) {
 			if ((!$this->__blnRestored) || ($blnForceInsert)) {

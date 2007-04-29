@@ -56,6 +56,10 @@
 						$this->btnDelete->RenderWithError();
 						$this->btnCancel->RenderWithError();
 					}
+					else {
+						echo('&nbsp;');
+						$this->btnCancelCompleteShipment->RenderWithError();
+					}
 				?>
 			</td>
 		</tr>

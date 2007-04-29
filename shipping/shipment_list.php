@@ -88,7 +88,6 @@
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
 			$this->ctlShortcutMenu_Create();			
-			
 			$this->txtToCompany_Create();
 			$this->txtToContact_Create();
 			$this->txtShipmentNumber_Create();
@@ -261,7 +260,7 @@
       $this->dtgShipment->AddColumn(new QDataGridColumn('Ship to Contact', '<?= $_ITEM->ToContact->__toString() ?>', 'SortByCommand="shipment__to_contact_id__last_name ASC"', 'ReverseSortByCommand="shipment__to_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgShipment->AddColumn(new QDataGridColumn('Ship to Address', '<?= $_ITEM->ToAddress->__toString() ?>', 'SortByCommand="shipment__to_address_id__short_description ASC"', 'ReverseSortByCommand="shipment__to_address_id__short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgShipment->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="shipment__created_by__last_name ASC"', 'ReverseSortByCommand="shipment__created_by__last_name DESC"', 'CssClass="dtg_column"'));
-      $this->dtgShipment->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgShipment->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'SortByCommand="shipped_flag ASC"', 'ReverseSortByCommand="shipped_flag DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumn('Tracking', '<?= $_ITEM->__toStringTrackingNumber() ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       
       

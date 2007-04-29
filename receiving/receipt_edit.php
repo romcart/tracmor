@@ -986,6 +986,10 @@
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "That asset has already been received.";
 						}
+						elseif (!QApplication::AuthorizeEntityBoolean($objNewAsset, 2)) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = "You do not have authorization to perform a transaction on this asset.";
+						}
 						// Check that the asset isn't already in another pending receipt
 						elseif ($objNewAsset && $objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
 							if ($this->blnEditMode && $objPendingReceipt->TransactionId != $this->objReceipt->TransactionId) {
@@ -1001,6 +1005,7 @@
 										if ($value) {
 											$objOffendingAssetTransaction = AssetTransaction::Load($value);
 											if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
+												$objOffendingAssetTransaction->Delete();
 												unset($this->arrAssetTransactionToDelete[$key]);
 											}
 										}
@@ -1057,6 +1062,10 @@
 								$this->txtNewInventoryModelCode->Warning = "That inventory has already been added.";
 							}
 						}
+					}
+					if (!$blnError && !QApplication::AuthorizeEntityBoolean($objNewInventoryModel, 2)) {
+						$blnError = true;
+						$this->txtNewInventoryModelCode->Warning = "You do not have authorization to perform a transaction on this inventory model.";
 					}
 					if (!$blnError) {
 						$objNewInventoryLocation = InventoryLocation::LoadByLocationIdInventoryModelId(5, $objNewInventoryModel->InventoryModelId);

@@ -237,7 +237,12 @@ class QAssetEditComposite extends QControl {
 		$this->lstLocation->Name = 'Location';
 		$this->lstLocation->Required = true;
 		$this->lstLocation->AddItem('- Select One -', null);
-		$objLocationArray = Location::LoadAllLocations(true);
+		if (!$this->blnEditMode) {
+			$objLocationArray = Location::LoadAllLocations(true);
+		}
+		else {
+			$objLocationArray = Location::LoadAllLocations(true, true);
+		}
 		if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
 			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
 			if ($objLocation->LocationId == 5) {

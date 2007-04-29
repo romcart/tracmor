@@ -141,7 +141,7 @@
 			}
 			
 			/**
-			 * Authorizes an entity for viewing. If the user is not authorized to view/create this entity, then they are sent to the trespass page.
+			 * Authorizes an entity for viewing or editing. If the user is not authorized to view/create this entity, then they are sent to the trespass page.
 			 *
 			 * @param object $objEntity
 			 * @param bool $blnEditMode
@@ -164,6 +164,25 @@
 						QApplication::Redirect('../common/trespass.php');
 					}
 				}
+			}
+			
+			/**
+			 * Authorizes an entity for editing and returns a boolean value for error checking purposes
+			 * 
+			 * @param object $objEntity
+			 * @param integer $intAuthorizationId
+			 * @return bool $blnAuthorized
+			 */
+			public static function AuthorizeEntityBoolean($objEntity, $intAuthorizationId) {
+				$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, $intAuthorizationId);
+				if ($objRoleModuleAuthorization->AuthorizationLevelId != 1 && !($objRoleModuleAuthorization->AuthorizationLevelId == 2 && $objEntity->CreatedBy == QApplication::$objUserAccount->UserAccountId)) {
+					$blnAuthorized = false;
+				}
+				else {
+					$blnAuthorized = true;
+				}
+				
+				return $blnAuthorized;
 			}
 			
 			/**

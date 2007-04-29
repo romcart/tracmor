@@ -214,7 +214,7 @@
 		 * @return AssetTransaction
 		*/
 		public static function PendingShipment($intAssetId) {
-			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
+			// Call to QueryHelper to Get Database Object and Get SQL Clauses
 			AssetTransaction::QueryHelper($objDatabase);
 
 			// Properly Escape All Input Parameters using Database->SqlVariable()
@@ -238,6 +238,16 @@
 			// Perform the Query and Instantiate the Row
 			$objDbResult = $objDatabase->Query($strQuery);
 			return AssetTransaction::InstantiateDbRow($objDbResult->GetNextRow());
+		}
+		
+		/**
+		 * Determine if a transaction has been conducted after the current AssetTransaction
+		 * @return object AssetTransaction
+		 */
+		public function NewerTransaction() {
+			
+			$objNewerAssetTransaction = AssetTransaction::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->AssetId), QQ::GreaterOrEqual(QQN::AssetTransaction()->CreationDate, $this->CreationDate), QQ::NotEqual(QQN::AssetTransaction()->AssetTransactionId, $this->AssetTransactionId)));
+			return $objNewerAssetTransaction;
 		}
 		
 		/**

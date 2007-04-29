@@ -88,7 +88,9 @@
 		protected $btnCompleteShipment;
 		protected $btnCancelShipment;
 		// We are not allowing users to cancel complete shipments any longer. Creates a problem if transactions are conducted on assets/inventory after they are shipped.
-		// protected $btnCancelCompleteShipment;
+		// We are now allowing users to cancel complete shipments, only if there have not been any related transactions after the shipment was completed.
+		// Users can still cancel a shipment if they have scheduled a return, but only if the return has not been received
+		protected $btnCancelCompleteShipment;
 		
 		// Labels
 		protected $lblHeaderShipment;
@@ -248,7 +250,7 @@
 			// Complete Shipment Buttons
 			$this->btnCompleteShipment_Create();
 			$this->btnCancelShipment_Create();
-			//$this->btnCancelCompleteShipment_Create();
+			$this->btnCancelCompleteShipment_Create();
 			
 			// Shipping Datagrids
 			$this->dtgAssetTransact_Create();
@@ -1399,13 +1401,13 @@
 		}
 		
 		// Create and Setup btnCancelCompleteShipment
-/*		protected function btnCancelCompleteShipment_Create() {
-			$this->btnCancelCompleteShipment = new QButton($this->pnlCompleteShipmentLabels);
-			$this->btnCancelCompleteShipment->Text = 'Cancel Shipment';
+		protected function btnCancelCompleteShipment_Create() {
+			$this->btnCancelCompleteShipment = new QButton($this);
+			$this->btnCancelCompleteShipment->Text = 'Cancel Complete Shipment';
 			$this->btnCancelCompleteShipment->AddAction(new QClickEvent(), new QAjaxAction('btnCancelCompleteShipment_Click'));
 			$this->btnCancelCompleteShipment->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objShipment, $this->btnCancelCompleteShipment, 2);
-		}*/
+		}
 		
 		// Setup btnSave
 		protected function btnSave_Create() {
@@ -1823,6 +1825,10 @@
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset is reserved.";
 					}
+					elseif (!QApplication::AuthorizeEntityBoolean($objNewAsset, 2)) {
+						$blnError = true;
+						$this->txtNewAssetCode->Warning = "You do not have authorization to perform a transaction on this asset.";
+					}
 					
 					if ($objNewAsset && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
 						if ($this->blnEditMode && $objPendingShipment->TransactionId != $this->objShipment->TransactionId) {
@@ -1838,6 +1844,7 @@
 									if ($value) {
 										$objOffendingAssetTransaction = AssetTransaction::Load($value);
 										if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
+											$objOffendingAssetTransaction->Delete();
 											unset($this->arrAssetTransactionToDelete[$key]);
 										}
 									}
@@ -2004,6 +2011,10 @@
 						$this->txtQuantity->Warning = "Quantity shipped cannot exceed quantity available.";
 						$blnError = true;
 					}
+					elseif (!QApplication::AuthorizeEntityBoolean($objNewInventoryLocation->InventoryModel, 2)) {
+						$blnError = true;
+						$this->txtQuantity->Warning = "You do not have authorization to perform a transaction on this inventory model.";
+					}
 					
 					// Check to see if that InventoryLocation has some quantity scheduled for shipment
 					// If so, make sure that there is enough inventory available to add the new quantity.
@@ -2127,29 +2138,28 @@
 						$this->objTransaction->Save();
 					
 						$this->UpdateShipmentFields();
-						$this->objShipment->Save();
+						$this->objShipment->Save(true);
 						
 						// If the courier is FedEx, create new fedexShipment
 						if ($this->lstCourier->SelectedValue === 1) {
-							$this->objFedexShipment = new FedexShipment();
-							$this->objFedexShipment->Shipment = $this->objShipment;
+							if (!($this->objFedexShipment instanceof FedexShipment)) {
+								$this->objFedexShipment = new FedexShipment();
+							}
+							$this->objFedexShipment->ShipmentId = $this->objShipment->ShipmentId;
 							$this->UpdateFedexFields();
-							$this->objFedexShipment->Save();
+							$this->objFedexShipment->Save(true);
 						}					
 					}
 					
 					// If courier is FedEx, initiate communication with FedEx
 					if(!$blnError && $this->objShipment->CourierId == 1) {
-						if ($this->FedEx()) {
-							$blnError = false;
-						}
-						else {
+						if (!$this->FedEx()) {
 							$blnError = true;
 							$objDatabase->TransactionRollback();
 							return;
 						}	
 					}
-							
+					
 					if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
 						
 						$objTransaction = '';
@@ -2169,9 +2179,29 @@
 									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
 								}
 								$objAssetTransaction->DestinationLocationId = $DestinationLocationId;
-								$objAssetTransaction->Save();
 								
 								if ($objAssetTransaction->ScheduleReceiptFlag) {
+									
+									if ($objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset) {
+										// We have to create the new asset before we can 
+										$objReceiptAsset = new Asset();
+										$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
+										$objReceiptAsset->LocationId = $objAssetTransaction->NewAsset->LocationId;
+										if ($objAssetTransaction->NewAsset->AssetCode == '') {
+											$objReceiptAsset->AssetCode = Asset::GenerateAssetCode();
+										}
+										else {
+											$objReceiptAsset->AssetCode = $objAssetTransaction->NewAsset->AssetCode;
+										}
+										$objReceiptAsset->Save();
+										
+										// Assign any default custom field values
+										CustomField::AssignNewEntityDefaultValues(1, $objReceiptAsset->AssetId);
+										
+										// Associate the new Asset with the AssetTransaction
+										$objAssetTransaction->NewAsset = $objReceiptAsset;
+									}
+									
 									// If it doesn't exist, create a new transaction object and receipt object
 									if (!($objTransaction instanceof Transaction) && !($objReceipt instanceof Receipt)) {
 										$objTransaction = new Transaction();
@@ -2197,17 +2227,24 @@
 									}
 									
 									$objReceiptAssetTransaction = new AssetTransaction();
+									// If this is a return
 									if (!$objAssetTransaction->NewAssetId) {
 										$objReceiptAssetTransaction->AssetId = $objAssetTransaction->AssetId;
 									}
+									// If this is an exchange
 									else {
 										$objReceiptAssetTransaction->AssetId = $objAssetTransaction->NewAssetId;
+										$objAssetTransaction->NewAssetFlag = true;
+										$objAssetTransaction->Save();
 									}
 									$objReceiptAssetTransaction->TransactionId = $objTransaction->TransactionId;
 									$objReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->DestinationLocationId;
-									$objReceiptAssetTransaction->NewAssetFlag = true;
+									// This is not right. NewAssetFlag should be set only if a new asset was created when creating this AssetTransaction
+									// It should not be true on the new AssetTransaction, but only on the AssetTransaction that caused the new asset to be created.
+									// $objReceiptAssetTransaction->NewAssetFlag = true;
 									$objReceiptAssetTransaction->Save();
 								}
+								$objAssetTransaction->Save();
 							}
 						}
 					}
@@ -2218,6 +2255,10 @@
 							
 							// LocationId #2 == Shipped
 							$DestinationLocationId = 2;
+							
+							if (!$this->blnEditMode) {
+								$objInventoryTransaction->TransactionId = $this->objTransaction->TransactionId;
+							}
 							
 							// Remove the inventory quantity from the source
 							$objInventoryTransaction->InventoryLocation->Quantity = $objInventoryTransaction->InventoryLocation->Quantity - $objInventoryTransaction->Quantity;
@@ -2231,9 +2272,11 @@
 					
 					if ($this->blnEditMode) {
 						$this->UpdateShipmentFields();
-						if ($this->objShipment->CourierId === 1)
+						if ($this->objShipment->CourierId === 1) {
 							$this->UpdateFedexFields();
-					} else if ($this->objShipment->CourierId === 1) {
+						}
+					}
+					elseif ($this->objShipment->CourierId === 1) {
 						// Update $this->objShipment with FedEx tracking number
 						$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
 					}
@@ -2269,7 +2312,7 @@
 		}
 		
 		// Cancel/Delete Completed Shipment
-/*		protected function btnCancelCompleteShipment_Click($strFormId, $strControlId, $strParameter) {
+		protected function btnCancelCompleteShipment_Click($strFormId, $strControlId, $strParameter) {
 			
 			// Determine the entity type(s) of this transaction
 			if ($this->objAssetTransactionArray && $this->objInventoryTransactionArray) {
@@ -2296,6 +2339,24 @@
 				if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
 				// Set the DestinationLocation of the AssetTransction to null and set the Asset's location to the SourceLocationId of the Asset Transaction
 					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+						
+						if ($objNewerAssetTransaction = $objAssetTransaction->NewerTransaction()) {
+							// If this is an automatically scheduled return receipt, then we just delete it also
+							if ($objAssetTransaction->ScheduleReceiptFlag && $objNewerAssetTransaction->DestinationLocationId == null) {
+								// Delete the unreceived, automatically scheduled receipt
+								$objNewerAssetTransaction->Delete();
+								// If the receipt is empty (no AssetTransactions and no InventoryTransactions, you also need to delete the transaction here also.
+								if ($objNewerAssetTransaction->Transaction->IsEmpty()) {
+									$objNewerAssetTransaction->Transaction->Delete();
+								}
+							}
+							// Generate an error
+							else {
+								$this->btnCancelCompleteShipment->Warning = sprintf('The asset %s has been involved in a transaction since this shipment was completed.', $objAssetTransaction->Asset->AssetCode);
+								$objDatabase->TransactionRollback();
+								return;
+							}
+						}
 						
 						// Set the destination location to null
 						$objAssetTransaction->DestinationLocationId = null;
@@ -2331,16 +2392,18 @@
 				}
 				
 				// Set all 'Complete Shipment' information to null
-				$this->objShipment->PackageTypeId = null;
-				$this->objShipment->PackageWeight = null;
-				$this->objShipment->WeightUnitId = null;
-				$this->objShipment->PackageLength = null;
-				$this->objShipment->PackageWidth = null;
-				$this->objShipment->PackageHeight = null;
-				$this->objShipment->LengthUnitId = null;
-				$this->objShipment->Value = null;
-				$this->objShipment->CurrencyUnitId = null;
-				$this->objShipment->NotificationFlag = null;
+				// $this->objShipment->PackageTypeId = null;
+				// $this->objShipment->PackageWeight = null;
+				// $this->objShipment->WeightUnitId = null;
+				// $this->objShipment->PackageLength = null;
+				// $this->objShipment->PackageWidth = null;
+				// $this->objShipment->PackageHeight = null;
+				// $this->objShipment->LengthUnitId = null;
+				// $this->objShipment->Value = null;
+				// $this->objShipment->CurrencyUnitId = null;
+				// $this->objShipment->NotificationFlag = null;
+				
+				// Set the TrackingNumber back to null
 				$this->objShipment->TrackingNumber = null;
 				
 				// Set the shipment as pending
@@ -2365,7 +2428,7 @@
 					throw new QOptimisticLockingException($objExc->Class);
 				}
 			}
-		}*/
+		}
 		
 		// Save new or existing shipment
 		// This does not complete a shipment
@@ -2479,7 +2542,8 @@
 										$objReceiptAsset = new Asset();
 										$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
 										$objReceiptAsset->LocationId = $objAssetTransaction->NewAsset->LocationId;
-										if ($objReceiptAsset->AssetCode == '') {
+										//if ($objReceiptAsset->AssetCode == '') {
+										if ($objAssetTransaction->NewAsset->AssetCode == '') {
 											$objReceiptAsset->AssetCode = Asset::GenerateAssetCode();
 										}
 										else {
@@ -2775,7 +2839,8 @@
 		// This assigns the new values to the Shipment Object
 		protected function UpdateShipmentFields() {
 			if (!$this->blnEditMode) {
-				$this->objShipment->TransactionId = $this->objTransaction->TransactionId;
+				//$this->objShipment->TransactionId = $this->objTransaction->TransactionId;
+				$this->objShipment->Transaction = $this->objTransaction;
 			}
 			
 			if ($this->blnEditMode) {
@@ -3055,8 +3120,18 @@
 		// Cancel a FedEx shipment using the FedExDC class
 		protected function FedExCancel(){
 			
+			// Create the new Fedex object
+			if ($this->objFedexShipment->ShippingAccountId) {
+				$fed = new FedExDC($this->objFedexShipment->ShippingAccount->AccessId, $this->objFedexShipment->ShippingAccount->AccessCode);
+			}
+			else {
+				// if not billing to a sender account, use the default fedex account from admin_setting for FedEx communication
+				$objFedexAccount = ShippingAccount::Load(QApplication::$TracmorSettings->FedexAccountId);
+				$fed = new FedExDC($objFedexAccount->AccessId, $objFedexAccount->AccessCode);
+			}
+			
 			// create new FedExDC object
-			$fed = new FedExDC($this->objShipment->ShippingAccount->Value, QApplication::$TracmorSettings->FedexMeterNumber);
+			//$fed = new FedExDC($this->objShipment->ShippingAccount->Value, QApplication::$TracmorSettings->FedexMeterNumber);
 			
 			// Populate an array with the necessary information
 			$fdx_arr = array(
@@ -3065,24 +3140,21 @@
 			);
 			
 			// If ground service
-			if($this->objShipment->FedexServiceType->Value	== '92')
-			{	
+			// if($this->objShipment->FedexServiceType->Value	== '92')
+			if ($this->objFedexShipment->FedexServiceType->Value == '92') {	
 				$cancel_Ret = $fed->ground_cancel($fdx_arr);
 			}
 			// If express service
-			else
-			{
+			else {
 				$cancel_Ret = $fed->express_cancel($fdx_arr);
 			}
 
 			// If there is an error, display it and return false
-			if($error = $fed->getError()) 
-			{
+			if($error = $fed->getError()) {
 				$this->btnCancelCompleteShipment->Warning = $error;
 				return false;
 			}
-			else 
-			{
+			else {
 				return true;
 			}
 		}		
@@ -3146,6 +3218,10 @@
 				$this->lblAdvanced->Display = false;
 				$this->btnSave->Display = false;
 				$this->btnCancel->Display = false;
+				$this->btnCancelCompleteShipment->Display = false;
+			}
+			else {
+				$this->btnCancelCompleteShipment->Display = true;
 			}
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->RemoveColumnByName('Action');
@@ -3181,6 +3257,7 @@
 			if (!$this->objShipment->ShippedFlag) {
 				$this->btnEdit->Display = true;
 			}
+
 			// This is not necessary, because this method is only being called in EditMode
 			if ($this->blnEditMode) {
 				$this->btnCompleteShipment->Enabled = true;

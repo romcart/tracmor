@@ -261,6 +261,10 @@ class QAssetTransactComposite extends QControl {
 					$blnError = true;
 					$this->txtNewAssetCode->Warning = "That asset is already in a pending shipment.";
 				}
+				elseif (!QApplication::AuthorizeEntityBoolean($objNewAsset, 2)) {
+					$blnError = true;
+					$this->txtNewAssetCode->Warning = "You do not have authorization to perform a transaction on this asset.";
+				}
 				// Move
 				elseif ($this->intTransactionTypeId == 1) {
 					if ($objNewAsset->CheckedOutFlag) {

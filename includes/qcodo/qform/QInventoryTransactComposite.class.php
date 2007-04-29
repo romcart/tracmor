@@ -290,8 +290,8 @@ class QInventoryTransactComposite extends QControl {
 		// Assign the values from the user submitted form input
 		$intNewInventoryLocationId = $this->lstSourceLocation->SelectedValue;
 		$intTransactionQuantity = $this->txtQuantity->Text;
-
-		// If transaction is a move or take out, or restock
+		
+		// If transaction is a move or take out
 		if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
 			if ($intNewInventoryLocationId) {
 				// Begin error checking
@@ -360,6 +360,11 @@ class QInventoryTransactComposite extends QControl {
 				// LocationID = 4 is 'New Inventory' Location
 				$objNewInventoryLocation->LocationId = 4;
 			}
+		}
+		
+		if (!$blnError && !QApplication::AuthorizeEntityBoolean($objNewInventoryModel, 2)) {
+			$blnError = true;
+			$this->txtNewInventoryModelCode->Warning = "You do not have authorization to perform a transaction on this inventory model.";
 		}
 		
 		if (!$blnError && $objNewInventoryLocation instanceof InventoryLocation)  {
