@@ -201,7 +201,7 @@ CREATE FIELD METHODS
 		
 		// Originally taken from AssetEditFormBase.inc
 		// Altered because it is being called from a composite control
-		public function SetupAsset($objCaller) {
+		public function SetupAsset($objCaller = null) {
 			
 			// Lookup Object PK information from Query String (if applicable)
 			// Set mode to Edit or New depending on what's found

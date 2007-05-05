@@ -208,7 +208,7 @@
 			$this->ctlInventoryTransact = new QInventoryTransactComposite($this);
 		}		
 
-		public function SetupInventoryModel($objCaller) {
+		public function SetupInventoryModel($objCaller = null) {
 			// Lookup Object PK information from Query String (if applicable)
 			// Set mode to Edit or New depending on what's found
 			// Overridden from InventoryModelEditForm to add the $objCaller parameter
