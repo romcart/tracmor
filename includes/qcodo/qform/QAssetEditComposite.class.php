@@ -490,6 +490,10 @@ class QAssetEditComposite extends QControl {
 			$this->btnShip->Display = false;
 		}
 		QApplication::AuthorizeControl($this->objAsset, $this->btnShip, 2);
+		if ($this->btnShip->Visible) {
+			// Check if they have the ability to create a new shipment
+			QApplication::AuthorizeControl(null, $this->btnShip, 2, 5);
+		}
 	}
 	
 	// Setup Receive Button
@@ -505,6 +509,10 @@ class QAssetEditComposite extends QControl {
 			$this->btnReceive->Display = false;
 		}
 		QApplication::AuthorizeControl($this->objAsset, $this->btnReceive, 2);
+		if ($this->btnReceive->Visible) {
+			// Check if they have the ability to create a new shipment
+			QApplication::AuthorizeControl(null, $this->btnReceive, 2, 6);
+		}
 	}
 	
 	protected function dtgAssetTransaction_Create() {

@@ -257,7 +257,7 @@
       $this->dtgReceipt->AddColumn(new QDataGridColumn('Receive From Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="receipt__from_company_id__short_description ASC"', 'ReverseSortByCommand="receipt__from_company_id__short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumn('Receive From Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="receipt__from_contact_id__last_name ASC"', 'ReverseSortByCommand="receipt__from_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="receipt__created_by__last_name ASC"', 'ReverseSortByCommand="receipt__created_by__last_name DESC"', 'CssClass="dtg_column"'));
-      $this->dtgReceipt->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'SortByCommand="received_flag ASC"', 'ReverseSortByCommand="received_flag DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       
       $this->dtgReceipt->SortColumnIndex = 0;
     	$this->dtgReceipt->SortDirection = 1;

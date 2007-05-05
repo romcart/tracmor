@@ -313,9 +313,9 @@
 		 * @return AssetModel
 		*/
 		
-		public static function InstantiateDbRow($objDbRow, $strAliasPrefix = null) {
+		public static function InstantiateDbRow($objDbRow, $strAliasPrefix = null, $strExpandAsArrayNodes = null, $objPreviousItem = null) {
 			
-			$objToReturn = parent::InstantiateDbRow($objDbRow, $strAliasPrefix);
+			$objToReturn = parent::InstantiateDbRow($objDbRow, $strAliasPrefix, $strExpandAsArrayNodes, $objPreviousItem);
 			$objToReturn->intAssetCount = $objDbRow->GetColumn($strAliasPrefix . 'asset_count', 'Integer');
 			
 			return $objToReturn;

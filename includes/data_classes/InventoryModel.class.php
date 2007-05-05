@@ -407,22 +407,5 @@
 			
 			return $arrSearchSql;
 	  }
-	  
-		/**
-		 * Instantiate an InventoryModel object from a Database Row.
-		 * Calls parent function, and adds InventoryModelQuantity.
-		 * @param DatabaseRowBase $objDbRow
-		 * @param string $strAliasPrefix
-		 * @return AssetModel
-		*/
-		
-		public static function InstantiateDbRow($objDbRow, $strAliasPrefix = null) {
-			
-			$objToReturn = parent::InstantiateDbRow($objDbRow, $strAliasPrefix);
-			// $objToReturn->intInventoryModelQuantity = $objDbRow->GetColumn($strAliasPrefix . 'inventory_model_quantity', 'Integer');
-			
-			return $objToReturn;
-			
-		}
 	}
 ?>

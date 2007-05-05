@@ -34,15 +34,6 @@
 			$intColumnIndex = 0;
 			if ($this->objColumnArray) foreach ($this->objColumnArray as $objColumn) {
 				
-				// For Extended DatagridColumns only
-				if ($this->ShowColumnToggle && $objColumn instanceof QDataGridColumnExt) {
-					// Check if this user has a display preference for this particular column
-					if ($objDatagridColumnPreference = DatagridColumnPreference::LoadByDatagridShortDescriptionColumnNameUserAccountId($this->Name, $objColumn->Name, QApplication::$objUserAccount->UserAccountId)) {
-						// Set the columns display attribute only if this user has a display preference set for this column
-						$objColumn->Display = $objDatagridColumnPreference->DisplayFlag;
-					}
-				}
-				
 				if ($objColumn->OrderByClause) {						
 					// This Column is Sortable
 					$strArrowImage = "";
@@ -199,7 +190,7 @@
 			$strToReturn .= '</td></tr></table></td></tr>';
 			
 			return $strToReturn;
-		}		
+		}
 		
 		protected function GetControlHtml() {
 			
@@ -213,6 +204,16 @@
 				$strStyle = sprintf('style="%s" ', $strStyle);
 			$strToReturn .= sprintf('<table %s%s>', $this->GetAttributes(), $strStyle);
 
+			if ($this->objColumnArray) foreach ($this->objColumnArray as $objColumn) {
+				if ($this->ShowColumnToggle && $objColumn instanceof QDataGridColumnExt) {
+					// Check if this user has a display preference for this particular column
+					if ($objDatagridColumnPreference = DatagridColumnPreference::LoadByDatagridShortDescriptionColumnNameUserAccountId($this->Name, $objColumn->Name, QApplication::$objUserAccount->UserAccountId)) {
+						// Set the columns display attribute only if this user has a display preference set for this column
+						$objColumn->Display = $objDatagridColumnPreference->DisplayFlag;
+					}
+				}
+			}
+			
 			// Paginator Row (if applicable)
 			if ($this->objPaginator)
 				$strToReturn .= $this->GetPaginatorRowHtml($this->objPaginator);

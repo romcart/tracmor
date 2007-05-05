@@ -79,6 +79,7 @@
 		protected $txtValue;
 		protected $lstCurrencyUnit;
 		protected $chkNotificationFlag;
+		protected $dlgExchange;
 		
 		// Buttons
 		protected $btnEdit;
@@ -91,6 +92,8 @@
 		// We are now allowing users to cancel complete shipments, only if there have not been any related transactions after the shipment was completed.
 		// Users can still cancel a shipment if they have scheduled a return, but only if the return has not been received
 		protected $btnCancelCompleteShipment;
+		protected $btnSaveExchange;
+		protected $btnCancelExchange;
 		
 		// Labels
 		protected $lblHeaderShipment;
@@ -200,6 +203,7 @@
 			$this->lblCurrencyUnit_Create();
 			
 			// Shipping Inputs
+			$this->dlgExchange_Create();
 			$this->calShipDate_Create();
 			$this->lstFromCompany_Create();
 			$this->lstFromContact_Create();
@@ -230,7 +234,7 @@
 			$this->lstSourceLocation_Create();
 			$this->txtQuantity_Create();
 			$this->txtTrackingNumber_Create();
-			$this->lblAdvanced_Create();
+			//$this->lblAdvanced_Create();
 			$this->txtReceiptAssetCode_Create();
 			$this->chkAutoGenerateAssetCode_Create();
 			$this->rblAssetType_Create();
@@ -238,6 +242,8 @@
 			$this->btnAddAsset_Create();
 			$this->btnLookup_Create();
 			$this->btnAddInventory_Create();
+			$this->btnSaveExchange_Create();
+			$this->btnCancelExchange_Create();
 			
 			if (!$this->objShipment->ShippedFlag) {
 				// Shipping Buttons
@@ -245,6 +251,7 @@
 				$this->btnCancel_Create();
 				$this->btnEdit_Create();
 				$this->btnDelete_Create();		
+				
 			}
 			
 			// Complete Shipment Buttons
@@ -378,6 +385,19 @@
   		$this->pnlFedExShipment->Template = 'pnl_fedex_shipment.inc.php';
   		$this->pnlFedExShipment->Display = ($this->blnEditMode && $this->objShipment->CourierId===1) ? true : false;
   	}
+  	
+  	// Create and Setup the Modal Dialog Box
+  	protected function dlgExchange_Create() {
+  		$this->dlgExchange = new QDialogBox($this);
+  		$this->dlgExchange->AutoRenderChildren = false;
+  		$this->dlgExchange->Template = 'dlg_exchange.inc.php';
+  		$this->dlgExchange->Width = '300px';
+  		$this->dlgExchange->Height = '80px';
+  		$this->dlgExchange->Padding = '10px';
+  		$this->dlgExchange->Display = false;
+  		$this->dlgExchange->BackColor = '#FFFFFF';
+  		$this->dlgExchange->MatteClickable = false;
+    }
   	
 		//**************
 		// CREATE LABELS
@@ -1238,17 +1258,17 @@
 		}
 		
 		protected function txtReceiptAssetCode_Create() {
-			$this->txtReceiptAssetCode = new QTextBox($this);
+			$this->txtReceiptAssetCode = new QTextBox($this->dlgExchange);
 			$this->txtReceiptAssetCode->Name = 'Asset Code';
-			$this->txtReceiptAssetCode->Display = false;
+			//$this->txtReceiptAssetCode->Display = false;
 		}
 		
 		protected function chkAutoGenerateAssetCode_Create() {
-			$this->chkAutoGenerateAssetCode = new QCheckBox($this);
+			$this->chkAutoGenerateAssetCode = new QCheckBox($this->dlgExchange);
 			$this->chkAutoGenerateAssetCode->Name = 'Auto Generate';
 			$this->chkAutoGenerateAssetCode->Text = 'Auto Generate';
 			$this->chkAutoGenerateAssetCode->AddAction(new QClickEvent(), new QToggleEnableAction($this->txtReceiptAssetCode));
-			$this->chkAutoGenerateAssetCode->Display = false;
+			//$this->chkAutoGenerateAssetCode->Display = false;
 		}
 		
 		//******************
@@ -1276,6 +1296,7 @@
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->SourceLocation->__toString() ?>', array('CssClass' => "dtg_column")));
 	    if (!$this->blnEditMode) {
     		$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    }
 	
 	    $objStyle = $this->dtgAssetTransact->RowStyle;
@@ -1294,11 +1315,51 @@
 	    $this->dtgAssetTransact->ShowHeader = false;
 		}
 		
+		// Render the advanced label in the AssetTransact datagrid
+		public function AdvancedColumn_Render(AssetTransaction $objAssetTransaction) {
+			if (!$objAssetTransaction->Asset->TempId) {
+				$objAssetTransaction->Asset->TempId = $this->intNewTempId++;
+			}
+			$strControlId = 'lstAdvanced' . $objAssetTransaction->Asset->TempId;
+			$lstAdvanced = $this->GetControl($strControlId);
+			if (!$lstAdvanced) {
+				// Create the advanced label for this row in the datagrid
+				// Use ActionParameter to specify the Temp ID of the asset
+				$lstAdvanced = new QListBox($this->dtgAssetTransact, $strControlId);
+				$lstAdvanced->ActionParameter = $objAssetTransaction->Asset->TempId;
+				$lstAdvanced->CausesValidation = false;
+				$lstAdvanced->AddItem('None', 0);
+				$lstAdvanced->AddItem('Return', 1);
+				$lstAdvanced->AddItem('Exchange', 2);
+				$lstAdvanced->AddAction(new QChangeEvent(), new QAjaxAction('lstAdvancedColumn_Change'));
+				$lstAdvanced->CausesValidation = false;
+				$lstAdvanced->Width = 100;
+			}
+			
+			if ($objAssetTransaction->ScheduleReceiptFlag) {
+				if ($objAssetTransaction->NewAssetFlag) {
+					$lstAdvanced->SelectedValue = 2;
+				}
+				else {
+					$lstAdvanced->SelectedValue = 1;
+				}
+			}
+			else {
+				$lstAdvanced->SelectedValue = 0;
+			}
+			
+			
+			return $lstAdvanced->Render(false);
+		}
+		
 		// Render the remove button column in the AssetTransact datagrid
 		public function RemoveAssetColumn_Render(AssetTransaction $objAssetTransaction) {
 			
 			// Assign the asset a TempId and increment it by one
-	    $objAssetTransaction->Asset->TempId = $this->intNewTempId++;
+			// Only if it wasn't already created when making the advanced label
+			if (!$objAssetTransaction->Asset->TempId) {
+	    	$objAssetTransaction->Asset->TempId = $this->intNewTempId++;
+			}
       //$strControlId = 'btnRemoveAsset' . $objAssetTransaction->Asset->AssetId;
       $strControlId = 'btnRemoveAsset' . $objAssetTransaction->Asset->TempId;
       $btnRemove = $this->GetControl($strControlId);
@@ -1437,6 +1498,15 @@
 			//$this->btnCancel->TabIndex=16;
 		}
 		
+		// Setup btnDelete
+		protected function btnDelete_Create() {
+			$this->btnDelete = new QButton($this);
+			$this->btnDelete->Text = QApplication::Translate('Delete');
+			$this->btnDelete->AddAction(new QClickEvent(), new QServerAction('btnDelete_Click'));
+			$this->btnDelete->CausesValidation = false;
+			QApplication::AuthorizeControl($this->objShipment, $this->btnDelete, 3);
+		}
+		
 		// Setup AddAsset Button
 		protected function btnAddAsset_Create() {
 			$this->btnAddAsset = new QButton($this);
@@ -1466,6 +1536,24 @@
 			$this->btnAddInventory->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddInventory_Click'));
 			$this->btnAddInventory->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnAddInventory->CausesValidation = false;
+		}
+		
+		// Create Save Exchange Button
+		protected function btnSaveExchange_Create() {
+			$this->btnSaveExchange = new QButton($this->dlgExchange);
+			$this->btnSaveExchange->Text = 'Save';
+			$this->btnSaveExchange->AddAction(new QClickEvent(), new QAjaxAction('btnSaveExchange_Click'));
+			$this->btnSaveExchange->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSaveExchange_Click'));
+			$this->btnSaveExchange->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		// Create Cancel Exchange Button
+		protected function btnCancelExchange_Create() {
+			$this->btnCancelExchange = new QButton($this->dlgExchange);
+			$this->btnCancelExchange->Text = 'Cancel';
+			$this->btnCancelExchange->AddAction(new QClickEvent(), new QAjaxAction('btnCancelExchange_Click'));
+			$this->btnCancelExchange->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCancelExchange_Click'));
+			$this->btnCancelExchange->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}		
 
 		//******************
@@ -1852,10 +1940,10 @@
 							}
 						}
 					}
-					elseif ($this->lblAdvanced->Text == 'Hide Advanced' && $this->chkScheduleReceipt->Checked && $this->rblAssetType->SelectedValue == 'new' && !$this->chkAutoGenerateAssetCode->Checked && $this->txtReceiptAssetCode->Text == '') {
+/*					elseif ($this->lblAdvanced->Text == 'Hide Advanced' && $this->chkScheduleReceipt->Checked && $this->rblAssetType->SelectedValue == 'new' && !$this->chkAutoGenerateAssetCode->Checked && $this->txtReceiptAssetCode->Text == '') {
 						$blnError = true;
 						$this->txtReceiptAssetCode->Warning = "You must provide an asset code for the new asset.";
-					}
+					}*/
 						// Create a new, but incomplete AssetTransaction
 					if (!$blnError) {
 						// Clear out the AssetCode field
@@ -1865,7 +1953,7 @@
 						$objNewAssetTransaction->AssetId = $objNewAsset->AssetId;
 						$objNewAssetTransaction->SourceLocationId = $objNewAsset->LocationId;
 						// If scheduling a receipt for this asset
-						if ($this->lblAdvanced->Text == "Hide Advanced" && $this->chkScheduleReceipt->Checked) {
+/*						if ($this->lblAdvanced->Text == "Hide Advanced" && $this->chkScheduleReceipt->Checked) {
 							// If creating a new asset
 							if ($this->rblAssetType->SelectedValue == 'new') {
 								$objReceiptAsset = new Asset();
@@ -1888,7 +1976,7 @@
 							// Set this flag so that it will schedule this asset for receipt once the shipment is completed
 							$objNewAssetTransaction->ScheduleReceiptFlag = true;
 							$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
-						}
+						}*/
 						$this->objAssetTransactionArray[] = $objNewAssetTransaction;
 						$this->blnModifyAssets = true;
 					}
@@ -1897,6 +1985,41 @@
 			else {
 				$this->txtNewAssetCode->Warning = 'Please enter an asset code.';
 				$blnError = true;
+			}
+		}
+		
+		// Advanced listbox change action for each AssetTransaction in the datagrid
+		public function lstAdvancedColumn_Change($strFormId, $strControlId, $strParameter) {
+			
+			$intTempId = $strParameter;
+			$lstAdvanced = $this->GetControl($strControlId);
+			if ($this->objAssetTransactionArray) {
+				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+					if ($objAssetTransaction->Asset->TempId == $intTempId) {
+						// 'None'
+						if ($lstAdvanced->SelectedValue == 0) {
+							$objAssetTransaction->ScheduleReceiptFlag = false;
+							$objAssetTransaction->NewAssetFlag = false;
+							$objAssetTransaction->NewAssetId = null;
+							$objAssetTransaction->NewAsset = null;
+						}
+						// Return
+						elseif ($lstAdvanced->SelectedValue == 1) {
+							$objAssetTransaction->ScheduleReceiptFlag = true;
+							$objAssetTransaction->NewAssetFlag = false;
+							$objAssetTransaction->NewAssetId = null;
+							$objAssetTransaction->NewAsset = null;
+						}
+						// Exchange
+						elseif ($lstAdvanced->SelectedValue == 2) {
+							$objAssetTransaction->ScheduleReceiptFlag = true;
+							$objAssetTransaction->NewAssetFlag = true;
+							$this->dlgExchange->ActionParameter = $intTempId;
+							$this->dlgExchange->ShowDialogBox();
+						}
+					}
+				}
+				$this->blnModifyAssets = true;
 			}
 		}
 		
@@ -2659,30 +2782,32 @@
 									// Save the asset just to update the modified_date field so it can trigger an Optimistic Locking Exception when appropriate
 									$objAssetTransaction->Asset->Save();
 									// Create the new asset if it was scheduled for receipt
-									if ($objAssetTransaction->ScheduleReceiptFlag && $objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset) {
-										$objReceiptAsset = new Asset();
-										$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
-										$objReceiptAsset->LocationId = $objAssetTransaction->NewAsset->LocationId;
-										if ($objAssetTransaction->NewAsset->AssetCode == '') {
-											$objReceiptAsset->AssetCode = Asset::GenerateAssetCode();
-										}
-										else {
-											$objReceiptAsset->AssetCode = $objAssetTransaction->NewAsset->AssetCode;
-										}
-										$objReceiptAsset->Save();
-										
-										// Assign any default custom field values
-										CustomField::AssignNewEntityDefaultValues(1, $objReceiptAsset->AssetId);
-										
-										// Associate the new Asset with the AssetTransaction
-										$objAssetTransaction->NewAsset = $objReceiptAsset;
-									}						
 									// $DestinationLocationId = 2; // Shipped
 									// $objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 									// $objAssetTransaction->Asset->LocationId = $DestinationLocationId;
 									// $objAssetTransaction->Asset->Save();
-									$objAssetTransaction->Save();
 								}
+								
+								if ($objAssetTransaction->ScheduleReceiptFlag && $objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset && !$objAssetTransaction->NewAssetId) {
+									$objReceiptAsset = new Asset();
+									$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
+									$objReceiptAsset->LocationId = $objAssetTransaction->NewAsset->LocationId;
+									if ($objAssetTransaction->NewAsset->AssetCode == '') {
+										$objReceiptAsset->AssetCode = Asset::GenerateAssetCode();
+									}
+									else {
+										$objReceiptAsset->AssetCode = $objAssetTransaction->NewAsset->AssetCode;
+									}
+									$objReceiptAsset->Save();
+									
+									// Assign any default custom field values
+									CustomField::AssignNewEntityDefaultValues(1, $objReceiptAsset->AssetId);
+									
+									// Associate the new Asset with the AssetTransaction
+									$objAssetTransaction->NewAsset = $objReceiptAsset;
+								}								
+								
+								$objAssetTransaction->Save();
 							}
 						}
 						
@@ -2793,6 +2918,56 @@
 					}
 				}
 			}
+		}
+		
+		// Save Exchange Button Click
+		protected function btnSaveExchange_Click($strFormId, $strControlId, $strParameter) {
+			$intTempId = $this->dlgExchange->ActionParameter;
+			if ($this->objAssetTransactionArray) {
+				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+					if ($objAssetTransaction->Asset->TempId == $intTempId) {
+						$objAssetTransaction->ScheduleReceiptFlag = true;
+						$objAssetTransaction->NewAssetFlag = true;
+						$objReceiptAsset = new Asset();
+						// AssetId must be set so that it can be assigned to the AssetTransaction
+						$objReceiptAsset->AssetId = 0;
+						// The new receipt asset will be the same AssetModel as the asset being shipped (but a new asset)
+						$objReceiptAsset->AssetModelId = $objAssetTransaction->Asset->AssetModelId;
+						// Set Location to TBR
+						$objReceiptAsset->LocationId = 5;
+						// Set the asset code to empty so that we'll know to auto generate later
+						if ($this->chkAutoGenerateAssetCode->Checked) {
+							$strAssetCode = '';
+							$this->txtReceiptAssetCode->Text = '';
+						}
+						else {
+							$strAssetCode = $this->txtReceiptAssetCode->Text;
+						}
+						$objReceiptAsset->AssetCode = $strAssetCode;
+						$objAssetTransaction->NewAsset = $objReceiptAsset;								
+					}
+				}
+			}
+			$this->dlgExchange->ActionParameter = null;
+			$this->dlgExchange->HideDialogBox();
+		}
+		
+		// Cancel Exchange Button Click
+		protected function btnCancelExchange_Click($strFormId, $strControlId, $strParameter) {
+			
+			$intTempId = $this->dlgExchange->ActionParameter;
+			if ($this->objAssetTransactionArray) {
+				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+					if ($objAssetTransaction->Asset->TempId == $intTempId) {
+						$objAssetTransaction->ScheduleReceiptFlag = false;
+						$objAssetTransaction->NewAssetFlag = false;
+						$objAssetTransaction->NewAsset = null;
+					}
+				}
+			}
+			
+			$this->dlgExchange->ActionParameter = null;
+			$this->dlgExchange->HideDialogBox();
 		}
 		
 		// This method triggers if the Advanced label gets clicked. It shows or hides the advanced fields for scheduling receipts
@@ -3210,12 +3385,12 @@
 			// Disable (instead of hiding) chkNotificationFlag
 			$this->chkNotificationFlag->Enabled = false;
 			
-			if ($this->lblAdvanced->Text == 'Hide Advanced') {
+/*			if ($this->lblAdvanced->Text == 'Hide Advanced') {
 				$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
-			}
+			}*/
 			
 			if (!$this->objShipment->ShippedFlag) {
-				$this->lblAdvanced->Display = false;
+				//$this->lblAdvanced->Display = false;
 				$this->btnSave->Display = false;
 				$this->btnCancel->Display = false;
 				$this->btnCancelCompleteShipment->Display = false;
@@ -3224,8 +3399,10 @@
 				$this->btnCancelCompleteShipment->Display = true;
 			}
 			if ($this->blnEditMode) {
+				
 				$this->dtgAssetTransact->RemoveColumnByName('Action');
 				$this->dtgInventoryTransact->RemoveColumnByName('Action');
+				$this->dtgAssetTransact->RemoveColumnByName('Advanced');
 			}
 			
 			// Display Labels
@@ -3341,7 +3518,7 @@
 			$this->txtNote->Display = true;
 			$this->txtTrackingNumber->Display = true;
 			$this->txtNewAssetCode->Display = true;
-			$this->lblAdvanced->Display = true;
+			//$this->lblAdvanced->Display = true;
 			$this->btnAddAsset->Display = true;
 			$this->txtNewInventoryModelCode->Display = true;
 			$this->btnLookup->Display = true;
@@ -3375,6 +3552,7 @@
 			if ($this->blnEditMode) {
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			}
 		}
 	}

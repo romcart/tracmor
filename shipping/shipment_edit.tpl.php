@@ -21,6 +21,7 @@
 
 	include('../includes/header.inc.php');
 	$this->RenderBegin();
+	$this->dlgExchange->Render();
 ?>
 <!-- Begin Header Menu -->
 <?php 
@@ -142,10 +143,10 @@
 <table>
 	<tr>
 		<td><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
-		<td><?php $this->btnAddAsset->Render(); $this->lblAdvanced->Render(); ?></td>
+		<td><?php $this->btnAddAsset->Render(); //$this->lblAdvanced->Render(); ?></td>
 	</tr>
 	<tr>
-		<td colspan="2"><?php $this->chkScheduleReceipt->RenderDesigned('DisplayName=false'); $this->rblAssetType->RenderDesigned(); $this->txtReceiptAssetCode->RenderDesigned(); $this->chkAutoGenerateAssetCode->RenderDesigned('DisplayName=false'); ?></td>
+		<td colspan="2"><?php //$this->chkScheduleReceipt->RenderDesigned('DisplayName=false'); //$this->rblAssetType->RenderDesigned(); //$this->txtReceiptAssetCode->RenderDesigned(); //$this->chkAutoGenerateAssetCode->RenderDesigned('DisplayName=false'); ?></td>
 	</tr>
 </table>
 <?php $this->dtgAssetTransact->Render(); ?>

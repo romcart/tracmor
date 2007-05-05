@@ -125,14 +125,21 @@
 			 * Authorizes any control to determine if the user has access
 			 * If not, it sets the objControl->Visible to false
 			 *
-			 * @param object $objEntity - anyt entity a created_by column (asset, location, etc.)
+			 * @param object $objEntity - any entity with a created_by column (asset, location, etc.)
 			 * @param object $objControl - the control which is being evaluated - any QControl where visible is a property
 			 * @param integer $intAuthorizationId - the authorization required to see this control (view(1), edit(2), or delete(3))
 			 */
-			public static function AuthorizeControl($objEntity, $objControl, $intAuthorizationId) {
+			public static function AuthorizeControl($objEntity, $objControl, $intAuthorizationId, $intModuleId = null) {
 				
-				$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, $intAuthorizationId);
-				if ($objRoleModuleAuthorization->AuthorizationLevelId == 1 || ($objRoleModuleAuthorization->AuthorizationLevelId == 2 && $objEntity->CreatedBy == QApplication::$objUserAccount->UserAccountId)) {
+				if ($intModuleId == null) {
+					$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, $intAuthorizationId);
+				}
+				else {
+					$objRoleModule = RoleModule::LoadByRoleIdModuleId(QApplication::$objRoleModule->RoleId, $intModuleId);
+					$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId($objRoleModule->RoleModuleId, $intAuthorizationId);
+				}
+				// Added if $objEntity == null for the ship button shortcut on the asset page.
+				if ($objRoleModuleAuthorization->AuthorizationLevelId == 1 || ($objRoleModuleAuthorization->AuthorizationLevelId == 2 && $objEntity == null) || ($objRoleModuleAuthorization->AuthorizationLevelId == 2 && $objEntity->CreatedBy == QApplication::$objUserAccount->UserAccountId)) {
 					$objControl->Visible = true;
 				}
 				else {

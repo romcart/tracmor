@@ -57,18 +57,25 @@
 		 * @return string
 		 */
 		public function ToStringHoverTips($objControl) {
-			if ($this->blnScheduleReceiptFlag && $this->NewAsset) {
+			if ($this->blnScheduleReceiptFlag && $this->blnNewAssetFlag) {
 				$lblExchangeImage = new QLabelExt($objControl);
 				$lblExchangeImage->HtmlEntities = false;
 				$lblExchangeImage->Text = sprintf('<img src="%s/icons/receipt_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
 				
+				if ($this->NewAsset instanceof Asset && $this->NewAsset->AssetCode) {
+					$strAssetCode = $this->NewAsset->AssetCode;
+				}
+				else {
+					$strAssetCode = 'Auto Generated';
+				}
+				
 				$objHoverTip = new QHoverTip($lblExchangeImage);
-				$objHoverTip->Text = 'Exchange Scheduled';
+				$objHoverTip->Text = sprintf('Exchange Scheduled: %s', $strAssetCode);
 				$lblExchangeImage->HoverTip = $objHoverTip;
 				$strToReturn = $lblExchangeImage->Render(false);
 			}
 			
-			elseif ($this->blnScheduleReceiptFlag && $this->intNewAssetId == null) {
+			elseif ($this->blnScheduleReceiptFlag && !$this->blnNewAssetFlag) {
 				$lblReturnImage = new QLabelExt($objControl);
 				$lblReturnImage->HtmlEntities = false;
 				$lblReturnImage->Text = sprintf('<img src="%s/icons/receipt_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
