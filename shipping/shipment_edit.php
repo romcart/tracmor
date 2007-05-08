@@ -1268,6 +1268,9 @@
 			$this->chkAutoGenerateAssetCode->Name = 'Auto Generate';
 			$this->chkAutoGenerateAssetCode->Text = 'Auto Generate';
 			$this->chkAutoGenerateAssetCode->AddAction(new QClickEvent(), new QToggleEnableAction($this->txtReceiptAssetCode));
+			if (!QApplication::$TracmorSettings->MinAssetCode) {
+				$this->chkAutoGenerateAssetCode->Display = false;
+			}
 			//$this->chkAutoGenerateAssetCode->Display = false;
 		}
 		
@@ -2305,7 +2308,7 @@
 								
 								if ($objAssetTransaction->ScheduleReceiptFlag) {
 									
-									if ($objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset) {
+									if ($objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset && $objAssetTransaction->NewAsset->AssetId == null) {
 										// We have to create the new asset before we can 
 										$objReceiptAsset = new Asset();
 										$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
@@ -2777,6 +2780,7 @@
 						// Save new AssetTransactions
 						if ($this->objAssetTransactionArray) {
 							foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+								// If the AssetTransaction has not been saved
 								if (!$objAssetTransaction->AssetTransactionId) {
 									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
 									// Save the asset just to update the modified_date field so it can trigger an Optimistic Locking Exception when appropriate
@@ -2923,33 +2927,58 @@
 		// Save Exchange Button Click
 		protected function btnSaveExchange_Click($strFormId, $strControlId, $strParameter) {
 			$intTempId = $this->dlgExchange->ActionParameter;
-			if ($this->objAssetTransactionArray) {
-				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-					if ($objAssetTransaction->Asset->TempId == $intTempId) {
-						$objAssetTransaction->ScheduleReceiptFlag = true;
-						$objAssetTransaction->NewAssetFlag = true;
-						$objReceiptAsset = new Asset();
-						// AssetId must be set so that it can be assigned to the AssetTransaction
-						$objReceiptAsset->AssetId = 0;
-						// The new receipt asset will be the same AssetModel as the asset being shipped (but a new asset)
-						$objReceiptAsset->AssetModelId = $objAssetTransaction->Asset->AssetModelId;
-						// Set Location to TBR
-						$objReceiptAsset->LocationId = 5;
-						// Set the asset code to empty so that we'll know to auto generate later
-						if ($this->chkAutoGenerateAssetCode->Checked) {
-							$strAssetCode = '';
-							$this->txtReceiptAssetCode->Text = '';
-						}
-						else {
-							$strAssetCode = $this->txtReceiptAssetCode->Text;
-						}
-						$objReceiptAsset->AssetCode = $strAssetCode;
-						$objAssetTransaction->NewAsset = $objReceiptAsset;								
-					}
+			$blnError = false;
+			if ($this->chkAutoGenerateAssetCode->Checked) {
+				$strAssetCode = '';
+				$this->txtReceiptAssetCode->Text = '';
+			}
+			elseif ($this->txtReceiptAssetCode->Text) {
+				$objAsset = Asset::LoadByAssetCode($this->txtReceiptAssetCode->Text);
+				if ($objAsset) {
+					$blnError = true;
+					$this->txtReceiptAssetCode->Warning = 'That asset code is already in use. Please input another.';
+				}
+				else {
+					$strAssetCode = $this->txtReceiptAssetCode->Text;
 				}
 			}
-			$this->dlgExchange->ActionParameter = null;
-			$this->dlgExchange->HideDialogBox();
+			if (!$blnError) {
+				if ($this->objAssetTransactionArray) {
+					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+						if ($objAssetTransaction->NewAsset instanceof Asset && $objAssetTransaction->NewAsset->AssetCode == $strAssetCode) {
+							$blnError = true;
+							$this->txtReceiptAssetCode->Warning = 'That asset code is already in use. Please input another.';
+						}
+						if (!$blnError) {
+							if ($objAssetTransaction->Asset->TempId == $intTempId) {
+								$objAssetTransaction->ScheduleReceiptFlag = true;
+								$objAssetTransaction->NewAssetFlag = true;
+								$objReceiptAsset = new Asset();
+								// AssetId must be set so that it can be assigned to the AssetTransaction
+								$objReceiptAsset->AssetId = 0;
+								// The new receipt asset will be the same AssetModel as the asset being shipped (but a new asset)
+								$objReceiptAsset->AssetModelId = $objAssetTransaction->Asset->AssetModelId;
+								// Set Location to TBR
+								$objReceiptAsset->LocationId = 5;
+								// Set the asset code to empty so that we'll know to auto generate later
+								/*if ($this->chkAutoGenerateAssetCode->Checked) {
+									$strAssetCode = '';
+									$this->txtReceiptAssetCode->Text = '';
+								}
+								else {
+									$strAssetCode = $this->txtReceiptAssetCode->Text;
+								}*/
+								$objReceiptAsset->AssetCode = $strAssetCode;
+								$objAssetTransaction->NewAsset = $objReceiptAsset;								
+							}
+						}
+					}
+				}
+				if (!$blnError) {
+					$this->dlgExchange->ActionParameter = null;
+					$this->dlgExchange->HideDialogBox();
+				}
+			}
 		}
 		
 		// Cancel Exchange Button Click
