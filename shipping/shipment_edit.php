@@ -397,6 +397,7 @@
   		$this->dlgExchange->Display = false;
   		$this->dlgExchange->BackColor = '#FFFFFF';
   		$this->dlgExchange->MatteClickable = false;
+  		$this->dlgExchange->SetCustomStyle('overflow', 'auto');
     }
   	
 		//**************
