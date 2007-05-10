@@ -392,7 +392,7 @@
   		$this->dlgExchange->AutoRenderChildren = false;
   		$this->dlgExchange->Template = 'dlg_exchange.inc.php';
   		$this->dlgExchange->Width = '300px';
-  		$this->dlgExchange->Height = '80px';
+  		$this->dlgExchange->Height = '60px';
   		$this->dlgExchange->Padding = '10px';
   		$this->dlgExchange->Display = false;
   		$this->dlgExchange->BackColor = '#FFFFFF';
@@ -1333,11 +1333,11 @@
 				$lstAdvanced->ActionParameter = $objAssetTransaction->Asset->TempId;
 				$lstAdvanced->CausesValidation = false;
 				$lstAdvanced->AddItem('None', 0);
-				$lstAdvanced->AddItem('Return', 1);
-				$lstAdvanced->AddItem('Exchange', 2);
+				$lstAdvanced->AddItem('Schedule for Return', 1);
+				$lstAdvanced->AddItem('Schedule for Exchange', 2);
 				$lstAdvanced->AddAction(new QChangeEvent(), new QAjaxAction('lstAdvancedColumn_Change'));
 				$lstAdvanced->CausesValidation = false;
-				$lstAdvanced->Width = 100;
+				$lstAdvanced->Width = 200;
 			}
 			
 			if ($objAssetTransaction->ScheduleReceiptFlag) {
@@ -2998,6 +2998,7 @@
 			
 			$this->dlgExchange->ActionParameter = null;
 			$this->dlgExchange->HideDialogBox();
+			$this->blnModifyAssets = true;
 		}
 		
 		// This method triggers if the Advanced label gets clicked. It shows or hides the advanced fields for scheduling receipts
