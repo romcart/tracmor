@@ -46,10 +46,13 @@
 		protected $ctlHeaderMenu;
 		
 		protected $lstCompany;
+		protected $chkAutoDetectTrackingNumbers;
 		protected $btnSave;
 		protected $btnNew;
 		protected $lstFedexAccount;
-		protected $btnFedexSave;
+		protected $txtFedexGatewayUri;
+		protected $txtPackingListTerms;
+		protected $pnlSaveNotification;
 		
 		protected function Form_Create() {
 			
@@ -65,7 +68,11 @@
 			
 			// Create FedEx Shipping Account Fields
 			$this->lstFedexAccount_Create();
-			$this->btnFedexSave_Create();
+			
+			$this->chkAutoDetectTrackingNumbers_Create();
+			$this->txtFedexGatewayUri_Create();
+			$this->txtPackingListTerms_Create();
+			$this->pnlSaveNotification_Create();
 		}
 		
 		protected function Form_PreRender() {
@@ -118,6 +125,38 @@
 			$this->lstCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}		
 		
+		// Create and Setup chkAutoDetectTrackingNumbers
+		protected function chkAutoDetectTrackingNumbers_Create() {
+			$this->chkAutoDetectTrackingNumbers = new QCheckBox($this);
+			$this->chkAutoDetectTrackingNumbers->Name = QApplication::Translate('Auto-Detect Tracking Numbers');
+			$this->chkAutoDetectTrackingNumbers->Checked = QApplication::$TracmorSettings->AutodetectTrackingNumbers;
+		}
+		
+		// Create and Setup the MinAssetCode Text Field
+		protected function txtFedexGatewayUri_Create() {
+			$this->txtFedexGatewayUri = new QTextBox($this);
+			$this->txtFedexGatewayUri->Name = 'Fedex Gateway URI';
+			$this->txtFedexGatewayUri->Text = QApplication::$TracmorSettings->FedexGatewayUri;
+		}
+		
+		// Create and Setup the MinAssetCode Text Field
+		protected function txtPackingListTerms_Create() {
+			$this->txtPackingListTerms = new QTextBox($this);
+			$this->txtPackingListTerms->Name = 'Packing List Terms';
+			$this->txtPackingListTerms->TextMode = QTextMode::MultiLine;
+			$this->txtPackingListTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
+		}	
+		
+		// Creat and Setup pnlSaveNotification Panel
+		protected function pnlSaveNotification_Create() {
+			$this->pnlSaveNotification = new QPanel($this);
+			$this->pnlSaveNotification->Name = 'Save Notification';
+			$this->pnlSaveNotification->Text = 'Your settings have been saved';
+			$this->pnlSaveNotification->CssClass="save_notification";
+			$this->pnlSaveNotification->Display = false;
+			
+		}
+		
 		// Create and Setup lstFedexAccount
 		protected function lstFedexAccount_Create() {
 			$this->lstFedexAccount = new QListBox($this);
@@ -132,34 +171,7 @@
 				$this->lstFedexAccount->AddItem($objListItem);
 			}
 			$this->lstFedexAccount->AddAction(new QChangeEvent(), new QAjaxAction('lstFedexAccount_Change'));
-			$this->lstFedexAccount->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnFedexSave_Click'));
 			$this->lstFedexAccount->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		}
-		
-		// Create and Setup the Fedex Save button
-		protected function btnFedexSave_Create() {
-			$this->btnFedexSave = new QButton($this);
-			$this->btnFedexSave->Text = 'Save';
-			$this->btnFedexSave->AddAction(new QClickEvent(), new QAjaxAction('btnFedexSave_Click'));
-		}
-		
-		// Create and Setup btnFedexSave_Click
-		// Sets the FedEx Account setting in the AdminSetting table
-		protected function btnFedexSave_Click() {
-			$intAccountId = $this->lstFedexAccount->SelectedValue;
-			$objAccount = ShippingAccount::Load($intAccountId);
-			if (!$objAccount) {
-				$this->lstFedexAccount->Warning = "Not a valid FedEx Account.";
-			}
-			elseif (!$objAccount->AccessId || !$objAccount->AccessCode) {
-				$this->lstFedexAccount->Warning = "The FedEx Account must have a valid account number and meter number.";
-			}
-			else {
-			  // Altered $TracmorSettings __set() method so that just setting a value will save it in the database.
-				QApplication::$TracmorSettings->FedexAccountId = $intAccountId;
-				// Not really a warning, just need to display that it has been saved without changing pages.
-				$this->lstFedexAccount->Warning = "Saved";
-			}
 		}
 		
 		// Create/Setup the New button
@@ -210,20 +222,26 @@
 		// Create/Setup the Save button
 		// Sets the Shipping/Receiving Company setting in the AdminSetting table
 		protected function btnSave_Click() {
-			
 			$intCompanyId = $this->lstCompany->SelectedValue;
 			$objCompany = Company::Load($intCompanyId);
-			if (!$objCompany) {
-				$this->lstCompany->Warning = "Not a valid company.";
-			}
-			elseif (!$objCompany->Telephone) {
+			$intAccountId = $this->lstFedexAccount->SelectedValue;
+			$objAccount = ShippingAccount::Load($intAccountId);
+			
+			if ($objCompany && !$objCompany->Telephone) {
 				$this->lstCompany->Warning = "The Shipping/Receiving company must have a valid telephone number.";
 			}
-			else {
-			  // Altered $TracmorSettings __set() method so that just setting a value will save it in the database.
+			elseif ($objAccount && (!$objAccount->AccessId || !$objAccount->AccessCode)) {
+				$this->lstFedexAccount->Warning = "The FedEx Account must have a valid account number and meter number.";
+			} else {
+				// Altered $TracmorSettings __set() method so that just setting a value will save it in the database.
 				QApplication::$TracmorSettings->CompanyId = $intCompanyId;
-				// Not really a warning, just need to display that it has been saved without changing pages.
-				$this->lstCompany->Warning = "Saved";
+				QApplication::$TracmorSettings->FedexAccountId = $intAccountId;
+				QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
+				QApplication::$TracmorSettings->PackingListTerms = $this->txtPackingListTerms->Text;
+				QApplication::$TracmorSettings->AutodetectTrackingNumbers = $this->chkAutoDetectTrackingNumbers->Checked;
+				
+				// Show saved notification
+				$this->pnlSaveNotification->Display = true;
 			}
 		}
 		

@@ -30,8 +30,7 @@
 		// Inputs
 		protected $txtMinAssetCode;
 		protected $txtImageUploadPrefix;
-		protected $txtFedexGatewayUri;
-		protected $txtPackingListTerms;
+		protected $pnlSaveNotification;
 		
 		// Buttons
 		protected $btnSave;
@@ -43,11 +42,12 @@
 			// Create Inputs
 			$this->txtMinAssetCode_Create();
 			$this->txtImageUploadPrefix_Create();
-			$this->txtFedexGatewayUri_Create();
-			$this->txtPackingListTerms_Create();
 			
 			// Create Buttons
 			$this->btnSave_Create();
+			
+			// Create Panels
+			$this->pnlSaveNotification_Create();
 		}
 		
 		// Create and Setup the Header Composite Control
@@ -67,22 +67,7 @@
 			$this->txtImageUploadPrefix = new QTextBox($this);
 			$this->txtImageUploadPrefix->Name = 'Image Upload Prefix';
 			$this->txtImageUploadPrefix->Text = QApplication::$TracmorSettings->ImageUploadPrefix;
-		}
-		
-		// Create and Setup the MinAssetCode Text Field
-		protected function txtFedexGatewayUri_Create() {
-			$this->txtFedexGatewayUri = new QTextBox($this);
-			$this->txtFedexGatewayUri->Name = 'Fedex Gateway URI';
-			$this->txtFedexGatewayUri->Text = QApplication::$TracmorSettings->FedexGatewayUri;
-		}
-		
-		// Create and Setup the MinAssetCode Text Field
-		protected function txtPackingListTerms_Create() {
-			$this->txtPackingListTerms = new QTextBox($this);
-			$this->txtPackingListTerms->Name = 'Packing List Terms';
-			$this->txtPackingListTerms->TextMode = QTextMode::MultiLine;
-			$this->txtPackingListTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
-		}				
+		}			
 		
 		// Create and Setup the Save Buttons
 		protected function btnSave_Create() {
@@ -91,13 +76,23 @@
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 		}
 		
+		// Create and Setup the Save Notification Panel
+		protected function pnlSaveNotification_Create() {
+			$this->pnlSaveNotification = new QPanel($this);
+			$this->pnlSaveNotification->Name = 'Save Notification';
+			$this->pnlSaveNotification->Text = 'Your settings have been saved';
+			$this->pnlSaveNotification->CssClass="save_notification";
+			$this->pnlSaveNotification->Display = false;
+		}
+		
 		// Save button click action
 		// Setting a TracmorSetting saves it to the database automagically because the __set() method has been altered
 		protected function btnSave_Click() {
 			QApplication::$TracmorSettings->MinAssetCode = $this->txtMinAssetCode->Text;
 			QApplication::$TracmorSettings->ImageUploadPrefix = $this->txtImageUploadPrefix->Text;
-			QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
-			QApplication::$TracmorSettings->PackingListTerms = $this->txtPackingListTerms->Text;
+			
+			// Show saved notification
+			$this->pnlSaveNotification->Display = true;
 		}
 	}
 

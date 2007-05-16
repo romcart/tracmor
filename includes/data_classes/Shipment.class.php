@@ -92,10 +92,60 @@
 		}
 		
 		public function __toStringTrackingNumber($CssClass = null) {
-			// If this is a FedEx Shipment
 			if ($this->CourierId == 1) {
-				// http://www.fedex.com/Tracking?sum=n&initial=n&cntry_code=us&language=english&tracknumber_list=408639210000128
+				// FedEx Shipment
 				$strToReturn = sprintf('<a href="http://www.fedex.com/Tracking?action=track&tracknumbers=%s" target="_blank">%s</a>', $this->TrackingNumber, $this->TrackingNumber);
+			}
+			elseif ($this->TrackingNumber && QApplication::$TracmorSettings->AutodetectTrackingNumbers) {
+				// Attempt auto-detection of tracking number
+				$strTrackingNumber = strtoupper(str_replace(" ","",$this->TrackingNumber));
+				$intTrackingNumberLength = strlen($strTrackingNumber);
+				$intCarrier=0;
+				
+				// Determine carrier by evaluating the tracking number
+				if (substr($strTrackingNumber,0,2) == "1Z") {
+					// UPS
+					$intCarrier=1;
+				} else if (($intTrackingNumberLength >= 12 && $intTrackingNumberLength <= 19) || $intTrackingNumberLength == 22) {
+					// FedEx
+					if (is_numeric($strTrackingNumber))
+						$intCarrier=2;					
+				} else if (($intTrackingNumberLength >=20 && $intTrackingNumberLength <=21) || $intTrackingNumberLength == 22) {
+					// USPS
+					if (is_numeric($strTrackingNumber))
+						$intCarrier=3;
+				} else if ($intTrackingNumberLength == 10 || $intTrackingNumberLength == 11) {
+					// DHL
+					if (is_numeric($strTrackingNumber))
+						$intCarrier=4;
+				}
+				
+				switch ($intCarrier) {
+					case 0: 
+						// Unknown
+						$strToReturn = $this->TrackingNumber;
+						break;
+						
+					case 1:
+						// UPS
+						$strToReturn = sprintf('<a href="http://wwwapps.ups.com/etracking/tracking.cgi?InquiryNumber1=%s&TypeOfInquiryNumber=T&AcceptUPSLicenseAgreement=yes&submit=Track" target="_blank">%s</a>',$this->TrackingNumber,$this->TrackingNumber);
+						break;
+						
+					case 2:
+						// FedEx
+						$strToReturn = sprintf('<a href="http://www.fedex.com/Tracking?tracknumbers=%s&action=track" target="_blank">%s</a>',$this->TrackingNumber,$this->TrackingNumber);
+						break;
+						
+					case 3:
+						// USPS
+						$strToReturn= sprintf('<a href="http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum=%s" target="_blank">%s</a>',$this->TrackingNumber,$this->TrackingNumber);
+						break;
+						
+					case 4:
+						// DHL
+						$strToReturn = sprintf('<a href="http://track.dhl-usa.com/TrackByNbr.asp?ShipmentNumber=%s" target="_blank">%s</a>',$this->TrackingNumber,$this->TrackingNumber);
+						break;
+				}				
 			}
 			elseif ($this->TrackingNumber) {
 				$strToReturn = $this->TrackingNumber;

@@ -101,3 +101,11 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 	border-top:1px solid #FF6600;
 	padding-bottom:4px;
 }
+.save_notification {
+	color: darkgreen;
+	background-color: #D0FFC3;
+	font-size:10pt;
+	font-family: verdana;
+	border: 1px solid #9cbf92;
+	padding: 5px; 
+}

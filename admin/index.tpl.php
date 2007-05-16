@@ -39,10 +39,8 @@
 		</td>
 		<td width="100%" valign="top">
 		<div class="title">Administration Settings</div>
-		<div class="instructions" style="font-size:10;">
-			Update the administrative settings below and save the changes.<br /><br />
-		</div>
-		<table class="datagrid" cellpadding="5" cellspacing="0" border="0">
+		<div style="padding:5px"><?php $this->pnlSaveNotification->Render(); ?></div>
+		<table class="datagrid" cellpadding="5" cellspacing="0">
 			<tr>
 				<td class="record_header">
 					<?php 
@@ -61,14 +59,6 @@
 						<tr>
 							<td class="record_field_name">Image Upload Prefix: </td>
 							<td class="record_field_edit"><?php $this->txtImageUploadPrefix->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Fedex Gateway Uri: </td>
-							<td class="record_field_edit"><?php $this->txtFedexGatewayUri->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Packing List Terms: </td>
-							<td class="record_field_edit"><?php $this->txtPackingListTerms->RenderWithError("Rows=10"); ?></td>
 						</tr>
 					</table>
 				</td>

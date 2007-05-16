@@ -33,26 +33,48 @@
 	include('shortcut_menu.inc.php');
 ?>
 <!-- End Shortcut Menu -->
-
 		</td>
 		<td>
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
-		<div class="title">Shipping/Receiving</div>	
-		<table>
+		<div class="title">Shipping/Receiving</div>
+		<div style="padding:5px"><?php $this->pnlSaveNotification->Render(); ?></div>
+		<table class="datagrid" cellpadding="5" cellspacing="0">
 			<tr>
-				<td><?php $this->lstCompany->RenderDesigned(); ?></td>
-				<td><?php $this->btnSave->Render(); ?></td>
+				<td class="record_header">
+					<?php 
+						$this->btnSave->Render();
+						echo('&nbsp;');
+					?>
+				</td>
 			</tr>
-		</table>
-		<br class="item_divider" />
-		<div class="title">FedEx&reg; Shipping</div>	
-		<table>
 			<tr>
-				<td><?php $this->lstFedexAccount->RenderDesigned(); ?></td>
-				<td><?php $this->btnFedexSave->Render(); ?></td>
-			</tr>		
+				<td>
+					<table>
+						<tr>
+							<td class="record_field_name">Default Shipping & Receiving Company:</td>
+							<td class="record_field_edit"><?php $this->lstCompany->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Default FedEx&reg; Integration Account:</td>
+							<td class="record_field_edit"><?php $this->lstFedexAccount->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">FedEx&reg; Gateway URI:</td>
+							<td class="record_field_edit"><?php $this->txtFedexGatewayUri->RenderWithError(); ?></td>
+						</tr>			
+						<tr>
+							<td class="record_field_name">Auto-Detect Tracking Numbers:</td>
+							<td class="record_field_edit"><?php $this->chkAutoDetectTrackingNumbers->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Packing List Terms:</td>
+							<td class="record_field_edit"><?php $this->txtPackingListTerms->RenderWithError(); ?></td>
+						</tr>
+					</table>	
+				</td>
+			</tr>
 		</table>
 		<br class="item_divider" />		
 		<div class="title"><?php _t('Shipping Accounts'); ?></div>		
