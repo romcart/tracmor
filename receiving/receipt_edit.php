@@ -49,13 +49,14 @@
 		protected $blnModifyInventory = false;
 		
 		// Labels
-		protected $lblReceiptNumber;
 		protected $lblHeaderReceipt;
 		protected $lblFromCompany;
 		protected $lblFromContact;
 		protected $lblToContact;
 		protected $lblToAddress;
 		protected $pnlNote;
+		protected $lblDueDate;
+		protected $lblReceiptDate;
 		
 		// Inputs
 		protected $txtNote;
@@ -65,6 +66,7 @@
 		protected $rblAssetType;
 		protected $lstAssetModel;
 		protected $chkAutoGenerateAssetCode;
+		protected $calDueDate;
 		
 		// Buttons
 		protected $btnEdit;
@@ -83,6 +85,7 @@
 		protected $objAssetTransactionArray;
 		protected $objInventoryTransactionArray;
 		protected $objTransaction;
+		protected $dttNow;
 		
 		// Integers
 		protected $intNewTempId = 1;
@@ -98,13 +101,14 @@
 			$this->ctlShortcutMenu_Create();			
 			
 			// Create the labels
-			$this->lblReceiptNumber_Create();
 			$this->lblHeaderReceipt_Create();
 			$this->lblFromCompany_Create();
 			$this->lblFromContact_Create();
 			$this->lblToContact_Create();
 			$this->lblToAddress_Create();
 			$this->pnlNote_Create();
+			$this->lblDueDate_Create();
+			$this->lblReceiptDate_Create();
 			
 			// Create the inputs
 			$this->lstFromCompany_Create();
@@ -118,6 +122,7 @@
 			$this->rblAssetType_Create();
 			$this->lstAssetModel_Create();
 			$this->chkAutoGenerateAssetCode_Create();
+			$this->calDueDate_Create();
 			
 			// Create the buttons
 			$this->btnSave_Create();
@@ -232,23 +237,11 @@
 		// CREATE LABELS
 		//**************
 		
-		// Create and Setup Receipt Number label
-		protected function lblReceiptNumber_Create() {
-			$this->lblReceiptNumber = new QLabel($this);
-			$this->lblReceiptNumber->Name = 'Receipt Number';
-			if ($this->blnEditMode) {
-				$this->lblReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
-			}
-			else {
-				$this->lblReceiptNumber->Text = '';
-			}
-		}
-		
 		// Create Header Label
 		protected function lblHeaderReceipt_Create() {
 			$this->lblHeaderReceipt = new QLabel($this);
 			if ($this->blnEditMode) {
-				$this->lblHeaderReceipt->Text = $this->objReceipt->ReceiptNumber;
+				$this->lblHeaderReceipt->Text = sprintf('Receipt #%s',$this->objReceipt->ReceiptNumber); 
 			}
 			else {
 				$this->lblHeaderReceipt->Text = 'Schedule Receipt';
@@ -299,6 +292,24 @@
 			$this->pnlNote->Name = 'Note';
 			if ($this->objReceipt->TransactionId) {
 				$this->pnlNote->Text = nl2br($this->objReceipt->Transaction->Note);
+			}
+		}
+		
+		// Create and Setup Due Date Label
+		protected function lblDueDate_Create() {
+			$this->lblDueDate = new QLabel($this);
+			$this->lblDueDate->Name = 'Date Due';
+			if ($this->objReceipt->DueDate) {
+				$this->lblDueDate->Text = $this->objReceipt->DueDate->__toString();
+			}
+		}
+		
+		// Create and Setup Receipt Date Label
+		protected function lblReceiptDate_Create() {
+			$this->lblReceiptDate = new QLabel($this);
+			$this->lblReceiptDate->Name = 'Receipt Due';
+			if ($this->objReceipt->ReceiptDate) {
+				$this->lblReceiptDate->Text = $this->objReceipt->ReceiptDate->__toString();
 			}
 		}
 		
@@ -385,6 +396,22 @@
 				$this->txtNote->Text = $this->objReceipt->Transaction->Note;
 			}
 			$this->txtNote->TabIndex=5;
+		}
+		
+		// Create and Setup calDueDate
+		protected function calDueDate_Create() {
+			$this->calDueDate = new QDateTimePicker($this);
+			$this->calDueDate->Name = QApplication::Translate('Due Date');
+			$this->calDueDate->DateTimePickerType = QDateTimePickerType::Date;
+			if ($this->blnEditMode) {
+				$this->calDueDate->DateTime = $this->objReceipt->DueDate;
+			}
+			elseif (!$this->blnEditMode) {
+				$this->calDueDate->DateTime = new QDateTime(QDateTime::Now);
+			}
+			$this->calDueDate->Required = true;
+			$this->dttNow = new QDateTime(QDateTime::Now);
+			$this->calDueDate->MinimumYear = $this->dttNow->Year;
 		}
 		
 		// Create the text field to enter new asset codes to add to the transaction
@@ -1253,9 +1280,12 @@
 						// Set the entire receipt as received if assets and inventory have all been received
 						if ($blnAllInventoryReceived) {
 							$this->objReceipt->ReceivedFlag = true;
+							$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);
 							$this->objReceipt->Save();
 							// Reload to get new timestamp to avoid optimistic locking if edited/saved again without reload
 							$this->objReceipt = Receipt::Load($this->objReceipt->ReceiptId);
+							// Update labels (specifically we want to update Received Date)
+							$this->UpdateReceiptLabels();
 						}
 					}
 					
@@ -1456,9 +1486,12 @@
 						if ($blnAllAssetsReceived) {
 							// Flip the received flag for the entire Receipt
 							$this->objReceipt->ReceivedFlag = true;
+							$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);
 							$this->objReceipt->Save();
 							// Reload to get new timestamp to avoid optimistic locking if edited/saved again without reload
 							$this->objReceipt = Receipt::Load($this->objReceipt->ReceiptId);
+							// Update labels (specifically we want to update Received Date)
+							$this->UpdateReceiptLabels();
 						}
 					}
 					
@@ -1765,6 +1798,7 @@
 						if ($blnAllAssetsReceived && $blnAllInventoryReceived) {
 							// Flip the received flag for the entire Receipt
 							$this->objReceipt->ReceivedFlag = true;
+							$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);						
 						}
 						
 						$this->UpdateReceiptFields();
@@ -1871,16 +1905,14 @@
 		// Protected Update Methods
 		protected function UpdateReceiptFields() {
 			$this->objReceipt->TransactionId = $this->objTransaction->TransactionId;
-			if ($this->blnEditMode) {
-				$this->objReceipt->ReceiptNumber = $this->lblReceiptNumber->Text;
-			}
-			else {
+			if (!$this->blnEditMode) {
 				$this->objReceipt->ReceiptNumber = Receipt::LoadNewReceiptNumber();
 			}
 			$this->objReceipt->FromCompanyId = $this->lstFromCompany->SelectedValue;
 			$this->objReceipt->FromContactId = $this->lstFromContact->SelectedValue;
 			$this->objReceipt->ToContactId = $this->lstToContact->SelectedValue;
 			$this->objReceipt->ToAddressId = $this->lstToAddress->SelectedValue;
+			$this->objReceipt->DueDate = $this->calDueDate->DateTime;
 			$this->objTransaction->Note = $this->txtNote->Text;
 			
 			// Reload the Assets and inventory locations so that they don't trigger an OLE if edit/save adding assets or inventory multiple times
@@ -1904,15 +1936,17 @@
 			$this->lstToContact->SelectedValue = $this->objReceipt->ToContactId;
 			$this->lstToAddress->SelectedValue = $this->objReceipt->ToAddressId;
 			$this->txtNote->Text = $this->objReceipt->Transaction->Note;
+			$this->calDueDate->DateTime = $this->objReceipt->DueDate;
 		}		
 		
 		protected function UpdateReceiptLabels() {
-			$this->lblReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
 			$this->lblFromCompany->Text = $this->objReceipt->FromCompany->__toString();
 			$this->lblFromContact->Text = $this->objReceipt->FromContact->__toString();
 			$this->lblToContact->Text = $this->objReceipt->ToContact->__toString();
 			$this->lblToAddress->Text = $this->objReceipt->ToAddress->__toString();
 			$this->pnlNote->Text = nl2br($this->objReceipt->Transaction->Note);
+			$this->lblDueDate->Text = $this->objReceipt->DueDate->__toString();
+			$this->lblReceiptDate->Text = $this->objReceipt->ReceiptDate->__toString();
 		}
 		
 		protected function DisplayLabels() {
@@ -1923,6 +1957,7 @@
 			$this->lstToContact->Display = false;
 			$this->lstToAddress->Display = false;
 			$this->txtNote->Display = false;
+			$this->calDueDate->Display = false;
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->RemoveColumnByName('&nbsp;');
 				$this->dtgInventoryTransact->RemoveColumnByName('&nbsp;');
@@ -1944,6 +1979,7 @@
 			$this->lblToContact->Display = true;
 			$this->lblToAddress->Display = true;
 			$this->pnlNote->Display = true;
+			$this->lblDueDate->Display = true;
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
 			if ($this->blnEditMode) {
@@ -1960,6 +1996,7 @@
 			$this->lblToContact->Display = false;
 			$this->lblToAddress->Display = false;
 			$this->pnlNote->Display = false;
+			$this->lblDueDate->Display = false;
 			$this->btnEdit->Display = false;
 			$this->btnDelete->Display = false;
 			if ($this->blnEditMode) {
@@ -1973,6 +2010,7 @@
 			$this->lstToContact->Display = true;
 			$this->lstToAddress->Display = true;
 			$this->txtNote->Display = true;
+			$this->calDueDate->Display = true;
 			$this->btnSave->Display = true;
 			$this->btnCancel->Display = true;
 			if (!$this->objReceipt->ReceivedFlag) {

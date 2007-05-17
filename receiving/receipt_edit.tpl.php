@@ -38,17 +38,7 @@
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
-	<?php 
-	
-		// Build array of all fields to display
-		$arrReceiptFields[] = array('name' => 'Receipt Number:',  'value' => $this->lblReceiptNumber->Render(false));
-		$arrReceiptFields[] = array('name' => 'From Company:',  'value' => $this->lblFromCompany->Render(false) . $this->lstFromCompany->RenderWithError(false));
-		$arrReceiptFields[] = array('name' => 'From Contact:',  'value' => $this->lblFromContact->Render(false) . $this->lstFromContact->RenderWithError(false));		
-		$arrReceiptFields[] = array('name' => 'To Contact:',  'value' => $this->lblToContact->Render(false) . $this->lstToContact->RenderWithError(false));				
-		$arrReceiptFields[] = array('name' => 'To Address:',  'value' => $this->lblToAddress->Render(false) . $this->lstToAddress->RenderWithError(false));				
-		$arrReceiptFields[] = array('name' => 'Note:',  'value' => $this->pnlNote->Render(false) . $this->txtNote->RenderWithError(false));
-		
-	?>	
+
 	<div class="title">Receipts: <?php $this->lblHeaderReceipt->Render(); ?></div>
 	<table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
 		<tr>
@@ -68,30 +58,55 @@
 					<tr>
 						<td style="vertical-align:top;">
 							<table cellpadding="0" cellspacing="0">
-							<?php
-								for ($i=0;$i<ceil(count($arrReceiptFields)/2);$i++) {
-									echo('<tr>');
-									echo('<td class="record_field_name">'. $arrReceiptFields[$i]['name'] .'&nbsp;</td>');
-									echo('<td class="record_field_value">'. $arrReceiptFields[$i]['value'] .'&nbsp;</td>');
-									echo('</tr>');
-								}
-							?>
+								<tr>
+									<td colspan="2" class="record_subheader">Sender Information</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Company:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); ?>&nbsp;</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Contact:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); ?>&nbsp;</td>
+								</tr>
+							</table>
+							<br class="item_divider" />
+							<table cellpadding="0" cellspacing="0">
+								<tr>
+									<td colspan="2" class="record_subheader">Recipient Information</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Contact:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render(); ?>&nbsp;</td>
+								</tr>
+								<tr>
+									<td class="record_field_name">Address:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); ?>&nbsp;</td>
+								</tr>						
 							</table>
 						</td>
+						<td style="width:16px">&nbsp;</td>
 						<td style="vertical-align:top;">
 							<table cellpadding="0" cellspacing="0">
-							<?php
-								for ($i=ceil(count($arrReceiptFields)/2);$i<count($arrReceiptFields);$i++) {
-									echo('<tr>');
-									echo('<td class="record_field_name">'. $arrReceiptFields[$i]['name'] .'&nbsp;</td>');
-									echo('<td class="record_field_value">'. $arrReceiptFields[$i]['value'] .'&nbsp;</td>');
-									echo('</tr>');
-								}
-							?>				
+								<tr>
+									<td colspan="2" class="record_subheader">Receipt Information</td>
+								</tr>								
+								<tr>
+									<td class="record_field_name">Note:&nbsp;</td>
+									<td class="record_field_value"><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?>&nbsp;</td>
+								</tr>									
+								<tr>
+									<td class="record_field_name">Date Due:&nbsp;</td>
+									<td class="record_field_value"><?php $this->calDueDate->RenderWithError();$this->lblDueDate->Render(); ?>&nbsp;</td>
+								</tr>
+								<tr style="<?php if (!$this->blnEditMode) { echo('display:none'); } ?>">
+									<td class="record_field_name">Date Received:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lblReceiptDate->Render(); ?>&nbsp;</td>
+								</tr>										
 							</table>
 						</td>
 					</tr>
-				</table>
+				</table>				
 			</td>
 		</tr>
 	</table>	

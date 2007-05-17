@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes" ?>
 <DBMODEL Version="4.0">
 <SETTINGS>
-<GLOBALSETTINGS ModelName="tracmor" IDModel="0" IDVersion="0" VersionStr="1.0.0.0" Comments="" UseVersionHistroy="1" AutoIncVersion="1" DatabaseType="MySQL" ZoomFac="75.00" XPos="4" YPos="255" DefaultDataType="5" DefaultTablePrefix="0" DefSaveDBConn="" DefSyncDBConn="" DefQueryDBConn="" Printer="\\C-6\HP Officejet 7300 series" HPageCount="2.79399727148704" PageAspectRatio="1.441048034934498" PageOrientation="0" PageFormat="A4 (210x297 mm, 8.26x11.7 inches)" SelectedPages="0;1" UsePositionGrid="0" PositionGridX="20" PositionGridY="20" TableNameInRefs="1" DefaultTableType="1" ActivateRefDefForNewRelations="1" FKPrefix="" FKPostfix="" CreateFKRefDefIndex="1" DBQuoteCharacter="`" CreateSQLforLinkedObjects="0" DefModelFont="Verdana" CanvasWidth="4096" CanvasHeight="2842" />
+<GLOBALSETTINGS ModelName="tracmor" IDModel="0" IDVersion="0" VersionStr="1.0.0.0" Comments="" UseVersionHistroy="1" AutoIncVersion="1" DatabaseType="MySQL" ZoomFac="75.00" XPos="0" YPos="571" DefaultDataType="5" DefaultTablePrefix="0" DefSaveDBConn="" DefSyncDBConn="" DefQueryDBConn="" Printer="\\C-6\HP Officejet 7300 series" HPageCount="2.79399727148704" PageAspectRatio="1.441048034934498" PageOrientation="0" PageFormat="A4 (210x297 mm, 8.26x11.7 inches)" SelectedPages="0;1" UsePositionGrid="0" PositionGridX="20" PositionGridY="20" TableNameInRefs="1" DefaultTableType="1" ActivateRefDefForNewRelations="1" FKPrefix="" FKPostfix="" CreateFKRefDefIndex="1" DBQuoteCharacter="`" CreateSQLforLinkedObjects="0" DefModelFont="Verdana" CanvasWidth="4096" CanvasHeight="2842" />
 <DATATYPEGROUPS>
 <DATATYPEGROUP Name="Numeric Types" Icon="1" />
 <DATATYPEGROUP Name="Date and Time Types" Icon="2" />
@@ -2583,6 +2583,10 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
+<COLUMN ID="4209" ColName="due_date" PrevColName="" Pos="13" idDatatype="14" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<OPTIONSELECTED>
+</OPTIONSELECTED>
+</COLUMN>
 <COLUMN ID="3306" ColName="receipt_date" PrevColName="" Pos="12" idDatatype="14" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 </OPTIONSELECTED>
@@ -3264,7 +3268,7 @@
 </INDEX>
 </INDICES>
 </TABLE>
-<TABLE ID="3874" Tablename="datagrid" PrevTableName="Table_42" XPos="829" YPos="1583" TableType="1" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="INSERT INTO datagrid (short_description) VALUES (\aasset_list\a);\nINSERT INTO datagrid (short_description) VALUES (\aasset_model_list\a);\nINSERT INTO datagrid (short_description) VALUES (\ainventory_model_list\a);\nINSERT INTO datagrid (short_description) VALUES (\acompany_list\a);\nINSERT INTO datagrid (short_description) VALUES (\acontact_list\a);\nINSERT INTO datagrid (short_description) VALUES (\acategory_list\a);\nINSERT INTO datagrid (short_description) VALUES (\amanufacturer_list\a);\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="151" >
+<TABLE ID="3874" Tablename="datagrid" PrevTableName="Table_42" XPos="829" YPos="1583" TableType="1" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="INSERT INTO datagrid (short_description) VALUES (\aasset_list\a);\nINSERT INTO datagrid (short_description) VALUES (\aasset_model_list\a);\nINSERT INTO datagrid (short_description) VALUES (\ainventory_model_list\a);\nINSERT INTO datagrid (short_description) VALUES (\acompany_list\a);\nINSERT INTO datagrid (short_description) VALUES (\acontact_list\a);\nINSERT INTO datagrid (short_description) VALUES (\acategory_list\a);\nINSERT INTO datagrid (short_description) VALUES (\amanufacturer_list\a);\nINSERT INTO datagrid (short_description) VALUES (\areceipt_list\a);\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="151" >
 <COLUMNS>
 <COLUMN ID="3876" ColName="datagrid_id" PrevColName="" Pos="0" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="1" NotNull="1" AutoInc="1" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
