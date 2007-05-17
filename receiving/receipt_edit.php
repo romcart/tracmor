@@ -1945,8 +1945,8 @@
 			$this->lblToContact->Text = $this->objReceipt->ToContact->__toString();
 			$this->lblToAddress->Text = $this->objReceipt->ToAddress->__toString();
 			$this->pnlNote->Text = nl2br($this->objReceipt->Transaction->Note);
-			$this->lblDueDate->Text = $this->objReceipt->DueDate->__toString();
-			$this->lblReceiptDate->Text = $this->objReceipt->ReceiptDate->__toString();
+			$this->lblDueDate->Text = ($this->objReceipt->DueDate) ? $this->objReceipt->DueDate->__toString() : '';
+			$this->lblReceiptDate->Text = ($this->objReceipt->ReceiptDate) ? $this->objReceipt->ReceiptDate->__toString() : '';
 		}
 		
 		protected function DisplayLabels() {
