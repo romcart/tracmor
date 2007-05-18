@@ -241,9 +241,13 @@
 	  // Create the Receipt datagrid
   	protected function dtgReceipt_Create() {
 			$this->dtgReceipt = new QDataGrid($this);
+			$this->dtgReceipt->Name = 'receipt_list';
   		$this->dtgReceipt->CellPadding = 5;
   		$this->dtgReceipt->CellSpacing = 0;
   		$this->dtgReceipt->CssClass = "datagrid";
+  		
+  		// Allow for column toggling
+      $this->dtgReceipt->ShowColumnToggle = true;
       		
       // Enable AJAX - this won't work while using the DB profiler
       $this->dtgReceipt->UseAjax = true;
@@ -253,12 +257,14 @@
       $this->dtgReceipt->Paginator = $objPaginator;
       $this->dtgReceipt->ItemsPerPage = 20;
           
-      $this->dtgReceipt->AddColumn(new QDataGridColumn('Receipt Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="receipt_number ASC"', 'ReverseSortByCommand="receipt_number DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgReceipt->AddColumn(new QDataGridColumn('Receive From Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="receipt__from_company_id__short_description ASC"', 'ReverseSortByCommand="receipt__from_company_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgReceipt->AddColumn(new QDataGridColumn('Receive From Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="receipt__from_contact_id__last_name ASC"', 'ReverseSortByCommand="receipt__from_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
-      $this->dtgReceipt->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="receipt__created_by__last_name ASC"', 'ReverseSortByCommand="receipt__created_by__last_name DESC"', 'CssClass="dtg_column"'));
-      $this->dtgReceipt->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'SortByCommand="received_flag ASC"', 'ReverseSortByCommand="received_flag DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receipt Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="receipt_number ASC"', 'ReverseSortByCommand="receipt_number DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receive From Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="receipt__from_company_id__short_description ASC"', 'ReverseSortByCommand="receipt__from_company_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receive From Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="receipt__from_contact_id__last_name ASC"', 'ReverseSortByCommand="receipt__from_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="receipt__created_by__last_name ASC"', 'ReverseSortByCommand="receipt__created_by__last_name DESC"', 'CssClass="dtg_column"'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'SortByCommand="received_flag ASC, due_date ASC"', 'ReverseSortByCommand="received_flag DESC, due_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Due Date', '<?= $_FORM->DisplayDate($_ITEM->DueDate); ?>', 'SortByCommand="due_date ASC"', 'ReverseSortByCommand="due_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receipt Date', '<?= $_FORM->DisplayDate($_ITEM->ReceiptDate); ?>', 'SortByCommand="receipt_date ASC"', 'ReverseSortByCommand="receipt_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"', 'Display="false"'));
+           
       $this->dtgReceipt->SortColumnIndex = 0;
     	$this->dtgReceipt->SortDirection = 1;
       
@@ -274,6 +280,15 @@
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#EFEFEF';
       $objStyle->CssClass = 'dtg_header';  		
+  	}
+  	
+  	public function DisplayDate($objDateTime) {
+  		if ($objDateTime instanceof QDateTime) {
+  			return $objDateTime->__toString();
+  		}
+  		else {
+  			return null;
+  		}
   	}
 
   	// Reset the page number to 1 if a new search is enacted
