@@ -75,8 +75,13 @@
 			if ($this->ReceivedFlag) {
 				$strToReturn = 'Received';
 			}
+			elseif ($this->DueDate && $this->DueDate->IsEarlierThan(new QDateTime(QDateTime::Now)) ) {
+				$now = new QDateTime(QDateTime::Now);
+				$dtsDifference = $now->Difference($this->DueDate);
+				$strToReturn = sprintf('<strong style="color:#BC3500;">Pending (%s)</strong>', $dtsDifference->Days);
+			}
 			else {
-				$strToReturn = '<strong style="color:#bc3500;">Pending</strong>';
+				$strToReturn = '<strong style="color:#CC9933;">Pending</strong>';
 			}
 			return sprintf('%s', $strToReturn);
 		}
@@ -298,6 +303,8 @@
 					`receipt`.`to_contact_id` AS `to_contact_id`,
 					`receipt`.`to_address_id` AS `to_address_id`,
 					`receipt`.`receipt_number` AS `receipt_number`,
+					`receipt`.`due_date` AS `due_date`,
+					`receipt`.`receipt_date` AS `receipt_date`,
 					`receipt`.`received_flag` AS `received_flag`,
 					`receipt`.`created_by` AS `created_by`,
 					`receipt`.`creation_date` AS `creation_date`,
