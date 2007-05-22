@@ -53,11 +53,11 @@
 				<td>
 					<table>
 						<tr>
-							<td class="record_field_name">Default Shipping & Receiving Company:</td>
+							<td class="record_field_name">Default Company:</td>
 							<td class="record_field_edit"><?php $this->lstCompany->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Default FedEx&reg; Integration Account:</td>
+							<td class="record_field_name">Default FedEx&reg; Account:</td>
 							<td class="record_field_edit"><?php $this->lstFedexAccount->RenderWithError(); ?></td>
 						</tr>
 						<tr>
@@ -65,12 +65,12 @@
 							<td class="record_field_edit"><?php $this->txtFedexGatewayUri->RenderWithError(); ?></td>
 						</tr>			
 						<tr>
-							<td class="record_field_name">Auto-Detect Tracking Numbers:</td>
+							<td class="record_field_name">Detect Tracking Numbers:</td>
 							<td class="record_field_edit"><?php $this->chkAutoDetectTrackingNumbers->RenderWithError(); ?></td>
 						</tr>
 						<tr>
 							<td class="record_field_name">Packing List Terms:</td>
-							<td class="record_field_edit"><?php $this->txtPackingListTerms->RenderWithError(); ?></td>
+							<td class="record_field_edit"><?php $this->fckPackingListTerms->RenderWithError(); ?></td>
 						</tr>
 					</table>	
 				</td>

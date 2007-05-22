@@ -51,7 +51,7 @@
 		protected $btnNew;
 		protected $lstFedexAccount;
 		protected $txtFedexGatewayUri;
-		protected $txtPackingListTerms;
+		protected $fckPackingListTerms;
 		protected $pnlSaveNotification;
 		
 		protected function Form_Create() {
@@ -61,7 +61,6 @@
 			
 			// Create Shipping/Receiving Company Fields
 			$this->lstCompany_Create();
-			$this->btnSave_Create();
 			
 			$this->btnNew_Create();
 			$this->dtgShippingAccount_Create();
@@ -71,8 +70,10 @@
 			
 			$this->chkAutoDetectTrackingNumbers_Create();
 			$this->txtFedexGatewayUri_Create();
-			$this->txtPackingListTerms_Create();
+			$this->fckPackingListTerms_Create();
 			$this->pnlSaveNotification_Create();
+			
+			$this->btnSave_Create();
 		}
 		
 		protected function Form_PreRender() {
@@ -104,6 +105,8 @@
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
 			$this->btnSave->Text = 'Save';
+			// This javascript function call is necessary in order to save the FCKEditor contents via AJAX
+			$this->btnSave->AddAction(new QClickEvent(), new QJavaScriptAction(sprintf('FCKeditorAPI.GetInstance(\'%s\').UpdateLinkedField();',$this->fckPackingListTerms->ControlId)));
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 		}
 		
@@ -140,11 +143,14 @@
 		}
 		
 		// Create and Setup the MinAssetCode Text Field
-		protected function txtPackingListTerms_Create() {
-			$this->txtPackingListTerms = new QTextBox($this);
-			$this->txtPackingListTerms->Name = 'Packing List Terms';
-			$this->txtPackingListTerms->TextMode = QTextMode::MultiLine;
-			$this->txtPackingListTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
+		protected function fckPackingListTerms_Create() {
+			$this->fckPackingListTerms = new QFCKeditor($this);
+			$this->fckPackingListTerms->Width = 640;
+			$this->fckPackingListTerms->ToolbarCanCollapse = false;
+			$this->fckPackingListTerms->Name = 'Packing List Terms';
+			$this->fckPackingListTerms->ToolbarSet = 'Tracmor';
+			$this->fckPackingListTerms->SkinPath = 'skins/default/';
+			$this->fckPackingListTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
 		}	
 		
 		// Creat and Setup pnlSaveNotification Panel
@@ -237,7 +243,7 @@
 				QApplication::$TracmorSettings->CompanyId = $intCompanyId;
 				QApplication::$TracmorSettings->FedexAccountId = $intAccountId;
 				QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
-				QApplication::$TracmorSettings->PackingListTerms = $this->txtPackingListTerms->Text;
+				QApplication::$TracmorSettings->PackingListTerms = $this->fckPackingListTerms->Text;
 				QApplication::$TracmorSettings->AutodetectTrackingNumbers = $this->chkAutoDetectTrackingNumbers->Checked;
 				
 				// Show saved notification
