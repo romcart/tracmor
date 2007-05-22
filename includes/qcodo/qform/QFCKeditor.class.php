@@ -51,7 +51,8 @@
 		ForceSimpleAmpersand
 		TabSpaces
 		ShowBorders
-		UseBROnCarriageReturn
+		EnterMode
+		ShiftEnterMode
 		ToolbarStartExpanded
 		ToolbarCanCollapse
 		IEForceVScroll
@@ -104,17 +105,6 @@
 		SmileyColumns
 		SmileyWindowWidth
 		SmileyWindowHeight
-
-*/
-
-/*
-
-	to implement this control you need to add:
-
-	QApplicationBase::$QformClasses['QFCKeditor'] = 'qcodo/qform_objects/QFCKeditor.inc';
-	QApplicationBase::$QformClasses['FCKeditor'] = 'FCKeditor/fckeditor.php';
-
-	to wwwroot/includes/qcodo/qform_objects/_loader.inc
 
 */
 
@@ -590,14 +580,22 @@
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
-				case "UseBROnCarriageReturn":
+				case "EnterMode":
 					try {
-						$this->arrConfig['UseBROnCarriageReturn'] = QType::Cast($mixValue, QType::String);
+						$this->arrConfig['EnterMode'] = QType::Cast($mixValue, QType::String);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
+				case "ShiftEnterMode":
+					try {
+						$this->arrConfig['ShiftEnterMode'] = QType::Cast($mixValue, QType::String);
+						break;
+					} catch (QInvalidCastException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}					
 				case "ToolbarStartExpanded":
 					try {
 						$this->arrConfig['ToolbarStartExpanded'] = QType::Cast($mixValue, QType::String);

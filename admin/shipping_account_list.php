@@ -147,6 +147,8 @@
 			$this->fckPackingListTerms = new QFCKeditor($this);
 			$this->fckPackingListTerms->Width = 640;
 			$this->fckPackingListTerms->ToolbarCanCollapse = false;
+			$this->fckPackingListTerms->EnterMode = 'br';
+			$this->fckPackingListTerms->ShiftEnterMode = 'p';
 			$this->fckPackingListTerms->Name = 'Packing List Terms';
 			$this->fckPackingListTerms->ToolbarSet = 'Tracmor';
 			$this->fckPackingListTerms->SkinPath = 'skins/default/';
