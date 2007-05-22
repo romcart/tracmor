@@ -338,9 +338,11 @@
 				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
-				
+
+				//echo($strQuery); exit;
 
 			$objDbResult = $objDatabase->Query($strQuery);				
+			
 			return Asset::InstantiateDbResult($objDbResult);			
 		
 		}
@@ -400,7 +402,7 @@
 				$strAssetModelCode = QApplication::$Database[1]->SqlVariable("%" . $strAssetModelCode . "%", false);
 				$arrSearchSql['strAssetModelCodeSql'] = "AND `asset__asset_model_id`.`asset_model_code` LIKE $strAssetModelCode";
 			}
-			if ($intReservedBy) {
+/*			if ($intReservedBy) {
 				$arrSearchSql['strReservedBySql'] = sprintf("AND `asset` . `reserved_flag` = true", $intReservedBy);
 				if ($intReservedBy != 'any') {
 					$intReservedBy = QApplication::$Database[1]->SqlVariable($intReservedBy, true);
@@ -415,7 +417,23 @@
 					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
 					$arrSearchSql['strCheckedOutBySql'] .= sprintf("\nAND (SELECT `created_by` FROM `transaction` WHERE `transaction_type_id` = 3 ORDER BY creation_date DESC LIMIT 0,1)%s", $intCheckedOutBy);
 				}
-			}			
+			}		*/
+			if ($intReservedBy) {
+				$arrSearchSql['strReservedBySql'] = sprintf("AND `asset` . `reserved_flag` = true");
+				if ($intReservedBy != 'any') {
+					$intReservedBy = QApplication::$Database[1]->SqlVariable($intReservedBy, true);
+					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
+					$arrSearchSql['strReservedBySql'] .= sprintf("\nAND (SELECT `created_by` FROM `asset_transaction` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intReservedBy);
+				}
+			}
+			if ($intCheckedOutBy) {
+				$arrSearchSql['strCheckedOutBySql'] = sprintf("AND `asset` . `checked_out_flag` = true");
+				if ($intCheckedOutBy != 'any') {
+					$intCheckedOutBy = QApplication::$Database[1]->SqlVariable($intCheckedOutBy, true);
+					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
+					$arrSearchSql['strCheckedOutBySql'] .= sprintf("\nAND (SELECT `created_by` FROM `asset_transaction` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutBy);
+				}
+			}		
 			if ($strDateModified) {
 				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {
 					$strDateModifiedFirst = QApplication::$Database[1]->SqlVariable($strDateModifiedFirst->Timestamp, false);
