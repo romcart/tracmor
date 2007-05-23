@@ -146,7 +146,7 @@
 		protected function fckPackingListTerms_Create() {
 			$this->fckPackingListTerms = new QFCKeditor($this);
 			$this->fckPackingListTerms->Width = 640;
-			$this->fckPackingListTerms->ToolbarCanCollapse = false;
+			$this->fckPackingListTerms->ToolbarCanCollapse = true;
 			$this->fckPackingListTerms->EnterMode = 'br';
 			$this->fckPackingListTerms->ShiftEnterMode = 'p';
 			$this->fckPackingListTerms->Name = 'Packing List Terms';
