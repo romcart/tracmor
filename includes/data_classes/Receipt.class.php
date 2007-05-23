@@ -78,7 +78,7 @@
 			elseif ($this->DueDate && $this->DueDate->IsEarlierThan(new QDateTime(QDateTime::Now)) ) {
 				$now = new QDateTime(QDateTime::Now);
 				$dtsDifference = $now->Difference($this->DueDate);
-				$strToReturn = sprintf('<strong style="color:#BC3500;">Pending (%s)</strong>', $dtsDifference->Days);
+				$strToReturn = sprintf('<strong style="color:#BC3500;">Pending</strong>', $dtsDifference->Days);
 			}
 			else {
 				$strToReturn = '<strong style="color:#CC9933;">Pending</strong>';
