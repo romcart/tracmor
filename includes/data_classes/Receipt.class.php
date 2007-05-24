@@ -85,6 +85,66 @@
 			}
 			return sprintf('%s', $strToReturn);
 		}
+
+		/**
+		 * Returns the status (with hovertip) of a Receipt based on it's ReceivedFlag
+		 * 
+		 * @param QDatagrid Object $objControl
+		 * @return string that says either Received or Pending with a hovertip if the Receipt is overdue
+		 */
+		public function __toStringStatusWithHovertip($objControl) {
+			
+			$dtsDueDate = new QDateTime($this->DueDate);
+			$dtsDueDate->Hour = 0;
+			$dtsDueDate->Minute = 0;
+			$dtsDueDate->Second = 0;
+			$dtsToday = new QDateTime(QDateTime::Now);
+			$dtsToday->Hour = 0;
+			$dtsToday->Minute = 0;
+			$dtsToday->Second = 0;
+			
+			if ($this->ReceivedFlag) {
+				$strToReturn = 'Received';
+			}
+			elseif ($this->DueDate && $dtsDueDate->IsEarlierThan($dtsToday) ) {
+				//$now = new QDateTime(QDateTime::Now);
+				$dtsDifference = $dtsToday->Difference($dtsDueDate);
+				
+				$lblStatus = new QLabelExt($objControl);
+				$lblStatus->HtmlEntities = false;
+				$lblStatus->Text = '<strong style="color:#BC3500;">Pending</strong>';
+			
+				// create hovertip
+				$objHoverTip = new QHoverTip($lblStatus);
+				$lblOverdue = new QLabel($objHoverTip);
+				$lblOverdue->Text = ($dtsDifference->Days == 0) ? 'Due today' : sprintf('%s days overdue',$dtsDifference->Days);
+				$objHoverTip->AutoRenderChildren = true;
+				$lblStatus->HoverTip = $objHoverTip;
+				
+				$strToReturn = $lblStatus->Render(false);
+				
+			}
+			elseif ($this->DueDate && ($dtsDueDate->IsLaterThan($dtsToday) || ($dtsDueDate->IsEqualTo($dtsToday)))) {
+				$dtsDifference = $dtsDueDate->Difference($dtsToday);	
+				
+				$lblStatus = new QLabelExt($objControl);
+				$lblStatus->HtmlEntities = false;
+				$lblStatus->Text = '<strong style="color:#CC9933">Pending</strong>';
+				
+				// create hovertip
+				$objHoverTip = new QHoverTip($lblStatus);
+				$lblDueIn = new QLabel($objHoverTip);
+				$lblDueIn->Text = ($dtsDifference->Days == 0) ? 'Due today': sprintf('Due in %s days',$dtsDifference->Days);
+				$objHoverTip->AutoRenderChildren = true;
+				$lblStatus->HoverTip = $objHoverTip;
+							
+				$strToReturn = $lblStatus->Render(false);
+			}
+			else {
+				$strToReturn = '<strong style="color:#CC9933;">Pending</strong>';
+			}
+			return sprintf('%s', $strToReturn);
+		}		
 		
 		/**
 		 * Returns the Default __toString (receipt number) with a link to the receipt record
