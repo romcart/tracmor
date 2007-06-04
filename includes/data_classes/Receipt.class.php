@@ -95,13 +95,7 @@
 		public function __toStringStatusWithHovertip($objControl) {
 			
 			$dtsDueDate = new QDateTime($this->DueDate);
-			$dtsDueDate->Hour = 0;
-			$dtsDueDate->Minute = 0;
-			$dtsDueDate->Second = 0;
-			$dtsToday = new QDateTime(QDateTime::Now);
-			$dtsToday->Hour = 0;
-			$dtsToday->Minute = 0;
-			$dtsToday->Second = 0;
+			$dtsToday = new QDateTime(date('Y-m-d'));
 			
 			if ($this->ReceivedFlag) {
 				$strToReturn = 'Received';
