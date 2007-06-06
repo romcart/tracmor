@@ -222,9 +222,10 @@
 		// Create and Setup txtAssetModelCode
 		protected function txtAssetModelCode_Create() {
 			parent::txtAssetModelCode_Create();
+			$this->txtAssetModelCode->Required = true;
 			$this->txtAssetModelCode->CausesValidation = true;
 			$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnSave_Click'));
-   		$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+   			$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtAssetModelCode->TabIndex=4;
 			$this->intNextTabIndex++;
 		}
@@ -291,6 +292,7 @@
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
 			$this->btnSave->Text = 'Save';
+			$this->btnSave->CausesValidation = true;
 			// This cannot be Ajax because Javascript cannot access local files
 			$this->btnSave->AddAction(new QClickEvent(), new QServerAction('btnSave_Click'));
 			$this->btnSave->AddAction(new QEnterKeyEvent(), new QServerAction('btnSave_Click'));
