@@ -278,6 +278,12 @@ CREATE FIELD METHODS
 				$this->ctlAssetTransact->Display = false;
 			}
 		}
+		
+		// This method is run when the asset model edit dialog box is closed
+		public function CloseAssetModelEditPanel($blnUpdates) {
+			$objPanel = $this->ctlAssetEdit->dlgNewAssetModel;
+			$objPanel->HideDialogBox();
+		}			
 	}
 
 	// Run the form using the template asset_edit.php.inc to render the html

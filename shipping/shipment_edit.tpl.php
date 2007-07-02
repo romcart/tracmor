@@ -75,15 +75,15 @@
 								</tr>
 								<tr>
 									<td class="record_field_name">Company:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); $this->lblNewFromCompany->RenderWithError(); ?></td>
 								</tr>
 								<tr>
 									<td class="record_field_name">Contact:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); $this->lblNewFromContact->RenderWithError();  ?></td>
 								</tr>
 								<tr>
 									<td class="record_field_name">Address:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromAddress->RenderWithError();$this->lblFromAddress->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromAddress->RenderWithError();$this->lblFromAddress->Render();  $this->lblNewFromAddress->RenderWithError(); ?></td>
 								</tr>
 							</table>
 							<br class="item_divider" />
@@ -93,15 +93,15 @@
 								</tr>
 								<tr>
 									<td class="record_field_name">Company:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstToCompany->RenderWithError();$this->lblToCompany->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToCompany->RenderWithError();$this->lblToCompany->Render(); $this->lblNewToCompany->RenderWithError(); ?></td>
 								</tr>
 								<tr>
 									<td class="record_field_name">Contact:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render();  $this->lblNewToContact->RenderWithError(); ?></td>
 								</tr>
 								<tr>
 									<td class="record_field_name">Address:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); ?>&nbsp;<br><?php $this->lblToAddressFull->Render(); ?></td>
+									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); $this->lblNewToAddress->RenderWithError(); ?><br><?php $this->lblToAddressFull->Render(); ?></td>
 								</tr>						
 							</table>
 						</td>
@@ -168,4 +168,6 @@
 	</tr>
 </table>
 <?php $this->dtgInventoryTransact->Render(); ?>
+
+<?php $this->dlgNew->Render(); ?>
 <?php $this->RenderEnd() ?>

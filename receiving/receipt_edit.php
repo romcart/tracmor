@@ -22,6 +22,9 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(6);
 	require_once(__FORMBASE_CLASSES__ . '/ReceiptEditFormBase.class.php');
+	require('../contacts/CompanyEditPanel.class.php');
+	require('../contacts/ContactEditPanel.class.php');
+	require('../contacts/AddressEditPanel.class.php');
 
 	/**
 	 * This is a quick-and-dirty draft form object to do Create, Edit, and Delete functionality
@@ -57,6 +60,11 @@
 		protected $pnlNote;
 		protected $lblDueDate;
 		protected $lblReceiptDate;
+		protected $lblNewFromCompany;
+		protected $lblNewFromContact;
+		protected $lblNewToContact;
+		protected $lblNewToAddress;
+		
 		
 		// Inputs
 		protected $txtNote;
@@ -90,6 +98,9 @@
 		// Integers
 		protected $intNewTempId = 1;
 		
+		// Dialog
+		protected $dlgNew;
+		
 		protected function Form_Create() {
 			
 			// Call Setup Receipt to either load existing or create new receipt
@@ -112,9 +123,13 @@
 			
 			// Create the inputs
 			$this->lstFromCompany_Create();
+			$this->lblNewFromCompany_Create();
 			$this->lstFromContact_Create();
+			$this->lblNewFromContact_Create();
 			$this->lstToContact_Create();
+			$this->lblNewToContact_Create();
 			$this->lstToAddress_Create();
+			$this->lblNewToAddress_Create();
 			$this->txtNote_Create();
 			$this->txtNewAssetCode_Create();
 			$this->txtNewInventoryModelCode_Create();
@@ -135,6 +150,9 @@
 			// Create the datagrids
 			$this->dtgAssetTransact_Create();
 			$this->dtgInventoryTransact_Create();
+			
+			// New entities Dialog
+			$this->dlgNew_Create();
 			
 			// Load the objAssetTransactionArray and objInventoryTransactionArray for the first time
 			if ($this->blnEditMode) {
@@ -311,6 +329,46 @@
 			if ($this->objReceipt->ReceiptDate) {
 				$this->lblReceiptDate->Text = $this->objReceipt->ReceiptDate->__toString();
 			}
+		}
+		
+		protected function lblNewFromCompany_Create() {
+			$this->lblNewFromCompany = new QLabel($this);
+			$this->lblNewFromCompany->Text = 'new';
+			$this->lblNewFromCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromCompany_Click'));
+			$this->lblNewFromCompany->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewFromCompany->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewFromCompany->FontSize = '10px';
+		  $this->lblNewFromCompany->ActionParameter = $this->lstFromCompany->ControlId;
+		}
+		
+		protected function lblNewFromContact_Create() {
+			$this->lblNewFromContact = new QLabel($this);
+			$this->lblNewFromContact->Text = 'new';
+			$this->lblNewFromContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromContact_Click'));
+			$this->lblNewFromContact->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewFromContact->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewFromContact->FontSize = '10px';
+		  $this->lblNewFromContact->ActionParameter = $this->lstFromContact->ControlId;
+		}
+		
+		protected function lblNewToContact_Create() {
+			$this->lblNewToContact = new QLabel($this);
+			$this->lblNewToContact->Text = 'new';
+			$this->lblNewToContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewToContact_Click'));
+			$this->lblNewToContact->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewToContact->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewToContact->FontSize = '10px';
+		  $this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
+		}
+		
+		protected function lblNewToAddress_Create() {
+			$this->lblNewToAddress = new QLabel($this);
+			$this->lblNewToAddress->Text = 'new';
+			$this->lblNewToAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewToAddress_Click'));
+			$this->lblNewToAddress->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewToAddress->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewToAddress->FontSize = '10px';
+		  $this->lblNewToAddress->ActionParameter = $this->lstToAddress->ControlId;
 		}
 		
 		//*****************
@@ -535,6 +593,21 @@
 		}
 		
 		//*****************
+		// CREATE DIALOG
+		//*****************
+		// New Entity (Company, Contact, Address Dialog Box)
+		protected function dlgNew_Create() {
+			$this->dlgNew = new QDialogBox($this);
+			$this->dlgNew->AutoRenderChildren = true;
+			$this->dlgNew->Width = '440px';
+			$this->dlgNew->Overflow = QOverflow::Auto;
+			$this->dlgNew->Padding = '10px';
+			$this->dlgNew->Display = false;
+			$this->dlgNew->BackColor = '#FFFFFF';
+			$this->dlgNew->MatteClickable = false;
+		}		
+		
+		//*****************
 		// ONSELECT METHODS
 		//*****************
 		
@@ -543,21 +616,22 @@
 			if ($this->lstFromCompany->SelectedValue) {
 				$objCompany = Company::Load($this->lstFromCompany->SelectedValue);
 				if ($objCompany) {
-					// Load the values for the 'To Contact' List
+					// Load the values for the 'From Contact' List
 					if ($this->lstFromContact) {
 						$objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId);
+						
+						if ($this->lstFromContact->SelectedValue) {
+							$SelectedContactId = $this->lstFromContact->SelectedValue;
+						}
+						elseif ($this->objReceipt->FromContactId) {
+							$SelectedContactId = $this->objReceipt->FromContactId;
+						}
+						else {
+							$SelectedContactId = null;
+						}
+						$this->lstFromContact->RemoveAllItems();
+						$this->lstFromContact->AddItem('- Select One -', null);
 						if ($objFromContactArray) {
-							if ($this->lstToContact->SelectedValue) {
-								$SelectedContactId = $this->lstFromContact->SelectedValue;
-							}
-							elseif ($this->objReceipt->ToContactId) {
-								$SelectedContactId = $this->objReceipt->ToContactId;
-							}
-							else {
-								$SelectedContactId = null;
-							}
-							$this->lstFromContact->RemoveAllItems();
-							$this->lstFromContact->AddItem('- Select One -', null);
 							foreach ($objFromContactArray as $objFromContact) {
 								$objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
 								if ($SelectedContactId == $objFromContact->ContactId) {
@@ -565,8 +639,8 @@
 								}
 								$this->lstFromContact->AddItem($objListItem);
 							}
-							$this->lstFromContact->Enabled = true;
 						}
+						$this->lstFromContact->Enabled = true;
 					}
 				}
 			}
@@ -889,6 +963,48 @@
 		// ONCLICK BUTTON METHODS
 		// These methods are run when buttons are clicked
 		//************************
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewFromCompany_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewFromCompanyPanel');
+			$pnlEdit->ActionParameter = $strParameter;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->txtShortDescription->Focus();
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewFromContact_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
+			$pnlEdit->ActionParameter = $strParameter;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->lstCompany->Focus();
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewToContact_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, QApplication::$TracmorSettings->CompanyId);
+			$pnlEdit->ActionParameter = $strParameter;
+			$pnlEdit->lstCompany->Enabled = false;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->lstCompany->Focus();
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewToAddress_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewPanel', null, null, QApplication::$TracmorSettings->CompanyId);
+			$pnlEdit->ActionParameter = $strParameter;
+			$pnlEdit->lstCompany->Enabled = false;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->lstCompany->Focus();
+		}
 		
 		// Cancel editing an existing receipt, or cancel adding a new receipt and return to the list page
 		protected function btnCancel_Click($strFormId, $strControlId, $strParameter) {
@@ -1986,6 +2102,10 @@
 				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationAssetReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveAssetTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
 				$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationInventoryReceived_Render($_ITEM) ?> <?= $_FORM->txtQuantityReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveInventoryTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
 			}
+			$this->lblNewFromCompany->Display = false;
+			$this->lblNewFromContact->Display = false;
+			$this->lblNewToContact->Display = false;
+			$this->lblNewToAddress->Display = false;
 		}
 		
 		protected function DisplayInputs() {
@@ -2030,6 +2150,20 @@
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			}
+			$this->lblNewFromCompany->Display = true;
+			$this->lblNewFromContact->Display = true;
+			$this->lblNewToContact->Display = true;
+			$this->lblNewToAddress->Display = true;
+		}
+		
+		// This method is run when the new entity edit dialog box is closed
+		public function CloseNewPanel($blnUpdates) {
+			$this->dlgNew->HideDialogBox();
+		}
+		
+		public function CloseNewFromCompanyPanel($blnUpdates) {
+			$this->lstFromCompany_Select();
+			$this->CloseNewPanel($blnUpdates);
 		}
 	}
 

@@ -21,7 +21,7 @@
 	
 	// Build array of all fields to display
 	$arrAssetViewFields = array();
-	$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lblAssetModel->Render(false) . $this->lstAssetModel->RenderWithError(false));	
+	$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lblAssetModel->Render(false) . $this->lstAssetModel->RenderWithError(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));	
 	$arrAssetFields[] = array('name' => 'Asset Code:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
 	$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false) . '&nbsp;');
 	$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . '&nbsp;');
@@ -118,4 +118,6 @@ if ($this->blnEditMode) {
 	$this->lblShipmentReceipt->Render();
 	$this->dtgShipmentReceipt->RenderWithError();
 }
+
+$this->dlgNewAssetModel->Render();
 ?>

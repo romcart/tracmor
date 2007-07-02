@@ -63,11 +63,11 @@
 								</tr>
 								<tr>
 									<td class="record_field_name">Company:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); $this->lblNewFromCompany->RenderWithError(); ?></td>
 								</tr>
 								<tr>
 									<td class="record_field_name">Contact:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); $this->lblNewFromContact->RenderWithError(); ?></td>
 								</tr>
 							</table>
 							<br class="item_divider" />
@@ -77,11 +77,11 @@
 								</tr>
 								<tr>
 									<td class="record_field_name">Contact:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render(); $this->lblNewToContact->RenderWithError();?></td>
 								</tr>
 								<tr>
 									<td class="record_field_name">Address:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); ?>&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); $this->lblNewToAddress->RenderWithError();?></td>
 								</tr>						
 							</table>
 						</td>
@@ -146,5 +146,6 @@
 		<?php $this->dtgInventoryTransact->RenderWithError(); ?>
 		<br class="item_divider" />
 
+	<?php $this->dlgNew->Render(); ?>
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>

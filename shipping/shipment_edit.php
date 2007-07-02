@@ -22,6 +22,9 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(5);
 	require_once(__FORMBASE_CLASSES__ . '/ShipmentEditFormBase.class.php');
+	require('../contacts/CompanyEditPanel.class.php');
+	require('../contacts/ContactEditPanel.class.php');
+	require('../contacts/AddressEditPanel.class.php');
 	require_once('./fedexdc.class.php');
 	
 	/**
@@ -80,6 +83,12 @@
 		protected $lstCurrencyUnit;
 		protected $chkNotificationFlag;
 		protected $dlgExchange;
+		public $lstFromCompany;
+		public $lstFromContact;
+		public $lstFromAddress;
+		public $lstToCompany;
+		public $lstToContact;
+		public $lstToAddress;
 		
 		// Buttons
 		protected $btnEdit;
@@ -127,6 +136,13 @@
 		protected $lblWeightUnit;
 		protected $lblLengthUnit;
 		protected $lblCurrencyUnit;
+		protected $lblNewFromCompany;
+		protected $lblNewFromContact;
+		protected $lblNewFromAddress;
+		protected $lblNewToCompany;
+		protected $lblNewToContact;
+		protected $lblNewToAddress;
+		protected $dlgNew;
 		
 		// Datagrids
 		protected $dtgAssetTransact;
@@ -202,14 +218,26 @@
 			$this->lblLengthUnit_Create();
 			$this->lblCurrencyUnit_Create();
 			
+			
+			
+			
+			
+			
+			
+			
 			// Shipping Inputs
 			$this->dlgExchange_Create();
 			$this->calShipDate_Create();
 			$this->lstFromCompany_Create();
+			$this->lblNewFromCompany_Create();
 			$this->lstFromContact_Create();
+			$this->lblNewFromContact_Create();
 			$this->lstFromAddress_Create();
+			$this->lblNewFromAddress_Create();
 			$this->lstToCompany_Create();
+			$this->lblNewToCompany_Create();
 			$this->lstToContact_Create();
+			$this->lblNewToContact_Create();
 			$this->txtToPhone_Create();
 			$this->lstBillTransportationTo_Create();
 			$this->lstShippingAccount_Create();
@@ -227,6 +255,7 @@
 			$this->lstCurrencyUnit_Create();
 			$this->chkNotificationFlag_Create();
 			$this->lstToAddress_Create();
+			$this->lblNewToAddress_Create();
 			$this->lstCourier_Create();
 			$this->txtNote_Create();
 			$this->txtNewAssetCode_Create();
@@ -244,6 +273,9 @@
 			$this->btnAddInventory_Create();
 			$this->btnSaveExchange_Create();
 			$this->btnCancelExchange_Create();
+			
+			// New entities Dialog
+			$this->dlgNew_Create();
 			
 			if (!$this->objShipment->ShippedFlag) {
 				// Shipping Buttons
@@ -692,6 +724,66 @@
 			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->CurrencyUnitId) {
 				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
 			}				
+		}
+		
+		protected function lblNewFromCompany_Create() {
+			$this->lblNewFromCompany = new QLabel($this);
+			$this->lblNewFromCompany->Text = 'new';
+			$this->lblNewFromCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromCompany_Click'));
+			$this->lblNewFromCompany->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewFromCompany->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewFromCompany->FontSize = '10px';
+		  $this->lblNewFromCompany->ActionParameter = $this->lstFromCompany->ControlId;
+		}
+		
+		protected function lblNewFromContact_Create() {
+			$this->lblNewFromContact = new QLabel($this);
+			$this->lblNewFromContact->Text = 'new';
+			$this->lblNewFromContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromContact_Click'));
+			$this->lblNewFromContact->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewFromContact->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewFromContact->FontSize = '10px';
+		  $this->lblNewFromContact->ActionParameter = $this->lstFromContact->ControlId;
+		}
+		
+		protected function lblNewFromAddress_Create() {
+			$this->lblNewFromAddress = new QLabel($this);
+			$this->lblNewFromAddress->Text = 'new';
+			$this->lblNewFromAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromAddress_Click'));
+			$this->lblNewFromAddress->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewFromAddress->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewFromAddress->FontSize = '10px';
+		  $this->lblNewFromAddress->ActionParameter = $this->lstFromAddress->ControlId;
+		}
+		
+		protected function lblNewToCompany_Create() {
+			$this->lblNewToCompany = new QLabel($this);
+			$this->lblNewToCompany->Text = 'new';
+			$this->lblNewToCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewToCompany_Click'));
+			$this->lblNewToCompany->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewToCompany->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewToCompany->FontSize = '10px';
+		  $this->lblNewToCompany->ActionParameter = $this->lstToCompany->ControlId;
+		}
+		
+		protected function lblNewToContact_Create() {
+			$this->lblNewToContact = new QLabel($this);
+			$this->lblNewToContact->Text = 'new';
+			$this->lblNewToContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewToContact_Click'));
+			$this->lblNewToContact->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewToContact->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewToContact->FontSize = '10px';
+		  $this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
+		}
+		
+		protected function lblNewToAddress_Create() {
+			$this->lblNewToAddress = new QLabel($this);
+			$this->lblNewToAddress->Text = 'new';
+			$this->lblNewToAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewToAddress_Click'));
+			$this->lblNewToAddress->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewToAddress->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewToAddress->FontSize = '10px';
+		  $this->lblNewToAddress->ActionParameter = $this->lstToAddress->ControlId;
 		}
 		
 		// Create and Setup pnlNote
@@ -1558,6 +1650,18 @@
 			$this->btnCancelExchange->AddAction(new QClickEvent(), new QAjaxAction('btnCancelExchange_Click'));
 			$this->btnCancelExchange->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCancelExchange_Click'));
 			$this->btnCancelExchange->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		// New Entity (Company, Contact, Address Dialog Box)
+		protected function dlgNew_Create() {
+			$this->dlgNew = new QDialogBox($this);
+			$this->dlgNew->AutoRenderChildren = true;
+			$this->dlgNew->Width = '440px';
+			$this->dlgNew->Overflow = QOverflow::Auto;
+			$this->dlgNew->Padding = '10px';
+			$this->dlgNew->Display = false;
+			$this->dlgNew->BackColor = '#FFFFFF';
+			$this->dlgNew->MatteClickable = false;
 		}		
 
 		//******************
@@ -1569,6 +1673,7 @@
 		// It loads the values for the 'From Address' and 'From Contact' drop-downs for the selected company 
 		protected function lstFromCompany_Select() {
 			if ($this->lstFromCompany->SelectedValue) {
+				// this SelectedValue is incorrect - it still thinks Fictional, INC. is selected
 				$objCompany = Company::Load($this->lstFromCompany->SelectedValue);
 				if ($objCompany) {
 					// Load the values for the 'From Contact' List
@@ -1599,7 +1704,6 @@
 					// Load the values for the 'From Address' List
 					if ($this->lstFromAddress) {
 						$objFromAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
-						
 						if ($this->lstFromAddress->SelectedValue) {
 							$SelectedAddressId = $this->lstFromAddress->SelectedValue;
 						}
@@ -1614,10 +1718,10 @@
 						if ($objFromAddressArray) {
 							foreach ($objFromAddressArray as $objFromAddress) {
 								$objListItem = new QListItem($objFromAddress->__toString(), $objFromAddress->AddressId);
+								$this->lstFromAddress->AddItem($objListItem);
 								if ($SelectedAddressId == $objFromAddress->AddressId) {
 									$objListItem->Selected = true;
 								}
-								$this->lstFromAddress->AddItem($objListItem);
 							}
 							$this->lstFromAddress->Enabled = true;
 						}
@@ -1809,7 +1913,6 @@
 			    $this->calShipDate->MaximumDay = $this->dttFiveDaysFromNow->Day;
 				} 
 				elseif($this->calShipDate->DateTime->Year == $this->dttNow->Year) {
-					// echo("How About HERE"); exit;
 			    $this->calShipDate->MinimumMonth = $this->dttNow->Month ;
 			    $this->calShipDate->MinimumDay = $this->dttNow->Day;
 			    if ($this->calShipDate->DateTime->Year == $this->dttFiveDaysFromNow->Year) {
@@ -1851,6 +1954,76 @@
 		// ONCLICK BUTTON METHODS
 		// These methods are run when buttons are clicked
 		//************************
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewFromCompany_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewFromCompanyPanel');
+			$pnlEdit->ActionParameter = $strParameter;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->txtShortDescription->Focus();
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewFromContact_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
+			$pnlEdit->ActionParameter = $strParameter;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->lstCompany->Focus();
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewFromAddress_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
+			$pnlEdit->ActionParameter = $strParameter;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->lstCompany->Focus();
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewToCompany_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewToCompanyPanel');
+			$pnlEdit->ActionParameter = $strParameter;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->txtShortDescription->Focus();
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewToContact_Click($strFormId, $strControlId, $strParameter) {
+			if ($this->lstToCompany->SelectedValue) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewToContactPanel', null, null, $this->lstToCompany->SelectedValue);
+				$pnlEdit->ActionParameter = $strParameter;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->lstCompany->Focus();
+			}
+			else {
+				$this->lblNewToContact->Warning = 'You must select a company first.';
+			}
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewToAddress_Click($strFormId, $strControlId, $strParameter) {
+			if ($this->lstToCompany->SelectedValue) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewToAddressPanel', null, null, $this->lstToCompany->SelectedValue);
+				$pnlEdit->ActionParameter = $strParameter;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->lstCompany->Focus();
+			}
+			else {
+				$this->lblNewToAddress->Warning = 'You must select a company first.';
+			}
+		}
 		
 		// Cancel editing an existing shipment, or cancel adding a new shipment and return to the list page
 		protected function btnCancel_Click($strFormId, $strControlId, $strParameter) {
@@ -3412,6 +3585,12 @@
 			$this->lstLengthUnit->Display = false;
 			$this->txtValue->Display = false;
 			$this->lstCurrencyUnit->Display = false;
+			$this->lblNewFromCompany->Display = false;
+			$this->lblNewFromContact->Display = false;
+			$this->lblNewFromAddress->Display = false;
+			$this->lblNewToCompany->Display = false;
+			$this->lblNewToContact->Display = false;
+			$this->lblNewToAddress->Display = false;
 			
 			// Disable (instead of hiding) chkNotificationFlag
 			$this->chkNotificationFlag->Enabled = false;
@@ -3576,6 +3755,12 @@
 			$this->lstLengthUnit->Display = true;
 			$this->txtValue->Display = true;
 			$this->lstCurrencyUnit->Display = true;
+			$this->lblNewFromCompany->Display = true;
+			$this->lblNewFromContact->Display = true;
+			$this->lblNewFromAddress->Display = true;
+			$this->lblNewToCompany->Display = true;
+			$this->lblNewToContact->Display = true;
+			$this->lblNewToAddress->Display = true;
 			
 			// Enable chkNotificationFlag (because it's disabled, not hidden)
 			$this->chkNotificationFlag->Enabled = true;
@@ -3585,6 +3770,33 @@
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			}
+		}
+		
+		// This method is run when the company edit dialog box is closed
+		public function CloseNewPanel($blnUpdates) {
+			$this->dlgNew->HideDialogBox();
+		}
+		
+		public function CloseNewFromCompanyPanel($blnUpdates) {
+			$this->lstFromCompany_Select();
+			$this->CloseNewPanel($blnUpdates);
+		}
+		
+		public function CloseNewToCompanyPanel($blnUpdates) {
+			$this->lstToCompany_Select();
+			$this->CloseNewPanel($blnUpdates);
+		}
+		
+		public function CloseNewToContactPanel($blnUpdates) {
+			$this->lstToContact->Enabled = true;
+			$this->lstToContact_Select();
+			$this->CloseNewPanel($blnUpdates);
+		}
+		
+		public function CloseNewToAddressPanel($blnUpdates) {
+			$this->lstToAddress->Enabled = true;
+			$this->lstToAddress_Select();
+			$this->CloseNewPanel($blnUpdates);
 		}
 	}
 

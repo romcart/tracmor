@@ -41,7 +41,7 @@
 	<?php 
 	
 		// Build array of all fields to display
-		$arrContactFields[] = array('name' => 'Company:', 'value' => $this->lblCompany->Render(false) . $this->lstCompany->RenderWithError(false));
+		$arrContactFields[] = array('name' => 'Company:', 'value' => $this->lblCompany->Render(false) . $this->lstCompany->RenderWithError(false) . '&nbsp;' . $this->lblNewCompany->Render(false));
 		$arrContactFields[] = array('name' => 'First Name:', 'value' => $this->lblFirstName->Render(false) . $this->txtFirstName->RenderWithError(false));
 		$arrContactFields[] = array('name' => 'Last Name:', 'value' => $this->lblLastName->Render(false) . $this->txtLastName->RenderWithError(false));
 		$arrContactFields[] = array('name' => 'Title:', 'value' => $this->lblTitle->Render(false) . $this->txtTitle->RenderWithError(false));
@@ -51,7 +51,7 @@
 		$arrContactFields[] = array('name' => 'Home Phone:', 'value' => $this->lblPhoneHome->Render(false) . $this->txtPhoneHome->RenderWithError(false));
 		$arrContactFields[] = array('name' => 'Mobile Phone:', 'value' => $this->lblPhoneMobile->Render(false) . $this->txtPhoneMobile->RenderWithError(false));
 		$arrContactFields[] = array('name' => 'Fax:', 'value' => $this->lblFax->Render(false) . $this->txtFax->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Address:', 'value' => $this->lblAddress->Render(false) . $this->lstAddress->RenderWithError(false));
+		$arrContactFields[] = array('name' => 'Address:', 'value' => $this->lblAddress->Render(false) . $this->lstAddress->RenderWithError(false) . '&nbsp;' . $this->lblNewAddress->RenderWithError(false));
 		
 		if ($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as $field) {
@@ -108,9 +108,12 @@
 							</td>
 						</tr>
 					</table>
-					<?php $this->pnlNewCompany->Render(); ?>
+					<?php //$this->pnlNewCompany->Render(); ?>
 				</td>
 			</tr>
 		</table>
+		
+		<?php $this->dlgNewCompany->Render(); ?>
+		<?php $this->dlgNewAddress->Render(); ?>
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>

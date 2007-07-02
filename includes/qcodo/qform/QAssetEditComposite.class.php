@@ -22,6 +22,8 @@
 
 <?php
 
+require('../assets/AssetModelEditPanel.class.php');
+
 class QAssetEditComposite extends QControl {
 
 	public $objAsset;
@@ -41,10 +43,12 @@ class QAssetEditComposite extends QControl {
 	protected $lblCreationDate;
 	protected $lblModifiedDate;
 	protected $chkAutoGenerateAssetCode;
+	protected $lblNewAssetModel;
 	public $lblShipmentReceipt;
 	
+	
 	// Inputs
-	protected $lstAssetModel;
+	public $lstAssetModel;
 	protected $txtAssetCode;
 	protected $lstLocation;
 	protected $lstCreatedByObject;
@@ -72,6 +76,9 @@ class QAssetEditComposite extends QControl {
 	// protected $objCustomFieldArray;
 	public $arrCustomFields;
 	
+	// Dialog Box
+	protected $dlgNewAssetModel;
+	
 	// We want to override the constructor in order to setup the subcontrols
 	public function __construct($objParentObject, $strControlId = null) {
 	    // First, call the parent to do most of the basic setup
@@ -96,6 +103,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblAssetCode_Create();
 		$this->lblCreationDate_Create();
 		$this->lblModifiedDate_Create();
+		$this->lblNewAssetModel_Create();
 		$this->UpdateAssetLabels();
 		
 		// Create Inputs
@@ -103,6 +111,7 @@ class QAssetEditComposite extends QControl {
 		$this->txtAssetCode_Create();
 		$this->lstLocation_Create();
 		$this->chkAutoGenerateAssetCode_Create();
+		$this->dlgNewAssetModel_Create();
 		$this->UpdateAssetControls();
 
 		// Create all custom asset fields
@@ -333,6 +342,15 @@ class QAssetEditComposite extends QControl {
 		}
 	}
 	
+	protected function lblNewAssetModel_Create() {
+		$this->lblNewAssetModel = new QLabel($this);
+		$this->lblNewAssetModel->Text = 'new';
+		$this->lblNewAssetModel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblNewAssetModel_Click'));
+		$this->lblNewAssetModel->SetCustomStyle('text-decoration', 'underline');
+	  $this->lblNewAssetModel->SetCustomStyle('cursor', 'pointer');
+	  $this->lblNewAssetModel->FontSize = '10px';
+	}
+	
 	// Create the Auto Generate Asset Code Checkbox
 	protected function chkAutoGenerateAssetCode_Create() {
 		$this->chkAutoGenerateAssetCode = new QCheckBox($this);
@@ -343,6 +361,17 @@ class QAssetEditComposite extends QControl {
 			$this->chkAutoGenerateAssetCode->Display = false;
 		}
 	}
+	
+	protected function dlgNewAssetModel_Create() {
+		$this->dlgNewAssetModel = new QDialogBox($this);
+		$this->dlgNewAssetModel->AutoRenderChildren = true;
+		$this->dlgNewAssetModel->Width = '440px';
+		$this->dlgNewAssetModel->Overflow = QOverflow::Auto;
+		$this->dlgNewAssetModel->Padding = '10px';
+		$this->dlgNewAssetModel->Display = false;
+		$this->dlgNewAssetModel->BackColor = '#FFFFFF';
+		$this->dlgNewAssetModel->MatteClickable = false;
+	}	
 
 	// Setup Delete Button
 	// This still doesn't delete CustomAssetFieldValues for text selections
@@ -620,6 +649,14 @@ class QAssetEditComposite extends QControl {
 		}
 	}
 	
+	// This is called when the 'new' label is clicked
+	public function lblNewAssetModel_Click($strFormId, $strControlId, $strParameter) {
+		// Create the panel, assigning it to the Dialog Box
+		$pnlAssetModelEdit = new AssetModelEditPanel($this->dlgNewAssetModel, 'CloseAssetModelEditPanel');
+		// Show the dialog box
+		$this->dlgNewAssetModel->ShowDialogBox();
+	}
+	
 	// Edit Button Click
 	public function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 
@@ -852,6 +889,7 @@ class QAssetEditComposite extends QControl {
 		$this->lstLocation->Display = false;
 		$this->txtAssetCode->Display = false;
 		$this->chkAutoGenerateAssetCode->Display = false;
+		$this->lblNewAssetModel->Display = false;
 		
 		// Do not display Cancel and Save buttons
 		$this->btnCancel->Display = false;
@@ -885,6 +923,7 @@ class QAssetEditComposite extends QControl {
    		$this->lblAssetModelCode->Display = false;
    		$this->lblAssetModel->Display = false;
    		$this->lstAssetModel->Display = true;
+   		$this->lblNewAssetModel->Display = true;
    		$this->lblLocation->Display = false;
    		$this->lstLocation->Display = true;
    		if (QApplication::$TracmorSettings->MinAssetCode) {
@@ -1046,6 +1085,8 @@ class QAssetEditComposite extends QControl {
 	  		break;
 	  	case "dtgAssetTransaction": return $this->dtgAssetTransaction;
 	  		break;
+	  	case "dlgNewAssetModel": return $this->dlgNewAssetModel;
+	  	  break;
       default:
         try {
             return parent::__get($strName);

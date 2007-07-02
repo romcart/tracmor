@@ -22,6 +22,8 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(4);
 	require_once(__FORMBASE_CLASSES__ . '/ContactEditFormBase.class.php');
+	require('../contacts/CompanyEditPanel.class.php');
+	require('../contacts/AddressEditPanel.class.php');
 
 	/**
 	 * This is a quick-and-dirty draft form object to do Create, Edit, and Delete functionality
@@ -47,6 +49,9 @@
 		// Shortcut Menu
 		protected $ctlShortcutMenu;
 		
+		// This needs to be public so that the New Company Dialog can access it
+		public $lstCompany;
+		
 		// Custom Field Objects
 		public $arrCustomFields;
 		
@@ -54,15 +59,15 @@
 		public $arrCompanyCustomFields;
 		
 		// New Company Panel
-		protected $pnlNewCompany;
+		//protected $pnlNewCompany;
 		
 		// New Company Controls
-		protected $txtCompanyShortDescription;
-		protected $txtCompanyWebsite;
-		protected $txtCompanyTelephone;
-		protected $txtCompanyFax;
-		protected $txtCompanyEmail;
-		protected $txtCompanyLongDescription;
+//		protected $txtCompanyShortDescription;
+//		protected $txtCompanyWebsite;
+//		protected $txtCompanyTelephone;
+//		protected $txtCompanyFax;
+//		protected $txtCompanyEmail;
+//		protected $txtCompanyLongDescription;
 
 		// Labels
 		protected $lblCompany;
@@ -79,12 +84,18 @@
 		protected $lblFax;
 		protected $lblCreationDate;
 		protected $lblModifiedDate;
+		protected $lblNewCompany;
+		protected $lblNewAddress;
 		
 		// Inputs
-		protected $lstAddress;
+		public $lstAddress;
 		
 		// Buttons
 		protected $btnEdit;
+		
+		// Dialog Boxes
+		protected $dlgNewCompany;
+		protected $dlgNewAddress;
 		
 		// Tab Index
 		protected $intTabIndex;
@@ -120,6 +131,8 @@
 			$this->lblFax_Create();
 			$this->lblCreationDate_Create();
 			$this->lblModifiedDate_Create();
+			$this->lblNewCompany_Create();
+			$this->lblNewAddress_Create();
 			$this->UpdateContactLabels();
 
 			// Create/Setup Controls for Contact's Data Fields
@@ -135,21 +148,25 @@
 			$this->txtFax_Create();
 			$this->lstAddress_Create();
 			
+			// New Dialog Boxes
+			$this->dlgNewCompany_Create();
+			$this->dlgNewAddress_Create();
+			
 			// Create all custom contact fields
 			$this->customFields_Create();
 
 			// Create/Setup Controls for a new Company
-			$this->pnlNewCompany_Create();
-			$this->txtCompanyShortDescription_Create();
-			$this->txtCompanyLongDescription_Create();
-			$this->txtCompanyWebsite_Create();
-			$this->txtCompanyEmail_Create();
-			$this->txtCompanyTelephone_Create();
-			$this->txtCompanyFax_Create();
+//			$this->pnlNewCompany_Create();
+//			$this->txtCompanyShortDescription_Create();
+//			$this->txtCompanyLongDescription_Create();
+//			$this->txtCompanyWebsite_Create();
+//			$this->txtCompanyEmail_Create();
+//			$this->txtCompanyTelephone_Create();
+//			$this->txtCompanyFax_Create();
 			$this->UpdateContactControls();
 			
 			// Create all custom company fields
-			$this->arrCompanyCustomFields_Create();
+			//$this->arrCompanyCustomFields_Create();
 			
 			// Create/Setup Button Action controls
 			$this->btnEdit_Create();
@@ -161,7 +178,7 @@
 			if ($this->blnEditMode) {
 				$this->displayLabels();
 			}
-			// Display empty inputs to create a new company
+			// Display empty inputs to create a new contact
 			else {
 				$this->displayInputs();
 			}
@@ -182,7 +199,7 @@
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
   	}
   	
-  	protected function pnlNewCompany_Create() {
+/*  	protected function pnlNewCompany_Create() {
   		$this->pnlNewCompany = new QPanel($this);
   		$this->pnlNewCompany->Template = 'pnl_new_company.inc.php';
   		if ($this->blnEditMode) {
@@ -191,7 +208,7 @@
   		else {
   			$this->pnlNewCompany->Visible = true;
   		}
-  	}
+  	}*/
 		
 		// Setup the Company Label
 		protected function lblCompany_Create() {
@@ -285,6 +302,24 @@
 			}
 		}
 		
+		protected function lblNewCompany_Create() {
+			$this->lblNewCompany = new QLabel($this);
+			$this->lblNewCompany->Text = 'new';
+			$this->lblNewCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewCompany_Click'));
+			$this->lblNewCompany->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewCompany->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewCompany->FontSize = '10px';
+		}
+		
+		protected function lblNewAddress_Create() {
+			$this->lblNewAddress = new QLabel($this);
+			$this->lblNewAddress->Text = 'new';
+			$this->lblNewAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewAddress_Click'));
+			$this->lblNewAddress->SetCustomStyle('text-decoration', 'underline');
+		  $this->lblNewAddress->SetCustomStyle('cursor', 'pointer');
+		  $this->lblNewAddress->FontSize = '10px';
+		}
+		
 		// Setup the Company Input
 		protected function lstCompany_Create() {
 			$this->lstCompany = new QListBox($this);
@@ -292,7 +327,7 @@
 			$this->lstCompany->Required = true;
 			if (!$this->blnEditMode) {
 				$this->lstCompany->AddItem('- Select One -', null);
-				$this->lstCompany->AddItem('New Company', -1, false);
+				//$this->lstCompany->AddItem('New Company', -1, false);
 			}
 			
 			$objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
@@ -403,10 +438,33 @@
 			$this->lstAddress->TabIndex = $this->intTabIndex++;
 		}
 		
+		// New Company Dialog Box
+		protected function dlgNewCompany_Create() {
+			$this->dlgNewCompany = new QDialogBox($this);
+			$this->dlgNewCompany->AutoRenderChildren = true;
+			$this->dlgNewCompany->Width = '440px';
+			$this->dlgNewCompany->Overflow = QOverflow::Auto;
+			$this->dlgNewCompany->Padding = '10px';
+			$this->dlgNewCompany->Display = false;
+			$this->dlgNewCompany->BackColor = '#FFFFFF';
+			$this->dlgNewCompany->MatteClickable = false;
+		}		
+		
+		// New Company Dialog Box
+		protected function dlgNewAddress_Create() {
+			$this->dlgNewAddress = new QDialogBox($this);
+			$this->dlgNewAddress->AutoRenderChildren = true;
+			$this->dlgNewAddress->Width = '440px';
+			$this->dlgNewAddress->Overflow = QOverflow::Auto;
+			$this->dlgNewAddress->Padding = '10px';
+			$this->dlgNewAddress->Display = false;
+			$this->dlgNewAddress->BackColor = '#FFFFFF';
+			$this->dlgNewAddress->MatteClickable = false;
+		}		
 		
 		// BEGIN COMPANY FIELDS
 		// Create the Company Name Text Field
-		protected function txtCompanyShortDescription_Create() {
+/*		protected function txtCompanyShortDescription_Create() {
 			$this->txtCompanyShortDescription = new QTextBox($this->pnlNewCompany);
 			$this->txtCompanyShortDescription->Name = QApplication::Translate('Company Short Description');
 			$this->txtCompanyShortDescription->CausesValidation = true;
@@ -462,7 +520,7 @@
 			$this->txtCompanyFax->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtCompanyFax->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtCompanyFax->TabIndex = $this->intTabIndex++;
-		}
+		}*/
 		
 		// Create all Custom Contact Fields
 		protected function customFields_Create() {
@@ -482,7 +540,7 @@
 		}
 		
 		// Create all custom company fields
-		protected function arrCompanyCustomFields_Create() {
+/*		protected function arrCompanyCustomFields_Create() {
 			
 			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 			$this->objCompany = new Company();
@@ -497,7 +555,7 @@
 					}
 				}
 			}
-		}
+		}*/
 		
 		// Setup Edit Button
 		protected function btnEdit_Create() {
@@ -546,7 +604,7 @@
 		}
 		
 		// Update address field when company is selected
-		protected function lstCompany_Select() {
+		public function lstCompany_Select() {
 			// Clear out the items from lstAddress
 			$this->lstAddress->RemoveAllItems();
 			if ($this->lstCompany->SelectedValue) {
@@ -576,12 +634,28 @@
 				$this->lstAddress->AddItem($objListItem);
 			}
 			
-			if ($this->lstCompany->SelectedValue && $this->lstCompany->SelectedValue == -1) {
+/*			if ($this->lstCompany->SelectedValue && $this->lstCompany->SelectedValue == -1) {
 				$this->pnlNewCompany->Visible = true;
 			}
 			else {
 				$this->pnlNewCompany->Visible = false;
-			}
+			}*/
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewCompany_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlCompanyEdit = new CompanyEditPanel($this->dlgNewCompany, 'CloseCompanyEditPanel');
+			// Show the dialog box
+			$this->dlgNewCompany->ShowDialogBox();
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewAddress_Click($strFormId, $strControlId, $strParameter) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlAddressEdit = new AddressEditPanel($this->dlgNewAddress, 'CloseAddressEditPanel', null, null, $this->lstCompany->SelectedValue);
+			// Show the dialog box
+			$this->dlgNewAddress->ShowDialogBox();
 		}
 		
 		// Edit Button Click
@@ -595,7 +669,7 @@
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 			try {
 				
-				if ($this->pnlNewCompany->Visible) {
+/*				if ($this->pnlNewCompany->Visible) {
 					if (!$this->txtCompanyShortDescription->Text) {
 						$this->txtCompanyShortDescription->Warning = 'Company Name is a required field.';
 						return;
@@ -603,7 +677,7 @@
 					else {
 						$this->SaveNewCompany();
 					}
-				}
+				}*/
 				
 				$this->UpdateContactFields();
 				$this->objContact->Save();
@@ -667,7 +741,7 @@
 			}
 		}				
 		
-		// Save New Company for contacts
+/*		// Save New Company for contacts
 		protected function SaveNewCompany() {
 			if (!($this->objCompany instanceof Company)) {
 				$this->objCompany = new Company();
@@ -683,19 +757,19 @@
 			if ($this->arrCompanyCustomFields && $this->objCompany->objCustomFieldArray) {
 				CustomField::SaveControls($this->objCompany->objCustomFieldArray, $this->blnEditMode, $this->arrCompanyCustomFields, $this->objCompany->CompanyId, 7);
 			}
-		}
+		}*/
 		
 		// Protected Update Methods
 		protected function UpdateContactFields() {
 			
 			// Assign the new CompanyId if it was just created
-			if ($this->pnlNewCompany->Visible) {
-				$this->objContact->CompanyId = $this->objCompany->CompanyId;
-			}
-			// Assign the selected Company
-			else {
-				$this->objContact->CompanyId = $this->lstCompany->SelectedValue;
-			}
+//			if ($this->pnlNewCompany->Visible) {
+//				$this->objContact->CompanyId = $this->objCompany->CompanyId;
+//			}
+//			// Assign the selected Company
+//			else {
+			$this->objContact->CompanyId = $this->lstCompany->SelectedValue;
+//			}
 			$this->objContact->FirstName = $this->txtFirstName->Text;
 			$this->objContact->LastName = $this->txtLastName->Text;
 			$this->objContact->Title = $this->txtTitle->Text;
@@ -777,6 +851,8 @@
 			$this->txtPhoneMobile->Display = false;
 			$this->txtPhoneHome->Display = false;
 			$this->txtFax->Display = false;
+			$this->lblNewCompany->Display = false;
+			$this->lblNewAddress->Display = false;
 			
 			// Do not display Cancel and Save buttons
 			$this->btnCancel->Display = false;
@@ -837,6 +913,8 @@
 			$this->txtPhoneMobile->Display = true;
 			$this->txtPhoneHome->Display = true;
 			$this->txtFax->Display = true;
+			$this->lblNewCompany->Display = true;
+			$this->lblNewAddress->Display = true;
 			
 	    // Display custom field inputs
 	    if ($this->arrCustomFields) {
@@ -846,7 +924,20 @@
 			// Display Cancel and Save buttons
 			$this->btnCancel->Display = true;
 			$this->btnSave->Display = true;	
-		}		
+		}
+		
+		// This method is run when the company edit dialog box is closed
+		public function CloseCompanyEditPanel($blnUpdates) {
+			$objPanel = $this->dlgNewCompany;
+			$objPanel->HideDialogBox();
+			$this->lstCompany_Select();
+		}
+		
+		// This method is run when the address edit dialog box is closed
+		public function CloseAddressEditPanel($blnUpdates) {
+			$objPanel = $this->dlgNewAddress;
+			$objPanel->HideDialogBox();
+		}
 	}
 	ContactEditForm::Run('ContactEditForm', __DOCROOT__ . __SUBDIRECTORY__ . '/contacts/contact_edit.tpl.php');
 ?>
