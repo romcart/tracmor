@@ -304,20 +304,20 @@
 		
 		protected function lblNewCompany_Create() {
 			$this->lblNewCompany = new QLabel($this);
-			$this->lblNewCompany->Text = 'new';
+			$this->lblNewCompany->HtmlEntities = false;
+			$this->lblNewCompany->Text = '<img src="../images/add.png">';
+			$this->lblNewCompany->ToolTip = "New Company";
+			$this->lblNewCompany->CssClass = "add_icon";
 			$this->lblNewCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewCompany_Click'));
-			$this->lblNewCompany->SetCustomStyle('text-decoration', 'underline');
-		  $this->lblNewCompany->SetCustomStyle('cursor', 'pointer');
-		  $this->lblNewCompany->FontSize = '10px';
 		}
 		
 		protected function lblNewAddress_Create() {
 			$this->lblNewAddress = new QLabel($this);
-			$this->lblNewAddress->Text = 'new';
+			$this->lblNewAddress->HtmlEntities = false;
+			$this->lblNewAddress->Text = '<img src="../images/add.png">';
+			$this->lblNewAddress->ToolTip = "New Address";
+			$this->lblNewAddress->CssClass = "add_icon";
 			$this->lblNewAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewAddress_Click'));
-			$this->lblNewAddress->SetCustomStyle('text-decoration', 'underline');
-		  $this->lblNewAddress->SetCustomStyle('cursor', 'pointer');
-		  $this->lblNewAddress->FontSize = '10px';
 		}
 		
 		// Setup the Company Input
@@ -448,6 +448,7 @@
 			$this->dlgNewCompany->Display = false;
 			$this->dlgNewCompany->BackColor = '#FFFFFF';
 			$this->dlgNewCompany->MatteClickable = false;
+			$this->dlgNewCompany->CssClass = "modal_dialog";
 		}		
 		
 		// New Company Dialog Box
@@ -460,6 +461,7 @@
 			$this->dlgNewAddress->Display = false;
 			$this->dlgNewAddress->BackColor = '#FFFFFF';
 			$this->dlgNewAddress->MatteClickable = false;
+			$this->dlgNewAddress->CssClass = "modal_dialog";
 		}		
 		
 		// BEGIN COMPANY FIELDS

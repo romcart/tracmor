@@ -344,11 +344,11 @@ class QAssetEditComposite extends QControl {
 	
 	protected function lblNewAssetModel_Create() {
 		$this->lblNewAssetModel = new QLabel($this);
-		$this->lblNewAssetModel->Text = 'new';
-		$this->lblNewAssetModel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblNewAssetModel_Click'));
-		$this->lblNewAssetModel->SetCustomStyle('text-decoration', 'underline');
-	  $this->lblNewAssetModel->SetCustomStyle('cursor', 'pointer');
-	  $this->lblNewAssetModel->FontSize = '10px';
+		$this->lblNewAssetModel->HtmlEntities = false;
+		$this->lblNewAssetModel->Text = '<img src="../images/add.png">';
+		$this->lblNewAssetModel->ToolTip = "New Asset Model";
+		$this->lblNewAssetModel->CssClass = "add_icon";
+	  	$this->lblNewAssetModel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblNewAssetModel_Click'));
 	}
 	
 	// Create the Auto Generate Asset Code Checkbox
@@ -371,6 +371,7 @@ class QAssetEditComposite extends QControl {
 		$this->dlgNewAssetModel->Display = false;
 		$this->dlgNewAssetModel->BackColor = '#FFFFFF';
 		$this->dlgNewAssetModel->MatteClickable = false;
+		$this->dlgNewAssetModel->CssClass = "modal_dialog";
 	}	
 
 	// Setup Delete Button

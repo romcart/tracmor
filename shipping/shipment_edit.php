@@ -728,62 +728,62 @@
 		
 		protected function lblNewFromCompany_Create() {
 			$this->lblNewFromCompany = new QLabel($this);
-			$this->lblNewFromCompany->Text = 'new';
+			$this->lblNewFromCompany->HtmlEntities = false; 
+			$this->lblNewFromCompany->Text = '<img src="../images/add.png">';
+			$this->lblNewFromCompany->ToolTip = "New Company";
+			$this->lblNewFromCompany->CssClass = "add_icon";
 			$this->lblNewFromCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromCompany_Click'));
-			$this->lblNewFromCompany->SetCustomStyle('text-decoration', 'underline');
-		  $this->lblNewFromCompany->SetCustomStyle('cursor', 'pointer');
-		  $this->lblNewFromCompany->FontSize = '10px';
-		  $this->lblNewFromCompany->ActionParameter = $this->lstFromCompany->ControlId;
+			$this->lblNewFromCompany->ActionParameter = $this->lstFromCompany->ControlId;
 		}
 		
 		protected function lblNewFromContact_Create() {
 			$this->lblNewFromContact = new QLabel($this);
-			$this->lblNewFromContact->Text = 'new';
+			$this->lblNewFromContact->HtmlEntities = false; 
+			$this->lblNewFromContact->Text = '<img src="../images/add.png">';
+			$this->lblNewFromContact->ToolTip = "New Contact";
+			$this->lblNewFromContact->CssClass = "add_icon";
 			$this->lblNewFromContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromContact_Click'));
-			$this->lblNewFromContact->SetCustomStyle('text-decoration', 'underline');
-		  $this->lblNewFromContact->SetCustomStyle('cursor', 'pointer');
-		  $this->lblNewFromContact->FontSize = '10px';
-		  $this->lblNewFromContact->ActionParameter = $this->lstFromContact->ControlId;
+			$this->lblNewFromContact->ActionParameter = $this->lstFromContact->ControlId;
 		}
 		
 		protected function lblNewFromAddress_Create() {
 			$this->lblNewFromAddress = new QLabel($this);
-			$this->lblNewFromAddress->Text = 'new';
+			$this->lblNewFromAddress->HtmlEntities = false;
+			$this->lblNewFromAddress->Text = '<img src="../images/add.png">';
+			$this->lblNewFromAddress->ToolTip = "New Address";
+			$this->lblNewFromAddress->CssClass = "add_icon";
 			$this->lblNewFromAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromAddress_Click'));
-			$this->lblNewFromAddress->SetCustomStyle('text-decoration', 'underline');
-		  $this->lblNewFromAddress->SetCustomStyle('cursor', 'pointer');
-		  $this->lblNewFromAddress->FontSize = '10px';
-		  $this->lblNewFromAddress->ActionParameter = $this->lstFromAddress->ControlId;
+			$this->lblNewFromAddress->ActionParameter = $this->lstFromAddress->ControlId;
 		}
 		
 		protected function lblNewToCompany_Create() {
 			$this->lblNewToCompany = new QLabel($this);
-			$this->lblNewToCompany->Text = 'new';
+			$this->lblNewToCompany->HtmlEntities = false;
+			$this->lblNewToCompany->Text = '<img src="../images/add.png">';
+			$this->lblNewToCompany->ToolTip = "New Company";
+			$this->lblNewToCompany->CssClass = "add_icon";
 			$this->lblNewToCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewToCompany_Click'));
-			$this->lblNewToCompany->SetCustomStyle('text-decoration', 'underline');
-		  $this->lblNewToCompany->SetCustomStyle('cursor', 'pointer');
-		  $this->lblNewToCompany->FontSize = '10px';
-		  $this->lblNewToCompany->ActionParameter = $this->lstToCompany->ControlId;
+			$this->lblNewToCompany->ActionParameter = $this->lstToCompany->ControlId;
 		}
 		
 		protected function lblNewToContact_Create() {
 			$this->lblNewToContact = new QLabel($this);
-			$this->lblNewToContact->Text = 'new';
+			$this->lblNewToContact->HtmlEntities = false;
+			$this->lblNewToContact->Text = '<img src="../images/add.png">';
+			$this->lblNewToContact->ToolTip = "New Contact";
+			$this->lblNewToContact->CssClass = "add_icon";
+			$this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
 			$this->lblNewToContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewToContact_Click'));
-			$this->lblNewToContact->SetCustomStyle('text-decoration', 'underline');
-		  $this->lblNewToContact->SetCustomStyle('cursor', 'pointer');
-		  $this->lblNewToContact->FontSize = '10px';
-		  $this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
 		}
 		
 		protected function lblNewToAddress_Create() {
 			$this->lblNewToAddress = new QLabel($this);
-			$this->lblNewToAddress->Text = 'new';
+			$this->lblNewToAddress->HtmlEntities = false;
+			$this->lblNewToAddress->Text = '<img src="../images/add.png">';
+			$this->lblNewToAddress->ToolTip = "New Address";
+			$this->lblNewToAddress->CssClass = "add_icon";
 			$this->lblNewToAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewToAddress_Click'));
-			$this->lblNewToAddress->SetCustomStyle('text-decoration', 'underline');
-		  $this->lblNewToAddress->SetCustomStyle('cursor', 'pointer');
-		  $this->lblNewToAddress->FontSize = '10px';
-		  $this->lblNewToAddress->ActionParameter = $this->lstToAddress->ControlId;
+			$this->lblNewToAddress->ActionParameter = $this->lstToAddress->ControlId;
 		}
 		
 		// Create and Setup pnlNote
@@ -1662,6 +1662,7 @@
 			$this->dlgNew->Display = false;
 			$this->dlgNew->BackColor = '#FFFFFF';
 			$this->dlgNew->MatteClickable = false;
+			$this->dlgNew->CssClass = "modal_dialog";
 		}		
 
 		//******************

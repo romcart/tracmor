@@ -109,3 +109,13 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 	border: 1px solid #9cbf92;
 	padding: 5px; 
 }
+
+.add_icon {
+	cursor: pointer;
+	vertical-align:bottom;
+	padding: 4px;
+}
+
+.modal_dialog {
+	border: 2px inset #333333;
+}

@@ -87,8 +87,8 @@
 								<?php
 									for ($i=0;$i<ceil(count($arrContactFields)/2);$i++) {
 										echo('<tr>');
-										echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'&nbsp;</td>');
-										echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'&nbsp;</td>');
+										echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'</td>');
+										echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'</td>');
 										echo('</tr>');
 									}
 								?>
@@ -99,8 +99,8 @@
 								<?php
 									for ($i=ceil(count($arrContactFields)/2);$i<count($arrContactFields);$i++) {
 										echo('<tr>');
-										echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'&nbsp;</td>');
-										echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'&nbsp;</td>');
+										echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'</td>');
+										echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'</td>');
 										echo('</tr>');
 									}
 								?>				
