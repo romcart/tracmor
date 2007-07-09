@@ -71,7 +71,7 @@
 			$this->pnlColumnToggleMenu->Name = 'Toggle Menu';
 			// The ColumnToggleMenu requires that a width be set, and that it be set in pixels only
 			$this->pnlColumnToggleMenu->Width = '130px';
-			$this->pnlColumnToggleMenu->BorderWidth = '1px';
+			$this->pnlColumnToggleMenu->BorderWidth = 1;
 			$this->pnlColumnToggleMenu->SetCustomStyle('padding', '2px');
 			$this->pnlColumnToggleMenu->BackColor = 'white';
 			$this->pnlColumnToggleMenu->Template = __INCLUDES__.'/qcodo/qform/pnl_column_toggle.tpl.php';

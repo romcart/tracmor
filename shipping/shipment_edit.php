@@ -841,15 +841,15 @@
       		$intDayOfWeek = date('w', time());
       		// Sunday - just add five days
       		if ($intDayOfWeek == 0) {
-      			$this->dttFiveDaysFromNow = new QDateTime($this->dttNow->Timestamp + 432000);
+      			$this->dttFiveDaysFromNow = new QDateTime(date('r', $this->dttNow->Timestamp + 432000));
       		}
       		// Monday - Friday, add seven days
       		elseif ($intDayOfWeek > 0 && $intDayOfWeek < 6) {
-      			$this->dttFiveDaysFromNow = new QDateTime($this->dttNow->Timestamp + 604800);
+      			$this->dttFiveDaysFromNow = new QDateTime(date('r', $this->dttNow->Timestamp + 604800));
       		}
       		// Saturday - add six days
       		elseif ($intDayOfWeek == 6) {
-      			$this->dttFiveDaysFromNow = new QDateTime($this->dttNow->Timestamp + 518400);
+      			$this->dttFiveDaysFromNow = new QDateTime(date('r', $this->dttNow->Timestamp + 518400));
       		}
       		$this->calShipDate->MaximumYear = $this->dttFiveDaysFromNow->Year;
       		$this->calShipDate->MaximumMonth = $this->dttFiveDaysFromNow->Month;

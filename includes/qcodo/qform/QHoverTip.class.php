@@ -34,7 +34,7 @@ class QHoverTip extends QPanel {
 		$this->Display = false;
 		
 		// Set some default values. These can be overridden
-		$this->BorderWidth = '1px';
+		$this->BorderWidth = 1;
 		$this->Position = QPosition::Absolute;
 		$this->BackColor = 'white';
 		$this->SetCustomStyle('padding', '2px');
