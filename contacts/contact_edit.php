@@ -57,17 +57,6 @@
 		
 		// Company Custom Field array
 		public $arrCompanyCustomFields;
-		
-		// New Company Panel
-		//protected $pnlNewCompany;
-		
-		// New Company Controls
-//		protected $txtCompanyShortDescription;
-//		protected $txtCompanyWebsite;
-//		protected $txtCompanyTelephone;
-//		protected $txtCompanyFax;
-//		protected $txtCompanyEmail;
-//		protected $txtCompanyLongDescription;
 
 		// Labels
 		protected $lblCompany;
@@ -155,14 +144,6 @@
 			// Create all custom contact fields
 			$this->customFields_Create();
 
-			// Create/Setup Controls for a new Company
-//			$this->pnlNewCompany_Create();
-//			$this->txtCompanyShortDescription_Create();
-//			$this->txtCompanyLongDescription_Create();
-//			$this->txtCompanyWebsite_Create();
-//			$this->txtCompanyEmail_Create();
-//			$this->txtCompanyTelephone_Create();
-//			$this->txtCompanyFax_Create();
 			$this->UpdateContactControls();
 			
 			// Create all custom company fields
@@ -198,17 +179,6 @@
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
   	}
-  	
-/*  	protected function pnlNewCompany_Create() {
-  		$this->pnlNewCompany = new QPanel($this);
-  		$this->pnlNewCompany->Template = 'pnl_new_company.inc.php';
-  		if ($this->blnEditMode) {
-  			$this->pnlNewCompany->Visible = false;
-  		}
-  		else {
-  			$this->pnlNewCompany->Visible = true;
-  		}
-  	}*/
 		
 		// Setup the Company Label
 		protected function lblCompany_Create() {
@@ -427,13 +397,10 @@
 			$this->lstAddress->AddItem('- Select One -', null);
 			if ($this->blnEditMode || $this->objContact->CompanyId) {
 				$objAddressArray = $this->objContact->Company->GetAddressArray();
-			}
-			else {
-				$objAddressArray = Address::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
-			}
-			if ($objAddressArray) foreach ($objAddressArray as $objAddress) {
-				$objListItem = new QListItem($objAddress->__toString(), $objAddress->AddressId);
-				$this->lstAddress->AddItem($objListItem);
+				if ($objAddressArray) foreach ($objAddressArray as $objAddress) {
+					$objListItem = new QListItem($objAddress->__toString(), $objAddress->AddressId);
+					$this->lstAddress->AddItem($objListItem);
+				}
 			}
 			$this->lstAddress->TabIndex = $this->intTabIndex++;
 		}
@@ -464,66 +431,6 @@
 			$this->dlgNewAddress->CssClass = "modal_dialog";
 		}		
 		
-		// BEGIN COMPANY FIELDS
-		// Create the Company Name Text Field
-/*		protected function txtCompanyShortDescription_Create() {
-			$this->txtCompanyShortDescription = new QTextBox($this->pnlNewCompany);
-			$this->txtCompanyShortDescription->Name = QApplication::Translate('Company Short Description');
-			$this->txtCompanyShortDescription->CausesValidation = true;
-			$this->txtCompanyShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtCompanyShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtCompanyShortDescription->TabIndex = $this->intTabIndex++;
-		}
-		
-		// Create the Website Text Field
-		protected function txtCompanyWebsite_Create() {
-			$this->txtCompanyWebsite = new QTextBox($this->pnlNewCompany);
-			$this->txtCompanyWebsite->Name = QApplication::Translate('Company Website');
-			$this->txtCompanyWebsite->CausesValidation = true;
-			$this->txtCompanyWebsite->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtCompanyWebsite->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtCompanyWebsite->TabIndex = $this->intTabIndex++;
-		}
-		
-		// Create the LongDescription Text Field
-		protected function txtCompanyLongDescription_Create() {
-			$this->txtCompanyLongDescription = new QTextBox($this->pnlNewCompany);
-			$this->txtCompanyLongDescription->Name = QApplication::Translate('Company Long Description');
-			$this->txtCompanyLongDescription->TextMode = QTextMode::MultiLine;
-			$this->txtCompanyLongDescription->TabIndex = $this->intTabIndex++;
-			
-		}
-		
-		// Create the Telephone Text Field
-		protected function txtCompanyTelephone_Create() {
-			$this->txtCompanyTelephone = new QTextBox($this->pnlNewCompany);
-			$this->txtCompanyTelephone->Name = QApplication::Translate('Company Telephone');
-			$this->txtCompanyTelephone->CausesValidation = true;
-			$this->txtCompanyTelephone->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtCompanyTelephone->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtCompanyTelephone->TabIndex = $this->intTabIndex++;
-		}		
-		
-		// Create the Email Text Field
-		protected function txtCompanyEmail_Create() {
-			$this->txtCompanyEmail = new QTextBox($this->pnlNewCompany);
-			$this->txtCompanyEmail->Name = QApplication::Translate('Company Email');
-			$this->txtCompanyEmail->CausesValidation = true;
-			$this->txtCompanyEmail->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtCompanyEmail->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtCompanyEmail->TabIndex = $this->intTabIndex++;
-		}
-		
-		// Create the Telephone Fax Field
-		protected function txtCompanyFax_Create() {
-			$this->txtCompanyFax = new QTextBox($this->pnlNewCompany);
-			$this->txtCompanyFax->Name = QApplication::Translate('Company Fax');
-			$this->txtCompanyFax->CausesValidation = true;
-			$this->txtCompanyFax->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtCompanyFax->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtCompanyFax->TabIndex = $this->intTabIndex++;
-		}*/
-		
 		// Create all Custom Contact Fields
 		protected function customFields_Create() {
 		
@@ -540,24 +447,6 @@
 				}
 			}
 		}
-		
-		// Create all custom company fields
-/*		protected function arrCompanyCustomFields_Create() {
-			
-			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
-			$this->objCompany = new Company();
-			$this->objCompany->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(7, $this->blnEditMode);
-			
-			if ($this->objCompany) {
-				// Create the Custom Field Controls - labels and inputs (text or list) for each
-				$this->arrCompanyCustomFields = CustomField::CustomFieldControlsCreate($this->objCompany->objCustomFieldArray, $this->blnEditMode, $this->pnlNewCompany, true, true);
-				if ($this->arrCompanyCustomFields) {
-					foreach ($this->arrCompanyCustomFields as $field) {
-						$field['input']->TabIndex = $this->intTabIndex++;
-					}
-				}
-			}
-		}*/
 		
 		// Setup Edit Button
 		protected function btnEdit_Create() {
@@ -624,8 +513,9 @@
 			}
 			else {
 				// Or load all addresses for all companies
-				$objAddressArray = Address::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
-				$this->lstAddress->Enabled = true;
+				//$objAddressArray = Address::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+				//$this->lstAddress->Enabled = true;
+				$objAddressArray = null;
 			}
 			$this->lstAddress->AddItem('- Select One -', null);
 			if ($objAddressArray) foreach ($objAddressArray as $objAddress) {
@@ -741,25 +631,7 @@
 					throw new QDatabaseExceptionBase();
 				}
 			}
-		}				
-		
-/*		// Save New Company for contacts
-		protected function SaveNewCompany() {
-			if (!($this->objCompany instanceof Company)) {
-				$this->objCompany = new Company();
-			}
-			$this->objCompany->ShortDescription = $this->txtCompanyShortDescription->Text;
-			$this->objCompany->LongDescription = $this->txtCompanyLongDescription->Text;
-			$this->objCompany->Website = $this->txtCompanyWebsite->Text;
-			$this->objCompany->Email = $this->txtCompanyEmail->Text;
-			$this->objCompany->Telephone = $this->txtCompanyTelephone->Text;
-			$this->objCompany->Fax = $this->txtCompanyFax->Text;
-			$this->objCompany->Save();
-			
-			if ($this->arrCompanyCustomFields && $this->objCompany->objCustomFieldArray) {
-				CustomField::SaveControls($this->objCompany->objCustomFieldArray, $this->blnEditMode, $this->arrCompanyCustomFields, $this->objCompany->CompanyId, 7);
-			}
-		}*/
+		}
 		
 		// Protected Update Methods
 		protected function UpdateContactFields() {

@@ -38,7 +38,7 @@
 		</td>
 		<td width="100%" valign="top">
 		<?php $this->ctlAssetEdit->Render(); ?>
-		<?php $this->ctlAssetTransact->Render(); ?>
+		<?php if ($this->blnEditMode) $this->ctlAssetTransact->Render(); ?>
 		
 		<br class="item_divider" />
 		<br class="item_divider" />

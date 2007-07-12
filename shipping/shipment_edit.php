@@ -27,6 +27,7 @@
 	require('../contacts/AddressEditPanel.class.php');
 	require_once('./fedexdc.class.php');
 	
+	
 	/**
 	 * This is a quick-and-dirty draft form object to do Create, Edit, and Delete functionality
 	 * of the Shipment class.  It extends from the code-generated
@@ -151,6 +152,7 @@
 		// Arrays
 		protected $arrAssetTransactionToDelete;
 		protected $arrInventoryTransactionToDelete;
+		protected $objCompanyArray;
 		
 		// Objects
 		protected $objAssetTransactionArray;
@@ -174,6 +176,8 @@
 					$this->objFedexShipment = FedexShipment::LoadByShipmentId($this->objShipment->ShipmentId);
 				}
 			}
+			
+			$this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
 			
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
@@ -217,13 +221,6 @@
 			$this->lblWeightUnit_Create();
 			$this->lblLengthUnit_Create();
 			$this->lblCurrencyUnit_Create();
-			
-			
-			
-			
-			
-			
-			
 			
 			// Shipping Inputs
 			$this->dlgExchange_Create();
@@ -297,10 +294,6 @@
 			
 			// Load the objAssetTransactionArray and objInventoryTransactionArray for the first time
 			if ($this->blnEditMode) {
-				/*$objExpansionMap[AssetTransaction::ExpandSourceLocation] = true;
-				$objExpansionMap[AssetTransaction::ExpandAsset][Asset::ExpandAssetModel] = true;
-				$this->objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($this->objShipment->TransactionId, $this->dtgAssetTransact->SortInfo, $this->dtgAssetTransact->LimitInfo, $objExpansionMap);
-				$objExpansionMap = null;*/
 				
 				$objClauses = array();
 				if ($objClause = $this->dtgAssetTransact->OrderByClause)
@@ -314,10 +307,6 @@
 				$this->objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($this->objShipment->TransactionId, $objClauses);
 				$objClauses = null;
 				
-/*				$objExpansionMap[InventoryTransaction::ExpandSourceLocation] = true;
-				$objExpansionMap[InventoryTransaction::ExpandInventoryLocation][InventoryLocation::ExpandInventoryModel] = true;
-				$this->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->objShipment->TransactionId, $this->dtgInventoryTransact->SortInfo, $this->dtgInventoryTransact->LimitInfo, $objExpansionMap);*/
-
 				$objClauses = array();
 				if ($objClause = $this->dtgInventoryTransact->OrderByClause)
 					array_push($objClauses, $objClause);
@@ -328,14 +317,14 @@
 				$this->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->objShipment->TransactionId, $objClauses);
 				
 				// If shipped, display labels. Otherwise, we don't need to call DisplayLabels because only labels are on the QPanel.
-				//if (!$this->objShipment->ShippedFlag) {
 				$this->DisplayLabels();
-				//}
 			}
 			// For a new shipment, display the inputs
 			elseif (!$this->blnEditMode) {
 				$this->DisplayInputs();
 			}
+			
+			
 			
 			// Check if there is an Asset or InventoryModel ID in the query string to automatically add them - they would be coming from AssetEdit or InventoryEdit
 			if (!$this->blnEditMode) {
@@ -358,11 +347,15 @@
 						QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->lstSourceLocation->ControlId));
 					}
 				}
-			}			
+			}
+			
+			
 		}
 		
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
 		protected function Form_PreRender() {
+			
+			
 			
 			// Load the data for the AssetTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyAssets || $this->blnEditMode) {
@@ -869,16 +862,15 @@
 			$this->lstFromCompany->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstFromCompany->AddItem('- Select One -', null);
-			$objFromCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
+			$objFromCompanyArray = $this->objCompanyArray;
+			$intCompanyId = QApplication::$TracmorSettings->CompanyId;
 			if ($objFromCompanyArray) foreach ($objFromCompanyArray as $objFromCompany) {
 				$objListItem = new QListItem($objFromCompany->__toString(), $objFromCompany->CompanyId);
-				if (($this->objShipment->FromCompanyId && $this->objShipment->FromCompanyId == $objFromCompany->CompanyId) || (QApplication::$TracmorSettings->CompanyId && QApplication::$TracmorSettings->CompanyId == $objFromCompany->CompanyId))
+				if (($this->objShipment->FromCompanyId && $this->objShipment->FromCompanyId == $objFromCompany->CompanyId) || ($intCompanyId && $intCompanyId == $objFromCompany->CompanyId))
 					$objListItem->Selected = true;
 				$this->lstFromCompany->AddItem($objListItem);
 			}
-			if (QApplication::$TracmorSettings->CompanyId) {
-					
-			}
+
 			$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFromCompany_Select'));
 			//$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
 			$this->lstFromCompany->TabIndex=1;
@@ -929,7 +921,7 @@
 			$this->lstToCompany->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstToCompany->AddItem('- Select One -', null);
-			$objToCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
+			$objToCompanyArray = $this->objCompanyArray;
 			if ($objToCompanyArray) foreach ($objToCompanyArray as $objToCompany) {
 				$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
 				if (($this->objShipment->ToCompanyId) && ($this->objShipment->ToCompanyId == $objToCompany->CompanyId))
@@ -1380,7 +1372,7 @@
 			$this->dtgAssetTransact->CssClass = "datagrid";
 			
 	    // Enable AJAX - this won't work while using the DB profiler
-	    $this->dtgAssetTransact->UseAjax = true;
+	    $this->dtgAssetTransact->UseAjax = false;
 	
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgAssetTransact);
@@ -1484,7 +1476,7 @@
 			$this->dtgInventoryTransact->CssClass = "datagrid";
 			
 	    // Enable AJAX - this won't work while using the DB profiler
-	    $this->dtgInventoryTransact->UseAjax = true;
+	    $this->dtgInventoryTransact->UseAjax = false;
 	
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgInventoryTransact);

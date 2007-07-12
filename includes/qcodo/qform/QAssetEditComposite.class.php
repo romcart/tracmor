@@ -22,7 +22,7 @@
 
 <?php
 
-require('../assets/AssetModelEditPanel.class.php');
+require(__DOCROOT__ . __SUBDIRECTORY__ . '/assets/AssetModelEditPanel.class.php');
 
 class QAssetEditComposite extends QControl {
 
@@ -107,9 +107,7 @@ class QAssetEditComposite extends QControl {
 		$this->UpdateAssetLabels();
 		
 		// Create Inputs
-		$this->lstAssetModel_Create();
 		$this->txtAssetCode_Create();
-		$this->lstLocation_Create();
 		$this->chkAutoGenerateAssetCode_Create();
 		$this->dlgNewAssetModel_Create();
 		$this->UpdateAssetControls();
@@ -146,6 +144,8 @@ class QAssetEditComposite extends QControl {
 		}
 		// Display empty inputs to create a new asset
 		else {
+			$this->lstAssetModel_Create();
+			$this->lstLocation_Create();
 			$this->displayInputs();
 		}
 	}
@@ -227,8 +227,8 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel->Name = 'Asset Model';
 		$this->lstAssetModel->Required = true;
 		
-		if (!$this->blnEditMode)
-			$this->lstAssetModel->AddItem('- Select One -', null);
+		//if (!$this->blnEditMode)
+		$this->lstAssetModel->AddItem('- Select One -', null);
 		$objAssetModelArray = AssetModel::LoadAll(QQ::Clause(QQ::OrderBy(QQN::AssetModel()->ShortDescription)));
 		if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
 			$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
@@ -246,12 +246,7 @@ class QAssetEditComposite extends QControl {
 		$this->lstLocation->Name = 'Location';
 		$this->lstLocation->Required = true;
 		$this->lstLocation->AddItem('- Select One -', null);
-		if (!$this->blnEditMode) {
-			$objLocationArray = Location::LoadAllLocations(true);
-		}
-		else {
-			$objLocationArray = Location::LoadAllLocations(true, true);
-		}
+		$objLocationArray = Location::LoadAllLocations(true);
 		if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
 			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
 			if ($objLocation->LocationId == 5) {
@@ -701,10 +696,11 @@ class QAssetEditComposite extends QControl {
 				if (!$blnError) {
 				
 					// AssetModel can only be selected for new Assets
-					$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
-					
 					// Location can only be decided when creating an asset. Otherwise they must conduct a transaction.
-					$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
+					if (!$this->blnEditMode) {
+						$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
+						$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
+					}
 		
 					// Object should be saved only if it is new, to obtain the proper AssetId to add to the custom field tables
 					$this->objAsset->Save();
@@ -886,8 +882,6 @@ class QAssetEditComposite extends QControl {
 	public function displayLabels() {
 
 		// Do not display inputs
-		$this->lstAssetModel->Display = false;
-		$this->lstLocation->Display = false;
 		$this->txtAssetCode->Display = false;
 		$this->chkAutoGenerateAssetCode->Display = false;
 		$this->lblNewAssetModel->Display = false;
@@ -934,9 +928,7 @@ class QAssetEditComposite extends QControl {
     else {
       $this->lblAssetModelCode->Display = true;
       $this->lblAssetModel->Display = true;
-    	$this->lstAssetModel->Display = false;
    		$this->lblLocation->Display = true;
-   		$this->lstLocation->Display = false;
    		$this->chkAutoGenerateAssetCode->Display = false;
     }
     
@@ -1062,8 +1054,10 @@ class QAssetEditComposite extends QControl {
 	
 	// Protected Update Methods
 	protected function UpdateAssetFields() {
-		$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
-		$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
+		if (!$this->blnEditMode) {
+			$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
+			$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
+		}
 		// This is set in the btnSave method so doesn't need to be set again here.
 		// $this->objAsset->AssetCode = $this->txtAssetCode->Text;
 	}
@@ -1071,8 +1065,6 @@ class QAssetEditComposite extends QControl {
 	// Assign the original values to all Asset Controls
 	protected function UpdateAssetControls() {
 		
-		$this->lstAssetModel->SelectedValue = $this->objAsset->AssetModelId;
-		$this->lstLocation->SelectedValue = $this->objAsset->LocationId;
 		$this->txtAssetCode->Text = $this->objAsset->AssetCode;
 		$this->arrCustomFields = CustomField::UpdateControls($this->objAsset->objCustomFieldArray, $this->arrCustomFields);
 	}

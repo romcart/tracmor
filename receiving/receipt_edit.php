@@ -401,12 +401,15 @@
 			$this->lstFromContact->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstFromContact->AddItem('- Select One -', null);
-			$objFromContactArray = Contact::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
-			if ($objFromContactArray) foreach ($objFromContactArray as $objFromContact) {
-				$objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
-				if (($this->objReceipt->FromContact) && ($this->objReceipt->FromContact->ContactId == $objFromContact->ContactId))
-					$objListItem->Selected = true;
-				$this->lstFromContact->AddItem($objListItem);
+			if ($this->lstFromCompany->SelectedValue) {
+				$intFromCompanyId = $this->lstFromCompany->SelectedValue;
+				$objFromContactArray = Contact::LoadArrayByCompanyId($intFromCompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
+				if ($objFromContactArray) foreach ($objFromContactArray as $objFromContact) {
+					$objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
+					if (($this->objReceipt->FromContact) && ($this->objReceipt->FromContact->ContactId == $objFromContact->ContactId))
+						$objListItem->Selected = true;
+					$this->lstFromContact->AddItem($objListItem);
+				}
 			}
 			$this->lstFromContact->TabIndex=2;		
 		}
@@ -515,11 +518,6 @@
 			$this->lstAssetModel = new QListBox($this);
 			$this->lstAssetModel->Name = 'Asset Model';
 			$this->lstAssetModel->AddItem('- Select One -', null, true);
-			$objAssetModelArray = AssetModel::LoadAll(QQ::Clause(QQ::OrderBy(QQN::AssetModel()->ShortDescription)));
-			if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
-				$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
-				$this->lstAssetModel->AddItem($objListItem);
-			}
 			$this->lstAssetModel->Display = false;
 		}
 		
@@ -1039,6 +1037,11 @@
 			}
 			// If adding a new receipt to the receipt
 			elseif ($this->rblAssetType->SelectedValue == 'new') {
+				$objAssetModelArray = AssetModel::LoadAll(QQ::Clause(QQ::OrderBy(QQN::AssetModel()->ShortDescription)));
+				if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
+					$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
+					$this->lstAssetModel->AddItem($objListItem);
+				}
 				// Display the list of possible asset models
 				$this->lstAssetModel->Display = true;
 				// Display the Auto Generate Asset Code checkbox if a minimum value exists

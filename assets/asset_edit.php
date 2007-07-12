@@ -51,11 +51,9 @@
 		// These are needed for the hovertips in the Shipping/Receiving datagrid
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
-		
+
 		// Override the Form_Create method in AssetEditFormBase.inc
 		protected function Form_Create() {
-			
-			// QApplication::$Database[1]->EnableProfiling();
 			
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
@@ -66,7 +64,9 @@
 			$this->intTransactionTypeId = QApplication::QueryString('intTransactionTypeId');
 			
 			// Create the two composite controls
-			$this->ctlAssetTransact_Create();
+			if ($this->blnEditMode) {
+				$this->ctlAssetTransact_Create();
+			}
 			$this->ctlAssetEdit_Create();
 			
 			// Display transaction screen if passed an intTransactionTypeId (from shortcut menu)
@@ -95,14 +95,16 @@
 			}
 
 			// If assets are in the array, finish setting up the datagrid of assets prepared for a transaction
-			if ($this->ctlAssetTransact->objAssetArray) {
-				$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = count($this->ctlAssetTransact->objAssetArray);
-				$this->ctlAssetTransact->dtgAssetTransact->DataSource = $this->ctlAssetTransact->objAssetArray;
-				$this->ctlAssetTransact->dtgAssetTransact->ShowHeader = true;
-			}
-			else {
-				$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = 0;
-				$this->ctlAssetTransact->dtgAssetTransact->ShowHeader = false;
+			if ($this->blnEditMode) {
+				if ($this->ctlAssetTransact->objAssetArray) {
+					$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = count($this->ctlAssetTransact->objAssetArray);
+					$this->ctlAssetTransact->dtgAssetTransact->DataSource = $this->ctlAssetTransact->objAssetArray;
+					$this->ctlAssetTransact->dtgAssetTransact->ShowHeader = true;
+				}
+				else {
+					$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = 0;
+					$this->ctlAssetTransact->dtgAssetTransact->ShowHeader = false;
+				}
 			}
 		}
 		
@@ -274,7 +276,7 @@ CREATE FIELD METHODS
 				$this->ctlAssetTransact->SetupDisplay($intTransactionTypeId);
 				$this->ctlAssetTransact->Display = true;
 			}
-			else {
+			elseif ($this->ctlAssetTransact) {
 				$this->ctlAssetTransact->Display = false;
 			}
 		}

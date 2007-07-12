@@ -171,3 +171,4 @@
 
 <?php $this->dlgNew->Render(); ?>
 <?php $this->RenderEnd() ?>
+<?php include('../includes/footer.inc.php'); ?>
