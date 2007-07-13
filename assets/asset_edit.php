@@ -63,11 +63,11 @@
 			// Assign the Transaction Type from the query string, if it exists.
 			$this->intTransactionTypeId = QApplication::QueryString('intTransactionTypeId');
 			
+			$this->ctlAssetEdit_Create();
 			// Create the two composite controls
-			if ($this->blnEditMode) {
+			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
 				$this->ctlAssetTransact_Create();
 			}
-			$this->ctlAssetEdit_Create();
 			
 			// Display transaction screen if passed an intTransactionTypeId (from shortcut menu)
 			if ($this->intTransactionTypeId) {
@@ -95,7 +95,7 @@
 			}
 
 			// If assets are in the array, finish setting up the datagrid of assets prepared for a transaction
-			if ($this->blnEditMode) {
+			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
 				if ($this->ctlAssetTransact->objAssetArray) {
 					$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = count($this->ctlAssetTransact->objAssetArray);
 					$this->ctlAssetTransact->dtgAssetTransact->DataSource = $this->ctlAssetTransact->objAssetArray;
