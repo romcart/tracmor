@@ -788,6 +788,13 @@ class QAssetEditComposite extends QControl {
 	public function btnClone_Click($strFormId, $strControlId, $strParameter) {
 		// Creating a new asset
 		$this->blnEditMode = false;
+		
+		// Create the asset model and location fields
+		$this->lstAssetModel_Create();
+		$this->lstAssetModel->SelectedValue = $this->objAsset->AssetModelId;
+		$this->lstLocation_Create();
+		$this->lstLocation->SelectedValue = $this->objAsset->LocationId;
+		
 		// Instantiate new Asset object
 		$this->objAsset = new Asset();
 		// Load custom fields for asset with values from original asset
