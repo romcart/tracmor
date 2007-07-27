@@ -92,7 +92,7 @@
 			$this->dtgCompany_Create();
 		}
 		
-		protected function Form_PreRender() {
+		protected function dtgCompany_Bind() {
 			
 			// Assing the search values given from the form input
 			if ($this->blnSearch) {
@@ -227,7 +227,10 @@
       $this->dtgCompany->UseAjax = true;
       
       // Allow for column toggling
-      $this->dtgCompany->ShowColumnToggle = true;      
+      $this->dtgCompany->ShowColumnToggle = true;
+      
+      // Allow for CSV Export
+      $this->dtgCompany->ShowExportCsv = true;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgCompany);
@@ -261,7 +264,9 @@
       $objStyle = $this->dtgCompany->HeaderRowStyle;
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';  		
+      $objStyle->CssClass = 'dtg_header';
+      
+      $this->dtgCompany->SetDataBinder('dtgCompany_Bind');
   	}	  
 	  
 	  protected function btnSearch_Click() {

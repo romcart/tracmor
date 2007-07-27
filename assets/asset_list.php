@@ -99,6 +99,9 @@
       // Allow for column toggling
       $this->dtgAsset->ShowColumnToggle = true;
       
+      // Allow for CSV Export
+      $this->dtgAsset->ShowExportCsv = true;
+      
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgAsset);
       $this->dtgAsset->Paginator = $objPaginator;
@@ -135,6 +138,8 @@
       $objStyle->BackColor = '#EFEFEF';
       $objStyle->CssClass = 'dtg_header';
       
+      $this->dtgAsset->SetDataBinder('dtgAsset_Bind');
+      
       $this->lstCategory_Create();
       $this->lstManufacturer_Create();
       $this->lstLocation_Create();
@@ -154,7 +159,7 @@
 			}
   	}
   	
-		protected function Form_PreRender() {
+		protected function dtgAsset_Bind() {
 			
 			// If the search button has been pressed or the AssetModelId was sent in the query string from the asset models page
 			if ($this->blnSearch) {

@@ -100,7 +100,7 @@
 			$this->dtgReceipt_Create();
 		}
 		
-		protected function Form_PreRender() {
+		protected function dtgReceipt_Bind() {
 			
 			// Assing the class member values from the search form inputs
 			if ($this->blnSearch) {
@@ -248,6 +248,9 @@
   		
   		// Allow for column toggling
       $this->dtgReceipt->ShowColumnToggle = true;
+      
+      // Allow for CSV Export
+      $this->dtgReceipt->ShowExportCsv = true;
       		
       // Enable AJAX - this won't work while using the DB profiler
       $this->dtgReceipt->UseAjax = true;
@@ -279,7 +282,9 @@
       $objStyle = $this->dtgReceipt->HeaderRowStyle;
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';  		
+      $objStyle->CssClass = 'dtg_header';
+      
+      $this->dtgReceipt->SetDataBinder('dtgReceipt_Bind');
   	}
   	
   	public function DisplayDate($objDateTime) {

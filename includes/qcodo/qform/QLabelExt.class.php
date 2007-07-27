@@ -52,7 +52,7 @@ class QLabelExt extends QLabel {
 			$strTemplateEvaluated,
 			($this->blnAutoRenderChildren) ? $this->RenderChildren(false) : '',
 			$this->strTagName,
-			$this->objHoverTip->Render(false));
+			($this->objHoverTip && !$this->objParentControl->ExportCsv) ? $this->objHoverTip->Render(false) : '');
 
 		return $strToReturn;
 	}

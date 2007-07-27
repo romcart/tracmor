@@ -4,6 +4,8 @@
 		// DataGrid Preferences
 		///////////////////////////
 		protected $blnShowColumnToggle = false;
+		protected $blnShowExportCsv = false;
+		protected $blnExportCsv = false;
 		protected $objColumnToggle;
 		protected $pnlColumnToggleButton;
 		protected $lblColumnToggleButton;
@@ -63,7 +65,7 @@
 			}
 			
 			// Create the ColumnToggleButton if blnShowColumnToggle is set to true
-			if ($this->blnShowColumnToggle) {
+			if ($this->blnShowColumnToggle || $this->blnShowExportCsv) {
 				if (!$this->pnlColumnToggleButton) {
 					$this->pnlColumnToggleButton_Create();
 				}
@@ -105,7 +107,7 @@
 			}
 			
 			// Add an extra empty column to go underneath the Column Toggle Button
-			if ($this->ShowColumnToggle) {
+			if ($this->ShowColumnToggle || $this->ShowExportCsv) {
 				// This is nasty - cloning the original object just to reset the display to true and get the attributes
 				// There must be a better way to do this, but it gets the job done for now
 				// Also, for inclusion in Qcodo, this might not be what you want to do. What if the last column has weird attributes, and they should go back to normal?
@@ -153,7 +155,7 @@
 			// We have to dynamically determine the number of columns in the table.
 			// When rendering colspans, Firefox includes columns that are not being displayed, but IE does not.
 			$intColspan = 0;
-			if ($this->blnShowColumnToggle) {
+			if ($this->blnShowColumnToggle || $this->blnShowExportCsv) {
 				foreach ($this->objColumnArray as $objColumn) {
 					if ($objColumn->Display === true) {
 						$intColspan += 1;
@@ -236,13 +238,21 @@
 			$strToReturn .= '</table>';
 			
 			// Render the ColumnToggleMenu
-			if ($this->blnShowColumnToggle) {
+			if ($this->blnShowColumnToggle || $this->ShowExportCsv) {
 				$strToReturn .= $this->objColumnToggle->Render(false);
 			}
 			
 			$this->objDataSource = null;
 			
 			return $strToReturn;
+		}
+		
+		public function ParseColumnCsv($objColumn, $objObject, $blnExportCsv = false) {
+			if ($blnExportCsv) {
+				$this->blnExportCsv = $blnExportCsv;
+			}
+			
+			return $this->ParseColumnHtml($objColumn, $objObject);
 		}
 		
 		/////////////////////////
@@ -252,6 +262,8 @@
 			switch ($strName) {
 				// APPEARANCE
 				case "ShowColumnToggle": return $this->blnShowColumnToggle;
+				case "ShowExportCsv": return $this->blnShowExportCsv;
+				case "ExportCsv": return $this->blnExportCsv;
 				case "ColumnArray": return $this->objColumnArray;
 				case "lblColumnToggleButton": return $this->lblColumnToggleButton;
 				case "pnlColumnToggleButton": return $this->pnlColumnToggleButton;
@@ -275,6 +287,24 @@
 				case "ShowColumnToggle":
 					try {
 						$this->blnShowColumnToggle = QType::Cast($mixValue, QType::Boolean);
+						break;
+					} catch (QInvalidCastException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+					
+				case "ShowExportCsv":
+					try {
+						$this->blnShowExportCsv = QType::Cast($mixValue, QType::Boolean);
+						break;
+					} catch (QInvalidCastException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+					
+				case "ExportCsv":
+					try {
+						$this->blnExportCsv = QType::Cast($mixValue, QType::Boolean);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();

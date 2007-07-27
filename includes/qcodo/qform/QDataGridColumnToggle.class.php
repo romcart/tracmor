@@ -8,6 +8,9 @@
 		// The array of column labels found inside the QPanel
 		protected $arrColumnLabels;
 		
+		// The label to export the datagrid as CSV
+		public $lblExportCsv;
+		
 		// JAVASCRIPT
 		protected $strJavaScripts = 'datagrid_column_toggle.js';
 		
@@ -54,6 +57,17 @@
 				}
 			}
 			
+			if ($this->objParentControl->ShowExportCsv) {
+				$this->lblExportCsv = new QLabel($this);
+				$this->lblExportCsv->Text = 'Export CSV';
+				$this->lblExportCsv->AddAction(new QClickEvent(), new QServerControlAction($this, 'lblExportCsv_Click'));
+				$this->lblExportCsv->AddAction(new QClickEvent(), new QTerminateAction());
+				$this->lblExportCsv->AddAction(new QMouseOverEvent(), new QJavascriptAction('this.style.backgroundColor=\'#EEEEEE\';'));
+				$this->lblExportCsv->AddAction(new QMouseOutEvent(), new QJavaScriptAction('this.style.backgroundColor=\'#FFFFFF\';'));
+				$this->lblExportCsv->TagName = 'div';
+				$this->lblExportCsv->SetCustomStyle('cursor', 'pointer');
+			}
+			
 			// Setting display to false again. This is to fix the problem when changing pagination or sorting while the menu is open.
 			$this->pnlColumnToggleMenu->Display = false;
 			
@@ -76,8 +90,6 @@
 			$this->pnlColumnToggleMenu->BackColor = 'white';
 			$this->pnlColumnToggleMenu->Template = __INCLUDES__.'/qcodo/qform/pnl_column_toggle.tpl.php';
 			$this->pnlColumnToggleMenu->Display = false;
-			$this->pnlColumnToggleMenu->Text = 'Show/Hide Columns:';
-			// $this->pnlColumnToggleMenu->AutoRenderChildren = true;
 		}
 		
 		// Toggle whether a column is being displayed or not
@@ -94,6 +106,102 @@
 			$objColumn->SaveDisplayPreference($this->objParentControl->Name);
 		}
 		
+		public function lblExportCsv_Click($strFormId, $strControlId, $strParameter) {
+			
+			$this->objForm->RenderCsvBegin(false);
+			
+			$this->objParentControl->PageNumber = 1;
+			$this->objParentControl->ItemsPerPage = 2147483647;
+			$this->objParentControl->DataBind();
+			
+			if ($this->objParentControl->DataSource) {
+				foreach ($this->objParentControl->DataSource as $objObject) {
+					$arrRows[] = $this->PrintCsvRow($objObject);
+				}
+			}
+			
+			ob_end_clean();
+			
+			session_cache_limiter('must-revalidate');    // force a "no cache" effect
+      header("Pragma: hack"); // IE chokes on "no cache", so set to something, anything, else.
+      $ExpStr = "Expires: " . gmdate("D, d M Y H:i:s", time()) . " GMT";
+      header($ExpStr);
+			header('Content-Type: text/csv');
+			header('Content-Disposition: csv; filename=export.csv');
+			
+			$this->PrintCsvHeader();
+			
+			if ($arrRows) {
+				foreach ($arrRows as $strRow) {
+					print $strRow;
+				}
+			}
+			
+			$this->ParentControl->DataSource = null;
+			QApplication::$JavaScriptArray = array();
+			QApplication::$JavaScriptArrayHighPriority = array();
+			$this->objForm->RenderCsvEnd(false);
+			exit();
+		}
+		
+		protected function PrintCSVHeader()
+    {
+      $strToReturn = '';
+
+      $arrNames = array();
+      foreach($this->objParentControl->ColumnArray as $col) {
+      	if ($col->Display === true) {
+        	$arrNames[] = $col->Name;
+      	}
+      }
+
+      if ($this->objParentControl->ColumnArray) 
+      {
+        $strToReturn = implode('","', $arrNames);
+        $strToReturn = '"' . $strToReturn . '"' . "\r\n";
+      }
+      print $strToReturn;
+    }
+		
+    protected function PrintCSVRow($objObject)
+    {
+      // Iterate through the Columns
+      $strColumnsHtml = '';
+      $arrColumnText = array();
+      foreach ($this->objParentControl->ColumnArray as $objColumn) {
+      	if ($objColumn->Display === true) {
+	        try {
+	          $strHtml = $this->objParentControl->ParseColumnCsv($objColumn, $objObject, true);
+	          
+	          if ($objColumn->HtmlEntities)
+	            $strHtml = QApplication::HtmlEntities($strHtml);
+	          
+	          // For IE
+	          if (QApplication::IsBrowser(QBrowserType::InternetExplorer) && ($strHtml == ''))
+	          	$strHtml = '&nbsp;';
+	          $strHtml = str_replace('"', "'", $strHtml);
+	          //$strHtml = $this->StripControls($strHtml);
+	          $strHtml = strip_tags($strHtml);
+	          $strHtml = trim($strHtml);
+	        } catch (QCallerException $objExc) {
+	          $objExc->IncrementOffset();
+	          throw $objExc;
+	        }
+	        $arrColumnText[] = $strHtml;
+      	}
+      }
+      
+      $strColumnsHtml = implode('","', $arrColumnText);
+      $strColumnsHtml = '"' . $strColumnsHtml . '"' . "\r\n";
+      
+      return $strColumnsHtml;
+    }
+    
+    protected function StripControls($strHtml) {
+    	
+    	
+    }
+		
 		/////////////////////////
 		// Public Properties: GET
 		/////////////////////////
@@ -101,7 +209,7 @@
 			switch ($strName) {
 				
 				case 'ColumnLabels': return $this->arrColumnLabels;
-
+				
 				default:			
 					try {
 						return parent::__get($strName);

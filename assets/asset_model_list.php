@@ -73,6 +73,9 @@
       
       // Allow for column toggling
       $this->dtgAssetModel->ShowColumnToggle = true;
+      
+      // Allow for CSV Export
+      $this->dtgAssetModel->ShowExportCsv = true;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgAssetModel);
@@ -109,6 +112,8 @@
       $objStyle->BackColor = '#EFEFEF';
       $objStyle->CssClass = 'dtg_header';
       
+      $this->dtgAssetModel->SetDataBinder('dtgAssetModel_Bind');
+      
       $this->lstCategory_Create();
       $this->lstManufacturer_Create();
       $this->txtDescription_Create();
@@ -117,7 +122,7 @@
       $this->btnClear_Create();
   	}
 
-		protected function Form_PreRender() {		
+		protected function dtgAssetModel_Bind() {
 			
 			if ($this->blnSearch) {
 				$this->assignSearchValues();
@@ -128,9 +133,6 @@
 			$strDescription = $this->strDescription;
 			$strAssetModelCode = $this->strAssetModelCode;			
 			
-			// Enable Profiling
-      // QApplication::$Database[1]->EnableProfiling();
-      
       $objExpansionMap[AssetModel::ExpandCategory] = true;
       $objExpansionMap[AssetModel::ExpandManufacturer] = true;
       
@@ -139,23 +141,8 @@
     	$this->dtgAssetModel->TotalItemCount = AssetModel::CountBySearch($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $objExpansionMap);
 			$this->dtgAssetModel->DataSource = AssetModel::LoadArrayBySearch($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $this->dtgAssetModel->SortInfo, $this->dtgAssetModel->LimitInfo, $objExpansionMap);
 			$this->blnSearch = false;
-/*      }
-			else {
-				// Pagination must be set to access the TotalItemCount variable
-				$this->dtgAssetModel->TotalItemCount = AssetModel::CountAll();
-				// Load the data source
-				$this->dtgAssetModel->DataSource = AssetModel::LoadAllWithAssetCount($this->dtgAssetModel->SortInfo, $this->dtgAssetModel->LimitInfo, $objExpansionMap);
-			}*/
     }
 
-//		protected function Form_End() {}
-
-/*  	protected function Form_Exit() {
-  	  // Output database profiling - it shows you the queries made to create this page
-  	  // This will not work on pages with the AJAX Pagination
-      // QApplication::$Database[1]->OutputProfiling();
-  	}*/
-  	
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {
   		$this->ctlHeaderMenu = new QHeaderMenu($this);

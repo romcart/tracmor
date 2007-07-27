@@ -51,5 +51,15 @@
 		// Declare DefaultWaitIcon public (instead of protected in QFormBase.inc) so that it can be set from a custom control
 		// This can be removed once HeaderMenu is moved from a custom control to a QPanel.
 		public $objDefaultWaitIcon;
+		
+		// This is simply to make RenderBegin publicly available
+		public function RenderCsvBegin($blnDisplayOutput = true) {
+			$this->RenderBegin($blnDisplayOutput);
+		}
+		
+		// This is simply to make RenderEnd publicly available
+		public function RenderCsvEnd($blnDisplayOutput = true) {
+			$this->RenderEnd($blnDisplayOutput);
+		}
 	}
 ?>

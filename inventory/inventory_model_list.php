@@ -92,6 +92,9 @@
       
       // Allow for column toggling
       $this->dtgInventoryModel->ShowColumnToggle = true;
+      
+      // Allow for CSV Export
+      $this->dtgInventoryModel->ShowExportCsv = true;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgInventoryModel);
@@ -128,6 +131,8 @@
       $objStyle->BackColor = '#EFEFEF';
       $objStyle->CssClass = 'dtg_header';
       
+      $this->dtgInventoryModel->SetDataBinder('dtgInventoryModel_Bind');
+      
       $this->lstCategory_Create();
       $this->lstManufacturer_Create();
       $this->lstLocation_Create();
@@ -139,7 +144,7 @@
       $this->lblAdvanced_Create();
   	}
   	
-		protected function Form_PreRender() {
+		protected function dtgInventoryModel_Bind() {
 			
 			// If the search button has been pressed
 			if ($this->blnSearch) {

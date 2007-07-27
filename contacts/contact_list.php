@@ -89,7 +89,7 @@
 			$this->dtgContact_Create();
 		}
 		
-		protected function Form_PreRender() {
+		protected function dtgContact_Bind() {
 			
 			// Assing the class member values from the search form inputs
 			if ($this->blnSearch) {
@@ -212,7 +212,10 @@
       $this->dtgContact->UseAjax = true;
       
       // Allow for column toggling
-      $this->dtgContact->ShowColumnToggle = true;      
+      $this->dtgContact->ShowColumnToggle = true;
+      
+      // Allow for CSV Export
+      $this->dtgContact->ShowExportCsv = true;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgContact);
@@ -246,7 +249,9 @@
       $objStyle = $this->dtgContact->HeaderRowStyle;
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';  		
+      $objStyle->CssClass = 'dtg_header';
+      
+      $this->dtgContact->SetDataBinder('dtgContact_Bind');
   	}
   	
 	  protected function btnSearch_Click() {

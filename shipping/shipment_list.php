@@ -101,7 +101,7 @@
 			$this->dtgShipment_Create();
 		}
 		
-		protected function Form_PreRender() {
+		protected function dtgShipment_Bind() {
 			
 			// Assing the class member values from the search form inputs
 			if ($this->blnSearch) {
@@ -249,6 +249,9 @@
   		
   		// Allow for column toggling
   		$this->dtgShipment->ShowColumnToggle = true;
+  		
+  		// Allow for CSV Export
+  		$this->dtgShipment->ShowExportCsv = true;
       		
       // Enable AJAX - this won't work while using the DB profiler
       $this->dtgShipment->UseAjax = true;
@@ -282,7 +285,9 @@
       $objStyle = $this->dtgShipment->HeaderRowStyle;
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';  		
+      $objStyle->CssClass = 'dtg_header';
+      
+      $this->dtgShipment->SetDataBinder('dtgShipment_Bind');
   	}
   	
 	  protected function btnSearch_Click() {
