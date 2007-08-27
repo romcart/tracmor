@@ -343,7 +343,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblNewAssetModel->Text = '<img src="../images/add.png">';
 		$this->lblNewAssetModel->ToolTip = "New Asset Model";
 		$this->lblNewAssetModel->CssClass = "add_icon";
-	  	$this->lblNewAssetModel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblNewAssetModel_Click'));
+	  $this->lblNewAssetModel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblNewAssetModel_Click'));
 	}
 	
 	// Create the Auto Generate Asset Code Checkbox
@@ -647,10 +647,13 @@ class QAssetEditComposite extends QControl {
 	
 	// This is called when the 'new' label is clicked
 	public function lblNewAssetModel_Click($strFormId, $strControlId, $strParameter) {
-		// Create the panel, assigning it to the Dialog Box
-		$pnlAssetModelEdit = new AssetModelEditPanel($this->dlgNewAssetModel, 'CloseAssetModelEditPanel');
-		// Show the dialog box
-		$this->dlgNewAssetModel->ShowDialogBox();
+		// Avoid doubleclick issues by checking if it is already displayed
+		if (!$this->dlgNewAssetModel->Display) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlAssetModelEdit = new AssetModelEditPanel($this->dlgNewAssetModel, 'CloseAssetModelEditPanel');
+			// Show the dialog box
+			$this->dlgNewAssetModel->ShowDialogBox();
+		}
 	}
 	
 	// Edit Button Click

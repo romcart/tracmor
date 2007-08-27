@@ -965,44 +965,52 @@
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewFromCompany_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewFromCompanyPanel');
-			$pnlEdit->ActionParameter = $strParameter;
-			// Show the dialog box
-			$this->dlgNew->ShowDialogBox();
-			$pnlEdit->txtShortDescription->Focus();
+			if (!$this->dlgNew->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewFromCompanyPanel');
+				$pnlEdit->ActionParameter = $strParameter;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->txtShortDescription->Focus();
+			}
 		}
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewFromContact_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
-			$pnlEdit->ActionParameter = $strParameter;
-			// Show the dialog box
-			$this->dlgNew->ShowDialogBox();
-			$pnlEdit->lstCompany->Focus();
+			if (!$this->dlgNew->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
+				$pnlEdit->ActionParameter = $strParameter;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->lstCompany->Focus();
+			}
 		}
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewToContact_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, QApplication::$TracmorSettings->CompanyId);
-			$pnlEdit->ActionParameter = $strParameter;
-			$pnlEdit->lstCompany->Enabled = false;
-			// Show the dialog box
-			$this->dlgNew->ShowDialogBox();
-			$pnlEdit->lstCompany->Focus();
+			if (!$this->dlgNew->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, QApplication::$TracmorSettings->CompanyId);
+				$pnlEdit->ActionParameter = $strParameter;
+				$pnlEdit->lstCompany->Enabled = false;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->lstCompany->Focus();
+			}
 		}
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewToAddress_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewPanel', null, null, QApplication::$TracmorSettings->CompanyId);
-			$pnlEdit->ActionParameter = $strParameter;
-			$pnlEdit->lstCompany->Enabled = false;
-			// Show the dialog box
-			$this->dlgNew->ShowDialogBox();
-			$pnlEdit->lstCompany->Focus();
+			if (!$this->dlgNew->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewPanel', null, null, QApplication::$TracmorSettings->CompanyId);
+				$pnlEdit->ActionParameter = $strParameter;
+				$pnlEdit->lstCompany->Enabled = false;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->lstCompany->Focus();
+			}
 		}
 		
 		// Cancel editing an existing receipt, or cancel adding a new receipt and return to the list page

@@ -1950,71 +1950,83 @@
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewFromCompany_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewFromCompanyPanel');
-			$pnlEdit->ActionParameter = $strParameter;
-			// Show the dialog box
-			$this->dlgNew->ShowDialogBox();
-			$pnlEdit->txtShortDescription->Focus();
+			if (!$this->dlgNew->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewFromCompanyPanel');
+				$pnlEdit->ActionParameter = $strParameter;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->txtShortDescription->Focus();
+			}
 		}
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewFromContact_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
-			$pnlEdit->ActionParameter = $strParameter;
-			// Show the dialog box
-			$this->dlgNew->ShowDialogBox();
-			$pnlEdit->lstCompany->Focus();
-		}
-		
-		// This is called when the 'new' label is clicked
-		public function lblNewFromAddress_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
-			$pnlEdit->ActionParameter = $strParameter;
-			// Show the dialog box
-			$this->dlgNew->ShowDialogBox();
-			$pnlEdit->lstCompany->Focus();
-		}
-		
-		// This is called when the 'new' label is clicked
-		public function lblNewToCompany_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewToCompanyPanel');
-			$pnlEdit->ActionParameter = $strParameter;
-			// Show the dialog box
-			$this->dlgNew->ShowDialogBox();
-			$pnlEdit->txtShortDescription->Focus();
-		}
-		
-		// This is called when the 'new' label is clicked
-		public function lblNewToContact_Click($strFormId, $strControlId, $strParameter) {
-			if ($this->lstToCompany->SelectedValue) {
+			if (!$this->dlgNew->Display) {
 				// Create the panel, assigning it to the Dialog Box
-				$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewToContactPanel', null, null, $this->lstToCompany->SelectedValue);
+				$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
 				$pnlEdit->ActionParameter = $strParameter;
 				// Show the dialog box
 				$this->dlgNew->ShowDialogBox();
 				$pnlEdit->lstCompany->Focus();
 			}
-			else {
-				$this->lblNewToContact->Warning = 'You must select a company first.';
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewFromAddress_Click($strFormId, $strControlId, $strParameter) {
+			if (!$this->dlgNew->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
+				$pnlEdit->ActionParameter = $strParameter;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->lstCompany->Focus();
+			}
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewToCompany_Click($strFormId, $strControlId, $strParameter) {
+			if (!$this->dlgNew->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewToCompanyPanel');
+				$pnlEdit->ActionParameter = $strParameter;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->txtShortDescription->Focus();
+			}
+		}
+		
+		// This is called when the 'new' label is clicked
+		public function lblNewToContact_Click($strFormId, $strControlId, $strParameter) {
+			if (!$this->dlgNew->Display) {
+				if ($this->lstToCompany->SelectedValue) {
+					// Create the panel, assigning it to the Dialog Box
+					$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewToContactPanel', null, null, $this->lstToCompany->SelectedValue);
+					$pnlEdit->ActionParameter = $strParameter;
+					// Show the dialog box
+					$this->dlgNew->ShowDialogBox();
+					$pnlEdit->lstCompany->Focus();
+				}
+				else {
+					$this->lblNewToContact->Warning = 'You must select a company first.';
+				}
 			}
 		}
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewToAddress_Click($strFormId, $strControlId, $strParameter) {
-			if ($this->lstToCompany->SelectedValue) {
-				// Create the panel, assigning it to the Dialog Box
-				$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewToAddressPanel', null, null, $this->lstToCompany->SelectedValue);
-				$pnlEdit->ActionParameter = $strParameter;
-				// Show the dialog box
-				$this->dlgNew->ShowDialogBox();
-				$pnlEdit->lstCompany->Focus();
-			}
-			else {
-				$this->lblNewToAddress->Warning = 'You must select a company first.';
+			if (!$this->dlgNew->Display) {
+				if ($this->lstToCompany->SelectedValue) {
+					// Create the panel, assigning it to the Dialog Box
+					$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewToAddressPanel', null, null, $this->lstToCompany->SelectedValue);
+					$pnlEdit->ActionParameter = $strParameter;
+					// Show the dialog box
+					$this->dlgNew->ShowDialogBox();
+					$pnlEdit->lstCompany->Focus();
+				}
+				else {
+					$this->lblNewToAddress->Warning = 'You must select a company first.';
+				}
 			}
 		}
 		

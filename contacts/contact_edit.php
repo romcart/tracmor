@@ -536,18 +536,24 @@
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewCompany_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlCompanyEdit = new CompanyEditPanel($this->dlgNewCompany, 'CloseCompanyEditPanel');
-			// Show the dialog box
-			$this->dlgNewCompany->ShowDialogBox();
+			// Avoid Doubleclick issues
+			if (!$this->dlgNewCompany->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlCompanyEdit = new CompanyEditPanel($this->dlgNewCompany, 'CloseCompanyEditPanel');
+				// Show the dialog box
+				$this->dlgNewCompany->ShowDialogBox();
+			}
 		}
 		
 		// This is called when the 'new' label is clicked
 		public function lblNewAddress_Click($strFormId, $strControlId, $strParameter) {
-			// Create the panel, assigning it to the Dialog Box
-			$pnlAddressEdit = new AddressEditPanel($this->dlgNewAddress, 'CloseAddressEditPanel', null, null, $this->lstCompany->SelectedValue);
-			// Show the dialog box
-			$this->dlgNewAddress->ShowDialogBox();
+			// Avoid doubleclick issues
+			if (!$this->dlgNewAddress->Display) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlAddressEdit = new AddressEditPanel($this->dlgNewAddress, 'CloseAddressEditPanel', null, null, $this->lstCompany->SelectedValue);
+				// Show the dialog box
+				$this->dlgNewAddress->ShowDialogBox();
+			}
 		}
 		
 		// Edit Button Click
