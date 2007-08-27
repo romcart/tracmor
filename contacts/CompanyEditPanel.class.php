@@ -242,6 +242,12 @@
 				return;
 			}
 			
+			if (Company::LoadByShortDescription($this->txtShortDescription->Text)) {
+				$this->txtShortDescription->Warning = 'A company with that name already exists. Please try another';
+				$blnError = true;
+				return;
+			}
+			
 			$this->UpdateCompanyFields();
 			$this->objCompany->Save();
 			
