@@ -1147,7 +1147,7 @@
 						}
 						// Check that the asset isn't already in another pending receipt
 						elseif ($objNewAsset && $objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
-							if ($this->blnEditMode && $objPendingReceipt->TransactionId != $this->objReceipt->TransactionId) {
+							if (($this->blnEditMode && $objPendingReceipt->TransactionId != $this->objReceipt->TransactionId) || !$this->blnEditMode) {
 								$blnError = true;
 								$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
 							}
@@ -1772,6 +1772,9 @@
 							else {
 								$this->btnCancel->Warning = 'An Asset has been deleted by another user and removed from this shipment.';
 							}
+						}
+						if ($objExc->Class == 'AssetTransaction') {
+							$this->btnCancel->Warning = 'This asset transaction has been modified by another user. You may reload the receipt and try your modifications again.';
 						}
 						if ($objExc->Class == 'InventoryLocation') {
 							$this->btnRemoveInventory_Click($this->FormId, 'btnRemoveInventory' . $objExc->EntityId, $objExc->EntityId);
