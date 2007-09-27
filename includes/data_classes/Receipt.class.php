@@ -266,7 +266,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */		
-		public static function CountBySearch($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			Receipt::QueryHelper($objDatabase);
@@ -302,8 +302,9 @@
 				  %s
 				  %s
 				  %s
+				  %s
 			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'],
-			$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strDateModifiedSql'],
+			$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strDateModifiedSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -321,6 +322,7 @@
      * @param string $strAssetCode
      * @param string $strInventoryModelCode
      * @param int $intStatus
+     * @param string $strNote
      * @param string $strDateModified
      * @param string $strDateModifiedFirst
      * @param string $strDateModifiedLast
@@ -329,7 +331,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Receipt[]
      */
-		public static function LoadArrayBySearch($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			
 			Receipt::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			
@@ -344,7 +346,7 @@
 				}
 			}
 					
-			$arrSearchSql = Receipt::GenerateSearchSql($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Receipt::GenerateSearchSql($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
 
 			$strQuery = sprintf('
 				SELECT
@@ -385,18 +387,20 @@
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"),
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'],
-				$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strDateModifiedSql'],
+				$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
+				
+				//echo($strQuery); exit;
 
 			$objDbResult = $objDatabase->Query($strQuery);				
 			return Receipt::InstantiateDbResult($objDbResult);			
 		}
 		
 		// Returns an array of SQL strings to be used in either the Count or Load BySearch queries
-	  protected static function GenerateSearchSql ($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
 
-	  	$arrSearchSql = array("strFromCompanySql" => "", "strFromContactSql" => "", "strReceiptNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
+	  	$arrSearchSql = array("strFromCompanySql" => "", "strFromContactSql" => "", "strReceiptNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strNoteSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
 	  	
 			if ($strFromCompany) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -438,6 +442,10 @@
 					$intStatus = QApplication::$Database[1]->SqlVariable($intStatus, true);
 					$arrSearchSql['strStatusSql'] = "AND `receipt` . `received_flag` = true";
 				}
+			}
+			if ($strNote) {
+				$strNote = QApplication::$Database[1]->SqlVariable("%" . $strNote . "%", false);
+				$arrSearchSql['strNoteSql'] = "AND `note` LIKE $strNote";
 			}
 			if ($strDateModified) {
 				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {

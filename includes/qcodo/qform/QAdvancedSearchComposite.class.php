@@ -28,11 +28,14 @@ class QAdvancedSearchComposite extends QControl {
 	protected $lstReservedBy;
 	protected $lstCheckedOutBy;
 	protected $txtTrackingNumber;
+	protected $lstCourier;
+	protected $txtNote;
 	protected $lstDateModified;
 	protected $dtpDateModifiedFirst;
 	protected $dtpDateModifiedLast;
 	protected $strAssetModelCode;
 	protected $strTrackingNumber;
+	protected $strNote;
 	protected $objCustomFieldArray;
 	protected $arrCustomFields;
 	protected $intEntityQtypeId;
@@ -59,6 +62,11 @@ class QAdvancedSearchComposite extends QControl {
 	    
 	    if ($objParentObject instanceof ShipmentListForm) {
 	    	$this->txtTrackingNumber_Create();
+	    	$this->lstCourier_Create();
+	    	$this->txtNote_Create();
+	    }
+	    if ($objParentObject instanceof ReceiptListForm) {
+	    	$this->txtNote_Create();
 	    }
 	    $this->lstDateModified_Create();
       $this->dtpDateModifiedFirst_Create();
@@ -72,6 +80,10 @@ class QAdvancedSearchComposite extends QControl {
 		}
 		if ($this->objParentObject instanceof ShipmentListForm) {
 			$this->strTrackingNumber = $this->txtTrackingNumber->Text;
+			$this->strNote = $this->txtNote->Text;
+		}
+		if ($this->objParentObject instanceof ReceiptListForm) {
+			$this->strNote = $this->txtNote->Text;
 		}
 	}
 	
@@ -159,6 +171,26 @@ class QAdvancedSearchComposite extends QControl {
 		$this->txtTrackingNumber->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
   }
   
+  protected function lstCourier_Create() {
+  	$this->lstCourier = new QListBox($this);
+  	$this->lstCourier->Name = 'Courier';
+  	$this->lstCourier->AddItem('- Select One -', null, true);
+  	$objCourierArray = Courier::LoadAll();
+  	if ($objCourierArray) {
+  		foreach ($objCourierArray as $objCourier) {
+  			$this->lstCourier->AddItem($objCourier->__toString(), $objCourier->CourierId);
+  		}
+  	}
+  }
+  
+  protected function txtNote_Create() {
+  	$this->txtNote = new QTextBox($this);
+  	$this->txtNote->Name = 'Note';
+  	$this->txtNote->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+  	$this->txtNote->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  	$this->txtNote->Visible = (get_class($this->objParentObject) == 'ShipmentListForm' || get_class($this->objParentObject) == 'ReceiptListForm') ? true : false;
+  }
+  
   protected function dtpDateModifiedFirst_Create() {
   	$this->dtpDateModifiedFirst = new QDateTimePicker($this);
   	$this->dtpDateModifiedFirst->Name = '';
@@ -224,6 +256,11 @@ class QAdvancedSearchComposite extends QControl {
 		}
 		if ($this->objParentObject instanceof ShipmentListForm) {
 			$this->txtTrackingNumber->Text = '';
+			$this->lstCourier->SelectedIndex = 0;
+			$this->txtNote->Text = '';
+		}
+		if ($this->objParentObject instanceof ReceiptListForm) {
+			$this->txtNote->Text = '';
 		}
 		$this->lstDateModified->SelectedIndex = 0;
 		$this->dtpDateModifiedFirst->DateTime = new QDateTime(QDateTime::Now);
@@ -250,6 +287,10 @@ class QAdvancedSearchComposite extends QControl {
 			case "CheckedOutBy": return $this->lstCheckedOutBy->SelectedValue;
 				break;				
 			case "TrackingNumber": return $this->txtTrackingNumber->Text;
+				break;
+			case "CourierId": return $this->lstCourier->SelectedValue;
+				break;
+			case "Note": return $this->txtNote->Text;
 				break;
 			case "DateModified": return $this->lstDateModified->SelectedValue;
 				break;

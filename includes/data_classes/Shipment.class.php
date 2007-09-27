@@ -156,6 +156,17 @@
 			return $strToReturn;
 		}
 		
+		public function __toStringCourier() {
+			if ($this->CourierId) {
+				$strToReturn = $this->Courier->__toString();
+			}
+			else {
+				$strToReturn = '';
+			}
+			
+			return $strToReturn;
+		}
+		
 		/**
 		 * Returns the Default __toString (shipment number) with a link to the shipment record
 		 *
@@ -286,13 +297,15 @@
      * @param string $strInventoryModelCode
      * @param int $intStatus
      * @param string $strTrackingNumber
+     * @param int $intCourierId
+     * @param string $strNote
      * @param string $strDateModified
      * @param string $strDateModifiedFirst
      * @param string $strDateModifiedLast
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearch($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			Shipment::QueryHelper($objDatabase);
@@ -308,7 +321,7 @@
 				}
 			}
 			
-			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
 
 			$strQuery = sprintf('
 				SELECT
@@ -328,10 +341,12 @@
 				  %s
 				  %s
 				  %s
+				  %s
+				  %s
 			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'],
-			$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strDateModifiedSql'],
+			$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strDateModifiedSql'],
 			$arrSearchSql['strAuthorizationSql']);
-
+			
 			$objDbResult = $objDatabase->Query($strQuery);
 			$strDbRow = $objDbResult->FetchRow();
 			return QType::Cast($strDbRow[0], QType::Integer);
@@ -348,6 +363,8 @@
      * @param string $strInventoryModelCode
      * @param int $intStatus
      * @param string $strTrackingNumber
+     * @param int $intCourierId
+     * @param string $strNote
      * @param string $strDateModified
      * @param string $strDateModifiedFirst
      * @param string $strDateModifiedLast
@@ -356,7 +373,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Shipment[]
      */
-		public static function LoadArrayBySearch($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			
 			Shipment::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			
@@ -371,7 +388,7 @@
 				}
 			}
 					
-			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
 
 			$strQuery = sprintf('
 				SELECT
@@ -413,21 +430,22 @@
 				%s
 				%s
 				%s
+				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"),
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'],
-				$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strDateModifiedSql'],
+				$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
-
+				
 			$objDbResult = $objDatabase->Query($strQuery);				
 			return Shipment::InstantiateDbResult($objDbResult);			
 		}
 		
 		// Returns an array of SQL strings to be used in either the Count or Load BySearch queries
-	  protected static function GenerateSearchSql ($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
 
-	  	$arrSearchSql = array("strToCompanySql" => "", "strToContactSql" => "", "strShipmentNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strTrackingNumberSql" => "", "strDateModifiedSql" => "");
+	  	$arrSearchSql = array("strToCompanySql" => "", "strToContactSql" => "", "strShipmentNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strTrackingNumberSql" => "", "strCourierSql" => "", "strNoteSql" => "", "strDateModifiedSql" => "");
 	  	
 			if ($strToCompany) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -474,6 +492,14 @@
 				// Properly Escape All Input Parameters using Database->SqlVariable()		
 				$strTrackingNumber = QApplication::$Database[1]->SqlVariable("%" . $strTrackingNumber . "%", false);
 				$arrSearchSql['strTrackingNumberSql'] = "AND `shipment` . `tracking_number` LIKE $strTrackingNumber";
+			}
+			if ($intCourierId) {
+				$intCourierId = QApplication::$Database[1]->SqlVariable($intCourierId, true);
+				$arrSearchSql['strCourierSql'] = "AND `shipment` . `courier_id` $intCourierId";
+			}
+			if ($strNote) {
+				$strNote = QApplication::$Database[1]->SqlVariable("%" . $strNote . "%", false);
+				$arrSearchSql['strNoteSql'] = "AND `note` LIKE $strNote";
 			}
 			if ($strDateModified) {
 				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {

@@ -73,6 +73,8 @@
 		protected $strInventoryModelCode;
 		protected $intStatus;
 		protected $strTrackingNumber;
+		protected $intCourierId;
+		protected $strNote;
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
@@ -116,24 +118,28 @@
 			$strInventoryModelCode = $this->strInventoryModelCode;
 			$intStatus = $this->intStatus;
 			$strTrackingNumber = $this->strTrackingNumber;
+			$intCourierId = $this->intCourierId;
+			$strNote = $this->strNote;
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
 			
 			// Expand to include the primary address, State/Province, and Country
+			$objExpansionMap[Shipment::ExpandTransaction] = true;
 			$objExpansionMap[Shipment::ExpandToCompany] = true;
 			$objExpansionMap[Shipment::ExpandToContact] = true;
 			$objExpansionMap[Shipment::ExpandToAddress] = true;
+			$objExpansionMap[Shipment::ExpandCourier] = true;
 			$objExpansionMap[Shipment::ExpandCreatedByObject] = true;
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
 			if ($this->dtgShipment->TotalItemCount == 0) {
 				$this->dtgShipment->ShowHeader = false;
 			}
 			else {
-				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
+				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
 				$this->dtgShipment->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -269,7 +275,8 @@
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="shipment__created_by__last_name ASC"', 'ReverseSortByCommand="shipment__created_by__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'SortByCommand="shipped_flag ASC"', 'ReverseSortByCommand="shipped_flag DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Tracking', '<?= $_ITEM->__toStringTrackingNumber() ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Note', '<?= $_ITEM->Transaction->Note ?>', 'CssClass="dtg_column"', 'Width="160"', 'HtmlEntities="false"', 'Display="false"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Courier', '<?= $_ITEM->__toStringCourier() ?>', 'SortByCommand="shipment__courier_id__short_description ASC"', 'ReverseSortByCommand="shipment__courier_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"', 'Display="false"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Note', '<?= $_ITEM->Transaction->Note ?>', 'SortByCommand="shipment__transaction_id__note ASC"', 'ReverseSortByCommand="shipment__transaction_id__note DESC"', 'CssClass="dtg_column"', 'Width="160"', 'HtmlEntities="false"', 'Display="false"'));
       
       $this->dtgShipment->SortColumnIndex = 0;
     	$this->dtgShipment->SortDirection = 1;
@@ -314,6 +321,8 @@
 	  	$this->strInventoryModelCode = null;
 	  	$this->intStatus = null;
 	  	$this->strTrackingNumber = null;
+	  	$this->intCourierId = null;
+	  	$this->strNote = null;
 	  	$this->strDateModified = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
@@ -344,6 +353,8 @@
 	  	$this->strInventoryModelCode = $this->txtInventoryModelCode->Text;
 	  	$this->intStatus = $this->lstStatus->SelectedValue;
 	  	$this->strTrackingNumber = $this->ctlAdvanced->TrackingNumber;
+	  	$this->intCourierId = $this->ctlAdvanced->CourierId;
+	  	$this->strNote = $this->ctlAdvanced->Note;
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;

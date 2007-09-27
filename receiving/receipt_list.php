@@ -72,6 +72,7 @@
 		protected $strAssetCode;
 		protected $strInventoryModelCode;
 		protected $intStatus;
+		protected $strNote;
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;		
@@ -114,23 +115,25 @@
 			$strAssetCode = $this->strAssetCode;
 			$strInventoryModelCode = $this->strInventoryModelCode;
 			$intStatus = $this->intStatus;
+			$strNote = $this->strNote;
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
 			
 			// Expand to include the primary address, State/Province, and Country
+			$objExpansionMap[Receipt::ExpandTransaction] = true;
 			$objExpansionMap[Receipt::ExpandFromCompany] = true;
 			$objExpansionMap[Receipt::ExpandFromContact] = true;
 			$objExpansionMap[Receipt::ExpandCreatedByObject] = true;
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgReceipt->TotalItemCount = Receipt::CountBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgReceipt->TotalItemCount = Receipt::CountBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
 			if ($this->dtgReceipt->TotalItemCount == 0) {
 				$this->dtgReceipt->ShowHeader = false;
 			}
 			else {
-				$this->dtgReceipt->DataSource = Receipt::LoadArrayBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgReceipt->SortInfo, $this->dtgReceipt->LimitInfo, $objExpansionMap);
+				$this->dtgReceipt->DataSource = Receipt::LoadArrayBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgReceipt->SortInfo, $this->dtgReceipt->LimitInfo, $objExpansionMap);
 				$this->dtgReceipt->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -267,7 +270,7 @@
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Status', '<?= $_ITEM->__toStringStatusWithHovertip($_CONTROL) ?>', 'SortByCommand="received_flag ASC, due_date ASC"', 'ReverseSortByCommand="received_flag DESC, due_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Date Due', '<?= $_FORM->DisplayDate($_ITEM->DueDate); ?>', 'SortByCommand="due_date ASC"', 'ReverseSortByCommand="due_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Date Received', '<?= $_FORM->DisplayDate($_ITEM->ReceiptDate); ?>', 'SortByCommand="receipt_date ASC"', 'ReverseSortByCommand="receipt_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"', 'Display="false"'));
-      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Note', '<?= $_ITEM->Transaction->Note ?>', 'CssClass="dtg_column"', 'Width="160"', 'HtmlEntities="false"', 'Display="false"'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Note', '<?= $_ITEM->Transaction->Note ?>', 'SortByCommand="receipt__transaction_id__note ASC"', 'ReverseSortByCommand="receipt__transaction_id__note DESC"', 'CssClass="dtg_column"', 'Width="160"', 'HtmlEntities="false"', 'Display="false"'));
 
            
       $this->dtgReceipt->SortColumnIndex = 0;
@@ -323,6 +326,7 @@
 	  	$this->strAssetCode = null;
 	  	$this->strInventoryModelCode = null;
 	  	$this->intStatus = null;
+	  	$this->strNote = null;
 	  	$this->strDateModified = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
@@ -352,6 +356,7 @@
 	  	$this->strAssetCode = $this->txtAssetCode->Text;
 	  	$this->strInventoryModelCode = $this->txtInventoryModelCode->Text;
 	  	$this->intStatus = $this->lstStatus->SelectedValue;
+	  	$this->strNote = $this->ctlAdvanced->Note;
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
