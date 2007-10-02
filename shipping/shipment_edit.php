@@ -67,6 +67,7 @@
 		protected $rblAssetType;
 		protected $txtReceiptAssetCode;
 		protected $chkAutoGenerateAssetCode;
+		protected $dtpScheduleReceiptDueDate;
 		protected $txtToPhone;
 		protected $lstBillTransportationTo;
 		protected $lstShippingAccount;
@@ -84,6 +85,7 @@
 		protected $lstCurrencyUnit;
 		protected $chkNotificationFlag;
 		protected $dlgExchange;
+		protected $dlgDueDate;
 		public $lstFromCompany;
 		public $lstFromContact;
 		public $lstFromAddress;
@@ -104,6 +106,8 @@
 		protected $btnCancelCompleteShipment;
 		protected $btnSaveExchange;
 		protected $btnCancelExchange;
+		protected $btnSaveDueDate;
+		protected $btnCancelDueDate;
 		
 		// Labels
 		protected $lblHeaderShipment;
@@ -224,6 +228,7 @@
 			
 			// Shipping Inputs
 			$this->dlgExchange_Create();
+			$this->dlgDueDate_Create();
 			$this->calShipDate_Create();
 			$this->lstFromCompany_Create();
 			$this->lblNewFromCompany_Create();
@@ -263,6 +268,7 @@
 			//$this->lblAdvanced_Create();
 			$this->txtReceiptAssetCode_Create();
 			$this->chkAutoGenerateAssetCode_Create();
+			$this->dtpScheduleReceiptDueDate_Create();
 			$this->rblAssetType_Create();
 			$this->chkScheduleReceipt_Create();
 			$this->btnAddAsset_Create();
@@ -270,6 +276,8 @@
 			$this->btnAddInventory_Create();
 			$this->btnSaveExchange_Create();
 			$this->btnCancelExchange_Create();
+			$this->btnSaveDueDate_Create();
+			$this->btnCancelDueDate_Create();
 			
 			// New entities Dialog
 			$this->dlgNew_Create();
@@ -355,8 +363,6 @@
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
 		protected function Form_PreRender() {
 			
-			
-			
 			// Load the data for the AssetTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyAssets || $this->blnEditMode) {
 				$this->blnModifyAssets = false;
@@ -423,6 +429,20 @@
   		$this->dlgExchange->BackColor = '#FFFFFF';
   		$this->dlgExchange->MatteClickable = false;
   		$this->dlgExchange->SetCustomStyle('overflow', 'auto');
+    }
+    
+    // Create and Setup the Due Date Modal Dialog Box
+    protected function dlgDueDate_Create() {
+    	$this->dlgDueDate = new QDialogBox($this);
+    	$this->dlgDueDate->AutoRenderChildren = true;
+    	$this->dlgDueDate->Template = 'dlg_due_date.inc.php';
+    	$this->dlgDueDate->Width = '200px';
+    	$this->dlgDueDate->Height = '80px';
+    	$this->dlgDueDate->Padding = '10px';
+    	$this->dlgDueDate->Display = false;
+    	$this->dlgDueDate->BackColor = '#FFFFFF';
+    	$this->dlgDueDate->MatteClickable = false;
+    	$this->dlgDueDate->SetCustomStyle('overflow', 'auto');
     }
   	
 		//**************
@@ -1339,7 +1359,7 @@
 			$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->txtReceiptAssetCode));
 			if (QApplication::$TracmorSettings->MinAssetCode) {
 				$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->chkAutoGenerateAssetCode));
-			}		
+			}
 		}
 		
 		protected function txtReceiptAssetCode_Create() {
@@ -1357,6 +1377,13 @@
 				$this->chkAutoGenerateAssetCode->Display = false;
 			}
 			//$this->chkAutoGenerateAssetCode->Display = false;
+		}
+		
+		protected function dtpScheduleReceiptDueDate_Create() {
+			$this->dtpScheduleReceiptDueDate = new QDateTimePicker($this->dlgDueDate);
+			$this->dtpScheduleReceiptDueDate->Name = 'Due Date';
+			$this->dtpScheduleReceiptDueDate->DateTimePickerType = QDateTimePickerType::Date;
+			$this->dtpScheduleReceiptDueDate->MinimumYear = date('Y');
 		}
 		
 		//******************
@@ -1382,9 +1409,11 @@
     	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHovertips($_CONTROL) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => "200", 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->SourceLocation->__toString() ?>', array('CssClass' => "dtg_column")));
+	    
 	    if (!$this->blnEditMode) {
     		$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    }
 	
 	    $objStyle = $this->dtgAssetTransact->RowStyle;
@@ -1403,7 +1432,7 @@
 	    $this->dtgAssetTransact->ShowHeader = false;
 		}
 		
-		// Render the advanced label in the AssetTransact datagrid
+		// Render the advanced listbox in the AssetTransact datagrid
 		public function AdvancedColumn_Render(AssetTransaction $objAssetTransaction) {
 			if (!$objAssetTransaction->Asset->TempId) {
 				$objAssetTransaction->Asset->TempId = $this->intNewTempId++;
@@ -1420,7 +1449,6 @@
 				$lstAdvanced->AddItem('Schedule for Return', 1);
 				$lstAdvanced->AddItem('Schedule for Exchange', 2);
 				$lstAdvanced->AddAction(new QChangeEvent(), new QAjaxAction('lstAdvancedColumn_Change'));
-				$lstAdvanced->CausesValidation = false;
 				$lstAdvanced->Width = 200;
 			}
 			
@@ -1438,6 +1466,33 @@
 			
 			
 			return $lstAdvanced->Render(false);
+		}
+		
+		public function DueDateColumn_Render(AssetTransaction $objAssetTransaction) {
+			$strControlId = 'lblDueDate' . $objAssetTransaction->Asset->TempId;
+			$lblDueDate = $this->GetControl($strControlId);
+			if (!$lblDueDate) {
+				// Create the due date label for this row in the datagrid
+				// Use the ActionParameter to specify the Temp ID of the asset
+				$lblDueDate = new QLabel($this->dtgAssetTransact, $strControlId);
+				$lblDueDate->ActionParameter = $objAssetTransaction->Asset->TempId;
+				$lblDueDate->CausesValidation = false;
+				if ($objAssetTransaction->ScheduleReceiptDueDate && $objAssetTransaction->ScheduleReceiptFlag) {
+					$lblDueDate->Text = $objAssetTransaction->ScheduleReceiptDueDate->__toString();
+				}
+				elseif ($objAssetTransaction->ScheduleReceiptFlag) {
+					$lblDueDate->Text = 'Set Due Date';
+				}
+				else {
+					$lblDueDate->Text = 'Set Due Date';
+					$lblDueDate->Visible = false;
+				}
+				$lblDueDate->SetCustomStyle('text-decoration', 'underline');
+	  		$lblDueDate->SetCustomStyle('cursor', 'pointer');
+				$lblDueDate->AddAction(new QClickEvent(), new QAjaxAction('lblDueDate_Click'));
+			}
+			
+			return $lblDueDate->Render(false);
 		}
 		
 		// Render the remove button column in the AssetTransact datagrid
@@ -1642,6 +1697,24 @@
 			$this->btnCancelExchange->AddAction(new QClickEvent(), new QAjaxAction('btnCancelExchange_Click'));
 			$this->btnCancelExchange->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCancelExchange_Click'));
 			$this->btnCancelExchange->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		// Create Save Due Date Button
+		protected function btnSaveDueDate_Create() {
+			$this->btnSaveDueDate = new QButton($this->dlgDueDate);
+			$this->btnSaveDueDate->Text = 'Save';
+			$this->btnSaveDueDate->AddAction(new QClickEvent(), new QAjaxAction('btnSaveDueDate_Click'));
+			$this->btnSaveDueDate->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSaveDueDate_Click'));
+			$this->btnSaveDueDate->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		// Create Cancel Exchange Button
+		protected function btnCancelDueDate_Create() {
+			$this->btnCancelDueDate = new QButton($this->dlgDueDate);
+			$this->btnCancelDueDate->Text = 'Cancel';
+			$this->btnCancelDueDate->AddAction(new QClickEvent(), new QAjaxAction('btnCancelDueDate_Click'));
+			$this->btnCancelDueDate->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCancelDueDate_Click'));
+			$this->btnCancelDueDate->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
 		// New Entity (Company, Contact, Address Dialog Box)
@@ -2178,12 +2251,14 @@
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 					if ($objAssetTransaction->Asset->TempId == $intTempId) {
+						$lblDueDate = $this->GetControl('lblDueDate' . $intTempId);
 						// 'None'
 						if ($lstAdvanced->SelectedValue == 0) {
 							$objAssetTransaction->ScheduleReceiptFlag = false;
 							$objAssetTransaction->NewAssetFlag = false;
 							$objAssetTransaction->NewAssetId = null;
 							$objAssetTransaction->NewAsset = null;
+							$lblDueDate->Visible = false;
 						}
 						// Return
 						elseif ($lstAdvanced->SelectedValue == 1) {
@@ -2191,6 +2266,7 @@
 							$objAssetTransaction->NewAssetFlag = false;
 							$objAssetTransaction->NewAssetId = null;
 							$objAssetTransaction->NewAsset = null;
+							$lblDueDate->Visible = true;
 						}
 						// Exchange
 						elseif ($lstAdvanced->SelectedValue == 2) {
@@ -2198,11 +2274,36 @@
 							$objAssetTransaction->NewAssetFlag = true;
 							$this->dlgExchange->ActionParameter = $intTempId;
 							$this->dlgExchange->ShowDialogBox();
+							$lblDueDate->Visible = true;
 						}
 					}
 				}
 				$this->blnModifyAssets = true;
 			}
+		}
+		
+		// Due Date Click Action for each AssetTransaction in the datagrid
+		public function lblDueDate_Click($strFormId, $strControlId, $strParameter) {
+			
+			$intTempId = $strParameter;
+			$this->dlgDueDate->ActionParameter = $intTempId;
+			$this->dlgDueDate->ShowDialogBox();
+			
+			//$lblDueDate = $this->GetControl($strControlId);
+			if ($this->objAssetTransactionArray) {
+				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+					if ($objAssetTransaction->Asset->TempId == $intTempId) {
+						if ($objAssetTransaction->ScheduleReceiptDueDate) {
+							$this->dtpScheduleReceiptDueDate->DateTime = new QDateTime($objAssetTransaction->ScheduleReceiptDueDate);
+						}
+						else {
+							$this->dtpScheduleReceiptDueDate->DateTime = new QDateTime(QDateTime::Now);
+						}
+					}
+				}
+			}
+			
+			$this->blnModifyAssets = true;
 		}
 		
 		// Remove button click action for each asset in the datagrid
@@ -2527,6 +2628,9 @@
 										$objReceipt->ToContactId = $this->objShipment->FromContactId;
 										$objReceipt->ToAddressId = $this->objShipment->FromAddressId;
 										$objReceipt->ReceiptNumber = Receipt::LoadNewReceiptNumber();
+										if ($objAssetTransaction->ScheduleReceiptDueDate) {
+											$objReceipt->DueDate = $objAssetTransaction->ScheduleReceiptDueDate;
+										}
 										
 										$objReceipt->Save();
 									}
@@ -2550,6 +2654,8 @@
 									$objReceiptAssetTransaction->Save();
 								}
 								$objAssetTransaction->Save();
+								$objReceipt = null;
+								$objTransaction = null;
 							}
 						}
 					}
@@ -3170,13 +3276,43 @@
 						$objAssetTransaction->ScheduleReceiptFlag = false;
 						$objAssetTransaction->NewAssetFlag = false;
 						$objAssetTransaction->NewAsset = null;
+						$lblDueDate = $this->GetControl('lblDueDate' . $intTempId);
+						$lblDueDate->Visible = false;
 					}
 				}
 			}
 			
 			$this->dlgExchange->ActionParameter = null;
 			$this->dlgExchange->HideDialogBox();
+			$this->dtpScheduleReceiptDueDate->DateTime = null;
+		}
+		
+		// Save Due Date Button Click
+		protected function btnSaveDueDate_Click($strFormId, $strControlId, $strParameter) {
+			$intTempId = $this->dlgDueDate->ActionParameter;
+			$lblDueDate = $this->GetControl('lblDueDate' . $intTempId);
+			if ($this->objAssetTransactionArray) {
+				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+					if ($objAssetTransaction->Asset->TempId == $intTempId) {
+						$objAssetTransaction->ScheduleReceiptDueDate = $this->dtpScheduleReceiptDueDate->DateTime;
+						$lblDueDate->Text = $objAssetTransaction->ScheduleReceiptDueDate->__toString();
+					}
+				}
+			}
 			$this->blnModifyAssets = true;
+			
+			$this->dlgDueDate->HideDialogBox();
+			$this->dlgDueDate->ActionParameter = null;
+			$this->dtpScheduleReceiptDueDate->DateTime = null;
+			
+		}
+		
+		// Cancel Due Date Button Click
+		protected function btnCancelDueDate_Click($strFormId, $strControlId, $strParameter) {
+			
+			$this->dlgDueDate->HideDialogBox();
+			$this->blnModifyAssets = true;
+			$this->dtpScheduleReceiptDueDate->DateTime = null;
 		}
 		
 		// This method triggers if the Advanced label gets clicked. It shows or hides the advanced fields for scheduling receipts
@@ -3618,6 +3754,7 @@
 				$this->dtgAssetTransact->RemoveColumnByName('Action');
 				$this->dtgInventoryTransact->RemoveColumnByName('Action');
 				$this->dtgAssetTransact->RemoveColumnByName('Advanced');
+				$this->dtgAssetTransact->RemoveColumnByName('Due Date');
 			}
 			
 			// Display Labels
@@ -3774,6 +3911,7 @@
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			}
 		}
 		

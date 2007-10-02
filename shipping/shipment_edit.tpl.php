@@ -22,6 +22,7 @@
 	include('../includes/header.inc.php');
 	$this->RenderBegin();
 	$this->dlgExchange->Render();
+	$this->dlgDueDate->Render();
 ?>
 <!-- Begin Header Menu -->
 <?php 
