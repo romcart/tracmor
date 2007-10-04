@@ -108,6 +108,7 @@ class QAssetEditComposite extends QControl {
 		
 		// Create Inputs
 		$this->txtAssetCode_Create();
+		$this->lstAssetModel_Create();
 		$this->chkAutoGenerateAssetCode_Create();
 		$this->dlgNewAssetModel_Create();
 		$this->UpdateAssetControls();
@@ -144,7 +145,6 @@ class QAssetEditComposite extends QControl {
 		}
 		// Display empty inputs to create a new asset
 		else {
-			$this->lstAssetModel_Create();
 			$this->lstLocation_Create();
 			$this->displayInputs();
 		}
@@ -216,9 +216,9 @@ class QAssetEditComposite extends QControl {
 		$this->txtAssetCode->Required = true;
 		$this->txtAssetCode->CausesValidation = true;
 		$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
-   	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-   	$this->txtAssetCode->TabIndex=2;
-   	$this->intNextTabIndex++;
+  	 	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+   		$this->txtAssetCode->TabIndex=2;
+   		$this->intNextTabIndex++;
 	}
 	
 	// Create and Setup lstAssetModel
@@ -227,12 +227,14 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel->Name = 'Asset Model';
 		$this->lstAssetModel->Required = true;
 		
-		//if (!$this->blnEditMode)
-		$this->lstAssetModel->AddItem('- Select One -', null);
+		if (!$this->blnEditMode)
+			$this->lstAssetModel->AddItem('- Select One -', null);
 		$objAssetModelArray = AssetModel::LoadAll(QQ::Clause(QQ::OrderBy(QQN::AssetModel()->ShortDescription)));
 		if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
 			$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
 			$this->lstAssetModel->AddItem($objListItem);
+			if (($this->objAsset->AssetModelId) && ($this->objAsset->AssetModelId == $objAssetModel->AssetModelId))
+				$objListItem->Selected = true;
 		}
 		$this->lstAssetModel->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstAssetModel_Select'));
 		QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->lstAssetModel->ControlId));
@@ -625,22 +627,24 @@ class QAssetEditComposite extends QControl {
 	// Asset Model List Selection Action
 	// Display the AssetModelCode for the given AssetModel once it is chosen
 	public function lstAssetModel_Select($strFormId, $strControlId, $strParameter) {
-		$objAssetModel = AssetModel::Load($this->lstAssetModel->SelectedValue);
-		if ($objAssetModel) {
-			if ($objAssetModel->AssetModelCode) {
-				$this->lblAssetModelCode->Text = $objAssetModel->AssetModelCode;
-			}
-			else {
-				$this->lblAssetModelCode->Text = 'None';
-			}
-			if ($objAssetModel->Manufacturer) {
-				$this->lblManufacturer->Text = $objAssetModel->Manufacturer->ShortDescription;
-			}
-			else {
-				$this->lblManufactuerer->Text = 'None';
-			}
-			if ($objAssetModel->Category) {
-				$this->lblCategory->Text = $objAssetModel->Category->ShortDescription;
+		if ($this->lstAssetModel->SelectedValue != null) {
+			$objAssetModel = AssetModel::Load($this->lstAssetModel->SelectedValue);
+			if ($objAssetModel) {
+				if ($objAssetModel->AssetModelCode) {
+					$this->lblAssetModelCode->Text = $objAssetModel->AssetModelCode;
+				}
+				else {
+					$this->lblAssetModelCode->Text = 'None';
+				}
+				if ($objAssetModel->Manufacturer) {
+					$this->lblManufacturer->Text = $objAssetModel->Manufacturer->ShortDescription;
+				}
+				else {
+					$this->lblManufactuerer->Text = 'None';
+				}
+				if ($objAssetModel->Category) {
+					$this->lblCategory->Text = $objAssetModel->Category->ShortDescription;
+				}
 			}
 		}
 	}
@@ -683,7 +687,7 @@ class QAssetEditComposite extends QControl {
 			}
 			
 			$this->objAsset->AssetCode = $this->txtAssetCode->Text;
-	
+			$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
 			
 			$blnError = false;
 			// If a new asset is being created
@@ -698,10 +702,8 @@ class QAssetEditComposite extends QControl {
 				
 				if (!$blnError) {
 				
-					// AssetModel can only be selected for new Assets
 					// Location can only be decided when creating an asset. Otherwise they must conduct a transaction.
 					if (!$this->blnEditMode) {
-						$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
 						$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
 					}
 		
@@ -893,6 +895,7 @@ class QAssetEditComposite extends QControl {
 
 		// Do not display inputs
 		$this->txtAssetCode->Display = false;
+		$this->lstAssetModel->Display = false;
 		$this->chkAutoGenerateAssetCode->Display = false;
 		$this->lblNewAssetModel->Display = false;
 		
@@ -904,7 +907,8 @@ class QAssetEditComposite extends QControl {
 		$this->lblAssetModelCode->Display = true;
 		$this->lblLocation->Display = true;
 		$this->lblAssetCode->Display = true;
-
+		$this->lblAssetModel->Display = true;
+		
 		// Display Edit and Delete buttons
 		$this->btnEdit->Display = true;
 		$this->btnDelete->Display = true;
@@ -919,15 +923,13 @@ class QAssetEditComposite extends QControl {
 	// Display the inputs and buttons for Edit or Create mode
 	public function displayInputs() {
 		
-		// Do not display labels
+	// Do not display labels
     
     $this->lblAssetCode->Display = false;
-    // Only display the Asset Model list if creating a new asset
+    
     // Only display location list if creating a new asset
     if (!$this->blnEditMode) {
-   		$this->lblAssetModelCode->Display = false;
    		$this->lblAssetModel->Display = false;
-   		$this->lstAssetModel->Display = true;
    		$this->lblNewAssetModel->Display = true;
    		$this->lblLocation->Display = false;
    		$this->lstLocation->Display = true;
@@ -939,6 +941,7 @@ class QAssetEditComposite extends QControl {
       $this->lblAssetModelCode->Display = true;
       $this->lblAssetModel->Display = true;
    		$this->lblLocation->Display = true;
+   		$this->lblAssetModel->Display = false;
    		$this->chkAutoGenerateAssetCode->Display = false;
     }
     
@@ -950,8 +953,9 @@ class QAssetEditComposite extends QControl {
     $this->btnDelete->Display = false;
     $this->btnClone->Display = false;
     
-    // Display Asset Code input for edit mode
+    // Display Asset Code and Asset Model input for edit mode
 		$this->txtAssetCode->Display = true;
+		$this->lstAssetModel->Display = true;
 		
     // Display Cancel and Save butons    
     $this->btnCancel->Display = true;

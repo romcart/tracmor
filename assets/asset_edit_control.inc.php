@@ -25,7 +25,7 @@
 		$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lstAssetModel->RenderWithError(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));
 	}
 	else {
-		$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lblAssetModel->Render(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));
+		$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lstAssetModel->Render(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false) . $this->lblAssetModel->Render(false));
 	}
 	$arrAssetFields[] = array('name' => 'Asset Code:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
 	$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false) . '&nbsp;');
