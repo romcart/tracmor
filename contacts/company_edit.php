@@ -679,13 +679,24 @@
 						$this->txtAddressShortDescription->Warning = 'Address Name is a required field.';
 						return;
 					}
+					
+					// Enforce unique company name when creating new company
+	                                if (Company::LoadByShortDescription($this->txtShortDescription->Text)) {
+        	                                $this->txtShortDescription->Warning = 'A company with that name already exists. Please try another';
+                	                        $blnError = true;
+                        	                return;
+                                	}
 				}
-				if (Company::LoadByShortDescription($this->txtShortDescription->Text)) {
-					$this->txtShortDescription->Warning = 'A company with that name already exists. Please try another';
-					$blnError = true;
-					return;
+
+				// Enforce unique company name when editing a company
+				if ($this->blnEditMode) {
+					if ($this->txtShortDescription->Text != $this->objCompany->ShortDescription && Company::LoadByShortDescription($this->txtShortDescription->Text)) {
+						$this->txtShortDescription->Warning = 'A company with that name already exists. Please try another';
+                                                $blnError = true;
+                                                return;
+					}
 				}
-				
+
 				$this->UpdateCompanyFields();
 				$this->objCompany->Save();
 				// Assign input values to custom fields
