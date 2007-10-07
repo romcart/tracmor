@@ -384,6 +384,7 @@
 				%s
 				%s
 				%s
+				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"),
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'],
