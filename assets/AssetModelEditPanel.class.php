@@ -66,6 +66,7 @@
 			$this->lstManufacturer->Required = true;
 			$this->btnSave->RemoveAllActions('onclick');
 			$this->btnSave->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
+			$this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
 			
 			// Add Enter Key Events to each control except the Cancel Button
 			$arrControls = array($this->txtShortDescription, $this->lstCategory, $this->lstManufacturer, $this->txtAssetModelCode, $this->txtLongDescription, $this->ifcImage);

@@ -55,6 +55,7 @@
 			}
 			
 			$this->strOverflow = QOverflow::Auto;
+			$this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
 		}
 		
 		protected function lstCompany_Create() {

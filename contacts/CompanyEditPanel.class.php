@@ -74,6 +74,7 @@
 			}
 			
 			$this->strOverflow = QOverflow::Auto;
+			$this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
 		}
 		
 		// Create and Setup txtShortDescription
