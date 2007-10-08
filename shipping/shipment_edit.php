@@ -886,7 +886,7 @@
 			$intCompanyId = QApplication::$TracmorSettings->CompanyId;
 			if ($objFromCompanyArray) foreach ($objFromCompanyArray as $objFromCompany) {
 				$objListItem = new QListItem($objFromCompany->__toString(), $objFromCompany->CompanyId);
-				if (($this->objShipment->FromCompanyId && $this->objShipment->FromCompanyId == $objFromCompany->CompanyId) || ($intCompanyId && $intCompanyId == $objFromCompany->CompanyId))
+				if (($this->objShipment->FromCompanyId && $this->objShipment->FromCompanyId == $objFromCompany->CompanyId) || (!$this->blnEditMode && $intCompanyId && $intCompanyId == $objFromCompany->CompanyId))
 					$objListItem->Selected = true;
 				$this->lstFromCompany->AddItem($objListItem);
 			}
@@ -903,8 +903,8 @@
 			$this->lstFromContact->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstFromContact->AddItem('- Select One -', null);
-			// $objFromContactArray = Contact::LoadArrayByCompanyId(QApplication::$TracmorSettings->CompanyId, 'last_name ASC, first_name ASC');
-			$objFromContactArray = Contact::LoadArrayByCompanyId(QApplication::$TracmorSettings->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
+			$intCompanyId = ($this->objShipment->FromCompanyId) ? $this->objShipment->FromCompanyId : QApplication::$TracmorSettings->CompanyId;
+			$objFromContactArray = Contact::LoadArrayByCompanyId($intCompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
 			if ($objFromContactArray) foreach ($objFromContactArray as $objFromContact) {
 				$objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
 				if (($this->objShipment->FromContactId) && ($this->objShipment->FromContactId == $objFromContact->ContactId))
@@ -922,7 +922,8 @@
 			$this->lstFromAddress->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstFromAddress->AddItem('- Select One -', null);
-			$objFromAddressArray = Address::LoadArrayByCompanyId(QApplication::$TracmorSettings->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+			$intCompanyId = ($this->objShipment->FromCompanyId) ? $this->objShipment->FromCompanyId : QApplication::$TracmorSettings->CompanyId;
+			$objFromAddressArray = Address::LoadArrayByCompanyId($intCompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
 			if ($objFromAddressArray) foreach ($objFromAddressArray as $objFromAddress) {
 				$objListItem = new QListItem($objFromAddress->__toString(), $objFromAddress->AddressId);
 				if (($this->objShipment->FromAddressId) && ($this->objShipment->FromAddressId == $objFromAddress->AddressId))
