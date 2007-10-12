@@ -111,7 +111,7 @@
 									<td class="record_field_name">Date Received:&nbsp;</td>
 									<td class="record_field_value"><?php $this->lblReceiptDate->Render(); ?>&nbsp;</td>
 								</tr>
-								<?php if ($arrReceiptFields) {
+								<?php if (!empty($arrReceiptFields)) {
 									foreach ($arrReceiptFields as $field) {
 										?>
 										<tr>

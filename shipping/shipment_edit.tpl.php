@@ -136,7 +136,7 @@
 									<td class="record_field_name">Ship Date:&nbsp;</td>
 									<td class="record_field_value"><?php $this->calShipDate->RenderWithError();$this->lblShipDate->Render(); ?>&nbsp;</td>
 								</tr>
-								<?php if ($arrShipmentFields) {
+								<?php if (!empty($arrShipmentFields)) {
 									foreach ($arrShipmentFields as $field) {
 										?>
 										<tr>
