@@ -194,6 +194,10 @@
 					break;
 				case 9: $strId = 'address`.`address_id';
 					break;
+				case 10: $strId = 'shipment`.`shipment_id';
+					break;
+				case 11: $strId = 'receipt`.`receipt_id';
+					break;
 				
 				default:
 					throw new Exception('Not a valid EntityQtypeId.');

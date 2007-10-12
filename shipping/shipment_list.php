@@ -79,6 +79,9 @@
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
 		
+		// Custom Fields array
+		protected $arrCustomFields;
+		
 		// HoverTip Arrays
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
@@ -123,6 +126,7 @@
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
+			$arrCustomFields = $this->arrCustomFields;
 			
 			// Expand to include the primary address, State/Province, and Country
 			$objExpansionMap[Shipment::ExpandTransaction] = true;
@@ -134,12 +138,12 @@
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
 			if ($this->dtgShipment->TotalItemCount == 0) {
 				$this->dtgShipment->ShowHeader = false;
 			}
 			else {
-				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
+				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote,  $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
 				$this->dtgShipment->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -241,7 +245,7 @@
 	  
 	  // Create the Advanced Search Composite Control
   	protected function ctlAdvanced_Create() {
-  		$this->ctlAdvanced = new QAdvancedSearchComposite($this);
+  		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 10);
   		$this->ctlAdvanced->Display = false;
   	}
 	  
@@ -277,6 +281,14 @@
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Tracking', '<?= $_ITEM->__toStringTrackingNumber() ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Courier', '<?= $_ITEM->__toStringCourier() ?>', 'SortByCommand="shipment__courier_id__short_description ASC"', 'ReverseSortByCommand="shipment__courier_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"', 'Display="false"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Note', '<?= $_ITEM->Transaction->Note ?>', 'SortByCommand="shipment__transaction_id__note ASC"', 'ReverseSortByCommand="shipment__transaction_id__note DESC"', 'CssClass="dtg_column"', 'Width="160"', 'HtmlEntities="false"', 'Display="false"'));
+      
+      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(10, false);
+      if ($objCustomFieldArray) {
+      	foreach ($objCustomFieldArray as $objCustomField) {
+      		$this->dtgShipment->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+      	}
+      }
       
       $this->dtgShipment->SortColumnIndex = 0;
     	$this->dtgShipment->SortDirection = 1;
@@ -326,6 +338,11 @@
 	  	$this->strDateModified = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
+	  	if ($this->arrCustomFields) {
+	  		foreach ($this->arrCustomFields as $field) {
+	  			$field['value'] = null;
+	  		}
+	  	}
 	  	$this->blnSearch = false;
   	}
   	
@@ -358,6 +375,18 @@
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
+			
+			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
+			if ($this->arrCustomFields) {
+				foreach ($this->arrCustomFields as &$field) {
+					if ($field['input'] instanceof QListBox) {
+						$field['value'] = $field['input']->SelectedValue;
+					}
+					elseif ($field['input'] instanceof QTextBox) {
+						$field['value'] = $field['input']->Text;
+					}
+				}
+			}
 	  }
 	}
 

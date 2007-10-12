@@ -169,6 +169,9 @@
 		
 		// Integers
 		protected $intNewTempId = 1;
+		
+		// Custom Field Objects
+		public $arrCustomFields;		
 
 		protected function Form_Create() {
 			
@@ -280,6 +283,9 @@
 			$this->btnCancelExchange_Create();
 			$this->btnSaveDueDate_Create();
 			$this->btnCancelDueDate_Create();
+			
+			// Create all custom asset fields
+			$this->customFields_Create();
 			
 			// New entities Dialog
 			$this->dlgNew_Create();
@@ -1730,6 +1736,23 @@
 			$this->btnCancelDueDate->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
+		// Create all Custom Company Fields
+		protected function customFields_Create() {
+		
+			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
+			$this->objShipment->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(10, $this->blnEditMode, $this->objShipment->ShipmentId);
+			
+			// Create the Custom Field Controls - labels and inputs (text or list) for each
+			if ($this->objShipment->objCustomFieldArray) {
+				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this, true, true);
+				if ($this->arrCustomFields) {
+					foreach ($this->arrCustomFields as $field) {
+						//$field['input']->TabIndex = $this->intTabIndex++;
+					}
+				}
+			}
+		}
+		
 		// New Entity (Company, Contact, Address Dialog Box)
 		protected function dlgNew_Create() {
 			$this->dlgNew = new QDialogBox($this);
@@ -2739,9 +2762,12 @@
 		// Cancel/Delete entire incomplete shipment
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 			
+			$objCustomFieldArray = $this->objShipment->objCustomFieldArray;
+			
 			// Just delete the transaction and MySQL CASCADE down to shipment, asset_transaction, and inventory_transaction
 			$this->objTransaction = Transaction::Load($this->objShipment->TransactionId);
 			$this->objTransaction->Delete();
+			CustomField::DeleteTextValues($objCustomFieldArray);
 			
 			QApplication::Redirect('../shipping/shipment_list.php');
 		}
@@ -3013,6 +3039,11 @@
 						$this->UpdateShipmentFields();
 						$this->objShipment->ShippedFlag = false;
 						$this->objShipment->Save();
+						
+						if ($this->arrCustomFields) {
+							// Save the values from all of the custom field controls to save the shipment
+							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
+						}				
 				
 						// If the courier is FedEx, create new fedexShipment
 						if ($this->lstCourier->SelectedValue === 1) {
@@ -3161,6 +3192,11 @@
 						$this->UpdateShipmentFields();
 						// $this->objShipment->Save(false, true);
 						$this->objShipment->Save();
+						
+						if ($this->arrCustomFields) {
+							// Save the values from all of the custom field controls to save the shipment
+							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
+						}
 						
 						// If the courier is FedEx, save the fedexShipment
 						if ($this->lstCourier->SelectedValue === 1) {
@@ -3456,6 +3492,7 @@
 				$this->lstCurrencyUnit->SelectedValue = $this->objFedexShipment->CurrencyUnitId;
 				$this->chkNotificationFlag->Checked = $this->objFedexShipment->NotificationFlag;
 			}
+			$this->arrCustomFields = CustomField::UpdateControls($this->objShipment->objCustomFieldArray, $this->arrCustomFields);
 		}
 		
 		// Update FedEx Shipment Information
@@ -3808,6 +3845,11 @@
 			$this->lblLengthUnit->Display = true;
 			$this->lblCurrencyUnit->Display = true;
 			
+			// Display custom field labels
+			if ($this->arrCustomFields) {
+				CustomField::DisplayLabels($this->arrCustomFields);
+			}
+			
 			if (!$this->objShipment->ShippedFlag) {
 				$this->btnEdit->Display = true;
 			}
@@ -3846,6 +3888,11 @@
 				$this->lblWeightUnit->Text = $this->objFedexShipment->WeightUnit->__toString();
 				$this->lblLengthUnit->Text = $this->objFedexShipment->LengthUnit->__toString();
 				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
+			}
+			
+			// Update custom labels
+			if ($this->arrCustomFields) {
+				CustomField::UpdateLabels($this->arrCustomFields);
 			}
 			
 		}		
@@ -3937,6 +3984,11 @@
 				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			}
+			
+			// Display custom field inputs
+	    if ($this->arrCustomFields) {
+	    	CustomField::DisplayInputs($this->arrCustomFields);
+	    }
 		}
 		
 		// This method is run when the company edit dialog box is closed

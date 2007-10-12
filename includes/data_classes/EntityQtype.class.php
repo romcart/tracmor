@@ -80,6 +80,10 @@
 				case 8: $strToReturn = 'contact';
 					break;
 				case 9: $strToReturn = 'address';
+					break;
+				case 10: $strToReturn = 'shipment';
+					break;
+				case 11: $strToReturn = 'receipt';
 			}
 			
 			return $strToReturn;

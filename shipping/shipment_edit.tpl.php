@@ -23,6 +23,13 @@
 	$this->RenderBegin();
 	$this->dlgExchange->Render();
 	$this->dlgDueDate->Render();
+	
+	// Custom Fields
+	if ($this->arrCustomFields) {
+		foreach ($this->arrCustomFields as $field) {
+			$arrShipmentFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+		}
+	}
 ?>
 <!-- Begin Header Menu -->
 <?php 
@@ -128,7 +135,18 @@
 								<tr>
 									<td class="record_field_name">Ship Date:&nbsp;</td>
 									<td class="record_field_value"><?php $this->calShipDate->RenderWithError();$this->lblShipDate->Render(); ?>&nbsp;</td>
-								</tr>									
+								</tr>
+								<?php if ($arrShipmentFields) {
+									foreach ($arrShipmentFields as $field) {
+										?>
+										<tr>
+											<td class="record_field_name"><?php echo $field['name']; ?></td>
+											<td class="record_field_value"><?php echo $field['value']; ?></td>
+										</tr>
+										<?php
+									}
+								};
+								?>
 							</table>
 						</td>
 					</tr>

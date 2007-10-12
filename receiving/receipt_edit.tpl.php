@@ -20,7 +20,15 @@
  */
 
 	include('../includes/header.inc.php');
+	
 	$this->RenderBegin();
+	
+	// Custom Fields
+	if ($this->arrCustomFields) {
+		foreach ($this->arrCustomFields as $field) {
+			$arrReceiptFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+		}
+	}
 ?>
 <!-- Begin Header Menu -->
 <?php 
@@ -102,7 +110,18 @@
 								<tr style="<?php if (!$this->blnEditMode) { echo('display:none'); } ?>">
 									<td class="record_field_name">Date Received:&nbsp;</td>
 									<td class="record_field_value"><?php $this->lblReceiptDate->Render(); ?>&nbsp;</td>
-								</tr>										
+								</tr>
+								<?php if ($arrReceiptFields) {
+									foreach ($arrReceiptFields as $field) {
+										?>
+										<tr>
+											<td class="record_field_name"><?php echo $field['name']; ?></td>
+											<td class="record_field_value"><?php echo $field['value']; ?></td>
+										</tr>
+										<?php
+									}
+								};
+								?>
 							</table>
 						</td>
 					</tr>

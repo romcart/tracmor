@@ -98,6 +98,9 @@
 		// Integers
 		protected $intNewTempId = 1;
 		
+		// Custom Field Objects
+		public $arrCustomFields;	
+		
 		// Dialog
 		protected $dlgNew;
 		
@@ -146,6 +149,9 @@
 			$this->btnDelete_Create();
 			$this->btnAddAsset_Create();
 			$this->btnAddInventory_Create();
+			
+			// Create all custom asset fields
+			$this->customFields_Create();
 			
 			// Create the datagrids
 			$this->dtgAssetTransact_Create();
@@ -588,6 +594,24 @@
 			$this->btnAddInventory->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddInventory_Click'));
 			$this->btnAddInventory->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnAddInventory->CausesValidation = false;
+		}
+		
+		// Create all Custom Company Fields
+		protected function customFields_Create() {
+		
+			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
+			$this->objReceipt->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(11, $this->blnEditMode, $this->objReceipt->ReceiptId);
+			
+			// Create the Custom Field Controls - labels and inputs (text or list) for each
+			if ($this->objReceipt->objCustomFieldArray) {
+				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this, true, true);
+				if ($this->arrCustomFields) {
+					foreach ($this->arrCustomFields as $field) {
+						//$field['input']->TabIndex = $this->intTabIndex++;
+					}
+				}
+			}
+			
 		}
 		
 		//*****************
@@ -1752,6 +1776,11 @@
 						$this->objReceipt->ReceivedFlag = false;
 						$this->objReceipt->Save();
 						
+						if ($this->arrCustomFields) {
+							// Save the values from all of the custom field controls to save the shipment
+							CustomField::SaveControls($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objReceipt->ReceiptId, 11);
+						}
+						
 						$objDatabase->TransactionCommit();
 						
 						QApplication::Redirect('receipt_list.php');
@@ -1935,6 +1964,12 @@
 						$this->UpdateReceiptFields();
 						$this->UpdateReceiptLabels();
 						$this->objReceipt->Save();
+						
+						if ($this->arrCustomFields) {
+							// Save the values from all of the custom field controls to save the shipment
+							CustomField::SaveControls($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objReceipt->ReceiptId, 10);
+						}
+						
 						// Reload to get new timestamp to avoid optimistic locking if edited/saved again without reload
 						$this->objReceipt = Receipt::Load($this->objReceipt->ReceiptId);
 						$this->DisplayLabels();
@@ -1981,6 +2016,8 @@
 		// Delete a receipt
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 			
+			$objCustomFieldArray = $this->objReceipt->objCustomFieldArray;
+			
 			$blnError = false;
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -2023,6 +2060,8 @@
 				$this->objTransaction = Transaction::Load($this->objReceipt->TransactionId);
 				// Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
 				$this->objTransaction->Delete();
+				
+				CustomField::DeleteTextValues($objCustomFieldArray);
 
 				$this->RedirectToListPage();
 
@@ -2068,6 +2107,7 @@
 			$this->lstToAddress->SelectedValue = $this->objReceipt->ToAddressId;
 			$this->txtNote->Text = $this->objReceipt->Transaction->Note;
 			$this->calDueDate->DateTime = $this->objReceipt->DueDate;
+			$this->arrCustomFields = CustomField::UpdateControls($this->objReceipt->objCustomFieldArray, $this->arrCustomFields);
 		}		
 		
 		protected function UpdateReceiptLabels() {
@@ -2078,6 +2118,11 @@
 			$this->pnlNote->Text = nl2br($this->objReceipt->Transaction->Note);
 			$this->lblDueDate->Text = ($this->objReceipt->DueDate) ? $this->objReceipt->DueDate->__toString() : '';
 			$this->lblReceiptDate->Text = ($this->objReceipt->ReceiptDate) ? $this->objReceipt->ReceiptDate->__toString() : '';
+			
+			// Update custom labels
+			if ($this->arrCustomFields) {
+				CustomField::UpdateLabels($this->arrCustomFields);
+			}
 		}
 		
 		protected function DisplayLabels() {
@@ -2121,6 +2166,11 @@
 			$this->lblNewFromContact->Display = false;
 			$this->lblNewToContact->Display = false;
 			$this->lblNewToAddress->Display = false;
+			
+			// Display custom field labels
+			if ($this->arrCustomFields) {
+				CustomField::DisplayLabels($this->arrCustomFields);
+			}
 		}
 		
 		protected function DisplayInputs() {
@@ -2169,6 +2219,11 @@
 			$this->lblNewFromContact->Display = true;
 			$this->lblNewToContact->Display = true;
 			$this->lblNewToAddress->Display = true;
+			
+			// Display custom field inputs
+	    if ($this->arrCustomFields) {
+	    	CustomField::DisplayInputs($this->arrCustomFields);
+	    }
 		}
 		
 		// This method is run when the new entity edit dialog box is closed
