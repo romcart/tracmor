@@ -84,7 +84,7 @@
 								</tr>
 								<tr>
 									<td class="record_field_name">Address:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromAddress->RenderWithError();$this->lblFromAddress->Render();  $this->lblNewFromAddress->RenderWithError(); ?></td>
+									<td class="record_field_value"><?php $this->lstFromAddress->RenderWithError();$this->lblFromAddress->Render();  $this->lblNewFromAddress->RenderWithError(); ?><br><?php $this->lblFromAddressFull->Render(); ?></td>
 								</tr>
 							</table>
 							<br class="item_divider" />

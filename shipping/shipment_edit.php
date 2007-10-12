@@ -117,6 +117,7 @@
 		protected $lblFromCompany;
 		protected $lblFromContact;
 		protected $lblFromAddress;
+		protected $lblFromAddressFull;
 		protected $lblToCompany;
 		protected $lblToContact;
 		protected $lblToAddress;
@@ -203,6 +204,7 @@
 			$this->lblFromCompany_Create();
 			$this->lblFromContact_Create();
 			$this->lblFromAddress_Create();
+			$this->lblFromAddressFull_Create();
 			$this->lblToCompany_Create();
 			$this->lblToContact_Create();
 			$this->lblToAddress_Create();
@@ -532,6 +534,15 @@
 				$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toString();
 			}
 		}
+
+		// Create and Setup lblFromAddressFull
+		protected function lblFromAddressFull_Create() {
+			$this->lblFromAddressFull = new QLabel($this);
+			$this->lblFromAddressFull->HtmlEntities = false;
+			$this->lblFromAddressFull->Name = 'Full Address';
+			if ($this->blnEditMode && $this->objShipment->FromAddressId)
+			$this->lblFromAddressFull->Text = $this->objShipment->FromAddress->__ToStringFullAddress();
+		}		
 		
 		// Create and Setup lblToCompany
 		protected function lblToCompany_Create() {
@@ -565,7 +576,8 @@
 			$this->lblToAddressFull = new QLabel($this);
 			$this->lblToAddressFull->HtmlEntities = false;
 			$this->lblToAddressFull->Name = 'Full Address';
-			$this->lblToAddressFull->Text = '<br><br>';
+			if ($this->blnEditMode && $this->objShipment->ToAddressId)
+			$this->lblToAddressFull->Text = $this->objShipment->ToAddress->__ToStringFullAddress();
 		}
 		
 		// Create and Setup lblCourier
@@ -930,7 +942,7 @@
 					$objListItem->Selected = true;
 				$this->lstFromAddress->AddItem($objListItem);
 			}
-			
+			$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFromAddress_Select'));	
 			//$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
 			$this->lstFromAddress->TabIndex=3;
 		}
@@ -1943,6 +1955,17 @@
 				}
 			}
 		}
+
+		// Set the From Address Label text when it is selected from the drop-down
+		protected function lstFromAddress_Select() {
+			$objAddress = Address::Load($this->lstFromAddress->SelectedValue);
+			if ($objAddress) {
+				$this->lblFromAddressFull->Text = $objAddress->__toStringFullAddress();
+			}
+			else {
+				$this->lblFromAddressFull->Text = '';
+			}
+		}		
 		
 		// Set the To Address Label text when it is selected from the drop-down
 		protected function lstToAddress_Select() {
@@ -3701,7 +3724,6 @@
 			$this->lstToCompany->Display = false;
 			$this->lstToContact->Display = false;
 			$this->lstToAddress->Display = false;
-			$this->lblToAddressFull->Display = false;
 			$this->lstCourier->Display = false;
 			$this->txtNote->Display = false;
 			$this->txtTrackingNumber->Display = false;
@@ -3763,9 +3785,11 @@
 			$this->lblFromCompany->Display = true;
 			$this->lblFromContact->Display = true;
 			$this->lblFromAddress->Display = true;
+			$this->lblFromAddressFull->Display = true;
 			$this->lblToCompany->Display = true;
 			$this->lblToContact->Display = true;
 			$this->lblToAddress->Display = true;
+			$this->lblToAddressFull->Display = true;
 			$this->lblCourier->Display = true;
 			$this->pnlNote->Display = true;
 			$this->lblTrackingNumber->Display = true;
@@ -3866,7 +3890,6 @@
 			$this->lstToCompany->Display = true;
 			$this->lstToContact->Display = true;
 			$this->lstToAddress->Display = true;
-			$this->lblToAddressFull->Display = true;
 			$this->lstCourier->Display = true;
 			$this->txtNote->Display = true;
 			$this->txtTrackingNumber->Display = true;
