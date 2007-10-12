@@ -159,6 +159,8 @@
 			$objCompanyListItem = new QListItem('Company', 7);
 			$objContactListItem = new QListItem('Contact', 8);
 			$objAddressListItem = new QListItem('Address', 9);
+			$objShipmentListItem = new QListItem('Shipment', 10);
+			$objReceiptListItem = new QListItem('Receipt', 11);
 			if ($objEntityQtypeCustomFieldArray) {
 				foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
 					if ($objEntityQtypeCustomField->EntityQtypeId == 1) {
@@ -184,7 +186,13 @@
 					}
 					if ($objEntityQtypeCustomField->EntityQtypeId == 9) {
 						$objAddressListItem->Selected = true;
-					}					
+					}
+					if ($objEntityQtypeCustomField->EntityQtypeId == 10) {
+						$objShipmentListItem->Selected = true;
+					}
+					if ($objEntityQtypeCustomField->EntityQtypeId == 11) {
+						$objReceiptListItem->Selected = true;
+					}
 				}
 			}
 			$this->lstEntityQtype->AddItem($objAssetListItem);
@@ -195,6 +203,8 @@
 			$this->lstEntityQtype->AddItem($objCompanyListItem);
 			$this->lstEntityQtype->AddItem($objContactListItem);
 			$this->lstEntityQtype->AddItem($objAddressListItem);
+			$this->lstEntityQtype->AddItem($objShipmentListItem);
+			$this->lstEntityQtype->AddItem($objReceiptListItem);
 		}
 		
 		// Create/Setup the Value textbox
