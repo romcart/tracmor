@@ -18,9 +18,6 @@
 	 * along with Tracmor; if not, write to the Free Software
 	 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	 */
-?>
-
-<?php
 
 	/**
 	 * This returns the html for either a check or an x based on the boolean value

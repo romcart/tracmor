@@ -20,9 +20,7 @@
 	 * 
 	 * Original Qcodo code under the MIT License. See qcodo.inc.php for more information.
 	 */
-?>
 
-<?php
 	/*
 	 * This class is INTENDED to be modified.  Please define any custom "Render"-based methods
 	 * to handle custom global rendering functionality for all your controls.

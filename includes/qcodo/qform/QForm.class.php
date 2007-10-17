@@ -20,9 +20,7 @@
 	 * 
 	 * Original Qcodo code under the MIT License. See qcodo.inc.php for more information.
 	 */
-?>
 
-<?php
 	abstract class QForm extends QFormBase {
 		///////////////////////////
 		// Form Preferences
@@ -46,7 +44,7 @@
 		 *
 		 * @var string FormStateHandler the classname of the FormState handler to use
 		 */
-		public static $FormStateHandler = 'QFormStateHandler';
+		public static $FormStateHandler = 'QFileFormStateHandler';
 		
 		// Declare DefaultWaitIcon public (instead of protected in QFormBase.inc) so that it can be set from a custom control
 		// This can be removed once HeaderMenu is moved from a custom control to a QPanel.
