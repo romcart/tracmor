@@ -60,6 +60,14 @@
 							<td class="record_field_name">Image Upload Prefix: </td>
 							<td class="record_field_edit"><?php $this->txtImageUploadPrefix->RenderWithError(); ?></td>
 						</tr>
+						<tr>
+							<td class="record_field_name">Custom Shipment Numbers: </td>
+							<td class="record_field_edit"><?php $this->chkCustomShipmentNumbers->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Custom Receipt Numbers: </td>
+							<td class="record_field_edit"><?php $this->chkCustomReceiptNumbers->RenderWithError(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>

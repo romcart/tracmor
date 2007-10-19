@@ -98,7 +98,15 @@
 							<table cellpadding="0" cellspacing="0">
 								<tr>
 									<td colspan="2" class="record_subheader">Receipt Information</td>
-								</tr>								
+								</tr>
+								<?php if (QApplication::$TracmorSettings->CustomReceiptNumbers) { ?>
+								<tr>
+									<td class="record_field_name">Receipt Number&nbsp;</td>
+									<td class="record_field_value"><?php $this->txtReceiptNumber->RenderWithError();$this->lblReceiptNumber->Render(); ?>&nbsp;</td>
+								</tr>
+								<?php
+								}
+								?>
 								<tr>
 									<td class="record_field_name">Note:&nbsp;</td>
 									<td class="record_field_value"><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?>&nbsp;</td>

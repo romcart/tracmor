@@ -58,6 +58,7 @@
 		protected $blnModifyInventory = false;
 		
 		// Inputs
+		protected $txtShipmentNumber;
 		protected $txtNote;
 		protected $txtNewAssetCode;
 		protected $txtNewInventoryModelCode;
@@ -263,6 +264,9 @@
 			$this->chkNotificationFlag_Create();
 			$this->lstToAddress_Create();
 			$this->lblNewToAddress_Create();
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				$this->txtShipmentNumber_Create();
+			}
 			$this->lstCourier_Create();
 			$this->txtNote_Create();
 			$this->txtNewAssetCode_Create();
@@ -1023,6 +1027,16 @@
 			}
 			$this->lstToAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstToAddress_Select'));		
 			$this->lstToAddress->TabIndex=6;
+		}
+		
+		// Create and Setup txtShipmentNumber
+		protected function txtShipmentNumber_Create() {
+			$this->txtShipmentNumber = new QTextBox($this);
+			$this->txtShipmentNumber->Name = 'Shipment Number';
+			if ($this->blnEditMode) {
+				$this->txtShipmentNumber->Text = $this->objShipment->ShipmentNumber;
+			}
+			$this->txtShipmentNumber->Required = true;
 		}
 		
 		// Create and Setup lstCourier
@@ -2911,6 +2925,15 @@
 				$this->btnCancel->Warning = 'There are no assets or inventory in this shipment.';
 			}
 			
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				if ($objShipment = Shipment::LoadByShipmentNumber($this->txtShipmentNumber->Text)) {
+					if ($objShipment->ShipmentId != $this->objShipment->ShipmentId) {
+						$blnError = true;
+						$this->txtShipmentNumber->Warning = 'That is a duplicate shipment number.';
+					}
+				}
+			}
+			
 			if($this->lstFxServiceType->SelectedValue)
 			{			
 				$objtoFxAddress = Address::Load($this->lstToAddress->SelectedValue);
@@ -3430,6 +3453,9 @@
 				$this->objShipment->Transaction = $this->objTransaction;
 				$this->objShipment->ShipmentNumber = $this->lblShipmentNumber->Text;
 			}
+			elseif (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				$this->objShipment->ShipmentNumber = $this->txtShipmentNumber->Text;
+			}
 			else {
 				$this->objShipment->ShipmentNumber = Shipment::LoadNewShipmentNumber();
 			}
@@ -3470,6 +3496,9 @@
 			$this->lstToCompany_Select();
 			$this->lstToAddress->SelectedValue = $this->objShipment->ToAddressId;
 			$this->lstToAddress_Select();
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				$this->txtShipmentNumber->Text = $this->objShipment->ShipmentNumber;
+			}
 			$this->lstCourier->SelectedValue = $this->objShipment->CourierId;
 			$this->lstCourier_Select();
 			$this->txtTrackingNumber->Text = $this->objShipment->TrackingNumber;
@@ -3761,6 +3790,9 @@
 			$this->lstToCompany->Display = false;
 			$this->lstToContact->Display = false;
 			$this->lstToAddress->Display = false;
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				$this->txtShipmentNumber->Display = false;
+			}
 			$this->lstCourier->Display = false;
 			$this->txtNote->Display = false;
 			$this->txtTrackingNumber->Display = false;
@@ -3827,6 +3859,9 @@
 			$this->lblToContact->Display = true;
 			$this->lblToAddress->Display = true;
 			$this->lblToAddressFull->Display = true;
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				$this->lblShipmentNumber->Display = true;
+			}
 			$this->lblCourier->Display = true;
 			$this->pnlNote->Display = true;
 			$this->lblTrackingNumber->Display = true;
@@ -3869,6 +3904,9 @@
 			$this->lblToCompany->Text = $this->objShipment->ToCompany->__toString();
 			$this->lblToContact->Text = $this->objShipment->ToContact->__toString();
 			$this->lblToAddress->Text = $this->objShipment->ToAddress->__toString();
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				$this->lblShipmentNumber->Text = $this->objShipment->ShipmentNumber;
+			}
 			$this->lblCourier->Text = ($this->objShipment->CourierId) ? $this->objShipment->Courier->__toString() : "Other";
 			$this->lblTrackingNumber->Text = $this->objShipment->__toStringTrackingNumber();
 			$this->pnlNote->Text = nl2br($this->objShipment->Transaction->Note);
@@ -3907,6 +3945,9 @@
 			$this->lblToCompany->Display = false;
 			$this->lblToContact->Display = false;
 			$this->lblToAddress->Display = false;
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				$this->lblShipmentNumber->Display = false;
+			}
 			$this->lblCourier->Display = false;
 			$this->pnlNote->Display = false;
 			$this->lblTrackingNumber->Display = false;
@@ -3937,6 +3978,9 @@
 			$this->lstToCompany->Display = true;
 			$this->lstToContact->Display = true;
 			$this->lstToAddress->Display = true;
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+				$this->txtShipmentNumber->Display = true;
+			}
 			$this->lstCourier->Display = true;
 			$this->txtNote->Display = true;
 			$this->txtTrackingNumber->Display = true;

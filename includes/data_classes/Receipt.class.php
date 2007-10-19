@@ -49,7 +49,7 @@
 		 * @return string a nicely formatted string representation of this object
 		 */
 		public function __toString() {
-			return sprintf('%s',  $this->intReceiptNumber);
+			return sprintf('%s',  $this->strReceiptNumber);
 		}
 
 		/**
@@ -229,7 +229,7 @@
 			
 			Receipt::QueryHelper($objDatabase);
 			
-			$strQuery = 'SELECT MAX(receipt_number) AS max_receipt_number FROM receipt';
+			$strQuery = 'SELECT MAX(CAST(receipt_number AS UNSIGNED)) AS max_receipt_number FROM receipt';
 			// Perform the Query and Return the Count
 			$objDbResult = $objDatabase->Query($strQuery);
 			$strDbRow = $objDbResult->FetchRow();

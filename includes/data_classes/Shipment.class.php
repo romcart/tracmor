@@ -49,7 +49,7 @@
 		 * @return string a nicely formatted string representation of this object
 		 */
 		public function __toString() {
-			return sprintf('%s',  $this->intShipmentNumber);
+			return sprintf('%s',  $this->strShipmentNumber);
 		}
 		
 		/**
@@ -278,7 +278,7 @@
 			
 			Shipment::QueryHelper($objDatabase);
 			
-			$strQuery = 'SELECT MAX(shipment_number) AS max_shipment_number FROM shipment';
+			$strQuery = 'SELECT MAX(CAST(shipment_number AS UNSIGNED)) AS max_shipment_number FROM shipment';
 			// Perform the Query and Return the Count
 			$objDbResult = $objDatabase->Query($strQuery);
 			$strDbRow = $objDbResult->FetchRow();

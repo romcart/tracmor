@@ -30,6 +30,8 @@
 		// Inputs
 		protected $txtMinAssetCode;
 		protected $txtImageUploadPrefix;
+		protected $chkCustomShipmentNumbers;
+		protected $chkCustomReceiptNumbers;
 		protected $pnlSaveNotification;
 		
 		// Buttons
@@ -42,6 +44,8 @@
 			// Create Inputs
 			$this->txtMinAssetCode_Create();
 			$this->txtImageUploadPrefix_Create();
+			$this->chkCustomShipmentNumbers_Create();
+			$this->chkCustomReceiptNumbers_Create();
 			
 			// Create Buttons
 			$this->btnSave_Create();
@@ -67,7 +71,31 @@
 			$this->txtImageUploadPrefix = new QTextBox($this);
 			$this->txtImageUploadPrefix->Name = 'Image Upload Prefix';
 			$this->txtImageUploadPrefix->Text = QApplication::$TracmorSettings->ImageUploadPrefix;
-		}			
+		}
+		
+		// Create and Setup the CustomShipmentNumbers Checkbox
+		protected function chkCustomShipmentNumbers_Create() {
+			$this->chkCustomShipmentNumbers = new QCheckBox($this);
+			$this->chkCustomShipmentNumbers->Name = 'Custom Shipment Numbers';
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers == '1') {
+				$this->chkCustomShipmentNumbers->Checked = true;
+			}
+			else {
+				$this->chkCustomShipmentNumbers->Checked = false;
+			}
+		}
+		
+		// Create and Setup the CustomShipmentNumbers Checkbox
+		protected function chkCustomReceiptNumbers_Create() {
+			$this->chkCustomReceiptNumbers = new QCheckBox($this);
+			$this->chkCustomReceiptNumbers->Name = 'Custom Receipt Numbers';
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers == '1') {
+				$this->chkCustomReceiptNumbers->Checked = true;
+			}
+			else {
+				$this->chkCustomReceiptNumbers->Checked = false;
+			}
+		}
 		
 		// Create and Setup the Save Buttons
 		protected function btnSave_Create() {
@@ -90,6 +118,9 @@
 		protected function btnSave_Click() {
 			QApplication::$TracmorSettings->MinAssetCode = $this->txtMinAssetCode->Text;
 			QApplication::$TracmorSettings->ImageUploadPrefix = $this->txtImageUploadPrefix->Text;
+			// We have to cast these to string because the admin_settings value column is TEXT, and checkboxes give boolean values
+			QApplication::$TracmorSettings->CustomShipmentNumbers = (string) $this->chkCustomShipmentNumbers->Checked;
+			QApplication::$TracmorSettings->CustomReceiptNumbers = (string) $this->chkCustomReceiptNumbers->Checked;
 			
 			// Show saved notification
 			$this->pnlSaveNotification->Display = true;

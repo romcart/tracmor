@@ -57,6 +57,7 @@
 		protected $lblFromContact;
 		protected $lblToContact;
 		protected $lblToAddress;
+		protected $lblReceiptNumber;
 		protected $pnlNote;
 		protected $lblDueDate;
 		protected $lblReceiptDate;
@@ -67,6 +68,7 @@
 		
 		
 		// Inputs
+		protected $txtReceiptNumber;
 		protected $txtNote;
 		protected $txtNewAssetCode;
 		protected $txtNewInventoryModelCode;
@@ -120,6 +122,7 @@
 			$this->lblFromContact_Create();
 			$this->lblToContact_Create();
 			$this->lblToAddress_Create();
+			$this->lblReceiptNumber_Create();
 			$this->pnlNote_Create();
 			$this->lblDueDate_Create();
 			$this->lblReceiptDate_Create();
@@ -141,6 +144,9 @@
 			$this->lstAssetModel_Create();
 			$this->chkAutoGenerateAssetCode_Create();
 			$this->calDueDate_Create();
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				$this->txtReceiptNumber_Create();
+			}
 			
 			// Create the buttons
 			$this->btnSave_Create();
@@ -309,6 +315,18 @@
 			}
 		}
 		
+		// Create and Setup lblReceiptNumber
+		protected function lblReceiptNumber_Create() {
+			$this->lblReceiptNumber = new QLabel($this);
+			$this->lblReceiptNumber->Name = 'Receipt Number';
+			if (!$this->blnEditMode) {
+				$this->lblReceiptNumber->Text = '';
+			}
+			elseif ($this->blnEditMode) {
+				$this->lblReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
+			}
+		}
+		
 		// Create and Setup Note panel
 		protected function pnlNote_Create() {
 			$this->pnlNote = new QPanel($this);
@@ -452,7 +470,17 @@
 				$this->lstToAddress->AddItem($objListItem);
 			}
 			$this->lstToAddress->TabIndex=4;	
-		}	
+		}
+		
+		// Create and Setup txtReceiptNumber
+		protected function txtReceiptNumber_Create() {
+			$this->txtReceiptNumber = new QTextBox($this);
+			$this->txtReceiptNumber->Name = 'Receipt Number';
+			if ($this->blnEditMode) {
+				$this->txtReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
+			}
+			$this->txtReceiptNumber->Required = true;
+		}
 		
 		// Create and Setup Note textbox
 		protected function txtNote_Create() {
@@ -1684,6 +1712,15 @@
 				$this->btnCancel->Warning = 'There are no assets nor inventory in this receipt.';
 			}
 			
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				if ($objReceipt = Receipt::LoadByReceiptNumber($this->txtReceiptNumber->Text)) {
+					if ($objReceipt->ReceiptId != $this->objReceipt->ReceiptId) {
+						$blnError = true;
+						$this->txtReceiptNumber->Warning = 'That is a duplicate receipt number.';
+					}
+				}
+			}
+			
 			if (!$this->lstFromCompany->SelectedValue) {
 				$blnError = true;
 				$this->lstFromCompany->Warning = 'You must select a From Company';
@@ -2075,7 +2112,10 @@
 		// Protected Update Methods
 		protected function UpdateReceiptFields() {
 			$this->objReceipt->TransactionId = $this->objTransaction->TransactionId;
-			if (!$this->blnEditMode) {
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				$this->objReceipt->ReceiptNumber = $this->txtReceiptNumber->Text;
+			}
+			elseif (!$this->blnEditMode) {
 				$this->objReceipt->ReceiptNumber = Receipt::LoadNewReceiptNumber();
 			}
 			$this->objReceipt->FromCompanyId = $this->lstFromCompany->SelectedValue;
@@ -2105,6 +2145,9 @@
 			$this->lstFromContact->SelectedValue = $this->objReceipt->FromContactId;
 			$this->lstToContact->SelectedValue = $this->objReceipt->ToContactId;
 			$this->lstToAddress->SelectedValue = $this->objReceipt->ToAddressId;
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				$this->txtReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
+			}
 			$this->txtNote->Text = $this->objReceipt->Transaction->Note;
 			$this->calDueDate->DateTime = $this->objReceipt->DueDate;
 			$this->arrCustomFields = CustomField::UpdateControls($this->objReceipt->objCustomFieldArray, $this->arrCustomFields);
@@ -2115,6 +2158,9 @@
 			$this->lblFromContact->Text = $this->objReceipt->FromContact->__toString();
 			$this->lblToContact->Text = $this->objReceipt->ToContact->__toString();
 			$this->lblToAddress->Text = $this->objReceipt->ToAddress->__toString();
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				$this->lblReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
+			}
 			$this->pnlNote->Text = nl2br($this->objReceipt->Transaction->Note);
 			$this->lblDueDate->Text = ($this->objReceipt->DueDate) ? $this->objReceipt->DueDate->__toString() : '';
 			$this->lblReceiptDate->Text = ($this->objReceipt->ReceiptDate) ? $this->objReceipt->ReceiptDate->__toString() : '';
@@ -2132,6 +2178,9 @@
 			$this->lstFromContact->Display = false;
 			$this->lstToContact->Display = false;
 			$this->lstToAddress->Display = false;
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				$this->txtReceiptNumber->Display = false;
+			}
 			$this->txtNote->Display = false;
 			$this->calDueDate->Display = false;
 			if ($this->blnEditMode) {
@@ -2154,6 +2203,9 @@
 			$this->lblFromContact->Display = true;
 			$this->lblToContact->Display = true;
 			$this->lblToAddress->Display = true;
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				$this->lblReceiptNumber->Display = true;
+			}
 			$this->pnlNote->Display = true;
 			$this->lblDueDate->Display = true;
 			$this->btnEdit->Display = true;
@@ -2180,6 +2232,9 @@
 			$this->lblFromContact->Display = false;
 			$this->lblToContact->Display = false;
 			$this->lblToAddress->Display = false;
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				$this->lblReceiptNumber->Display = false;
+			}
 			$this->pnlNote->Display = false;
 			$this->lblDueDate->Display = false;
 			$this->btnEdit->Display = false;
@@ -2194,6 +2249,9 @@
 			$this->lstFromContact->Display = true;
 			$this->lstToContact->Display = true;
 			$this->lstToAddress->Display = true;
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
+				$this->txtReceiptNumber->Display = true;
+			}
 			$this->txtNote->Display = true;
 			$this->calDueDate->Display = true;
 			$this->btnSave->Display = true;
