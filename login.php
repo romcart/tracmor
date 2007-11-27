@@ -39,8 +39,6 @@
 			$this->txtUsername = new QTextBox($this);
 			$this->txtUsername->Name = 'Username:';
 			$this->txtUsername->Required = true;
-			$this->txtUsername->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnLogin_Click'));
-			$this->txtUsername->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->txtUsername->ControlId));
 		}
 		
@@ -49,13 +47,12 @@
 			$this->txtPassword->Name = 'Password:';
 			$this->txtPassword->Required = true;
 			$this->txtPassword->TextMode = QTextMode::Password;
-			$this->txtPassword->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnLogin_Click'));
-			$this->txtPassword->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
 		protected function btnLogin_Create() {
 			$this->btnLogin = new QButton($this);
 			$this->btnLogin->Text = 'Login';
+			$this->btnLogin->PrimaryButton = true;
 			$this->btnLogin->AddAction(new QClickEvent(), new QAjaxAction('btnLogin_Click'));
 		}
 		
