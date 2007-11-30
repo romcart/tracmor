@@ -838,7 +838,7 @@
 					$objLocationArray = Location::LoadAllLocations(false, false, 'short_description');
 					if ($objLocationArray) {
 						// Get assets last location if the admin setting is enabled, otherwise set to null
-						$objLastLocation = (QApplication::$TracmorSettings->ReceiveToLastLocation) ? $objAssetTransaction->Asset->GetLastLocation() : null;
+						$objLastLocation = (QApplication::$TracmorSettings->ReceiveToLastLocation) ? $objAssetTransaction->Asset->GetLastShippedFromLocation() : null;
 							
 						foreach ($objLocationArray as $objLocation) {
 							// Default to the assets last location,  if it had one

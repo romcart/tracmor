@@ -204,7 +204,7 @@
 		 *
 		 * @return Object Location
 		 */
-		public function GetLastLocation() {
+		public function GetLastShippedFromLocation() {
 			
 			$objCondition = QQ::AndCondition(
 				QQ::Equal(QQN::AssetTransaction()->AssetId, $this->AssetId), 
