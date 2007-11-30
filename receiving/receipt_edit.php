@@ -837,12 +837,18 @@
 					$lstLocationAssetReceived->AddItem('- Select One -', null);
 					$objLocationArray = Location::LoadAllLocations(false, false, 'short_description');
 					if ($objLocationArray) {
+						// Get assets last location if the admin setting is enabled, otherwise set to null
+						$objLastLocation = (QApplication::$TracmorSettings->ReceiveToLastLocation) ? $objAssetTransaction->Asset->GetLastLocation() : null;
+							
 						foreach ($objLocationArray as $objLocation) {
-							$lstLocationAssetReceived->AddItem($objLocation->__toString(), $objLocation->LocationId);
+							// Default to the assets last location,  if it had one
+							$blnSelected = ($objLastLocation != null && $objLocation->LocationId == $objLastLocation->LocationId);
+							$lstLocationAssetReceived->AddItem($objLocation->__toString(), $objLocation->LocationId, $blnSelected);
 						}
 					}
 					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveAssetTransaction'));
 					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+					
 				}
 				QApplication::AuthorizeControl($this->objReceipt, $lstLocationAssetReceived, 2);
 				

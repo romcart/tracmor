@@ -199,6 +199,35 @@
 			return $Account;
 		}
 				
+		/**
+		 * Returns a Location object from the most recent shipment transaction for this asset
+		 *
+		 * @return Object Location
+		 */
+		public function GetLastLocation() {
+			
+			$objCondition = QQ::AndCondition(
+				QQ::Equal(QQN::AssetTransaction()->AssetId, $this->AssetId), 
+				QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6)
+			);
+			$objClauses = array();
+			$objExpansionClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation);
+			$objOrderByClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false);
+			$objLimitClause = QQ::LimitInfo(1, 0);
+			array_push($objClauses, $objExpansionClause);
+			array_push($objClauses, $objOrderByClause);
+			array_push($objClauses, $objLimitClause);
+			
+			$AssetTransactionArray = AssetTransaction::QueryArray($objCondition,$objClauses);
+			
+			if (count($AssetTransactionArray) > 0) {
+				$Location = $AssetTransactionArray[0]->SourceLocation;
+			} else {
+				$Location = null;
+			}
+			
+			return $Location;
+		}
 		
     /**
      * Count the total assets by category_id, which is a column in the asset_model table

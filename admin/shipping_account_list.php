@@ -47,6 +47,7 @@
 		
 		protected $lstCompany;
 		protected $chkAutoDetectTrackingNumbers;
+		protected $chkReceiveToLastLocation;
 		protected $btnSave;
 		protected $btnNew;
 		protected $lstFedexAccount;
@@ -69,6 +70,7 @@
 			$this->lstFedexAccount_Create();
 			
 			$this->chkAutoDetectTrackingNumbers_Create();
+			$this->chkReceiveToLastLocation_Create();
 			$this->txtFedexGatewayUri_Create();
 			$this->fckPackingListTerms_Create();
 			$this->pnlSaveNotification_Create();
@@ -133,6 +135,13 @@
 			$this->chkAutoDetectTrackingNumbers = new QCheckBox($this);
 			$this->chkAutoDetectTrackingNumbers->Name = QApplication::Translate('Auto-Detect Tracking Numbers');
 			$this->chkAutoDetectTrackingNumbers->Checked = QApplication::$TracmorSettings->AutodetectTrackingNumbers;
+		}
+		
+		// Create and Setup chkReceiveToLastLocation
+		protected function chkReceiveToLastLocation_Create() {
+			$this->chkReceiveToLastLocation = new QCheckBox($this);
+			$this->chkReceiveToLastLocation->Name = QApplication::Translate('Receive to Last Location');
+			$this->chkReceiveToLastLocation->Checked = QApplication::$TracmorSettings->ReceiveToLastLocation;
 		}
 		
 		// Create and Setup the MinAssetCode Text Field
@@ -247,6 +256,7 @@
 				QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
 				QApplication::$TracmorSettings->PackingListTerms = $this->fckPackingListTerms->Text;
 				QApplication::$TracmorSettings->AutodetectTrackingNumbers = $this->chkAutoDetectTrackingNumbers->Checked;
+				QApplication::$TracmorSettings->ReceiveToLastLocation = $this->chkReceiveToLastLocation->Checked;
 				
 				// Show saved notification
 				$this->pnlSaveNotification->Display = true;

@@ -69,6 +69,10 @@
 							<td class="record_field_edit"><?php $this->chkAutoDetectTrackingNumbers->RenderWithError(); ?></td>
 						</tr>
 						<tr>
+							<td class="record_field_name">Receive to Last Location:</td>
+							<td class="record_field_edit"><?php $this->chkReceiveToLastLocation->RenderWithError(); ?></td>
+						</tr>
+						<tr>
 							<td class="record_field_name">Packing List Terms:</td>
 							<td class="record_field_edit"><?php $this->fckPackingListTerms->RenderWithError(); ?></td>
 						</tr>
