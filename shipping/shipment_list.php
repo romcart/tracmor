@@ -68,6 +68,8 @@
 		// Search Values
 		protected $strToCompany;
 		protected $strToContact;
+		protected $strFromCompany;
+		protected $strFromContact;
 		protected $strShipmentNumber;
 		protected $strAssetCode;
 		protected $strInventoryModelCode;
@@ -116,6 +118,8 @@
 			// Assign local method variables
 			$strToCompany = $this->strToCompany;
 			$strToContact = $this->strToContact;
+			$strFromCompany = $this->strFromCompany;
+			$strFromContact = $this->strFromContact;
 			$strShipmentNumber = $this->strShipmentNumber;
 			$strAssetCode = $this->strAssetCode;
 			$strInventoryModelCode = $this->strInventoryModelCode;
@@ -132,18 +136,21 @@
 			$objExpansionMap[Shipment::ExpandTransaction] = true;
 			$objExpansionMap[Shipment::ExpandToCompany] = true;
 			$objExpansionMap[Shipment::ExpandToContact] = true;
+			$objExpansionMap[Shipment::ExpandFromCompany] = true;
+			$objExpansionMap[Shipment::ExpandFromContact] = true;
+			$objExpansionMap[Shipment::ExpandFromAddress] = true;
 			$objExpansionMap[Shipment::ExpandToAddress] = true;
 			$objExpansionMap[Shipment::ExpandCourier] = true;
 			$objExpansionMap[Shipment::ExpandCreatedByObject] = true;
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
 			if ($this->dtgShipment->TotalItemCount == 0) {
 				$this->dtgShipment->ShowHeader = false;
 			}
 			else {
-				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote,  $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
+				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote,  $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
 				$this->dtgShipment->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -175,7 +182,7 @@
 			$this->txtToContact->Name = 'Ship to Contact';
 			$this->txtToContact->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
 			$this->txtToContact->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		}
+		}	
 		
 		protected function txtShipmentNumber_Create() {
 			$this->txtShipmentNumber = new QTextBox($this);
@@ -276,6 +283,9 @@
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship to Company', '<?= $_ITEM->ToCompany->__toString() ?>', 'Width=200', 'SortByCommand="shipment__to_company_id__short_description ASC"', 'ReverseSortByCommand="shipment__to_company_id__short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship to Contact', '<?= $_ITEM->ToContact->__toString() ?>', 'SortByCommand="shipment__to_contact_id__last_name ASC"', 'ReverseSortByCommand="shipment__to_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship to Address', '<?= $_ITEM->ToAddress->__toString() ?>', 'SortByCommand="shipment__to_address_id__short_description ASC"', 'ReverseSortByCommand="shipment__to_address_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship From Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="shipment__from_company_id__short_description ASC"', 'ReverseSortByCommand="shipment__from_company_id__short_description DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship From Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="shipment__from_contact_id__last_name ASC"', 'ReverseSortByCommand="shipment__from_contact_id__last_name DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship From Address', '<?= $_ITEM->FromAddress->__toString() ?>', 'SortByCommand="shipment__from_address_id__short_description ASC"', 'ReverseSortByCommand="shipment__from_address_id__short_description DESC"', 'CssClass="dtg_column"', 'Display="false"'));      
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="shipment__created_by__last_name ASC"', 'ReverseSortByCommand="shipment__created_by__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'SortByCommand="shipped_flag ASC"', 'ReverseSortByCommand="shipped_flag DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Tracking', '<?= $_ITEM->__toStringTrackingNumber() ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
@@ -328,6 +338,8 @@
 	  	// Set search variables to null
 	  	$this->strToCompany = null;
 	  	$this->strToContact = null;
+	  	$this->strFromCompany = null;
+	  	$this->strFromContact = null;
 	  	$this->strShipmentNumber = null;
 	  	$this->strAssetCode = null;
 	  	$this->strInventoryModelCode = null;
@@ -369,6 +381,8 @@
 	  	$this->strAssetCode = $this->txtAssetCode->Text;
 	  	$this->strInventoryModelCode = $this->txtInventoryModelCode->Text;
 	  	$this->intStatus = $this->lstStatus->SelectedValue;
+	  	$this->strFromCompany = $this->ctlAdvanced->FromCompany;
+	  	$this->strFromContact = $this->ctlAdvanced->FromContact;	  	
 	  	$this->strTrackingNumber = $this->ctlAdvanced->TrackingNumber;
 	  	$this->intCourierId = $this->ctlAdvanced->CourierId;
 	  	$this->strNote = $this->ctlAdvanced->Note;

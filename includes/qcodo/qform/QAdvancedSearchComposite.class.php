@@ -27,6 +27,8 @@ class QAdvancedSearchComposite extends QControl {
 	protected $txtAssetModelCode;
 	protected $lstReservedBy;
 	protected $lstCheckedOutBy;
+	protected $txtFromCompany;
+	protected $txtFromContact;
 	protected $txtTrackingNumber;
 	protected $lstCourier;
 	protected $txtNote;
@@ -61,6 +63,8 @@ class QAdvancedSearchComposite extends QControl {
 	    }
 	    
 	    if ($objParentObject instanceof ShipmentListForm) {
+	    	$this->txtFromCompany_Create();
+	    	$this->txtFromContact_Create();
 	    	$this->txtTrackingNumber_Create();
 	    	$this->lstCourier_Create();
 	    	$this->txtNote_Create();
@@ -161,6 +165,22 @@ class QAdvancedSearchComposite extends QControl {
   			$this->lstCheckedOutBy->AddItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);
   		}
   	}
+  }
+  
+  protected function txtFromCompany_Create() {
+	$this->txtFromCompany = new QTextBox($this);
+	$this->txtFromCompany->Name = 'Ship FromCompany';
+	$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+	$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	$this->txtFromCompany->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
+  }
+
+  protected function txtFromContact_Create() {
+	$this->txtFromContact = new QTextBox($this);
+	$this->txtFromContact->Name = 'Ship From Contact';
+	$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+	$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	$this->txtFromContact->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
   }
   
   protected function txtTrackingNumber_Create() {
@@ -285,7 +305,11 @@ class QAdvancedSearchComposite extends QControl {
 			case "ReservedBy": return $this->lstReservedBy->SelectedValue;
 				break;
 			case "CheckedOutBy": return $this->lstCheckedOutBy->SelectedValue;
-				break;				
+				break;
+			case "FromCompany": return $this->txtFromCompany->Text;
+				break;
+			case "FromContact": return $this->txtFromContact->Text;
+				break;			
 			case "TrackingNumber": return $this->txtTrackingNumber->Text;
 				break;
 			case "CourierId": return $this->lstCourier->SelectedValue;

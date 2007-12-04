@@ -295,6 +295,8 @@
      *
      * @param string $strToCompany
      * @param string $strToContact
+     * @param string $strFromCompany
+     * @param string $strFromContact
      * @param string $strShipmentNumber
      * @param string $strAssetCode
      * @param string $strInventoryModelCode
@@ -308,7 +310,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearch($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			Shipment::QueryHelper($objDatabase);
@@ -324,7 +326,7 @@
 				}
 			}
 			
-			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
 			$arrCustomFieldSql = CustomField::GenerateSql(10);
 
 			$strQuery = sprintf('
@@ -350,8 +352,10 @@
 				  %s
 				  %s
 				  %s
+				  %s
+				  %s
 			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'],  $arrCustomFieldSql['strFrom'],
-			$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
+			$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 			$arrSearchSql['strAuthorizationSql']);
 			
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -361,10 +365,12 @@
 		
     /**
      * Load an array of Shipment objects
-		 * by To Company, To Contact, Shipment Number, Asset Code, Inventory Code, Tracking Number, or Status
+		 * by To Company, To Contact, From Company, From Contact, Shipment Number, Asset Code, Inventory Code, Tracking Number, or Status
      *
      * @param string $strToCompany
      * @param string $strToContact
+     * @param string $strFromCompany
+     * @param string $strFromContact
      * @param string $strShipmentNumber
      * @param string $strAssetCode
      * @param string $strInventoryModelCode
@@ -380,7 +386,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Shipment[]
      */
-		public static function LoadArrayBySearch($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 
 			Shipment::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			// Setup QueryExpansion
@@ -394,7 +400,7 @@
 				}
 			}
 					
-			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
+			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
 			$arrCustomFieldSql = CustomField::GenerateSql(10);
 
 			$strQuery = sprintf('
@@ -442,10 +448,12 @@
 				%s
 				%s
 				%s
+				%s
+				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'],
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'],
-				$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
+				$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
 				$arrSearchSql['strAuthorizationSql'],
 				$strOrderBy, $strLimitSuffix);
 				
@@ -454,9 +462,9 @@
 		}
 		
 		// Returns an array of SQL strings to be used in either the Count or Load BySearch queries
-	  protected static function GenerateSearchSql ($strToCompany = null, $strToContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
 
-	  	$arrSearchSql = array("strToCompanySql" => "", "strToContactSql" => "", "strShipmentNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strTrackingNumberSql" => "", "strCourierSql" => "", "strNoteSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "");
+	  	$arrSearchSql = array("strToCompanySql" => "", "strToContactSql" => "", "strFromCompanySql" => "", "strFromContactSql" => "", "strShipmentNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strTrackingNumberSql" => "", "strCourierSql" => "", "strNoteSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "");
 	  	
 			if ($strToCompany) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -469,6 +477,18 @@
 				$arrSearchSql['strToContactSql'] = "AND (`shipment__to_contact_id` . `first_name` LIKE $strToContact";
 				$arrSearchSql['strToContactSql'] .= " OR `shipment__to_contact_id` . `last_name` LIKE $strToContact";
 				$arrSearchSql['strToContactSql'] .= " OR CONCAT(`shipment__to_contact_id` . `first_name`, ' ', `shipment__to_contact_id` . `last_name`) LIKE $strToContact)";
+			}
+			if ($strFromCompany) {
+			// Properly escape all input parameters using Database->SqlVariable()
+				$strFromCompany = QApplication::$Database[1]->SqlVariable("%" . $strFromCompany . "%", false);
+				$arrSearchSql['strFromCompanySql'] = "AND `shipment__from_company_id` . `short_description` LIKE $strFromCompany";
+			}
+			if ($strFromContact) {
+			// Properly escape all input parameters using Database->SqlVariable()
+				$strFromContact = QApplication::$Database[1]->SqlVariable("%" . $strFromContact . "%", false);
+				$arrSearchSql['strFromContactSql'] = "AND (`shipment__from_contact_id` . `first_name` LIKE $strFromContact";
+				$arrSearchSql['strFromContactSql'] .= " OR `shipment__from_contact_id` . `last_name` LIKE $strFromContact";
+				$arrSearchSql['strFromContactSql'] .= " OR CONCAT(`shipment__from_contact_id` . `first_name`, ' ', `shipment__from_contact_id` . `last_name`) LIKE $strFromContact)";				
 			}
 			if ($strShipmentNumber) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
