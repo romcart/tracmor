@@ -42,7 +42,7 @@
 					$lblColumn->Text = $objColumn->Name;
 					$lblColumn->ActionParameter = $objColumn->Name;
 					$lblColumn->AddAction(new QClickEvent(), new QToggleDisplayAction($this->pnlColumnToggleMenu));
-					$lblColumn->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblColumn_Click'));
+					$lblColumn->AddAction(new QClickEvent(), new QServerControlAction($this, 'lblColumn_Click'));
 					$lblColumn->AddAction(new QMouseOverEvent(), new QJavascriptAction('this.style.backgroundColor=\'#EEEEEE\';'));
 					$lblColumn->AddAction(new QMouseOutEvent(), new QJavaScriptAction('this.style.backgroundColor=\'#FFFFFF\';'));
 					if ($objColumn->Display) {
