@@ -173,35 +173,35 @@
 		protected function txtToCompany_Create() {
 			$this->txtToCompany = new QTextBox($this);
 			$this->txtToCompany->Name = 'Ship to Company';
-			$this->txtToCompany->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->txtToCompany->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtToCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
 		protected function txtToContact_Create() {
 			$this->txtToContact = new QTextBox($this);
 			$this->txtToContact->Name = 'Ship to Contact';
-			$this->txtToContact->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->txtToContact->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtToContact->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}	
 		
 		protected function txtShipmentNumber_Create() {
 			$this->txtShipmentNumber = new QTextBox($this);
 			$this->txtShipmentNumber->Name = 'Shipment Number';
-			$this->txtShipmentNumber->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->txtShipmentNumber->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtShipmentNumber->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
 		protected function txtAssetCode_Create() {
 			$this->txtAssetCode = new QTextBox($this);
 			$this->txtAssetCode->Name = 'Asset Code';
-			$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
 		protected function txtInventoryModelCode_Create() {
 			$this->txtInventoryModelCode = new QTextBox($this);
 			$this->txtInventoryModelCode->Name = 'Inventory Code';
-			$this->txtInventoryModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->txtInventoryModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtInventoryModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
@@ -211,7 +211,7 @@
 			$this->lstStatus->AddItem('- Select One -', null);
 			$this->lstStatus->AddItem('Pending', 1);
 			$this->lstStatus->AddItem('Shipped', 2);
-			$this->lstStatus->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->lstStatus->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->lstStatus->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
@@ -224,8 +224,8 @@
 			$this->btnSearch = new QButton($this);
 			$this->btnSearch->Name = 'search';
 			$this->btnSearch->Text = 'Search';
-			$this->btnSearch->AddAction(new QClickEvent(), new QAjaxAction('btnSearch_Click'));
-			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->btnSearch->AddAction(new QClickEvent(), new QServerAction('btnSearch_Click'));
+			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 	  
@@ -234,8 +234,8 @@
 	  	$this->btnClear = new QButton($this);
 			$this->btnClear->Name = 'clear';
 			$this->btnClear->Text = 'Clear';
-			$this->btnClear->AddAction(new QClickEvent(), new QAjaxAction('btnClear_Click'));
-			$this->btnClear->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnClear_Click'));
+			$this->btnClear->AddAction(new QClickEvent(), new QServerAction('btnClear_Click'));
+			$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
 	  }
 	  
@@ -245,7 +245,7 @@
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QServerAction('lblAdvanced_Click'));
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
 	  }
@@ -270,8 +270,8 @@
   		// Allow for CSV Export
   		$this->dtgShipment->ShowExportCsv = true;
       		
-      // Enable AJAX - this won't work while using the DB profiler
-      $this->dtgShipment->UseAjax = true;
+      // Disable AJAX on the datagrid
+      $this->dtgShipment->UseAjax = false;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgShipment);

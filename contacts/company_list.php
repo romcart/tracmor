@@ -138,7 +138,7 @@
 	  protected function txtShortDescription_Create() {
 	    $this->txtShortDescription = new QTextBox($this);
 			$this->txtShortDescription->Name = 'Company Name';
-      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 	  
@@ -146,7 +146,7 @@
 	  protected function txtCity_Create() {
 	    $this->txtCity = new QTextBox($this);
 			$this->txtCity->Name = 'City';
-      $this->txtCity->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+      $this->txtCity->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->txtCity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 	  
@@ -169,8 +169,8 @@
 				$this->lstCountry->AddItem($objCountry->ShortDescription, $objCountry->CountryId);
 			}
 			// Add actions for when this input is changed
-			$this->lstCountry->AddAction(new QChangeEvent(), new QAjaxAction('lstCountry_Select'));
-			$this->lstCountry->AddAction(new QEnterKeyEvent(), new QAjaxAction('lstCountry_Select'));
+			$this->lstCountry->AddAction(new QChangeEvent(), new QServerAction('lstCountry_Select'));
+			$this->lstCountry->AddAction(new QEnterKeyEvent(), new QServerAction('lstCountry_Select'));
 			$this->lstCountry->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
 	  }
 	  
@@ -182,8 +182,8 @@
 			$this->btnSearch = new QButton($this);
 			$this->btnSearch->Name = 'search';
 			$this->btnSearch->Text = 'Search';
-			$this->btnSearch->AddAction(new QClickEvent(), new QAjaxAction('btnSearch_Click'));
-			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->btnSearch->AddAction(new QClickEvent(), new QServerAction('btnSearch_Click'));
+			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 	  
@@ -192,8 +192,8 @@
 	  	$this->btnClear = new QButton($this);
 			$this->btnClear->Name = 'clear';
 			$this->btnClear->Text = 'Clear';
-			$this->btnClear->AddAction(new QClickEvent(), new QAjaxAction('btnClear_Click'));
-			$this->btnClear->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnClear_Click'));
+			$this->btnClear->AddAction(new QClickEvent(), new QServerAction('btnClear_Click'));
+			$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
 	  }
 	  
@@ -203,7 +203,7 @@
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QServerAction('lblAdvanced_Click'));
 	  	// Make it appear like a link even though it is actually a control
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
@@ -223,8 +223,8 @@
   		$this->dtgCompany->CellSpacing = 0;
   		$this->dtgCompany->CssClass = "datagrid";
       		
-      // Enable AJAX - this won't work while using the DB profiler
-      $this->dtgCompany->UseAjax = true;
+      // Disable AJAX for the datagrid
+      $this->dtgCompany->UseAjax = false;
       
       // Allow for column toggling
       $this->dtgCompany->ShowColumnToggle = true;

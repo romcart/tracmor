@@ -87,8 +87,8 @@
   		$this->dtgInventoryModel->CellSpacing = 0;
   		$this->dtgInventoryModel->CssClass = "datagrid";
       		
-      // Enable AJAX - this won't work while using the DB profiler
-      $this->dtgInventoryModel->UseAjax = true;
+      // Disable AJAX for the datagrid
+      $this->dtgInventoryModel->UseAjax = false;
       
       // Allow for column toggling
       $this->dtgInventoryModel->ShowColumnToggle = true;
@@ -208,7 +208,7 @@
   		foreach (Location::LoadAllLocations(false, false, 'short_description') as $objLocation) {
   			$this->lstLocation->AddItem($objLocation->ShortDescription, $objLocation->LocationId);
   		}
-      $this->lstLocation->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+      $this->lstLocation->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->lstLocation->AddAction(new QEnterKeyEvent(), new QTerminateAction());  		
   	}
 
@@ -233,14 +233,14 @@
 	  protected function txtShortDescription_Create() {
 	    $this->txtShortDescription = new QTextBox($this);
 			$this->txtShortDescription->Name = 'Model';
-      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 	  
 	  protected function txtInventoryModelCode_Create() {
 	  	$this->txtInventoryModelCode = new QTextBox($this);
 	  	$this->txtInventoryModelCode->Name = 'Inventory Code';
-	  	$this->txtInventoryModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+	  	$this->txtInventoryModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 	  	$this->txtInventoryModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 	  
@@ -252,8 +252,8 @@
 			$this->btnSearch = new QButton($this);
 			$this->btnSearch->Name = 'search';
 			$this->btnSearch->Text = 'Search';
-			$this->btnSearch->AddAction(new QClickEvent(), new QAjaxAction('btnSearch_Click'));
-			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+			$this->btnSearch->AddAction(new QClickEvent(), new QServerAction('btnSearch_Click'));
+			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 	  
@@ -261,8 +261,8 @@
 	  	$this->btnClear = new QButton($this);
 			$this->btnClear->Name = 'clear';
 			$this->btnClear->Text = 'Clear';
-			$this->btnClear->AddAction(new QClickEvent(), new QAjaxAction('btnClear_Click'));
-			$this->btnClear->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnClear_Click'));
+			$this->btnClear->AddAction(new QClickEvent(), new QServerAction('btnClear_Click'));
+			$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 	  
@@ -271,7 +271,7 @@
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QServerAction('lblAdvanced_Click'));
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
 	  }
