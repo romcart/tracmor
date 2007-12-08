@@ -533,6 +533,8 @@ class FedExTags {
         1733 => 'tracking_activity_line_13',
         1734 => 'tracking_activity_line_14',
         1735 => 'tracking_activity_line_15',
+        1961 => 'shipper_exception_notification_flag',
+        1962 => 'recipient_exception_notification_flag',
         2254 => 'recipient_fax_number',
         2382 => 'return_shipment_indicator',
         2399 => 'signature_option',

@@ -84,10 +84,30 @@
 								<td class="record_field_name">Declared Value:&nbsp;</td>
 								<td class="record_field_value"><?php $this->txtValue->RenderWithError(); $this->lblValue->Render(); ?>&nbsp;<?php $this->lstCurrencyUnit->RenderWithError(); ?>&nbsp;<?php $this->lblCurrencyUnit->Render(); ?></td>
 							</tr>
-							<tr>
+							<!--<tr>
 								<td class="record_field_name"></td>
-								<td class="record_field_value"><?php $this->chkNotificationFlag->RenderWithError(); ?>&nbsp;Send notification</td>
-							</tr>																															
+								<td class="record_field_value"><?php //$this->chkNotificationFlag->RenderWithError(); ?>&nbsp;Send notification</td>
+							</tr>-->																															
+						</table>
+						<br class="item_divider" />						
+						<table cellpadding="0" cellspacing="0">
+							<tr>
+								<td colspan="2" class="fedex_subheader">Shipment Notifications</td>
+							</tr>
+							<tr>
+								<td class="record_field_name">Sender:&nbsp;</td>
+								<td class="record_field_value">
+									<?php $this->txtFedexNotifySenderEmail->RenderWithError(); $this->lblFedexNotifySenderEmail->Render(); ?>&nbsp;<br>
+									<?php $this->chkFedexNotifySenderShipFlag->RenderWithError(); ?>Ship&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifySenderExceptionFlag->RenderWithError(); ?>Exception&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifySenderDeliveryFlag->RenderWithError(); ?>Delivery
+								</td>
+							</tr>
+							<tr>
+								<td class="record_field_name">Recipient:&nbsp;</td>
+								<td class="record_field_value">
+									<?php $this->txtFedexNotifyRecipientEmail->RenderWithError(); $this->lblFedexNotifyRecipientEmail->Render(); ?>&nbsp;<br>
+									<?php $this->chkFedexNotifyRecipientShipFlag->RenderWithError(); ?>Ship&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyRecipientExceptionFlag->RenderWithError(); ?>Exception&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyRecipientDeliveryFlag->RenderWithError(); ?>Delivery
+								</td>
+							</tr>
 						</table>
 					</td>
 				</tr>
