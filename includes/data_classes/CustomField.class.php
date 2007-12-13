@@ -371,7 +371,7 @@
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	 					elseif ($blnSearch) {
-	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	      		
