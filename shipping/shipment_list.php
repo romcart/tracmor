@@ -245,7 +245,7 @@
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QServerAction('lblAdvanced_Click'));
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
 	  }

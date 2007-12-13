@@ -203,7 +203,7 @@
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QServerAction('lblAdvanced_Click'));
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
 	  	// Make it appear like a link even though it is actually a control
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
