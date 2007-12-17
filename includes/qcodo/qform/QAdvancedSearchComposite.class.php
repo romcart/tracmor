@@ -130,7 +130,7 @@ class QAdvancedSearchComposite extends QControl {
   protected function txtAssetModelCode_Create() {
     $this->txtAssetModelCode = new QTextBox($this);
 		$this->txtAssetModelCode->Name = 'Asset Model Code';
-    $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+    $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
     $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
     // if ($this->objParentObject instanceof AssetListFormBase) {
     if (get_class($this->objParentObject) == 'AssetListForm') {
@@ -170,7 +170,7 @@ class QAdvancedSearchComposite extends QControl {
   protected function txtFromCompany_Create() {
 	$this->txtFromCompany = new QTextBox($this);
 	$this->txtFromCompany->Name = 'Ship FromCompany';
-	$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+	$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 	$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	$this->txtFromCompany->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
   }
@@ -178,7 +178,7 @@ class QAdvancedSearchComposite extends QControl {
   protected function txtFromContact_Create() {
 	$this->txtFromContact = new QTextBox($this);
 	$this->txtFromContact->Name = 'Ship From Contact';
-	$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+	$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 	$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	$this->txtFromContact->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
   }
@@ -186,7 +186,7 @@ class QAdvancedSearchComposite extends QControl {
   protected function txtTrackingNumber_Create() {
 		$this->txtTrackingNumber = new QTextBox($this);
 		$this->txtTrackingNumber->Name = 'Tracking Number';
-		$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+		$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 		$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->txtTrackingNumber->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
   }
@@ -206,7 +206,7 @@ class QAdvancedSearchComposite extends QControl {
   protected function txtNote_Create() {
   	$this->txtNote = new QTextBox($this);
   	$this->txtNote->Name = 'Note';
-  	$this->txtNote->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSearch_Click'));
+  	$this->txtNote->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
   	$this->txtNote->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	$this->txtNote->Visible = (get_class($this->objParentObject) == 'ShipmentListForm' || get_class($this->objParentObject) == 'ReceiptListForm') ? true : false;
   }
