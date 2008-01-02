@@ -27,7 +27,7 @@
 		public function __construct($objParentObject, $strControlId = null, $intEntityQtypeId = null, $intEntityId = null) {
 			parent::__construct($objParentObject, $strControlId);
 			// Setup Default Properties
-			$this->TemporaryUploadPath = 'C:/xampp/htdocs/tracmor/uploads/attachments';
+			$this->TemporaryUploadPath = __DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments';
 			$this->strTemplate = __DOCROOT__ . __SUBDIRECTORY__ . '/common/QAttach.tpl.php';
 			$this->DialogBoxCssClass = 'file_asset_dbox';
 			$this->UploadText = QApplication::Translate('Upload');
