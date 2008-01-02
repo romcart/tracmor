@@ -28,7 +28,7 @@
 				$this->arrAttachments = array();
 				foreach ($this->objAttachmentArray as $key => $objAttachment) {
 					
-					$strAttachment = sprintf('<a href="http://localhost/tracmor/includes/php/download.php?tmp_filename=%s&attachment_id=%s" target="_blank">%s</a> (%s bytes) %s by %s  ', $objAttachment->TmpFilename, $objAttachment->AttachmentId, $objAttachment->Filename, $objAttachment->Size, $objAttachment->CreationDate, $objAttachment->CreatedByObject->__toStringFullName());
+					$strAttachment = sprintf('<a href="' . __PHP_ASSETS__ . '/download.php?tmp_filename=%s&attachment_id=%s" target="_blank">%s</a> (%s bytes) %s by %s  ', $objAttachment->TmpFilename, $objAttachment->AttachmentId, $objAttachment->Filename, $objAttachment->Size, $objAttachment->CreationDate, $objAttachment->CreatedByObject->__toStringFullName());
 					
 					$lblDelete = new QLabel($this->pnlAttachments);
 					$lblDelete->Text = 'Delete<br/>';
