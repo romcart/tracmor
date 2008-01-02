@@ -54,6 +54,9 @@
 		protected $lblImage;
 		protected $pnlLongDescription;
 		
+		protected $atcAttach;
+		protected $pnlAttachments;
+		
 		// Custom Field Objects
 		public $arrCustomFields;
 		
@@ -95,6 +98,8 @@
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
+			$this->atcAttach_Create();
+			$this->pnlAttachments_Create();			
 
 			// $this->btnClone_Create();	
 			
@@ -332,6 +337,18 @@
 			QApplication::AuthorizeControl($this->objAssetModel, $this->btnDelete, 3);			
 		}
 		
+
+		// Setup Attach File Asset Button
+		protected function atcAttach_Create() {
+			$this->atcAttach = new QAttach($this, null, EntityQtype::AssetModel, $this->objAssetModel->AssetModelId);
+			QApplication::AuthorizeControl($this->objAssetModel, $this->atcAttach, 2);
+		}
+		
+		// Setup Attachments Panel
+		public function pnlAttachments_Create() {
+			$this->pnlAttachments = new QAttachments($this, null, EntityQtype::AssetModel, $this->objAssetModel->AssetModelId);
+		}
+		
 		// Edit Button Click
 		protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 
@@ -464,6 +481,7 @@
 			// Display Edit and Delete buttons
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
+			$this->atcAttach->Display = true;
 			// $this->btnClone->Display = true;
 			
 			// Display custom field labels
@@ -494,10 +512,12 @@
       // Do not display Edit and Delete buttons
       $this->btnEdit->Display = false;
       $this->btnDelete->Display = false;
+      $this->atcAttach->Display = false;
 			
       // Display Cancel and Save butons    
       $this->btnCancel->Display = true;
       $this->btnSave->Display = true;
+      
       
       // Display custom field inputs
 	    if ($this->arrCustomFields) {

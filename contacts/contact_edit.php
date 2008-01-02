@@ -81,6 +81,8 @@
 		
 		// Buttons
 		protected $btnEdit;
+		protected $atcAttach;
+		protected $pnlAttachments;		
 		
 		// Dialog Boxes
 		protected $dlgNewCompany;
@@ -154,6 +156,8 @@
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
+			$this->atcAttach_Create();
+			$this->pnlAttachments_Create();			
 			
 			// Display labels for the existing company
 			if ($this->blnEditMode) {
@@ -494,8 +498,20 @@
 			QApplication::AuthorizeControl($this->objContact, $this->btnDelete, 3);
 		}
 		
+		// Setup Attach File Asset Button
+		protected function atcAttach_Create() {
+			$this->atcAttach = new QAttach($this, null, EntityQtype::Contact, $this->objContact->ContactId);
+			QApplication::AuthorizeControl($this->objContact, $this->atcAttach, 2);
+		}
+		
+		// Setup Attachments Panel
+		public function pnlAttachments_Create() {
+			$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Contact, $this->objContact->ContactId);
+		}		
+		
 		// Update address field when company is selected
 		public function lstCompany_Select() {
+			
 			// Clear out the items from lstAddress
 			$this->lstAddress->RemoveAllItems();
 			if ($this->lstCompany->SelectedValue) {
@@ -759,6 +775,7 @@
 			// Display Edit and Delete buttons
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
+			$this->atcAttach->Display = true;
 		}
 		
 		// Display the inputs for Contact Edit mode
@@ -780,6 +797,7 @@
 			// Do Not Display Edit and Delete buttons
 			$this->btnEdit->Display = false;
 			$this->btnDelete->Display = false;
+			$this->atcAttach->Display = false;
 			
 			// Display inputs
 			$this->lstCompany->Display = true;

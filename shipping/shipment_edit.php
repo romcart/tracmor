@@ -103,6 +103,8 @@
 		
 		// Buttons
 		protected $btnEdit;
+		protected $atcAttach;
+		protected $pnlAttachments;
 		protected $btnAddAsset;
 		protected $btnLookup;
 		protected $btnAddInventory;
@@ -317,7 +319,9 @@
 				$this->btnSave_Create();
 				$this->btnCancel_Create();
 				$this->btnEdit_Create();
-				$this->btnDelete_Create();		
+				$this->btnDelete_Create();
+				$this->atcAttach_Create();
+				$this->pnlAttachments_Create();
 				
 			}
 			
@@ -1788,6 +1792,17 @@
 			$this->btnDelete->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objShipment, $this->btnDelete, 3);
 		}
+		
+		// Setup Attach File Asset Button
+		protected function atcAttach_Create() {
+			$this->atcAttach = new QAttach($this, null, EntityQtype::Shipment, $this->objShipment->ShipmentId);
+			QApplication::AuthorizeControl($this->objShipment, $this->atcAttach, 2);
+		}
+		
+		// Setup Attachments Panel
+		public function pnlAttachments_Create() {
+			$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Shipment, $this->objShipment->ShipmentId);
+		}		
 		
 		// Setup AddAsset Button
 		protected function btnAddAsset_Create() {
@@ -3861,6 +3876,9 @@
 				// decode and save label
 				$this->txtTrackingNumber->Text = $ship_Ret[29];
 				$fed->label('../images/shipping_labels/fedex/' . QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . '.png');
+				if (AWS_S3) {
+					MoveToS3(__DOCROOT__ . __IMAGE_ASSETS__ . '/shipping_labels/fedex', QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . '.png', 'image/png', '/images/shipping_labels/fedex');
+				}
 				return true;
 			}
 		}
@@ -4034,6 +4052,7 @@
 			
 			if (!$this->objShipment->ShippedFlag) {
 				$this->btnEdit->Display = true;
+				$this->atcAttach->Display = true;
 			}
 
 			// This is not necessary, because this method is only being called in EditMode
@@ -4101,6 +4120,7 @@
 			$this->pnlNote->Display = false;
 			$this->lblTrackingNumber->Display = false;
 			$this->btnEdit->Display = false;
+			$this->atcAttach->Display = false;
 			$this->lblToPhone->Display = false;
 			$this->lblBillTransportationTo->Display = false;
 			$this->lblPayerAccount->Display = false;

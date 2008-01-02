@@ -73,6 +73,8 @@
 						$this->btnEdit->Render();
 						$this->btnSave->Render();
 						echo('&nbsp;');
+						$this->atcAttach->RenderWithError();
+						echo('&nbsp;');
 						$this->btnCancel->RenderWithError();
 						$this->btnDelete->RenderWithError();
 					?>
@@ -112,6 +114,10 @@
 				</td>
 			</tr>
 		</table>
+		
+<?php
+$this->pnlAttachments->Render();
+?>		
 		
 		<?php $this->dlgNewCompany->Render(); ?>
 		<?php $this->dlgNewAddress->Render(); ?>

@@ -60,6 +60,8 @@
 						$this->btnEdit->Render();
 						$this->btnSave->RenderWithError();
 						echo('&nbsp;');
+						$this->atcAttach->RenderWithError();
+						echo('&nbsp;');
 						$this->btnCompleteShipment->RenderWithError();
 						echo('&nbsp;');
 						$this->btnDelete->RenderWithError();
@@ -161,7 +163,11 @@
 				</table>
 			</td>
 		</tr>
-	</table>	
+	</table>
+	
+<?php
+$this->pnlAttachments->Render();
+?>	
 
 <br class="item_divider" />
 <?php $this->pnlFedExShipment->Render(); ?>

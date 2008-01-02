@@ -53,7 +53,9 @@ class QInventoryEditComposite extends QControl {
 	protected $btnSave;
 	protected $btnDelete;
 	protected $btnEdit;
-	protected $btnCancel;		
+	protected $btnCancel;
+	protected $atcAttach;
+	protected $pnlAttachments;
 	protected $btnMove;
 	protected $btnTakeOut;
 	protected $btnRestock;
@@ -115,6 +117,8 @@ class QInventoryEditComposite extends QControl {
 		$this->btnDelete_Create();
 		$this->btnEdit_Create();
 		$this->btnCancel_Create();
+		$this->atcAttach_Create();
+		$this->pnlAttachments_Create();
 		// Only create transaction buttons if editing an existing inventory model
 		if ($this->blnEditMode) {
 			$this->btnMove_Create();
@@ -356,7 +360,18 @@ class QInventoryEditComposite extends QControl {
 		$this->btnCancel->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnCancel_Click'));
 		$this->btnCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnCancel->CausesValidation = false;
-	}			
+	}
+
+// Setup Attach File Asset Button
+	protected function atcAttach_Create() {
+		$this->atcAttach = new QAttach($this, null, EntityQtype::Inventory, $this->objInventoryModel->InventoryModelId);
+		QApplication::AuthorizeControl($this->objInventoryModel, $this->atcAttach, 2);
+	}
+	
+	// Setup Attachments Panel
+	public function pnlAttachments_Create() {
+		$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Inventory, $this->objInventoryModel->InventoryModelId);
+	}	
 	
 	// Setup Delete Button
 	protected function btnDelete_Create() {
@@ -739,6 +754,7 @@ class QInventoryEditComposite extends QControl {
 		// Display Edit and Delete buttons
 		$this->btnEdit->Display = true;
 		$this->btnDelete->Display = true;
+		$this->atcAttach->Display = true;
 		
 		// Display custom field labels
 		if ($this->arrCustomFields) {
@@ -759,6 +775,7 @@ class QInventoryEditComposite extends QControl {
     	// Do not display Edit and Delete buttons
     	$this->btnEdit->Display = false;
     	$this->btnDelete->Display = false;
+    	$this->atcAttach->Display = false;
     
     	// Display inputs
 		$this->txtShortDescription->Display = true;

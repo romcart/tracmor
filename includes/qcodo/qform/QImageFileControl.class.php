@@ -72,6 +72,7 @@
 		 *
 		 */
 		public function ProcessUpload() {
+			
 			if((strpos($this->strType, "image")) !== false) {
 				move_uploaded_file($this->strFile, $this->strUploadPath.$this->strFileName);
 				if ($this->boolBuildThumbs) {
@@ -80,6 +81,14 @@
 				                            $this->intThumbWidth,
 				                            $this->intThumbHeight,
 				                            $this->intThumbQuality);
+				}
+			}
+			if (AWS_S3) {
+				MoveToS3($this->strUploadPath, $this->strFileName, $this->strType, '/images/asset_models');
+				if ($this->boolBuildThumbs) {
+					if (file_exists($this->strThumbUploadPath.$this->strFileName)) {
+						MoveToS3($this->strThumbUploadPath, $this->strFileName, $this->strType, '/images/asset_models/thumbs');
+					}
 				}
 			}
 		}
@@ -133,9 +142,16 @@
 		 */
 		public function GetDisplayHtml($strImagePath) {
 			if ($strImagePath) {
-				$href = $this->strWebPath . $strImagePath;
-				$src = $this->strThumbWebPath . $this->strThumbPrefix . $strImagePath;
+				if (AWS_S3) {
+					$href = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/images/asset_models/' . $strImagePath;
+					$src = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/images/asset_models/thumbs/' . $strImagePath;
+				}
+				else {
+					$href = $this->strWebPath . $strImagePath;
+					$src = $this->strThumbWebPath . $this->strThumbPrefix . $strImagePath;
+				}
 				$strToReturn = sprintf('<a href="%s"><img src="%s" border="0" /></a>', $href, $src);
+				
 			}
 			else {
 				$strToReturn = "";

@@ -55,6 +55,8 @@
 					$this->btnEdit->Render();
 					$this->btnSave->RenderWithError();
 					echo('&nbsp;');
+					$this->atcAttach->RenderWithError();
+					echo('&nbsp;');
 					$this->btnDelete->RenderWithError();
 					$this->btnCancel->RenderWithError();
 				?>
@@ -136,7 +138,12 @@
 				</table>				
 			</td>
 		</tr>
-	</table>	
+	</table>
+	
+<?php
+$this->pnlAttachments->Render();
+?>	
+	
 	<br class="item_divider" />
 	<div class="title">Assets to Receive</div>
 	<table>

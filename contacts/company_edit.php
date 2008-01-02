@@ -74,6 +74,8 @@
 		
 		// Buttons
 		protected $btnEdit;
+		protected $atcAttach;
+		protected $pnlAttachments;
 		protected $btnCreateContact;
 		protected $btnCreateAddress;
 		
@@ -140,6 +142,8 @@
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
+			$this->atcAttach_Create();
+			$this->pnlAttachments_Create();			
 			$this->btnCreateAddress_Create();
 			$this->btnCreateContact_Create();
 			
@@ -510,6 +514,17 @@
 			QApplication::AuthorizeControl($this->objCompany, $this->btnDelete, 3);
 		}
 		
+		// Setup Attach File Asset Button
+		protected function atcAttach_Create() {
+			$this->atcAttach = new QAttach($this, null, EntityQtype::Company, $this->objCompany->CompanyId);
+			QApplication::AuthorizeControl($this->objCompany, $this->atcAttach, 2);
+		}
+		
+		// Setup Attachments Panel
+		public function pnlAttachments_Create() {
+			$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Company, $this->objCompany->CompanyId);
+		}		
+		
 		// Setup Create Address Button
 		protected function btnCreateAddress_Create() {
 			$this->btnCreateAddress = new QButton($this);
@@ -875,6 +890,7 @@
 			// Display Edit and Delete buttons
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
+			$this->atcAttach->Display = true;
 		}
 		
 		// Display the inputs for Company Edit mode
@@ -892,6 +908,7 @@
 			// Do not display the Edit or Delete button
 			$this->btnEdit->Display = false;
 			$this->btnDelete->Display = false;
+			$this->atcAttach->Display = false;
 			
 			// Display the inputs for edit mode
 			$this->txtShortDescription->Display = true;

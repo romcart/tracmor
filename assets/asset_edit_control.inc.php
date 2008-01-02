@@ -69,6 +69,8 @@
 				$this->btnCancel->RenderWithError();
 				$this->btnClone->Render();
 				echo('&nbsp;');
+				$this->atcAttach->Render();
+				echo('&nbsp;');
 				$this->btnDelete->RenderWithError();
 			?>
 		</td>
@@ -106,7 +108,9 @@
 		</td>
 	</tr>
 </table>
-
+<?php
+$this->pnlAttachments->Render();
+?>
 <?php
 	if ($this->blnEditMode) {
 		$this->btnMove->Render();

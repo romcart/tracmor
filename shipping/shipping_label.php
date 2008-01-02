@@ -54,7 +54,13 @@
 		protected function lblImage_Create() {
 			$this->lblImage = new QLabel($this);
 			$this->lblImage->HtmlEntities = false;
-			$this->lblImage->Text = '<img src="../images/shipping_labels/fedex/'. QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . '.png" style="width:7in;height:4.75in;">';			
+			if (AWS_S3) {
+				$strSrc = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/images/shipping_labels/fedex/';
+			}
+			else {
+				$strSrc = '../images/shipping_labels/fedex/';
+			}
+			$this->lblImage->Text = '<img src="' . $strSrc . QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . '.png" style="width:7in;height:4.75in;">';			
 		}
 	}
 	

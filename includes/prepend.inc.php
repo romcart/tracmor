@@ -14,6 +14,8 @@
 		 * a relative or absolute path to the file.
 		 */
 		require(dirname(__FILE__) . '/configuration.inc.php');
+		
+		require(dirname(__FILE__) . '/configuration_tracmor.inc.php');
 
 
 		//////////////////////////////
@@ -248,7 +250,7 @@
 		 * custom error handling script(s).
 		 */
 		if (array_key_exists('SERVER_PROTOCOL', $_SERVER)) {
-			set_error_handler('QcodoHandleError');
+			set_error_handler('QcodoHandleError', E_ALL);
 			set_exception_handler('QcodoHandleException');
 		}
 

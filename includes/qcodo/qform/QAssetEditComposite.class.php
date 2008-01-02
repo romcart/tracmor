@@ -60,6 +60,8 @@ class QAssetEditComposite extends QControl {
 	protected $btnEdit;
 	protected $btnCancel;		
 	protected $btnClone;
+	protected $atcAttach;
+	protected $pnlAttachments;
 	protected $btnMove;
 	protected $btnCheckOut;
 	protected $btnCheckIn;
@@ -122,6 +124,8 @@ class QAssetEditComposite extends QControl {
 		$this->btnEdit_Create();
 		$this->btnCancel_Create();
 		$this->btnClone_Create();
+		$this->atcAttach_Create();
+		$this->pnlAttachments_Create();
 		// Only create transaction buttons if editing an existing asset
 		if ($this->blnEditMode) {
 			$this->btnMove_Create();
@@ -429,6 +433,17 @@ class QAssetEditComposite extends QControl {
 		$this->btnClone->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnClone->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objAsset, $this->btnClone, 2);
+	}
+	
+	// Setup Attach File Asset Button
+	protected function atcAttach_Create() {
+		$this->atcAttach = new QAttach($this, null, EntityQtype::Asset, $this->objAsset->AssetId);
+		QApplication::AuthorizeControl($this->objAsset, $this->atcAttach, 2);
+	}
+	
+	// Setup Attachments Panel
+	public function pnlAttachments_Create() {
+		$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Asset, $this->objAsset->AssetId);
 	}
 	
 	// Setup Move Button
@@ -901,7 +916,7 @@ class QAssetEditComposite extends QControl {
 		
 		// Do not display Cancel and Save buttons
 		$this->btnCancel->Display = false;
-		$this->btnSave->Display = false;		
+		$this->btnSave->Display = false;
 		
 		// Display Labels for Viewing mode
 		$this->lblAssetModelCode->Display = true;
@@ -913,6 +928,7 @@ class QAssetEditComposite extends QControl {
 		$this->btnEdit->Display = true;
 		$this->btnDelete->Display = true;
 		$this->btnClone->Display = true;
+		$this->atcAttach->Display = true;
 		
 		// Display custom field labels
 		if ($this->arrCustomFields) {
@@ -952,6 +968,7 @@ class QAssetEditComposite extends QControl {
     $this->btnEdit->Display = false;
     $this->btnDelete->Display = false;
     $this->btnClone->Display = false;
+		$this->atcAttach->Display = false;
     
     // Display Asset Code and Asset Model input for edit mode
 		$this->txtAssetCode->Display = true;

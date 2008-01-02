@@ -77,7 +77,7 @@
 			// Create/Setup Button Action controls
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
-			$this->btnDelete_Create();			
+			$this->btnDelete_Create();
 		}
 		
 		// Create and Setup the Header Composite Control
@@ -135,6 +135,7 @@
 							// We could loop through AuthorizationLevels here, but no need to right now
 							$objControl = new QListBox($this);
 							$objControl->Width = 100;
+							$objControl->ActionParameter = $objModule->ModuleId;
 							$objAllItem = new QListItem('All', 1);
 							$objOwnerItem = new QListItem('Owner', 2);
 							$objNoneItem = new QListItem('None', 3);	
@@ -163,6 +164,9 @@
 								$this->objRoleModuleAuthorizationArray[$objRoleModule->RoleModuleId.'-'.$objAuthorization->AuthorizationId] = $objRoleModuleAuthorization;
 								$objRoleModuleAuthorization = null;
 							}
+							else {
+								$objAllItem->Selected = true;
+							}
 							$objControl->AddItem($objAllItem);
 							$objControl->AddItem($objOwnerItem);
 							// Do not include the 'None' List Item for View
@@ -175,12 +179,21 @@
 							$objOwnerItem = null;
 							$objNoneItem = null;
 							// Assign the Controls array
+							if ($objAuthorization->ShortDescription == 'edit') {
+								$objControl->AddAction(new QChangeEvent(), new QAjaxAction('lstEdit_Change'));
+								$arrEditControlIdModuleId[] = $objControl->ControlId . "-" . $objModule->ModuleId;
+								//$this->lstEdit_Change($this->FormId, $objControl->ControlId, $objModule->ModuleId);
+							}
 							$this->arrControls[$objModule->ShortDescription][$objAuthorization->ShortDescription] = $objControl;
 							$objControl = null;
 						}
 					}
 					$objRoleModule = null;
 				}
+			}
+			foreach ($arrEditControlIdModuleId as $strControlIdModuleId) {
+				$arrExplode = explode("-", $strControlIdModuleId);
+				$this->lstEdit_Change($this->FormId, $arrExplode[0], $arrExplode[1]);
 			}
 		}
 		
@@ -199,6 +212,32 @@
 			foreach ($this->objAuthorizationArray as $objAuthorization) {
 				$this->arrControls[$objModule->ShortDescription][$objAuthorization->ShortDescription]->Enabled = ($objAccessControl->SelectedValue) ? true : false;
 				
+			}
+		}
+		
+		protected function lstEdit_Change($strFormId, $strControlId, $strParameter) {
+			$objControl = $this->GetControl($strControlId);
+			// $strParameter is the ModuleId
+			$objModule = Module::Load($strParameter);
+			$objDeleteControl = $this->arrControls[$objModule->ShortDescription]['delete'];
+			if ($objControl->SelectedValue == 3) {
+				if ($objDeleteControl->ItemCount < 3) {
+					$objDeleteControl->AddItem('None', 3);
+				}
+				$objDeleteControl->SelectedValue = 3;
+				$objDeleteControl->Enabled = false;
+			}
+			elseif ($objControl->SelectedValue == 2) {
+				if ($objDeleteControl->ItemCount == 3) {
+					$objDeleteControl->RemoveItem(2);
+				}
+				$objDeleteControl->Enabled = true;
+			}
+			elseif ($objControl->SelectedValue == 1) {
+				if ($objDeleteControl->ItemCount == 3) {
+					$objDeleteControl->RemoveItem(2);
+				}
+				$objDeleteControl->Enabled = true;
 			}
 		}
 		

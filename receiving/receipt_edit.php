@@ -80,6 +80,8 @@
 		
 		// Buttons
 		protected $btnEdit;
+		protected $atcAttach;
+		protected $pnlAttachments;
 		protected $btnAddAsset;
 		protected $btnAddInventory;
 		
@@ -153,6 +155,8 @@
 			$this->btnEdit_Create();
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
+			$this->atcAttach_Create();
+			$this->pnlAttachments_Create();
 			$this->btnAddAsset_Create();
 			$this->btnAddInventory_Create();
 			
@@ -602,6 +606,17 @@
 			$this->btnDelete->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objReceipt, $this->btnDelete, 3);
 		}
+		
+		// Setup Attach File Asset Button
+		protected function atcAttach_Create() {
+			$this->atcAttach = new QAttach($this, null, EntityQtype::Receipt, $this->objReceipt->ReceiptId);
+			QApplication::AuthorizeControl($this->objReceipt, $this->atcAttach, 2);
+		}
+		
+		// Setup Attachments Panel
+		public function pnlAttachments_Create() {
+			$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Receipt, $this->objReceipt->ReceiptId);
+		}		
 		
 		// Setup AddAsset Button
 		protected function btnAddAsset_Create() {
@@ -2216,6 +2231,7 @@
 			$this->lblDueDate->Display = true;
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
+			$this->atcAttach->Display = true;
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationAssetReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveAssetTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
 				$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationInventoryReceived_Render($_ITEM) ?> <?= $_FORM->txtQuantityReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveInventoryTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
@@ -2245,6 +2261,7 @@
 			$this->lblDueDate->Display = false;
 			$this->btnEdit->Display = false;
 			$this->btnDelete->Display = false;
+			$this->atcAttach->Display = false;
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->RemoveColumnByName('&nbsp;');
 				$this->dtgInventoryTransact->RemoveColumnByName('&nbsp;');

@@ -62,6 +62,8 @@
 		
 		// Buttons
 		protected $btnEdit;
+		protected $atcAttach;
+		protected $pnlAttachments;		
 		
 		// Tab Index
 		protected $intTabIndex;
@@ -115,6 +117,8 @@
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
+			$this->atcAttach_Create();
+			$this->pnlAttachments_Create();			
 			
 			// Display labels for the existing address
 			if ($this->blnEditMode) {
@@ -345,6 +349,17 @@
 			QApplication::AuthorizeControl($this->objAddress, $this->btnDelete, 3);
 		}
 		
+		// Setup Attach File Asset Button
+		protected function atcAttach_Create() {
+			$this->atcAttach = new QAttach($this, null, EntityQtype::Address, $this->objAddress->AddressId);
+			QApplication::AuthorizeControl($this->objAddress, $this->atcAttach, 2);
+		}
+		
+		// Setup Attachments Panel
+		public function pnlAttachments_Create() {
+			$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Address, $this->objAddress->AddressId);
+		}		
+		
 		// Update state/province list when country is selected
 		protected function lstCountry_Select() {
 			
@@ -543,6 +558,7 @@
 			// Display Edit and Delete buttons
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
+			$this->atcAttach->Display = true;
 		}
 		
 		// Display the inputs for Contact Edit mode
@@ -560,6 +576,7 @@
 			// Do not display Edit and Delete buttons
 			$this->btnEdit->Display = false;
 			$this->btnDelete->Display = false;
+			$this->atcAttach->Display = false;
 			
 			// Display inputs
 			$this->txtShortDescription->Display = true;

@@ -69,6 +69,8 @@
 						$this->btnEdit->Render();
 						$this->btnSave->Render();
 						echo('&nbsp;');
+						$this->atcAttach->Render();
+						echo('&nbsp;');
 						$this->btnCancel->Render();
 						$this->btnDelete->RenderWithError();
 					?>
@@ -107,6 +109,10 @@
 				</td>
 			</tr>
 		</table>
+		
+<?php
+$this->pnlAttachments->Render();
+?>
 		
 		<br class="item_divider" />
 		<br class="item_divider" />

@@ -119,3 +119,7 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 .modal_dialog {
 	border: 2px inset #333333;
 }
+
+.file_asset_dbox { border: 1px solid #1c4a8c; background-color: #fff; padding: 20px; width: 400px; overflow: auto; }
+.file_asset_dbox h1 { margin: 0; }
+.file_asset_dbox input { padding: 3px; margin-right: 5px; }
