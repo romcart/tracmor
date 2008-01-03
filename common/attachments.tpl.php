@@ -1,7 +1,7 @@
 <table cellspacing="0" cellpading="0" border="0">
 	<tr>
 		<td>
-			<table cellspacing="0" cellpadding="0" border="0">
+			<table cellspacing="0" cellpadding="3" border="0">
 <?php
 if ($_CONTROL->ParentControl->arrAttachments) {
 	foreach ($_CONTROL->ParentControl->arrAttachments as $arrAttachment) {

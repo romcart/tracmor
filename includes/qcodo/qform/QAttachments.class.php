@@ -28,11 +28,11 @@
 				$this->arrAttachments = array();
 				foreach ($this->objAttachmentArray as $key => $objAttachment) {
 					
-					$strAttachment = sprintf('<a href="' . __PHP_ASSETS__ . '/download.php?tmp_filename=%s&attachment_id=%s" target="_blank">%s</a> (%s bytes) %s by %s  ', $objAttachment->TmpFilename, $objAttachment->AttachmentId, $objAttachment->Filename, $objAttachment->Size, $objAttachment->CreationDate, $objAttachment->CreatedByObject->__toStringFullName());
+					$strAttachment = sprintf('<strong><a href="' . __PHP_ASSETS__ . '/download.php?tmp_filename=%s&attachment_id=%s" target="_blank" style="color:blue;">%s</a></strong> (%s bytes) %s by %s  ', $objAttachment->TmpFilename, $objAttachment->AttachmentId, $objAttachment->Filename, $objAttachment->Size, $objAttachment->CreationDate, $objAttachment->CreatedByObject->__toStringFullName());
 					
 					$lblDelete = new QLabel($this->pnlAttachments);
 					$lblDelete->Text = 'Delete<br/>';
-					$lblDelete->ForeColor = 'gray';
+					$lblDelete->ForeColor = '#555555';
 					$lblDelete->FontUnderline = true;
 					$lblDelete->SetCustomStyle('cursor', 'pointer');
 					$lblDelete->HtmlEntities = false;
@@ -58,17 +58,22 @@
 			else {
 				$this->lblAttachments->Text = sprintf('%s Attachments', $this->intAttachmentCount);
 			}
-			$this->lblAttachments->ForeColor = 'gray';
+			$this->lblAttachments->ForeColor = '#555555';
 			$this->lblAttachments->FontUnderline = true;
-			$this->lblAttachments->FontBold = true;
+			//$this->lblAttachments->FontBold = true;
 			$this->lblAttachments->SetCustomStyle('cursor', 'pointer');
+			$this->lblAttachments->SetCustomStyle('padding','3px');
 			$this->lblAttachments->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblAttachments_Click'));
 		}
 		
 		public function lblAttachments_Click($strFormId, $strControlId, $strParameter) {
 			if ($this->pnlAttachments->Display) {
 				$this->pnlAttachments->Display = false;
-				$this->lblAttachments->Text = sprintf('%s Attachments', $this->intAttachmentCount);
+				if ($this->intAttachmentCount == 1) {
+					$this->lblAttachments->Text = sprintf('%s Attachment', $this->intAttachmentCount);
+				} else {
+					$this->lblAttachments->Text = sprintf('%s Attachments', $this->intAttachmentCount);
+				}
 			}
 			else {
 				$this->pnlAttachments->Display = true;
