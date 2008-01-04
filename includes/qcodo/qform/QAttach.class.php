@@ -37,6 +37,16 @@
 			$this->DisplayStyle = QDisplayStyle::Inline;
 			$this->EntityId = $intEntityId;
 			$this->EntityQtypeId = $intEntityQtypeId;
+			
+			// This is appalling, but the best I could come up with
+			// So I remove all of the actions that are created on btnUpload in QFileAssetBase
+			// Then I add them back, but only after changing the src URI for the spinner gif. Gross.
+			$this->dlgFileAsset->btnUpload->RemoveAllActions('onclick');
+			$this->dlgFileAsset->btnUpload->AddAction(new QClickEvent(), new QToggleEnableAction($this->dlgFileAsset->btnUpload));
+			$this->dlgFileAsset->btnUpload->AddAction(new QClickEvent(), new QToggleEnableAction($this->dlgFileAsset->btnCancel));
+			$this->dlgFileAsset->objSpinner->Text = sprintf('<img src="%s/spinner_white.gif" width="14" height="14" alt="Please Wait..."/>', __VIRTUAL_DIRECTORY__ . __IMAGE_ASSETS__);
+			$this->dlgFileAsset->btnUpload->AddAction(new QClickEvent(), new QToggleDisplayAction($this->dlgFileAsset->objSpinner));
+			$this->dlgFileAsset->btnUpload->AddAction(new QClickEvent(), new QServerControlAction($this->dlgFileAsset, 'btnUpload_Click'));
 		}
 		
 		public function dlgFileAsset_Upload() {
