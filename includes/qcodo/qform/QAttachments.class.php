@@ -71,14 +71,14 @@
 			if ($this->pnlAttachments->Display) {
 				$this->pnlAttachments->Display = false;
 				if ($this->intAttachmentCount == 1) {
-					$this->lblAttachments->Text = sprintf('<img src="../images/icons/attachment.gif" style="vertical-align:bottom;><span style="text-decoration:underline;">%s Attachment</span>', $this->intAttachmentCount);
+					$this->lblAttachments->Text = sprintf('<img src="../images/icons/attachment.gif" style="vertical-align:bottom;"><span style="text-decoration:underline;">%s Attachment</span>', $this->intAttachmentCount);
 				} else {
-					$this->lblAttachments->Text = sprintf('<img src="../images/icons/attachment.gif" style="vertical-align:bottom;><span style="text-decoration:underline;">%s Attachments</span>', $this->intAttachmentCount);
+					$this->lblAttachments->Text = sprintf('<img src="../images/icons/attachment.gif" style="vertical-align:bottom;"><span style="text-decoration:underline;">%s Attachments</span>', $this->intAttachmentCount);
 				}
 			}
 			else {
 				$this->pnlAttachments->Display = true;
-				$this->lblAttachments->Text = '<img src="../images/icons/attachment.gif" style="vertical-align:bottom;><span style="text-decoration:underline;">Hide Attachments</span>';
+				$this->lblAttachments->Text = '<img src="../images/icons/attachment.gif" style="vertical-align:bottom;"><span style="text-decoration:underline;">Hide Attachments</span>';
 			}
 		}
 		
