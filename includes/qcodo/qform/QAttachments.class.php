@@ -52,14 +52,15 @@
 		
 		protected function lblAttachments_Create() {
 			$this->lblAttachments = new QLabel($this);
+			$this->lblAttachments->HtmlEntities=false;
 			if ($this->intAttachmentCount == 1) {
-				$this->lblAttachments->Text = sprintf('%s Attachment', $this->intAttachmentCount);
+				$this->lblAttachments->Text = sprintf('<img src="../images/icons/attachment.gif" style="vertical-align:bottom;"><span style="text-decoration:underline;">%s Attachment</span>', $this->intAttachmentCount);
 			}
 			else {
-				$this->lblAttachments->Text = sprintf('%s Attachments', $this->intAttachmentCount);
+				$this->lblAttachments->Text = sprintf('<img src="../images/icons/attachment.gif" style="vertical-align:bottom;><span style="text-decoration:underline;">%s Attachments</span>', $this->intAttachmentCount);
 			}
 			$this->lblAttachments->ForeColor = '#555555';
-			$this->lblAttachments->FontUnderline = true;
+			//$this->lblAttachments->FontUnderline = true;
 			//$this->lblAttachments->FontBold = true;
 			$this->lblAttachments->SetCustomStyle('cursor', 'pointer');
 			$this->lblAttachments->SetCustomStyle('padding','3px');
@@ -70,14 +71,14 @@
 			if ($this->pnlAttachments->Display) {
 				$this->pnlAttachments->Display = false;
 				if ($this->intAttachmentCount == 1) {
-					$this->lblAttachments->Text = sprintf('%s Attachment', $this->intAttachmentCount);
+					$this->lblAttachments->Text = sprintf('<img src="../images/icons/attachment.gif" style="vertical-align:bottom;><span style="text-decoration:underline;">%s Attachment</span>', $this->intAttachmentCount);
 				} else {
-					$this->lblAttachments->Text = sprintf('%s Attachments', $this->intAttachmentCount);
+					$this->lblAttachments->Text = sprintf('<img src="../images/icons/attachment.gif" style="vertical-align:bottom;><span style="text-decoration:underline;">%s Attachments</span>', $this->intAttachmentCount);
 				}
 			}
 			else {
 				$this->pnlAttachments->Display = true;
-				$this->lblAttachments->Text = 'Hide Attachments';
+				$this->lblAttachments->Text = '<img src="../images/icons/attachment.gif" style="vertical-align:bottom;><span style="text-decoration:underline;">Hide Attachments</span>';
 			}
 		}
 		
