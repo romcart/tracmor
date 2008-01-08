@@ -307,6 +307,7 @@
 			$this->btnCancelExchange_Create();
 			$this->btnSaveDueDate_Create();
 			$this->btnCancelDueDate_Create();
+			$this->pnlAttachments_Create();
 			
 			// Create all custom asset fields
 			$this->customFields_Create();
@@ -321,8 +322,6 @@
 				$this->btnEdit_Create();
 				$this->btnDelete_Create();
 				$this->atcAttach_Create();
-				$this->pnlAttachments_Create();
-				
 			}
 			
 			// Complete Shipment Buttons
