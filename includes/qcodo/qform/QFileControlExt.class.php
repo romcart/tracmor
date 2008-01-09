@@ -48,6 +48,7 @@
 			$this->strType = null;
 			$this->intSize = null;
 			$this->strFile = null;
+			$this->intError = null;
 
 			$strStyle = $this->GetStyleAttributes();
 			if ($strStyle)
