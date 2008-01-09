@@ -38,6 +38,10 @@
 			$this->EntityId = $intEntityId;
 			$this->EntityQtypeId = $intEntityQtypeId;
 			
+			$this->dlgFileAsset->lblError->ForeColor = 'red';
+			
+			$this->dlgFileAsset->flcFileAsset = new QFileControlExt($this->dlgFileAsset);
+			
 			// This is appalling, but the best I could come up with
 			// So I remove all of the actions that are created on btnUpload in QFileAssetBase
 			// Then I add them back, but only after changing the src URI for the spinner gif. Gross.
@@ -51,6 +55,16 @@
 		
 		public function dlgFileAsset_Upload() {
 			parent::dlgFileAsset_Upload();
+			
+			if (!file_exists($this->dlgFileAsset->flcFileAsset->File) || !$this->dlgFileAsset->flcFileAsset->Size) {
+				if ($this->dlgFileAsset->flcFileAsset->Error == 1 || $this->dlgFileAsset->flcFileAsset->Error == 2) {
+					$this->dlgFileAsset->ShowError("The filesize is too large. File must be under 10MB");
+				}
+				else {
+					$this->dlgFileAsset->ShowError("That is an unacceptable file");
+				}
+			}
+			else {
 			
 			$objAttachment = new Attachment();
 			$objAttachment->EntityQtypeId = $this->intEntityQtypeId;
@@ -78,6 +92,7 @@
 			}
 			else {
 				$this->objForm->pnlAttachments_Create();
+			}
 			}
 		}
 		
