@@ -58,8 +58,8 @@
 		 *
 		 * @var array
 		 */
-		protected $strIgnoreJavaScriptFileArray = array();
-		/* protected $strIgnoreJavaScriptFileArray = array(
+		//protected $strIgnoreJavaScriptFileArray = array();
+		protected $strIgnoreJavaScriptFileArray = array(
 			'_core/calendar.js',
 			'_core/calendar_popup.js',
 			'_core/control.js',
@@ -74,8 +74,8 @@
 			'_core/logger.js',
 			'_core/post.js',
 			'_core/qcodo.js',
-			'_core/treenav.js'
-			'datagrid_column_toggle.js'); */
+			'_core/treenav.js',
+			'datagrid_column_toggle.js');
 		
 		// Declare DefaultWaitIcon public (instead of protected in QFormBase.inc) so that it can be set from a custom control
 		// This can be removed once HeaderMenu is moved from a custom control to a QPanel.
