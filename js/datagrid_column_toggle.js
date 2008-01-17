@@ -27,8 +27,15 @@ function toggleColumnToggleDisplay(e, toggleMenuId, toggleButtonId) {
 	var objToggleMenu = document.getElementById(toggleMenuId);
 	// Set the onresize and onclick event handlers only when the menu is being displayed to avoid unnecessarily running the function
 	if (objToggleMenu.parentNode.style.display != 'none') {
-		window.onresize = function() {resizeWindow(toggleMenuId, toggleButtonId);}
-		window.document.onclick = function () {clickWindow(toggleMenuId);}
+		function r() {
+			resizeWindow(toggleMenuId, toggleButtonId);
+		}
+		window.onresize = r;
+		
+		function c() {
+			clickWindow(toggleMenuId);
+		}
+		window.document.onclick = c;
 	}
 	// Set event handlers to null when menu is not being displayed
 	else {
@@ -38,9 +45,9 @@ function toggleColumnToggleDisplay(e, toggleMenuId, toggleButtonId) {
 	
 	// Stop bubbling up and propagation down in events so that functions don't get run more than once
 	// This was specifically because setPosition was getting run from the window.onClick() event and from clicking on the button
-	if (!e) var e = window.event;
-  e.cancelBubble = true;
-  if (e.stopPropagation) e.stopPropagation();
+	if (!e) { var e = window.event; }
+  	e.cancelBubble = true;
+  	if (e.stopPropagation) { e.stopPropagation(); }
 }
 
 // Based on the position of the button (strLabelControlId), this positions the column toggle menu (strPanelControlId)
@@ -67,11 +74,11 @@ function findPosition(obj) {
 	var current_top = 0;
 	var current_left = 0;
 	if (obj.offsetParent) {
-		current_left = obj.offsetLeft
-		current_top = obj.offsetTop
+		current_left = obj.offsetLeft;
+		current_top = obj.offsetTop;
 		while (obj = obj.offsetParent) {
-			current_left += obj.offsetLeft
-			current_top += obj.offsetTop
+			current_left += obj.offsetLeft;
+			current_top += obj.offsetTop;
 		}
 	}
 	return [current_left,current_top];
