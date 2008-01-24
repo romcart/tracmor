@@ -73,9 +73,12 @@
 		protected $strInventoryModelCode;
 		protected $intStatus;
 		protected $strNote;
+		protected $strDueDate;
+		protected $strReceiptDate;
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
+		protected $blnAttachment;
 		
 		// Custom Fields array
 		protected $arrCustomFields;
@@ -119,25 +122,29 @@
 			$strInventoryModelCode = $this->strInventoryModelCode;
 			$intStatus = $this->intStatus;
 			$strNote = $this->strNote;
+			$strDueDate = $this->strDueDate;
+			$strReceiptDate = $this->strReceiptDate;
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
+			$blnAttachment = $this->blnAttachment;
 			$arrCustomFields = $this->arrCustomFields;
 			
 			// Expand to include the primary address, State/Province, and Country
 			$objExpansionMap[Receipt::ExpandTransaction] = true;
 			$objExpansionMap[Receipt::ExpandFromCompany] = true;
 			$objExpansionMap[Receipt::ExpandFromContact] = true;
+			$objExpansionMap[Receipt::ExpandToContact] = true;
 			$objExpansionMap[Receipt::ExpandCreatedByObject] = true;
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgReceipt->TotalItemCount = Receipt::CountBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote,  $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgReceipt->TotalItemCount = Receipt::CountBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDueDate, $strReceiptDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgReceipt->TotalItemCount == 0) {
 				$this->dtgReceipt->ShowHeader = false;
 			}
 			else {
-				$this->dtgReceipt->DataSource = Receipt::LoadArrayBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgReceipt->SortInfo, $this->dtgReceipt->LimitInfo, $objExpansionMap);
+				$this->dtgReceipt->DataSource = Receipt::LoadArrayBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDueDate, $strReceiptDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgReceipt->SortInfo, $this->dtgReceipt->LimitInfo, $objExpansionMap);
 				$this->dtgReceipt->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -267,13 +274,15 @@
       $this->dtgReceipt->Paginator = $objPaginator;
       $this->dtgReceipt->ItemsPerPage = 20;
           
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receipt Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="receipt_number ASC"', 'ReverseSortByCommand="receipt_number DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receive From Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="receipt__from_company_id__short_description ASC"', 'ReverseSortByCommand="receipt__from_company_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receive From Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="receipt__from_contact_id__last_name ASC"', 'ReverseSortByCommand="receipt__from_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Sender Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="receipt__from_company_id__short_description ASC"', 'ReverseSortByCommand="receipt__from_company_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Sender Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="receipt__from_contact_id__last_name ASC"', 'ReverseSortByCommand="receipt__from_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="receipt__created_by__last_name ASC"', 'ReverseSortByCommand="receipt__created_by__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Status', '<?= $_ITEM->__toStringStatusWithHovertip($_CONTROL) ?>', 'SortByCommand="received_flag ASC, due_date ASC"', 'ReverseSortByCommand="received_flag DESC, due_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Date Due', '<?= $_FORM->DisplayDate($_ITEM->DueDate); ?>', 'SortByCommand="due_date ASC"', 'ReverseSortByCommand="due_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Date Received', '<?= $_FORM->DisplayDate($_ITEM->ReceiptDate); ?>', 'SortByCommand="receipt_date ASC"', 'ReverseSortByCommand="receipt_date DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"', 'Display="false"'));
+      $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Recipient Contact', '<?= $_ITEM->ToContact->__toString(); ?>', 'SortByCommand="receipt__to_contact_id__last_name ASC"', 'ReverseSortByCommand="receipt__to_contact_id__last_name DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"', 'Display="false"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Note', '<?= $_ITEM->Transaction->Note ?>', 'SortByCommand="receipt__transaction_id__note ASC"', 'ReverseSortByCommand="receipt__transaction_id__note DESC"', 'CssClass="dtg_column"', 'Width="160"', 'HtmlEntities="false"', 'Display="false"'));
 
       // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
@@ -284,7 +293,7 @@
       	}
       }
            
-      $this->dtgReceipt->SortColumnIndex = 0;
+      $this->dtgReceipt->SortColumnIndex = 1;
     	$this->dtgReceipt->SortDirection = 1;
       
       $objStyle = $this->dtgReceipt->RowStyle;
@@ -338,9 +347,12 @@
 	  	$this->strInventoryModelCode = null;
 	  	$this->intStatus = null;
 	  	$this->strNote = null;
+	  	$this->strDueDate = null;
+	  	$this->strReceiptDate = null;
 	  	$this->strDateModified = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
+	  	$this->blnAttachment = false;
 	  	if ($this->arrCustomFields) {
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
@@ -373,9 +385,12 @@
 	  	$this->strInventoryModelCode = $this->txtInventoryModelCode->Text;
 	  	$this->intStatus = $this->lstStatus->SelectedValue;
 	  	$this->strNote = $this->ctlAdvanced->Note;
+	  	$this->strDueDate = $this->ctlAdvanced->DueDate;
+	  	$this->strReceiptDate = $this->ctlAdvanced->ReceiptDate;
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
+			$this->blnAttachment = $this->ctlAdvanced->Attachment;
 			
 			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 			if ($this->arrCustomFields) {

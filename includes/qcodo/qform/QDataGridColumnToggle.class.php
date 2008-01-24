@@ -39,7 +39,19 @@
 			if ($this->objParentControl->ColumnArray) {
 				foreach ($this->objParentControl->ColumnArray as $objColumn) {
 					$lblColumn = new QLabel($this->pnlColumnToggleMenu);
-					$lblColumn->Text = $objColumn->Name;
+					// If it is an image, and only an image, and it has an alt attribute, then use that value for the menu
+					if (substr($objColumn->Name, 0, 4) == '<img') {
+						if ($intMatch = stripos($objColumn->Name, "alt=")) {
+							$intStart = $intMatch+4;
+							$lblColumn->Text = substr($objColumn->Name, $intStart, strlen($objColumn->Name) - 1 - $intStart);
+						}
+						else {
+							$lblColumn->Text = strip_tags($objColumn->Name);
+						}
+					}
+					else {
+						$lblColumn->Text = $objColumn->Name;
+					}
 					$lblColumn->ActionParameter = $objColumn->Name;
 					$lblColumn->AddAction(new QClickEvent(), new QToggleDisplayAction($this->pnlColumnToggleMenu));
 					$lblColumn->AddAction(new QClickEvent(), new QServerControlAction($this, 'lblColumn_Click'));
@@ -150,8 +162,21 @@
 
       $arrNames = array();
       foreach($this->objParentControl->ColumnArray as $col) {
+      	
       	if ($col->Display === true) {
-        	$arrNames[] = $col->Name;
+      		// Use the alt attribute's value if it is an image tag
+          if (substr($col->Name, 0, 4) == '<img') {
+						if ($intMatch = stripos($col->Name, 'alt=')) {
+							$intStart = $intMatch+4;
+							$arrNames[] = substr($col->Name, $intStart, strlen($col->Name) - 1 - $intStart);
+						}
+						else {
+							$arrNames[] = strip_tags($col->Name);
+						}
+          }
+          else {
+        		$arrNames[] = $col->Name;
+          }
       	}
       }
 
@@ -172,6 +197,13 @@
       	if ($objColumn->Display === true) {
 	        try {
 	          $strHtml = $this->objParentControl->ParseColumnCsv($objColumn, $objObject, true);
+	          // Use the alt attribute's value if it is an image tag
+	          if (substr($strHtml, 0, 4) == '<img') {
+							if ($intMatch = stripos($strHtml, 'alt="')) {
+								$intStart = $intMatch+5;
+								$strHtml = substr($strHtml, $intStart, strlen($strHtml) - 2 - $intStart);
+							}
+	          }
 	          
 	          if ($objColumn->HtmlEntities)
 	            $strHtml = QApplication::HtmlEntities($strHtml);

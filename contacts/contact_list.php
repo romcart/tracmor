@@ -70,7 +70,8 @@
 		protected $strCompany;
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
-		protected $strDateModifiedLast;					
+		protected $strDateModifiedLast;
+		protected $blnAttachment;
 
 		protected function Form_Create() {
 			
@@ -103,6 +104,7 @@
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
+			$blnAttachment = $this->blnAttachment;
 			$arrCustomFields = $this->arrCustomFields;
 			
 			// Expand to include the primary address, State/Province, and Country
@@ -110,12 +112,12 @@
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgContact->TotalItemCount = Contact::CountBySearch($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgContact->TotalItemCount = Contact::CountBySearch($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgContact->TotalItemCount == 0) {
 				$this->dtgContact->ShowHeader = false;
 			}
 			else {
-				$this->dtgContact->DataSource = Contact::LoadArrayBySearch($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgContact->SortInfo, $this->dtgContact->LimitInfo, $objExpansionMap);
+				$this->dtgContact->DataSource = Contact::LoadArrayBySearch($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgContact->SortInfo, $this->dtgContact->LimitInfo, $objExpansionMap);
 				$this->dtgContact->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -222,6 +224,7 @@
       $this->dtgContact->Paginator = $objPaginator;
       $this->dtgContact->ItemsPerPage = 20;
           
+      $this->dtgContact->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="last_name ASC, first_name DESC"', 'ReverseSortByCommand="last_name DESC, first_name DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Title', '<?= $_ITEM->Title ?>', 'Width=200', 'SortByCommand="title ASC"', 'ReverseSortByCommand="title DESC"', 'CssClass="dtg_column"'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Company', '<?= $_ITEM->Company->__toStringWithLink("bluelink") ?>', 'SortByCommand="contact__company_id__short_description ASC"', 'ReverseSortByCommand="contact__company_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
@@ -235,7 +238,7 @@
       	}
       }      
       
-      $this->dtgContact->SortColumnIndex = 0;
+      $this->dtgContact->SortColumnIndex = 1;
     	$this->dtgContact->SortDirection = 0;
       
       $objStyle = $this->dtgContact->RowStyle;
@@ -274,6 +277,7 @@
 	  	$this->strDateModified = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
+	  	$this->blnAttachment = false;
   		if ($this->arrCustomFields) {
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
@@ -305,6 +309,7 @@
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
+			$this->blnAttachment = $this->ctlAdvanced->Attachment;
 			
 			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 			if ($this->arrCustomFields) {

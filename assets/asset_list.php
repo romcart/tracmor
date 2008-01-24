@@ -80,7 +80,8 @@
 		protected $intCheckedOutBy;
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
-		protected $strDateModifiedLast;		
+		protected $strDateModifiedLast;
+		protected $blnAttachment;
 		
 		protected function Form_Create() {
 			
@@ -107,6 +108,7 @@
       $this->dtgAsset->Paginator = $objPaginator;
       $this->dtgAsset->ItemsPerPage = 20;
       
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHoverTips($_CONTROL) ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgAsset->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgAsset->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->AssetModel->Category->__toString() ?>', 'SortByCommand="asset__asset_model_id__category_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__category_id__short_description DESC"', 'CssClass="dtg_column"'));
@@ -179,6 +181,7 @@
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
+			$blnAttachment = $this->blnAttachment;
 			$arrCustomFields = $this->arrCustomFields;
 					
 			// Enable Profiling
@@ -190,12 +193,12 @@
       $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandManufacturer] = true;
       $objExpansionMap[Asset::ExpandLocation] = true;
 
-			$this->dtgAsset->TotalItemCount = Asset::CountBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgAsset->TotalItemCount = Asset::CountBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgAsset->TotalItemCount == 0) {
 				$this->dtgAsset->ShowHeader = false;
 			}
 			else {
-				$this->dtgAsset->DataSource = Asset::LoadArrayBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap);
+				$this->dtgAsset->DataSource = Asset::LoadArrayBySearch($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap);
 				$this->dtgAsset->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -386,6 +389,7 @@
 		  	$this->strDateModified = null;
 		  	$this->strDateModifiedFirst = null;
 		  	$this->strDateModifiedLast = null;
+		  	$this->blnAttachment = false;
 		  	if ($this->arrCustomFields) {
 		  		foreach ($this->arrCustomFields as $field) {
 		  			$field['value'] = null;
@@ -425,6 +429,7 @@
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
+			$this->blnAttachment = $this->ctlAdvanced->Attachment;
 			
 			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 			if ($this->arrCustomFields) {

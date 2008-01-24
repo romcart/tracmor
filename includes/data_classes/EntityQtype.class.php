@@ -84,6 +84,10 @@
 				case 10: $strToReturn = 'shipment';
 					break;
 				case 11: $strToReturn = 'receipt';
+					break;
+				
+				default:
+					throw new Exception('Not a valid EntityQtypeId.');
 			}
 			
 			return $strToReturn;

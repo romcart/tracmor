@@ -321,8 +321,8 @@
 				$this->btnCancel_Create();
 				$this->btnEdit_Create();
 				$this->btnDelete_Create();
-				$this->atcAttach_Create();
 			}
+			$this->atcAttach_Create();
 			
 			// Complete Shipment Buttons
 			$this->btnCompleteShipment_Create();
@@ -4051,8 +4051,8 @@
 			
 			if (!$this->objShipment->ShippedFlag) {
 				$this->btnEdit->Display = true;
-				$this->atcAttach->Display = true;
 			}
+			$this->atcAttach->Display = true;
 
 			// This is not necessary, because this method is only being called in EditMode
 			if ($this->blnEditMode) {

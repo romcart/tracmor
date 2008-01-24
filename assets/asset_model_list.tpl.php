@@ -60,8 +60,14 @@
 				<td style="vertical-align:top;" noWrap>
 					<?php $this->txtAssetModelCode->RenderWithNameLeft("Width=150") ?>
 				</td>	
-				
-				<td>&nbsp;</td>
+				<td>
+					<?php $this->lblAdvanced->Render(); ?>
+				</td>
+			</tr>
+			<tr>
+			  <td style="vertical-align:top;" colspan="5" nowrap>
+			  	<?php $this->ctlAdvanced->Render(); ?>
+			  </td>
 			</tr>
 		</table>		
 

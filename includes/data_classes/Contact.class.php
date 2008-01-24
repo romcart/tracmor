@@ -80,7 +80,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearch($strFirstName = null, $strLastName = null, $strCompany = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strFirstName = null, $strLastName = null, $strCompany = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			Contact::QueryHelper($objDatabase);
@@ -96,14 +96,16 @@
 				}
 			}
 			
-			$arrSearchSql = Contact::GenerateSearchSql($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
-			$arrCustomFieldSql = CustomField::GenerateSql(8);
+			$arrSearchSql = Contact::GenerateSearchSql($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Contact);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Contact);
 
 			$strQuery = sprintf('
 				SELECT
 					COUNT(contact.contact_id) AS row_count
 				FROM
 					`contact` AS `contact`
+					%s
 					%s
 					%s
 				WHERE
@@ -114,8 +116,9 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
-			$arrSearchSql['strFirstNameSql'], $arrSearchSql['strLastNameSql'], $arrSearchSql['strCompanySql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
+				  %s
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
+			$arrSearchSql['strFirstNameSql'], $arrSearchSql['strLastNameSql'], $arrSearchSql['strCompanySql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 			$arrSearchSql['strAuthorizationSql']);
 			
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -138,7 +141,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Contact[]
      */
-		public static function LoadArrayBySearch($strFirstName = null, $strLastName = null, $strCompany = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strFirstName = null, $strLastName = null, $strCompany = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			
 			Contact::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			
@@ -153,8 +156,9 @@
 				}
 			}
 					
-			$arrSearchSql = Contact::GenerateSearchSql($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
-			$arrCustomFieldSql = CustomField::GenerateSql(8);
+			$arrSearchSql = Contact::GenerateSearchSql($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Contact);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Contact);
 
 			$strQuery = sprintf('
 				SELECT
@@ -177,8 +181,10 @@
 					`contact`.`modified_date` AS `modified_date`
 					%s
 					%s
+					%s
 				FROM
 					`contact` AS `contact`
+					%s
 					%s
 					%s
 				WHERE
@@ -191,11 +197,13 @@
 				%s
 				%s
 				%s
+				%s
+				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'],
-				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
-				$arrSearchSql['strFirstNameSql'], $arrSearchSql['strLastNameSql'], $arrSearchSql['strCompanySql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
-				$arrSearchSql['strAuthorizationSql'],
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'],
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
+				$arrSearchSql['strFirstNameSql'], $arrSearchSql['strLastNameSql'], $arrSearchSql['strCompanySql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],
 				$strOrderBy, $strLimitSuffix);
 				
 				//echo($strQuery); exit;
@@ -205,9 +213,9 @@
 		}
 		
 		// Returns an array of SQL strings to be used in either the Count or Load BySearch queries
-	  protected static function GenerateSearchSql ($strFirstName, $strLastName = null, $strCompany = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strFirstName, $strLastName = null, $strCompany = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null) {
 
-	  	$arrSearchSql = array("strFirstNameSql" => "", "strLastNameSql" => "", "strCompanySql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
+	  	$arrSearchSql = array("strFirstNameSql" => "", "strLastNameSql" => "", "strCompanySql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAttachmentSql" => "", "strAuthorizationSql" => "");
 	  	
 			if ($strFirstName) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -241,6 +249,9 @@
 					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`contact`.`modified_date`) > %s", $strDateModifiedFirst);
 					$arrSearchSql['strDateModifiedSql'] .= sprintf("\nAND UNIX_TIMESTAMP(`contact`.`modified_date`) < %s", $strDateModifiedLast);
 				}
+			}
+			if ($blnAttachment) {
+				$arrSearchSql['strAttachmentSql'] = sprintf("AND attachment.attachment_id IS NOT NULL");
 			}
 			
 			if ($arrCustomFields) {

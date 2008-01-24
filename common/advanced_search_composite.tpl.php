@@ -38,15 +38,19 @@
 		$arrAdvancedSearchFields[] = array('name' => 'Tracking Number:', 'value' => $this->txtTrackingNumber->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Courier:', 'value' => $this->lstCourier->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Note:', 'value' => $this->txtNote->RenderWithError(false));
+		$arrAdvancedSearchFields[] = array('name' => 'Ship Date:', 'value' => $this->dtpShipmentDate->RenderWithError(false));
 	}
 	
 	if (get_class($this->objParentObject) == 'ReceiptListForm') {
 		$arrAdvancedSearchFields[] = array('name' => 'Note:', 'value' => $this->txtNote->RenderWithError(false));
+		$arrAdvancedSearchFields[] = array('name' => 'Date Due:', 'value' => $this->dtpDueDate->RenderWithError(false));
+		$arrAdvancedSearchFields[] = array('name' => 'Date Received:', 'value' => $this->dtpReceiptDate->RenderWithError(false));
 	}
 	
 	$arrAdvancedSearchFields[] = array('name' => 'Date Modified:',   'value' => $this->lstDateModified->RenderWithError(false));
 	$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->dtpDateModifiedFirst->RenderWithError(false));
 	$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->dtpDateModifiedLast->RenderWithError(false));
+	$arrAdvancedSearchFields[] = array('name' => 'Attachment(s)', 'value' => $this->chkAttachment->RenderWithError(false));
 	
 	// Custom Fields
 	if ($this->arrCustomFields) {

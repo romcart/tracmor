@@ -174,7 +174,7 @@
 			return QType::Cast($strDbRow[0], QType::Integer);			
 		}
 		
-		public static function CountBySearch($intCategoryId = null, $intManufacturerId = null, $strDescription = null, $strAssetModelCode = null, $objExpansionMap = null) {
+		public static function CountBySearch($intCategoryId = null, $intManufacturerId = null, $strDescription = null, $strAssetModelCode = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			AssetModel::QueryHelper($objDatabase);
@@ -190,13 +190,17 @@
 				}
 			}
 
-			$arrSearchSql = AssetModel::GenerateSearchSql($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode);
+			$arrSearchSql = AssetModel::GenerateSearchSql($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::AssetModel);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::AssetModel);
 
 			$strQuery = sprintf('
 				SELECT
 					COUNT(asset_model.asset_model_id) AS row_count
 				FROM
 					`asset_model` AS `asset_model`
+					%s
+					%s
 					%s
 				WHERE
 				  1=1
@@ -205,16 +209,20 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"),
-			$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'],
+				  %s
+				  %s
+				  %s
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrAttachmentSql['strFrom'], $arrCustomFieldSql['strFrom'],
+			$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
+			//echo($strQuery); exit;
 			$objDbResult = $objDatabase->Query($strQuery);
 			$strDbRow = $objDbResult->FetchRow();
 			return QType::Cast($strDbRow[0], QType::Integer);
 		}
 		
-		public static function LoadArrayBySearch($intCategoryId = null, $intManufacturerId = null, $strDescription = null, $strAssetModelCode = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($intCategoryId = null, $intManufacturerId = null, $strDescription = null, $strAssetModelCode = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			
 			AssetModel::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
@@ -228,9 +236,10 @@
 					throw $objExc;
 				}
 			}
-					
-			$arrSearchSql = AssetModel::GenerateSearchSql($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode);
-			$arrCustomFieldSql = CustomField::GenerateSql(4);
+			
+			$arrSearchSql = AssetModel::GenerateSearchSql($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::AssetModel);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::AssetModel);
 
 			$strQuery = sprintf('
 				SELECT
@@ -249,9 +258,11 @@
 					`asset_model`.`modified_date` AS `modified_date`
 					%s
 					%s
+					%s
 				FROM
 					`asset_model` AS `asset_model`
 					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5
+					%s
 					%s
 					%s
 				WHERE
@@ -261,24 +272,25 @@
 				%s
 				%s
 				%s
-				GROUP BY `asset_model_id`
+				%s
+				%s
 				%s
 				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
-				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], 
-				$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'],
-				$arrSearchSql['strAuthorizationSql'], 
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'], 
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],  
+				$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'], 
+				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],  
 				$strOrderBy, $strLimitSuffix);
-
+				
 			$objDbResult = $objDatabase->Query($strQuery);				
 			return AssetModel::InstantiateDbResult($objDbResult);			
 		
 		}		
 		
-	  protected static function GenerateSearchSql ($intCategoryId = null, $intManufacturerId = null, $strDescription = null, $strAssetModelCode = null) {
+	  protected static function GenerateSearchSql ($intCategoryId = null, $intManufacturerId = null, $strDescription = null, $strAssetModelCode = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null) {
 			
-			$arrSearchSql = array("strCategorySql" => "", "strManufacturerSql" => "", "strDescriptionSql" => "", "strAssetModelCodeSql" => "", "strAuthorizationSql" => "");
+			$arrSearchSql = array("strCategorySql" => "", "strManufacturerSql" => "", "strDescriptionSql" => "", "strAssetModelCodeSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAttachmentSql" => "", "strAuthorizationSql" => "");
 			
 			if ($intCategoryId) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -296,6 +308,31 @@
 			if ($strAssetModelCode) {
 				$strAssetModelCode = QApplication::$Database[1]->SqlVariable("%" . $strAssetModelCode . "%", false);
 				$arrSearchSql['strAssetModelCodeSql'] = "AND `asset_model`.`asset_model_code` LIKE $strAssetModelCode";
+			}
+			if ($blnAttachment) {
+				$arrSearchSql['strAttachmentSql'] = sprintf("AND attachment.attachment_id IS NOT NULL");
+			}
+			
+			if ($arrCustomFields) {
+				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchSql($arrCustomFields);
+			}
+			if ($strDateModified) {
+				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {
+					$strDateModifiedFirst = QApplication::$Database[1]->SqlVariable($strDateModifiedFirst->Timestamp, false);
+					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`asset_model`.`modified_date`) < %s", $strDateModifiedFirst);
+				}
+				elseif ($strDateModified == "after" && $strDateModifiedFirst instanceof QDateTime) {
+					$strDateModifiedFirst = QApplication::$Database[1]->SqlVariable($strDateModifiedFirst->Timestamp, false);
+					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`asset_model`.`modified_date`) > %s", $strDateModifiedFirst);
+				}
+				elseif ($strDateModified == "between" && $strDateModifiedFirst instanceof QDateTime && $strDateModifiedLast instanceof QDateTime) {
+					$strDateModifiedFirst = QApplication::$Database[1]->SqlVariable($strDateModifiedFirst->Timestamp, false);
+					// Added 86399 (23 hrs., 59 mins., 59 secs) because the After variable needs to include the date given
+					// When only a date is given, conversion to a timestamp assumes 12:00am 
+					$strDateModifiedLast = QApplication::$Database[1]->SqlVariable($strDateModifiedLast->Timestamp, false) + 86399;
+					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`asset_model`.`modified_date`) > %s", $strDateModifiedFirst);
+					$arrSearchSql['strDateModifiedSql'] .= sprintf("\nAND UNIX_TIMESTAMP(`asset_model`.`modified_date`) < %s", $strDateModifiedLast);
+				}
 			}
 			
 			// Generate Authorization SQL based on the QApplication::$objRoleModule

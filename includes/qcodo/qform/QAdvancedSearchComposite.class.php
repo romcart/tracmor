@@ -32,12 +32,17 @@ class QAdvancedSearchComposite extends QControl {
 	protected $txtTrackingNumber;
 	protected $lstCourier;
 	protected $txtNote;
+	protected $dtpShipmentDate;
+	protected $dtpDueDate;
+	protected $dtpReceiptDate;
+	protected $chkAttachment;
 	protected $lstDateModified;
 	protected $dtpDateModifiedFirst;
 	protected $dtpDateModifiedLast;
 	protected $strAssetModelCode;
 	protected $strTrackingNumber;
 	protected $strNote;
+	protected $blnAttachment;
 	protected $objCustomFieldArray;
 	protected $arrCustomFields;
 	protected $intEntityQtypeId;
@@ -68,13 +73,17 @@ class QAdvancedSearchComposite extends QControl {
 	    	$this->txtTrackingNumber_Create();
 	    	$this->lstCourier_Create();
 	    	$this->txtNote_Create();
+	    	$this->dtpShipmentDate_Create();
 	    }
 	    if ($objParentObject instanceof ReceiptListForm) {
 	    	$this->txtNote_Create();
+	    	$this->dtpDueDate_Create();
+	    	$this->dtpReceiptDate_Create();
 	    }
 	    $this->lstDateModified_Create();
       $this->dtpDateModifiedFirst_Create();
       $this->dtpDateModifiedLast_Create();
+      $this->chkAttachment_Create();
       $this->customFields_Create();
       
 	}
@@ -211,6 +220,13 @@ class QAdvancedSearchComposite extends QControl {
   	$this->txtNote->Visible = (get_class($this->objParentObject) == 'ShipmentListForm' || get_class($this->objParentObject) == 'ReceiptListForm') ? true : false;
   }
   
+  protected function chkAttachment_Create() {
+  	$this->chkAttachment = new QCheckBox($this);
+  	$this->chkAttachment->Name = 'Attachment(s)';
+  	$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+  	$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  }
+  
   protected function dtpDateModifiedFirst_Create() {
   	$this->dtpDateModifiedFirst = new QDateTimePicker($this);
   	$this->dtpDateModifiedFirst->Name = '';
@@ -238,6 +254,27 @@ class QAdvancedSearchComposite extends QControl {
 		$this->lstDateModified->AddItem('Between', 'between');
 		$this->lstDateModified->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstDateModified_Select'));
 	}
+	
+	protected function dtpShipmentDate_Create() {
+  	$this->dtpShipmentDate = new QDateTimePicker($this);
+  	$this->dtpShipmentDate->Name = '';
+  	$this->dtpShipmentDate->DateTimePickerType = QDateTimePickerType::Date;
+  	$this->dtpShipmentDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+  }
+  
+  protected function dtpDueDate_Create() {
+  	$this->dtpDueDate = new QDateTimePicker($this);
+  	$this->dtpDueDate->Name = '';
+  	$this->dtpDueDate->DateTimePickerType = QDateTimePickerType::Date;
+  	$this->dtpDueDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+  }
+  
+  protected function dtpReceiptDate_Create() {
+  	$this->dtpReceiptDate = new QDateTimePicker($this);
+  	$this->dtpReceiptDate->Name = '';
+  	$this->dtpReceiptDate->DateTimePickerType = QDateTimePickerType::Date;
+  	$this->dtpReceiptDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+  }
 	
 	protected function customFields_Create() {
 		
@@ -287,6 +324,7 @@ class QAdvancedSearchComposite extends QControl {
 		$this->dtpDateModifiedLast->DateTime = new QDateTime(QDateTime::Now);
 		$this->dtpDateModifiedFirst->Enabled = false;
 		$this->dtpDateModifiedLast->Enabled = false;
+		$this->chkAttachment->Checked = false;
 		foreach ($this->arrCustomFields as $field) {
 			if ($field['input'] instanceof QTextBox) {
 				$field['input']->Text = '';
@@ -316,11 +354,19 @@ class QAdvancedSearchComposite extends QControl {
 				break;
 			case "Note": return $this->txtNote->Text;
 				break;
+			case "ShipmentDate": return $this->dtpShipmentDate->DateTime;
+				break;
+			case "DueDate": return $this->dtpDueDate->DateTime;
+				break;
+			case "ReceiptDate": return $this->dtpReceiptDate->DateTime;
+				break;
 			case "DateModified": return $this->lstDateModified->SelectedValue;
 				break;
 			case "DateModifiedFirst": return $this->dtpDateModifiedFirst->DateTime;
 				break;
 			case "DateModifiedLast": return $this->dtpDateModifiedLast->DateTime;
+				break;
+			case "Attachment": return $this->chkAttachment->Checked;
 				break;
 			case "CustomFieldArray": return $this->arrCustomFields;
 				break;

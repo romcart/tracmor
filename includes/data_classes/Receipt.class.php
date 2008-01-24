@@ -269,7 +269,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */		
-		public static function CountBySearch($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $strDueDate = null, $strReceiptDate = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			Receipt::QueryHelper($objDatabase);
@@ -285,14 +285,16 @@
 				}
 			}
 			
-			$arrSearchSql = Receipt::GenerateSearchSql($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
-			$arrCustomFieldSql = CustomField::GenerateSql(11);
+			$arrSearchSql = Receipt::GenerateSearchSql($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDueDate, $strReceiptDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Receipt);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Receipt);
 
 			$strQuery = sprintf('
 				SELECT
 					COUNT(DISTINCT receipt.receipt_id) AS row_count
 				FROM
 					`receipt` AS `receipt`
+					%s
 					%s
 					%s
 					%s
@@ -309,8 +311,11 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'],
-			$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
+				  %s
+				  %s
+				  %s
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
+			$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strDueDateSql'], $arrSearchSql['strReceiptDateSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 			$arrSearchSql['strAuthorizationSql']);
 			
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -337,7 +342,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Receipt[]
      */
-		public static function LoadArrayBySearch($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $strDueDate = null, $strReceiptDate = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			
 			Receipt::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			
@@ -352,8 +357,9 @@
 				}
 			}
 					
-			$arrSearchSql = Receipt::GenerateSearchSql($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
-			$arrCustomFieldSql = CustomField::GenerateSql(11);
+			$arrSearchSql = Receipt::GenerateSearchSql($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDueDate, $strReceiptDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Receipt);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Receipt);
 
 			$strQuery = sprintf('
 				SELECT
@@ -375,8 +381,10 @@
 					`receipt`.`modified_date` AS `modified_date`
 					%s
 					%s
+					%s
 				FROM
 					`receipt` AS `receipt`
+					%s
 					%s
 					%s
 					%s
@@ -395,11 +403,15 @@
 				%s
 				%s
 				%s
+				%s
+				%s
+				%s
+				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'],
-				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'],
-				$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
-				$arrSearchSql['strAuthorizationSql'],
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'],
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
+				$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strDueDateSql'], $arrSearchSql['strReceiptDateSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],
 				$strOrderBy, $strLimitSuffix);
 				
 				//echo($strQuery); exit;
@@ -409,9 +421,9 @@
 		}
 		
 		// Returns an array of SQL strings to be used in either the Count or Load BySearch queries
-	  protected static function GenerateSearchSql ($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strFromCompany = null, $strFromContact = null, $strReceiptNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strNote = null, $strDueDate = null, $strReceiptDate = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null) {
 
-	  	$arrSearchSql = array("strFromCompanySql" => "", "strFromContactSql" => "", "strReceiptNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strNoteSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
+	  	$arrSearchSql = array("strFromCompanySql" => "", "strFromContactSql" => "", "strReceiptNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strNoteSql" => "", "strDueDateSql" => "", "strReceiptDateSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAttachmentSql" => "", "strAuthorizationSql" => "");
 	  	
 			if ($strFromCompany) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -458,6 +470,14 @@
 				$strNote = QApplication::$Database[1]->SqlVariable("%" . $strNote . "%", false);
 				$arrSearchSql['strNoteSql'] = "AND `note` LIKE $strNote";
 			}
+			if ($strDueDate) {
+				$strDueDate = QApplication::$Database[1]->SqlVariable($strDueDate, false);
+				$arrSearchSql['strDueDateSql'] = sprintf("AND `receipt`.`due_date` = %s", $strDueDate);
+			}
+			if ($strReceiptDate) {
+				$strReceiptDate = QApplication::$Database[1]->SqlVariable($strReceiptDate, false);
+				$arrSearchSql['strReceiptDateSql'] = sprintf("AND `receipt`.`receipt_date` = %s", $strReceiptDate);
+			}
 			if ($strDateModified) {
 				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {
 					$strDateModifiedFirst = QApplication::$Database[1]->SqlVariable($strDateModifiedFirst->Timestamp, false);
@@ -476,6 +496,10 @@
 					$arrSearchSql['strDateModifiedSql'] .= sprintf("\nAND UNIX_TIMESTAMP(`receipt`.`modified_date`) < %s", $strDateModifiedLast);
 				}
 			}
+			if ($blnAttachment) {
+				$arrSearchSql['strAttachmentSql'] = sprintf("AND attachment.attachment_id IS NOT NULL");
+			}
+			
 			if ($arrCustomFields) {
 				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchSql($arrCustomFields);
 			}

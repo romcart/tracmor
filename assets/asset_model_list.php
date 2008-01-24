@@ -43,12 +43,20 @@
 		protected $ctlHeaderMenu;
 		
 		// Shortcut Menu
-		protected $ctlShortcutMenu;		
+		protected $ctlShortcutMenu;
+		
+		// Advanced Label/Link
+		protected $lblAdvanced;
+		// Boolean that toggles Advanced Search display
+		protected $blnAdvanced;
+		// Advanced Search Composite control
+		protected $ctlAdvanced;
 		
 		protected $lstCategory;
 		protected $lstManufacturer;
 		protected $txtDescription;
 		protected $txtAssetModelCode;
+		protected $arrCustomFields;
 		protected $btnSearch;
 		protected $btnClear;
 		protected $blnSearch;
@@ -56,6 +64,10 @@
 		protected $intManufacturerId;
 		protected $strDescription;
 		protected $strAssetModelCode;
+		protected $strDateModified;
+		protected $strDateModifiedFirst;
+		protected $strDateModifiedLast;
+		protected $blnAttachment;
 
 		protected function Form_Create() {
 			
@@ -82,6 +94,7 @@
       $this->dtgAssetModel->Paginator = $objPaginator;
       $this->dtgAssetModel->ItemsPerPage = 20;
       
+      $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Assets', '<?= $_ITEM->__toStringWithAssetCountLink($_ITEM,"bluelink"); ?>', 'SortByCommand="asset_count ASC"', 'ReverseSortByCommand="asset_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Name', '<?= $_ITEM->__toStringWithLink($_ITEM,"bluelink"); ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Category', '<?= $_FORM->dtgAssetModel_Category_Render($_ITEM); ?>', 'SortByCommand="asset_model__category_id__short_description ASC"', 'ReverseSortByCommand="asset_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
@@ -89,14 +102,14 @@
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?= htmlentities(QString::Truncate($_ITEM->AssetModelCode, 200)); ?>', 'FontBold=true', 'SortByCommand="asset_model_code ASC"', 'ReverseSortByCommand="asset_model_code DESC"', 'CssClass="dtg_column"'));
       
       // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
-      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(4, false);
+      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::AssetModel, false);
       if ($objCustomFieldArray) {
       	foreach ($objCustomFieldArray as $objCustomField) {
       		$this->dtgAssetModel->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
       	}
       }
       
-      $this->dtgAssetModel->SortColumnIndex = 1;
+      $this->dtgAssetModel->SortColumnIndex = 2;
     	$this->dtgAssetModel->SortDirection = 0;
       
       $objStyle = $this->dtgAssetModel->RowStyle;
@@ -120,6 +133,8 @@
       $this->txtAssetModelCode_Create();
       $this->btnSearch_Create();
       $this->btnClear_Create();
+      $this->ctlAdvanced_Create();
+      $this->lblAdvanced_Create();
   	}
 
 		protected function dtgAssetModel_Bind() {
@@ -131,15 +146,20 @@
 			$intCategoryId = $this->intCategoryId;
 			$intManufacturerId = $this->intManufacturerId;
 			$strDescription = $this->strDescription;
-			$strAssetModelCode = $this->strAssetModelCode;			
+			$strAssetModelCode = $this->strAssetModelCode;
+			$arrCustomFields = $this->arrCustomFields;
+			$strDateModifiedFirst = $this->strDateModifiedFirst;
+			$strDateModifiedLast = $this->strDateModifiedLast;
+			$strDateModified = $this->strDateModified;
+			$blnAttachment = $this->blnAttachment;
 			
       $objExpansionMap[AssetModel::ExpandCategory] = true;
       $objExpansionMap[AssetModel::ExpandManufacturer] = true;
       
       // If the search form has been posted
       // if ($intCategoryId || $intManufacturerId || $strDescription || $strAssetModelCode) {
-    	$this->dtgAssetModel->TotalItemCount = AssetModel::CountBySearch($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $objExpansionMap);
-			$this->dtgAssetModel->DataSource = AssetModel::LoadArrayBySearch($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $this->dtgAssetModel->SortInfo, $this->dtgAssetModel->LimitInfo, $objExpansionMap);
+    	$this->dtgAssetModel->TotalItemCount = AssetModel::CountBySearch($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
+			$this->dtgAssetModel->DataSource = AssetModel::LoadArrayBySearch($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAssetModel->SortInfo, $this->dtgAssetModel->LimitInfo, $objExpansionMap);
 			$this->blnSearch = false;
     }
 
@@ -151,7 +171,12 @@
   	// Create and Setp the Shortcut Menu Composite Control
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
-  	}  	
+  	}
+  	
+  	protected function ctlAdvanced_Create() {
+  		$this->ctlAdvanced = new QAdvancedSearchComposite($this, EntityQtype::AssetModel);
+  		$this->ctlAdvanced->Display = false;
+  	}
 
   	protected function lstCategory_Create() {
 	  	$this->lstCategory = new QListBox($this);
@@ -209,7 +234,17 @@
 			$this->btnClear->AddAction(new QClickEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }	  
+	  }	
+	  
+	  protected function lblAdvanced_Create() {
+	  	$this->lblAdvanced = new QLabel($this);
+	  	$this->lblAdvanced->Name = 'Advanced';
+	  	$this->lblAdvanced->Text = 'Advanced Search';
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
+	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
+	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
+	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
+	  }
 	  
 	  protected function btnSearch_Click() {
 	  	$this->blnSearch = true;
@@ -222,17 +257,63 @@
 	  	$this->lstManufacturer->SelectedIndex = 0;
 	  	$this->txtDescription->Text = '';
 	  	$this->txtAssetModelCode->Text = '';
+	  	$this->ctlAdvanced->ClearControls();
+	  	
+	  	$this->intCategoryId = null;
+	  	$this->intManufacturerId = null;
+	  	$this->strDescription = null;
+	  	$this->strAssetModelCode = null;
+	  	$this->strDateModified = null;
+	  	$this->strDateModifiedFirst = null;
+	  	$this->strDateModifiedLast = null;
+	  	$this->blnAttachment = false;
+	  	if ($this->arrCustomFields) {
+		  		foreach ($this->arrCustomFields as $field) {
+		  			$field['value'] = null;
+		  		}
+		  	}
 	  	
 	  	// Assign the class variables the null values
 			$this->assignSearchValues();
 			$this->dtgAssetModel->PageNumber = 1;			
 	  }
 	  
+	  protected function lblAdvanced_Click() {
+	  	if ($this->blnAdvanced) {
+	  		
+	  		$this->blnAdvanced = false;
+	  		$this->lblAdvanced->Text = 'Advanced Search';
+	  		
+	  		$this->ctlAdvanced->ClearControls();
+	  		
+	  	}
+	  	else {
+	  		$this->blnAdvanced = true;
+	  		$this->lblAdvanced->Text = 'Hide Advanced';
+	  	}
+	  }
+	  
 	  protected function assignSearchValues() {
 			$this->intCategoryId = $this->lstCategory->SelectedValue;
 			$this->intManufacturerId = $this->lstManufacturer->SelectedValue;
 			$this->strDescription = $this->txtDescription->Text;
-			$this->strAssetModelCode = $this->txtAssetModelCode->Text;		  	
+			$this->strAssetModelCode = $this->txtAssetModelCode->Text;
+			$this->strDateModified = $this->ctlAdvanced->DateModified;
+			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
+			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
+			$this->blnAttachment = $this->ctlAdvanced->Attachment;
+			
+			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
+			if ($this->arrCustomFields) {
+				foreach ($this->arrCustomFields as &$field) {
+					if ($field['input'] instanceof QListBox) {
+						$field['value'] = $field['input']->SelectedValue;
+					}
+					elseif ($field['input'] instanceof QTextBox) {
+						$field['value'] = $field['input']->Text;
+					}
+				}
+			}
 	  }
 	}
 

@@ -310,7 +310,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearch($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $strShipmentDate = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			Shipment::QueryHelper($objDatabase);
@@ -326,14 +326,16 @@
 				}
 			}
 			
-			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
-			$arrCustomFieldSql = CustomField::GenerateSql(10);
+			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strShipmentDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Shipment);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Shipment);
 
 			$strQuery = sprintf('
 				SELECT
 					COUNT(DISTINCT shipment.shipment_id) AS row_count
 				FROM
 					`shipment` AS `shipment`
+					%s
 					%s
 					%s
 					%s
@@ -354,8 +356,10 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'],  $arrCustomFieldSql['strFrom'],
-			$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
+				  %s
+				  %s
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'], 
+			$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strShipmentDateSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 			$arrSearchSql['strAuthorizationSql']);
 			
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -386,7 +390,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Shipment[]
      */
-		public static function LoadArrayBySearch($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $strShipmentDate = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 
 			Shipment::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			// Setup QueryExpansion
@@ -400,8 +404,9 @@
 				}
 			}
 					
-			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
-			$arrCustomFieldSql = CustomField::GenerateSql(10);
+			$arrSearchSql = Shipment::GenerateSearchSql($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strShipmentDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Shipment);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Shipment);
 
 			$strQuery = sprintf('
 				SELECT
@@ -426,8 +431,10 @@
 					`shipment`.`modified_date` AS `modified_date`
 					%s
 					%s
+					%s
 				FROM
 					`shipment` AS `shipment`
+					%s
 					%s
 					%s
 					%s
@@ -450,11 +457,14 @@
 				%s
 				%s
 				%s
+				%s
+				%s
+				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'],
-				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'],
-				$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'],
-				$arrSearchSql['strAuthorizationSql'],
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'],
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
+				$arrSearchSql['strToCompanySql'], $arrSearchSql['strToContactSql'], $arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strShipmentNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strTrackingNumberSql'], $arrSearchSql['strCourierSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strShipmentDateSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],
 				$strOrderBy, $strLimitSuffix);
 				
 			$objDbResult = $objDatabase->Query($strQuery);				
@@ -462,9 +472,9 @@
 		}
 		
 		// Returns an array of SQL strings to be used in either the Count or Load BySearch queries
-	  protected static function GenerateSearchSql ($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strToCompany = null, $strToContact = null, $strFromCompany = null, $strFromContact = null, $strShipmentNumber = null, $strAssetCode = null, $strInventoryModelCode = null, $intStatus = null, $strTrackingNumber = null, $intCourierId = null, $strNote = null, $strShipmentDate = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null) {
 
-	  	$arrSearchSql = array("strToCompanySql" => "", "strToContactSql" => "", "strFromCompanySql" => "", "strFromContactSql" => "", "strShipmentNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strTrackingNumberSql" => "", "strCourierSql" => "", "strNoteSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "");
+	  	$arrSearchSql = array("strToCompanySql" => "", "strToContactSql" => "", "strFromCompanySql" => "", "strFromContactSql" => "", "strShipmentNumberSql" => "","strAssetCodeFromSql" => "", "strAssetCodeSql" => "","strInventoryModelCodeFromSql" => "", "strInventoryModelCodeSql" => "", "strStatusSql" => "", "strTrackingNumberSql" => "", "strCourierSql" => "", "strNoteSql" => "", "strShipmentDateSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAttachmentSql" => "");
 	  	
 			if ($strToCompany) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -532,6 +542,10 @@
 				$strNote = QApplication::$Database[1]->SqlVariable("%" . $strNote . "%", false);
 				$arrSearchSql['strNoteSql'] = "AND `note` LIKE $strNote";
 			}
+			if ($strShipmentDate instanceof DateTime) {
+				$strShipmentDate = QApplication::$Database[1]->SqlVariable($strShipmentDate, false);
+				$arrSearchSql['strShipmentDateSql'] = sprintf("AND `shipment`.`ship_date` = %s", $strShipmentDate);
+			}
 			if ($strDateModified) {
 				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {
 					$strDateModifiedFirst = QApplication::$Database[1]->SqlVariable($strDateModifiedFirst->Timestamp, false);
@@ -549,6 +563,9 @@
 					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`shipment`.`modified_date`) > %s", $strDateModifiedFirst);
 					$arrSearchSql['strDateModifiedSql'] .= sprintf("\nAND UNIX_TIMESTAMP(`shipment`.`modified_date`) < %s", $strDateModifiedLast);
 				}
+			}
+			if ($blnAttachment) {
+				$arrSearchSql['strAttachmentSql'] = sprintf("AND attachment.attachment_id IS NOT NULL");
 			}
 			
 			if ($arrCustomFields) {

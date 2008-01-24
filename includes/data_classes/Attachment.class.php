@@ -47,6 +47,22 @@
 			return sprintf('Attachment Object %s',  $this->intAttachmentId);
 		}
 		
+		public static function toStringIcon($intAttachmentCount) {
+			if ($intAttachmentCount > 0) {
+				if ($intAttachmentCount > 1) {
+					$strToReturn = sprintf('<img src="../images/icons/attachment_gray.gif" title="%s Attachments" alt="%s Attachments">', $intAttachmentCount, $intAttachmentCount);
+				}
+				else {
+					$strToReturn = sprintf('<img src="../images/icons/attachment_gray.gif" title="%s Attachment" alt="%s Attachment">', $intAttachmentCount, $intAttachmentCount);
+				}
+			}
+			else {
+				$strToReturn = '';
+			}
+			
+			return $strToReturn;
+		}
+		
 		// This adds the created by and creation date before saving a new asset
 		public function Save($blnForceInsert = false, $blnForceUpdate = false) {
 			if ((!$this->__blnRestored) || ($blnForceInsert)) {
@@ -78,6 +94,23 @@
 				$objOptionalClauses
 			);
 		}
+		
+		/**
+		 * Generate the SQL for a list page to include attachments as virtual attributes (add __ before an alias to make a virutal attribute)
+		 * The virtual attributes can then be accessed by $objAsset->GetVirtualAttribute('name_of_attribute') where the name doesn't include the __
+		 * This method was added so that attachments can be added to the customizable datagrids
+		 *
+		 * @param integer $intEntityQtypeId
+		 * @return array $arrAttachmentSql - with three elements: strSelect, strFrom, and strGroupBy which are to be included in a SQL statement
+		 */
+		public static function GenerateSql($intEntityQtypeId) {
+			$arrAttachmentSql = array();
+			$arrAttachmentSql['strSelect'] = ', COUNT(`attachment`.`attachment_id`) AS `__attachment_count`';
+			$arrAttachmentSql['strFrom'] = sprintf('LEFT JOIN `attachment` ON (`attachment`.`entity_qtype_id` = %s AND `attachment`.`entity_id` = %s)', $intEntityQtypeId, EntityQtype::ToStringPrimaryKeySql($intEntityQtypeId));
+			$arrAttachmentSql['strGroupBy'] = sprintf('GROUP BY %s', EntityQtype::ToStringPrimaryKeySql($intEntityQtypeId));
+			
+			return $arrAttachmentSql;
+		}		
 
 		// Override or Create New Load/Count methods
 		// (For obvious reasons, these methods are commented out...

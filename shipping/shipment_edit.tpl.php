@@ -68,6 +68,7 @@
 						$this->btnCancel->RenderWithError();
 					}
 					else {
+						$this->atcAttach->RenderWithError();
 						echo('&nbsp;');
 						$this->btnCancelCompleteShipment->RenderWithError();
 					}

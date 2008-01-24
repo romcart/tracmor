@@ -75,6 +75,7 @@
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
+		protected $blnAttachment;
 		
 		protected function Form_Create() {
 			
@@ -101,6 +102,7 @@
       $this->dtgInventoryModel->Paginator = $objPaginator;
       $this->dtgInventoryModel->ItemsPerPage = 20;
           
+      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Inventory Code', '<?= $_ITEM->__toStringWithLink("bluelink"); ?>', 'SortByCommand="inventory_model_code ASC"', 'ReverseSortByCommand="inventory_model_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM->ShortDescription ?>', 'Width=200', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->Category->__toString(); ?>', 'SortByCommand="inventory_model__category_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
@@ -160,24 +162,24 @@
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
+			$blnAttachment = $this->blnAttachment;
 			$arrCustomFields = $this->arrCustomFields;
 					
 			// Enable Profiling
       // QApplication::$Database[1]->EnableProfiling();
-      
 
       // Expand the Asset object to include the AssetModel, Category, Manufacturer, and Location Objects
       $objExpansionMap[InventoryModel::ExpandCategory] = true;
       $objExpansionMap[InventoryModel::ExpandManufacturer] = true;
 
       // If the search form has been posted
-			$this->dtgInventoryModel->TotalItemCount = InventoryModel::CountBySearch($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgInventoryModel->TotalItemCount = InventoryModel::CountBySearch($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgInventoryModel->TotalItemCount == 0) {
 				$this->dtgInventoryModel->ShowHeader = false;
 			}
 			else {
 				$this->dtgInventoryModel->ShowHeader = true;
-				$this->dtgInventoryModel->DataSource = InventoryModel::LoadArrayBySearch($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgInventoryModel->SortInfo, $this->dtgInventoryModel->LimitInfo, $objExpansionMap);
+				$this->dtgInventoryModel->DataSource = InventoryModel::LoadArrayBySearch($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgInventoryModel->SortInfo, $this->dtgInventoryModel->LimitInfo, $objExpansionMap);
 			}
 			$this->blnSearch = false;
     }  	
@@ -300,6 +302,7 @@
 	  	$this->strDateModified = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
+	  	$this->blnAttachment = false;
 	  	if ($this->arrCustomFields) {
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
@@ -333,6 +336,7 @@
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
+			$this->blnAttachment = $this->ctlAdvanced->Attachment;
 			
 			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 			if ($this->arrCustomFields) {

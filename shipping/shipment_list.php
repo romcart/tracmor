@@ -77,9 +77,11 @@
 		protected $strTrackingNumber;
 		protected $intCourierId;
 		protected $strNote;
+		protected $strShipmentDate;
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
+		protected $blnAttachment;
 		
 		// Custom Fields array
 		protected $arrCustomFields;
@@ -127,9 +129,11 @@
 			$strTrackingNumber = $this->strTrackingNumber;
 			$intCourierId = $this->intCourierId;
 			$strNote = $this->strNote;
+			$strShipmentDate = $this->strShipmentDate;
 			$strDateModifiedFirst = $this->strDateModifiedFirst;
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
+			$blnAttachment = $this->blnAttachment;
 			$arrCustomFields = $this->arrCustomFields;
 			
 			// Expand to include the primary address, State/Province, and Country
@@ -145,12 +149,12 @@
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $objExpansionMap);
+			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strShipmentDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgShipment->TotalItemCount == 0) {
 				$this->dtgShipment->ShowHeader = false;
 			}
 			else {
-				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote,  $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
+				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strShipmentDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
 				$this->dtgShipment->ShowHeader = true;
 			}
 			$this->blnSearch = false;
@@ -278,6 +282,7 @@
       $this->dtgShipment->Paginator = $objPaginator;
       $this->dtgShipment->ItemsPerPage = 20;
           
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Shipment Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="shipment_number ASC"', 'ReverseSortByCommand="shipment_number DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship Date', '<?= $_ITEM->ShipDate->__toString(); ?>', 'SortByCommand="ship_date ASC"', 'ReverseSortByCommand="ship_date DESC"', 'CssClass="dtg_column"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship to Company', '<?= $_ITEM->ToCompany->__toString() ?>', 'Width=200', 'SortByCommand="shipment__to_company_id__short_description ASC"', 'ReverseSortByCommand="shipment__to_company_id__short_description DESC"', 'CssClass="dtg_column"'));
@@ -300,7 +305,7 @@
       	}
       }
       
-      $this->dtgShipment->SortColumnIndex = 0;
+      $this->dtgShipment->SortColumnIndex = 1;
     	$this->dtgShipment->SortDirection = 1;
       
       $objStyle = $this->dtgShipment->RowStyle;
@@ -347,9 +352,11 @@
 	  	$this->strTrackingNumber = null;
 	  	$this->intCourierId = null;
 	  	$this->strNote = null;
+	  	$this->strShipmentDate = null;
 	  	$this->strDateModified = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
+	  	$this->blnAttachment = false;
 	  	if ($this->arrCustomFields) {
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
@@ -386,9 +393,11 @@
 	  	$this->strTrackingNumber = $this->ctlAdvanced->TrackingNumber;
 	  	$this->intCourierId = $this->ctlAdvanced->CourierId;
 	  	$this->strNote = $this->ctlAdvanced->Note;
+	  	$this->strShipmentDate = $this->ctlAdvanced->ShipmentDate;
 			$this->strDateModified = $this->ctlAdvanced->DateModified;
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
+			$this->blnAttachment = $this->ctlAdvanced->Attachment;
 			
 			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 			if ($this->arrCustomFields) {

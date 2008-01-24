@@ -163,7 +163,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearch($strInventoryModelCode = null, $intLocationId = null, $intInventoryModelId = null, $intCategoryId = null, $intManufacturerId = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $objExpansionMap = null) {
+		public static function CountBySearch($strInventoryModelCode = null, $intLocationId = null, $intInventoryModelId = null, $intCategoryId = null, $intManufacturerId = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null) {
 		
 			// Call to QueryHelper to Get the Database Object		
 			InventoryModel::QueryHelper($objDatabase);
@@ -179,8 +179,9 @@
 				}
 			}
 
-			$strSearchSql = InventoryModel::GenerateSearchSql($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
-			$arrCustomFieldSql = CustomField::GenerateSql(2);
+			$arrSearchSql = InventoryModel::GenerateSearchSql($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Inventory);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Inventory);
 
 			$strQuery = sprintf('
 				SELECT
@@ -188,6 +189,7 @@
 				FROM
 					`inventory_model` AS `inventory_model`
 					LEFT JOIN `inventory_location` AS `inventory_location` ON `inventory_model` . `inventory_model_id` = `inventory_location` . `inventory_model_id`
+					%s
 					%s
 					%s
 				WHERE
@@ -201,9 +203,10 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
-			$strSearchSql['strInventoryModelCodeSql'], $strSearchSql['strLocationSql'], $strSearchSql['strInventoryModelSql'], $strSearchSql['strCategorySql'], $strSearchSql['strManufacturerSql'], $strSearchSql['strShortDescriptionSql'], $strSearchSql['strCustomFieldsSql'], $strSearchSql['strDateModifiedSql'],
-			$strSearchSql['strAuthorizationSql']);
+				  %s
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
+			$arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strInventoryModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+			$arrSearchSql['strAuthorizationSql']);
 			
 			$objDbResult = $objDatabase->Query($strQuery);
 			$strDbRow = $objDbResult->FetchRow();
@@ -227,7 +230,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return InventoryModel[]
      */
-		public static function LoadArrayBySearch($strInventoryModelCode = null, $intLocationId = null, $intInventoryModelId = null, $intCategoryId = null, $intManufacturerId = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($strInventoryModelCode = null, $intLocationId = null, $intInventoryModelId = null, $intCategoryId = null, $intManufacturerId = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 			
 			InventoryModel::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 			
@@ -242,8 +245,9 @@
 				}
 			}
 					
-			$strSearchSql = InventoryModel::GenerateSearchSql($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast);
-			$arrCustomFieldSql = CustomField::GenerateSql(2);
+			$arrSearchSql = InventoryModel::GenerateSearchSql($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Inventory);
+			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Inventory);
 
 			$strQuery = sprintf('
 				SELECT
@@ -263,9 +267,11 @@
 					`inventory_model`.`modified_date` AS `modified_date`
 					%s
 					%s
+					%s
 				FROM
 					`inventory_model` AS `inventory_model`
 					LEFT JOIN `inventory_location` AS `inventory_location` ON `inventory_model` . `inventory_model_id` = `inventory_location` . `inventory_model_id`
+					%s
 					%s
 					%s
 				WHERE
@@ -279,14 +285,15 @@
 				%s
 				%s
 				%s
-				GROUP BY `inventory_model_id`
+				%s
+				%s
 				%s
 				%s
 			', $strLimitPrefix,
-				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], 
-				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'],
-				$strSearchSql['strInventoryModelCodeSql'], $strSearchSql['strLocationSql'], $strSearchSql['strInventoryModelSql'], $strSearchSql['strCategorySql'], $strSearchSql['strManufacturerSql'], $strSearchSql['strShortDescriptionSql'], $strSearchSql['strCustomFieldsSql'], $strSearchSql['strDateModifiedSql'],
-				$strSearchSql['strAuthorizationSql'],
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'],
+				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
+				$arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strInventoryModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],
 				$strOrderBy, $strLimitSuffix);
 				
 			$objDbResult = $objDatabase->Query($strQuery);				
@@ -347,10 +354,10 @@
 		 * @param string $strShortDescription
 		 * @return array with seven keys, strInventoryModelCodeSql, strLocationSql, strInventoryModelSql, strCategorySql, strManufacturerSql, strShortDescriptionSql
 		 */
-	  protected static function GenerateSearchSql ($strInventoryModelCode = null, $intLocationId = null, $intInventoryModelId = null, $intCategoryId = null, $intManufacturerId = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null) {
+	  protected static function GenerateSearchSql ($strInventoryModelCode = null, $intLocationId = null, $intInventoryModelId = null, $intCategoryId = null, $intManufacturerId = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null) {
 			
 	  	// Define all indexes for the array to be returned
-			$arrSearchSql = array("strInventoryModelCodeSql" => "", "strLocationSql" => "", "strLocationsFromSql" => "", "strInventoryModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "");
+			$arrSearchSql = array("strInventoryModelCodeSql" => "", "strLocationSql" => "", "strLocationsFromSql" => "", "strInventoryModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAttachmentSql" => "", "strAuthorizationSql" => "");
 
 			if ($strInventoryModelCode) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()		
@@ -396,7 +403,11 @@
 					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`inventory_model`.`modified_date`) > %s", $strDateModifiedFirst);
 					$arrSearchSql['strDateModifiedSql'] .= sprintf("\nAND UNIX_TIMESTAMP(`inventory_model`.`modified_date`) < %s", $strDateModifiedLast);
 				}
-			}			
+			}
+			
+			if ($blnAttachment) {
+				$arrSearchSql['strAttachmentSql'] = sprintf("AND attachment.attachment_id IS NOT NULL");
+			}
 			
 			if ($arrCustomFields) {
 				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchSql($arrCustomFields);
