@@ -42,7 +42,8 @@
 					$strName = $objColumn->Name;
 
 					if ($intColumnIndex == $this->intSortColumnIndex) {
-						$strName = strtoupper($strName);
+						//$strName = strtoupper($strName);
+						$strName = sprintf('<span style="text-transform: uppercase;">%s</span>', $strName);
 						if ($this->intSortDirection == 0)
 							$strArrowImage = sprintf(' <img src="%s/sort_arrow.png" width="7" height="7" alt="Sorted" />', __VIRTUAL_DIRECTORY__ . __IMAGE_ASSETS__);
 						else
