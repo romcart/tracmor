@@ -362,7 +362,7 @@ class QInventoryTransactComposite extends QControl {
 			}
 		}
 		
-		if (!$blnError && !QApplication::AuthorizeEntityBoolean($objNewInventoryModel, 2)) {
+		if (!$blnError && isset($objNewInventoryModel) && !QApplication::AuthorizeEntityBoolean($objNewInventoryModel, 2)) {
 			$blnError = true;
 			$this->txtNewInventoryModelCode->Warning = "You do not have authorization to perform a transaction on this inventory model.";
 		}
