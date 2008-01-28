@@ -163,7 +163,7 @@
 		// Create and Setup txtFromCompany
 		protected function txtFromCompany_Create() {
 			$this->txtFromCompany = new QTextBox($this);
-			$this->txtFromCompany->Name = 'From Company';
+			$this->txtFromCompany->Name = 'Sender Company';
 			$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
@@ -171,7 +171,7 @@
 		// Create and Setup txtFromContact
 		protected function txtFromContact_Create() {
 			$this->txtFromContact = new QTextBox($this);
-			$this->txtFromContact->Name = 'From Contact';
+			$this->txtFromContact->Name = 'Sender Contact';
 			$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}

@@ -176,14 +176,14 @@
 		
 		protected function txtToCompany_Create() {
 			$this->txtToCompany = new QTextBox($this);
-			$this->txtToCompany->Name = 'Ship to Company';
+			$this->txtToCompany->Name = 'Recipient Company';
 			$this->txtToCompany->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtToCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 		
 		protected function txtToContact_Create() {
 			$this->txtToContact = new QTextBox($this);
-			$this->txtToContact->Name = 'Ship to Contact';
+			$this->txtToContact->Name = 'Recipient Contact';
 			$this->txtToContact->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtToContact->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}	
@@ -285,12 +285,12 @@
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Shipment Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="shipment_number ASC"', 'ReverseSortByCommand="shipment_number DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship Date', '<?= $_ITEM->ShipDate->__toString(); ?>', 'SortByCommand="ship_date ASC"', 'ReverseSortByCommand="ship_date DESC"', 'CssClass="dtg_column"'));
-      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship to Company', '<?= $_ITEM->ToCompany->__toString() ?>', 'Width=200', 'SortByCommand="shipment__to_company_id__short_description ASC"', 'ReverseSortByCommand="shipment__to_company_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship to Contact', '<?= $_ITEM->ToContact->__toString() ?>', 'SortByCommand="shipment__to_contact_id__last_name ASC"', 'ReverseSortByCommand="shipment__to_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
-      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship to Address', '<?= $_ITEM->ToAddress->__toString() ?>', 'SortByCommand="shipment__to_address_id__short_description ASC"', 'ReverseSortByCommand="shipment__to_address_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship From Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="shipment__from_company_id__short_description ASC"', 'ReverseSortByCommand="shipment__from_company_id__short_description DESC"', 'CssClass="dtg_column"', 'Display="false"'));
-      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship From Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="shipment__from_contact_id__last_name ASC"', 'ReverseSortByCommand="shipment__from_contact_id__last_name DESC"', 'CssClass="dtg_column"', 'Display="false"'));
-      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship From Address', '<?= $_ITEM->FromAddress->__toString() ?>', 'SortByCommand="shipment__from_address_id__short_description ASC"', 'ReverseSortByCommand="shipment__from_address_id__short_description DESC"', 'CssClass="dtg_column"', 'Display="false"'));      
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Recipient Company', '<?= $_ITEM->ToCompany->__toString() ?>', 'Width=200', 'SortByCommand="shipment__to_company_id__short_description ASC"', 'ReverseSortByCommand="shipment__to_company_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Recipient Contact', '<?= $_ITEM->ToContact->__toString() ?>', 'SortByCommand="shipment__to_contact_id__last_name ASC"', 'ReverseSortByCommand="shipment__to_contact_id__last_name DESC"', 'CssClass="dtg_column"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Recipient Address', '<?= $_ITEM->ToAddress->__toString() ?>', 'SortByCommand="shipment__to_address_id__short_description ASC"', 'ReverseSortByCommand="shipment__to_address_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Sender Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="shipment__from_company_id__short_description ASC"', 'ReverseSortByCommand="shipment__from_company_id__short_description DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Sender Contact', '<?= $_ITEM->FromContact->__toString() ?>', 'SortByCommand="shipment__from_contact_id__last_name ASC"', 'ReverseSortByCommand="shipment__from_contact_id__last_name DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+      $this->dtgShipment->AddColumn(new QDataGridColumnExt('Sender Address', '<?= $_ITEM->FromAddress->__toString() ?>', 'SortByCommand="shipment__from_address_id__short_description ASC"', 'ReverseSortByCommand="shipment__from_address_id__short_description DESC"', 'CssClass="dtg_column"', 'Display="false"'));      
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Scheduled By', '<?= $_ITEM->CreatedByObject->__toString() ?>', 'SortByCommand="shipment__created_by__last_name ASC"', 'ReverseSortByCommand="shipment__created_by__last_name DESC"', 'CssClass="dtg_column"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Status', '<?= $_ITEM->__toStringStatusStyled() ?>', 'SortByCommand="shipped_flag ASC"', 'ReverseSortByCommand="shipped_flag DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Tracking', '<?= $_ITEM->__toStringTrackingNumber() ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));

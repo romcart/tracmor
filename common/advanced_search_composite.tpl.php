@@ -33,8 +33,8 @@
 	
 	// Show Tracking Number for Shipment Search
 	if (get_class($this->objParentObject) == 'ShipmentListForm') {
-		$arrAdvancedSearchFields[] = array('name' => 'Ship From Company:', 'value' => $this->txtFromCompany->RenderWithError(false));
-		$arrAdvancedSearchFields[] = array('name' => 'Ship From Contact:', 'value' => $this->txtFromContact->RenderWithError(false));
+		$arrAdvancedSearchFields[] = array('name' => 'Sender Company:', 'value' => $this->txtFromCompany->RenderWithError(false));
+		$arrAdvancedSearchFields[] = array('name' => 'Sender Contact:', 'value' => $this->txtFromContact->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Tracking Number:', 'value' => $this->txtTrackingNumber->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Courier:', 'value' => $this->lstCourier->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Note:', 'value' => $this->txtNote->RenderWithError(false));
