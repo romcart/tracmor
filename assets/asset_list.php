@@ -123,8 +123,8 @@
       	}
       }
       
-      // Column to originally sort by (defaults to asset_id, which is what we want
-      $this->dtgAsset->SortColumnIndex = 1;
+      // Column to originally sort by (Asset Model)
+      $this->dtgAsset->SortColumnIndex = 2;
       $this->dtgAsset->SortDirection = 0;
       
       $objStyle = $this->dtgAsset->RowStyle;

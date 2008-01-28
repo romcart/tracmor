@@ -117,7 +117,7 @@
       	}
       }
 
-      $this->dtgInventoryModel->SortColumnIndex = 1;
+      $this->dtgInventoryModel->SortColumnIndex = 2;
     	$this->dtgInventoryModel->SortDirection = 0;
       
       $objStyle = $this->dtgInventoryModel->RowStyle;
