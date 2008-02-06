@@ -54,7 +54,7 @@
 			if ($strStyle)
 				$strStyle = sprintf('style="%s"', $strStyle);
 
-			$strToReturn = sprintf('<input type="hidden" name="MAX_FILE_SIZE" value="10000000"><input type="file" name="%s" id="%s" %s%s />',
+			$strToReturn = sprintf('<input type="hidden" name="MAX_FILE_SIZE" value="10000000" /><input type="file" name="%s" id="%s" %s%s />',
 				$this->strControlId,
 				$this->strControlId,
 				$this->GetAttributes(),
