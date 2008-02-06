@@ -335,6 +335,7 @@
 			$this->btnSave->Text = QApplication::Translate('Save');
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->PrimaryButton = true;
+			$this->btnSave->CausesValidation = true;
 		}		
 		
 		// Create/Setup the Options/Values datagrid

@@ -283,11 +283,11 @@ class QAssetEditComposite extends QControl {
 		$this->lblLocation->Name = 'Location';
 	}
 	
-	// Create the Asset Model Code label (Part Number)
+	// Create the Asset Model Code label
 	protected function lblAssetModelCode_Create() {
 		// It is better to use late-binding here because we are only getting one record
 		$this->lblAssetModelCode = new QLabel($this);
-		$this->lblAssetModelCode->Name = 'Part Number';		
+		$this->lblAssetModelCode->Name = 'Asset Model Code';		
 	}
 	
 	// Create the Manufacturer Label
@@ -928,7 +928,7 @@ class QAssetEditComposite extends QControl {
 		$this->btnEdit->Display = true;
 		$this->btnDelete->Display = true;
 		$this->btnClone->Display = true;
-		$this->atcAttach->Display = true;
+		$this->atcAttach->btnUpload->Display = true;
 		
 		// Display custom field labels
 		if ($this->arrCustomFields) {
@@ -968,7 +968,7 @@ class QAssetEditComposite extends QControl {
     $this->btnEdit->Display = false;
     $this->btnDelete->Display = false;
     $this->btnClone->Display = false;
-		$this->atcAttach->Display = false;
+		$this->atcAttach->btnUpload->Display = false;
     
     // Display Asset Code and Asset Model input for edit mode
 		$this->txtAssetCode->Display = true;

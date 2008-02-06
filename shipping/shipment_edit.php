@@ -4052,7 +4052,7 @@
 			if (!$this->objShipment->ShippedFlag) {
 				$this->btnEdit->Display = true;
 			}
-			$this->atcAttach->Display = true;
+			$this->atcAttach->btnUpload->Display = true;
 
 			// This is not necessary, because this method is only being called in EditMode
 			if ($this->blnEditMode) {
@@ -4119,7 +4119,7 @@
 			$this->pnlNote->Display = false;
 			$this->lblTrackingNumber->Display = false;
 			$this->btnEdit->Display = false;
-			$this->atcAttach->Display = false;
+			$this->atcAttach->btnUpload->Display = false;
 			$this->lblToPhone->Display = false;
 			$this->lblBillTransportationTo->Display = false;
 			$this->lblPayerAccount->Display = false;

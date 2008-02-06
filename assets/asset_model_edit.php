@@ -481,7 +481,7 @@
 			// Display Edit and Delete buttons
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
-			$this->atcAttach->Display = true;
+			$this->atcAttach->btnUpload->Display = true;
 			// $this->btnClone->Display = true;
 			
 			// Display custom field labels
@@ -512,7 +512,7 @@
       // Do not display Edit and Delete buttons
       $this->btnEdit->Display = false;
       $this->btnDelete->Display = false;
-      $this->atcAttach->Display = false;
+      $this->atcAttach->btnUpload->Display = false;
 			
       // Display Cancel and Save butons    
       $this->btnCancel->Display = true;

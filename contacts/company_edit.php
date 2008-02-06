@@ -890,7 +890,7 @@
 			// Display Edit and Delete buttons
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
-			$this->atcAttach->Display = true;
+			$this->atcAttach->btnUpload->Display = true;
 		}
 		
 		// Display the inputs for Company Edit mode
@@ -908,7 +908,7 @@
 			// Do not display the Edit or Delete button
 			$this->btnEdit->Display = false;
 			$this->btnDelete->Display = false;
-			$this->atcAttach->Display = false;
+			$this->atcAttach->btnUpload->Display = false;
 			
 			// Display the inputs for edit mode
 			$this->txtShortDescription->Display = true;

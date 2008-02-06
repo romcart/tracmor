@@ -2231,7 +2231,7 @@
 			$this->lblDueDate->Display = true;
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
-			$this->atcAttach->Display = true;
+			$this->atcAttach->btnUpload->Display = true;
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationAssetReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveAssetTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
 				$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->lstLocationInventoryReceived_Render($_ITEM) ?> <?= $_FORM->txtQuantityReceived_Render($_ITEM) ?> <?= $_FORM->btnReceiveInventoryTransaction_Render($_ITEM) ?>', array('CssClass' => "dtgcolumn", 'HtmlEntities' => false)));
@@ -2261,7 +2261,7 @@
 			$this->lblDueDate->Display = false;
 			$this->btnEdit->Display = false;
 			$this->btnDelete->Display = false;
-			$this->atcAttach->Display = false;
+			$this->atcAttach->btnUpload->Display = false;
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->RemoveColumnByName('&nbsp;');
 				$this->dtgInventoryTransact->RemoveColumnByName('&nbsp;');

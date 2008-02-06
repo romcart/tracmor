@@ -30,7 +30,7 @@
 	$arrAssetFields[] = array('name' => 'Asset Code:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
 	$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false) . '&nbsp;');
 	$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . '&nbsp;');
-	$arrAssetFields[] = array('name' => 'Part Number:',  'value' => $this->lblAssetModelCode->Render(false) . '&nbsp;');
+	$arrAssetFields[] = array('name' => 'Asset Model Code:',  'value' => $this->lblAssetModelCode->Render(false) . '&nbsp;');
 	if (!$this->blnEditMode) {
 		$arrAssetFields[] = array('name' => 'Location:',     'value' => $this->lstLocation->RenderWithError(false));
 	}
