@@ -66,33 +66,33 @@
 			}
 			else {
 			
-			$objAttachment = new Attachment();
-			$objAttachment->EntityQtypeId = $this->intEntityQtypeId;
-			$objAttachment->EntityId = $this->intEntityId;
-			$objAttachment->Filename = $this->FileName;
-			$arrPath = array_reverse(explode("\\", $this->File));
-			if (count($arrPath) <= 1) {
-				$arrPath = array_reverse(explode("/", $this->File));
-			}
-			$objAttachment->TmpFilename = $arrPath[0];
-			$objAttachment->FileType = $this->dlgFileAsset->flcFileAsset->Type;
-			$objAttachment->Path = $this->File;
-			$objAttachment->Size = filesize($this->File);
-			$objAttachment->Save();
-			
-			if (AWS_S3) {
-				MoveToS3(__DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments', $objAttachment->TmpFilename, $objAttachment->FileType, '/attachments');
-				
-				$objAttachment->Path = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/attachments/' . $objAttachment->TmpFilename;
+				$objAttachment = new Attachment();
+				$objAttachment->EntityQtypeId = $this->intEntityQtypeId;
+				$objAttachment->EntityId = $this->intEntityId;
+				$objAttachment->Filename = $this->FileName;
+				$arrPath = array_reverse(explode("\\", $this->File));
+				if (count($arrPath) <= 1) {
+					$arrPath = array_reverse(explode("/", $this->File));
+				}
+				$objAttachment->TmpFilename = $arrPath[0];
+				$objAttachment->FileType = $this->dlgFileAsset->flcFileAsset->Type;
+				$objAttachment->Path = $this->File;
+				$objAttachment->Size = filesize($this->File);
 				$objAttachment->Save();
-			}
-			
-			if ($this->objParentControl) {
-				$this->objParentControl->pnlAttachments_Create();
-			}
-			else {
-				$this->objForm->pnlAttachments_Create();
-			}
+
+				if (AWS_S3) {
+					MoveToS3(__DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments', $objAttachment->TmpFilename, $objAttachment->FileType, '/attachments');
+
+					$objAttachment->Path = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/attachments/' . $objAttachment->TmpFilename;
+					$objAttachment->Save();
+				}
+
+				if ($this->objParentControl) {
+					$this->objParentControl->pnlAttachments_Create();
+				}
+				else {
+					$this->objForm->pnlAttachments_Create();
+				}
 			}
 		}
 		
