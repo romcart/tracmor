@@ -502,15 +502,21 @@
 			$this->calDueDate = new QDateTimePicker($this);
 			$this->calDueDate->Name = QApplication::Translate('Due Date');
 			$this->calDueDate->DateTimePickerType = QDateTimePickerType::Date;
+			$this->dttNow = new QDateTime(QDateTime::Now);
 			if ($this->blnEditMode) {
-				$this->calDueDate->DateTime = $this->objReceipt->DueDate;
+				if ($this->objReceipt->DueDate) {
+					$this->calDueDate->DateTime = $this->objReceipt->DueDate;
+				}
+				else {
+					$this->calDueDate->MinimumYear = $this->dttNow->Year;
+				}
 			}
 			elseif (!$this->blnEditMode) {
 				$this->calDueDate->DateTime = new QDateTime(QDateTime::Now);
+				$this->calDueDate->MinimumYear = $this->dttNow->Year;
 			}
 			$this->calDueDate->Required = true;
-			$this->dttNow = new QDateTime(QDateTime::Now);
-			$this->calDueDate->MinimumYear = $this->dttNow->Year;
+			
 		}
 		
 		// Create the text field to enter new asset codes to add to the transaction
@@ -1992,31 +1998,34 @@
 						}
 						
 						// Check to see if all Inventory and Assets have been received (if the final entity was removed from the receipt without receiving it).
-						// Check to see if all assets have been received
-						$blnAllAssetsReceived = true;
-						if ($this->objAssetTransactionArray) {
-							foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-								if (!$objAssetTransaction->DestinationLocationId) {
-									$blnAllAssetsReceived = false;
+						// Only if it hasn't already been received
+						if (!$this->objReceipt->ReceivedFlag) {
+							// Check to see if all assets have been received
+							$blnAllAssetsReceived = true;
+							if ($this->objAssetTransactionArray) {
+								foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+									if (!$objAssetTransaction->DestinationLocationId) {
+										$blnAllAssetsReceived = false;
+									}
 								}
 							}
-						}
-						
-						// Check to see if all inventory have been received
-						$blnAllInventoryReceived = true;
-						if ($this->objInventoryTransactionArray) {
-							foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
-								if (!$objInventoryTransaction->DestinationLocationId) {
-									$blnAllInventoryReceived = false;
+							
+							// Check to see if all inventory have been received
+							$blnAllInventoryReceived = true;
+							if ($this->objInventoryTransactionArray) {
+								foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
+									if (!$objInventoryTransaction->DestinationLocationId) {
+										$blnAllInventoryReceived = false;
+									}
 								}
 							}
-						}
-						
-						// If all Inventory and Assets have been received
-						if ($blnAllAssetsReceived && $blnAllInventoryReceived) {
-							// Flip the received flag for the entire Receipt
-							$this->objReceipt->ReceivedFlag = true;
-							$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);						
+							
+							// If all Inventory and Assets have been received
+							if ($blnAllAssetsReceived && $blnAllInventoryReceived) {
+								// Flip the received flag for the entire Receipt
+								$this->objReceipt->ReceivedFlag = true;
+								$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);						
+							}
 						}
 						
 						$this->UpdateReceiptFields();
