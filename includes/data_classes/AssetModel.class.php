@@ -276,6 +276,7 @@
 				%s
 				%s
 				%s
+				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'], 
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],  
