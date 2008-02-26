@@ -54,7 +54,54 @@
 		}
 		
 		public function dlgFileAsset_Upload() {
-			parent::dlgFileAsset_Upload();
+
+			// This is from QFileAssetBase.class.php, with only adding a period to the regular expression below to allow for files like test.class.php
+			// This will be reported to Mike Ho and hopefully put in the core.
+			// File Not Uploaded
+			if (!file_exists($this->dlgFileAsset->flcFileAsset->File) || !$this->dlgFileAsset->flcFileAsset->Size) {
+				$this->dlgFileAsset->ShowError($this->strUnacceptableMessage);
+
+			// File Has Incorrect MIME Type (only if an acceptiblemimearray is setup)
+			} else if (is_array($this->strAcceptibleMimeArray) && (!array_key_exists($this->dlgFileAsset->flcFileAsset->Type, $this->strAcceptibleMimeArray))) {
+				$this->dlgFileAsset->ShowError($this->strUnacceptableMessage);
+
+			// File Successfully Uploaded
+			} else {
+				// Setup Filename, Base Filename and Extension
+				$strFilename = $this->dlgFileAsset->flcFileAsset->FileName;
+				$intPosition = strrpos($strFilename, '.');
+
+				if (is_array($this->strAcceptibleMimeArray) && array_key_exists($this->dlgFileAsset->flcFileAsset->Type, $this->strAcceptibleMimeArray))
+					$strExtension = $this->strAcceptibleMimeArray[$this->dlgFileAsset->flcFileAsset->Type];
+				else {
+					if ($intPosition) {
+						$strExtension = substr($strFilename, $intPosition + 1);
+						$strExtension = strtolower($strExtension);
+						$strBaseFilename = substr($strFilename, 0, $intPosition);
+					}
+					else {
+						$strExtension = null;
+						$strBaseFilename = $strFilename;
+					}
+				}
+
+				// Save the File in a slightly more permanent temporary location
+				$strTempFilePath = $this->strTemporaryUploadPath . '/' . basename($this->dlgFileAsset->flcFileAsset->File) . rand(1000, 9999) . '.' . $strExtension;
+				copy($this->dlgFileAsset->flcFileAsset->File, $strTempFilePath);
+				$this->File = $strTempFilePath;
+
+				// Cleanup and Save Filename
+				$this->strFileName = preg_replace('/[^A-Z^a-z^0-9_\-.]/', '', $strBaseFilename);
+				if ($strExtension) {
+					$this->strFileName .= '.' . $strExtension;
+				}
+
+				// Hide the Dialog Box
+				$this->dlgFileAsset->HideDialogBox();
+
+				// Refresh Thyself
+				$this->Refresh();
+			}
 			
 			if (!file_exists($this->dlgFileAsset->flcFileAsset->File) || !$this->dlgFileAsset->flcFileAsset->Size) {
 				if ($this->dlgFileAsset->flcFileAsset->Error == 1 || $this->dlgFileAsset->flcFileAsset->Error == 2) {

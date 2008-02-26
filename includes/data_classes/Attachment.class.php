@@ -105,7 +105,7 @@
 		 */
 		public static function GenerateSql($intEntityQtypeId) {
 			$arrAttachmentSql = array();
-			$arrAttachmentSql['strSelect'] = ', COUNT(`attachment`.`attachment_id`) AS `__attachment_count`';
+			$arrAttachmentSql['strSelect'] = ', COUNT(DISTINCT `attachment`.`attachment_id`) AS `__attachment_count`';
 			$arrAttachmentSql['strFrom'] = sprintf('LEFT JOIN `attachment` ON (`attachment`.`entity_qtype_id` = %s AND `attachment`.`entity_id` = %s)', $intEntityQtypeId, EntityQtype::ToStringPrimaryKeySql($intEntityQtypeId));
 			$arrAttachmentSql['strGroupBy'] = sprintf('GROUP BY %s', EntityQtype::ToStringPrimaryKeySql($intEntityQtypeId));
 			
