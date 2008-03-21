@@ -80,8 +80,14 @@
 				</td>
 			</tr>
 		</table>
-		<br class="item_divider" />		
-		<div class="title"><?php _t('Shipping Accounts'); ?></div>		
+		<br class="item_divider" />
+		<div class="title"><?php _t('Shipping Couriers'); ?></div>
+		<br class="item_divider" />
+		<?php $this->btnNewCourier->Render(); ?>
+		<br class="item_divider" />
+		<?php $this->dtgCourier->Render(); ?>
+		<br class="item_divider" />
+		<div class="title"><?php _t('Shipping Accounts'); ?></div>	
 		<br class="item_divider" />	
 		<?php $this->btnNew->Render() ?>
 		<br class="item_divider" />

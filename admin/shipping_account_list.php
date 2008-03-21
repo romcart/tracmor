@@ -53,6 +53,8 @@
 		protected $lstFedexAccount;
 		protected $txtFedexGatewayUri;
 		protected $fckPackingListTerms;
+		protected $btnNewCourier;
+		protected $dtgCourier;
 		protected $pnlSaveNotification;
 		
 		protected function Form_Create() {
@@ -73,6 +75,8 @@
 			$this->chkReceiveToLastLocation_Create();
 			$this->txtFedexGatewayUri_Create();
 			$this->fckPackingListTerms_Create();
+			$this->btnNewCourier_Create();
+			$this->dtgCourier_Create();
 			$this->pnlSaveNotification_Create();
 			
 			$this->btnSave_Create();
@@ -95,6 +99,20 @@
 					array_push($objClauses, $objClause);
 				$this->dtgShippingAccount->DataSource = ShippingAccount::LoadAll($objClauses);
 				$this->dtgShippingAccount->ShowHeader = true;
+			}
+			
+			$this->dtgCourier->TotalItemCount = Courier::CountAll();
+			if ($this->dtgCourier->TotalItemCount == 0) {
+				$this->dtgCourier->ShowHeader = false;
+			}
+			else {
+				$objClauses = array();
+				if ($objClause = $this->dtgCourier->OrderByClause)
+					array_push($objClauses, $objClause);
+				if ($objClause = $this->dtgCourier->LimitClause)
+					array_push($objClauses, $objClause);
+				$this->dtgCourier->DataSource = Courier::LoadAll($objClauses);
+				$this->dtgCourier->ShowHeader = true;
 			}
 		}
 		
@@ -164,7 +182,45 @@
 			$this->fckPackingListTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
 		}	
 		
-		// Creat and Setup pnlSaveNotification Panel
+		// Create and Setup btnNewCourier button
+		protected function btnNewCourier_Create() {
+			$this->btnNewCourier = new QButton($this);
+			$this->btnNewCourier->Text = 'New Courier';
+			$this->btnNewCourier->AddAction(new QClickEvent(), new QServerAction('btnNewCourier_Click'));
+		}
+		
+		// Create and Setup dtgCourier datagrid
+		protected function dtgCourier_Create() {
+			$this->dtgCourier = new QDatagrid($this);
+			$this->dtgCourier->CellPadding = 5;
+			$this->dtgCourier->CellSpacing = 0;
+			$this->dtgCourier->CssClass = "datagrid";
+			$this->dtgCourier->UseAjax = true;
+			
+			// Enable Pagination, and set to 10 items per page
+			$objPaginator = new QPaginator($this->dtgCourier);
+			$this->dtgCourier->Paginator = $objPaginator;
+			$this->dtgCourier->ItemsPerPage = 10;
+			
+			$this->dtgCourier->AddColumn(new QDataGridColumn('Courier', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Courier()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Courier()->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+			$this->dtgCourier->SortColumnIndex = 0;
+			$this->dtgCourier->SortDirection = 0;
+      
+			$objStyle = $this->dtgCourier->RowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#FFFFFF';
+			$objStyle->FontSize = 12;
+
+			$objStyle = $this->dtgCourier->AlternateRowStyle;
+			$objStyle->BackColor = '#EFEFEF';
+
+			$objStyle = $this->dtgCourier->HeaderRowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#EFEFEF';
+			$objStyle->CssClass = 'dtg_header';
+		}
+		
+		// Create and Setup pnlSaveNotification Panel
 		protected function pnlSaveNotification_Create() {
 			$this->pnlSaveNotification = new QPanel($this);
 			$this->pnlSaveNotification->Name = 'Save Notification';
@@ -277,6 +333,12 @@
 			
 			QApplication::Redirect('shipping_account_edit.php');
 		}
+		
+		protected function btnNewCourier_Click() {
+			
+			QApplication::Redirect('courier_edit.php');
+		}		
+		
 	}
 
 	// Go ahead and run this form object to generate the page and event handlers, using

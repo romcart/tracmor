@@ -48,5 +48,9 @@
 		public function __toString() {
 			return sprintf('%s',  $this->strShortDescription);
 		}
+		
+		public function __toStringWithLink($CssClass = null) {
+			return ($this->intCourierId !== 1) ? sprintf('<a href="./courier_edit.php?intCourierId=%s" class="%s">%s</a>', $this->intCourierId, $CssClass, $this->__toString()) : $this->__toString();
+		}		
 	}
 ?>
