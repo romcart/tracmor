@@ -1087,10 +1087,12 @@
 				$this->lstCourier->AddItem('- Select One -', null);
 			$objCourierArray = Courier::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Courier()->ShortDescription)));				
 			if ($objCourierArray) foreach ($objCourierArray as $objCourier) {
-				$objListItem = new QListItem($objCourier->__toString(), $objCourier->CourierId);
-				if (($this->objShipment->CourierId) && ($this->objShipment->CourierId == $objCourier->CourierId))
-					$objListItem->Selected = true;				
-				$this->lstCourier->AddItem($objListItem);
+				if ($objCourier->ActiveFlag) {
+					$objListItem = new QListItem($objCourier->__toString(), $objCourier->CourierId);
+					if (($this->objShipment->CourierId) && ($this->objShipment->CourierId == $objCourier->CourierId))
+						$objListItem->Selected = true;				
+					$this->lstCourier->AddItem($objListItem);
+				}
 			}
 			if ($this->blnEditMode && !$this->objShipment->CourierId) {
 				$this->lstCourier->AddItem('Other', null, true);

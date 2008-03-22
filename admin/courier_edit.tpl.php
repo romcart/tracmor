@@ -57,6 +57,10 @@ $this->RenderBegin();
 							<td class="record_field_name">Courier Name: </td>
 							<td class="record_field_edit"><?php $this->txtShortDescription->RenderWithError(); ?></td>
 						</tr>
+						<tr>
+							<td class="record_field_name">Enabled: </td>
+							<td class="record_field_edit"><?php $this->chkActiveFlag->RenderWithError(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>

@@ -58,9 +58,38 @@
 	  		$this->ctlHeaderMenu = new QHeaderMenu($this);
   		}
   		
+  		// Create and Setup lblHeaderCourier
 		protected function lblHeaderCourier_Create() {
 			$this->lblHeaderCourier = new QLabel($this);
 			$this->lblHeaderCourier->Text = ($this->objCourier->ShortDescription != '') ? $this->objCourier->ShortDescription : 'New Shipping Courier';
+		}
+		
+		// Create and Setup txtShortDescription
+		protected function txtShortDescription_Create() {
+			parent::txtShortDescription_Create();
+			
+			// FedEx is built-in,  so don't allow it's short description to be edited
+			$this->txtShortDescription->ReadOnly = ($this->objCourier->CourierId === 1) ? true : false;
+		}
+		
+		// Setup btnDelete
+		protected function btnDelete_Create() {
+			$this->btnDelete = new QButton($this);
+			$this->btnDelete->Text = QApplication::Translate('Delete');
+			$this->btnDelete->AddAction(new QClickEvent(), new QConfirmAction(sprintf(QApplication::Translate('Are you SURE you want to DELETE this %s?'), 'Courier')));
+			$this->btnDelete->AddAction(new QClickEvent(), new QServerAction('btnDelete_Click'));
+			$this->btnDelete->CausesValidation = false;
+			
+			// FedEx is built-in,  so don't allow it to be deleted
+			if (!$this->blnEditMode || $this->objCourier->CourierId ===1)
+				$this->btnDelete->Visible = false;
+		}
+		
+		// Create and Setup chkActiveFlag
+		protected function chkActiveFlag_Create() {
+			$this->chkActiveFlag = new QCheckBox($this);
+			$this->chkActiveFlag->Name = QApplication::Translate('Active Flag');
+			$this->chkActiveFlag->Checked = ($this->blnEditMode) ? $this->objCourier->ActiveFlag : true;
 		}
 		
 		protected function RedirectToListPage() {

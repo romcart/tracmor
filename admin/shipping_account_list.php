@@ -203,6 +203,7 @@
 			$this->dtgCourier->ItemsPerPage = 10;
 			
 			$this->dtgCourier->AddColumn(new QDataGridColumn('Courier', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Courier()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Courier()->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+			$this->dtgCourier->AddColumn(new QDataGridColumn('Enabled', '<?= $_ITEM->__toStringActiveFlag() ?>', array('OrderByClause' => QQ::OrderBy(QQN::Courier()->ActiveFlag), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Courier()->ActiveFlag, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			$this->dtgCourier->SortColumnIndex = 0;
 			$this->dtgCourier->SortDirection = 0;
       

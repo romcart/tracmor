@@ -50,7 +50,12 @@
 		}
 		
 		public function __toStringWithLink($CssClass = null) {
-			return ($this->intCourierId !== 1) ? sprintf('<a href="./courier_edit.php?intCourierId=%s" class="%s">%s</a>', $this->intCourierId, $CssClass, $this->__toString()) : $this->__toString();
+			return sprintf('<a href="./courier_edit.php?intCourierId=%s" class="%s">%s</a>', $this->intCourierId, $CssClass, $this->__toString());
+		}
+		
+		// Return the <IMG> tag (either a check or an X based on the boolean value)
+		public function __toStringActiveFlag() {
+			return BooleanImage($this->ActiveFlag);
 		}		
 	}
 ?>
