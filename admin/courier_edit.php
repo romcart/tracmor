@@ -92,6 +92,20 @@
 			$this->chkActiveFlag->Checked = ($this->blnEditMode) ? $this->objCourier->ActiveFlag : true;
 		}
 		
+		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
+			try {
+				$this->objCourier->Delete();
+				$this->RedirectToListPage();
+			} catch (QDatabaseExceptionBase $objExc) {
+				if ($objExc->ErrorNumber == 1451) {
+					$this->btnCancel->Warning = 'This courier cannot be deleted because it is associated with one or more shipments.';
+				}
+				else {
+					throw new QDatabaseExceptionBase();
+				}
+			}
+		}
+		
 		protected function RedirectToListPage() {
 			QApplication::Redirect('shipping_account_list.php');
 		}
