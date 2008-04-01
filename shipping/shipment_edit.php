@@ -2833,6 +2833,7 @@
 										$objReceipt->FromContactId = $this->objShipment->ToContactId;
 										$objReceipt->ToContactId = $this->objShipment->FromContactId;
 										$objReceipt->ToAddressId = $this->objShipment->FromAddressId;
+										$objReceipt->ReceivedFlag = 0;
 										$objReceipt->ReceiptNumber = Receipt::LoadNewReceiptNumber();
 										if ($objAssetTransaction->ScheduleReceiptDueDate) {
 											$objReceipt->DueDate = $objAssetTransaction->ScheduleReceiptDueDate;
