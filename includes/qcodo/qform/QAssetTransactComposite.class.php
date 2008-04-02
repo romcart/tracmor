@@ -356,6 +356,13 @@ class QAssetTransactComposite extends QControl {
 						$blnError = true;
 					}
 				}
+				
+				// For all transactions except Unreserve, make sure the asset is not already reserved
+				if ($this->intTransactionTypeId != 9 && $asset->ReservedFlag) {
+					$this->btnCancel->Warning = sprintf('The Asset %s is reserved.',$asset->AssetCode);
+					$blnError = true;
+				}	
+							
 			}
 			
 			if (!$blnError) {
@@ -388,7 +395,7 @@ class QAssetTransactComposite extends QControl {
 					// Assign different source and destinations depending on transaction type
 					foreach ($this->objAssetArray as $asset) {
 						if ($asset instanceof Asset) {
-						
+							
 							$SourceLocationId = $asset->LocationId;
 							
 							if ($this->intTransactionTypeId == 1) {
