@@ -117,7 +117,8 @@ FCKConfig.ToolbarSets["Tracmor"] = [
 	['Bold','Italic','Underline'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],	
 	['OrderedList','UnorderedList','-','Outdent','Indent'],
-	['TextColor','BGColor']
+	['TextColor'],
+	['PageBreak']
 ] ;
 
 FCKConfig.EnterMode = 'p' ;		// p | div | br
