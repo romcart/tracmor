@@ -92,6 +92,7 @@
 		protected $chkFedexNotifyRecipientExceptionFlag;
 		protected $chkFedexNotifyRecipientDeliveryFlag;
 		protected $lstCurrencyUnit;
+		protected $chkSaturdayDeliveryFlag;
 		protected $dlgExchange;
 		protected $dlgDueDate;
 		public $lstFromCompany;
@@ -282,6 +283,7 @@
 			$this->lstLengthUnit_Create();
 			$this->txtValue_Create();
 			$this->lstCurrencyUnit_Create();
+			$this->chkSaturdayDeliveryFlag_Create();
 			$this->lstToAddress_Create();
 			$this->lblNewToAddress_Create();
 			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
@@ -677,7 +679,7 @@
 			if ($this->blnEditMode) {
 				$this->lblAdvanced->Display = false;
 			}
-			$this->lblAdvanced->TabIndex = 29;
+			//$this->lblAdvanced->TabIndex = 29;
 		}
 		
 		// Create and Setup lblSenderLabel
@@ -1204,7 +1206,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->txtFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
 			}
-			$this->txtFedexNotifySenderEmail->TabIndex = 26;
+			$this->txtFedexNotifySenderEmail->TabIndex = 27;
 		}
 		
 		// Create and Setup txtFedexNotifyRecipientEmail
@@ -1214,7 +1216,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->txtFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
 			}
-			$this->txtFedexNotifyRecipientEmail->TabIndex = 30;
+			$this->txtFedexNotifyRecipientEmail->TabIndex = 31;
 		}
 		
 		// Create and Setup lstFxServiceType
@@ -1384,6 +1386,16 @@
 			$this->lstCurrencyUnit->TabIndex = 25;
 		}		
 
+		// Create and Setup chkSaturdayDeliveryFlag
+		protected function chkSaturdayDeliveryFlag_Create() {
+			$this->chkSaturdayDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
+			$this->chkSaturdayDeliveryFlag->Name = QApplication::Translate('Saturday Delivery');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->chkSaturdayDeliveryFlag->Checked = $this->objFedexShipment->SaturdayDeliveryFlag;
+			}
+			$this->chkSaturdayDeliveryFlag->TabIndex = 26;
+		}
+		
 		// Create and Setup chkFedexNotifySenderShipFlag
 		protected function chkFedexNotifySenderShipFlag_Create() {
 			$this->chkFedexNotifySenderShipFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1391,7 +1403,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifySenderShipFlag->Checked = $this->objFedexShipment->NotifySenderShipFlag;
 			}
-			$this->chkFedexNotifySenderShipFlag->TabIndex = 27;
+			$this->chkFedexNotifySenderShipFlag->TabIndex = 28;
 		}
 		
 		// Create and Setup chkFedexNotifySenderExceptionFlag
@@ -1401,7 +1413,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifySenderExceptionFlag->Checked = $this->objFedexShipment->NotifySenderExceptionFlag;
 			}
-			$this->chkFedexNotifySenderExceptionFlag->TabIndex = 28;
+			$this->chkFedexNotifySenderExceptionFlag->TabIndex = 29;
 		}
 		
 		// Create and Setup chkFedexNotifySenderDeliveryFlag
@@ -1411,7 +1423,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifySenderDeliveryFlag->Checked = $this->objFedexShipment->NotifySenderDeliveryFlag;
 			}
-			$this->chkFedexNotifySenderDeliveryFlag->TabIndex = 29;
+			$this->chkFedexNotifySenderDeliveryFlag->TabIndex = 30;
 		}
 				
 		// Create and Setup chkFedexNotifyRecipientShipFlag
@@ -1421,7 +1433,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifyRecipientShipFlag->Checked = $this->objFedexShipment->NotifyRecipientShipFlag;
 			}
-			$this->chkFedexNotifyRecipientShipFlag->TabIndex = 31;
+			$this->chkFedexNotifyRecipientShipFlag->TabIndex = 32;
 		}
 		
 		// Create and Setup chkFedexNotifyRecipientExceptionFlag
@@ -1431,7 +1443,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifyRecipientExceptionFlag->Checked = $this->objFedexShipment->NotifyRecipientExceptionFlag;
 			}
-			$this->chkFedexNotifyRecipientExceptionFlag->TabIndex = 32;
+			$this->chkFedexNotifyRecipientExceptionFlag->TabIndex = 33;
 		}
 		
 		// Create and Setup chkFedexNotifyRecipientDeliveryFlag
@@ -1441,7 +1453,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifyRecipientDeliveryFlag->Checked = $this->objFedexShipment->NotifyRecipientDeliveryFlag;
 			}
-			$this->chkFedexNotifyRecipientDeliveryFlag->TabIndex = 33;
+			$this->chkFedexNotifyRecipientDeliveryFlag->TabIndex = 34;
 		}
 		
 		// Create the text field to enter new asset codes to add to the transaction
@@ -1452,7 +1464,7 @@
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtNewAssetCode->CausesValidation = false;
-			$this->txtNewAssetCode->TabIndex=34;
+			$this->txtNewAssetCode->TabIndex=35;
 		}
 		
 		// Create the text field to enter new inventory_model codes to add to the transaction
@@ -1813,7 +1825,7 @@
 			$this->btnAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->btnAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnAddAsset->CausesValidation = false;
-			$this->btnAddAsset->TabIndex=34;
+			$this->btnAddAsset->TabIndex=36;
 		}
 		
 		// Create the lookup button
@@ -3673,6 +3685,7 @@
 				$this->lstLengthUnit->SelectedValue = $this->objFedexShipment->LengthUnitId;
 				$this->txtValue->Text = $this->objFedexShipment->DeclaredValue;
 				$this->lstCurrencyUnit->SelectedValue = $this->objFedexShipment->CurrencyUnitId;
+				$this->chkSaturdayDeliveryFlag->Checked = $this->objFedexShipment->SaturdayDeliveryFlag;
 			}
 			$this->arrCustomFields = CustomField::UpdateControls($this->objShipment->objCustomFieldArray, $this->arrCustomFields);
 		}
@@ -3710,6 +3723,7 @@
 			$this->objFedexShipment->LengthUnitId = $this->lstLengthUnit->SelectedValue;
 			$this->objFedexShipment->DeclaredValue = $this->txtValue->Text;
 			$this->objFedexShipment->CurrencyUnitId = $this->lstCurrencyUnit->SelectedValue;
+			$this->objFedexShipment->SaturdayDeliveryFlag = $this->chkSaturdayDeliveryFlag->Checked;
 		}
 		
 		// Load the Package Type options for the Shipment
@@ -3847,6 +3861,7 @@
 						1556 => ($this->chkFedexNotifyRecipientDeliveryFlag->Checked) ? 'Y' : 'N',		//Notify Recipient of Delivery
 						1139 => $fxIntlSSN,																//Sender's SSN
 						68 => $fxIntlCurrencyUnit,														//Recipient Currency
+						1266 => ($this->chkSaturdayDeliveryFlag->Checked) ? 'Y' : 'N',					//Saturday Delivery
 						1411 =>	$fxIntlCustomsValue,													//Total Customs Value
 						70 => $fxIntlDutiesPayType,														//Duties Pay Type
 						72 => $fxIntlTermsofSale,														//Terms of Sale
@@ -3992,6 +4007,9 @@
 			$this->chkFedexNotifyRecipientShipFlag->Enabled = false;
 			$this->chkFedexNotifyRecipientExceptionFlag->Enabled = false;
 			$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = false;
+			
+			// Disable (instead of hiding) Saturday Delivery checkbox
+			$this->chkSaturdayDeliveryFlag->Enabled = false;
 			
 /*			if ($this->lblAdvanced->Text == 'Hide Advanced') {
 				$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
@@ -4201,6 +4219,9 @@
 			$this->chkFedexNotifyRecipientShipFlag->Enabled = true;
 			$this->chkFedexNotifyRecipientExceptionFlag->Enabled = true;
 			$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = true;
+			
+			//Enable Saturday Delivery Checkbox (because it's disabled, not hidden)
+			$this->chkSaturdayDeliveryFlag->Enabled = true;
 			
 			if ($this->blnEditMode) {
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));

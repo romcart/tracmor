@@ -84,6 +84,10 @@
 								<td class="record_field_name">Declared Value:&nbsp;</td>
 								<td class="record_field_value"><?php $this->txtValue->RenderWithError(); $this->lblValue->Render(); ?>&nbsp;<?php $this->lstCurrencyUnit->RenderWithError(); ?>&nbsp;<?php $this->lblCurrencyUnit->Render(); ?></td>
 							</tr>
+							<tr>
+								<td class="record_field_name">Saturday Delivery:&nbsp;</td>
+								<td class="record_field_value"><?php $this->chkSaturdayDeliveryFlag->RenderWithError(); ?></td>
+							</tr>							
 							<!--<tr>
 								<td class="record_field_name"></td>
 								<td class="record_field_value"><?php //$this->chkNotificationFlag->RenderWithError(); ?>&nbsp;Send notification</td>
