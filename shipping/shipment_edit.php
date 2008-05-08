@@ -91,8 +91,17 @@
 		protected $chkFedexNotifyRecipientShipFlag;
 		protected $chkFedexNotifyRecipientExceptionFlag;
 		protected $chkFedexNotifyRecipientDeliveryFlag;
+		protected $txtFedexNotifyOtherEmail;
+		protected $chkFedexNotifyOtherShipFlag;
+		protected $chkFedexNotifyOtherExceptionFlag;
+		protected $chkFedexNotifyOtherDeliveryFlag;
 		protected $lstCurrencyUnit;
 		protected $chkSaturdayDeliveryFlag;
+		protected $chkHoldAtLocationFlag;
+		protected $txtHoldAtLocationAddress;
+		protected $txtHoldAtLocationCity;
+		protected $lstHoldAtLocationState;
+		protected $txtHoldAtLocationPostalCode;
 		protected $dlgExchange;
 		protected $dlgDueDate;
 		public $lstFromCompany;
@@ -155,12 +164,17 @@
 		protected $lblCurrencyUnit;
 		protected $lblFedexNotifySenderEmail;
 		protected $lblFedexNotifyRecipientEmail;
+		protected $lblFedexNotifyOtherEmail;
 		protected $lblNewFromCompany;
 		protected $lblNewFromContact;
 		protected $lblNewFromAddress;
 		protected $lblNewToCompany;
 		protected $lblNewToContact;
 		protected $lblNewToAddress;
+		protected $lblHoldAtLocationAddress;
+		protected $lblHoldAtLocationCity;
+		protected $lblHoldAtLocationState;
+		protected $lblHoldAtLocationPostalCode;
 		protected $dlgNew;
 		
 		// Datagrids
@@ -231,6 +245,11 @@
 			$this->lblReference_Create();
 			$this->lblFedexNotifySenderEmail_Create();
 			$this->lblFedexNotifyRecipientEmail_Create();
+			$this->lblFedexNotifyOtherEmail_Create();
+			$this->lblHoldAtLocationAddress_Create();
+			$this->lblHoldAtLocationCity_Create();
+			$this->lblHoldAtLocationState_Create();
+			$this->lblHoldAtLocationPostalCode_Create();
 			$this->pnlNote_Create();
 			$this->lblTrackingNumber_Create();
 			$this->lblSenderLabel_Create();
@@ -266,12 +285,16 @@
 			$this->txtReference_Create();
 			$this->txtFedexNotifySenderEmail_Create();
 			$this->txtFedexNotifyRecipientEmail_Create();
+			$this->txtFedexNotifyOtherEmail_Create();
 			$this->chkFedexNotifySenderShipFlag_Create();
 			$this->chkFedexNotifySenderExceptionFlag_Create();			
 			$this->chkFedexNotifySenderDeliveryFlag_Create();
 			$this->chkFedexNotifyRecipientShipFlag_Create();
 			$this->chkFedexNotifyRecipientExceptionFlag_Create();			
-			$this->chkFedexNotifyRecipientDeliveryFlag_Create();			
+			$this->chkFedexNotifyRecipientDeliveryFlag_Create();
+			$this->chkFedexNotifyOtherShipFlag_Create();
+			$this->chkFedexNotifyOtherExceptionFlag_Create();
+			$this->chkFedexNotifyOtherDeliveryFlag_Create();
 			$this->lstFxServiceType_Create();
 			$this->txtRecipientThirdPartyAccount_Create();
 			$this->lstPackageType_Create();
@@ -284,6 +307,11 @@
 			$this->txtValue_Create();
 			$this->lstCurrencyUnit_Create();
 			$this->chkSaturdayDeliveryFlag_Create();
+			$this->chkHoldAtLocationFlag_Create();
+			$this->txtHoldAtLocationAddress_Create();
+			$this->txtHoldAtLocationCity_Create();
+			$this->lstHoldAtLocationState_Create();
+			$this->txtHoldAtLocationPostalCode_Create();
 			$this->lstToAddress_Create();
 			$this->lblNewToAddress_Create();
 			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
@@ -665,7 +693,52 @@
 				$this->lblFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
 			}
 		}
+
+		// Create and Setup lblFedexNotifyOtherEmail
+		protected function lblFedexNotifyOtherEmail_Create() {
+			$this->lblFedexNotifyOtherEmail = new QLabel($this->pnlFedExShipment);
+			$this->lblFedexNotifyOtherEmail->Name = 'Other Email';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
+			}
+		}		
+		
+		// Create and Setup lblHoldAtLocationAddress
+		protected function lblHoldAtLocationAddress_Create() {
+			$this->lblHoldAtLocationAddress = new QLabel($this->pnlFedExShipment);
+			$this->lblHoldAtLocationAddress->Name = 'Hold at Location Address';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
+			}
+		}
+
+		// Create and Setup lblHoldAtLocationCity
+		protected function lblHoldAtLocationCity_Create() {
+			$this->lblHoldAtLocationCity = new QLabel($this->pnlFedExShipment);
+			$this->lblHoldAtLocationCity->Name = 'Hold at Location City';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
+			}
+		}
 				
+		// Create and Setup lblHoldAtLocationState
+		protected function lblHoldAtLocationState_Create() {
+			$this->lblHoldAtLocationState = new QLabel($this->pnlFedExShipment);
+			$this->lblHoldAtLocationState->Name = 'Hold at Location State';
+			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->HoldAtLocationStateObject) {
+				$this->lblHoldAtLocationState->Text = $this->objFedexShipment->HoldAtLocationStateObject->__toString();
+			}
+		}
+		
+		// Create and Setup lblHoldAtLocationPostalCode
+		protected function lblHoldAtLocationPostalCode_Create() {
+			$this->lblHoldAtLocationPostalCode = new QLabel($this->pnlFedExShipment);
+			$this->lblHoldAtLocationPostalCode->Name = 'Hold at Location Postal Code';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
+			}
+		}
+		
 		// Create and Setup lblAdvanced
 		protected function lblAdvanced_Create() {
 			$this->lblAdvanced = new QLabel($this);
@@ -1206,7 +1279,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->txtFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
 			}
-			$this->txtFedexNotifySenderEmail->TabIndex = 27;
+			$this->txtFedexNotifySenderEmail->TabIndex = 32;
 		}
 		
 		// Create and Setup txtFedexNotifyRecipientEmail
@@ -1216,8 +1289,18 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->txtFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
 			}
-			$this->txtFedexNotifyRecipientEmail->TabIndex = 31;
+			$this->txtFedexNotifyRecipientEmail->TabIndex = 36;
 		}
+		
+		// Create and Setup txtFedexNotifyOtherEmail
+		protected function txtFedexNotifyOtherEmail_Create() {
+			$this->txtFedexNotifyOtherEmail = new QTextBox($this->pnlFedExShipment);
+			$this->txtFedexNotifyOtherEmail->Name = QApplication::Translate('Other Email');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
+			}
+			$this->txtFedexNotifyOtherEmail->TabIndex = 40;
+		}		
 		
 		// Create and Setup lstFxServiceType
 		protected function lstFxServiceType_Create() {
@@ -1349,7 +1432,7 @@
 				}
 				$this->lstLengthUnit->AddItem($objListItem);
 			}
-			$this->lstLengthUnit->SetCustomStyle('Width','120px');	
+			$this->lstLengthUnit->SetCustomStyle('Width','60px');	
 			$this->lstLengthUnit->TabIndex = 23;
 		}		
 		
@@ -1382,7 +1465,7 @@
 				}
 				$this->lstCurrencyUnit->AddItem($objListItem);
 			}
-			$this->lstCurrencyUnit->SetCustomStyle('Width','120px');
+			$this->lstCurrencyUnit->SetCustomStyle('Width','60px');
 			$this->lstCurrencyUnit->TabIndex = 25;
 		}		
 
@@ -1396,6 +1479,59 @@
 			$this->chkSaturdayDeliveryFlag->TabIndex = 26;
 		}
 		
+		protected function chkHoldAtLocationFlag_Create() {
+			$this->chkHoldAtLocationFlag = new QCheckBox($this->pnlFedExShipment);
+			$this->chkHoldAtLocationFlag->Name = QApplication::Translate('Hold at Location');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->chkHoldAtLocationFlag->Checked = $this->objFedexShipment->HoldAtLocationFlag;
+			}
+			
+			$this->chkHoldAtLocationFlag->AddAction(new QClickEvent(), new QAjaxAction('chkHoldAtLocationFlag_Click'));
+			$this->chkHoldAtLocationFlag->TabIndex = 27;
+		}
+		
+		protected function txtHoldAtLocationAddress_Create() {
+			$this->txtHoldAtLocationAddress = new QTextBox($this->pnlFedExShipment);
+			$this->txtHoldAtLocationAddress->Name = QApplication::Translate('Hold at Location Address');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
+			}
+			$this->txtHoldAtLocationAddress->TabIndex = 28;
+		}
+		
+		protected function txtHoldAtLocationCity_Create() {
+			$this->txtHoldAtLocationCity = new QTextBox($this->pnlFedExShipment);
+			$this->txtHoldAtLocationCity->Name = QApplication::Translate('Hold at Location City');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
+			}
+			$this->txtHoldAtLocationCity->TabIndex = 29;
+		}
+		
+		protected function lstHoldAtLocationState_Create() {
+			$this->lstHoldAtLocationState = new QListBox($this->pnlFedExShipment);
+			$this->lstHoldAtLocationState->Name = QApplication::Translate('Hold at Location State');
+			$this->lstHoldAtLocationState->AddItem(QApplication::Translate('- Select One -'), null);
+			$objStateProvinceArray = StateProvince::LoadAll();
+			if ($objStateProvinceArray) foreach ($objStateProvinceArray as $objStateProvince) {
+				$objListItem = new QListItem($objStateProvince->__toString(), $objStateProvince->StateProvinceId);
+				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->HoldAtLocationState) && ($this->objFedexShipment->HoldAtLocationState == $objStateProvince->StateProvinceId)) {
+					$objListItem->Selected = true;
+				}
+				$this->lstHoldAtLocationState->AddItem($objListItem);
+			}
+			$this->lstHoldAtLocationState->TabIndex = 30;
+		}
+		
+		protected function txtHoldAtLocationPostalCode_Create() {
+			$this->txtHoldAtLocationPostalCode = new QTextBox($this->pnlFedExShipment);
+			$this->txtHoldAtLocationPostalCode->Name = QApplication::Translate('Hold at Location Postal Code');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
+			}
+			$this->txtHoldAtLocationPostalCode->TabIndex = 31;
+		}
+		
 		// Create and Setup chkFedexNotifySenderShipFlag
 		protected function chkFedexNotifySenderShipFlag_Create() {
 			$this->chkFedexNotifySenderShipFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1403,7 +1539,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifySenderShipFlag->Checked = $this->objFedexShipment->NotifySenderShipFlag;
 			}
-			$this->chkFedexNotifySenderShipFlag->TabIndex = 28;
+			$this->chkFedexNotifySenderShipFlag->TabIndex = 33;
 		}
 		
 		// Create and Setup chkFedexNotifySenderExceptionFlag
@@ -1413,7 +1549,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifySenderExceptionFlag->Checked = $this->objFedexShipment->NotifySenderExceptionFlag;
 			}
-			$this->chkFedexNotifySenderExceptionFlag->TabIndex = 29;
+			$this->chkFedexNotifySenderExceptionFlag->TabIndex = 34;
 		}
 		
 		// Create and Setup chkFedexNotifySenderDeliveryFlag
@@ -1423,7 +1559,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifySenderDeliveryFlag->Checked = $this->objFedexShipment->NotifySenderDeliveryFlag;
 			}
-			$this->chkFedexNotifySenderDeliveryFlag->TabIndex = 30;
+			$this->chkFedexNotifySenderDeliveryFlag->TabIndex = 35;
 		}
 				
 		// Create and Setup chkFedexNotifyRecipientShipFlag
@@ -1433,7 +1569,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifyRecipientShipFlag->Checked = $this->objFedexShipment->NotifyRecipientShipFlag;
 			}
-			$this->chkFedexNotifyRecipientShipFlag->TabIndex = 32;
+			$this->chkFedexNotifyRecipientShipFlag->TabIndex = 37;
 		}
 		
 		// Create and Setup chkFedexNotifyRecipientExceptionFlag
@@ -1443,7 +1579,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifyRecipientExceptionFlag->Checked = $this->objFedexShipment->NotifyRecipientExceptionFlag;
 			}
-			$this->chkFedexNotifyRecipientExceptionFlag->TabIndex = 33;
+			$this->chkFedexNotifyRecipientExceptionFlag->TabIndex = 38;
 		}
 		
 		// Create and Setup chkFedexNotifyRecipientDeliveryFlag
@@ -1453,8 +1589,38 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkFedexNotifyRecipientDeliveryFlag->Checked = $this->objFedexShipment->NotifyRecipientDeliveryFlag;
 			}
-			$this->chkFedexNotifyRecipientDeliveryFlag->TabIndex = 34;
+			$this->chkFedexNotifyRecipientDeliveryFlag->TabIndex = 39;
 		}
+		
+		// Create and Setup chkFedexNotifyOtherShipFlag
+		protected function chkFedexNotifyOtherShipFlag_Create() {
+			$this->chkFedexNotifyOtherShipFlag = new QCheckBox($this->pnlFedExShipment);
+			$this->chkFedexNotifyOtherShipFlag->Name = QApplication::Translate('Ship');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->chkFedexNotifyOtherShipFlag->Checked = $this->objFedexShipment->NotifyOtherShipFlag;
+			}
+			$this->chkFedexNotifyOtherShipFlag->TabIndex = 41;
+		}
+		
+		// Create and Setup chkFedexNotifyOtherExceptionFlag
+		protected function chkFedexNotifyOtherExceptionFlag_Create() {
+			$this->chkFedexNotifyOtherExceptionFlag = new QCheckBox($this->pnlFedExShipment);
+			$this->chkFedexNotifyOtherExceptionFlag->Name = QApplication::Translate('Exception');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->chkFedexNotifyOtherExceptionFlag->Checked = $this->objFedexShipment->NotifyOtherExceptionFlag;
+			}
+			$this->chkFedexNotifyOtherExceptionFlag->TabIndex = 42;
+		}
+		
+		// Create and Setup chkFedexNotifyOtherDeliveryFlag
+		protected function chkFedexNotifyOtherDeliveryFlag_Create() {
+			$this->chkFedexNotifyOtherDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
+			$this->chkFedexNotifyOtherDeliveryFlag->Name = QApplication::Translate('Delivery');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->chkFedexNotifyOtherDeliveryFlag->Checked = $this->objFedexShipment->NotifyOtherDeliveryFlag;
+			}
+			$this->chkFedexNotifyOtherDeliveryFlag->TabIndex = 43;
+		}		
 		
 		// Create the text field to enter new asset codes to add to the transaction
 		// Eventually this field will receive information from the AML
@@ -1464,7 +1630,7 @@
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtNewAssetCode->CausesValidation = false;
-			$this->txtNewAssetCode->TabIndex=35;
+			$this->txtNewAssetCode->TabIndex=44;
 		}
 		
 		// Create the text field to enter new inventory_model codes to add to the transaction
@@ -1825,7 +1991,7 @@
 			$this->btnAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->btnAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnAddAsset->CausesValidation = false;
-			$this->btnAddAsset->TabIndex=36;
+			$this->btnAddAsset->TabIndex=45;
 		}
 		
 		// Create the lookup button
@@ -2065,6 +2231,9 @@
 				// make sure tracking number text box is not displayed 
 				// FIXME: this is not currently done the "Qcodo way"
 				QApplication::ExecuteJavascript('document.getElementById("trackingNumber").style.display="none";');
+				
+				// make sure the Hold At Location checkbox is unchecked
+				$this->chkHoldAtLocationFlag->Checked = false;
 				
 				// Set the recipient phone if necessary
 				$this->lstToContact_Select();
@@ -2318,6 +2487,15 @@
 				else {
 					$this->lblNewToAddress->Warning = 'You must select a company first.';
 				}
+			}
+		}
+		
+		// When 'Hold at Location' checkbox is clicked,  show HAL panel
+		public function chkHoldAtLocationFlag_Click($strFormId, $strControlId, $strParameter) {
+			if ($this->chkHoldAtLocationFlag->Checked) {
+				QApplication::ExecuteJavascript('document.getElementById("HAL").style.display="";');
+			} else {
+				QApplication::ExecuteJavascript('document.getElementById("HAL").style.display="none";');
 			}
 		}
 		
@@ -3669,12 +3847,16 @@
 				$this->txtReference->Text = $this->objFedexShipment->Reference;
 				$this->txtFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
 				$this->txtFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
+				$this->txtFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
 				$this->chkFedexNotifySenderShipFlag->Checked = $this->objFedexShipment->NotifySenderShipFlag;
 				$this->chkFedexNotifySenderExceptionFlag->Checked = $this->objFedexShipment->NotifySenderExceptionFlag;
 				$this->chkFedexNotifySenderDeliveryFlag->Checked = $this->objFedexShipment->NotifySenderDeliveryFlag;
 				$this->chkFedexNotifyRecipientShipFlag->Checked = $this->objFedexShipment->NotifyRecipientShipFlag;
 				$this->chkFedexNotifyRecipientExceptionFlag->Checked = $this->objFedexShipment->NotifyRecipientExceptionFlag;
 				$this->chkFedexNotifyRecipientDeliveryFlag->Checked = $this->objFedexShipment->NotifyRecipientDeliveryFlag;
+				$this->chkFedexNotifyOtherShipFlag->Checked = $this->objFedexShipment->NotifyOtherShipFlag;
+				$this->chkFedexNotifyOtherExceptionFlag->Checked = $this->objFedexShipment->NotifyOtherExceptionFlag;
+				$this->chkFedexNotifyOtherDeliveryFlag->Checked = $this->objFedexShipment->NotifyOtherDeliveryFlag;				
 				$this->lstFxServiceType->SelectedValue = $this->objFedexShipment->FedexServiceTypeId;
 				$this->lstPackageType->SelectedValue = $this->objFedexShipment->PackageTypeId;
 				$this->txtPackageWeight->Text = $this->objFedexShipment->PackageWeight;
@@ -3686,6 +3868,11 @@
 				$this->txtValue->Text = $this->objFedexShipment->DeclaredValue;
 				$this->lstCurrencyUnit->SelectedValue = $this->objFedexShipment->CurrencyUnitId;
 				$this->chkSaturdayDeliveryFlag->Checked = $this->objFedexShipment->SaturdayDeliveryFlag;
+				$this->chkHoldAtLocationFlag->Checked = $this->objFedexShipment->HoldAtLocationFlag;
+				$this->txtHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
+				$this->txtHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
+				$this->lstHoldAtLocationState->SelectedValue = $this->objFedexShipment->HoldAtLocationState;
+				$this->txtHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
 			}
 			$this->arrCustomFields = CustomField::UpdateControls($this->objShipment->objCustomFieldArray, $this->arrCustomFields);
 		}
@@ -3707,12 +3894,16 @@
 			$this->objFedexShipment->Reference = $this->txtReference->Text;
 			$this->objFedexShipment->NotifySenderEmail = $this->txtFedexNotifySenderEmail->Text;
 			$this->objFedexShipment->NotifyRecipientEmail = $this->txtFedexNotifyRecipientEmail->Text;
+			$this->objFedexShipment->NotifyOtherEmail = $this->txtFedexNotifyOtherEmail->Text;
 			$this->objFedexShipment->NotifySenderShipFlag = $this->chkFedexNotifySenderShipFlag->Checked;
 			$this->objFedexShipment->NotifySenderExceptionFlag = $this->chkFedexNotifySenderExceptionFlag->Checked;
 			$this->objFedexShipment->NotifySenderDeliveryFlag = $this->chkFedexNotifySenderDeliveryFlag->Checked;
 			$this->objFedexShipment->NotifyRecipientShipFlag = $this->chkFedexNotifyRecipientShipFlag->Checked;
 			$this->objFedexShipment->NotifyRecipientExceptionFlag = $this->chkFedexNotifyRecipientExceptionFlag->Checked;
 			$this->objFedexShipment->NotifyRecipientDeliveryFlag = $this->chkFedexNotifyRecipientDeliveryFlag->Checked;
+			$this->objFedexShipment->NotifyOtherShipFlag = $this->chkFedexNotifyOtherShipFlag->Checked;
+			$this->objFedexShipment->NotifyOtherExceptionFlag = $this->chkFedexNotifyOtherExceptionFlag->Checked;
+			$this->objFedexShipment->NotifyOtherDeliveryFlag = $this->chkFedexNotifyOtherDeliveryFlag->Checked;			
 			$this->objFedexShipment->FedexServiceTypeId = $this->lstFxServiceType->SelectedValue;
 			$this->objFedexShipment->PackageTypeId = $this->lstPackageType->SelectedValue;
 			$this->objFedexShipment->PackageWeight = $this->txtPackageWeight->Text;
@@ -3724,6 +3915,11 @@
 			$this->objFedexShipment->DeclaredValue = $this->txtValue->Text;
 			$this->objFedexShipment->CurrencyUnitId = $this->lstCurrencyUnit->SelectedValue;
 			$this->objFedexShipment->SaturdayDeliveryFlag = $this->chkSaturdayDeliveryFlag->Checked;
+			$this->objFedexShipment->HoldAtLocationFlag = $this->chkHoldAtLocationFlag->Checked;
+			$this->objFedexShipment->HoldAtLocationAddress = $this->txtHoldAtLocationAddress->Text;
+			$this->objFedexShipment->HoldAtLocationCity = $this->txtHoldAtLocationCity->Text;
+			$this->objFedexShipment->HoldAtLocationState = $this->lstHoldAtLocationState->SelectedValue;
+			$this->objFedexShipment->HoldAtLocationPostalCode = $this->txtHoldAtLocationPostalCode->Text;
 		}
 		
 		// Load the Package Type options for the Shipment
@@ -3853,15 +4049,32 @@
 						1401 => number_format(round($this->txtPackageWeight->Text, 1), 1, '.', ''),		//Total Package Weight
 						1201 => $this->txtFedexNotifySenderEmail->Text,									//Sender EMail
 						1202 => $this->txtFedexNotifyRecipientEmail->Text,								//Recipient EMail
+						1204 => $this->txtFedexNotifyOtherEmail->Text,									//Other Email
 						1554 => ($this->chkFedexNotifySenderShipFlag->Checked) ? 'Y' : 'N',				//Notify Sender of Shipment
 						1961 => ($this->chkFedexNotifySenderExceptionFlag->Checked) ? 'Y' : 'N',		//Notify Sender of Exceptions
 						1553 => ($this->chkFedexNotifySenderDeliveryFlag->Checked) ? 'Y' : 'N',			//Notify Sender of Delivery
 						1557 => ($this->chkFedexNotifyRecipientShipFlag->Checked) ? 'Y' : 'N',			//Notify Recipient of Shipment
 						1962 => ($this->chkFedexNotifyRecipientExceptionFlag->Checked) ? 'Y' : 'N',		//Notify Recipient of Exceptions
 						1556 => ($this->chkFedexNotifyRecipientDeliveryFlag->Checked) ? 'Y' : 'N',		//Notify Recipient of Delivery
+						1206 => ($this->chkFedexNotifyOtherShipFlag->Checked) ? 'Y' : 'N',				//Notify Other of Shipment
+						1960 => ($this->chkFedexNotifyOtherExceptionFlag->Checked) ? 'Y' : 'N',			//Notify Other of Exception
+						1551 => ($this->chkFedexNotifyOtherDeliveryFlag->Checked) ? 'Y' : 'N',			//Notify Other of Delivery
 						1139 => $fxIntlSSN,																//Sender's SSN
 						68 => $fxIntlCurrencyUnit,														//Recipient Currency
 						1266 => ($this->chkSaturdayDeliveryFlag->Checked) ? 'Y' : 'N',					//Saturday Delivery
+						1200 => ($this->chkHoldAtLocationFlag->Checked) ? 'Y' : 'N',					//Hold at Location flag
+						44 => ($this->chkHoldAtLocationFlag->Checked) ? 								//Hold at Location Address
+							  $this->txtHoldAtLocationAddress->Text : 
+							  '',
+						46 => ($this->chkHoldAtLocationFlag->Checked) ?									//Hold at Location City
+							  $this->txtHoldAtLocationCity->Text :
+							  '',
+						47 => ($this->chkHoldAtLocationFlag->Checked && $this->objFedexShipment->HoldAtLocationStateObject) ? //Hold at Location State
+							  $this->objFedexShipment->HoldAtLocationStateObject->Abbreviation :
+							  '',
+						48 => ($this->chkHoldAtLocationFlag->Checked) ?									//Hold at Location Postal Code
+							  $this->txtHoldAtLocationPostalCode->Text :
+							  '',
 						1411 =>	$fxIntlCustomsValue,													//Total Customs Value
 						70 => $fxIntlDutiesPayType,														//Duties Pay Type
 						72 => $fxIntlTermsofSale,														//Terms of Sale
@@ -3983,6 +4196,7 @@
 			$this->txtReference->Display = false;
 			$this->txtFedexNotifySenderEmail->Display = false;
 			$this->txtFedexNotifyRecipientEmail->Display = false;
+			$this->txtFedexNotifyOtherEmail->Display = false;
 			$this->lstFxServiceType->Display = false;
 			$this->lstPackageType->Display = false;
 			$this->txtPackageWeight->Display = false;
@@ -3999,6 +4213,10 @@
 			$this->lblNewToCompany->Display = false;
 			$this->lblNewToContact->Display = false;
 			$this->lblNewToAddress->Display = false;
+			$this->txtHoldAtLocationAddress->Display = false;
+			$this->txtHoldAtLocationCity->Display = false;
+			$this->lstHoldAtLocationState->Display = false;
+			$this->txtHoldAtLocationPostalCode->Display = false;
 			
 			// Disable (instead of hiding) Fedex Notification checkboxes
 			$this->chkFedexNotifySenderShipFlag->Enabled = false;
@@ -4007,9 +4225,13 @@
 			$this->chkFedexNotifyRecipientShipFlag->Enabled = false;
 			$this->chkFedexNotifyRecipientExceptionFlag->Enabled = false;
 			$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = false;
+			$this->chkFedexNotifyOtherShipFlag->Enabled = false;
+			$this->chkFedexNotifyOtherExceptionFlag->Enabled = false;
+			$this->chkFedexNotifyOtherDeliveryFlag->Enabled = false;			
 			
-			// Disable (instead of hiding) Saturday Delivery checkbox
+			// Disable (instead of hiding) FedEx Special Services checkboxes
 			$this->chkSaturdayDeliveryFlag->Enabled = false;
+			$this->chkHoldAtLocationFlag->Enabled = false;
 			
 /*			if ($this->lblAdvanced->Text == 'Hide Advanced') {
 				$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
@@ -4054,6 +4276,7 @@
 			$this->lblReference->Display = true;
 			$this->lblFedexNotifySenderEmail->Display = true;
 			$this->lblFedexNotifyRecipientEmail->Display = true;
+			$this->lblFedexNotifyOtherEmail->Display = true;
 			$this->lblFxServiceType->Display = true;
 			$this->lblPackageType->Display = true;
 			$this->lblPackageWeight->Display = true;
@@ -4064,6 +4287,10 @@
 			$this->lblWeightUnit->Display = true;
 			$this->lblLengthUnit->Display = true;
 			$this->lblCurrencyUnit->Display = true;
+			$this->lblHoldAtLocationAddress->Display = true;
+			$this->lblHoldAtLocationCity->Display = true;
+			$this->lblHoldAtLocationState->Display = true;
+			$this->lblHoldAtLocationPostalCode->Display = true;
 			
 			// Display custom field labels
 			if ($this->arrCustomFields) {
@@ -4104,6 +4331,7 @@
 				$this->lblReference->Text = $this->objFedexShipment->Reference;
 				$this->lblFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
 				$this->lblFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
+				$this->lblFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
 				$this->lblFxServiceType->Text = ($this->objFedexShipment->FedexServiceType) ? $this->objFedexShipment->FedexServiceType->__toString() : '';
 				$this->lblPackageType->Text = ($this->objFedexShipment->PackageType) ? $this->objFedexShipment->PackageType->__toString() : '';
 				$this->lblPackageWeight->Text = $this->objFedexShipment->PackageWeight;
@@ -4114,6 +4342,10 @@
 				$this->lblWeightUnit->Text = $this->objFedexShipment->WeightUnit->__toString();
 				$this->lblLengthUnit->Text = $this->objFedexShipment->LengthUnit->__toString();
 				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
+				$this->lblHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
+				$this->lblHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
+				$this->lblHoldAtLocationState->Text = $this->objFedexShipment->HoldAtLocationStateObject->__toString();
+				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
 			}
 			
 			// Update custom labels
@@ -4147,6 +4379,7 @@
 			$this->lblReference->Display = false;
 			$this->lblFedexNotifySenderEmail->Display = false;
 			$this->lblFedexNotifyRecipientEmail->Display = false;
+			$this->lblFedexNotifyOtherEmail->Display = false;
 			$this->lblFxServiceType->Display = false;
 			$this->lblPackageType->Display = false;
 			$this->lblPackageWeight->Display = false;
@@ -4157,6 +4390,10 @@
 			$this->lblWeightUnit->Display = false;
 			$this->lblLengthUnit->Display = false;
 			$this->lblCurrencyUnit->Display = false;
+			$this->lblHoldAtLocationAddress->Display = false;
+			$this->lblHoldAtLocationCity->Display = false;
+			$this->lblHoldAtLocationState->Display = false;
+			$this->lblHoldAtLocationPostalCode->Display = false;
 			if ($this->blnEditMode) {
 				$this->btnCompleteShipment->Enabled = false;
 			}
@@ -4195,6 +4432,7 @@
 			$this->txtReference->Display = true;
 			$this->txtFedexNotifySenderEmail->Display = true;
 			$this->txtFedexNotifyRecipientEmail->Display = true;
+			$this->txtFedexNotifyOtherEmail->Display = true;			
 			$this->lstFxServiceType->Display = true;
 			$this->lstPackageType->Display = true;
 			$this->txtPackageWeight->Display = true;
@@ -4211,6 +4449,10 @@
 			$this->lblNewToCompany->Display = true;
 			$this->lblNewToContact->Display = true;
 			$this->lblNewToAddress->Display = true;
+			$this->txtHoldAtLocationAddress->Display = true;
+			$this->txtHoldAtLocationCity->Display = true;
+			$this->lstHoldAtLocationState->Display = true;
+			$this->txtHoldAtLocationPostalCode->Display = true;
 			
 			// Enable Fedex Notification Checkboxes (because they're disabled, not hidden)
 			$this->chkFedexNotifySenderShipFlag->Enabled = true;
@@ -4219,9 +4461,13 @@
 			$this->chkFedexNotifyRecipientShipFlag->Enabled = true;
 			$this->chkFedexNotifyRecipientExceptionFlag->Enabled = true;
 			$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = true;
+			$this->chkFedexNotifyOtherShipFlag->Enabled = true;
+			$this->chkFedexNotifyOtherExceptionFlag->Enabled = true;
+			$this->chkFedexNotifyOtherDeliveryFlag->Enabled = true;			
 			
-			//Enable Saturday Delivery Checkbox (because it's disabled, not hidden)
+			//Enable FedEx Special Services Checkboxes (because they're disabled, not hidden)
 			$this->chkSaturdayDeliveryFlag->Enabled = true;
+			$this->chkHoldAtLocationFlag->Enabled = true;
 			
 			if ($this->blnEditMode) {
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));

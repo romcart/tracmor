@@ -35,7 +35,7 @@
 					<td style="vertical-align:top;">
 						<table cellpadding="0" cellspacing="0">
 							<tr>
-								<td class="record_field_name">Recipient Telephone:&nbsp;</td>
+								<td class="record_field_name">Recipient Phone:&nbsp;</td>
 								<td class="record_field_value"><?php $this->txtToPhone->RenderWithError(); $this->lblToPhone->Render(); ?>&nbsp;</td>
 							</tr>
 						</table>
@@ -45,8 +45,8 @@
 								<td colspan="2" class="fedex_subheader">Billing Details</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Bill transportation to:&nbsp;</td>
-								<td class="record_field_value"><?php $this->lstBillTransportationTo->RenderWithError(); $this->lblBillTransportationTo->Render(); ?></td>
+								<td class="record_field_name">Bill to:&nbsp;</td>
+								<td class="record_field_value"><?php $this->lstBillTransportationTo->RenderWithError(); $this->lblBillTransportationTo->Render(); ?>&nbsp;</td>
 							</tr>
 							<tr>
 								<td class="record_field_name"><?php $this->lblSenderLabel->Render(); ?>:&nbsp;</td>
@@ -57,9 +57,7 @@
 								<td class="record_field_value"><?php $this->txtReference->RenderWithError(); $this->lblReference->Render(); ?>&nbsp;</td>
 							</tr>			
 						</table>
-					</td>
-					<td style="width:16px">&nbsp;</td>
-					<td style="vertical-align:top;">
+						<br class="item_divider" />
 						<table cellpadding="0" cellspacing="0">
 							<tr>
 								<td colspan="2" class="fedex_subheader">Package & Shipment Details</td>
@@ -84,16 +82,44 @@
 								<td class="record_field_name">Declared Value:&nbsp;</td>
 								<td class="record_field_value"><?php $this->txtValue->RenderWithError(); $this->lblValue->Render(); ?>&nbsp;<?php $this->lstCurrencyUnit->RenderWithError(); ?>&nbsp;<?php $this->lblCurrencyUnit->Render(); ?></td>
 							</tr>
+						</table>								
+					</td>
+					<td style="width:16px">&nbsp;</td>
+					<td style="vertical-align:top;">
+						<table cellpadding="0" cellspacing="0">
+							<tr>
+								<td colspan="2" class="fedex_subheader">Special Services</td>
+							</tr>
 							<tr>
 								<td class="record_field_name">Saturday Delivery:&nbsp;</td>
 								<td class="record_field_value"><?php $this->chkSaturdayDeliveryFlag->RenderWithError(); ?></td>
-							</tr>							
-							<!--<tr>
-								<td class="record_field_name"></td>
-								<td class="record_field_value"><?php //$this->chkNotificationFlag->RenderWithError(); ?>&nbsp;Send notification</td>
-							</tr>-->																															
+							</tr>
+							<tr>
+								<td class="record_field_name">Hold at Location:&nbsp;</td>
+								<td class="record_field_value"><?php $this->chkHoldAtLocationFlag->RenderWithError(); ?></td>
+							</tr>									
 						</table>
-						<br class="item_divider" />						
+						<?php $HALDisplay = ($this->blnEditMode && $this->objShipment->CourierId===1 && $this->objFedexShipment->HoldAtLocationFlag) ? "" : "display:none;"; ?>
+						<table style="<?php echo($HALDisplay); ?>" id="HAL">
+							<tr><td></td><td><div style="font-size:8pt;">Enter the address of the FedEx location where the package is to be held. This service is not available at every FedEx location. Contact your local FedEx office for more details.</div></tr>
+							<tr>
+								<td class="record_field_name">Address</td>
+								<td class="record_field_value"><?php $this->txtHoldAtLocationAddress->RenderWithError(); $this->lblHoldAtLocationAddress->Render(); ?>&nbsp;</td>
+							</tr>
+							<tr>
+								<td class="record_field_name">City</td>
+								<td class="record_field_value"><?php $this->txtHoldAtLocationCity->RenderWithError(); $this->lblHoldAtLocationCity->Render(); ?>&nbsp;</td>
+							</tr>
+							<tr>
+								<td class="record_field_name">State</td>
+								<td class="record_field_value"><?php $this->lstHoldAtLocationState->RenderWithError(); $this->lblHoldAtLocationState->Render(); ?>&nbsp;</td>
+							</tr>
+							<tr>
+								<td class="record_field_name">Postal Code</td>
+								<td class="record_field_value"><?php $this->txtHoldAtLocationPostalCode->RenderWithError(); $this->lblHoldAtLocationPostalCode->Render(); ?>&nbsp;</td>
+							</tr>														
+						</table>
+						<br class="item_divider" />		
 						<table cellpadding="0" cellspacing="0">
 							<tr>
 								<td colspan="2" class="fedex_subheader">Shipment Notifications</td>
@@ -112,6 +138,13 @@
 									<?php $this->chkFedexNotifyRecipientShipFlag->RenderWithError(); ?>Ship&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyRecipientExceptionFlag->RenderWithError(); ?>Exception&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyRecipientDeliveryFlag->RenderWithError(); ?>Delivery
 								</td>
 							</tr>
+							<tr>
+								<td class="record_field_name">Other:&nbsp;</td>
+								<td class="record_field_value">
+									<?php $this->txtFedexNotifyOtherEmail->RenderWithError(); $this->lblFedexNotifyOtherEmail->Render(); ?>&nbsp;<br>
+									<?php $this->chkFedexNotifyOtherShipFlag->RenderWithError(); ?>Ship&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyOtherExceptionFlag->RenderWithError(); ?>Exception&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyOtherDeliveryFlag->RenderWithError(); ?>Delivery
+								</td>
+							</tr>							
 						</table>
 					</td>
 				</tr>
