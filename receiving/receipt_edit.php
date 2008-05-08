@@ -1903,7 +1903,8 @@
 								if ($objAssetTransactionToDelete) {
 									// If a new asset was created in this receipt, it needs to be deleted
 									if ($objAssetTransactionToDelete->NewAssetFlag) {
-										$objAssetTransactionToDelete->Asset->Delete();
+										$intAssetIdToDelete = $objAssetTransactionToDelete->Asset->AssetId;
+										//$objAssetTransactionToDelete->Asset->Delete();
 									}
 									// Otherwise, just revert to it's old location
 									else {
@@ -1913,6 +1914,13 @@
 									}
 									// Delete the asset transaction
 									$objAssetTransactionToDelete->Delete();
+									
+									// If a new asset,  delete it
+									if (isset($intAssetIdToDelete)) {
+										$objAssetToDelete = Asset::LoadByAssetId($intAssetIdToDelete);
+										$objAssetToDelete->Delete();
+									}
+									
 									unset($objAssetTransactionToDelete);
 								}
 							}
