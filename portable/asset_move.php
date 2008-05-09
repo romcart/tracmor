@@ -1,6 +1,8 @@
 <?php
 require_once('../includes/prepend.inc.php');
 
+// Check that the user is properly authenticated
+
 if ($_POST && $_POST['method'] == 'complete_transaction') {
 	/*
 	Run error checking on the array of asset codes and the destination location
