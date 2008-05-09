@@ -2570,7 +2570,7 @@
 					}
 					
 					if ($objNewAsset && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
-						if ($this->blnEditMode && $objPendingShipment->TransactionId != $this->objShipment->TransactionId) {
+						if ($objPendingShipment->TransactionId != $this->objShipment->TransactionId) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "That asset was already scheduled for shipment.";
 						}
