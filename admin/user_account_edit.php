@@ -48,6 +48,8 @@
 		protected $txtPassword;
 		protected $txtPasswordConfirm;
 		protected $lblHeaderUser;
+		protected $lblUserAccountId;
+		protected $pnlPortableAccess;
 		
 		protected function Form_Create() {
 			// Call SetupUserAccount to either Load/Edit Existing or Create New
@@ -66,6 +68,10 @@
 			$this->chkAdminFlag_Create();
 			$this->lstRole_Create();
 			$this->lblHeaderUser_Create();
+			$this->pnlPortableAccess_Create();
+			$this->lblUserAccountId_Create();
+			$this->txtPortableUserPin_Create();
+			$this->chkPortableAccessFlag_Create();
 			
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
@@ -147,6 +153,42 @@
 			$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
+  	
+  	// Setup User Portable Access Flag Checkbox
+  	protected function chkPortableAccessFlag_Create() {
+  		parent::chkPortableAccessFlag_Create();
+  		$this->chkPortableAccessFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+  		$this->chkPortableAccessFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  		$this->chkPortableAccessFlag->AddAction(new QClickEvent(), new QToggleDisplayAction($this->pnlPortableAccess));
+  		$this->chkPortableAccessFlag->AddAction(new QClickEvent(), new QAjaxAction('chkPortableAccessFlag_Click'));
+  		
+  	}
+  	
+  	protected function pnlPortableAccess_Create() {
+  		$this->pnlPortableAccess = new QPanel($this);
+  		$this->pnlPortableAccess->Template = 'pnl_portable_access.inc.php';
+  		if (!$this->objUserAccount->PortableAccessFlag) {
+  			$this->pnlPortableAccess->Display = false;
+  		}
+  	}
+  	
+  	// Setup User Account Id Label
+  	protected function lblUserAccountId_Create() {
+  		parent::lblUserAccountId_Create();
+  		$this->lblUserAccountId->SetParentControl($this->pnlPortableAccess);
+  		$this->lblUserAccountId->DisplayStyle = QDisplayStyle::Inline;
+  	}
+  	
+  	// Setup Portable User Pin textbox
+  	protected function txtPortableUserPin_Create() {
+  		parent::txtPortableUserPin_Create();
+  		$this->txtPortableUserPin->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+  		$this->txtPortableUserPin->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  		$this->txtPortableUserPin->SetParentControl($this->pnlPortableAccess);
+  		if (QApplication::$TracmorSettings->PortablePinRequired && $this->objUserAccount->PortableAccessFlag) {
+  			$this->txtPortableUserPin->Required = true;
+  		}
+  	}
 		
 		// Setup btnSave
 		protected function btnSave_Create() {
@@ -204,7 +246,15 @@
 					throw new QDatabaseExceptionBase();
 				}
 			}
-		}		
+		}
+		
+		protected function chkPortableAccessFlag_Click($strFormId, $strControlId, $strParameter) {
+			if ($this->chkPortableAccessFlag->Checked) {
+				$this->txtPortableUserPin->Required = true;
+			} else {
+				$this->txtPortableUserPin->Required = false;
+			}
+		}
 		
 		// Protected Update Methods
 		protected function UpdateUserAccountFields() {
@@ -218,6 +268,8 @@
 			$this->objUserAccount->EmailAddress = $this->txtEmailAddress->Text;
 			$this->objUserAccount->ActiveFlag = $this->chkActiveFlag->Checked;
 			$this->objUserAccount->AdminFlag = $this->chkAdminFlag->Checked;
+			$this->objUserAccount->PortableAccessFlag = $this->chkPortableAccessFlag->Checked;
+			$this->objUserAccount->PortableUserPin = $this->txtPortableUserPin->Text;
 			$this->objUserAccount->RoleId = $this->lstRole->SelectedValue;
 		}
 	}

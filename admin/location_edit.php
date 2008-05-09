@@ -85,16 +85,22 @@
 		// Control ServerActions
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 			
-			try {
-				$this->UpdateLocationFields();
-				$this->objLocation->Save();
-	
-	
-				$this->RedirectToListPage();
+			if ($objLocation = Location::LoadByShortDescription($this->txtShortDescription->Text)) {
+				$this->txtShortDescription->Warning = 'This Location Name is already in use. Please try another.';
 			}
-			catch(QExtendedOptimisticLockingException $objExc) {
-				
-				$this->btnCancel->Warning = sprintf('This location has been updated by another user. You must <a href="location_edit.php?intLocationId=%s">Refresh</a> to edit this location.', $this->objLocation->LocationId);
+			else {
+			
+				try {
+					$this->UpdateLocationFields();
+					$this->objLocation->Save();
+		
+		
+					$this->RedirectToListPage();
+				}
+				catch(QExtendedOptimisticLockingException $objExc) {
+					
+					$this->btnCancel->Warning = sprintf('This location has been updated by another user. You must <a href="location_edit.php?intLocationId=%s">Refresh</a> to edit this location.', $this->objLocation->LocationId);
+				}
 			}
 		}
 		

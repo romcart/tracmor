@@ -91,6 +91,13 @@
 							<td class="record_field_name">Administrator: </td>
 							<td class="record_field_edit"><?php $this->chkAdminFlag->RenderWithError(); ?></td>
 						</tr>
+						<tr>
+							<td class="record_field_name">Portable Access: </td>
+							<td class="record_field_edit"><?php $this->chkPortableAccessFlag->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td colspan="2"><?php $this->pnlPortableAccess->RenderWithError(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>

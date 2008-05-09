@@ -32,6 +32,7 @@
 		protected $txtImageUploadPrefix;
 		protected $chkCustomShipmentNumbers;
 		protected $chkCustomReceiptNumbers;
+		protected $chkPortablPinRequired;
 		protected $pnlSaveNotification;
 		
 		// Buttons
@@ -46,6 +47,7 @@
 			$this->txtImageUploadPrefix_Create();
 			$this->chkCustomShipmentNumbers_Create();
 			$this->chkCustomReceiptNumbers_Create();
+			$this->chkPortablePinRequired_Create();
 			
 			// Create Buttons
 			$this->btnSave_Create();
@@ -97,6 +99,18 @@
 			}
 		}
 		
+		// Create and Setup the PortablePinRequired Checkbox
+		protected function chkPortablePinRequired_Create() {
+			$this->chkPortablePinRequired = new QCheckBox($this);
+			$this->chkPortablePinRequired->Name = 'Portabl Pin Required';
+			if (QApplication::$TracmorSettings->PortablePinRequired == '1') {
+				$this->chkPortablePinRequired->Checked = true;
+			}
+			else {
+				$this->chkPortablePinRequired->Checked = false;
+			}
+		}
+		
 		// Create and Setup the Save Buttons
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
@@ -121,6 +135,7 @@
 			// We have to cast these to string because the admin_settings value column is TEXT, and checkboxes give boolean values
 			QApplication::$TracmorSettings->CustomShipmentNumbers = (string) $this->chkCustomShipmentNumbers->Checked;
 			QApplication::$TracmorSettings->CustomReceiptNumbers = (string) $this->chkCustomReceiptNumbers->Checked;
+			QApplication::$TracmorSettings->PortablePinRequired = (string) $this->chkPortablePinRequired->Checked;
 			
 			// Show saved notification
 			$this->pnlSaveNotification->Display = true;

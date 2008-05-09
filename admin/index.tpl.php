@@ -68,6 +68,10 @@
 							<td class="record_field_name">Custom Receipt Numbers: </td>
 							<td class="record_field_edit"><?php $this->chkCustomReceiptNumbers->RenderWithError(); ?></td>
 						</tr>
+						<tr>
+							<td class="record_field_name">Portable Pin Required: </td>
+							<td class="record_field_edit"><?php $this->chkPortablePinRequired->RenderWithError(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>
