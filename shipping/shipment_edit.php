@@ -3049,8 +3049,12 @@
 									// It should not be true on the new AssetTransaction, but only on the AssetTransaction that caused the new asset to be created.
 									// $objReceiptAssetTransaction->NewAssetFlag = true;
 									$objReceiptAssetTransaction->Save();
+									
+									// Associate this shipment with the auto-scheduled receipt
+									$objReceipt->AssociateShipment($this->objShipment);
 								}
 								$objAssetTransaction->Save();
+								
 								$objReceipt = null;
 								$objTransaction = null;
 							}
@@ -4344,7 +4348,7 @@
 				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
 				$this->lblHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
 				$this->lblHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
-				$this->lblHoldAtLocationState->Text = $this->objFedexShipment->HoldAtLocationStateObject->__toString();
+				$this->lblHoldAtLocationState->Text = ($this->objFedexShipment->HoldAtLocationStateObject) ? $this->objFedexShipment->HoldAtLocationStateObject->__toString() : '';
 				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
 			}
 			
