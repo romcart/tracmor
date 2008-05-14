@@ -3050,11 +3050,8 @@
 									// $objReceiptAssetTransaction->NewAssetFlag = true;
 									$objReceiptAssetTransaction->Save();
 									
-									// Associate this shipment with the auto-scheduled receipt
-									$objReceipt->AssociateShipment($this->objShipment);
 								}
-								$objAssetTransaction->Save();
-								
+								$objAssetTransaction->Save();	
 								$objReceipt = null;
 								$objTransaction = null;
 							}
