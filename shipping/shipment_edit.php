@@ -2942,6 +2942,11 @@
 						$this->UpdateShipmentFields();
 						$this->objShipment->Save(true);
 						
+						if ($this->arrCustomFields) {
+							// Save the values from all of the custom field controls to save the shipment
+							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
+						}
+						
 						// If the courier is FedEx, create new fedexShipment
 						if ($this->lstCourier->SelectedValue === 1) {
 							if (!($this->objFedexShipment instanceof FedexShipment)) {
