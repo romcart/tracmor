@@ -24,7 +24,7 @@ if ($_POST && $_POST['method'] == 'menu' && is_numeric($_POST['menu_id'])) {
 <h1>TRACMOR PORTABLE INTERFACE</h1>
 <ol>
 <h3>Main Menu</h3>
-<li><a href="assets_menu.php">Manage Assets</a></li>
+<li><a href="asset_menu.php">Manage Assets</a></li>
 <li><a href="inventory_menu.php">Manage Inventory</a></li>
 </ol>
 
