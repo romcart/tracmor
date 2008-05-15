@@ -32,7 +32,7 @@
 		protected $txtImageUploadPrefix;
 		protected $chkCustomShipmentNumbers;
 		protected $chkCustomReceiptNumbers;
-		protected $chkPortablPinRequired;
+		protected $chkPortablePinRequired;
 		protected $pnlSaveNotification;
 		
 		// Buttons
