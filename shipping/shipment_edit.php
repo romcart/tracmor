@@ -3044,7 +3044,10 @@
 									}
 									// If this is an exchange
 									else {
+										// Both the shipmentAssetTranscation (objAssetTransaction and the objReceiptAssetTransaction were involved in creating a new asset
+										// Asset Transactions where NewAssetFlag = true but AssetId is NULL are receipt asset transactions for exchanges.
 										$objReceiptAssetTransaction->AssetId = $objAssetTransaction->NewAssetId;
+										$objReceiptAssetTransaction->NewAssetFlag = true;
 										$objAssetTransaction->NewAssetFlag = true;
 										$objAssetTransaction->Save();
 									}
