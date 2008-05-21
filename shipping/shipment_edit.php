@@ -3060,6 +3060,13 @@
 									
 								}
 								$objAssetTransaction->Save();	
+								
+								if ($objAssetTransaction->ScheduleReceiptFlag) {
+									// Set the Receipt Asset Transaction as child of the Shipment Asset Transaction
+									$objAssetTransaction->AssociateChildAssetTransaction($objReceiptAssetTransaction);
+								}
+								
+								
 								$objReceipt = null;
 								$objTransaction = null;
 							}

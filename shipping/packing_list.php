@@ -143,7 +143,8 @@
 
     	$this->dtgItem->AddColumn(new QDataGridColumn('Item', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column_print"'));
 		$this->dtgItem->AddColumn(new QDataGridColumn('Code', '<?= $_ITEM->RenderBarcode() ?>', 'Width=200', 'CssClass="dtg_column_print"', 'HtmlEntities=false'));
-	    $this->dtgItem->AddColumn(new QDataGridColumn('Qty', '<?= $_ITEM->Quantity ?>', 'CssClass=dtg_column_print'));
+	    $this->dtgItem->AddColumn(new QDataGridColumn('Qty', '<?= $_ITEM->Quantity ?>', 'Width=100','CssClass=dtg_column_print'));
+	    $this->dtgItem->AddColumn(new QDataGridColumn('Receipt #', '<?= $_ITEM->ReceiptNumber ?>', 'CssClass=dtg_column_print'));
 	    
 	    $objStyle = $this->dtgItem->RowStyle;
 	    $objStyle->ForeColor = '#000000';

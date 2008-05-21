@@ -74,6 +74,7 @@
 			$objToReturn->strShortDescription = $objDbRow->GetColumn($strAliasPrefix . 'short_description', 'VarChar');
 			$objToReturn->strCode = $objDbRow->GetColumn($strAliasPrefix . 'code', 'VarChar');
 			$objToReturn->strQuantity = $objDbRow->GetColumn($strAliasPrefix . 'quantity', 'VarChar');
+			$objToReturn->strReceiptNumber = $objDbRow->GetColumn($strAliasPrefix . 'receipt_number', 'VarChar');
 			
 			return $objToReturn;
 		}
@@ -113,7 +114,21 @@
 				SELECT 
 					asset_model.short_description AS short_description,
 					asset.asset_code AS code,
-					'1' AS quantity 
+					'1' AS quantity,
+					(
+					SELECT 
+						receipt.receipt_number 
+					FROM 
+						receipt,
+						transaction,
+						asset_transaction at
+					WHERE
+						receipt.transaction_id = transaction.transaction_id
+					AND
+						at.transaction_id = transaction.transaction_id
+					AND
+						at.parent_asset_transaction = asset_transaction.asset_transaction_id					
+					) AS receipt_number
 				FROM 
 					asset_transaction 
 					LEFT JOIN asset ON asset_transaction.asset_id = asset.asset_id
@@ -124,7 +139,8 @@
 				SELECT 
 					inventory_model.short_description AS short_description, 
 					inventory_model.inventory_model_code AS code, 
-					inventory_transaction.quantity AS quantity
+					inventory_transaction.quantity AS quantity,
+					'' AS receipt_number
 				FROM 
 					inventory_transaction
 					LEFT JOIN inventory_location ON inventory_transaction.inventory_location_id = inventory_location.inventory_location_id
@@ -163,7 +179,13 @@
 					 * @return string
 					 */
 					return $this->strQuantity;
-					
+
+				case 'ReceiptNumber':
+					/**
+					 * Gets the value for strReceiptNumber 
+					 * @return string
+					 */
+					return $this->strReceiptNumber;	
 				default:
 					try {
 						return parent::__get($strName);
@@ -243,5 +265,6 @@
 		protected $strShortDescription;
 		protected $strCode;
 		protected $strQuantity;
+		protected $strReceiptNumber;
 	}
 ?>
