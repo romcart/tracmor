@@ -127,7 +127,7 @@
 					AND
 						at.transaction_id = transaction.transaction_id
 					AND
-						at.parent_asset_transaction = asset_transaction.asset_transaction_id					
+						at.parent_asset_transaction_id = asset_transaction.asset_transaction_id					
 					) AS receipt_number
 				FROM 
 					asset_transaction 
