@@ -1842,7 +1842,7 @@
 						
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
-							CustomField::SaveControls($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objReceipt->ReceiptId, 11);
+							CustomField::SaveControls($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objReceipt->ReceiptId, EntityQtype::Receipt);
 						}
 						
 						$objDatabase->TransactionCommit();
@@ -2042,7 +2042,7 @@
 						
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
-							CustomField::SaveControls($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objReceipt->ReceiptId, 10);
+							CustomField::SaveControls($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objReceipt->ReceiptId, EntityQtype::Receipt);
 						}
 						
 						// Reload to get new timestamp to avoid optimistic locking if edited/saved again without reload
