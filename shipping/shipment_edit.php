@@ -3185,6 +3185,21 @@
 							}
 						}
 						
+						// If this is an automatically scheduled exchange receipt, then we delete the asset, which will cascade to the asset_transaction as well
+						if ($objAssetTransaction->NewAssetFlag && $objAssetTransaction->NewAsset instanceof Asset) {
+							$objChildAssetTransactionArray = $objAssetTransaction->GetChildAssetTransactionArray();
+							if ($objChildAssetTransactionArray) {
+								foreach ($objChildAssetTransactionArray as $objChildAssetTransaction) {
+									$objChildAssetTransaction->Asset->Delete();
+									if ($objChildAssetTransaction->Transaction->IsEmpty()) {
+										$objChildAssetTransaction->Transaction->Delete();
+									}
+								}
+							}
+							// The new asset no longer exists
+							$objAssetTransaction->NewAssetId = null;
+						}
+						
 						// Set the destination location to null
 						$objAssetTransaction->DestinationLocationId = null;
 						$objAssetTransaction->Save();
