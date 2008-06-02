@@ -2,6 +2,10 @@
 require_once('../includes/prepend.inc.php');
 
 // Check that the user is properly authenticated
+if (!isset($_SESSION['AuthenticateSuccess'])) {
+    // authenticate error
+	QApplication::Redirect('./index.php');
+}
 
 if ($_POST && $_POST['method'] == 'complete_transaction') {
 	/*
@@ -37,7 +41,8 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	}
 	*/
 }
-
+//Remove that flag when transaction is compelete or exists some errors
+unset($_SESSION['AuthenticateSuccess']);
 ?>
 
 <html>

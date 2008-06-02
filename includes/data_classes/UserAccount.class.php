@@ -80,5 +80,21 @@
 			
 			return BooleanImage($this->AdminFlag);
 		}
+		
+		// Returns true if UserAccountId/UserPin are correct and false otherwise
+		public function LoadByUserAccountIdPortableUserPin($intUserAccountId, $strPortableUserPin) {
+		    $strQuery = "SELECT * FROM `user_account` where `user_account_id`='$intUserAccountId' AND `portable_user_pin`='$strPortableUserPin'";
+		    
+		    $objDatabase = QApplication::$Database[1];
+	
+    	    // Perform the Query
+    	    $objDbResult = $objDatabase->Query($strQuery);
+    	    
+    	    $mixArray = $objDbResult->FetchArray();
+    	    if ($mixArray) {
+    	    	return $mixArray;
+	        }
+		    return false;
+		}
 	}
 ?>

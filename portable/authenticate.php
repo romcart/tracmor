@@ -1,40 +1,44 @@
 <?php
 require_once('../includes/prepend.inc.php');
 
+$error = "";
+
 if ($_GET['menu_id']) {
 	if ($_POST && is_numeric($_POST['user_account_id'])) {
 		if (QApplication::$TracmorSettings->PortablePinRequired && $_POST['portable_user_pin']) {
 			
-			QApplication::Redirect('./asset_move.php');
-			exit;
-			// This is just to make the example work, and obviously needs to be removed and changed.
+			//QApplication::Redirect('./asset_move.php');
+			//exit;
 			
+			require(__DATA_CLASSES__ . '/UserAccount.class.php');
+
 			$intUserAccountId = $_POST['user_account_id'];
 			$strPortableUserPin = $_POST['portable_user_pin'];
 			
-			// $objUserAccount = UserAccount::LoadByUserAccountIdPortableUserPin($intUserAccountId, $strPortableUserPin);
-			// This method needs to be added to UserAccount.class.php
+			$objUserAccount = UserAccount::LoadByUserAccountIdPortableUserPin($intUserAccountId, $strPortableUserPin);
+			
 			if (!$objUserAccount) {
-				// error
+				// authenticate error
+				$error = "That User ID and PIN did not authenticate. Please try again.";
 			}
 			else {
-				// Authenticate user and redirect to proper transaction page based on menu_id
-				/*
-				switch ($_POST['menu_id']) {
+			    $_SESSION['AuthenticateSuccess']=true;
+			    // Authenticate user and redirect to proper transaction page based on menu_id
+				switch ($_GET['menu_id']) {
 					case 1:
-						QApplication::Redirect('./assets_move.php');
+						QApplication::Redirect('./asset_move.php');
 						break;
 					case 2:
-						QApplication::Redirect('./assets_checkout.php');
+						QApplication::Redirect('./asset_checkout.php');
 						break;
 					case 3:
-						QApplication::Redirect('./assets_checkin.php');
+						QApplication::Redirect('./asset_checkin.php');
 						break;
 					case 4:
-						QApplication::Redirect('./assets_receive.php');
+						QApplication::Redirect('./asset_receive.php');
 						break;
 					case 5:
-						QApplication::Redirect('./assets_inventory.php');
+						QApplication::Redirect('./asset_inventory.php');
 						break;
 					case 6:
 						QApplication::Redirect('./inventory_move.php');
@@ -49,7 +53,6 @@ if ($_GET['menu_id']) {
 						QApplication::Redirect('./inventory_inventory.php');
 						break;
 				}
-				*/
 			}
 		}
 	}
@@ -76,6 +79,7 @@ User ID: <input type="text" name="user_account_id" size="4"><br />
 User PIN: <input type="text" name="portable_user_pin" size="10"><br />
 <input type="submit" value="Authenticate">
 </form>
+<p><?php echo $error; ?></p>
 
 </body>
 </html>
