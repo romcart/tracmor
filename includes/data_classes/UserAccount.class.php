@@ -81,9 +81,22 @@
 			return BooleanImage($this->AdminFlag);
 		}
 		
+		/**
+		 * Load a UserAccount Object based on the UserAccountId and PortableUserPin
+		 * Returns false if the ID and Pin do not match
+		 *
+		 * @param integer $intUserAccountId
+		 * @param string $strPortableUserPin
+		 * @return UserAccount Object
+		 */
 		// Returns true if UserAccountId/UserPin are correct and false otherwise
 		public function LoadByUserAccountIdPortableUserPin($intUserAccountId, $strPortableUserPin) {
-		    $strQuery = "SELECT * FROM `user_account` where `user_account_id`='$intUserAccountId' AND `portable_user_pin`='$strPortableUserPin'";
+			
+			return UserAccount::QuerySingle(
+				QQ::AndCondition(QQ::Equal(QQN::UserAccount()->UserAccountId, $intUserAccountId), QQ::Equal(QQN::UserAccount()->PortableUserPin, $strPortableUserPin))
+			);
+			
+		    /*$strQuery = "SELECT * FROM `user_account` where `user_account_id`='$intUserAccountId' AND `portable_user_pin`='$strPortableUserPin'";
 		    
 		    $objDatabase = QApplication::$Database[1];
 	
@@ -94,7 +107,7 @@
     	    if ($mixArray) {
     	    	return $mixArray;
 	        }
-		    return false;
+		    return false;*/
 		}
 	}
 ?>

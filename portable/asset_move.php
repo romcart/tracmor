@@ -42,7 +42,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	*/
 }
 //Remove that flag when transaction is compelete or exists some errors
-unset($_SESSION['AuthenticateSuccess']);
+unset($_SESSION['intUserAccountId']);
 ?>
 
 <html>

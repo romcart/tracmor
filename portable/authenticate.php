@@ -22,7 +22,8 @@ if ($_GET['menu_id']) {
 				$error = "That User ID and PIN did not authenticate. Please try again.";
 			}
 			else {
-			    $_SESSION['AuthenticateSuccess']=true;
+			  //$_SESSION['AuthenticateSuccess']=true;
+			  $_SESSION['intUserAccountId'] = $objUserAccount->UserAccountId;
 			    // Authenticate user and redirect to proper transaction page based on menu_id
 				switch ($_GET['menu_id']) {
 					case 1:
