@@ -2,7 +2,7 @@
 require_once('../includes/prepend.inc.php');
 
 // Check that the user is properly authenticated
-if (!isset($_SESSION['AuthenticateSuccess'])) {
+if (!isset($_SESSION['intUserAccountId'])) {
     // authenticate error
 	QApplication::Redirect('./index.php');
 }
@@ -18,15 +18,15 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	if (!$blnError) {
 	
 		$intDestinationLocationid = Location::LoadByShortDescription($_POST['destination_location']);
+		
+		$objTransaction = new Transaction();
+		$objTransaction->EntityQtypeId = EntityQtype::Asset;
+		$objTransaction->TransactionTypeId = 1; // Move
+		$objTransaction->Save();
 	
 		foreach ($arrAssetCode as $strAssetCode) {
 			
 			$objAsset = Asset::LoadByAssetCode($strAssetCode);
-			
-			$objTransaction = new Transaction();
-			$objTransaction->EntityQtypeId = EntityQtype::Asset;
-			$objTransaction->TransactionTypeId = 1; // Move
-			$objTransaction->Save();
 			
 			$objAssetTransaction = new AssetTransaction();
 			$objAssetTransaction->AssetId = $objAsset->AssetId;
