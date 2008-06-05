@@ -20,7 +20,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	$arrAssetCode = explode('#',$_POST['result']);
 	$blnError = false;
 	foreach ($arrAssetCode as $strAssetCode) {
-	   if ($strAssetCode) {
+		if ($strAssetCode) {
 			// Begin error checking
 			/*if ($this->objAssetArray) {
 				foreach ($this->objAssetArray as $asset) {
@@ -61,9 +61,9 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 					$strWarning = "That asset is reserved.";
 				}
 				
-				/*if (!$blnError && $objNewAsset instanceof Asset)  {
+				if (!$blnError && $objNewAsset instanceof Asset)  {
 					$objAssetArray[] = $objNewAsset;
-				}*/
+				}
 			}
 		}
 		else {
@@ -72,37 +72,44 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	}
 	
 	if (!$blnError) {
-	    $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
-        if (!$objDestinationLocation) {
-            $blnError = true;
-            $strWarning = "Detination Location does not exist.";
-        }
-        else {
-    	    $intDestinationLocationId = $objDestinationLocation->LocationId;
-    	    $arrAssetCode = explode('#',$_POST['result']);
-    	    
-    	    foreach ($arrAssetCode as $strAssetCode) {
-    			
-    			$objAsset = Asset::LoadByAssetCode($strAssetCode);
-    			$objTransaction = new Transaction();
-    			$objTransaction->EntityQtypeId = EntityQtype::Asset;
-    			$objTransaction->TransactionTypeId = 1; // Move
-    			$objTransaction->Save();
-    			
-    			$objAssetTransaction = new AssetTransaction();
-    			$objAssetTransaction->AssetId = $objAsset->AssetId;
-    			$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
-    			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
-    			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
-    			$objAssetTransaction->Save();
-    			
-    			$objAsset->LocationId = $intDestinationLocationId;
-    			$objAsset->Save();
-    		}
-    		$strWarning = "Your transaction has successfully completed<br/><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a>";
-    		//Remove that flag when transaction is compelete or exists some errors
-            unset($_SESSION['intUserAccountId']);
-        }
+    $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
+    if (!$objDestinationLocation) {
+        $blnError = true;
+        $strWarning = "Destination Location does not exist.";
+    }
+    else {
+	    $intDestinationLocationId = $objDestinationLocation->LocationId;
+	    $arrAssetCode = explode('#',$_POST['result']);
+	    
+	    // HJ Change
+	    // I moved these outside of the foreach, because this should only be 1 transaction.
+	    // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
+	    $objTransaction = new Transaction();
+			$objTransaction->EntityQtypeId = EntityQtype::Asset;
+			$objTransaction->TransactionTypeId = 1; // Move
+			$objTransaction->Save();
+	    
+	    //foreach ($arrAssetCode as $strAssetCode) {
+	    // HJ Change
+	    foreach ($objAssetArray as $objAsset) {
+			
+	    	// HJ Change
+  			//$objAsset = Asset::LoadByAssetCode($strAssetCode);
+  			
+  			$objAssetTransaction = new AssetTransaction();
+  			$objAssetTransaction->AssetId = $objAsset->AssetId;
+  			$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
+  			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
+  			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
+  			$objAssetTransaction->Save();
+  			
+  			$objAsset->LocationId = $intDestinationLocationId;
+  			$objAsset->Save();
+  		}
+			$strWarning = "Your transaction has successfully completed<br/><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a>";
+			//Remove that flag when transaction is compelete or exists some errors
+      unset($_SESSION['intUserAccountId']);
+    }        
 	}
 }
 
