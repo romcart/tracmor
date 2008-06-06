@@ -107,40 +107,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 <head>
 <title>Tracmor Portable Interface - Move Assets</title>
 <link rel="stylesheet" type="text/css" href="/css/portable.css">
-<script>
-var arrayAssetCode = new Array();
-var i=0;
-function AddAsset() {
-    strAssetCode = document.getElementById('asset_code').value;
-    if (strAssetCode != '') {
-        document.getElementById('warning').innerHTML = "";
-        arrayAssetCode[i] = strAssetCode;
-        document.getElementById('result').innerHTML += arrayAssetCode[i++] + "<br/>";
-        document.getElementById('asset_code').value = '';
-    }
-    else {
-        document.getElementById('warning').innerHTML = "Asset Code cannot be empty";
-    }
-    document.getElementById('asset_code').focus();
-}
-function AddAssetPost(strAssetCode) {
-    arrayAssetCode[i] = strAssetCode;
-    document.getElementById('result').innerHTML += arrayAssetCode[i++] + "<br/>";
-}
-
-function CompleteCheckOut() {
-    var strAssetCode = "";
-    var strAssetCode = arrayAssetCode.join("#");
-    if (arrayAssetCode.length == 0) {
-        document.getElementById('warning').innerHTML = "You must provide at least one asset";
-        return false;
-    }
-    if (arrayAssetCode.length>0) {
-         document.main_form.result.value = strAssetCode;
-         document.main_form.submit();
-    }
-}
-</script>
+<script type="text/javascript" src="<?php echo __JS_ASSETS__; ?>/portable.js"></script>
 </head>
 <body onload="document.getElementById('asset_code').value=''; document.getElementById('asset_code').focus(); <?php if (is_array($arrCheckedAssetCode)) echo $strJavaScriptCode; ?>">
 
