@@ -30,7 +30,7 @@ if ($_POST && $_POST['method'] == 'menu' && is_numeric($_POST['menu_id'])) {
 
 <form method="post" name="main_form">
 <input type="hidden" name="method" value="menu">
-<input type="text" name="menu_id" size="3">
+<input type="text" name="menu_id" onkeypress="javascript:if(event.keyCode=='13') document.main_form.submit();" size="3">
 <input type="submit" value="Submit">
 </form>
 
