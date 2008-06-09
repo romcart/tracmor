@@ -18,7 +18,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 		That will include an entry in the Transaction and Asset Transaction table.
 		You will also have to change the asset.location_id to the destination location
 	*/
-	$arrAssetCode = explode('#',$_POST['result']);
+	$arrAssetCode =  array_unique(explode('#',$_POST['result']));
 	$blnError = false;
 	$arrCheckedAssetCode = array();
 	foreach ($arrAssetCode as $strAssetCode) {
@@ -126,11 +126,11 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 Asset Code: <input type="text" id="asset_code" onkeypress="javascript:if(event.keyCode=='13') AddAsset();" size="10">
 <input type="button" value="Add Asset" onclick="javascript:AddAsset();">
 <br /><br />
-<form method="post" name="main_form" onsubmit="javascript:CompleteMove();">
+<form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">
 <input type="hidden" name="method" value="complete_transaction">
 <input type="hidden" name="result" value="">
 Destination Location: <input type="text" name="destination_location" size ="20">
-<input type="button" value="Complete Move" onclick="javascript:CompleteMove();">
+<input type="submit" value="Complete Move" onclick="javascript:CompleteMove();">
 </form>
 <div id="result"></div>
 

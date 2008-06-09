@@ -1,7 +1,7 @@
 var arrayAssetCode = new Array();
 var i=0;
 function AddAsset() {
-    strAssetCode = document.getElementById('asset_code').value;
+    var strAssetCode = document.getElementById('asset_code').value;
     if (strAssetCode != '') {
         document.getElementById('warning').innerHTML = "";
         arrayAssetCode[i] = strAssetCode;
@@ -19,7 +19,7 @@ function AddAssetPost(strAssetCode) {
 }
 function CompleteMove() {
     var strAssetCode = "";
-    var strAssetCode = arrayAssetCode.join("#");
+    strAssetCode = arrayAssetCode.join("#");
     if (arrayAssetCode.length == 0) {
         document.getElementById('warning').innerHTML = "You must provide at least one asset";
         return false;
@@ -30,18 +30,28 @@ function CompleteMove() {
     }
     if (arrayAssetCode.length>0 && document.main_form.destination_location.value != "") {
          document.main_form.result.value = strAssetCode;
-         document.main_form.submit();
+         return true;
     }
+    return false;
 }
 function CompleteCheckOut() {
     var strAssetCode = "";
-    var strAssetCode = arrayAssetCode.join("#");
+    strAssetCode = arrayAssetCode.join("#");
     if (arrayAssetCode.length == 0) {
         document.getElementById('warning').innerHTML = "You must provide at least one asset";
         return false;
     }
     if (arrayAssetCode.length>0) {
          document.main_form.result.value = strAssetCode;
-         document.main_form.submit();
+         return true;
+    }
+    return false;
+}
+function CheckIdPin() {
+    if (document.main_form.user_account_id.value != "" && document.main_form.portable_user_pin.value != "") return true;
+    else {
+        if (document.main_form.user_account_id.value == "") document.main_form.user_account_id.focus();
+        else document.main_form.portable_user_pin.focus();
+        return false;
     }
 }

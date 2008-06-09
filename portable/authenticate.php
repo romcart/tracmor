@@ -1,7 +1,7 @@
 <?php
 require_once('../includes/prepend.inc.php');
 
-$error = "";
+$strError = "";
 
 if ($_GET['menu_id']) {
 	if ($_POST && is_numeric($_POST['user_account_id'])) {
@@ -19,7 +19,7 @@ if ($_GET['menu_id']) {
 			
 			if (!$objUserAccount) {
 				// authenticate error
-				$error = "That User ID and PIN did not authenticate. Please try again.";
+				$strError = "That User ID and PIN did not authenticate. Please try again.";
 			}
 			else {
 			  //$_SESSION['AuthenticateSuccess']=true;
@@ -69,18 +69,19 @@ else {
 <head>
 <title>Tracmor Portable Interface - Authenticate</title>
 <link rel="stylesheet" type="text/css" href="/css/portable.css">
+<script type="text/javascript" src="<?php echo __JS_ASSETS__; ?>/portable.js"></script>
 </head>
 <body onload="document.main_form.user_account_id.focus();">
 
 <h1>TRACMOR PORTABLE INTERFACE</h1>
 <h3>Authenticate</h3>
 
-<form method="post" name="main_form">
+<form method="post" name="main_form" onsubmit="javascript:return CheckIdPin();">
 User ID: <input type="text" name="user_account_id" size="4"><br />
-User PIN: <input type="text" name="portable_user_pin" size="10"><br />
+User PIN: <input type="text" name="portable_user_pin" onkeypress="javascript:if(event.keyCode=='13') CheckIdPin();" size="10"><br />
 <input type="submit" value="Authenticate">
 </form>
-<p><?php echo $error; ?></p>
+<p><?php echo $strError; ?></p>
 
 </body>
 </html>
