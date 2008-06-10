@@ -18,7 +18,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 		That will include an entry in the Transaction and Asset Transaction table.
 		You will also have to change the asset.location_id to the destination location
 	*/
-	$arrAssetCode = array_unique(explode('#',$_POST['result']));
+	$arrAssetCode =  array_unique(explode('#',$_POST['result']));
 	$blnError = false;
 	$arrCheckedAssetCode = array();
 	foreach ($arrAssetCode as $strAssetCode) {
@@ -43,19 +43,25 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset is already in a pending shipment.<br />";
 			}
-			// Check Out
-			elseif ($objNewAsset->CheckedOutFlag) {
+			// Check in
+			elseif (!$objNewAsset->CheckedOutFlag) {
 				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset is already checked out.<br />";
+				$strWarning .= $strAssetCode." - That asset is not checked out.<br />";
 			}
 			elseif ($objNewAsset->ReservedFlag) {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset is reserved.<br />";
 			}
-			else {
-			    $arrCheckedAssetCode[] = $strAssetCode;
+			elseif ($objNewAsset->CheckedOutFlag) {
+				$objUserAccount = $objNewAsset->GetLastTransactionUser();
+				if ($objUserAccount->UserAccountId != QApplication::$objUserAccount->UserAccountId) {
+				    $blnError = true;
+					$strWarning .= $strAssetCode." - That asset was not checked out by the current user.<br />";
+				}
+				else {
+			        $arrCheckedAssetCode[] = $strAssetCode;
+				}
 			}
-			
 			if (!$blnError && $objNewAsset instanceof Asset)  {
 				$objAssetArray[] = $objNewAsset;
 			}
@@ -66,30 +72,40 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	}
 	
 	if (!$blnError) {
-        $objTransaction = new Transaction();
-    	$objTransaction->EntityQtypeId = EntityQtype::Asset;
-    	$objTransaction->TransactionTypeId = 3; // Check Out
-    	$objTransaction->Save();
+        $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
+        if (!$objDestinationLocation) {
+            $blnError = true;
+            $strWarning .= $_POST['destination_location']." - Destination Location does not exist.<br />";
+        }
+        else {
+    	    $intDestinationLocationId = $objDestinationLocation->LocationId;
     	    
-    	$intDestinationLocationId = 1; // Check Out
-    		
-    	foreach ($objAssetArray as $objAsset) {
-			$objAssetTransaction = new AssetTransaction();
-      		$objAssetTransaction->AssetId = $objAsset->AssetId;
-      		$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
-      		$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
-      		$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
-      		$objAssetTransaction->Save();
-      		
-      		$objAsset->LocationId = $intDestinationLocationId;
-      		$objAsset->CheckedOutFlag = true;
-      		$objAsset->Save();
-      	}
-    	$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
-    	//Remove that flag when transaction is compelete or exists some errors
-        unset($_SESSION['intUserAccountId']);
-        $arrCheckedAssetCode = "";
-    }
+    	    // HJ Change
+    	    // I moved these outside of the foreach, because this should only be 1 transaction.
+    	    // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
+    	    $objTransaction = new Transaction();
+    		$objTransaction->EntityQtypeId = EntityQtype::Asset;
+    		$objTransaction->TransactionTypeId = 2; // Check in
+    		$objTransaction->Save();
+    	    
+    	    foreach ($objAssetArray as $objAsset) {
+      			$objAssetTransaction = new AssetTransaction();
+      			$objAssetTransaction->AssetId = $objAsset->AssetId;
+      			$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
+      			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
+      			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
+      			$objAssetTransaction->Save();
+      			
+      			$objAsset->CheckedOutFlag = false;
+      			$objAsset->LocationId = $intDestinationLocationId;
+      			$objAsset->Save();
+      		}
+    		$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
+    		//Remove that flag when transaction is compelete or exists some errors
+            unset($_SESSION['intUserAccountId']);
+            $arrCheckedAssetCode = "";
+        }        
+	}
 	else {
 	    $strWarning .= "This transaction has not been completed.<br />";
 	}
@@ -105,22 +121,23 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 
 <html>
 <head>
-<title>Tracmor Portable Interface - Check Out Assets</title>
+<title>Tracmor Portable Interface - Check In Assets</title>
 <link rel="stylesheet" type="text/css" href="/css/portable.css">
 <script type="text/javascript" src="<?php echo __JS_ASSETS__; ?>/portable.js"></script>
 </head>
 <body onload="document.getElementById('asset_code').value=''; document.getElementById('asset_code').focus(); <?php if (is_array($arrCheckedAssetCode)) echo $strJavaScriptCode; ?>">
 
 <h1>TRACMOR PORTABLE INTERFACE</h1>
-<h3>Check Out Assets</h3>
+<h3>Check In Assets</h3>
 <div id="warning"><?php echo $strWarning; ?></div>
 Asset Code: <input type="text" id="asset_code" onkeypress="javascript:if(event.keyCode=='13') AddAsset();" size="10">
 <input type="button" value="Add Asset" onclick="javascript:AddAsset();">
 <br /><br />
-<form method="post" name="main_form" onsubmit="javascript:return CompleteCheckOut();">
+<form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">
 <input type="hidden" name="method" value="complete_transaction">
 <input type="hidden" name="result" value="">
-<input type="submit" value="Complete Check Out">
+Destination Location: <input type="text" name="destination_location" size ="20">
+<input type="submit" value="Complete Move" onclick="javascript:CompleteMove();">
 </form>
 <div id="result"></div>
 
