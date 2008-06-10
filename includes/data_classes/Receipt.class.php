@@ -314,7 +314,7 @@
 				  %s
 				  %s
 				  %s
-			', $objQueryExpansion->GetFromSql("", "\n					"), $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'], $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
+			', $objQueryExpansion->GetFromSql("", "\n					"), $arrAttachmentSql['strFrom'],  $arrCustomFieldSql['strFrom'], $arrSearchSql['strAssetCodeFromSql'], $arrSearchSql['strInventoryModelCodeFromSql'],
 			$arrSearchSql['strFromCompanySql'], $arrSearchSql['strFromContactSql'], $arrSearchSql['strReceiptNumberSql'], $arrSearchSql['strAssetCodeSql'], $arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strStatusSql'], $arrSearchSql['strNoteSql'], $arrSearchSql['strDueDateSql'], $arrSearchSql['strReceiptDateSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 			$arrSearchSql['strAuthorizationSql']);
 			
