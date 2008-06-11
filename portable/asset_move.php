@@ -10,6 +10,7 @@ else QApplication::$objUserAccount = UserAccount::Load($_SESSION['intUserAccount
 
 $strWarning = "";
 $arrCheckedAssetCode = "";
+$strJavaScriptCode = "";
 
 if ($_POST && $_POST['method'] == 'complete_transaction') {
 	/*
@@ -74,9 +75,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
         else {
     	    $intDestinationLocationId = $objDestinationLocation->LocationId;
     	    
-    	    // HJ Change
-    	    // I moved these outside of the foreach, because this should only be 1 transaction.
-    	    // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
+    	     // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
     	    $objTransaction = new Transaction();
     		$objTransaction->EntityQtypeId = EntityQtype::Asset;
     		$objTransaction->TransactionTypeId = 1; // Move
@@ -103,36 +102,30 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	    $strWarning .= "This transaction has not been completed.<br />";
 	}
 	if (is_array($arrCheckedAssetCode)) {
-	    $strJavaScriptCode = "";
 	    foreach ($arrCheckedAssetCode as $strAssetCode) {
 	    	$strJavaScriptCode .= "AddAssetPost('".$strAssetCode."');";
 	    }
 	}
 }
 
+$strTitle = "Move Assets";
+$strBodyOnLoad = "document.getElementById('asset_code').value=''; document.getElementById('asset_code').focus();".$strJavaScriptCode;
+
+require_once('./includes/header.inc.php');
 ?>
 
-<html>
-<head>
-<title>Tracmor Portable Interface - Move Assets</title>
-<link rel="stylesheet" type="text/css" href="/css/portable.css">
-<script type="text/javascript" src="<?php echo __JS_ASSETS__; ?>/portable.js"></script>
-</head>
-<body onload="document.getElementById('asset_code').value=''; document.getElementById('asset_code').focus(); <?php if (is_array($arrCheckedAssetCode)) echo $strJavaScriptCode; ?>">
+    <div id="warning"><?php echo $strWarning; ?></div>
+    Asset Code: <input type="text" id="asset_code" onkeypress="javascript:if(event.keyCode=='13') AddAsset();" size="10">
+    <input type="button" value="Add Asset" onclick="javascript:AddAsset();">
+    <br /><br />
+    <form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">
+    <input type="hidden" name="method" value="complete_transaction">
+    <input type="hidden" name="result" value="">
+    Destination Location: <input type="text" name="destination_location" size ="20">
+    <input type="submit" value="Complete Move" onclick="javascript:CompleteMove();">
+    </form>
+    <div id="result"></div>
 
-<h1>TRACMOR PORTABLE INTERFACE</h1>
-<h3>Move Assets</h3>
-<div id="warning"><?php echo $strWarning; ?></div>
-Asset Code: <input type="text" id="asset_code" onkeypress="javascript:if(event.keyCode=='13') AddAsset();" size="10">
-<input type="button" value="Add Asset" onclick="javascript:AddAsset();">
-<br /><br />
-<form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">
-<input type="hidden" name="method" value="complete_transaction">
-<input type="hidden" name="result" value="">
-Destination Location: <input type="text" name="destination_location" size ="20">
-<input type="submit" value="Complete Move" onclick="javascript:CompleteMove();">
-</form>
-<div id="result"></div>
-
-</body>
-</html>
+<?php
+require_once('./includes/footer.inc.php');
+?>
