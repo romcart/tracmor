@@ -19,12 +19,13 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 		That will include an entry in the Transaction and Asset Transaction table.
 		You will also have to change the asset.location_id to the destination location
 	*/
-	$arrAssetCodeLocation = explode('#',$_POST['result']);
+	$arrAssetCodeLocation = array_unique(explode('#',$_POST['result']));
 	
 	// !!!Only for test mode
-	$blnError = true;
-	//$blnError = false;
+	//$blnError = true;
+	$blnError = false;
 	$arrCheckedAssetCodeLocation = array();
+	$arrLocation = array();
 	foreach ($arrAssetCodeLocation as $strAssetCodeLocation) {
 	    list($strAssetCode, $strLocation) = split('[|]',$strAssetCodeLocation,2);
 		if ($strAssetCode && $strLocation) {
@@ -35,22 +36,15 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
 			}
-			/* ???				
-			// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
-			elseif ($objNewAsset->LocationId == 2) {
+			// Asset must either be 'To Be Received' or 'Shipped
+			elseif (!($objNewAsset->LocationId == 5 || $objNewAsset->LocationId == 2)) {
 				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset has already been shipped.<br />";
-			}
-			*/
-			// The asset.location_id must be 5 "To Be Received"
-			elseif ($objNewAsset->LocationId != 5) {
-				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset must be scheduled to be received.<br />";
+				$strWarning .= $strAssetCode." - That asset has already been received.<br />";
 			}
 			/* ???
 			elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
 				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset is already in a pending shipment.<br />";
+				$strWarning .= $strAssetCode." - That asset is in a pending shipment.<br />";
 			}
 			*/
 			// Asset must be in a pending receipt
@@ -74,131 +68,47 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
                 $strWarning .= $strLocation." - Destination Location does not exist.<br />";
 			}
 			else {
-			    $arrCheckedAssetCodeLocation[] = $strAssetCodeLocation;
+			    if (!array_key_exists($objNewAsset->AssetId,$arrLocation)) {
+			        $arrLocation[$objNewAsset->AssetId] = $objDestinationLocation;
+			        $arrCheckedAssetCodeLocation[] = $strAssetCodeLocation;
+			    }
+			    else {
+			        $blnError = true;
+			        $strWarning .= $strAssetCode." - That is a duplicate asset code.<br />";
+			    }
 			}
 			
 			if (!$blnError && $objNewAsset instanceof Asset)  {
 				$objAssetArray[] = $objNewAsset;
+				//$arrPendingReceiptId[] = $objPendingReceipt->ReceiptId;
 			}
-						
-			/* commented out, from receipt_edit.php
-			$intAssetTransactionId = $strParameter;
-			if ($this->objAssetTransactionArray) {
-				
-				try {
-					// Get an instance of the database
-					$objDatabase = QApplication::$Database[1];
-					// Begin a MySQL Transaction to be either committed or rolled back
-					$objDatabase->TransactionBegin();
-					// This boolean later lets us know if we need to flip the ReceivedFlag
-					$blnAllAssetsReceived = true;
-					foreach ($this->objAssetTransactionArray as &$objAssetTransaction) {
-						if ($objAssetTransaction->AssetTransactionId == $intAssetTransactionId) {
-							// Get the value of the location where this Asset is being received to
-							$lstLocationAssetReceived = $this->GetControl('lstLocationAssetReceived' . $objAssetTransaction->AssetTransactionId);
-							if ($lstLocationAssetReceived && $lstLocationAssetReceived->SelectedValue) {
-								// Set the DestinationLocation of the AssetTransaction
-								$objAssetTransaction->DestinationLocationId = $lstLocationAssetReceived->SelectedValue;
-								$objAssetTransaction->Save();
-								// Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
-								$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
-								// Move the asset to the new location
-								$objAssetTransaction->Asset->LocationId = $lstLocationAssetReceived->SelectedValue;
-								$objAssetTransaction->Asset->Save();
-								$objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
-							}
-							else {
-								$blnError = true;
-								$lstLocationAssetReceived->Warning = "Please Select a Location.";
-							}
-						}
-						// If any AssetTransaction still does not have a DestinationLocation, it is still Pending
-						if (!$objAssetTransaction->DestinationLocationId) {
-							$blnAllAssetsReceived = false;
-						}
-					}
-				
-					// If all the assets have been received, check that all the inventory has been received
-					if ($blnAllAssetsReceived) {
-						$blnAllInventoryReceived = true;
-						if ($this->objInventoryTransactionArray) {
-							foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
-								if (!$objInventoryTransaction->DestinationLocationId) {
-									$blnAllInventoryReceived = false;
-								}
-							}
-						}
-						// Set the entire receipt as received if assets and inventory have all been received
-						if ($blnAllInventoryReceived) {
-							$this->objReceipt->ReceivedFlag = true;
-							$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);
-							$this->objReceipt->Save();
-							// Reload to get new timestamp to avoid optimistic locking if edited/saved again without reload
-							$this->objReceipt = Receipt::Load($this->objReceipt->ReceiptId);
-							// Update labels (specifically we want to update Received Date)
-							$this->UpdateReceiptLabels();
-						}
-					}
-					
-					// Commit all of the transactions to the database
-					$objDatabase->TransactionCommit();
-				}
-				catch (QExtendedOptimisticLockingException $objExc) {
-					
-					// Rollback the database transactions if an exception was thrown
-					$objDatabase->TransactionRollback();
-					
-					if ($objExc->Class == 'AssetTransaction' || $objExc->Class == 'Asset') {
-						// Set the offending AssetTransaction DestinationLocation to null so that the value doesn't change in the datagrid
-						if ($objExc->Class == 'AssetTransaction' && $this->objAssetTransactionArray)
-							foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-								if ($objAssetTransaction->AssetTransactionId == $objExc->EntityId) {
-									$objAssetTransaction->DestinationLocationId = null;
-								}
-							}
-						$this->dtgAssetTransact->Warning = sprintf('That asset has been added, removed, or received by another user. You must <a href="receipt_edit.php?intReceiptId=%s">Refresh</a> to edit this receipt.', $this->objReceipt->ReceiptId);
-					}
-					else {
-						throw new QOptimisticLockingException($objExc->Class);
-					}
-				}
-			}
-			*/
 		}
 	}
 	
 	if (!$blnError) {
-	    /* commented out, Submit Transaction for Move Assets
-        $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
-        if (!$objDestinationLocation) {
-            $blnError = true;
-            $strWarning .= $_POST['destination_location']." - Destination Location does not exist.<br />";
-        }
-        else {
+    	/*$objTransaction = new Transaction();
+    	$objTransaction->EntityQtypeId = EntityQtype::Asset;
+    	$objTransaction->TransactionTypeId = 7; // Receive
+    	$objTransaction->Save();*/
+    	    
+    	foreach ($objAssetArray as $objAsset) {
+    	    $objDestinationLocationId = $arrLocation[$objAsset->AssetId];
     	    $intDestinationLocationId = $objDestinationLocation->LocationId;
-    	    
-    	    $objTransaction = new Transaction();
-    		$objTransaction->EntityQtypeId = EntityQtype::Asset;
-    		$objTransaction->TransactionTypeId = 1; // Move
-    		$objTransaction->Save();
-    	    
-    	    foreach ($objAssetArray as $objAsset) {
-      			$objAssetTransaction = new AssetTransaction();
-      			$objAssetTransaction->AssetId = $objAsset->AssetId;
-      			$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
-      			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
-      			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
-      			$objAssetTransaction->Save();
-      			
-      			$objAsset->LocationId = $intDestinationLocationId;
-      			$objAsset->Save();
-      		}
-    		$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
-    		//Remove that flag when transaction is compelete or exists some errors
-            unset($_SESSION['intUserAccountId']);
-            $arrCheckedAssetCodeLocation = "";
-        }
-        */        
+    	    /*
+      		$objAssetTransaction = new AssetTransaction();
+      		//$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
+      		//$objAssetTransaction->AssetId = $objAsset->AssetId;
+      		//$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
+      		$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
+      		$objAssetTransaction->Save();
+      		*/
+      		$objAsset->LocationId = $intDestinationLocationId;
+      		$objAsset->Save();
+      	}
+    	$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
+    	//Remove that flag when transaction is compelete or exists some errors
+        unset($_SESSION['intUserAccountId']);
+        $arrCheckedAssetCodeLocation = "";
 	}
 	else {
 	    $strWarning .= "This transaction has not been completed.<br />";

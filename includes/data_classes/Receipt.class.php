@@ -509,5 +509,49 @@
 
 			return $arrSearchSql;
 	  }
+	  
+	 /**
+      * Load an Reciept Object
+      * The method should check for assets or inventory in reciept that is still 'To Be Received' (TBR)
+	  *
+      * @param int $intReceiptId
+      * @return Receipt
+      */
+	  public function ReceiptComplete($intReceiptId) {
+	       $objClauses = null;
+	       $blnAllAssetsReceived = true;
+	       $blnAllInventoryReceived = true;
+    	   
+	       $objReceipt = Receipt::Load($intReceiptId);
+	       			 
+	       if ($objReceipt) {
+	           if (!$objReceipt->ReceivedFlag) {
+    		      $objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($objReceipt->TransactionId, $objClauses);
+    		      $objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($objReceipt->TransactionId, $objClauses);
+    		      foreach ($objAssetTransactionArray as &$objAssetTransaction) {
+        		      if (!$objAssetTransaction->DestinationLocationId) {
+        			     $blnAllAssetsReceived = false;
+        		      }
+    		      }
+    		      if ($blnAllAssetsReceived) {
+    			     if ($objInventoryTransactionArray) {
+    				    foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
+    						if (!$objInventoryTransaction->DestinationLocationId) {
+    							$blnAllInventoryReceived = false;
+    						}
+    					}
+    				 }
+    				 // Set the entire receipt as received if assets and inventory have all been received
+    				 if ($blnAllInventoryReceived) {
+    					$objReceipt->ReceivedFlag = true;
+    					$objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);
+    					$objReceipt->Save();
+    				 }
+    			  }
+	           }
+			   return $objReceipt;
+		   }		   
+		   else return false;
+	  }
 	}
 ?>
