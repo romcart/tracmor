@@ -21,8 +21,6 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	*/
 	$arrAssetCodeLocation = array_unique(explode('#',$_POST['result']));
 	
-	// !!!Only for test mode
-	//$blnError = true;
 	$blnError = false;
 	$arrCheckedAssetCodeLocation = array();
 	$arrLocation = array();
@@ -36,17 +34,11 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
 			}
-			// Asset must either be 'To Be Received' or 'Shipped
+			// Asset must either be 'To Be Received' or 'Shipped'
 			elseif (!($objNewAsset->LocationId == 5 || $objNewAsset->LocationId == 2)) {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset has already been received.<br />";
 			}
-			/* ???
-			elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
-				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset is in a pending shipment.<br />";
-			}
-			*/
 			// Asset must be in a pending receipt
 			elseif (!($objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId))) {
                 $blnError = true;
@@ -80,31 +72,36 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			
 			if (!$blnError && $objNewAsset instanceof Asset)  {
 				$objAssetArray[] = $objNewAsset;
-				//$arrPendingReceiptId[] = $objPendingReceipt->ReceiptId;
+				$arrPendingReceiptId[] = $objPendingReceipt->Transaction->Receipt->ReceiptId;
+				$objAssetTransactionArray[$objNewAsset->AssetId] = $objPendingReceipt;
 			}
 		}
 	}
 	
 	if (!$blnError) {
-    	/*$objTransaction = new Transaction();
-    	$objTransaction->EntityQtypeId = EntityQtype::Asset;
-    	$objTransaction->TransactionTypeId = 7; // Receive
-    	$objTransaction->Save();*/
+	    $arrPendingReceiptId = array_unique($arrPendingReceiptId);
     	    
     	foreach ($objAssetArray as $objAsset) {
     	    $objDestinationLocationId = $arrLocation[$objAsset->AssetId];
     	    $intDestinationLocationId = $objDestinationLocation->LocationId;
-    	    /*
-      		$objAssetTransaction = new AssetTransaction();
-      		//$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
-      		//$objAssetTransaction->AssetId = $objAsset->AssetId;
-      		//$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
+    	    
+    	    // Set the DestinationLocation of the AssetTransaction
+    	    $objAssetTransaction = $objAssetTransactionArray[$objAsset->AssetId];
       		$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
       		$objAssetTransaction->Save();
-      		*/
-      		$objAsset->LocationId = $intDestinationLocationId;
-      		$objAsset->Save();
+      		
+      		// Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
+			$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
+			// Move the asset to the new location
+			$objAssetTransaction->Asset->LocationId = $intDestinationLocationId;
+			$objAssetTransaction->Asset->Save();
+			$objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
       	}
+      	
+    	foreach ($arrPendingReceiptId as $intReceiptId) {
+    	    Receipt::ReceiptComplete($intReceiptId);
+    	}
+    	
     	$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
     	//Remove that flag when transaction is compelete or exists some errors
         unset($_SESSION['intUserAccountId']);
@@ -121,66 +118,12 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	}
 }
 
+$strTitle = "Receive Assets";
+$strBodyOnLoad = "document.getElementById('asset_code').value=''; document.getElementById('asset_code').focus();".$strJavaScriptCode;
+
+require_once('./includes/header.inc.php');
 ?>
 
-<html>
-<head>
-<title>Tracmor Portable Interface - Receive Assets</title>
-<link rel="stylesheet" type="text/css" href="/css/portable.css">
-<!-- <script type="text/javascript" src="<?php echo __JS_ASSETS__; ?>/portable.js"></script> -->
-<script>
-var i = 0;
-var arrayAssetCode = new Array();
-function AddAssetLocation() {
-    var strAssetCode = document.getElementById('asset_code').value;
-    var strLocation = document.getElementById('destination_location').value
-    if (strAssetCode != '' && strLocation != '') {
-        document.getElementById('warning').innerHTML = "";
-        arrayAssetCode[i++] = strAssetCode + "|" + strLocation;
-        document.getElementById('result').innerHTML += "Asset Code: " + strAssetCode + " Location: " + strLocation + "<br/>";
-        document.getElementById('asset_code').value = '';
-        document.getElementById('destination_location').value = '';
-        document.getElementById('asset_code').focus();
-    }
-    else {
-        if (strAssetCode == '') {
-            document.getElementById('warning').innerHTML = "Asset Code cannot be empty";
-            document.getElementById('asset_code').focus();
-        }
-        else {
-            document.getElementById('warning').innerHTML = "Destination Location cannot be empty";
-            document.getElementById('destination_location').focus();
-        }
-    }
-}
-function AddAssetLocationPost(strAssetCode,strLocation) {
-    if (strAssetCode != '' && strLocation != '') {
-        arrayAssetCode[i++] = strAssetCode + "|" + strLocation;
-        document.getElementById('result').innerHTML += "Asset Code: " + strAssetCode + " Location: " + strLocation + "<br/>";
-        document.getElementById('asset_code').value = '';
-        document.getElementById('destination_location').value = '';
-        document.getElementById('asset_code').focus();
-    }
-}
-function CompleteReceipt() {
-    var strAssetCode = "";
-    strAssetCode = arrayAssetCode.join("#");
-    if (arrayAssetCode.length == 0) {
-        document.getElementById('warning').innerHTML = "You must provide at least one asset";
-        return false;
-    }
-    if (arrayAssetCode.length>0) {
-         document.main_form.result.value = strAssetCode;
-         return true;
-    }
-    return false;
-}
-</script>
-</head>
-<body onload="document.getElementById('asset_code').value=''; document.getElementById('asset_code').focus(); <?php echo $strJavaScriptCode; ?>">
-
-<h1>TRACMOR PORTABLE INTERFACE</h1>
-<h3>Receive Assets</h3>
     <div id="warning"><?php echo $strWarning; ?></div>
     Asset Code: <input type="text" id="asset_code" size="10">
     <br /><br />
