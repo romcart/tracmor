@@ -1,5 +1,6 @@
 var arrayAssetCode = new Array();
-var i=0;
+var arrayInventoryCode = new Array();
+var i = 0;
 function AddAsset() {
     var strAssetCode = document.getElementById('asset_code').value;
     if (strAssetCode != '') {
@@ -57,7 +58,7 @@ function CheckIdPin() {
 }
 function AddAssetLocation() {
     var strAssetCode = document.getElementById('asset_code').value;
-    var strLocation = document.getElementById('destination_location').value
+    var strLocation = document.getElementById('destination_location').value;
     if (strAssetCode != '' && strLocation != '') {
         document.getElementById('warning').innerHTML = "";
         arrayAssetCode[i++] = strAssetCode + "|" + strLocation;
@@ -95,6 +96,58 @@ function CompleteReceipt() {
     }
     if (arrayAssetCode.length>0) {
          document.main_form.result.value = strAssetCode;
+         return true;
+    }
+    return false;
+}
+function AddInventory() {
+    var strInventoryCode = document.getElementById('inventory_code').value;
+    var strSourceLocation = document.getElementById('source_location').value;
+    var intQuantity = document.getElementById('quantity').value;
+    if (strInventoryCode != '' && strSourceLocation != '' && intQuantity != '' && !isNaN(parseInt(intQuantity))) {
+        document.getElementById('warning').innerHTML = "";
+        arrayInventoryCode[i++] = strInventoryCode + "|" + strSourceLocation + "|" + intQuantity;
+        document.getElementById('result').innerHTML += "Inventory Code: " + strInventoryCode + " Source Location: " + strSourceLocation + " Quantity: " + intQuantity + "<br/>";
+        document.getElementById('inventory_code').value = '';
+        document.getElementById('source_location').value = '';
+        document.getElementById('quantity').value = '';
+        document.getElementById('inventory_code').focus();
+    }
+    else {
+        if (strInventoryCode == '') {
+            document.getElementById('warning').innerHTML = "Inventory Code cannot be empty";
+            document.getElementById('inventory_code').focus();
+        }
+        else if (strSourceLocation == '') {
+            document.getElementById('warning').innerHTML = "Source Location cannot be empty";
+            document.getElementById('source_location').focus();
+        }
+        else {
+            document.getElementById('warning').innerHTML = "Qantity must be an integer > 0";
+            document.getElementById('quantity').focus();
+        }
+    }
+}
+function AddInventoryPost(strInventoryCode,strSourceLocation,intQuantity) {
+    if (strInventoryCode != '' && strSourceLocation != '' && intQuantity != '' && !isNaN(parseInt(intQuantity))) {
+        arrayInventoryCode[i++] = strInventoryCode + "|" + strSourceLocation + "|" + intQuantity;
+        document.getElementById('result').innerHTML += "Inventory Code: " + strInventoryCode + " Source Location: " + strSourceLocation + " Quantity: " + intQuantity + "<br/>";
+        document.getElementById('inventory_code').focus();
+    }
+}
+function CompleteMoveInventory() {
+    var strDestinationLocation = document.main_form.destination_location.value;
+    if (strDestinationLocation == '') {
+        document.getElementById('warning').innerHTML = "Destination Location cannot be empty";
+        return false;
+    }
+    var strInventoryCode = arrayInventoryCode.join("#");
+    if (arrayInventoryCode.length == 0) {
+        document.getElementById('warning').innerHTML = "You must provide at least one inventory";
+        return false;
+    }
+    if (arrayInventoryCode.length>0) {
+         document.main_form.result.value = strInventoryCode;
          return true;
     }
     return false;
