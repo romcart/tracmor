@@ -42,7 +42,7 @@ if ($_GET['menu_id']) {
 						QApplication::Redirect('./inventory_move.php');
 						break;
 					case 7:
-						QApplication::Redirect('./inventory_takeout.php');
+						QApplication::Redirect('./inventory_take_out.php');
 						break;
 					case 8:
 						QApplication::Redirect('./inventory_restock.php');

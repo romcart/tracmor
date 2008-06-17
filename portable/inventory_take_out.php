@@ -85,9 +85,9 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 					$blnErrorCurrentInventory = true;
 					$blnError = true;
 				}
-				// Move
+				// Take Out
 				elseif ($objNewInventoryLocation->Quantity < $intQuantity) {
-					$strWarning .= $strInventoryModelCode." - Quantity moved cannot exceed quantity available.<br />";
+					$strWarning .= $strInventoryModelCode." - Quantity taken out cannot exceed quantity available.<br />";
 					$blnErrorCurrentInventory = true;
 					$blnError = true;
 				}
@@ -111,54 +111,26 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	}
 	
 	if (isset($objInventoryLocationArray)) {
-        // Destination Location must match an existing location
-        $strDestinationLocation = $_POST['destination_location'];
-		if (!($objDestinationLocation = Location::LoadByShortDescription($strDestinationLocation))) {
-		    $blnError = true;
-            $strWarning .= $strDestinationLocation." - Destination Location does not exist.<br />";
-		}
-		else {
-		    foreach ($objInventoryLocationArray as $objInventoryLocation) {
-  				if ($objInventoryLocation->LocationId == $objDestinationLocation->LocationId) {
-   					$strWarning .= $strInventoryModelCode." - Cannot move inventory from a location to the same location.<br />";
-   					$blnError = true;
-   				}
-   			}
-		}
-		
-		if (!$blnError) {
+        if (!$blnError) {
 			// Create the new transaction object and save it
 			$objTransaction = new Transaction();
 			$objTransaction->EntityQtypeId = EntityQtype::Inventory;
-			$objTransaction->TransactionTypeId = 1; // Move
+			$objTransaction->TransactionTypeId = 5; // Take Out
 			$objTransaction->Save();
 			
 			// Assign different source and destinations depending on transaction type
 			foreach ($objInventoryLocationArray as $objInventoryLocation) {
-				// Move
 				$SourceLocationId = $objInventoryLocation->LocationId;
-				$DestinationLocationId = $objDestinationLocation->LocationId;
+				// LocationId = 3 - 'Taken Out'
+				$DestinationLocationId = 3;
 				
 				// Remove the inventory quantity from the source for moves and take outs
 				$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
 				$objInventoryLocation->Save();
 					
-				// Add the new quantity where it belongs for moves and restocks
-				$objNewInventoryLocation = InventoryLocation::LoadByLocationIdInventoryModelId($DestinationLocationId, $objInventoryLocation->InventoryModelId);
-				if ($objNewInventoryLocation) {
-					$objNewInventoryLocation->Quantity = $objNewInventoryLocation->Quantity + $objInventoryLocation->intTransactionQuantity;
-				}
-				else {
-					$objNewInventoryLocation = new InventoryLocation();
-					$objNewInventoryLocation->InventoryModelId = $objInventoryLocation->InventoryModelId;
-					$objNewInventoryLocation->Quantity = $objInventoryLocation->intTransactionQuantity;
-				}
-				$objNewInventoryLocation->LocationId = $DestinationLocationId;
-				$objNewInventoryLocation->Save();
-				
 				// Create the new InventoryTransaction object and save it
 				$objInventoryTransaction = new InventoryTransaction();
-				$objInventoryTransaction->InventoryLocationId = $objNewInventoryLocation->InventoryLocationId;
+				$objInventoryTransaction->InventoryLocationId = $objInventoryLocation->InventoryLocationId;
 				$objInventoryTransaction->TransactionId = $objTransaction->TransactionId;
 				$objInventoryTransaction->Quantity = $objInventoryLocation->intTransactionQuantity;
 				$objInventoryTransaction->SourceLocationId = $SourceLocationId;
@@ -185,7 +157,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	}
 }
 
-$strTitle = "Move Inventory";
+$strTitle = "Take Out Inventory";
 $strBodyOnLoad = "document.getElementById('inventory_code').focus();".$strJavaScriptCode;
 
 require_once('./includes/header.inc.php');
@@ -199,11 +171,10 @@ require_once('./includes/header.inc.php');
     Quantity: <input type="text" id="quantity" size="10" onkeypress="javascript:if(event.keyCode=='13') AddInventory();">
     <input type="button" value="Add" onclick="javascript:AddInventory();">
     <br /><br />
-    <form method="post" name="main_form" onsubmit="javascript:return CompleteMoveInventory();">
+    <form method="post" name="main_form" onsubmit="javascript:return CompleteTakeOutInventory();">
     <input type="hidden" name="method" value="complete_transaction">
     <input type="hidden" name="result" value="">
-    Destination Location: <input type="text" name="destination_location" onkeypress="javascript:if(event.keyCode=='13') CompleteMoveInventory();" size="20">
-    <input type="submit" value="Complete Move" onclick="javascript:CompleteMoveInventory();">
+    <input type="submit" value="Complete Take Out">
     </form>
     <div id="result"></div>
 

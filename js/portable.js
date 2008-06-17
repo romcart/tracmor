@@ -152,3 +152,15 @@ function CompleteMoveInventory() {
     }
     return false;
 }
+function CompleteTakeOutInventory() {
+    var strInventoryCode = arrayInventoryCode.join("#");
+    if (arrayInventoryCode.length == 0) {
+        document.getElementById('warning').innerHTML = "You must provide at least one inventory";
+        return false;
+    }
+    if (arrayInventoryCode.length>0) {
+         document.main_form.result.value = strInventoryCode;
+         return true;
+    }
+    return false;
+}
