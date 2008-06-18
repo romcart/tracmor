@@ -164,3 +164,32 @@ function CompleteTakeOutInventory() {
     }
     return false;
 }
+function AddInventoryQuantity() {
+    var strInventoryCode = document.getElementById('inventory_code').value;
+    var intQuantity = document.getElementById('quantity').value;
+    if (strInventoryCode != '' && intQuantity != '' && !isNaN(parseInt(intQuantity))) {
+        document.getElementById('warning').innerHTML = "";
+        arrayInventoryCode[i++] = strInventoryCode + "|" + intQuantity;
+        document.getElementById('result').innerHTML += "Inventory Code: " + strInventoryCode + " Quantity: " + intQuantity + "<br/>";
+        document.getElementById('inventory_code').value = '';
+        document.getElementById('quantity').value = '';
+        document.getElementById('inventory_code').focus();
+    }
+    else {
+        if (strInventoryCode == '') {
+            document.getElementById('warning').innerHTML = "Inventory Code cannot be empty";
+            document.getElementById('inventory_code').focus();
+        }
+        else {
+            document.getElementById('warning').innerHTML = "Qantity must be an integer > 0";
+            document.getElementById('quantity').focus();
+        }
+    }
+}
+function AddInventoryQuantityPost(strInventoryCode,intQuantity) {
+    if (strInventoryCode != '' && intQuantity != '' && !isNaN(parseInt(intQuantity))) {
+        arrayInventoryCode[i++] = strInventoryCode + "|" + intQuantity;
+        document.getElementById('result').innerHTML += "Inventory Code: " + strInventoryCode + " Quantity: " + intQuantity + "<br/>";
+        document.getElementById('inventory_code').focus();
+    }
+}

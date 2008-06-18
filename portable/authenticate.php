@@ -36,7 +36,7 @@ if ($_GET['menu_id']) {
 						QApplication::Redirect('./asset_receive.php');
 						break;
 					case 5:
-						QApplication::Redirect('./asset_inventory.php');
+						QApplication::Redirect('./asset_audit.php');
 						break;
 					case 6:
 						QApplication::Redirect('./inventory_move.php');
@@ -48,7 +48,7 @@ if ($_GET['menu_id']) {
 						QApplication::Redirect('./inventory_restock.php');
 						break;
 					case 9:
-						QApplication::Redirect('./inventory_inventory.php');
+						QApplication::Redirect('./inventory_audit.php');
 						break;
 					default:
 					    QApplication::Redirect('./index.php');
