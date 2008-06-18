@@ -338,9 +338,14 @@ class QInventoryTransactComposite extends QControl {
 		elseif ($this->intTransactionTypeId == 4) {
 			
 			// Check for duplicate inventory code
-			if ($this->objInventoryLocationArray) {
+			$strNewInventoryModelCode = $this->txtNewInventoryModelCode->Text;
+			if (!($objNewInventoryModel = InventoryModel::LoadByInventoryModelCode($strNewInventoryModelCode))) {
+				$blnError = true;
+				$this->txtNewInventoryModelCode->Warning = "That is an invalid Inventory Code.";
+			}
+			elseif ($this->objInventoryLocationArray) {
 				foreach ($this->objInventoryLocationArray as $objInventoryLocation) {
-					if ($objInventoryLocation && $objInventoryLocation->InventoryLocationId == $intNewInventoryLocationId) {
+					if ($objInventoryLocation && $objInventoryLocation->InventoryModel->InventoryModelCode == $strNewInventoryModelCode) {
 						$blnError = true;
 						$this->txtNewInventoryModelCode->Warning = "That Inventory has already been added.";
 					}
@@ -348,10 +353,6 @@ class QInventoryTransactComposite extends QControl {
 			}
 			
 			if (!$blnError) {
-				// Load the new inventory model by InventoryModelCode
-				$strNewInventoryModelCode = $this->txtNewInventoryModelCode->Text;
-				$objNewInventoryModel = InventoryModel::LoadByInventoryModelCode($strNewInventoryModelCode);
-				
 				// Create a new InventoryLocation for the time being
 				// Before saving we will check to see if it already exists 
 				$objNewInventoryLocation = new InventoryLocation();
