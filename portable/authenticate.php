@@ -21,7 +21,7 @@ if ($_GET['menu_id']) {
 			else {
 			  //$_SESSION['AuthenticateSuccess']=true;
 			  $_SESSION['intUserAccountId'] = $objUserAccount->UserAccountId;
-			    // Authenticate user and redirect to proper transaction page based on menu_id
+			  // Authenticate user and redirect to proper transaction page based on menu_id
 				switch ($_GET['menu_id']) {
 					case 1:
 						QApplication::Redirect('./asset_move.php');
@@ -51,13 +51,12 @@ if ($_GET['menu_id']) {
 						QApplication::Redirect('./inventory_audit.php');
 						break;
 					default:
-					    QApplication::Redirect('./index.php');
-					    break;
+					  QApplication::Redirect('./index.php');
+					  break;
 				}
 			}
 		}
 	}
-	
 }
 else {
 	QApplication::Redirect('./index.php');
@@ -69,12 +68,12 @@ $strBodyOnLoad = "document.main_form.user_account_id.focus();";
 require_once('./includes/header.inc.php');
 ?>
 
-    <form method="post" name="main_form" onsubmit="javascript:return CheckIdPin();">
-    User ID: <input type="text" name="user_account_id" size="4"><br />
-    User PIN: <input type="text" name="portable_user_pin" onkeypress="javascript:if(event.keyCode=='13') CheckIdPin();" size="10"><br />
-    <input type="submit" value="Authenticate">
-    </form>
-    <p><?php echo $strError; ?></p>
+  <form method="post" name="main_form" onsubmit="javascript:return CheckIdPin();">
+  User ID: <input type="text" name="user_account_id" size="4"><br />
+  User PIN: <input type="text" name="portable_user_pin" onkeypress="javascript:if(event.keyCode=='13') CheckIdPin();" size="10"><br />
+  <input type="submit" value="Authenticate">
+  </form>
+  <p><?php echo $strError; ?></p>
 
 <?php
 require_once('./includes/footer.inc.php');

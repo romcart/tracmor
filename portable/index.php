@@ -19,16 +19,16 @@ $strBodyOnLoad = "document.main_form.menu_id.value=''; document.main_form.menu_i
 require_once('./includes/header.inc.php');
 ?>
 
-    <ol>
-    <li><a href="asset_menu.php">Manage Assets</a></li>
-    <li><a href="inventory_menu.php">Manage Inventory</a></li>
-    </ol>
-    
-    <form method="post" name="main_form">
-    <input type="hidden" name="method" value="menu">
-    <input type="text" name="menu_id" onkeypress="javascript:if(event.keyCode=='13') document.main_form.submit();" size="3">
-    <input type="submit" value="Submit">
-    </form>
+  <ol>
+  <li><a href="asset_menu.php">Manage Assets</a></li>
+  <li><a href="inventory_menu.php">Manage Inventory</a></li>
+  </ol>
+  
+  <form method="post" name="main_form">
+  <input type="hidden" name="method" value="menu">
+  <input type="text" name="menu_id" onkeypress="javascript:if(event.keyCode=='13') document.main_form.submit();" size="3">
+  <input type="submit" value="Submit">
+  </form>
 
 <?php
 require_once('./includes/footer.inc.php');

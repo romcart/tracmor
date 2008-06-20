@@ -3,7 +3,7 @@ require_once('../includes/prepend.inc.php');
 
 // Check that the user is properly authenticated
 if (!isset($_SESSION['intUserAccountId'])) {
-    // authenticate error
+  // authenticate error
 	QApplication::Redirect('./index.php');
 }
 else QApplication::$objUserAccount = UserAccount::Load($_SESSION['intUserAccountId']);
@@ -54,7 +54,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 				$strWarning .= $strAssetCode." - That asset is reserved.<br />";
 			}
 			else {
-			    $arrCheckedAssetCode[] = $strAssetCode;
+			  $arrCheckedAssetCode[] = $strAssetCode;
 			}
 			
 			if (!$blnError && $objNewAsset instanceof Asset)  {
@@ -67,44 +67,44 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	}
 	
 	if (!$blnError) {
-        $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
-        if (!$objDestinationLocation) {
-            $blnError = true;
-            $strWarning .= $_POST['destination_location']." - Destination Location does not exist.<br />";
-        }
-        else {
-    	    $intDestinationLocationId = $objDestinationLocation->LocationId;
-    	    
-    	     // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
-    	    $objTransaction = new Transaction();
-    		$objTransaction->EntityQtypeId = EntityQtype::Asset;
-    		$objTransaction->TransactionTypeId = 1; // Move
-    		$objTransaction->Save();
-    	    
-    	    foreach ($objAssetArray as $objAsset) {
-      			$objAssetTransaction = new AssetTransaction();
-      			$objAssetTransaction->AssetId = $objAsset->AssetId;
-      			$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
-      			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
-      			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
-      			$objAssetTransaction->Save();
-      			
-      			$objAsset->LocationId = $intDestinationLocationId;
-      			$objAsset->Save();
-      		}
-    		$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
-    		//Remove that flag when transaction is compelete or exists some errors
-            unset($_SESSION['intUserAccountId']);
-            $arrCheckedAssetCode = "";
-        }        
+    $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
+    if (!$objDestinationLocation) {
+      $blnError = true;
+      $strWarning .= $_POST['destination_location']." - Destination Location does not exist.<br />";
+    }
+    else {
+  	  $intDestinationLocationId = $objDestinationLocation->LocationId;
+  	  
+  	   // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
+  	  $objTransaction = new Transaction();
+  		$objTransaction->EntityQtypeId = EntityQtype::Asset;
+  		$objTransaction->TransactionTypeId = 1; // Move
+  		$objTransaction->Save();
+  	  
+  	  foreach ($objAssetArray as $objAsset) {
+    			$objAssetTransaction = new AssetTransaction();
+    			$objAssetTransaction->AssetId = $objAsset->AssetId;
+    			$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
+    			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
+    			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
+    			$objAssetTransaction->Save();
+    			
+    			$objAsset->LocationId = $intDestinationLocationId;
+    			$objAsset->Save();
+    		}
+  		$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
+  		//Remove that flag when transaction is compelete or exists some errors
+      unset($_SESSION['intUserAccountId']);
+      $arrCheckedAssetCode = "";
+    }    
 	}
 	else {
-	    $strWarning .= "This transaction has not been completed.<br />";
+	  $strWarning .= "This transaction has not been completed.<br />";
 	}
 	if (is_array($arrCheckedAssetCode)) {
-	    foreach ($arrCheckedAssetCode as $strAssetCode) {
-	    	$strJavaScriptCode .= "AddAssetPost('".$strAssetCode."');";
-	    }
+	  foreach ($arrCheckedAssetCode as $strAssetCode) {
+	  	$strJavaScriptCode .= "AddAssetPost('".$strAssetCode."');";
+	  }
 	}
 }
 
@@ -114,17 +114,17 @@ $strBodyOnLoad = "document.getElementById('asset_code').value=''; document.getEl
 require_once('./includes/header.inc.php');
 ?>
 
-    <div id="warning"><?php echo $strWarning; ?></div>
-    Asset Code: <input type="text" id="asset_code" onkeypress="javascript:if(event.keyCode=='13') AddAsset();" size="10">
-    <input type="button" value="Add Asset" onclick="javascript:AddAsset();">
-    <br /><br />
-    <form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">
-    <input type="hidden" name="method" value="complete_transaction">
-    <input type="hidden" name="result" value="">
-    Destination Location: <input type="text" name="destination_location" size ="20">
-    <input type="submit" value="Complete Move" onclick="javascript:CompleteMove();">
-    </form>
-    <div id="result"></div>
+  <div id="warning"><?php echo $strWarning; ?></div>
+  Asset Code: <input type="text" id="asset_code" onkeypress="javascript:if(event.keyCode=='13') AddAsset();" size="10">
+  <input type="button" value="Add Asset" onclick="javascript:AddAsset();">
+  <br /><br />
+  <form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">
+  <input type="hidden" name="method" value="complete_transaction">
+  <input type="hidden" name="result" value="">
+  Destination Location: <input type="text" name="destination_location" size ="20">
+  <input type="submit" value="Complete Move" onclick="javascript:CompleteMove();">
+  </form>
+  <div id="result"></div>
 
 <?php
 require_once('./includes/footer.inc.php');

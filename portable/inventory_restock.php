@@ -3,7 +3,7 @@ require_once('../includes/prepend.inc.php');
 
 // Check that the user is properly authenticated
 if (!isset($_SESSION['intUserAccountId'])) {
-    // authenticate error
+  // authenticate error
 	QApplication::Redirect('./index.php');
 }
 else QApplication::$objUserAccount = UserAccount::Load($_SESSION['intUserAccountId']);
@@ -25,29 +25,29 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	$arrCheckedInventoryCodeQuantity = array();
 	
 	foreach ($arrInventoryCodeQuantity as $strInventoryCodeQuantity) {
-	    $blnErrorCurrentInventory = false;
-	    list($strInventoryModelCode, $intQuantity) = split('[|]',$strInventoryCodeQuantity,2);
-	    if ($strInventoryModelCode && $intQuantity) {
-		    // Begin error checking
-	        // Load the inventory model object based on the inventory_model_code submitted
+	  $blnErrorCurrentInventory = false;
+	  list($strInventoryModelCode, $intQuantity) = split('[|]',$strInventoryCodeQuantity,2);
+	  if ($strInventoryModelCode && $intQuantity) {
+		  // Begin error checking
+	    // Load the inventory model object based on the inventory_model_code submitted
 			$objNewInventoryModel = InventoryModel::LoadByInventoryModelCode($strInventoryModelCode);
 			if (!$objNewInventoryModel) {
-			    $blnError = true;
-			    $blnErrorCurrentInventory = true;
+			  $blnError = true;
+			  $blnErrorCurrentInventory = true;
 				$strWarning .= $strInventoryModelCode." - That is not a valid inventory code.<br />";
 			}
 			else {
-			    $intInventoryModelId = $objNewInventoryModel->InventoryModelId;
+			  $intInventoryModelId = $objNewInventoryModel->InventoryModelId;
 			}
 			
 			if (isset($objInventoryLocationArray) && !$blnErrorCurrentInventory) {
-    			foreach ($objInventoryLocationArray as $objInventoryLocation) {
-    				if ($objInventoryLocation && $objInventoryLocation->InventoryModelId == $intInventoryModelId) {
-    					$blnError = true;
-    					$blnErrorCurrentInventory = true;
-    					$strWarning .= $strInventoryModelCode." - That Inventory has already been added.<br />";
-    				}
-    			}
+  			foreach ($objInventoryLocationArray as $objInventoryLocation) {
+  				if ($objInventoryLocation && $objInventoryLocation->InventoryModelId == $intInventoryModelId) {
+  					$blnError = true;
+  					$blnErrorCurrentInventory = true;
+  					$strWarning .= $strInventoryModelCode." - That Inventory has already been added.<br />";
+  				}
+  			}
 			}
 			
 			if (!$blnError) {
@@ -59,7 +59,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 				// LocationID = 4 is 'New Inventory' Location
 				$objNewInventoryLocation->LocationId = 4;
 			
-			    // This should not be possible because the list is populated with existing InventoryLocations
+			  // This should not be possible because the list is populated with existing InventoryLocations
 				if (!($objNewInventoryLocation instanceof InventoryLocation)) {
 					$strWarning .= $strInventoryModelCode." - That Inventory location does not exist.<br />";
 					$blnErrorCurrentInventory = true;
@@ -72,29 +72,29 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 				}
 			}
 		
-    		if (!$blnError && $objNewInventoryLocation instanceof InventoryLocation)  {
-    			$objNewInventoryLocation->intTransactionQuantity = $intQuantity;
-    			$objInventoryLocationArray[] = $objNewInventoryLocation;
-    		}
-    		
-    		if (!$blnErrorCurrentInventory) {
-    		    $arrCheckedInventoryCodeQuantity[] = $strInventoryCodeQuantity;
-    		}
-    	}
-    	else {
-    	    if (!ctype_digit($intQuantity) || $intQuantity <= 0) {
-    	        $strWarning .= $strInventoryModelCode." - That is not a valid quantity.<br />";
-       			$blnError = true;
-    	    }
-    	}
+  		if (!$blnError && $objNewInventoryLocation instanceof InventoryLocation)  {
+  			$objNewInventoryLocation->intTransactionQuantity = $intQuantity;
+  			$objInventoryLocationArray[] = $objNewInventoryLocation;
+  		}
+  		
+  		if (!$blnErrorCurrentInventory) {
+  		  $arrCheckedInventoryCodeQuantity[] = $strInventoryCodeQuantity;
+  		}
+  	}
+  	else {
+  	  if (!ctype_digit($intQuantity) || $intQuantity <= 0) {
+  	    $strWarning .= $strInventoryModelCode." - That is not a valid quantity.<br />";
+     			$blnError = true;
+  	  }
+  	}
 	}
 	
 	if (isset($objInventoryLocationArray)) {
-        // Destination Location must match an existing location
-        $strDestinationLocation = $_POST['destination_location'];
+    // Destination Location must match an existing location
+    $strDestinationLocation = $_POST['destination_location'];
 		if (!($objDestinationLocation = Location::LoadByShortDescription($strDestinationLocation))) {
-		    $blnError = true;
-            $strWarning .= $strDestinationLocation." - Destination Location does not exist.<br />";
+		  $blnError = true;
+      $strWarning .= $strDestinationLocation." - Destination Location does not exist.<br />";
 		}
 		
 		if (!$blnError) {
@@ -135,20 +135,20 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			
 			$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='inventory_menu.php'>Inventory Menu</a><br />";
 			//Remove that flag when transaction is compelete or exists some errors
-            unset($_SESSION['intUserAccountId']);
-            $arrCheckedInventoryCodeQuantity = "";
+      unset($_SESSION['intUserAccountId']);
+      $arrCheckedInventoryCodeQuantity = "";
 		}
-    }
-    
-    if ($blnError) {
-        $strWarning .= "This transaction has not been completed.<br />";
-    }
-    
-    if (is_array($arrCheckedInventoryCodeQuantity)) {
-	    foreach ($arrCheckedInventoryCodeQuantity as $strInventoryCodeQuantity) {
-	        list($strInventoryModelCode, $intQuantity) = split('[|]',$strInventoryCodeQuantity,2);
-	    	$strJavaScriptCode .= "AddInventoryQuantityPost('".$strInventoryModelCode."','".$intQuantity."');";
-	    }
+  }
+  
+  if ($blnError) {
+    $strWarning .= "This transaction has not been completed.<br />";
+  }
+  
+  if (is_array($arrCheckedInventoryCodeQuantity)) {
+	  foreach ($arrCheckedInventoryCodeQuantity as $strInventoryCodeQuantity) {
+	    list($strInventoryModelCode, $intQuantity) = split('[|]',$strInventoryCodeQuantity,2);
+	  	$strJavaScriptCode .= "AddInventoryQuantityPost('".$strInventoryModelCode."','".$intQuantity."');";
+	  }
 	}
 }
 
@@ -158,19 +158,19 @@ $strBodyOnLoad = "document.getElementById('inventory_code').focus();".$strJavaSc
 require_once('./includes/header.inc.php');
 ?>
 
-    <div id="warning"><?php echo $strWarning; ?></div>
-    Inventory Code: <input type="text" id="inventory_code" size="20">
-    <br /><br />
-    Quantity: <input type="text" id="quantity" size="10" onkeypress="javascript:if(event.keyCode=='13') AddInventoryQuantity();">
-    <input type="button" value="Add" onclick="javascript:AddInventoryQuantity();">
-    <br /><br />
-    <form method="post" name="main_form" onsubmit="javascript:return CompleteMoveInventory();">
-    <input type="hidden" name="method" value="complete_transaction">
-    <input type="hidden" name="result" value="">
-    Destination Location: <input type="text" name="destination_location" onkeypress="javascript:if(event.keyCode=='13') CompleteMoveInventory();" size="20">
-    <input type="submit" value="Complete Move">
-    </form>
-    <div id="result"></div>
+  <div id="warning"><?php echo $strWarning; ?></div>
+  Inventory Code: <input type="text" id="inventory_code" size="20">
+  <br /><br />
+  Quantity: <input type="text" id="quantity" size="10" onkeypress="javascript:if(event.keyCode=='13') AddInventoryQuantity();">
+  <input type="button" value="Add" onclick="javascript:AddInventoryQuantity();">
+  <br /><br />
+  <form method="post" name="main_form" onsubmit="javascript:return CompleteMoveInventory();">
+  <input type="hidden" name="method" value="complete_transaction">
+  <input type="hidden" name="result" value="">
+  Destination Location: <input type="text" name="destination_location" onkeypress="javascript:if(event.keyCode=='13') CompleteMoveInventory();" size="20">
+  <input type="submit" value="Complete Move">
+  </form>
+  <div id="result"></div>
 
 <?php
 require_once('./includes/footer.inc.php');
