@@ -112,6 +112,9 @@ if ($_POST) {
   	*/
   }
   elseif ($_POST['method'] == 'next_location') {
+    if ($_POST['main_result']) {
+      $strCheckedLocationAsset = $_POST['main_result'];
+    }
     $arrCheckedAssetCode = array();
     $arrAssetCode =  array_unique(explode('#',$_POST['result']));
   	$blnError = false;
@@ -123,9 +126,24 @@ if ($_POST) {
   			if (!($objNewAsset instanceof Asset)) {
   				$blnError = true;
   				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
-  			}				
+  			}
   			else {
-  			  $arrCheckedAssetCode[] = $strAssetCode;
+  			  if ($_POST['main_result'] && (strstr($_POST['main_result'],$strAssetCode) /*|| strstr($_POST['main_result'],$_POST['location'])*/)) {
+            $arrLocationAsset = explode('|',$_POST['main_result']);
+            foreach ($arrLocationAsset as $strLocationAsset) {
+             	list($strLocation, $strAsset) = split('[:]',$strLocationAsset,2);
+             	if ($strAsset && strstr($strAsset,$strAssetCode)) {
+             	  $blnError = true;
+             	  $strWarning .= $strAssetCode." - That asset code has already been added.<br />";
+             	}
+             	/*
+             	elseif (!$blnError && $strAsset && strstr($strLocation,$_POST['location'])) {
+             	  $blnError = true;
+             	  $strWarning .= $_POST['location']." - That location has already been added.<br />";
+             	}*/
+            }
+          }
+  			  else $arrCheckedAssetCode[] = $strAssetCode;
   			}
   		}
   		else {
@@ -134,20 +152,36 @@ if ($_POST) {
   	}
   	
   	$objDestinationLocation = Location::LoadByShortDescription($_POST['location']);
+  	if ($objDestinationLocation) {
+  	  if ($_POST['main_result'] && strstr($_POST['main_result'],$_POST['location'])) {
+  	    $arrLocationAsset = explode('|',$_POST['main_result']);
+        foreach ($arrLocationAsset as $strLocationAsset) {
+          list($strLocation, $strAsset) = split('[:]',$strLocationAsset,2);
+          if ($strAsset && strstr($strLocation,$_POST['location'])) {
+            $blnError = true;
+            $strWarning .= $_POST['location']." - That location has already been added.<br />";
+            break;
+          }         	
+        }
+  	  }
+  	}
     if (!$objDestinationLocation) {
       $strWarning .= $_POST['location']." - Destination Location does not exist. Please provide another location.<br />";
-      if (is_array($arrCheckedAssetCode)) {
-    	  $strJavaScriptCode .= " strCheckedAssetCode = '".implode("#",$arrCheckedAssetCode)."';";
-      }
+      $blnError = true;
     }
     elseif (!$blnError) {
       $strWarning .= $_POST['location']." - New location with multiple assets added. You may provide one more location.<br />";
       if ($_POST['main_result']) {
-        $strCheckedLocationAsset = $_POST['main_result']."|".$_POST['location'].":".$_POST['result'];
+        $strCheckedLocationAsset .= "|".$_POST['location'].":".$_POST['result'];
       }
       else {
         $strCheckedLocationAsset = $_POST['location'].":".$_POST['result'];
       }
+    }
+    
+    if ($blnError && is_array($arrCheckedAssetCode)) {
+      $strJavaScriptCode .= " strCheckedAssetCode = '".implode("#",$arrCheckedAssetCode)."';";
+      $strJavaScriptCode .= " document.getElementById('location').value = '".$_POST['location']."';";
     }
   }
 }
