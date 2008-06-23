@@ -2398,7 +2398,7 @@
 				} else {
 					$this->lstShippingAccount->Display=FALSE;
 					$this->txtRecipientThirdPartyAccount->Display=TRUE;
-					$this->lblSenderLabel->Text = 'Recipient/third party<br>account #';					
+					$this->lblSenderLabel->Text = 'Account #';					
 				}
 			}
 		}

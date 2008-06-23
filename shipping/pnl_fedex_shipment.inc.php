@@ -100,7 +100,7 @@
 							</tr>									
 						</table>
 						<?php $HALDisplay = ($this->blnEditMode && $this->objShipment->CourierId===1 && $this->objFedexShipment->HoldAtLocationFlag) ? "" : "display:none;"; ?>
-						<table style="<?php echo($HALDisplay); ?>" id="HAL">
+						<table style="<?php echo($HALDisplay); ?>" cellpadding="0" cellspacing="0" id="HAL">
 							<tr><td></td><td><div style="font-size:8pt;">Enter the address of the FedEx location where the package is to be held. This service is not available at every FedEx location. Contact your local FedEx office for more details.</div></tr>
 							<tr>
 								<td class="record_field_name">Address</td>
