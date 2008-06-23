@@ -34,6 +34,11 @@
 	$this->ctlShortcutMenu->Render();
 ?>
 <!-- End Shortcut Menu -->
+
+<!-- This is where you will render the datagrid -->
+<?php //$this->dtgAssetAudit->Render() ?>
+
+
 		
 <?php $this->RenderEnd() ?>		
 <?php require_once('../includes/footer.inc.php'); ?>
