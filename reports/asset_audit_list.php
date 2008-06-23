@@ -69,8 +69,8 @@
   	}
   	
   	protected function dtgAssetAudit_Bind() {
-  		// This is where you will use a QQuery to select all audits where entity_qtype_id = 1 (Assets)
-  		//$this->dtgAssetAudit->DataSource = AssetAudit::
+  		// This is where you will use a generated method to select all audits where entity_qtype_id = 1 (Assets)
+  		//$this->dtgAssetAudit->DataSource = AssetAudit::LoadArrayByEntityQtypeId(1);
   	}
   	
 	}
