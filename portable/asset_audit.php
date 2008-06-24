@@ -136,11 +136,6 @@ if ($_POST) {
              	  $blnError = true;
              	  $strWarning .= $strAssetCode." - That asset code has already been added.<br />";
              	}
-             	/*
-             	elseif (!$blnError && $strAsset && strstr($strLocation,$_POST['location'])) {
-             	  $blnError = true;
-             	  $strWarning .= $_POST['location']." - That location has already been added.<br />";
-             	}*/
             }
           }
   			  else $arrCheckedAssetCode[] = $strAssetCode;
@@ -166,11 +161,11 @@ if ($_POST) {
   	  }
   	}
     if (!$objDestinationLocation) {
-      $strWarning .= $_POST['location']." - Destination Location does not exist. Please provide another location.<br />";
+      $strWarning .= $_POST['location']." - Location does not exist. Please provide another location.<br />";
       $blnError = true;
     }
     elseif (!$blnError) {
-      $strWarning .= $_POST['location']." - New location with multiple assets added. You may provide one more location.<br />";
+      $strWarning .= $_POST['location']." - Location added. Please provide another location or click 'Done'.<br />";
       if ($_POST['main_result']) {
         $strCheckedLocationAsset .= "|".$_POST['location'].":".$_POST['result'];
       }
