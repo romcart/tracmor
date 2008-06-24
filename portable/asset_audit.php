@@ -112,6 +112,7 @@ if ($_POST) {
   	*/
   }
   elseif ($_POST['method'] == 'next_location') {
+    // Load locations that have already been added 
     if ($_POST['main_result']) {
       $strCheckedLocationAsset = $_POST['main_result'];
     }
@@ -119,16 +120,17 @@ if ($_POST) {
     $arrAssetCode =  array_unique(explode('#',$_POST['result']));
   	$blnError = false;
   	$arrCheckedAssetCode = array();
+  	// Begin error checking for assets
   	foreach ($arrAssetCode as $strAssetCode) {
   		if ($strAssetCode) {
-  			// Begin error checking
   			$objNewAsset = Asset::LoadByAssetCode($strAssetCode);
   			if (!($objNewAsset instanceof Asset)) {
   				$blnError = true;
   				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
   			}
   			else {
-  			  if ($_POST['main_result'] && (strstr($_POST['main_result'],$strAssetCode) /*|| strstr($_POST['main_result'],$_POST['location'])*/)) {
+  			  // Check a duplicate asset code
+  			  if ($_POST['main_result'] && strstr($_POST['main_result'],$strAssetCode)) {
             $arrLocationAsset = explode('|',$_POST['main_result']);
             foreach ($arrLocationAsset as $strLocationAsset) {
              	list($strLocation, $strAsset) = split('[:]',$strLocationAsset,2);
@@ -145,9 +147,10 @@ if ($_POST) {
   			$strWarning .= "Please enter an asset code.<br />";
   		}
   	}
-  	
+  	// Location must be exist
   	$objDestinationLocation = Location::LoadByShortDescription($_POST['location']);
   	if ($objDestinationLocation) {
+  	  // Check a duplicate location
   	  if ($_POST['main_result'] && strstr($_POST['main_result'],$_POST['location'])) {
   	    $arrLocationAsset = explode('|',$_POST['main_result']);
         foreach ($arrLocationAsset as $strLocationAsset) {
