@@ -36,7 +36,16 @@
 <!-- End Shortcut Menu -->
 
 <!-- This is where you will render the datagrid -->
-<?php //$this->dtgAssetAudit->Render() ?>
+<?php 
+if ($this->objAuditArray) {
+	foreach ($this->objAuditArray as $objAudit) {
+		// This is where you will display the list of audits in the form "Audit by Justin Sinclair on 2008-06-09 17:07:11"
+		// Then you will display a delete link. something like ./asset_audit_list.php?method=delete&intAuditId=X ...
+		// and you will need to create a method to delete the audit. This should have a javascript warning: "Are you sure you want to delete this audit?"
+	}
+}
+
+?>
 
 
 		

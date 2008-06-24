@@ -25,19 +25,23 @@
 	require_once(__FORMBASE_CLASSES__ . '/AuditListFormBase.class.php');
 	
 	class AssetAuditListForm extends AuditListFormBase {
+		
 		// Header Menu
 		protected $ctlHeaderMenu;
 		
 		// Shortcut Menu
 		protected $ctlShortcutMenu;
 		
-		protected $dtgAssetAudit;
+		// Audit Array
+		protected $objAuditArray;
 		
 		protected function Form_Create() {
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			$this->ctlShortcutMenu_Create();
-			$this->dtgAssetAudit_Create();
+			
+			// You will need to add the optional clauses here to join by CreatedBy so that you can use the full name of the user that created this report.
+			$this->objAuditArray = Audit::LoadAll();
 		}
 		
 		// Create and Setup the Header Composite Control
@@ -50,31 +54,10 @@
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
   	}
   	
-  	// Create and Setup the Asset Audir List
-  	protected function dtgAssetAuditList_Create() {
-  		$this->dtgAssetAudit = new QDataGrid($this);
-			$this->dtgAssetAudit->Name = 'asset_audit_list';
-  		$this->dtgAssetAudit->CellPadding = 5;
-  		$this->dtgAssetAudit->CellSpacing = 0;
-  		$this->dtgAssetAudit->CssClass = "datagrid";
-  		$this->dtgAssetAudit->UseAjax = true;
-  		$this->dtgAssetAudit->SetDataBinder('dtgAssetAudit_Bind');
-  		
-  		// You should create here a datagrid with two columns: Date and Created By. Date should be linked to the asset_audit_view.php?intAuditId=x
-  		/*
-  		$this->dtgAsset->AddColumn(new QDataGridColumnExt('Date', '<?= $_ITEM->ToStringDateWithLink("bluelink") ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::Audit()->AuditId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Audit()->Id, false))));
-  		$this->dtgAsset->AddColumn(new QDataGridColumnExt('Created By' ...));
-  		*/
-  	}
   	
-  	protected function dtgAssetAudit_Bind() {
-  		// This is where you will use a generated method to select all audits where entity_qtype_id = 1 (Assets)
-  		//$this->dtgAssetAudit->DataSource = AssetAudit::LoadArrayByEntityQtypeId(1);
-  	}
   	
 	}
 	
 	// Go ahead and run this form object to generate the page
-	ReportIndexForm::Run('ReportIndexForm', 'index.tpl.php');	
+	AssetAuditListForm::Run('AssetAuditListForm', 'asset_audit_list.tpl.php');	
 ?>

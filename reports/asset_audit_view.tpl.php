@@ -35,8 +35,9 @@
 ?>
 <!-- End Shortcut Menu -->
 
-<!-- This is where you will render the datagrid -->
-<?php //$this->dtgAssetAuditReport->Render() ?>
+<!-- This is where you will render the radio button list and the datagrid -->
+<?php //$this->rblDiscrepancy->Render(); ?>
+<?php //$this->dtgAssetAuditReport->Render(); ?>
 
 
 		
