@@ -286,3 +286,13 @@ function NextLocation() {
   }
   return false;
 }
+function AssetsAuditDone() {
+  var strResult = document.main_form.result.value;
+  if (strResult != '') {
+    return true;
+  }
+  else {
+    document.getElementById('warning').innerHTML = "You must provide at least one location";
+  }
+  return false;
+}

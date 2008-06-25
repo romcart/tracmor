@@ -15,101 +15,67 @@ $strCheckedLocationAsset = "";
 
 if ($_POST) {
   if  ($_POST['method'] == 'complete_transaction') {
-  	/*
-  	Run error checking on the array of asset codes and the destination location
-  	If there are no errors, then you will add the transaction to the database.
-  		That will include an entry in the Transaction and Asset Transaction table.
-  		You will also have to change the asset.location_id to the destination location
-  	*/
-  	/*
-  	$arrAssetCode =  array_unique(explode('#',$_POST['result']));
+  	$arrLocationAssetCode =  array_unique(explode('|',$_POST['result']));
   	$blnError = false;
-  	$arrCheckedAssetCode = array();
-  	foreach ($arrAssetCode as $strAssetCode) {
-  		if ($strAssetCode) {
-  			// Begin error checking
-  			$objNewAsset = Asset::LoadByAssetCode($strAssetCode);
-  			if (!($objNewAsset instanceof Asset)) {
-  				$blnError = true;
-  				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
-  			}				
-  			// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
-  			elseif ($objNewAsset->LocationId == 2) {
-  				$blnError = true;
-  				$strWarning .= $strAssetCode." - That asset has already been shipped.<br />";
-  			}
-  			// Cannot move, check out/in, nor reserve/unreserve any assets that are scheduled to  be received
-  			elseif ($objNewAsset->LocationId == 5) {
-  				$blnError = true;
-  				$strWarning .= $strAssetCode." - That asset is currently scheduled to be received.<br />";
-  			}
-  			elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
-  				$blnError = true;
-  				$strWarning .= $strAssetCode." - That asset is already in a pending shipment.<br />";
-  			}
-  			// Move
-  			elseif ($objNewAsset->CheckedOutFlag) {
-  				$blnError = true;
-  				$strWarning .= $strAssetCode." - That asset is checked out.<br />";
-  			}
-  			elseif ($objNewAsset->ReservedFlag) {
-  				$blnError = true;
-  				$strWarning .= $strAssetCode." - That asset is reserved.<br />";
-  			}
-  			else {
-  			  $arrCheckedAssetCode[] = $strAssetCode;
-  			}
-  			
-  			if (!$blnError && $objNewAsset instanceof Asset)  {
-  				$objAssetArray[] = $objNewAsset;
-  			}
-  		}
-  		else {
-  			$strWarning .= "Please enter an asset code.<br />";
+  	// Begin error checking for assets
+  	foreach ($arrLocationAssetCode as $strLocationAssetCode) {
+  		if ($strLocationAssetCode) {
+  		  list($strLocation, $strAssetCodeArray) = split('[:]',$strLocationAssetCode,2);
+  		  // Location must be exist
+        $objDestinationLocation = Location::LoadByShortDescription($strLocation);
+        if (!$objDestinationLocation) {
+          $strWarning .= $strLocation." - Location does not exist.<br />";
+          $blnError = true;
+        }
+        else {
+          $arrAssetCode =  array_unique(explode('#',$strAssetCodeArray));
+          foreach ($arrAssetCode as $strAssetCode) {
+          	$objNewAsset = Asset::LoadByAssetCode($strAssetCode);
+          	// Asset Code must be exist
+      			if (!($objNewAsset instanceof Asset)) {
+      				$blnError = true;
+      				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
+      			}
+      			elseif (!$blnError && $objNewAsset instanceof Asset)  {
+      			  $objAuditScan = new AuditScan();
+              $objAuditScan->LocationId = $objDestinationLocation->LocationId;
+              $objAuditScan->EntityId = $objNewAsset->AssetId;
+              $objAuditScan->Count = 1;
+    				  $objAuditScanArray[] = $objAuditScan;
+    			  }
+          }
+        }
   		}
   	}
   	
+  	// Submit
   	if (!$blnError) {
-      $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
-      if (!$objDestinationLocation) {
-        $blnError = true;
-        $strWarning .= $_POST['destination_location']." - Destination Location does not exist.<br />";
-      }
-      else {
-    	  $intDestinationLocationId = $objDestinationLocation->LocationId;
+  	  try {
+        // Get an instance of the database
+				$objDatabase = QApplication::$Database[1];
+				// Begin a MySQL Transaction to be either committed or rolled back
+				$objDatabase->TransactionBegin();
+				
+				$objAudit = new Audit();
+        $objAudit->EntityQtypeId = 1; // Asset
+        $objAudit->Save();
+        
+    	  foreach ($objAuditScanArray as $objAuditScan) {
+    	  	$objAuditScan->AuditId = $objAudit->AuditId;
+    	  	$objAuditScan->Save();
+    	  }
     	  
-    	   // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
-    	  $objTransaction = new Transaction();
-    		$objTransaction->EntityQtypeId = EntityQtype::Asset;
-    		$objTransaction->TransactionTypeId = 1; // Move
-    		$objTransaction->Save();
+    	  $objDatabase->TransactionCommit();
     	  
-    	  foreach ($objAssetArray as $objAsset) {
-      			$objAssetTransaction = new AssetTransaction();
-      			$objAssetTransaction->AssetId = $objAsset->AssetId;
-      			$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
-      			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
-      			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
-      			$objAssetTransaction->Save();
-      			
-      			$objAsset->LocationId = $intDestinationLocationId;
-      			$objAsset->Save();
-      		}
-    		$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
+    	  $strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
     		//Remove that flag when transaction is compelete or exists some errors
         unset($_SESSION['intUserAccountId']);
-        $arrCheckedAssetCode = "";
-      }    
-  	}
-  	else {
-  	  $strWarning .= "This transaction has not been completed.<br />";
-  	}
-  	if (is_array($arrCheckedAssetCode)) {
-  	  foreach ($arrCheckedAssetCode as $strAssetCode) {
-  	  	$strJavaScriptCode .= "AddAssetPost('".$strAssetCode."');";
+  	  }
+  	  catch (QExtendedOptimisticLockingException $objExc) {
+  	    // Rollback the database
+  	    $objDatabase->TransactionRollback();
   	  }
   	}
-  	*/
   }
   elseif ($_POST['method'] == 'next_location') {
     // Load locations that have already been added 
@@ -204,7 +170,7 @@ require_once('./includes/header.inc.php');
   <input type="hidden" name="location" value="">
   <input type="submit" value="Next Location">
   </form>
-  <form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">
+  <form method="post" name="main_form" onsubmit="javascript:return AssetsAuditDone();">
   <input type="hidden" name="method" value="complete_transaction">
   <input type="hidden" name="result" value="<?php echo $strCheckedLocationAsset; ?>">
   <input type="submit" value="Done">
