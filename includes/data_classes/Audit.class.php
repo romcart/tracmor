@@ -32,7 +32,6 @@
 			if ((!$this->__blnRestored) || ($blnForceInsert)) {
 				$this->CreatedBy = QApplication::$objUserAccount->UserAccountId;
 				$this->CreationDate = new QDateTime(QDateTime::Now);
-				$this->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
 			}
 			else {
 				$this->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
