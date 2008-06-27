@@ -21,7 +21,6 @@
  	
 	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
 	QApplication::Authenticate(7);
-	// SERGEI - this will generate an error until you add the tables to the data model and re-codegenerate (then codegen will create this file).
 	require_once(__FORMBASE_CLASSES__ . '/AuditListFormBase.class.php');
 	
 	class AssetAuditListForm extends AuditListFormBase {
@@ -39,9 +38,20 @@
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			$this->ctlShortcutMenu_Create();
-			
-			// You will need to add the optional clauses here to join by CreatedBy so that you can use the full name of the user that created this report.
-			$this->objAuditArray = Audit::LoadAll();
+			QApplication::$Database[1]->EnableProfiling();
+			if ($_GET && $_GET['method'] == 'delete') {
+        $objAudit = Audit::Load($_GET['intAuditId']);
+        if ($objAudit) {
+          $objAuditScanArray = AuditScan::LoadArrayByAuditId($objAudit->AuditId);
+          foreach ($objAuditScanArray as $objAuditScan) {
+          	$objAuditScan->Delete();
+          }
+          $objAudit->Delete();
+          QApplication::Redirect("./asset_audit_list.php");
+        }
+      }
+	    // Load an array of Audit objects using join on UserAccount.
+			$this->objAuditArray = Audit::LoadAll(QQ::Clause(QQ::Expand(QQN::Audit()->CreatedByObject)));
 		}
 		
 		// Create and Setup the Header Composite Control
@@ -53,11 +63,12 @@
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
   	}
-  	
-  	
+  	  	
   	
 	}
 	
 	// Go ahead and run this form object to generate the page
-	AssetAuditListForm::Run('AssetAuditListForm', 'asset_audit_list.tpl.php');	
+	AssetAuditListForm::Run('AssetAuditListForm', 'asset_audit_list.tpl.php');
+	QApplication::$Database[1]->OutputProfiling();
+	  	
 ?>
