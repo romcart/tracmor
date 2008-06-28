@@ -35,14 +35,17 @@
 		protected $rblDiscrepancy;
 		
 		// The Audit Datagrid
-		protected $dtgAssetAudit;
+		protected $dtgAudit;
+		
+		// The Audit Objects Array By AssetId
+		protected $objAssetArrayById;
 		
 		protected function Form_Create() {
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			$this->ctlShortcutMenu_Create();
-			$this->rblDiscrepancy_Create();
-			$this->dtgAssetAudit_Create();
+			//$this->rblDiscrepancy_Create();
+			$this->dtgAudit_Create();
 		}
 		
 		// Create and Setup the Header Composite Control
@@ -63,27 +66,113 @@
   	}
   	
   	// Create and Setup the Asset Audir List
-  	protected function dtgAssetAuditList_Create() {
-  		$this->dtgAssetAudit = new QDataGrid($this);
-			$this->dtgAssetAudit->Name = 'asset_audit_list';
-  		$this->dtgAssetAudit->CellPadding = 5;
-  		$this->dtgAssetAudit->CellSpacing = 0;
-  		$this->dtgAssetAudit->CssClass = "datagrid";
-  		$this->dtgAssetAudit->UseAjax = true;
-  		$this->dtgAssetAudit->SetDataBinder('dtgAssetAudit_Bind');
-  		
+  	protected function dtgAudit_Create() {
+  		$this->dtgAudit = new QDataGrid($this);
+			$this->dtgAudit->Name = 'asset_audit_list';
+  		$this->dtgAudit->CellPadding = 5;
+  		$this->dtgAudit->CellSpacing = 0;
+  		$this->dtgAudit->CssClass = "datagrid";
+  		$this->dtgAudit->UseAjax = true;
+  		$this->dtgAudit->SetDataBinder('dtgAudit_Bind');
+  		QApplication::$Database[1]->EnableProfiling();
   		// You should create here a datagrid with five columns: Location, Asset Code, Asset Model, PDT Count, System Count
-  		/*
-  		$this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->ShortDescription ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN:::AuditScan()->Location->ShortDescription, false))));
-  		$this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code' ...));
-  		*/
-  	}
+  		/*$this->dtgAudit->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('PDT Count', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('System Count', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
+  	*/}
   	
-  	protected function dtgAssetAudit_Bind() {
+  	protected function dtgAudit_Bind() {
   		// This is where you will use a generated method to select all audit_scans with a specific audit ID ...
   		// you will also need to calculate the system count so that you can 
-  		//$this->dtgAssetAudit->DataSource = AssetAudit::LoadArrayByAuditIdWithCount($intAuditId);
+  		 $strQuery = 
+        "SELECT
+          `audit_scan`.`audit_scan_id` AS `audit_scan_id`,
+          `audit_scan`.`audit_id` AS `audit_id`,
+          `audit_scan`.`location_id` AS `location_id`,
+          `audit_scan`.`entity_id` AS `entity_id`,
+          `audit_scan`.`count` AS `count`,
+          `audit_scan__location_id`.`location_id` AS `audit_scan__location_id__location_id`,
+          `audit_scan__location_id`.`short_description` AS `audit_scan__location_id__short_description`,
+          `audit_scan__location_id`.`long_description` AS `audit_scan__location_id__long_description`,
+          `audit_scan__location_id`.`created_by` AS `audit_scan__location_id__created_by`,
+          `audit_scan__location_id`.`creation_date` AS `audit_scan__location_id__creation_date`,
+          `audit_scan__location_id`.`modified_by` AS `audit_scan__location_id__modified_by`,
+          `audit_scan__location_id`.`modified_date` AS `audit_scan__location_id__modified_date`,
+          `asset`.`asset_id` AS `asset_id`,
+        	`asset`.`asset_model_id` AS `asset_model_id`,
+        	`asset`.`location_id` AS `location_id`,
+        	`asset`.`asset_code` AS `asset_code`,
+        	`asset`.`image_path` AS `image_path`,
+        	`asset`.`checked_out_flag` AS `checked_out_flag`,
+        	`asset`.`reserved_flag` AS `reserved_flag`,
+        	`asset`.`created_by` AS `created_by`,
+        	`asset`.`creation_date` AS `creation_date`,
+        	`asset`.`modified_by` AS `modified_by`,
+        	`asset`.`modified_date` AS `modified_date`,
+        	`asset__asset_model_id`.`asset_model_id` AS `asset__asset_model_id__asset_model_id`,
+        	`asset__asset_model_id`.`category_id` AS `asset__asset_model_id__category_id`,
+        	`asset__asset_model_id`.`manufacturer_id` AS `asset__asset_model_id__manufacturer_id`,
+        	`asset__asset_model_id`.`asset_model_code` AS `asset__asset_model_id__asset_model_code`,
+        	`asset__asset_model_id`.`short_description` AS `asset__asset_model_id__short_description`,
+        	`asset__asset_model_id`.`long_description` AS `asset__asset_model_id__long_description`,
+        	`asset__asset_model_id`.`image_path` AS `asset__asset_model_id__image_path`,
+        	`asset__asset_model_id`.`created_by` AS `asset__asset_model_id__created_by`,
+        	`asset__asset_model_id`.`creation_date` AS `asset__asset_model_id__creation_date`,
+        	`asset__asset_model_id`.`modified_by` AS `asset__asset_model_id__modified_by`,
+        	`asset__asset_model_id`.`modified_date` AS `asset__asset_model_id__modified_date`
+        FROM
+        	`audit_scan` AS `audit_scan`
+	      LEFT JOIN `location` AS `audit_scan__location_id` ON `audit_scan`.`location_id` = `audit_scan__location_id`.`location_id`
+	      LEFT JOIN `asset` AS `asset` ON `audit_scan`.`entity_id` = `asset`.`asset_id`
+	      LEFT JOIN `asset_model` AS `asset__asset_model_id` ON `asset`.`asset_model_id` = `asset__asset_model_id`.`asset_model_id`
+        WHERE
+        	`audit_scan`.`audit_id` = '".$_GET['intAuditId']."'";
+  		//$this->dtgAudit->DataSource = AuditScan::LoadArrayByAuditId($_GET['intAuditId'],QQ::Clause(QQ::Expand(QQN::AuditScan()->Location)));
+  	  //echo "<table cellspacing='0' cellpadding='5' border='1'><tr><td>Location</td><td>Asset Code</td><td>Asset Model</td><td>PDT Count</td><td>System Count</td></tr>";
+  	  /* // Load AuditScan objects with short descriptions of locations
+  	  $objAuditScanArray = AuditScan::LoadArrayByAuditId($objAudit->AuditId,QQ::Clause(QQ::Expand(QQN::AuditScan()->Location)));
+  		$intEntityIdArray = array();
+  		// Array of AssetId in that audit
+  		foreach ($objCopyAuditScanArray=&$objAuditScanArray as $objNewAuditScan) {
+  			$intEntityIdArray[] = $objNewAuditScan->EntityId;
+  		}
+  		// Load Asset objects by array of AssetId
+  		$objAssetArray = Asset::QueryArray(QQ::In(QQN::Asset()->AssetId,$intEntityIdArray),QQ::Clause(QQ::Expand(QQN::Asset()->AssetModel)));
+  		foreach ($objAssetArray as $objAsset) {
+  			$objAssetArrayById[$objAsset->AssetId] = $objAsset;
+  		}
+  		// Display the report table
+  	  foreach ($objAuditScanArray as $objAuditScan) {
+  	    $intAssetId = $objAuditScan->EntityId;
+  	    echo "<tr><td>".$objAuditScan->Location->ShortDescription."</td><td>".$objAssetArrayById[$intAssetId]->AssetCode."</td><td>".$objAssetArrayById[$intAssetId]->AssetModel."</td><td>".$objAuditScan->Count."</td><td>";
+  	  	if ($objAuditScan->Location->LocationId != $objAssetArrayById[$intAssetId]->LocationId) {
+  	  	  echo "0";
+  	  	}
+  	  	else {
+  	  	  echo "1";
+  	  	}
+  	  	echo "</td></tr>";
+  	  }
+  	  echo "</table></td></tr>";*/
+  	  
+  	 
+  	  
+  	  $objDatabase = QApplication::$Database[1];
+      // Perform the Query
+      $objDbResult = $objDatabase->Query($strQuery);
+      while ($objNextRow = $objDbResult->GetNextRow()) {
+   	    $objDbRowArray[]=$objNextRow;
+      }
+      echo "</table>";
+      //$this->dtgAudit->DataSource = $mixRowArray;
+      $this->dtgAudit->DataSource = $objDbRowArray;
   	}
   	
   	protected function rblDiscrepancy_Click() {
@@ -93,5 +182,6 @@
 	}
 	
 	// Go ahead and run this form object to generate the page
-	ReportIndexForm::Run('ReportIndexForm', 'index.tpl.php');	
+	AssetAuditListForm::Run('AssetAuditListForm', 'asset_audit_view.tpl.php');
+	QApplication::$Database[1]->OutputProfiling();	
 ?>

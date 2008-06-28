@@ -37,7 +37,7 @@
 
 <!-- This is where you will render the radio button list and the datagrid -->
 <?php //$this->rblDiscrepancy->Render(); ?>
-<?php //$this->dtgAssetAuditReport->Render(); ?>
+<?php $this->dtgAudit->Render(); ?>
 
 
 		
