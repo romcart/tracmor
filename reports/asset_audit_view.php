@@ -63,7 +63,7 @@
   		$this->rblDiscrepancy = new QRadioButtonList($this);
 			$this->rblDiscrepancy->AddItem(new QListItem('View Discrepancies Only', 'discrepanies', true));
 			$this->rblDiscrepancy->AddItem(new QListItem('View All', 'all'));
-			$this->rblDiscrepancy->AddAction(new QChangeEvent(), new QAjaxAction('rblDiscrepancy_Click'));
+			$this->rblDiscrepancy->AddAction(new QChangeEvent(), new QAjaxAction('rblDiscrepancy_Change'));
 			// Add the values for 'View Discrepancies Only' and 'View All'
   		// Add a Ajax Click Action
   	}
@@ -176,9 +176,8 @@
       $this->dtgAudit->DataSource = $objDbRowArray;
   	}
   	
-  	protected function rblDiscrepancy_Click($strFormId, $strControlId, $strParameter) {
+  	protected function rblDiscrepancy_Change($strFormId, $strControlId, $strParameter) {
   		// This is where you will toggle between showing only the discrepancies in the datagrid or showing all of the audit scans.
-  	  $this->rblDiscrepancy->Enabled = false;
   	}
   	
 	}
