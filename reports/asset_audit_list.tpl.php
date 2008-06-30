@@ -37,6 +37,8 @@
 </td>
 		<td>
 			<img src="../images/empty.gif" width="10">
+		</td>
+		
 			<script type="text/javascript">
 			  function ConfirmDeleteAudit(intAuditId) {
 			    if (confirm("Are you sure you want to delete this audit?")) {
@@ -46,6 +48,7 @@
 			</script> 
 		</td>
 		<td width="100%" valign="top">
+		<div class="title">&nbsp;Asset Audit Reports</div><br />
       <table>
 <?php 
 

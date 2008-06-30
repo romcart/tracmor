@@ -39,6 +39,7 @@
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
+		<div class="title">&nbsp;Asset Audit Report</div><br />
 <!-- This is where you will render the radio button list and the datagrid -->
 <?php $this->rblDiscrepancy->Render(); ?>
 <?php $this->dtgAudit->Render(); ?>

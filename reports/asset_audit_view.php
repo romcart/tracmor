@@ -61,40 +61,50 @@
   	// Create and Setup the Discrepancy Radio Button List
   	protected function rblDiscrepancy_Create() {
   		$this->rblDiscrepancy = new QRadioButtonList($this);
-			$this->rblDiscrepancy->AddItem(new QListItem('View Discrepancies Only', 'discrepanies', true));
+			$this->rblDiscrepancy->AddItem(new QListItem('View Discrepancies Only', 'discrepancies', true));
 			$this->rblDiscrepancy->AddItem(new QListItem('View All', 'all'));
 			$this->rblDiscrepancy->AddAction(new QChangeEvent(), new QAjaxAction('rblDiscrepancy_Change'));
-			// Add the values for 'View Discrepancies Only' and 'View All'
-  		// Add a Ajax Click Action
   	}
   	
-  	// Create and Setup the Asset Audir List
+  	// Create and Setup the Asset Audit List
   	protected function dtgAudit_Create() {
   		$this->dtgAudit = new QDataGrid($this);
 			$this->dtgAudit->Name = 'asset_audit_list';
   		$this->dtgAudit->CellPadding = 5;
   		$this->dtgAudit->CellSpacing = 0;
   		$this->dtgAudit->CssClass = "datagrid";
+  		
+  		// Enable Pagination, and set to 1000 items per page
+      $objPaginator = new QPaginator($this->dtgAudit);
+      $this->dtgAudit->Paginator = $objPaginator;
+      $this->dtgAudit->ItemsPerPage = 1000;
+  		
   		$this->dtgAudit->UseAjax = true;
+  		// Allow for column toggling
+      $this->dtgAudit->ShowColumnToggle = true;
+      // Allow for CSV Export
+      $this->dtgAudit->ShowExportCsv = true;
+      
+  		
+  		//QApplication::$Database[1]->EnableProfiling();
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->ShortDescription ?>',
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->Asset->AssetCode ?>',
+  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->Asset->AssetModel->ShortDescription ?>',
+  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('PDT Count', '<?= $_ITEM->Count ?>',
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Count), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Count, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('System Count', '<?= $_ITEM->SystemCount ?>',
+  			array()));
+  			
   		$this->dtgAudit->SetDataBinder('dtgAudit_Bind');
-  		QApplication::$Database[1]->EnableProfiling();
-  		// You should create here a datagrid with five columns: Location, Asset Code, Asset Model, PDT Count, System Count
-  		/*$this->dtgAudit->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
-  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
-  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
-  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('PDT Count', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
-  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('System Count', '<?= $_ITEM["audit_scan__location_id__short_description"] ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Location->ShortDescription, false))));
-  	*/}
+  	}
   	
   	protected function dtgAudit_Bind() {
   		// This is where you will use a generated method to select all audit_scans with a specific audit ID ...
   		// you will also need to calculate the system count so that you can 
-  		 $strQuery = 
+/*  		 $strQuery = 
         "SELECT
           `audit_scan`.`audit_scan_id` AS `audit_scan_id`,
           `audit_scan`.`audit_id` AS `audit_id`,
@@ -136,7 +146,7 @@
         LEFT JOIN `asset` AS `asset` ON `audit_scan`.`entity_id` = `asset`.`asset_id`
         LEFT JOIN `asset_model` AS `asset__asset_model_id` ON `asset`.`asset_model_id` = `asset__asset_model_id`.`asset_model_id`
         WHERE
-          `audit_scan`.`audit_id` = '".$_GET['intAuditId']."'";
+          `audit_scan`.`audit_id` = '".$_GET['intAuditId']."'";*/
   		//$this->dtgAudit->DataSource = AuditScan::LoadArrayByAuditId($_GET['intAuditId'],QQ::Clause(QQ::Expand(QQN::AuditScan()->Location)));
   	  //echo "<table cellspacing='0' cellpadding='5' border='1'><tr><td>Location</td><td>Asset Code</td><td>Asset Model</td><td>PDT Count</td><td>System Count</td></tr>";
   	  /* // Load AuditScan objects with short descriptions of locations
@@ -165,24 +175,35 @@
   	  }
   	  echo "</table></td></tr>";*/
   	  
-  	 
+  	 $objAuditScanArray = AuditScan::QueryArray(QQ::Equal(QQN::AuditScan()->AuditId, $_GET['intAuditId']), QQ::Clause(QQ::Expand(QQN::AuditScan()->Location), $this->dtgAudit->OrderByClause));
   	  
-  	  $objDatabase = QApplication::$Database[1];
-      // Perform the Query
-      $objDbResult = $objDatabase->Query($strQuery);
-      while ($objNextRow = $objDbResult->GetNextRow()) {
-   	    $objDbRowArray[]=$objNextRow;
+      if ($objAuditScanArray) {
+      	$i = 0;
+      	foreach ($objAuditScanArray as $objAuditScan) {
+      		$objAuditScan->Asset = Asset::QuerySingle(QQ::Equal(QQN::Asset()->AssetId, $objAuditScan->EntityId), QQ::Clause(QQ::Expand(QQN::Asset()->AssetModel)));
+      		if ($objAuditScan->Location->LocationId != $objAuditScan->Asset->LocationId) {
+      			$objAuditScan->SystemCount = 0;
+      		}
+      		else {
+      			$objAuditScan->SystemCount = 1;
+      			if ($this->rblDiscrepancy->SelectedValue == 'discrepancies') {
+      				unset($objAuditScanArray[$i]);
+      			}
+      		}
+      		$i++;
+      	}
       }
-      $this->dtgAudit->DataSource = $objDbRowArray;
+  	  $this->dtgAudit->DataSource = $objAuditScanArray;
   	}
   	
   	protected function rblDiscrepancy_Change($strFormId, $strControlId, $strParameter) {
   		// This is where you will toggle between showing only the discrepancies in the datagrid or showing all of the audit scans.
+  		$this->dtgAudit->MarkAsModified();
   	}
   	
 	}
 	
 	// Go ahead and run this form object to generate the page
 	AssetAuditViewForm::Run('AssetAuditViewForm', 'asset_audit_view.tpl.php');
-	QApplication::$Database[1]->OutputProfiling();	
+	//QApplication::$Database[1]->OutputProfiling();	
 ?>

@@ -38,14 +38,11 @@
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			$this->ctlShortcutMenu_Create();
-			QApplication::$Database[1]->EnableProfiling();
+			//QApplication::$Database[1]->EnableProfiling();
 			if ($_GET && $_GET['method'] == 'delete') {
         $objAudit = Audit::Load($_GET['intAuditId']);
         if ($objAudit) {
-          $objAuditScanArray = AuditScan::LoadArrayByAuditId($objAudit->AuditId);
-          foreach ($objAuditScanArray as $objAuditScan) {
-          	$objAuditScan->Delete();
-          }
+        	// Set the relationship to ON DELETE CASCADE so that the AuditScans will be automatically deleted when deleting the Audit Object
           $objAudit->Delete();
           QApplication::Redirect("./asset_audit_list.php");
         }
@@ -69,6 +66,6 @@
 	
 	// Go ahead and run this form object to generate the page
 	AssetAuditListForm::Run('AssetAuditListForm', 'asset_audit_list.tpl.php');
-	QApplication::$Database[1]->OutputProfiling();
+	//QApplication::$Database[1]->OutputProfiling();
 	  	
 ?>

@@ -93,18 +93,25 @@
 		}
 */
 
-
+		static public function AuditScanExt() {
+			return new QQNodeAuditScanExt('audit_scan', null);
+		}
 
 		// Override or Create New Properties and Variables
 		// For performance reasons, these variables and __set and __get override methods
 		// are commented out.  But if you wish to implement or override any
 		// of the data generated properties, please feel free to uncomment them.
-/*
-		protected $strSomeNewProperty;
+
+		protected $objAsset;
+		protected $intSystemCount;
 
 		public function __get($strName) {
 			switch ($strName) {
-				case 'SomeNewProperty': return $this->strSomeNewProperty;
+				case 'SystemCount': return $this->intSystemCount;
+					break;
+					
+				case 'Asset': return $this->objAsset;
+					break;
 
 				default:
 					try {
@@ -115,16 +122,53 @@
 					}
 			}
 		}
-
 		public function __set($strName, $mixValue) {
 			switch ($strName) {
-				case 'SomeNewProperty':
+				
+				case 'SystemCount':
+					/**
+					 * Sets the value for intCount 
+					 * @param integer $mixValue
+					 * @return integer
+					 */
 					try {
-						return ($this->strSomeNewProperty = QType::Cast($mixValue, QType::String));
-					} catch (QInvalidCastException $objExc) {
+						return ($this->intSystemCount = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
+					
+				case 'Asset':
+					/**
+					 * Sets the value for the Location object referenced by intLocationId (Not Null)
+					 * @param Location $mixValue
+					 * @return Location
+					 */
+					if (is_null($mixValue)) {
+						$this->intEntityId = null;
+						$this->objEntity = null;
+						return null;
+					} else {
+						// Make sure $mixValue actually is a Location object
+						try {
+							$mixValue = QType::Cast($mixValue, 'Asset');
+						} catch (QInvalidCastException $objExc) {
+							$objExc->IncrementOffset();
+							throw $objExc;
+						} 
+
+						// Make sure $mixValue is a SAVED Entity object
+						if (is_null($mixValue->AssetId))
+							throw new QCallerException('Unable to set an unsaved entity_id for this AuditScan');
+
+						// Update Local Member Variables
+						$this->objAsset = $mixValue;
+						$this->intEntityId = $mixValue->AssetId;
+
+						// Return $mixValue
+						return $mixValue;
+					}
+					break;
 
 				default:
 					try {
@@ -135,6 +179,23 @@
 					}
 			}
 		}
-*/
+	}
+	
+	class QQNodeAuditScanExt extends QQNodeAuditScan {
+		
+		public function __get($strName) {
+			switch ($strName) {
+				case 'Asset':
+					return new QQNodeAsset('entity_id', 'integer', $this);
+
+				default:
+					try {
+						return parent::__get($strName);
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+			}
+		}
 	}
 ?>
