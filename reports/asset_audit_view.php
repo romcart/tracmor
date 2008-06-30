@@ -24,7 +24,7 @@
 	// SERGEI - this will generate an error until you add the tables to the data model and re-codegenerate (then codegen will create this file).
 	require_once(__FORMBASE_CLASSES__ . '/AuditListFormBase.class.php');
 	
-	class AssetAuditListForm extends AuditListFormBase {
+	class AssetAuditViewForm extends QForm {
 		// Header Menu
 		protected $ctlHeaderMenu;
 		
@@ -44,7 +44,7 @@
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			$this->ctlShortcutMenu_Create();
-			//$this->rblDiscrepancy_Create();
+			$this->rblDiscrepancy_Create();
 			$this->dtgAudit_Create();
 		}
 		
@@ -60,8 +60,11 @@
   	
   	// Create and Setup the Discrepancy Radio Button List
   	protected function rblDiscrepancy_Create() {
-  		$this->rblDiscrepancy = new QRadioButtonList();
-  		// Add the values for 'View Discrepancies Only' and 'View All'
+  		$this->rblDiscrepancy = new QRadioButtonList($this);
+			$this->rblDiscrepancy->AddItem(new QListItem('View Discrepancies Only', 'discrepanies', true));
+			$this->rblDiscrepancy->AddItem(new QListItem('View All', 'all'));
+			$this->rblDiscrepancy->AddAction(new QChangeEvent(), new QAjaxAction('rblDiscrepancy_Click'));
+			// Add the values for 'View Discrepancies Only' and 'View All'
   		// Add a Ajax Click Action
   	}
   	
@@ -106,34 +109,34 @@
           `audit_scan__location_id`.`modified_by` AS `audit_scan__location_id__modified_by`,
           `audit_scan__location_id`.`modified_date` AS `audit_scan__location_id__modified_date`,
           `asset`.`asset_id` AS `asset_id`,
-        	`asset`.`asset_model_id` AS `asset_model_id`,
-        	`asset`.`location_id` AS `location_id`,
-        	`asset`.`asset_code` AS `asset_code`,
-        	`asset`.`image_path` AS `image_path`,
-        	`asset`.`checked_out_flag` AS `checked_out_flag`,
-        	`asset`.`reserved_flag` AS `reserved_flag`,
-        	`asset`.`created_by` AS `created_by`,
-        	`asset`.`creation_date` AS `creation_date`,
-        	`asset`.`modified_by` AS `modified_by`,
-        	`asset`.`modified_date` AS `modified_date`,
-        	`asset__asset_model_id`.`asset_model_id` AS `asset__asset_model_id__asset_model_id`,
-        	`asset__asset_model_id`.`category_id` AS `asset__asset_model_id__category_id`,
-        	`asset__asset_model_id`.`manufacturer_id` AS `asset__asset_model_id__manufacturer_id`,
-        	`asset__asset_model_id`.`asset_model_code` AS `asset__asset_model_id__asset_model_code`,
-        	`asset__asset_model_id`.`short_description` AS `asset__asset_model_id__short_description`,
-        	`asset__asset_model_id`.`long_description` AS `asset__asset_model_id__long_description`,
-        	`asset__asset_model_id`.`image_path` AS `asset__asset_model_id__image_path`,
-        	`asset__asset_model_id`.`created_by` AS `asset__asset_model_id__created_by`,
-        	`asset__asset_model_id`.`creation_date` AS `asset__asset_model_id__creation_date`,
-        	`asset__asset_model_id`.`modified_by` AS `asset__asset_model_id__modified_by`,
-        	`asset__asset_model_id`.`modified_date` AS `asset__asset_model_id__modified_date`
+          `asset`.`asset_model_id` AS `asset_model_id`,
+          `asset`.`location_id` AS `location_id`,
+          `asset`.`asset_code` AS `asset_code`,
+          `asset`.`image_path` AS `image_path`,
+          `asset`.`checked_out_flag` AS `checked_out_flag`,
+          `asset`.`reserved_flag` AS `reserved_flag`,
+          `asset`.`created_by` AS `created_by`,
+          `asset`.`creation_date` AS `creation_date`,
+          `asset`.`modified_by` AS `modified_by`,
+          `asset`.`modified_date` AS `modified_date`,
+          `asset__asset_model_id`.`asset_model_id` AS `asset__asset_model_id__asset_model_id`,
+          `asset__asset_model_id`.`category_id` AS `asset__asset_model_id__category_id`,
+          `asset__asset_model_id`.`manufacturer_id` AS `asset__asset_model_id__manufacturer_id`,
+          `asset__asset_model_id`.`asset_model_code` AS `asset__asset_model_id__asset_model_code`,
+          `asset__asset_model_id`.`short_description` AS `asset__asset_model_id__short_description`,
+          `asset__asset_model_id`.`long_description` AS `asset__asset_model_id__long_description`,
+          `asset__asset_model_id`.`image_path` AS `asset__asset_model_id__image_path`,
+          `asset__asset_model_id`.`created_by` AS `asset__asset_model_id__created_by`,
+          `asset__asset_model_id`.`creation_date` AS `asset__asset_model_id__creation_date`,
+          `asset__asset_model_id`.`modified_by` AS `asset__asset_model_id__modified_by`,
+          `asset__asset_model_id`.`modified_date` AS `asset__asset_model_id__modified_date`
         FROM
-        	`audit_scan` AS `audit_scan`
-	      LEFT JOIN `location` AS `audit_scan__location_id` ON `audit_scan`.`location_id` = `audit_scan__location_id`.`location_id`
-	      LEFT JOIN `asset` AS `asset` ON `audit_scan`.`entity_id` = `asset`.`asset_id`
-	      LEFT JOIN `asset_model` AS `asset__asset_model_id` ON `asset`.`asset_model_id` = `asset__asset_model_id`.`asset_model_id`
+          `audit_scan` AS `audit_scan`
+        LEFT JOIN `location` AS `audit_scan__location_id` ON `audit_scan`.`location_id` = `audit_scan__location_id`.`location_id`
+        LEFT JOIN `asset` AS `asset` ON `audit_scan`.`entity_id` = `asset`.`asset_id`
+        LEFT JOIN `asset_model` AS `asset__asset_model_id` ON `asset`.`asset_model_id` = `asset__asset_model_id`.`asset_model_id`
         WHERE
-        	`audit_scan`.`audit_id` = '".$_GET['intAuditId']."'";
+          `audit_scan`.`audit_id` = '".$_GET['intAuditId']."'";
   		//$this->dtgAudit->DataSource = AuditScan::LoadArrayByAuditId($_GET['intAuditId'],QQ::Clause(QQ::Expand(QQN::AuditScan()->Location)));
   	  //echo "<table cellspacing='0' cellpadding='5' border='1'><tr><td>Location</td><td>Asset Code</td><td>Asset Model</td><td>PDT Count</td><td>System Count</td></tr>";
   	  /* // Load AuditScan objects with short descriptions of locations
@@ -170,18 +173,17 @@
       while ($objNextRow = $objDbResult->GetNextRow()) {
    	    $objDbRowArray[]=$objNextRow;
       }
-      echo "</table>";
-      //$this->dtgAudit->DataSource = $mixRowArray;
       $this->dtgAudit->DataSource = $objDbRowArray;
   	}
   	
-  	protected function rblDiscrepancy_Click() {
+  	protected function rblDiscrepancy_Click($strFormId, $strControlId, $strParameter) {
   		// This is where you will toggle between showing only the discrepancies in the datagrid or showing all of the audit scans.
+  	  $this->rblDiscrepancy->Enabled = false;
   	}
   	
 	}
 	
 	// Go ahead and run this form object to generate the page
-	AssetAuditListForm::Run('AssetAuditListForm', 'asset_audit_view.tpl.php');
+	AssetAuditViewForm::Run('AssetAuditViewForm', 'asset_audit_view.tpl.php');
 	QApplication::$Database[1]->OutputProfiling();	
 ?>

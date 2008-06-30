@@ -34,12 +34,15 @@
 	$this->ctlShortcutMenu->Render();
 ?>
 <!-- End Shortcut Menu -->
-
+</td>
+		<td>
+			<img src="../images/empty.gif" width="10">
+		</td>
+		<td width="100%" valign="top">
 <!-- This is where you will render the radio button list and the datagrid -->
-<?php //$this->rblDiscrepancy->Render(); ?>
+<?php $this->rblDiscrepancy->Render(); ?>
 <?php $this->dtgAudit->Render(); ?>
-
-
+    </td>
 		
 <?php $this->RenderEnd() ?>		
 <?php require_once('../includes/footer.inc.php'); ?>
