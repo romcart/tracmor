@@ -68,8 +68,8 @@ if ($_POST) {
               $objAuditScan->LocationId = $objDestinationLocation->LocationId;
               $objAuditScan->EntityId = $objNewInventoryModel->InventoryModelId;
               $objAuditScan->Count = $intQuantity;
-              if (!$blnSourceLocationError && $objNewInventoryLocation instanceof InventoryLocation && $objNewInventoryLocation->Quantity == $intQuantity) {
-                $objAuditScan->SystemCount = 1;
+              if (!$blnSourceLocationError && $objNewInventoryLocation instanceof InventoryLocation) {
+                $objAuditScan->SystemCount = $objNewInventoryLocation->Quantity;
               }
               else {
                 $objAuditScan->SystemCount = 0;
