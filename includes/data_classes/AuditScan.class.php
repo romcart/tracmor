@@ -103,13 +103,13 @@
 		// of the data generated properties, please feel free to uncomment them.
 
 		protected $objAsset;
-		protected $intSystemCount;
+		//protected $intSystemCount;
 
 		public function __get($strName) {
 			switch ($strName) {
-				case 'SystemCount': return $this->intSystemCount;
+				/*case 'SystemCount': return $this->intSystemCount;
 					break;
-					
+					*/
 				case 'Asset': return $this->objAsset;
 					break;
 
@@ -125,18 +125,18 @@
 		public function __set($strName, $mixValue) {
 			switch ($strName) {
 				
-				case 'SystemCount':
+				/*case 'SystemCount':
 					/**
 					 * Sets the value for intCount 
 					 * @param integer $mixValue
 					 * @return integer
 					 */
-					try {
+				/*	try {
 						return ($this->intSystemCount = QType::Cast($mixValue, QType::Integer));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
-					}
+					}*/
 					
 				case 'Asset':
 					/**
@@ -187,7 +187,9 @@
 			switch ($strName) {
 				case 'Asset':
 					return new QQNodeAsset('entity_id', 'integer', $this);
-
+				/*case 'Inventory':
+					return new QQNodeInventory('entity_id', 'integer', $this);
+*/
 				default:
 					try {
 						return parent::__get($strName);

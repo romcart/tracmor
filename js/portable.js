@@ -1,6 +1,7 @@
 var arrayAssetCode = new Array();
 var arrayInventoryCode = new Array();
 var strCheckedAssetCode = '';
+var strCheckedInventoryQuantity = '';
 var i = 0;
 function AddAsset() {
   var strAssetCode = document.getElementById('asset_code').value;
@@ -293,6 +294,85 @@ function AssetsAuditDone() {
   }
   else {
     document.getElementById('warning').innerHTML = "You must provide at least one location";
+  }
+  return false;
+}
+function AddAuditInventoryLocation() {
+  var strLocation = document.getElementById('location').value;
+  if (strLocation != '') {
+    document.getElementById('warning').innerHTML = "";
+    document.getElementById('location').disabled = true;
+    document.getElementById('btn_add_location').disabled = true;
+    document.getElementById('inventory_code').disabled = false;
+    document.getElementById('quantity').disabled = false;
+    document.getElementById('btn_add_inventory').disabled = false;
+    document.getElementById('result').innerHTML += "Location: " + strLocation + "<br />";
+    if (strCheckedInventoryQuantity != '') {
+      var arrCheckedInventoryQuantity = strCheckedInventoryQuantity.split("#");
+      for (j=0; j<arrCheckedInventoryQuantity.length; j++) {
+        var CheckedInventoryQuantitySplitted = arrCheckedInventoryQuantity[j].split("|");
+        document.getElementById('inventory_code').value = CheckedInventoryQuantitySplitted[0];
+        document.getElementById('quantity').value = CheckedInventoryQuantitySplitted[1];        
+        AddAuditInventory();
+      }
+      strCheckedInventoryQuantity = '';
+    }
+    document.getElementById('inventory_code').focus();
+  }
+  else {
+    document.getElementById('warning').innerHTML = "Location cannot be empty";
+    document.getElementById('location').focus();
+  }
+}
+function AddAuditInventory() {
+  var strLocation = document.getElementById('location').value;
+  var strInventoryCode = document.getElementById('inventory_code').value;
+  var intQuantity = document.getElementById('quantity').value;
+  if (strLocation != '' && strInventoryCode != '' && intQuantity != '' && !isNaN(parseInt(intQuantity))) {
+    var blnError = CheckDuplicateCode(strInventoryCode, arrayInventoryCode);
+    if (blnError == 1) {
+      document.getElementById('warning').innerHTML = "That Inventory has already been added.";
+      document.getElementById('inventory_code').focus();
+      return;
+    }
+    document.getElementById('warning').innerHTML = "";
+    document.getElementById('result').innerHTML += "&nbsp;&nbsp;" + strInventoryCode + " Quantity: " + intQuantity + "<br />";
+    arrayInventoryCode[i++] = strInventoryCode + "|" + intQuantity;
+    document.getElementById('inventory_code').value = "";
+    document.getElementById('quantity').value = ""; 
+    document.getElementById('inventory_code').focus();
+  }
+  else {
+    if (strInventoryCode == '') {
+      document.getElementById('warning').innerHTML = "Inventory Code cannot be empty";
+      document.getElementById('inventory_code').focus();
+    }
+    else if (strLocation != '') {
+      document.getElementById('warning').innerHTML = "Qantity must be an integer > 0";
+      document.getElementById('quantity').focus();
+    }
+    else {
+      document.getElementById('warning').innerHTML = "Location cannot be empty";
+      document.getElementById('location').focus();
+    }
+  }
+}
+function NextLocationInventory() {
+  var strLocation = document.getElementById('location').value;
+  var strInventoryCode = arrayInventoryCode.join("#");
+  if (strLocation == '') {
+    document.getElementById('warning').innerHTML = "Location cannot be empty";
+    document.getElementById('location').focus();
+    return false;
+  }
+  if (arrayInventoryCode.length == 0) {
+    document.getElementById('warning').innerHTML = "You must provide at least one inventory";
+    return false;
+  }
+  if (arrayInventoryCode.length>0) {
+    document.nextlocation_form.result.value = strInventoryCode;
+    document.nextlocation_form.location.value = strLocation;
+    return true;
   }
   return false;
 }

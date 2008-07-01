@@ -41,6 +41,12 @@ if ($_POST) {
               $objAuditScan->LocationId = $objDestinationLocation->LocationId;
               $objAuditScan->EntityId = $objNewAsset->AssetId;
               $objAuditScan->Count = 1;
+              if ($objDestinationLocation->LocationId != $objNewAsset->LocationId) {
+                $objAuditScan->SystemCount = 0;
+              }
+              else {
+                $objAuditScan->SystemCount = 1;
+              }
     				  $objAuditScanArray[] = $objAuditScan;
     			  }
           }

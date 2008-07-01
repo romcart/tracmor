@@ -42,21 +42,21 @@
 			<script type="text/javascript">
 			  function ConfirmDeleteAudit(intAuditId) {
 			    if (confirm("Are you sure you want to delete this audit?")) {
-			      parent.location = './asset_audit_list.php?method=delete&intAuditId=' + intAuditId;
+			      parent.location = './inventory_audit_list.php?method=delete&intAuditId=' + intAuditId;
 			    }
 			  }
 			</script> 
 		</td>
 		<td width="100%" valign="top">
-		<div class="title">&nbsp;Asset Audit Reports</div><br />
+		<div class="title">&nbsp;Inventory Audit Reports</div><br />
       <table>
 <?php 
 
 if ($this->objAuditArray) {
 	foreach ($this->objAuditArray as $objAudit) {
-		// Assets reports only
-	  if ($objAudit->EntityQtypeId == 1)  
-		  echo "<tr><td><a href='./asset_audit_view.php?intAuditId=".$objAudit->AuditId."'>Audit by ".$objAudit->CreatedByObject->FirstName." ".$objAudit->CreatedByObject->LastName."</a> on ".$objAudit->CreationDate->PHPDate("Y-m-d H:i:s")." <a href='#' onclick='javascript:ConfirmDeleteAudit(".$objAudit->AuditId.");'>Delete</a></td></tr>";
+	  // Inventory only
+	  if ($objAudit->EntityQtypeId == 2)
+		  echo "<tr><td><a href='./inventory_audit_view.php?intAuditId=".$objAudit->AuditId."'>Audit by ".$objAudit->CreatedByObject->FirstName." ".$objAudit->CreatedByObject->LastName."</a> on ".$objAudit->CreationDate->PHPDate("Y-m-d H:i:s")." <a href='#' onclick='javascript:ConfirmDeleteAudit(".$objAudit->AuditId.");'>Delete</a></td></tr>";
 	}
 }
 
