@@ -21,10 +21,9 @@
  	
 	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
 	QApplication::Authenticate(7);
-	// SERGEI - this will generate an error until you add the tables to the data model and re-codegenerate (then codegen will create this file).
 	require_once(__FORMBASE_CLASSES__ . '/AuditListFormBase.class.php');
 	
-	class AssetAuditViewForm extends QForm {
+	class InventoryAuditViewForm extends QForm {
 		// Header Menu
 		protected $ctlHeaderMenu;
 		
@@ -87,31 +86,31 @@
       
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->ShortDescription ?>',
   			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId, false))));
-  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->Asset->AssetCode ?>',
-  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode, false))));
-  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->Asset->AssetModel->ShortDescription ?>',
-  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Inventory Code', '<?= $_ITEM->InventoryModel->InventoryModelCode ?>',
+  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->InventoryModel->InventoryModelCode), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->InventoryModel->InventoryModelCode, false))));
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Inventory Model', '<?= $_ITEM->InventoryModel->ShortDescription ?>',
+  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->InventoryModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->InventoryModel->ShortDescription, false))));
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('PDT Count', '<?= $_ITEM->Count ?>',
   			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Count), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Count, false))));
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('System Count', '<?= $_ITEM->SystemCount ?>',
   			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->SystemCount), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->SystemCount, false))));
-  			
+  		
   		$this->dtgAudit->SetDataBinder('dtgAudit_Bind');
   	}
   	
   	protected function dtgAudit_Bind() {
   	  if ($this->rblDiscrepancy->SelectedValue == 'discrepancies') {
-  	    $objConditions = QQ::AndCondition(QQ::Equal(QQN::AuditScan()->AuditId, $_GET['intAuditId']), QQ::NotEqual(QQN::AuditScan()->SystemCount,1));
+  	    $objConditions = QQ::AndCondition(QQ::Equal(QQN::AuditScan()->AuditId, $_GET['intAuditId']), QQ::NotEqual(QQN::AuditScan()->Count, QQN::AuditScan()->SystemCount));
   	  }
   	  else {
   	    $objConditions = QQ::Equal(QQN::AuditScan()->AuditId, $_GET['intAuditId']);
   	  }
-  		
+  	  
   	  $objAuditScanArray = AuditScan::QueryArray($objConditions, QQ::Clause(QQ::Expand(QQN::AuditScan()->Location), $this->dtgAudit->OrderByClause));
   	  
       if ($objAuditScanArray) {
       	foreach ($objAuditScanArray as $objAuditScan) {
-      	  $objAuditScan->Asset = Asset::QuerySingle(QQ::Equal(QQN::Asset()->AssetId, $objAuditScan->EntityId), QQ::Clause(QQ::Expand(QQN::Asset()->AssetModel)));
+      		$objAuditScan->InventoryModel = InventoryModel::QuerySingle(QQ::Equal(QQN::InventoryModel()->InventoryModelId, $objAuditScan->EntityId), QQ::Clause(QQ::Expand(QQN::InventoryModel()->InventoryModelCode)));
       	}
       }
   	  $this->dtgAudit->DataSource = $objAuditScanArray;
@@ -125,5 +124,5 @@
 	}
 	
 	// Go ahead and run this form object to generate the page
-	AssetAuditViewForm::Run('AssetAuditViewForm', 'asset_audit_view.tpl.php');
+	InventoryAuditViewForm::Run('InventoryAuditViewForm', 'inventory_audit_view.tpl.php');
 ?>

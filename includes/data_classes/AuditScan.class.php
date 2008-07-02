@@ -103,15 +103,15 @@
 		// of the data generated properties, please feel free to uncomment them.
 
 		protected $objAsset;
-		//protected $intSystemCount;
+		protected $objInventoryModel;
 
 		public function __get($strName) {
 			switch ($strName) {
-				/*case 'SystemCount': return $this->intSystemCount;
+				
+			  case 'Asset': return $this->objAsset;
 					break;
-					*/
-				case 'Asset': return $this->objAsset;
-					break;
+				case 'InventoryModel': return $this->objInventoryModel; 
+				  break;
 
 				default:
 					try {
@@ -125,19 +125,6 @@
 		public function __set($strName, $mixValue) {
 			switch ($strName) {
 				
-				/*case 'SystemCount':
-					/**
-					 * Sets the value for intCount 
-					 * @param integer $mixValue
-					 * @return integer
-					 */
-				/*	try {
-						return ($this->intSystemCount = QType::Cast($mixValue, QType::Integer));
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}*/
-					
 				case 'Asset':
 					/**
 					 * Sets the value for the Location object referenced by intLocationId (Not Null)
@@ -146,7 +133,7 @@
 					 */
 					if (is_null($mixValue)) {
 						$this->intEntityId = null;
-						$this->objEntity = null;
+						$this->objAsset = null;
 						return null;
 					} else {
 						// Make sure $mixValue actually is a Location object
@@ -169,6 +156,38 @@
 						return $mixValue;
 					}
 					break;
+				
+				case 'InventoryModel':
+					/**
+					 * Sets the value for the InventoryModel object referenced by InventoryModelId (Not Null)
+					 * @param InentoryModel $mixValue
+					 * @return IndentoryModel
+					 */
+					if (is_null($mixValue)) {
+						$this->intEntityId = null;
+						$this->objInventoryModel = null;
+						return null;
+					} else {
+						// Make sure $mixValue actually is a InventoryModel object
+						try {
+							$mixValue = QType::Cast($mixValue, 'InventoryModel');
+						} catch (QInvalidCastException $objExc) {
+							$objExc->IncrementOffset();
+							throw $objExc;
+						} 
+
+						// Make sure $mixValue is a SAVED object
+						if (is_null($mixValue->InventoryModelId))
+							throw new QCallerException('Unable to set an unsaved InventoryModelId for this AuditScan');
+
+						// Update Local Member Variables
+						$this->objInventoryModel = $mixValue;
+						$this->intEntityId = $mixValue->InventoryModelId;
+
+						// Return $mixValue
+						return $mixValue;
+					}
+					break;  
 
 				default:
 					try {
@@ -187,9 +206,9 @@
 			switch ($strName) {
 				case 'Asset':
 					return new QQNodeAsset('entity_id', 'integer', $this);
-				/*case 'Inventory':
-					return new QQNodeInventory('entity_id', 'integer', $this);
-*/
+				case 'InventoryModel':
+					return new QQNodeInventoryModel('entity_id', 'integer', $this);
+
 				default:
 					try {
 						return parent::__get($strName);
