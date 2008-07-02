@@ -113,6 +113,14 @@
       		$objAuditScan->InventoryModel = InventoryModel::QuerySingle(QQ::Equal(QQN::InventoryModel()->InventoryModelId, $objAuditScan->EntityId), QQ::Clause(QQ::Expand(QQN::InventoryModel()->InventoryModelCode)));
       	}
       }
+      
+      if (count($objAuditScanArray) == 0) {
+      	$this->dtgAudit->ShowHeader = false;
+      }
+      else {
+      	$this->dtgAudit->ShowHeader = true;
+      }
+      
   	  $this->dtgAudit->DataSource = $objAuditScanArray;
   	}
   	

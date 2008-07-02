@@ -114,6 +114,14 @@
       	  $objAuditScan->Asset = Asset::QuerySingle(QQ::Equal(QQN::Asset()->AssetId, $objAuditScan->EntityId), QQ::Clause(QQ::Expand(QQN::Asset()->AssetModel)));
       	}
       }
+      
+      if (count($objAuditScanArray) == 0) {
+      	$this->dtgAudit->ShowHeader = false;
+      }
+      else {
+      	$this->dtgAudit->ShowHeader = true;
+      }
+      
   	  $this->dtgAudit->DataSource = $objAuditScanArray;
   	}
   	
