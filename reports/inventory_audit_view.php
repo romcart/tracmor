@@ -68,7 +68,7 @@
   	// Create and Setup the Asset Audit List
   	protected function dtgAudit_Create() {
   		$this->dtgAudit = new QDataGrid($this);
-			$this->dtgAudit->Name = 'asset_audit_list';
+			$this->dtgAudit->Name = 'inventory_audit_list';
   		$this->dtgAudit->CellPadding = 5;
   		$this->dtgAudit->CellSpacing = 0;
   		$this->dtgAudit->CssClass = "datagrid";
