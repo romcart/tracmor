@@ -169,6 +169,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='inventory_menu.php'>Inventory Menu</a><br />";
 			//Remove that flag when transaction is compelete or exists some errors
       unset($_SESSION['intUserAccountId']);
+      $blnTransactionComplete = true;
       $arrCheckedInventoryCodeLocationQuantity = "";
 		}
   }
@@ -192,6 +193,9 @@ require_once('./includes/header.inc.php');
 ?>
 
   <div id="warning"><?php echo $strWarning; ?></div>
+<?php
+if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
+?>
   Inventory Code: <input type="text" id="inventory_code" size="20">
   <br /><br />
   Source Location: <input type="text" id="source_location" size="20">
@@ -203,10 +207,11 @@ require_once('./includes/header.inc.php');
   <input type="hidden" name="method" value="complete_transaction">
   <input type="hidden" name="result" value="">
   Destination Location: <input type="text" name="destination_location" onkeypress="javascript:if(event.keyCode=='13') CompleteMoveInventory();" size="20">
-  <input type="submit" value="Complete Move" onclick="javascript:CompleteMoveInventory();">
+  <input type="submit" value="Complete Move">
   </form>
   <div id="result"></div>
 
 <?php
+}
 require_once('./includes/footer.inc.php');
 ?>

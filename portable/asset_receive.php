@@ -105,6 +105,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
   	$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
   	//Remove that flag when transaction is compelete or exists some errors
     unset($_SESSION['intUserAccountId']);
+    $blnTransactionComplete = true;
     $arrCheckedAssetCodeLocation = "";
 	}
 	else {
@@ -125,6 +126,9 @@ require_once('./includes/header.inc.php');
 ?>
 
   <div id="warning"><?php echo $strWarning; ?></div>
+<?php
+if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
+?>
   Asset Code: <input type="text" id="asset_code" size="10">
   <br /><br />
   Destination Location: <input type="text" id="destination_location" onkeypress="javascript:if(event.keyCode=='13') AddAssetLocation();" size ="20">
@@ -133,10 +137,11 @@ require_once('./includes/header.inc.php');
   <form method="post" name="main_form" onsubmit="javascript:return CompleteReceipt();">
   <input type="hidden" name="method" value="complete_transaction">
   <input type="hidden" name="result" value="">
-  <input type="submit" value="Complete Receipt " onclick="javascript:CompleteReceipt();">
+  <input type="submit" value="Complete Receipt">
   </form>
   <div id="result"></div>
 
 <?php
+}
 require_once('./includes/footer.inc.php');
 ?>

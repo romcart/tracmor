@@ -103,6 +103,7 @@ if ($_POST) {
     	  $strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='inventory_menu.php'>Inventory Menu</a><br />";
     		//Remove that flag when transaction is compelete or exists some errors
         unset($_SESSION['intUserAccountId']);
+        $blnTransactionComplete = true;
   	  }
   	  catch (QExtendedOptimisticLockingException $objExc) {
   	    // Rollback the database
@@ -199,6 +200,9 @@ require_once('./includes/header.inc.php');
 ?>
 
   <div id="warning"><?php echo $strWarning; ?></div>
+<?php
+if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
+?>
   Location: <input type="text" id="location" onkeypress="javascript:if(event.keyCode=='13') AddAuditInventoryLocation();" size ="10">
   <input type="button" value="Add Location" id="btn_add_location" onclick="javascript:AddAuditInventoryLocation();">
   <br /><br />
@@ -222,5 +226,6 @@ require_once('./includes/header.inc.php');
   <div id="result"></div>
 
 <?php
+}
 require_once('./includes/footer.inc.php');
 ?>
