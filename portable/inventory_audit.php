@@ -16,6 +16,8 @@ $strCheckedLocationInventory = "";
 if ($_POST) {
   if  ($_POST['method'] == 'complete_transaction') {
   	$blnError = false;
+  	$intLocationIdArray = array();
+  	$intInventoryIdArray = array();
   	$arrLocationInventoryCodeQuantity = array_unique(explode('!',$_POST['result']));
   	foreach ($arrLocationInventoryCodeQuantity as $strLocationInventoryCodeQuantity) {
       if ($strLocationInventoryCodeQuantity) {
@@ -25,6 +27,9 @@ if ($_POST) {
       	if (!$objDestinationLocation) {
           $strWarning .= $strLocation." - Location does not exist.<br />";
           $blnError = true;
+        }
+        else {
+          $intLocationIdArray[] = $objDestinationLocation->LocationId;
         }
         $arrInventoryCodeQuantity = array_unique(explode('#',$strInventoryCodeQuantity));
         foreach ($arrInventoryCodeQuantity as $strInventoryCodeQuantity) {
@@ -64,7 +69,8 @@ if ($_POST) {
         	  }
         
      			  if (!$blnError && $objNewInventoryModel instanceof InventoryModel)  {
-         			$objAuditScan = new AuditScan();
+         			$intInventoryIdArray[] = $objNewInventoryModel->InventoryModelId;
+     			    $objAuditScan = new AuditScan();
               $objAuditScan->LocationId = $objDestinationLocation->LocationId;
               $objAuditScan->EntityId = $objNewInventoryModel->InventoryModelId;
               $objAuditScan->Count = $intQuantity;
@@ -83,8 +89,27 @@ if ($_POST) {
 
   	// Submit
   	if (!$blnError) {
+  	  // Add missing inventories that should have been at a location covered by the audit session but were not scanned
+  	  if ($intLocationIdArray) {
+  	    foreach ($intLocationIdArray as $intLocationId) {
+  	    	$objInventoryLocationArray = InventoryLocation::LoadArrayByLocationId($intLocationId);
+  	     	if ($objInventoryLocationArray) {
+  	    		foreach ($objInventoryLocationArray as $objInventory) {
+  	     			if (!in_array($objInventory->InventoryModelId, $intInventoryIdArray)) {
+  	     				$objNewAuditScan = new AuditScan();
+  	     			  $objNewAuditScan->LocationId = $intLocationId;
+  	     			  $objNewAuditScan->EntityId = $objInventory->InventoryModelId;
+  	     				$objNewAuditScan->Count = 0;
+  	     				$objNewAuditScan->SystemCount = $objInventory->Quantity;
+  	     				$objAuditScanArray[] = $objNewAuditScan;
+  	     				unset($objNewAuditScan);
+  	     			}
+  	     		}
+  	     	}
+  	    }
+      }
   	  try {
-        // Get an instance of the database
+  	    // Get an instance of the database
 				$objDatabase = QApplication::$Database[1];
 				// Begin a MySQL Transaction to be either committed or rolled back
 				$objDatabase->TransactionBegin();

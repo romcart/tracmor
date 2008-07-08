@@ -119,7 +119,7 @@ function AddInventory() {
   var strSourceLocation = document.getElementById('source_location').value;
   var intQuantity = document.getElementById('quantity').value;
   if (strInventoryCode != '' && strSourceLocation != '' && intQuantity != '' && !isNaN(parseInt(intQuantity))) {
-    var blnError = CheckDuplicateCode(strInventoryCode, arrayInventoryCode);
+    var blnError = CheckDuplicateCode(strInventoryCode, arrayInventoryCode, strSourceLocation);
     if (blnError == 1) {
       document.getElementById('warning').innerHTML = "That Inventory has already been added.";
       document.getElementById('inventory_code').focus();
@@ -143,7 +143,7 @@ function AddInventory() {
       document.getElementById('source_location').focus();
     }
     else {
-      document.getElementById('warning').innerHTML = "Qantity must be an integer > 0";
+      document.getElementById('warning').innerHTML = "Quantity must be an integer > 0";
       document.getElementById('quantity').focus();
     }
   }
@@ -207,7 +207,7 @@ function AddInventoryQuantity() {
       document.getElementById('inventory_code').focus();
     }
     else {
-      document.getElementById('warning').innerHTML = "Qantity must be an integer > 0";
+      document.getElementById('warning').innerHTML = "Quantity must be an integer > 0";
       document.getElementById('quantity').focus();
     }
   }
@@ -219,11 +219,16 @@ function AddInventoryQuantityPost(strInventoryCode,intQuantity) {
     document.getElementById('inventory_code').focus();
   }
 }
-function CheckDuplicateCode(strNewCode, arrUnderTest) {
+function CheckDuplicateCode(strNewCode, arrUnderTest, strLocation) {
   for (j=0; j<arrUnderTest.length; j++) {
     var strUnderTest = arrUnderTest[j];
     var arrSplitted = strUnderTest.split("|");
-    if (strNewCode == arrSplitted[0]) {
+    if (strLocation) {
+      if (strNewCode == arrSplitted[0] && strLocation == arrSplitted[1]) {
+        return 1;
+      }
+    }
+    else if (strNewCode == arrSplitted[0]) {
       return 1;
     }
   }
@@ -348,7 +353,7 @@ function AddAuditInventory() {
       document.getElementById('inventory_code').focus();
     }
     else if (strLocation != '') {
-      document.getElementById('warning').innerHTML = "Qantity must be an integer > 0";
+      document.getElementById('warning').innerHTML = "Quantity must be an integer > 0";
       document.getElementById('quantity').focus();
     }
     else {

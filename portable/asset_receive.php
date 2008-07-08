@@ -82,7 +82,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	  $arrPendingReceiptId = array_unique($arrPendingReceiptId);
   	  
   	foreach ($objAssetArray as $objAsset) {
-  	  $objDestinationLocationId = $arrLocation[$objAsset->AssetId];
+  	  $objDestinationLocation = $arrLocation[$objAsset->AssetId];
   	  $intDestinationLocationId = $objDestinationLocation->LocationId;
   	  
   	  // Set the DestinationLocation of the AssetTransaction
@@ -90,7 +90,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     		$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
     		$objAssetTransaction->Save();
     		
-    		// Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
+    	// Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
 			$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
 			// Move the asset to the new location
 			$objAssetTransaction->Asset->LocationId = $intDestinationLocationId;

@@ -21,7 +21,7 @@ require_once('./includes/header.inc.php');
   
   <form method="post" name="main_form">
   <input type="hidden" name="method" value="inventory_menu">
-  <input type="text" name="menu_id" onkeyup="javascript:if (event.keyCode>47 && event.keyCode<58) document.main_form.submit();" size="3">
+  <input type="text" name="menu_id" onkeyup="javascript:if (event.keyCode>48 && event.keyCode<53) document.main_form.submit(); else document.main_form.menu_id.value='';" size="3">
   </form>
 
 <?php

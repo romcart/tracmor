@@ -101,7 +101,7 @@
   	
   	protected function dtgAudit_Bind() {
   	  if ($this->rblDiscrepancy->SelectedValue == 'discrepancies') {
-  	    $objConditions = QQ::AndCondition(QQ::Equal(QQN::AuditScan()->AuditId, $_GET['intAuditId']), QQ::NotEqual(QQN::AuditScan()->SystemCount,1));
+  	    $objConditions = QQ::AndCondition(QQ::Equal(QQN::AuditScan()->AuditId, $_GET['intAuditId']), QQ::NotEqual(QQN::AuditScan()->Count,QQN::AuditScan()->SystemCount));
   	  }
   	  else {
   	    $objConditions = QQ::Equal(QQN::AuditScan()->AuditId, $_GET['intAuditId']);
@@ -114,42 +114,6 @@
       	  $objAuditScan->Asset = Asset::QuerySingle(QQ::Equal(QQN::Asset()->AssetId, $objAuditScan->EntityId), QQ::Clause(QQ::Expand(QQN::Asset()->AssetModel)));
       	}
       }
-      
-      /*$intLocationIdArray = array();
-  	  $strQuery = "SELECT DISTINCT location_id FROM audit_scan WHERE audit_id = " . $_GET['intAuditId'];
-  	  $objDatabase = QApplication::$Database[1];
-  	  $objDbResult = $objDatabase->Query($strQuery);
-  	  while ($mixRow = $objDbResult->FetchArray()) {
-  	  	$intLocationIdArray[] = $mixRow['location_id'];
-  	  }
-  	  
-  	  $intAssetIdArray = array();
-  	  $strQuery = "SELECT DISTINCT entity_id FROM audit_scan WHERE audit_id = " . $_GET['intAuditId'];
-  	  $objDbResult = $objDatabase->Query($strQuery);
-  	  while ($mixRow = $objDbResult->FetchArray()) {
-  	  	$intAssetIdArray[] = $mixRow['entity_id'];
-  	  }
-      
-      if ($intLocationIdArray) {
-	      foreach ($intLocationIdArray as $intLocationId) {
-	      	$objAssetLocationArray = Asset::LoadArrayByLocationId($intLocationId);
-	      	if ($objAssetLocationArray) {
-	      		foreach ($objAssetLocationArray as $objAsset) {
-	      			if (!in_array($objAsset->AssetId, $intAssetIdArray)) {
-	      				 //if (($this->rblDiscrepancy->SelectedValue == 'discrepancies' && !($objAuditScan = AuditScan::LoadByAuditIdEntityIdEntityQtypeId($_GET['intAuditId'], $objAsset->AssetId, 1))) || $this->rblDiscrepancy->SelectedValue == 'all') {
-	      				$objNewAuditScan = new AuditScan();
-	      				$objNewAuditScan->LocationId = $intLocationId;
-	      				$objNewAuditScan->Asset = $objAsset;
-	      				$objNewAuditScan->Count = 0;
-	      				$objNewAuditScan->SystemCount = 1;
-	      				$objAuditScanArray[] = $objNewAuditScan;
-	      				unset($objNewAuditScan);
-	      				//}
-	      			}
-	      		}
-	      	}
-	      }
-      }*/
       
       if (count($objAuditScanArray) == 0) {
       	$this->dtgAudit->ShowHeader = false;

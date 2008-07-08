@@ -17,6 +17,8 @@ if ($_POST) {
   if  ($_POST['method'] == 'complete_transaction') {
   	$arrLocationAssetCode =  array_unique(explode('|',$_POST['result']));
   	$blnError = false;
+  	$intLocationIdArray = array();
+  	$intAssetIdArray = array();
   	// Begin error checking for assets
   	foreach ($arrLocationAssetCode as $strLocationAssetCode) {
   		if ($strLocationAssetCode) {
@@ -28,6 +30,7 @@ if ($_POST) {
           $blnError = true;
         }
         else {
+          $intLocationIdArray[] = $objDestinationLocation->LocationId;
           $arrAssetCode =  array_unique(explode('#',$strAssetCodeArray));
           foreach ($arrAssetCode as $strAssetCode) {
           	$objNewAsset = Asset::LoadByAssetCode($strAssetCode);
@@ -37,6 +40,7 @@ if ($_POST) {
       				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
       			}
       			elseif (!$blnError && $objNewAsset instanceof Asset)  {
+      			  $intAssetIdArray[] = $objNewAsset->AssetId;
       			  $objAuditScan = new AuditScan();
               $objAuditScan->LocationId = $objDestinationLocation->LocationId;
               $objAuditScan->EntityId = $objNewAsset->AssetId;
@@ -56,6 +60,25 @@ if ($_POST) {
   	
   	// Submit
   	if (!$blnError) {
+  	  // Add missing assets that should have been at a location covered by the audit session but were not scanned
+  	  if ($intLocationIdArray) {
+  	    foreach ($intLocationIdArray as $intLocationId) {
+  	    	$objAssetLocationArray = Asset::LoadArrayByLocationId($intLocationId);
+  	     	if ($objAssetLocationArray) {
+  	    		foreach ($objAssetLocationArray as $objAsset) {
+  	     			if (!in_array($objAsset->AssetId, $intAssetIdArray)) {
+  	     				$objNewAuditScan = new AuditScan();
+  	     			  $objNewAuditScan->LocationId = $intLocationId;
+  	     				$objNewAuditScan->Asset = $objAsset;
+  	     				$objNewAuditScan->Count = 0;
+  	     				$objNewAuditScan->SystemCount = 1;
+  	     				$objAuditScanArray[] = $objNewAuditScan;
+  	     				unset($objNewAuditScan);
+  	     			}
+  	     		}
+  	     	}
+  	    }
+      }
   	  try {
         // Get an instance of the database
 				$objDatabase = QApplication::$Database[1];
@@ -72,7 +95,7 @@ if ($_POST) {
     	  }
     	  
     	  $objDatabase->TransactionCommit();
-    	  
+    	   
     	  $strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
     		//Remove that flag when transaction is compelete or exists some errors
         unset($_SESSION['intUserAccountId']);

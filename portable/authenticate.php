@@ -12,17 +12,24 @@ if ($_GET['menu_id']) {
 		if (QApplication::$TracmorSettings->PortablePinRequired && $_POST['portable_user_pin']) {
 			$strPortableUserPin = $_POST['portable_user_pin'];
 			$objUserAccount = UserAccount::LoadByUserAccountIdPortableUserPin($intUserAccountId, $strPortableUserPin);
+			if (!$objUserAccount) {
+  			// authenticate error
+  			$strError = "That User ID and PIN did not authenticate. Please try again.";
+		  }
+		}
+		else {
+		  $strError = "You must enter a PIN. Please try again.";
 		}
 		
 		if (!(QApplication::$TracmorSettings->PortablePinRequired)) {
 		  $objUserAccount = UserAccount::LoadByUserAccountId($intUserAccountId);
+		  if (!$objUserAccount) {
+  			// authenticate error
+  			$strError = "That is not a valid User ID. Please try again.";
+		  }
 		}
 
-		if (!$objUserAccount) {
-			// authenticate error
-			$strError = "That User ID and PIN did not authenticate. Please try again.";
-		}
-		else {
+		if ($objUserAccount) {
 		  $_SESSION['intUserAccountId'] = $objUserAccount->UserAccountId;
 		  // Authenticate user and redirect to proper transaction page based on menu_id
 			switch ($_GET['menu_id']) {
