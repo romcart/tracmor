@@ -66,6 +66,9 @@ if ($_GET['menu_id']) {
 			}
 		}
 	}
+	elseif ($_POST && !is_numeric($_POST['user_account_id'])) {
+	  $strError = "That is not a valid User ID. Please try again.";
+	}
 }
 else {
 	QApplication::Redirect('./index.php');

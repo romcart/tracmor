@@ -381,3 +381,21 @@ function NextLocationInventory() {
   }
   return false;
 }
+function MenuSubmit(intMinValue,intMaxValue) {
+  var intMenuId = document.main_form.menu_id.value;
+  if (intMenuId == '') return;
+  if (isNaN(parseInt(intMenuId))) {
+    document.main_form.menu_id.value='';
+    alert("That is not a valid menu option");
+    return;
+  }
+  else {
+    intMenuId = parseInt(intMenuId);
+    if (intMenuId < intMinValue || intMenuId > intMaxValue) {
+      document.main_form.menu_id.value='';
+      alert("That is not a valid menu option");
+      return;
+    }
+    else document.main_form.submit();
+  }
+}

@@ -13,7 +13,7 @@ if ($_POST && $_POST['method'] == 'menu' && is_numeric($_POST['menu_id'])) {
 			QApplication::Redirect('./inventory_menu.php');
 			break;
 		default:
-		  $strWarning = "Invalid menu number";
+		  $strWarning = "That is not a valid menu option";
 		  break;
 	}
 }
@@ -31,7 +31,7 @@ require_once('./includes/header.inc.php');
   
   <form method="post" name="main_form">
   <input type="hidden" name="method" value="menu">
-  <input type="text" name="menu_id" onkeyup="javascript:if (event.keyCode>48 && event.keyCode<51) document.main_form.submit(); else document.main_form.menu_id.value='';" size="3">
+  <input type="text" name="menu_id" onkeyup="javascript:MenuSubmit(1,2);" size="3">
   </form>
 
 <?php
