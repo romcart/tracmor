@@ -35,16 +35,19 @@
 
 <?php		
 		// Build array of all fields to display
-		$arrCompanyFields[] = array('name' => 'Company Name:',  'value' => $this->lblShortDescription->Render(false) . $this->txtShortDescription->RenderWithError(false));
-		$arrCompanyFields[] = array('name' => 'Description:',  'value' => $this->pnlLongDescription->Render(false) . $this->txtLongDescription->RenderWithError(false));		
-		$arrCompanyFields[] = array('name' => 'Website:',  'value' => $this->lblWebsite->Render(false) . $this->txtWebsite->RenderWithError(false));
-		$arrCompanyFields[] = array('name' => 'Email:',  'value' => $this->lblEmail->Render(false) . $this->txtEmail->RenderWithError(false));		
-		$arrCompanyFields[] = array('name' => 'Telephone:',  'value' => $this->lblTelephone->Render(false) . $this->txtTelephone->RenderWithError(false));	
-		$arrCompanyFields[] = array('name' => 'Fax:',  'value' => $this->lblFax->Render(false) . $this->txtFax->RenderWithError(false));
-		// Custom Fields
+			$arrCompanyFields[] = array('name' => 'Company Name:',  'value' => $this->lblShortDescription->Render(false) . $this->txtShortDescription->RenderWithError(false));
+			$arrCompanyFields[] = array('name' => 'Description:',  'value' => $this->pnlLongDescription->Render(false) . $this->txtLongDescription->RenderWithError(false));		
+			$arrCompanyFields[] = array('name' => 'Website:',  'value' => $this->lblWebsite->Render(false) . $this->txtWebsite->RenderWithError(false));
+			$arrCompanyFields[] = array('name' => 'Email:',  'value' => $this->lblEmail->Render(false) . $this->txtEmail->RenderWithError(false));		
+			$arrCompanyFields[] = array('name' => 'Telephone:',  'value' => $this->lblTelephone->Render(false) . $this->txtTelephone->RenderWithError(false));	
+			$arrCompanyFields[] = array('name' => 'Fax:',  'value' => $this->lblFax->Render(false) . $this->txtFax->RenderWithError(false));
+	    
+			// Custom Fields
 		if ($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as $field) {
-				$arrCompanyFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+				if(!$this->blnEditMode || $field['blnView']){
+					$arrCompanyFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+				}
 			}
 		}
 		
@@ -61,10 +64,11 @@
 			$arrCompanyFields[] = array('name' => 'State/Province:', 'value' => $this->lstStateProvince->RenderWithError(false));
 			$arrCompanyFields[] = array('name' => 'Postal Code:', 'value' => $this->txtPostalCode->RenderWithError(false));
 			$arrCompanyFields[] = array('name' => 'Country:', 'value' => $this->lstCountry->RenderWithError(false));
-			
 			if ($this->arrAddressCustomFields) {
 				foreach ($this->arrAddressCustomFields as $field) {
-					$arrCompanyFields[] = array('name' => $field['input']->Name . ":", 'value' => $field['input']->RenderWithError(false));
+					if(!$this->blnEditMode || $field['blnView']){
+						$arrCompanyFields[] = array('name' => $field['input']->Name . ":", 'value' => $field['input']->RenderWithError(false));
+					}
 				}
 			}
 		}
@@ -103,7 +107,7 @@
 						<td style="vertical-align:top;">
 							<table cellpadding="0" cellspacing="0">
 							<?php
-								for ($i=0;$i<ceil(count($arrCompanyFields)/2);$i++) {
+								if(isset($arrCompanyFields))for ($i=0;$i<ceil(count($arrCompanyFields)/2);$i++) {
 									echo('<tr>');
 									echo('<td class="record_field_name">'. $arrCompanyFields[$i]['name'] .'&nbsp;</td>');
 									echo('<td class="record_field_value">'. $arrCompanyFields[$i]['value'] .'&nbsp;</td>');
@@ -115,7 +119,7 @@
 						<td style="vertical-align:top;">
 							<table cellpadding="0" cellspacing="0">
 							<?php
-								for ($i=ceil(count($arrCompanyFields)/2);$i<count($arrCompanyFields);$i++) {
+								if(isset($arrCompanyFields))for ($i=ceil(count($arrCompanyFields)/2);$i<count($arrCompanyFields);$i++) {
 									echo('<tr>');
 									echo('<td class="record_field_name">'. $arrCompanyFields[$i]['name'] .'&nbsp;</td>');
 									echo('<td class="record_field_value">'. $arrCompanyFields[$i]['value'] .'&nbsp;</td>');

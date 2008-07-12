@@ -282,7 +282,6 @@ class QAdvancedSearchComposite extends QControl {
 		$this->objCustomFieldArray = CustomField::LoadObjCustomFieldArray($this->intEntityQtypeId, false, null);
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCustomFieldArray, false, $this, false, true, true);
-
 	}
 	
 	public function lstDateModified_Select($strFormId, $strControlId, $strParameter) {

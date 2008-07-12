@@ -198,7 +198,11 @@
 		protected $intNewTempId = 1;
 		
 		// Custom Field Objects
-		public $arrCustomFields;		
+		public $arrCustomFields;	
+
+		// Set true if the Built-in Fields has to be rendered
+		public $blnViewBuiltInFields;
+		public $blnEditBuiltInFields;
 
 		protected function Form_Create() {
 			
@@ -341,6 +345,11 @@
 			
 			// Create all custom asset fields
 			$this->customFields_Create();
+			//Set display logic of Built-In Fields
+			$this->UpdateBuiltInFields();
+			$this->UpdateAddressAccess();
+			$this->UpdateCompanyAccess();
+			$this->UpdateContactAccess();
 			
 			// New entities Dialog
 			$this->dlgNew_Create();
@@ -362,6 +371,8 @@
 			// Shipping Datagrids
 			$this->dtgAssetTransact_Create();
 			$this->dtgInventoryTransact_Create();
+			
+			
 			
 			// Load the objAssetTransactionArray and objInventoryTransactionArray for the first time
 			if ($this->blnEditMode) {
@@ -2059,12 +2070,9 @@
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			if ($this->objShipment->objCustomFieldArray) {
 				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-				if ($this->arrCustomFields) {
-					foreach ($this->arrCustomFields as $field) {
-						//$field['input']->TabIndex = $this->intTabIndex++;
-					}
-				}
+				
 			}
+			$this->UpdateCustomFields();
 		}
 		
 		// New Entity (Company, Contact, Address Dialog Box)
@@ -2515,6 +2523,9 @@
 		// Edit an existing shipment by displaying inputs and hiding the labels
 		protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 			$this->DisplayInputs();
+			
+			$this->UpdateBuiltInFields();
+			$this->UpdateCustomFields();
 		}		
 		
 		// AddAsset Button Click
@@ -4402,8 +4413,8 @@
 			$this->lblCourier->Display = false;
 			$this->pnlNote->Display = false;
 			$this->lblTrackingNumber->Display = false;
-			$this->btnEdit->Display = false;
-			$this->atcAttach->btnUpload->Display = false;
+			
+			
 			$this->lblToPhone->Display = false;
 			$this->lblBillTransportationTo->Display = false;
 			$this->lblPayerAccount->Display = false;
@@ -4425,9 +4436,7 @@
 			$this->lblHoldAtLocationCity->Display = false;
 			$this->lblHoldAtLocationState->Display = false;
 			$this->lblHoldAtLocationPostalCode->Display = false;
-			if ($this->blnEditMode) {
-				$this->btnCompleteShipment->Enabled = false;
-			}
+			
 			
 			// Show Inputs
 			$this->calShipDate->Display = true;
@@ -4451,8 +4460,7 @@
 			$this->lstSourceLocation->Display = true;
 			$this->txtQuantity->Display = true;
 			$this->btnAddInventory->Display = true;
-			$this->btnSave->Display = true;
-			$this->btnCancel->Display = true;
+			
 			$this->txtToPhone->Display = true;
 			if ($this->lstBillTransportationTo->SelectedValue === 1) {
 				$this->lstShippingAccount->Display = true;
@@ -4507,6 +4515,18 @@
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			}
 			
+				//If the user is not authorized to edit built-in fields, the fields are render as labels.
+			if(!$this->blnEditBuiltInFields)	
+				$this->DisplayLabels();	
+				
+			$this->btnEdit->Display = false;
+			$this->atcAttach->btnUpload->Display = false;
+			$this->btnSave->Display = true;
+			$this->btnCancel->Display = true;
+			if ($this->blnEditMode) {
+				$this->btnCompleteShipment->Enabled = false;
+			}
+			
 			// Display custom field inputs
 	    if ($this->arrCustomFields) {
 	    	CustomField::DisplayInputs($this->arrCustomFields);
@@ -4539,6 +4559,79 @@
 			$this->lstToAddress_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
+	//Set display logic of the BuiltInFields in View Access and Edit Access 
+		protected function UpdateBuiltInFields() {
+		//Set View Display Logic of Built-In Fields  
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Shipment,1);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag)
+			$this->blnViewBuiltInFields=true;
+		else
+			$this->blnViewBuiltInFields=false;
+
+		//Set Edit Display Logic of Built-In Fields	
+		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Shipment,2);
+		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag)
+			$this->blnEditBuiltInFields=true;
+		else
+			$this->blnEditBuiltInFields=false;
+
+		
+		}
+		//Set display logic for the CustomFields
+		protected function UpdateCustomFields(){
+			if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
+						
+				//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+				if (!$this->blnEditMode && !$objCustomField['blnEdit'] && $objCustomField['blnRequired']){
+					$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+					$objCustomField['lbl']->Display=true;
+					$objCustomField['input']->Display=false;			
+				}			
+			}
+			
+		}
+		//Set display logic of the GreenPlusButton of Address
+	protected function UpdateAddressAccess() {
+		//checks if the entity has edit authorization
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->lblNewFromAddress->Visible=true;
+			$this->lblNewToAddress->Visible=true;
+		}
+		else{
+			$this->lblNewFromAddress->Visible=false;
+			$this->lblNewToAddress->Visible=false;
+		}
+			
+	}
+		//Set display logic of the GreenPlusButton of Company
+	protected function UpdateCompanyAccess() {
+		//checks if the entity  has edit authorization
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Company,2);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->lblNewFromCompany->Visible=true;
+			$this->lblNewToCompany->Visible=true;
+		}
+		else{
+			$this->lblNewFromCompany->Visible=false;
+			$this->lblNewToCompany->Visible=false;
+		}
+			
+	}
+		//Set display logic of the GreenPlusButton of Contact
+	protected function UpdateContactAccess() {
+		//checks if the entity  has edit authorization
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Contact,2);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->lblNewFromContact->Visible=true;
+			$this->lblNewToContact->Visible=true;
+		}
+		else{
+			$this->lblNewFromContact->Visible=false;
+			$this->lblNewToContact->Visible=false;
+		}
+			
+	}
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using

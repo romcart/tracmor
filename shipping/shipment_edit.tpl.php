@@ -27,7 +27,8 @@
 	// Custom Fields
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
-			$arrShipmentFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+			if(!$this->blnEditMode || $field['blnView'])
+				$arrShipmentFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
 		}
 	}
 ?>
@@ -84,6 +85,7 @@
 								<tr>
 									<td colspan="2" class="record_subheader">Sender Information</td>
 								</tr>
+								
 								<tr>
 									<td class="record_field_name">Company:&nbsp;</td>
 									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); $this->lblNewFromCompany->RenderWithError(); ?></td>
@@ -123,13 +125,16 @@
 									<td colspan="2" class="record_subheader">Shipment Information</td>
 								</tr>
 								<?php if (QApplication::$TracmorSettings->CustomShipmentNumbers) { ?>
+								<?php 	if(!$this->blnEditMode || $this->blnViewBuiltInFields){ ?>
 								<tr>
 									<td class="record_field_name">Shipment Number&nbsp;</td>
 									<td class="record_field_value"><?php $this->txtShipmentNumber->RenderWithError();$this->lblShipmentNumber->Render(); ?>&nbsp;</td>
 								</tr>
 								<?php
-								}
+										}
+									  }
 								?>
+
 								<tr>
 									<td class="record_field_name">Shipping Courier:&nbsp;</td>
 									<td class="record_field_value"><?php $this->lstCourier->RenderWithError();$this->lblCourier->Render(); ?>&nbsp;</td>
@@ -157,7 +162,9 @@
 										<?php
 									}
 								};
+								
 								?>
+								
 							</table>
 						</td>
 					</tr>

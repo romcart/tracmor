@@ -35,17 +35,18 @@
 <?php
 
 	// Build array of all fields to display
-	$arrAddressFields[] = array('name' => 'Address Name:', 'value' => $this->lblShortDescription->Render(false) . $this->txtShortDescription->RenderWithError(false));
-	$arrAddressFields[] = array('name' => 'Country:', 'value' => $this->lblCountry->Render(false) . $this->lstCountry->RenderWithError(false));
-	$arrAddressFields[] = array('name' => 'Address Line 1:', 'value' => $this->lblAddress1->Render(false) . $this->txtAddress1->RenderWithError(false));
-	$arrAddressFields[] = array('name' => 'Address Line 2:', 'value' => $this->lblAddress2->Render(false) . $this->txtAddress2->RenderWithError(false));	
-	$arrAddressFields[] = array('name' => 'City:', 'value' => $this->lblCity->Render(false) . $this->txtCity->RenderWithError(false));
-	$arrAddressFields[] = array('name' => 'State/Province:', 'value' => $this->lblStateProvince->Render(false) . $this->lstStateProvince->RenderWithError(false));
-	$arrAddressFields[] = array('name' => 'Postal Code:', 'value' => $this->lblPostalCode->Render(false) . $this->txtPostalCode->RenderWithError(false));
+			$arrAddressFields[] = array('name' => 'Address Name:', 'value' => $this->lblShortDescription->Render(false) . $this->txtShortDescription->RenderWithError(false));
+			$arrAddressFields[] = array('name' => 'Country:', 'value' => $this->lblCountry->Render(false) . $this->lstCountry->RenderWithError(false));
+			$arrAddressFields[] = array('name' => 'Address Line 1:', 'value' => $this->lblAddress1->Render(false) . $this->txtAddress1->RenderWithError(false));
+			$arrAddressFields[] = array('name' => 'Address Line 2:', 'value' => $this->lblAddress2->Render(false) . $this->txtAddress2->RenderWithError(false));	
+			$arrAddressFields[] = array('name' => 'City:', 'value' => $this->lblCity->Render(false) . $this->txtCity->RenderWithError(false));
+			$arrAddressFields[] = array('name' => 'State/Province:', 'value' => $this->lblStateProvince->Render(false) . $this->lstStateProvince->RenderWithError(false));
+			$arrAddressFields[] = array('name' => 'Postal Code:', 'value' => $this->lblPostalCode->Render(false) . $this->txtPostalCode->RenderWithError(false));
 	
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
-			$arrAddressFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+			if(!$this->blnEditMode || $field['blnView'])
+				$arrAddressFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
 		}
 	}	
 	
@@ -87,11 +88,13 @@
 							<td style="vertical-align:top;">
 								<table cellpadding="0" cellspacing="0">
 								<?php
-									for ($i=0;$i<ceil(count($arrAddressFields)/2);$i++) {
-										echo('<tr>');
-										echo('<td class="record_field_name">'. $arrAddressFields[$i]['name'] .'&nbsp;</td>');
-										echo('<td class="record_field_value">'. $arrAddressFields[$i]['value'] .'&nbsp;</td>');
-										echo('</tr>');
+									if($arrAddressFields){
+										for ($i=0;$i<ceil(count($arrAddressFields)/2);$i++) {
+											echo('<tr>');
+											echo('<td class="record_field_name">'. $arrAddressFields[$i]['name'] .'&nbsp;</td>');
+											echo('<td class="record_field_value">'. $arrAddressFields[$i]['value'] .'&nbsp;</td>');
+											echo('</tr>');
+										}
 									}
 								?>
 								</table>
@@ -99,11 +102,13 @@
 							<td style="vertical-align:top;">
 								<table cellpadding="0" cellspacing="0">
 								<?php
-									for ($i=ceil(count($arrAddressFields)/2);$i<count($arrAddressFields);$i++) {
-										echo('<tr>');
-										echo('<td class="record_field_name">'. $arrAddressFields[$i]['name'] .'&nbsp;</td>');
-										echo('<td class="record_field_value">'. $arrAddressFields[$i]['value'] .'&nbsp;</td>');
-										echo('</tr>');
+									if($arrAddressFields){
+										for ($i=ceil(count($arrAddressFields)/2);$i<count($arrAddressFields);$i++) {
+											echo('<tr>');
+											echo('<td class="record_field_name">'. $arrAddressFields[$i]['name'] .'&nbsp;</td>');
+											echo('<td class="record_field_value">'. $arrAddressFields[$i]['value'] .'&nbsp;</td>');
+											echo('</tr>');
+										}
 									}
 								?>				
 								</table>

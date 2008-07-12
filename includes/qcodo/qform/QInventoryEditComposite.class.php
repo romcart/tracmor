@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,12 +23,12 @@
 <?php
 
 class QInventoryEditComposite extends QControl {
-	
+
 	public $objInventoryModel;
 	public $strTitleVerb;
 	public $blnEditMode;
 	public $objParentObject;
-	
+
 	// Labels
 	protected $lblShortDescription;
 	protected $lblHeaderInventoryModelCode;
@@ -39,16 +39,16 @@ class QInventoryEditComposite extends QControl {
 	protected $lblCreationDate;
 	protected $lblModifiedDate;
 	public $lblShipmentReceipt;
-	
+
 	protected $pnlLongDescription;
-	
+
 	// Inputs
 	protected $txtShortDescription;
 	protected $lstCategory;
 	protected $lstManufacturer;
 	protected $txtLongDescription;
 	protected $txtInventoryModelCode;
-	
+
 	// Buttons
 	protected $btnSave;
 	protected $btnDelete;
@@ -64,32 +64,37 @@ class QInventoryEditComposite extends QControl {
 
 	// Quantities By Location Datagrid
 	public $dtgInventoryQuantities;
-	
+
 	// Transaction History Datagrid
 	public $dtgInventoryTransaction;
 	public $dtgShipmentReceipt;
-	
+
 	// Custom Field Objects
 	// protected $objCustomFieldArray;
 	// Array of Custom Field inputs and labels
 	protected $arrCustomFields;
-	
+
+		
+	// Set true if the Built-in Fields have to be rendered
+	public $blnViewBuiltInFields;
+	public $blnEditBuiltInFields;
+
 	// We want to override the constructor in order to setup the subcontrols
 	public function __construct($objParentObject, $strControlId = null) {
-		
-	    // First, call the parent to do most of the basic setup
-    try {
-        parent::__construct($objParentObject, $strControlId);
-    } catch (QCallerException $objExc) {
-        $objExc->IncrementOffset();
-        throw $objExc;
-    }
-    
-    // Assign the parent object (InventoryModelEditForm from inventory_edit.php)
-    $this->objParentObject = $objParentObject;
-    $this->objParentObject->SetupInventoryModel($this);
-    
-    // Create Labels
+
+		// First, call the parent to do most of the basic setup
+		try {
+			parent::__construct($objParentObject, $strControlId);
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
+
+		// Assign the parent object (InventoryModelEditForm from inventory_edit.php)
+		$this->objParentObject = $objParentObject;
+		$this->objParentObject->SetupInventoryModel($this);
+
+		// Create Labels
 		$this->lblShortDescription_Create();
 		$this->lblHeaderInventoryModelCode_Create();
 		$this->lblCategory_Create();
@@ -100,7 +105,7 @@ class QInventoryEditComposite extends QControl {
 		$this->lblModifiedDate_Create();
 		$this->pnlLongDescription_Create();
 		$this->UpdateInventoryLabels();
-		
+
 		// Create Inputs
 		$this->txtShortDescription_Create();
 		$this->lstCategory_Create();
@@ -109,9 +114,15 @@ class QInventoryEditComposite extends QControl {
 		$this->txtLongDescription_Create();
 		$this->UpdateInventoryControls();
 
+
+
+
 		// Create all custom inventory fields
 		$this->customFields_Create();
-				
+		// Set a variable which defines whether the built-in fields must be rendered or not.
+		$this->UpdateBuiltInFields();
+
+
 		// Create Buttons
 		$this->btnSave_Create();
 		$this->btnDelete_Create();
@@ -128,7 +139,7 @@ class QInventoryEditComposite extends QControl {
 			$this->btnReceive_Create();
 			$this->EnableTransactionButtons();
 		}
-		
+
 		// Display labels for the existing inventory model
 		if ($this->blnEditMode) {
 			// Create the Quantities by Location datagrid
@@ -145,16 +156,16 @@ class QInventoryEditComposite extends QControl {
 			$this->displayInputs();
 		}
 	}
-	
+
 	// Every composite control must have this function declared
 	public function ParsePostData() {}
-	
-	public function GetJavaScriptAction() {return "onchange";}	
-	
+
+	public function GetJavaScriptAction() {return "onchange";}
+
 	public function Validate() {return true;}
-	
+
 	protected function GetControlHtml() {
-		
+
 		$strStyle = $this->GetStyleAttributes();
 		if ($strStyle) {
 			$strStyle = sprintf('style="%s"', $strStyle);
@@ -172,77 +183,74 @@ class QInventoryEditComposite extends QControl {
 
 		// Restore the output buffer and return evaluated template
 		print($strAlreadyRendered);
-		
+
 		$strToReturn =  sprintf('<span id="%s" %s%s>%s</span>',
 		$this->strControlId,
 		$strStyle,
 		$strAttributes,
 		$strTemplateEvaluated);
-		
-		return $strToReturn;		
+
+		return $strToReturn;
 	}
-	
+
 	// Generate tab indexes
 	protected $intNextTabIndex = 1;
 	protected function getNextTabIndex() {
 		return ++$this->intNextTabIndex;
 	}
-		
+
 	// Create all Custom Fields
 	protected function customFields_Create() {
-		
+
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 		$this->objInventoryModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, $this->blnEditMode, $this->objInventoryModel->InventoryModelId);
-		
+
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objInventoryModel->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-	
-		foreach ($this->arrCustomFields as $objCustomField) {
-			$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
-		}
+		$this->UpdateCustomFields();
 	}
-	
+
 	// Create Short Description Label
 	protected function lblShortDescription_Create() {
 		$this->lblShortDescription = new QLabel($this);
 		$this->lblShortDescription->Name = 'Inventory Model';
 	}
-	
+
 	protected function lblHeaderInventoryModelCode_Create() {
 		$this->lblHeaderInventoryModelCode = new QLabel($this);
 	}
-	
+
 	// Create Category Label
 	protected function lblCategory_Create() {
 		$this->lblCategory = new QLabel($this);
 		$this->lblCategory->Name = 'Category';
 	}
-	
+
 	// Create Manufacturer Label
 	protected function lblManufacturer_Create() {
 		$this->lblManufacturer = new QLabel($this);
 		$this->lblManufacturer->Name = 'Manufacturer';
 	}
-	
+
 	// Create Inventory Model Code Label
 	protected function lblInventoryModelCode_Create() {
 		$this->lblInventoryModelCode = new QLabel($this);
 		$this->lblInventoryModelCode->Name = 'Inventory Code';
 	}
-	
+
 	// Create Long Description Panel
 	protected function pnlLongDescription_Create() {
 		$this->pnlLongDescription = new QPanel($this);
 		$this->pnlLongDescription->CssClass='scrollBox';
 		$this->pnlLongDescription->Name = 'Long Description';
 	}
-	
+
 	// Create Total Quantity Label
 	protected function lblTotalQuantity_Create() {
 		$this->lblTotalQuantity = new QLabel($this);
 		$this->lblTotalQuantity->Name = 'Quantity';
 	}
-	
+
 	// Create the Creation Date Label
 	protected function lblCreationDate_Create() {
 		$this->lblCreationDate = new QLabel($this);
@@ -254,7 +262,7 @@ class QInventoryEditComposite extends QControl {
 			$this->lblCreationDate->Visible = false;
 		}
 	}
-	
+
 	// Create the Modified Date Label
 	protected function lblModifiedDate_Create() {
 		$this->lblModifiedDate = new QLabel($this);
@@ -263,7 +271,7 @@ class QInventoryEditComposite extends QControl {
 			$this->lblModifiedDate->Visible = false;
 		}
 	}
-	
+
 	// Create the Short Description Input
 	protected function txtShortDescription_Create() {
 		$this->txtShortDescription = new QTextBox($this);
@@ -276,14 +284,14 @@ class QInventoryEditComposite extends QControl {
 		$this->intNextTabIndex++;
 		QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->txtShortDescription->ControlId));
 	}
-	
+
 	// Create the Catetgory Input
 	protected function lstCategory_Create() {
 		$this->lstCategory = new QListBox($this);
 		$this->lstCategory->Name = QApplication::Translate('Category');
 		$this->lstCategory->Required = true;
 		if (!$this->blnEditMode)
-			$this->lstCategory->AddItem('- Select One -', null);
+		$this->lstCategory->AddItem('- Select One -', null);
 		$objCategoryArray = Category::LoadAllWithFlags(false, true, 'short_description');
 		if ($objCategoryArray) foreach ($objCategoryArray as $objCategory) {
 			$objListItem = new QListItem($objCategory->__toString(), $objCategory->CategoryId);
@@ -292,14 +300,14 @@ class QInventoryEditComposite extends QControl {
 		$this->lstCategory->TabIndex=2;
 		$this->intNextTabIndex++;
 	}
-	
+
 	// Create and Setup lstManufacturer
 	protected function lstManufacturer_Create() {
 		$this->lstManufacturer = new QListBox($this);
 		$this->lstManufacturer->Name = QApplication::Translate('Manufacturer');
 		$this->lstManufacturer->Required = true;
 		if (!$this->blnEditMode)
-			$this->lstManufacturer->AddItem('- Select One -', null);
+		$this->lstManufacturer->AddItem('- Select One -', null);
 		$objManufacturerArray = Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription)));
 		if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
 			$objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
@@ -308,7 +316,7 @@ class QInventoryEditComposite extends QControl {
 		$this->lstManufacturer->TabIndex=3;
 		$this->intNextTabIndex++;
 	}
-	
+
 	// Create and Setup txtLongDescription
 	protected function txtLongDescription_Create() {
 		$this->txtLongDescription = new QTextBox($this);
@@ -317,7 +325,7 @@ class QInventoryEditComposite extends QControl {
 		$this->txtLongDescription->TabIndex=5;
 		$this->intNextTabIndex++;
 	}
-	
+
 	// Create and Setup txtInventoryModelCode
 	protected function txtInventoryModelCode_Create() {
 		$this->txtInventoryModelCode = new QTextBox($this);
@@ -329,7 +337,7 @@ class QInventoryEditComposite extends QControl {
 		$this->txtInventoryModelCode->TabIndex=4;
 		$this->intNextTabIndex++;
 	}
-	
+
 	// Setup Edit Button
 	protected function btnEdit_Create() {
 		$this->btnEdit = new QButton($this);
@@ -340,8 +348,8 @@ class QInventoryEditComposite extends QControl {
 		$this->btnEdit->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnEdit, 2);
 	}
-	
-  // Setup Save Button
+
+	// Setup Save Button
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
 		$this->btnSave->Text = 'Save';
@@ -351,7 +359,7 @@ class QInventoryEditComposite extends QControl {
 		$this->btnSave->CausesValidation = true;
 		$this->btnSave->TabIndex=$this->GetNextTabIndex();
 	}
-	
+
 	// Setup Cancel Button
 	protected function btnCancel_Create() {
 		$this->btnCancel = new QButton($this);
@@ -362,17 +370,17 @@ class QInventoryEditComposite extends QControl {
 		$this->btnCancel->CausesValidation = false;
 	}
 
-// Setup Attach File Asset Button
+	// Setup Attach File Asset Button
 	protected function atcAttach_Create() {
 		$this->atcAttach = new QAttach($this, null, EntityQtype::Inventory, $this->objInventoryModel->InventoryModelId);
 		QApplication::AuthorizeControl($this->objInventoryModel, $this->atcAttach, 2);
 	}
-	
+
 	// Setup Attachments Panel
 	public function pnlAttachments_Create() {
 		$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Inventory, $this->objInventoryModel->InventoryModelId);
-	}	
-	
+	}
+
 	// Setup Delete Button
 	protected function btnDelete_Create() {
 		$this->btnDelete = new QButton($this);
@@ -384,10 +392,10 @@ class QInventoryEditComposite extends QControl {
 		$this->btnDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnDelete->CausesValidation = false;
 		if (!$this->blnEditMode)
-			$this->btnDelete->Visible = false;
-		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnDelete, 3);			
+		$this->btnDelete->Visible = false;
+		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnDelete, 3);
 	}
-	
+
 	// Setup Move Button
 	protected function btnMove_Create() {
 		$this->btnMove = new QButton($this);
@@ -396,9 +404,9 @@ class QInventoryEditComposite extends QControl {
 		$this->btnMove->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnMove_Click'));
 		$this->btnMove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnMove->CausesValidation = false;
-		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnMove, 2);		
+		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnMove, 2);
 	}
-	
+
 	// Setup Take Out Button
 	protected function btnTakeOut_Create() {
 		$this->btnTakeOut = new QButton($this);
@@ -409,7 +417,7 @@ class QInventoryEditComposite extends QControl {
 		$this->btnTakeOut->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnTakeOut, 2);
 	}
-	
+
 	// Setup Take Out Button
 	protected function btnRestock_Create() {
 		$this->btnRestock = new QButton($this);
@@ -418,9 +426,9 @@ class QInventoryEditComposite extends QControl {
 		$this->btnRestock->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnRestock_Click'));
 		$this->btnRestock->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnRestock->CausesValidation = false;
-		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnRestock, 2);		
+		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnRestock, 2);
 	}
-	
+
 	// Setup Ship Button
 	protected function btnShip_Create() {
 		$this->btnShip = new QButton($this);
@@ -431,7 +439,7 @@ class QInventoryEditComposite extends QControl {
 		$this->btnShip->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnShip, 2);
 	}
-	
+
 	// Setup Receive Button
 	protected function btnReceive_Create() {
 		$this->btnReceive = new QButton($this);
@@ -442,85 +450,85 @@ class QInventoryEditComposite extends QControl {
 		$this->btnReceive->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnReceive, 2);
 	}
-	
+
 	protected function dtgInventoryQuantities_Create() {
 		$this->dtgInventoryQuantities = new QDataGrid($this);
 		$this->dtgInventoryQuantities->Name = 'Quantities By Location';
 		$this->dtgInventoryQuantities->CellPadding = 5;
 		$this->dtgInventoryQuantities->CellSpacing = 0;
 		$this->dtgInventoryQuantities->CssClass = "datagrid";
-		
-    // Enable AJAX - this won't work while using the DB profiler
-    $this->dtgInventoryQuantities->UseAjax = true;
 
-    // Enable Pagination, and set to 20 items per page
-    $objPaginator = new QPaginator($this->dtgInventoryQuantities);
-    $this->dtgInventoryQuantities->Paginator = $objPaginator;
-    $this->dtgInventoryQuantities->ItemsPerPage = 10;
-    
-    $this->dtgInventoryQuantities->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="inventory_location__location_id__short_description ASC"', 'ReverseSortByCommand="inventory_location__location_id__short_description DESC"', 'CssClass="dtg_column"'));
-    $this->dtgInventoryQuantities->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', 'SortByCommand="quantity ASC"', 'ReverseSortByCommand="quantity DESC"', 'CssClass="dtg_column"'));
-    
-    $objStyle = $this->dtgInventoryQuantities->RowStyle;
-    $objStyle->ForeColor = '#000000';
-    $objStyle->BackColor = '#FFFFFF';
-    $objStyle->FontSize = 12;
+		// Enable AJAX - this won't work while using the DB profiler
+		$this->dtgInventoryQuantities->UseAjax = true;
 
-    $objStyle = $this->dtgInventoryQuantities->AlternateRowStyle;
-    $objStyle->BackColor = '#EFEFEF';
+		// Enable Pagination, and set to 20 items per page
+		$objPaginator = new QPaginator($this->dtgInventoryQuantities);
+		$this->dtgInventoryQuantities->Paginator = $objPaginator;
+		$this->dtgInventoryQuantities->ItemsPerPage = 10;
 
-    $objStyle = $this->dtgInventoryQuantities->HeaderRowStyle;
-    $objStyle->ForeColor = '#000000';
-    $objStyle->BackColor = '#EFEFEF';
-    $objStyle->CssClass = 'dtg_header';		
-	}	
-	
+		$this->dtgInventoryQuantities->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="inventory_location__location_id__short_description ASC"', 'ReverseSortByCommand="inventory_location__location_id__short_description DESC"', 'CssClass="dtg_column"'));
+		$this->dtgInventoryQuantities->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', 'SortByCommand="quantity ASC"', 'ReverseSortByCommand="quantity DESC"', 'CssClass="dtg_column"'));
+
+		$objStyle = $this->dtgInventoryQuantities->RowStyle;
+		$objStyle->ForeColor = '#000000';
+		$objStyle->BackColor = '#FFFFFF';
+		$objStyle->FontSize = 12;
+
+		$objStyle = $this->dtgInventoryQuantities->AlternateRowStyle;
+		$objStyle->BackColor = '#EFEFEF';
+
+		$objStyle = $this->dtgInventoryQuantities->HeaderRowStyle;
+		$objStyle->ForeColor = '#000000';
+		$objStyle->BackColor = '#EFEFEF';
+		$objStyle->CssClass = 'dtg_header';
+	}
+
 	protected function dtgInventoryTransaction_Create() {
 		$this->dtgInventoryTransaction = new QDataGrid($this);
 		$this->dtgInventoryTransaction->Name = 'Transaction History';
 		$this->dtgInventoryTransaction->CellPadding = 5;
 		$this->dtgInventoryTransaction->CellSpacing = 0;
 		$this->dtgInventoryTransaction->CssClass = "datagrid";
-		
-    // Enable AJAX - this won't work while using the DB profiler
-    $this->dtgInventoryTransaction->UseAjax = true;
 
-    // Enable Pagination, and set to 20 items per page
-    $objPaginator = new QPaginator($this->dtgInventoryTransaction);
-    $this->dtgInventoryTransaction->Paginator = $objPaginator;
-    $this->dtgInventoryTransaction->ItemsPerPage = 20;
+		// Enable AJAX - this won't work while using the DB profiler
+		$this->dtgInventoryTransaction->UseAjax = true;
 
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Transaction Type', '<?= $_ITEM->Transaction->__toStringWithLink() ?>',  array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->TransactionType->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->TransactionType->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Quantity), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Quantity, false), 'CssClass' => "dtg_column")));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('From', '<?= $_ITEM->__toStringSourceLocation() ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->SourceLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->SourceLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('To', '<?= $_ITEM->__toStringDestinationLocation() ?>', array('OrderByClause' => QQ::Orderby(QQN::InventoryTransaction()->DestinationLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->DestinationLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('User', '<?= $_ITEM->Transaction->CreatedByObject->__toStringFullName() ?>', array('OrderByClause' => QQ::Orderby(QQN::InventoryTransaction()->CreatedByObject->LastName), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->CreatedByObject->LastName, false), 'CssClass' => "dtg_column")));
-    $this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Date', '<?= $_ITEM->Transaction->CreationDate->PHPDate("Y-m-d H:i:s"); ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->CreationDate), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->CreationDate, false), 'CssClass' => "dtg_column")));
-    
-    $this->dtgInventoryTransaction->SortColumnIndex = 5;
-    $this->dtgInventoryTransaction->SortDirection = 1;
-    
-    $objStyle = $this->dtgInventoryTransaction->RowStyle;
-    $objStyle->ForeColor = '#000000';
-    $objStyle->BackColor = '#FFFFFF';
-    $objStyle->FontSize = 12;
+		// Enable Pagination, and set to 20 items per page
+		$objPaginator = new QPaginator($this->dtgInventoryTransaction);
+		$this->dtgInventoryTransaction->Paginator = $objPaginator;
+		$this->dtgInventoryTransaction->ItemsPerPage = 20;
 
-    $objStyle = $this->dtgInventoryTransaction->AlternateRowStyle;
-    $objStyle->BackColor = '#EFEFEF';
+		$this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Transaction Type', '<?= $_ITEM->Transaction->__toStringWithLink() ?>',  array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->TransactionType->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->TransactionType->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+		$this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Quantity), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Quantity, false), 'CssClass' => "dtg_column")));
+		$this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('From', '<?= $_ITEM->__toStringSourceLocation() ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->SourceLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->SourceLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
+		$this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('To', '<?= $_ITEM->__toStringDestinationLocation() ?>', array('OrderByClause' => QQ::Orderby(QQN::InventoryTransaction()->DestinationLocation->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->DestinationLocation->ShortDescription, false), 'CssClass' => "dtg_column")));
+		$this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('User', '<?= $_ITEM->Transaction->CreatedByObject->__toStringFullName() ?>', array('OrderByClause' => QQ::Orderby(QQN::InventoryTransaction()->CreatedByObject->LastName), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->CreatedByObject->LastName, false), 'CssClass' => "dtg_column")));
+		$this->dtgInventoryTransaction->AddColumn(new QDataGridColumn('Date', '<?= $_ITEM->Transaction->CreationDate->PHPDate("Y-m-d H:i:s"); ?>', array('OrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->CreationDate), 'ReverseOrderByClause' => QQ::OrderBy(QQN::InventoryTransaction()->Transaction->CreationDate, false), 'CssClass' => "dtg_column")));
 
-    $objStyle = $this->dtgInventoryTransaction->HeaderRowStyle;
-    $objStyle->ForeColor = '#000000';
-    $objStyle->BackColor = '#EFEFEF';
-    $objStyle->CssClass = 'dtg_header';		
+		$this->dtgInventoryTransaction->SortColumnIndex = 5;
+		$this->dtgInventoryTransaction->SortDirection = 1;
+
+		$objStyle = $this->dtgInventoryTransaction->RowStyle;
+		$objStyle->ForeColor = '#000000';
+		$objStyle->BackColor = '#FFFFFF';
+		$objStyle->FontSize = 12;
+
+		$objStyle = $this->dtgInventoryTransaction->AlternateRowStyle;
+		$objStyle->BackColor = '#EFEFEF';
+
+		$objStyle = $this->dtgInventoryTransaction->HeaderRowStyle;
+		$objStyle->ForeColor = '#000000';
+		$objStyle->BackColor = '#EFEFEF';
+		$objStyle->CssClass = 'dtg_header';
 	}
-	
+
 	protected function lblShipmentReceipt_Create() {
 		$this->lblShipmentReceipt = new QLabel($this);
 		$this->lblShipmentReceipt->Name = 'Shipping/Receiving History';
 		$this->lblShipmentReceipt->Text = 'Shipping/Receiving History';
 		$this->lblShipmentReceipt->CssClass = 'title';
 	}
-	
+
 	protected function dtgShipmentReceipt_Create() {
 		$this->dtgShipmentReceipt = new QDataGrid($this);
 		$this->dtgShipmentReceipt->Name = 'Shipping/Receiving History';
@@ -528,11 +536,11 @@ class QInventoryEditComposite extends QControl {
 		$this->dtgShipmentReceipt->CellSpacing = 0;
 		$this->dtgShipmentReceipt->CssClass = "datagrid";
 		$this->dtgShipmentReceipt->UseAjax = true;
-		
+
 		$objPaginator = new QPaginator($this->dtgShipmentReceipt);
 		$this->dtgShipmentReceipt->Paginator = $objPaginator;
 		$this->dtgShipmentReceipt->ItemsPerPage = 20;
-		
+
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Type', '<?= $_ITEM->Transaction->TransactionType->__toString() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Number', '<?= $_ITEM->Transaction->ToStringNumberWithLink() ?> <?= $_ITEM->Transaction->ToStringHoverTips($_CONTROL); ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Company', '<?= $_ITEM->Transaction->ToStringCompany() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
@@ -540,97 +548,101 @@ class QInventoryEditComposite extends QControl {
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->Transaction->CreatedByObject->__toString() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->Transaction->ToStringStatusStyled() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Tracking', '<?= $_ITEM->Transaction->ToStringTrackingNumber() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
-		
+
 		//$this->dtgShipmentReceipt->SortColumnIndex = 4;
-    //$this->dtgShipmentReceipt->SortDirection = 1;
-    
-    $objStyle = $this->dtgShipmentReceipt->RowStyle;
-    $objStyle->ForeColor = '#000000';
-    $objStyle->BackColor = '#FFFFFF';
-    $objStyle->FontSize = 12;
+		//$this->dtgShipmentReceipt->SortDirection = 1;
 
-    $objStyle = $this->dtgShipmentReceipt->AlternateRowStyle;
-    $objStyle->BackColor = '#EFEFEF';
+		$objStyle = $this->dtgShipmentReceipt->RowStyle;
+		$objStyle->ForeColor = '#000000';
+		$objStyle->BackColor = '#FFFFFF';
+		$objStyle->FontSize = 12;
 
-    $objStyle = $this->dtgShipmentReceipt->HeaderRowStyle;
-    $objStyle->ForeColor = '#000000';
-    $objStyle->BackColor = '#EFEFEF';
-    $objStyle->CssClass = 'dtg_header';		
-	}	
-	
+		$objStyle = $this->dtgShipmentReceipt->AlternateRowStyle;
+		$objStyle->BackColor = '#EFEFEF';
+
+		$objStyle = $this->dtgShipmentReceipt->HeaderRowStyle;
+		$objStyle->ForeColor = '#000000';
+		$objStyle->BackColor = '#EFEFEF';
+		$objStyle->CssClass = 'dtg_header';
+	}
+
 	// Edit Button Click
 	public function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 
 		// Hide labels and display inputs where appropriate
 		$this->displayInputs();
-		
+
+		// Display logic: checks if the user should see the fields
+		$this->UpdateBuiltInFields();
+		$this->UpdateCustomFields();
+
 		// Deactivate the transaction buttons
 		$this->disableTransactionButtons();
 	}
 
 	// Save Button Click Actions
 	public function btnSave_Click($strFormId, $strControlId, $strParameter) {
-		
 		try {
 			// Get an instance of the database
 			$objDatabase = QApplication::$Database[1];
 			// Begin a MySQL Transaction to be either committed or rolled back
 			$objDatabase->TransactionBegin();
-		
+
 			// This happens whether or not they are creating a new one or editing an existing one
 			$this->objInventoryModel->ShortDescription = $this->txtShortDescription->Text;
 			$this->objInventoryModel->CategoryId = $this->lstCategory->SelectedValue;
 			$this->objInventoryModel->ManufacturerId = $this->lstManufacturer->SelectedValue;
 			$this->objInventoryModel->LongDescription = $this->txtLongDescription->Text;
 			$this->objInventoryModel->InventoryModelCode = $this->txtInventoryModelCode->Text;
-			
+				
 			$blnError = false;
-	
+
 			// If a new inventory model is being created
 			if (!$this->blnEditMode) {
-				
+
 				// Check to see if the InventoryModelCode already exists
 				$InventoryModelDuplicate = InventoryModel::LoadbyInventoryModelCode($this->objInventoryModel->InventoryModelCode);
 				if ($InventoryModelDuplicate) {
 					$blnError = true;
 					$this->txtInventoryModelCode->Warning = "That inventory code is already in use. Please try another.";
 				}
-				
+
 				if (!$blnError) {
 					// Object should be saved only if it is new, to obtain the proper InventoryModelId to add to the custom field tables
 					$this->objInventoryModel->Save();
-				}			
+				}
 			}
-	
+
 			// Assign input values to custom fields
 			if ($this->arrCustomFields) {
-				
+
 				// Save the values from all of the custom field controls to save the inventory model
 				CustomField::SaveControls($this->objInventoryModel->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objInventoryModel->InventoryModelId, 2);
 			}
-			
-			if ($this->blnEditMode) {
 				
+			if ($this->blnEditMode) {
+
+
 				// Check to see if the InventoryModelCode already exists and it is not the code for the inventory model that you are currently working with
 				$InventoryModelDuplicate = InventoryModel::LoadbyInventoryModelCode($this->objInventoryModel->InventoryModelCode);
 				if ($InventoryModelDuplicate && $InventoryModelDuplicate->InventoryModelId != $this->objInventoryModel->InventoryModelId) {
 					$blnError = true;
 					$this->txtInventoryModelCode->Warning = "That inventory code is already in use. Please try another.";
 				}
-				
+
 				if (!$blnError) {
 					// Update the values of all fields for an Ajax reload
 					$this->UpdateInventoryFields();
-					
+						
 					// If inventory model is not new, it must be saved after updating the inventoryfields
 					$this->objInventoryModel->Save();
-					
+						
 					// Setup the InventoryModel again to retrieve the latest Modified information
 					$this->objParentObject->SetupInventoryModel($this);
-					
+						
 					// Give the labels their appropriate values before display
 					$this->UpdateInventoryLabels();
-					
+						
 					// This was necessary because it was not saving the changes of a second edit/save in a row
 					// Reload all custom fields
 					$this->objInventoryModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, $this->blnEditMode, $this->objInventoryModel->InventoryModelId);
@@ -638,34 +650,34 @@ class QInventoryEditComposite extends QControl {
 					$this->displayLabels();
 					// Enable the appropriate transaction buttons
 					$this->EnableTransactionButtons();
-					
+						
 					// Commit the above transactions to the database
 					$objDatabase->TransactionCommit();
 				}
-				
+
 			}
 			elseif (!$blnError) {
-				
+
 				// Commit the above transactions to the database
 				$objDatabase->TransactionCommit();
-				
+
 				// Reload the edit inventory page with the newly created model
 				$strRedirect = "inventory_edit.php?intInventoryModelId=" . $this->objInventoryModel->InventoryModelId;
 				QApplication::Redirect($strRedirect);
 			}
-			
-			
+				
+				
 		}
 		catch (QOptimisticLockingException $objExc) {
-			
+				
 			// Rollback the database
 			$objDatabase->TransactionRollback();
-			
+				
 			// Output the error
 			$this->btnCancel->Warning = sprintf('This inventory has been updated by another user. You must <a href="inventory_edit.php?intInventoryModelId=%s">Refresh</a> to edit this Inventory.', $this->objInventoryModel->InventoryModelId);
-		}		
+		}
 	}
-	
+
 	// Cancel Button Click Actions
 	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
 		if ($this->blnEditMode) {
@@ -677,10 +689,10 @@ class QInventoryEditComposite extends QControl {
 			QApplication::Redirect('inventory_model_list.php');
 		}
 	}
-	
+
 	// Delete Button Click Actions
 	public function btnDelete_Click($strFormId, $strControlId, $strParameter) {
-		
+
 		try {
 			$objCustomFieldArray = $this->objInventoryModel->objCustomFieldArray;
 			$this->objInventoryModel->Delete();
@@ -698,7 +710,7 @@ class QInventoryEditComposite extends QControl {
 			}
 		}
 	}
-	
+
 	// Move Button Click Actions
 	public function btnMove_Click($strFormId, $strControlId, $strParameter) {
 		$this->objParentObject->DisplayEdit(false);
@@ -712,24 +724,24 @@ class QInventoryEditComposite extends QControl {
 		// 1 is the transaction_type_id for the move transaction
 		$this->objParentObject->DisplayTransaction(true, 5);
 	}
-	
+
 	// Move Button Click Actions
 	public function btnRestock_Click($strFormId, $strControlId, $strParameter) {
 		$this->objParentObject->DisplayEdit(false);
 		// 1 is the transaction_type_id for the move transaction
 		$this->objParentObject->DisplayTransaction(true, 4);
 	}
-	
+
 	// Ship Button Click Actions
 	public function btnShip_Click($strFormId, $strControlId, $strParameter) {
 		QApplication::Redirect(sprintf('../shipping/shipment_edit.php?intInventoryModelId=%s', $this->objInventoryModel->InventoryModelId));
 	}
-	
+
 	// Receive Button Click Actions
 	public function btnReceive_Click($strFormId, $strControlId, $strParameter) {
 		QApplication::Redirect(sprintf('../receiving/receipt_edit.php?intInventoryModelId=%s', $this->objInventoryModel->InventoryModelId));
-	}	
-	
+	}
+
 	// Display the labels and buttons for Inventory Viewing mode
 	public function displayLabels() {
 
@@ -739,11 +751,11 @@ class QInventoryEditComposite extends QControl {
 		$this->lstManufacturer->Display = false;
 		$this->txtLongDescription->Display = false;
 		$this->txtInventoryModelCode->Display = false;
-		
+
 		// Do not display Cancel and Save buttons
 		$this->btnCancel->Display = false;
 		$this->btnSave->Display = false;
-		
+
 		// Display Labels for Viewing mode
 		$this->lblShortDescription->Display = true;
 		$this->lblCategory->Display = true;
@@ -755,45 +767,52 @@ class QInventoryEditComposite extends QControl {
 		$this->btnEdit->Display = true;
 		$this->btnDelete->Display = true;
 		$this->atcAttach->btnUpload->Display = true;
-		
+
 		// Display custom field labels
 		if ($this->arrCustomFields) {
 			CustomField::DisplayLabels($this->arrCustomFields);
 		}
 	}
-	
+
 	// Display the inputs and buttons for Edit or Create mode
 	public function displayInputs() {
-		
+
 		// Do not display labels
 		$this->lblShortDescription->Display = false;
 		$this->lblCategory->Display = false;
 		$this->lblManufacturer->Display = false;
 		$this->lblInventoryModelCode->Display = false;
 		$this->pnlLongDescription->Display = false;
-	
-    	// Do not display Edit and Delete buttons
-    	$this->btnEdit->Display = false;
-    	$this->btnDelete->Display = false;
-    	$this->atcAttach->Display = false;
-    
-    	// Display inputs
+
+		// Do not display Edit and Delete buttons
+		$this->btnEdit->Display = false;
+		$this->btnDelete->Display = false;
+		$this->atcAttach->Display = false;
+
+		// Display inputs
 		$this->txtShortDescription->Display = true;
 		$this->lstCategory->Display = true;
 		$this->lstManufacturer->Display = true;
 		$this->txtLongDescription->Display = true;
 		$this->txtInventoryModelCode->Display = true;
-		
-    	// Display Cancel and Save butons    
-    	$this->btnCancel->Display = true;
-    	$this->btnSave->Display = true;
-    
-    	// Display custom field inputs
-    	if ($this->arrCustomFields) {
-    		CustomField::DisplayInputs($this->arrCustomFields);
-    	} 
+
+		// Display Cancel and Save butons
+		$this->btnCancel->Display = true;
+		$this->btnSave->Display = true;
+		 
+		 
+		// new: if the user is authorized to edit the built-in fields.
+		//if the user is not authorized to edit built-in fields, the fields are render as labels.
+		if(!$this->blnEditBuiltInFields){
+			$this->displayLabels();
+		}
+
+		// Display custom field inputs
+		if ($this->arrCustomFields) {
+			CustomField::DisplayInputs($this->arrCustomFields);
+		}
 	}
-	
+
 	// Disable all transaction buttons while editing
 	public function DisableTransactionButtons() {
 		if ($this->blnEditMode) {
@@ -817,7 +836,7 @@ class QInventoryEditComposite extends QControl {
 			$this->btnRestock->Enabled = true;
 		}
 	}
-	
+
 	// Update the Inventory labels with the values from the inventory inputs
 	public function UpdateInventoryLabels() {
 
@@ -835,13 +854,13 @@ class QInventoryEditComposite extends QControl {
 		if ($this->objInventoryModel->ModifiedDate) {
 			$this->lblModifiedDate->Text = $this->objInventoryModel->ModifiedDate . ' by ' . $this->objInventoryModel->ModifiedByObject->__toStringFullName();
 		}
-		
+
 		// Update custom labels
 		if ($this->arrCustomFields) {
 			CustomField::UpdateLabels($this->arrCustomFields);
-		}		
+		}
 	}
-	
+
 	// Protected Update Methods
 	protected function UpdateInventoryFields() {
 		$this->objInventoryModel->ShortDescription = $this->txtShortDescription->Text;
@@ -849,8 +868,8 @@ class QInventoryEditComposite extends QControl {
 		$this->objInventoryModel->ManufacturerId = $this->lstManufacturer->SelectedValue;
 		$this->objInventoryModel->LongDescription = $this->txtLongDescription->Text;
 		$this->objInventoryModel->InventoryModelCode = $this->txtInventoryModelCode->Text;
-	}	
-	
+	}
+
 	// Resets control values on Cancel Click
 	protected function UpdateInventoryControls() {
 		$this->txtShortDescription->Text = $this->objInventoryModel->ShortDescription;
@@ -859,24 +878,65 @@ class QInventoryEditComposite extends QControl {
 		$this->txtLongDescription->Text = $this->objInventoryModel->LongDescription;
 		$this->txtInventoryModelCode->Text = $this->objInventoryModel->InventoryModelCode;
 		$this->arrCustomFields = CustomField::UpdateControls($this->objInventoryModel->objCustomFieldArray, $this->arrCustomFields);
-	}	
-	
-  // And our public getter/setters
-  public function __get($strName) {
-	  switch ($strName) {
-	  	case "objInventoryModel": return $this->objInventoryModel;
-	  	case "blnEditMode": return $this->blnEditMode;
-	  	case "dtgInventoryTransaction": return $this->dtgInventoryTransaction;
-      default:
-        try {
-            return parent::__get($strName);
-        } catch (QCallerException $objExc) {
-            $objExc->IncrementOffset();
-            throw $objExc;
-        }
-	  }
-  }
-  
+	}
+
+	//Set display logic of the BuiltInFields in View Access and Edit Access
+	protected function UpdateBuiltInFields() {
+		//Set View Display Logic of Built-In Fields
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Inventory,1);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->blnViewBuiltInFields=true;
+		}
+		else{
+			$this->blnViewBuiltInFields=false;
+		}
+
+		//Set Edit Display Logic of Built-In Fields
+		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Inventory,2);
+		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag){
+			$this->blnEditBuiltInFields=true;
+		}
+		else{
+			$this->blnEditBuiltInFields=false;
+		}
+
+	}
+	//Set display logic for the CustomFields
+	protected function UpdateCustomFields(){
+		if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
+			//Set NextTabIndex only if the custom field is show
+			if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+				$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
+			}
+
+			//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+			if (!$this->blnEditMode && !$objCustomField['blnEdit']){
+				$objCustomField['lbl']->Display=true;
+				$objCustomField['input']->Display=false;
+				if(($objCustomField['blnRequired'])){
+					$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+				}
+			}
+		}
+	}
+
+
+	// And our public getter/setters
+	public function __get($strName) {
+		switch ($strName) {
+			case "objInventoryModel": return $this->objInventoryModel;
+			case "blnEditMode": return $this->blnEditMode;
+			case "dtgInventoryTransaction": return $this->dtgInventoryTransaction;
+			default:
+				try {
+					return parent::__get($strName);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+		}
+	}
+
 	/////////////////////////
 	// Public Properties: SET
 	/////////////////////////
@@ -884,14 +944,14 @@ class QInventoryEditComposite extends QControl {
 		$this->blnModified = true;
 
 		switch ($strName) {
-	    case "objInventoryModel": $this->objInventoryModel = $mixValue;
-	    	break;
-	    case "blnEditMode": $this->blnEditMode = $mixValue;
-	    	break;
-	    case "strTitleVerb": $this->strTitleVerb = $mixValue;
-	    	break;
-	    case "dtgInventoryTransaction": $this->dtgInventoryTransaction = $mixValue;
-	    	break;  	
+			case "objInventoryModel": $this->objInventoryModel = $mixValue;
+			break;
+			case "blnEditMode": $this->blnEditMode = $mixValue;
+			break;
+			case "strTitleVerb": $this->strTitleVerb = $mixValue;
+			break;
+			case "dtgInventoryTransaction": $this->dtgInventoryTransaction = $mixValue;
+			break;
 			default:
 				try {
 					parent::__set($strName, $mixValue);
@@ -901,6 +961,6 @@ class QInventoryEditComposite extends QControl {
 				}
 				break;
 		}
-	}    
+	}
 }
 ?>

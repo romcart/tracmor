@@ -26,7 +26,9 @@
 	// Custom Fields
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
-			$arrReceiptFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+			if(!$this->blnEditMode || $field['blnView']){
+				$arrReceiptFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+			}
 		}
 	}
 ?>
@@ -101,6 +103,8 @@
 								<tr>
 									<td colspan="2" class="record_subheader">Receipt Information</td>
 								</tr>
+								
+								
 								<?php if (QApplication::$TracmorSettings->CustomReceiptNumbers) { ?>
 								<tr>
 									<td class="record_field_name">Receipt Number&nbsp;</td>

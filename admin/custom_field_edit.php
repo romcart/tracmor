@@ -616,6 +616,8 @@
 			$objDatabase = QApplication::$Database[1];
 			$objDatabase->NonQuery($strQuery);
 			
+			$this->DeleteEntityQtypeCustomFields();
+			
 			parent::btnDelete_Click($strFormId, $strControlId, $strParameter);
 		}
 		
@@ -678,6 +680,12 @@
 								}
 							}
 						}
+						// If the EntityQtype needs to be deleted, you must delete EntityQtypeId for all roles in RoleEntityQTypeCustomFieldAuthorization
+						$objRoleEntityCustomAuthArray=RoleEntityQtypeCustomFieldAuthorization::LoadArrayByEntityQtypeCustomFieldId($objEntityQtypeCustomField->EntityQtypeCustomFieldId);
+						if($objRoleEntityCustomAuthArray)foreach($objRoleEntityCustomAuthArray as $objRoleEntityCustomAuth){
+							$objRoleEntityCustomAuth->Delete();
+						}
+						
 						// Delete the EntityQtypeCustomField last
 						$objEntityQtypeCustomField->Delete();
 					}
@@ -693,11 +701,48 @@
 						$objEntityQtypeCustomField->CustomFieldId = $this->objCustomField->CustomFieldId;
 						$objEntityQtypeCustomField->EntityQtypeId = $objEntityQtypeItem->Value;
 						$objEntityQtypeCustomField->Save();
+						
+						//// Insert the new EntityQtypeCustomField to the RoleEntityQTypeCustomFieldAuthorization table, to all the roles, with authorized_flag set to true, one for View Auth and another for Edit Auth
+						foreach(Role::LoadAll() as $objRole){
+							//Insert the view Auth
+							$objRoleEntityQtypeCustomFieldAuth = new RoleEntityQtypeCustomFieldAuthorization();
+							$objRoleEntityQtypeCustomFieldAuth->RoleId=$objRole->RoleId;
+							$objRoleEntityQtypeCustomFieldAuth->EntityQtypeCustomFieldId=$objEntityQtypeCustomField->EntityQtypeCustomFieldId;
+							$objRoleEntityQtypeCustomFieldAuth->AuthorizationId=1;
+							$objRoleEntityQtypeCustomFieldAuth->AuthorizedFlag=1;
+							$objRoleEntityQtypeCustomFieldAuth->Save();
+							//Insert the Edit Auth
+							$objRoleEntityQtypeCustomFieldAuth = new RoleEntityQtypeCustomFieldAuthorization();
+							$objRoleEntityQtypeCustomFieldAuth->RoleId=$objRole->RoleId;
+							$objRoleEntityQtypeCustomFieldAuth->EntityQtypeCustomFieldId=$objEntityQtypeCustomField->EntityQtypeCustomFieldId;
+							$objRoleEntityQtypeCustomFieldAuth->AuthorizationId=2;
+							$objRoleEntityQtypeCustomFieldAuth->AuthorizedFlag=1;
+							$objRoleEntityQtypeCustomFieldAuth->Save();
+							
+						}
+						
 					}
 				}
 			}
 		}
 		
+
+		protected function DeleteEntityQtypeCustomFields(){
+			$objEntityQtypeCustomFieldArray = EntityQtypeCustomField::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
+			if ($objEntityQtypeCustomFieldArray) {
+				foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
+							
+						// If the EntityQtype needs to be deleted, you must delete EntityQtypeId for all roles in RoleEntityQTypeCustomFieldAuthorization
+						$objRoleEntityCustomAuthArray=RoleEntityQtypeCustomFieldAuthorization::LoadArrayByEntityQtypeCustomFieldId($objEntityQtypeCustomField->EntityQtypeCustomFieldId);
+						if($objRoleEntityCustomAuthArray)foreach($objRoleEntityCustomAuthArray as $objRoleEntityCustomAuth){
+							$objRoleEntityCustomAuth->Delete();
+						}
+						
+						// Delete the EntityQtypeCustomField last
+						//$objEntityQtypeCustomField->Delete();
+				}
+			}
+		}
 		// Display the fields for adding options to select lists
 		protected function DisplayOptions($blnValue = true) {
 			

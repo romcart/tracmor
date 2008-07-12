@@ -102,6 +102,9 @@
 			
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objContact->objCustomFieldArray, $this->blnEditMode, $this, false, true, false);
+			
+			// Set Display logic of the Custom Fields
+			$this->UpdateCustomFields();
 		}
 		
 		// Update address field when company is selected
@@ -131,6 +134,21 @@
 				$objListItem = new QListItem($objAddress->__toString(), $objAddress->AddressId);
 				$this->lstAddress->AddItem($objListItem);
 			}
+		}
+		
+		//Set display logic for the CustomFields
+		protected function UpdateCustomFields(){
+			if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {	
+				// If the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+				if (!$objCustomField['blnEdit']){				
+					$objCustomField['lbl']->Display=true;
+					$objCustomField['input']->Display=false;
+					if(($objCustomField['blnRequired'])){
+						$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+					}			
+				}		
+			}
+			
 		}
 		
 		// Save Button Click Actions

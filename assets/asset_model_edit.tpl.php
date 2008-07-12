@@ -40,18 +40,19 @@
 	<?php 
 	
 		// Build array of all fields to display
-		$arrAssetModelFields[] = array('name' => 'Short Description:', 'value' => $this->txtShortDescription->RenderWithError(false) . $this->lblShortDescription->Render(false));
-		$arrAssetModelFields[] = array('name' => 'Category:', 'value' => $this->lblCategory->Render(false) . $this->lstCategory->RenderWithError(false));
-		$arrAssetModelFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . $this->lstManufacturer->RenderWithError(false));
-		$arrAssetModelFields[] = array('name' => 'Asset Model Code:', 'value' => $this->lblAssetModelCode->Render(false) . $this->txtAssetModelCode->RenderWithError(false));
-		$arrAssetModelFields[] = array('name' => 'Long Description:', 'value' => $this->pnlLongDescription->Render(false) . $this->txtLongDescription->RenderWithError(false));
-		$arrAssetModelFields[] = array('name' => 'Image:', 'value' => $this->ifcImage->RenderWithError(false) . $this->lblImage->Render(false));
-		
+			$arrAssetModelFields[] = array('name' => 'Short Description:', 'value' => $this->txtShortDescription->RenderWithError(false) . $this->lblShortDescription->Render(false));
+			$arrAssetModelFields[] = array('name' => 'Category:', 'value' => $this->lblCategory->Render(false) . $this->lstCategory->RenderWithError(false));
+			$arrAssetModelFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . $this->lstManufacturer->RenderWithError(false));
+			$arrAssetModelFields[] = array('name' => 'Asset Model Code:', 'value' => $this->lblAssetModelCode->Render(false) . $this->txtAssetModelCode->RenderWithError(false));
+			$arrAssetModelFields[] = array('name' => 'Long Description:', 'value' => $this->pnlLongDescription->Render(false) . $this->txtLongDescription->RenderWithError(false));
+			$arrAssetModelFields[] = array('name' => 'Image:', 'value' => $this->ifcImage->RenderWithError(false) . $this->lblImage->Render(false));
 		// Custom Fields
 		if ($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as $field) {
-				$arrAssetModelFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));
-			}
+					if(!$this->blnEditMode || $field['blnView'])
+						$arrAssetFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));				
+				}
+				
 		}
 		
 		// Display Metadata fields if this is not a new contact
@@ -83,11 +84,13 @@
 							<td style="vertical-align:top;">
 								<table cellpadding="0" cellspacing="0">
 								<?php
-									for ($i=0;$i<ceil(count($arrAssetModelFields)/2);$i++) {
-										echo('<tr>');
-										echo('<td class="record_field_name">'. $arrAssetModelFields[$i]['name'] .'&nbsp;</td>');
-										echo('<td class="record_field_value">'. $arrAssetModelFields[$i]['value'] .'&nbsp;</td>');
-										echo('</tr>');
+									if(isset($arrAssetModelFields)){
+										for ($i=0;$i<ceil(count($arrAssetModelFields)/2);$i++) {
+											echo('<tr>');
+											echo('<td class="record_field_name">'. $arrAssetModelFields[$i]['name'] .'&nbsp;</td>');
+											echo('<td class="record_field_value">'. $arrAssetModelFields[$i]['value'] .'&nbsp;</td>');
+											echo('</tr>');
+										}
 									}
 								?>
 								</table>
@@ -95,11 +98,13 @@
 							<td style="vertical-align:top;">
 								<table cellpadding="0" cellspacing="0">
 								<?php
-									for ($i=ceil(count($arrAssetModelFields)/2);$i<count($arrAssetModelFields);$i++) {
-										echo('<tr>');
-										echo('<td class="record_field_name">'. $arrAssetModelFields[$i]['name'] .'&nbsp;</td>');
-										echo('<td class="record_field_value">'. $arrAssetModelFields[$i]['value'] .'&nbsp;</td>');
-										echo('</tr>');
+									if(isset($arrAssetModelFields)){
+										for ($i=ceil(count($arrAssetModelFields)/2);$i<count($arrAssetModelFields);$i++) {
+											echo('<tr>');
+											echo('<td class="record_field_name">'. $arrAssetModelFields[$i]['name'] .'&nbsp;</td>');
+											echo('<td class="record_field_value">'. $arrAssetModelFields[$i]['value'] .'&nbsp;</td>');
+											echo('</tr>');
+										}
 									}
 								?>				
 								</table>

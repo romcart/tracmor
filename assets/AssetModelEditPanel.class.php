@@ -61,6 +61,8 @@
 			// Create all custom asset model fields
 			$this->customFields_Create();
 			
+			$this->UpdateCustomFields();
+			
 			// Modify Code Generated Controls
 			$this->lstCategory->Required = true;
 			$this->lstManufacturer->Required = true;
@@ -148,6 +150,21 @@
 			
 			$this->ParentControl->RemoveChildControls(true);
 			$this->CloseSelf(true);
+		}
+		//Set display logic for the CustomFields
+		protected function UpdateCustomFields(){
+			if($this->arrCustomFields){
+				foreach ($this->arrCustomFields as $objCustomField) {	
+					//If the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+					if (!$objCustomField['blnEdit']){				
+						$objCustomField['lbl']->Display=true;
+						$objCustomField['input']->Display=false;
+						if(($objCustomField['blnRequired']))
+							$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();			
+					}		
+				}
+			}
+			
 		}
 	}
 ?>

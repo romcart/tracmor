@@ -32,7 +32,8 @@
 	// Custom Fields
 	if ($_CONTROL->arrCustomFields) {
 		foreach ($_CONTROL->arrCustomFields as $field) {
-			$arrCompanyFields[] = array('name' => $field['input']->Name.':', 'value' => $field['input']->RenderWithError(false));
+			if(!$this->blnEditMode || $field['blnView'])
+				$arrCompanyFields[] = array('name' => $field['input']->Name.':', 'value' => $field['input']->RenderWithError(false));
 		}
 	}
 	
@@ -46,7 +47,8 @@
 	
 	if ($_CONTROL->arrAddressCustomFields) {
 		foreach ($_CONTROL->arrAddressCustomFields as $field) {
-			$arrCompanyFields[] = array('name' => $field['input']->Name . ":", 'value' => $field['input']->RenderWithError(false));
+			if(!$this->blnEditMode || $field['blnView'])
+				$arrCompanyFields[] = array('name' => $field['input']->Name . ":", 'value' => $field['input']->RenderWithError(false));
 		}
 	}
 	
@@ -63,7 +65,7 @@
 		</td>
 	</tr>
 	<?php 
-		foreach ($arrCompanyFields as $arrCompanyField) {
+		if($arrCompanyFields)foreach ($arrCompanyFields as $arrCompanyField) {
 			echo '<tr>';
 			echo('<td class="record_field_name">'. $arrCompanyField['name'] .'&nbsp;</td>');
 			echo('<td class="record_field_value">'. $arrCompanyField['value'] .'&nbsp;</td>');

@@ -78,6 +78,10 @@ class QAssetEditComposite extends QControl {
 	// protected $objCustomFieldArray;
 	public $arrCustomFields;
 	
+	// Set true if the Built-in Fields have to be rendered
+	public $blnViewBuiltInFields;
+	public $blnEditBuiltInFields;
+		
 	// Dialog Box
 	protected $dlgNewAssetModel;
 	
@@ -115,6 +119,12 @@ class QAssetEditComposite extends QControl {
 		$this->dlgNewAssetModel_Create();
 		$this->UpdateAssetControls();
 
+		// Set a variable which defines whether the built-in fields must be rendered or not.
+		$this->UpdateBuiltInFields();
+		
+		// Set a variable which defines whether the GreenPlusButton of the AssetModel must be rendered or not
+		$this->UpdateAssetModelAccess();
+		
 		// Create all custom asset fields
 		$this->customFields_Create();
 		
@@ -206,13 +216,11 @@ class QAssetEditComposite extends QControl {
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this, true, true);
 		
-		foreach ($this->arrCustomFields as $objCustomField) {
-			$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
-		}
+		//Setup Custom Fields
+		$this->UpdateCustomFields();
 			
 		
 	}
-	
 	// Create the Asset Code text input
 	protected function txtAssetCode_Create() {
 		$this->txtAssetCode = new QTextBox($this);
@@ -681,6 +689,10 @@ class QAssetEditComposite extends QControl {
 		// Hide labels and display inputs where appropriate
 		$this->displayInputs();
 		
+		// Set display logic in Edit Mode
+		$this->UpdateBuiltInFields();
+		$this->UpdateCustomFields();
+		
 		// Deactivate the transaction buttons
 		$this->disableTransactionButtons();
 	}
@@ -971,8 +983,14 @@ class QAssetEditComposite extends QControl {
 		$this->atcAttach->btnUpload->Display = false;
     
     // Display Asset Code and Asset Model input for edit mode
-		$this->txtAssetCode->Display = true;
-		$this->lstAssetModel->Display = true;
+    // new: if the user is authorized to edit the built-in fields.
+		if($this->blnEditBuiltInFields){	
+			$this->txtAssetCode->Display = true;
+			$this->lstAssetModel->Display = true;
+		}else{ //in edit mode, if the user is not authorized to edit built-in fields, the fields are render as labels.
+			$this->lblAssetCode->Display = true;
+			$this->lblAssetModel->Display = true;
+		}
 		
     // Display Cancel and Save butons    
     $this->btnCancel->Display = true;
@@ -1099,6 +1117,58 @@ class QAssetEditComposite extends QControl {
 		$this->txtAssetCode->Text = $this->objAsset->AssetCode;
 		$this->arrCustomFields = CustomField::UpdateControls($this->objAsset->objCustomFieldArray, $this->arrCustomFields);
 	}
+	//Set display logic of the BuiltInFields in View Access and Edit Access 
+	protected function UpdateBuiltInFields() {
+		//Set View Display Logic of Built-In Fields  
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,1,1);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->blnViewBuiltInFields=true;
+		}
+		else{
+			$this->blnViewBuiltInFields=false;
+		}
+
+		//Set Edit Display Logic of Built-In Fields	
+		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,1,2);
+		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag){
+			$this->blnEditBuiltInFields=true;
+		}
+		else{
+			$this->blnEditBuiltInFields=false;
+		}
+		
+	}
+	
+//Set display logic for the CustomFields
+		protected function UpdateCustomFields(){
+			if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
+			//Set NextTabIndex only if the custom field is show
+				if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+					$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
+				}
+				
+				//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+				if (!$this->blnEditMode && !$objCustomField['blnEdit']){				
+					$objCustomField['lbl']->Display=true;
+					$objCustomField['input']->Display=false;
+					if(($objCustomField['blnRequired'])){
+						$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+					}			
+				}
+			}
+		}
+	//Set display logic of the GreenPlusButton of AssetModel
+	protected function UpdateAssetModelAccess() {
+		//checks if the entity 4 (AssetModel) has edit authorization
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::AssetModel,2);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->lblNewAssetModel->Visible=true;
+		}
+		else{
+			$this->lblNewAssetModel->Visible=false;
+		}
+	}
+	
 
   // And our public getter/setters
   public function __get($strName) {

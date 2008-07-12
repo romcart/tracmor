@@ -105,6 +105,11 @@
 		// Custom Field Objects
 		public $arrCustomFields;	
 		
+			// Set true if the Built-in Fields has to be rendered
+		public $blnViewBuiltInFields;
+		public $blnEditBuiltInFields;
+		
+		
 		// Dialog
 		protected $dlgNew;
 		
@@ -112,7 +117,7 @@
 			
 			// Call Setup Receipt to either load existing or create new receipt
 			$this->SetupReceipt();
-			
+						
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
@@ -162,6 +167,14 @@
 			
 			// Create all custom asset fields
 			$this->customFields_Create();
+			
+			//Set display logic of Built-In Fields
+			$this->UpdateBuiltInFields();
+			
+			// Set display logic of certain Entities
+			$this->UpdateAddressAccess();
+			$this->UpdateCompanyAccess();
+			$this->UpdateContactAccess();
 			
 			// Create the datagrids
 			$this->dtgAssetTransact_Create();
@@ -654,12 +667,9 @@
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			if ($this->objReceipt->objCustomFieldArray) {
 				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-				if ($this->arrCustomFields) {
-					foreach ($this->arrCustomFields as $field) {
-						//$field['input']->TabIndex = $this->intTabIndex++;
-					}
-				}
+				
 			}
+			$this->UpdateCustomFields();
 			
 		}
 		
@@ -1108,6 +1118,10 @@
 		// Edit an existing receipt by displaying inputs and hiding the labels
 		protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 			$this->DisplayInputs();
+			
+			$this->UpdateBuiltInFields();
+			$this->UpdateCustomFields();
+			
 		}
 		
 		// This triggers any time the Asset Type Radio Button List is changed (not clicked)
@@ -2294,8 +2308,7 @@
 			}
 			$this->txtNote->Display = true;
 			$this->calDueDate->Display = true;
-			$this->btnSave->Display = true;
-			$this->btnCancel->Display = true;
+			
 			if (!$this->objReceipt->ReceivedFlag) {
 				$this->rblAssetType->SelectedIndex = 0;
 				$this->rblAssetType->Display = true;
@@ -2318,6 +2331,15 @@
 			$this->lblNewToContact->Display = true;
 			$this->lblNewToAddress->Display = true;
 			
+			
+			//If the user is not authorized to edit built-in fields, the fields are render as labels.
+			if(!$this->blnEditBuiltInFields){
+				$this->DisplayLabels();
+			}
+				
+			$this->btnSave->Display = true;
+			$this->btnCancel->Display = true;
+			
 			// Display custom field inputs
 	    if ($this->arrCustomFields) {
 	    	CustomField::DisplayInputs($this->arrCustomFields);
@@ -2333,6 +2355,83 @@
 			$this->lstFromCompany_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
+		
+	//Set display logic of the BuiltInFields in View Access and Edit Access 
+		protected function UpdateBuiltInFields() {
+		//Set View Display Logic of Built-In Fields  
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Receipt,1);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->blnViewBuiltInFields=true;
+		}
+		else{
+			$this->blnViewBuiltInFields=false;
+		}
+
+		//Set Edit Display Logic of Built-In Fields	
+		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Receipt,2);
+		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag){
+			$this->blnEditBuiltInFields=true;
+		}
+		else{
+			$this->blnEditBuiltInFields=false;
+		}
+
+		
+		}
+		//Set display logic for the CustomFields
+		protected function UpdateCustomFields(){
+			if($this->arrCustomFields){
+				foreach ($this->arrCustomFields as $objCustomField) {	
+					//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+					if (!$this->blnEditMode && !$objCustomField['blnEdit']){				
+						$objCustomField['lbl']->Display=true;
+						$objCustomField['input']->Display=false;
+						if(($objCustomField['blnRequired'])){
+							$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+						}			
+					}		
+				}
+			}
+			
+		}
+			//Set display logic of the GreenPlusButton of Company
+	protected function UpdateCompanyAccess() {
+		//checks if the entity  has edit authorization
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Company,2);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->lblNewFromCompany->Visible=true;
+		}
+		else{
+			$this->lblNewFromCompany->Visible=false;
+		}
+			
+	}
+		//Set display logic of the GreenPlusButton of Contact
+	protected function UpdateContactAccess() {
+		//checks if the entity  has edit authorization
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Contact,2);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->lblNewFromContact->Visible=true;
+			$this->lblNewToContact->Visible=true;
+		}
+		else{
+			$this->lblNewFromContact->Visible=false;
+			$this->lblNewToContact->Visible=false;
+		}
+			
+	}
+	//Set display logic of the GreenPlusButton of Address
+	protected function UpdateAddressAccess() {
+		//checks if the entity 4 (AssetModel) has edit authorization
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->lblNewToAddress->Visible=true;
+		}
+		else{
+			$this->lblNewToAddress->Visible=false;
+		}
+	}
+		
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using

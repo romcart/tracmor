@@ -38,7 +38,9 @@
 	class CustomField extends CustomFieldGen {
 		
 		public $CustomFieldSelection;
-		
+		//
+		public $objRoleAuthView;
+		public $objRoleAuthEdit;
 		/**
 		 * Default "to string" handler
 		 * Allows pages to _p()/echo()/print() this object, and to define the default
@@ -262,6 +264,18 @@
 					$objCustomField->LoadExpandedArrayByEntity($intEntityQtypeId, $intEntityId);
 				}
 			}
+			
+			if($objCustomFieldArray)foreach ($objCustomFieldArray as $objCustomField) {
+				$objEntityQtypeCustomField=EntityQtypeCustomField::LoadByEntityQtypeIdCustomFieldId($intEntityQtypeId,$objCustomField->CustomFieldId);
+				if($objEntityQtypeCustomField){					
+					$objRoleEntityQtypeCustomFieldAuthorization=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(QApplication::$objUserAccount->RoleId,$objEntityQtypeCustomField->EntityQtypeCustomFieldId,1);
+					if($objRoleEntityQtypeCustomFieldAuthorization)
+						$objCustomField->objRoleAuthView=$objRoleEntityQtypeCustomFieldAuthorization;
+					$objRoleEntityQtypeCustomFieldAuthorization2=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(QApplication::$objUserAccount->RoleId,$objEntityQtypeCustomField->EntityQtypeCustomFieldId,2);
+					if($objRoleEntityQtypeCustomFieldAuthorization2)
+						$objCustomField->objRoleAuthEdit=$objRoleEntityQtypeCustomFieldAuthorization2;
+				}				
+			}
 			return $objCustomFieldArray;
 		}
 		
@@ -419,6 +433,32 @@
  				if ($blnEditMode && $objCustomFieldArray[$i]->CustomFieldSelection) {
  					$arrCustomFields[$i]['CustomFieldSelectionId'] = $objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldSelectionId;
  				}
+			
+ 				
+ 				//Set an RoleEntityQtypeCustomFieldAuthorization object of View Authorization and for Edit Authorization for each custom field
+ 				$arrCustomFields[$i]['ViewAuth']=$objCustomFieldArray[$i]->objRoleAuthView;
+ 				$arrCustomFields[$i]['EditAuth']=$objCustomFieldArray[$i]->objRoleAuthEdit;
+ 				
+ 				// Set all reference booleans for display logic
+ 				
+ 				//set if the custom field must show or not
+ 				if($objCustomFieldArray[$i]->objRoleAuthView->AuthorizedFlag)
+ 					$arrCustomFields[$i]['blnView']=true;
+ 				else
+ 					$arrCustomFields[$i]['blnView']=false;
+ 				
+ 				// set if the custom field is editable or not 
+ 				if($objCustomFieldArray[$i]->objRoleAuthEdit->AuthorizedFlag)
+ 					$arrCustomFields[$i]['blnEdit']=true;
+ 				else
+ 					$arrCustomFields[$i]['blnEdit']=false;
+ 					
+ 				//set if the custom field is requiered or not
+ 				if($objCustomFieldArray[$i]->objRoleAuthEdit->EntityQtypeCustomField->CustomField->RequiredFlag)
+					$arrCustomFields[$i]['blnRequired']=true;	 					
+ 				else
+ 					$arrCustomFields[$i]['blnRequired']=false;
+ 			
 			}
 			
 			return $arrCustomFields;
@@ -529,14 +569,16 @@
 		
 		/**
 		 * Displays inputs and hides labels for an array of custom field controls
-		 *
+		 * only if the user is authorized to edit the custom field
 		 * @param array $arrCustomFields of QControls
 		 */
-		public static function DisplayInputs($arrCustomFields) {
+		public static function DisplayInputs($arrCustomFields,$blnEditMode=true) {
 			if ($arrCustomFields) {
 				foreach ($arrCustomFields as $field) {
-					$field['input']->Display = true;
-					$field['lbl']->Display = false;
+					if(($field['EditAuth'] && $field['EditAuth']->AuthorizedFlag)){
+						$field['input']->Display = true;
+						$field['lbl']->Display = false;	
+					}		
 				}
 			}
 		}

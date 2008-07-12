@@ -21,6 +21,7 @@
 
 	include('../includes/header.inc.php');
 	$this->RenderBegin();
+	
 ?>
 <!-- Begin Header Menu -->
 <?php 
@@ -91,13 +92,27 @@
 							<td class="role_table_cell"><?php $this->arrControls['assets']['view']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['assets']['edit']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['assets']['delete']->RenderWithName(); ?></td>
-						</tr>						
+							<td><?php $this->lblAssetsAdvanced->Render(); ?></td>
+						</tr>
+						<tr>
+			  				<td style="role_table_cell" colspan="5" nowrap>
+							<?php $this->pnlAssets->Render();?>
+							<?php $this->pnlAssetModel->Render();?>
+							</td>
+						</tr>										
 						<tr>
 							<td class="role_table_left">Inventory</td>
 							<td class="role_table_cell"><?php $this->arrControls['inventory']['access']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['inventory']['view']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['inventory']['edit']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['inventory']['delete']->RenderWithName(); ?></td>
+							<td><?php $this->lblInventoryAdvanced->Render(); ?></td>
+						</tr>
+						
+						<tr>
+			  				<td style="vertical-align:top;" colspan="5" nowrap>
+							<?php $this->pnlInventory->Render();?>
+							</td>
 						</tr>
 						<tr>
 							<td class="role_table_left">Contacts</td>
@@ -105,6 +120,14 @@
 							<td class="role_table_cell"><?php $this->arrControls['contacts']['view']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['contacts']['edit']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['contacts']['delete']->RenderWithName(); ?></td>
+							<td><?php $this->lblContactsAdvanced->Render(); ?></td>
+						</tr>
+						<tr>
+			  				<td style="role_table_cell" colspan="5" nowrap>
+							<?php $this->pnlContact->Render();?>
+							<?php $this->pnlCompany->Render();?>
+							<?php $this->pnlAddress->Render();?>
+							</td>
 						</tr>
 						<tr>
 							<td class="role_table_left">Shipping</td>
@@ -112,6 +135,12 @@
 							<td class="role_table_cell"><?php $this->arrControls['shipping']['view']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['shipping']['edit']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['shipping']['delete']->RenderWithName(); ?></td>
+							<td><?php $this->lblShippingAdvanced->Render(); ?></td>
+						</tr>
+						<tr>
+			  				<td style="role_table_cell" colspan="5" nowrap>
+							<?php $this->pnlShipping->Render();?>
+							</td>
 						</tr>
 						<tr>
 							<td class="role_table_left">Receiving</td>
@@ -119,6 +148,12 @@
 							<td class="role_table_cell"><?php $this->arrControls['receiving']['view']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['receiving']['edit']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['receiving']['delete']->RenderWithName(); ?></td>
+							<td><?php $this->lblReceivingAdvanced->Render(); ?></td>
+						</tr>
+						<tr>
+			  				<td style="role_table_cell" colspan="5" nowrap>
+							<?php $this->pnlReceiving->Render();?>
+							</td>
 						</tr>
 						<tr>
 							<td class="role_table_left">Reports</td>

@@ -33,7 +33,9 @@
 	// Custom Fields
 	if ($_CONTROL->arrCustomFields) {
 		foreach ($_CONTROL->arrCustomFields as $field) {
-			$arrAssetModelFields[] = array('name' => $field['input']->Name.':', 'value' => $field['input']->RenderWithError(false));
+			if(!$this->blnEditMode || $field['blnView']){
+				$arrAssetModelFields[] = array('name' => $field['input']->Name.':', 'value' => $field['input']->RenderWithError(false));
+			}
 		}
 	}
 	

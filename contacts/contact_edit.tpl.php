@@ -41,21 +41,23 @@
 	<?php 
 	
 		// Build array of all fields to display
-		$arrContactFields[] = array('name' => 'Company:', 'value' => $this->lblCompany->Render(false) . $this->lstCompany->RenderWithError(false) . '&nbsp;' . $this->lblNewCompany->Render(false));
-		$arrContactFields[] = array('name' => 'First Name:', 'value' => $this->lblFirstName->Render(false) . $this->txtFirstName->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Last Name:', 'value' => $this->lblLastName->Render(false) . $this->txtLastName->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Title:', 'value' => $this->lblTitle->Render(false) . $this->txtTitle->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Email:', 'value' => $this->lblEmail->Render(false) . $this->txtEmail->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Description:', 'value' => $this->pnlDescription->Render(false) . $this->txtDescription->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Office Phone:', 'value' => $this->lblPhoneOffice->Render(false) . $this->txtPhoneOffice->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Home Phone:', 'value' => $this->lblPhoneHome->Render(false) . $this->txtPhoneHome->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Mobile Phone:', 'value' => $this->lblPhoneMobile->Render(false) . $this->txtPhoneMobile->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Fax:', 'value' => $this->lblFax->Render(false) . $this->txtFax->RenderWithError(false));
-		$arrContactFields[] = array('name' => 'Address:', 'value' => $this->lblAddress->Render(false) . $this->lstAddress->RenderWithError(false) . '&nbsp;' . $this->lblNewAddress->RenderWithError(false));
-		
+			$arrContactFields[] = array('name' => 'Company:', 'value' => $this->lblCompany->Render(false) . $this->lstCompany->RenderWithError(false) . '&nbsp;' . $this->lblNewCompany->Render(false));
+			$arrContactFields[] = array('name' => 'First Name:', 'value' => $this->lblFirstName->Render(false) . $this->txtFirstName->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Last Name:', 'value' => $this->lblLastName->Render(false) . $this->txtLastName->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Title:', 'value' => $this->lblTitle->Render(false) . $this->txtTitle->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Email:', 'value' => $this->lblEmail->Render(false) . $this->txtEmail->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Description:', 'value' => $this->pnlDescription->Render(false) . $this->txtDescription->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Office Phone:', 'value' => $this->lblPhoneOffice->Render(false) . $this->txtPhoneOffice->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Home Phone:', 'value' => $this->lblPhoneHome->Render(false) . $this->txtPhoneHome->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Mobile Phone:', 'value' => $this->lblPhoneMobile->Render(false) . $this->txtPhoneMobile->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Fax:', 'value' => $this->lblFax->Render(false) . $this->txtFax->RenderWithError(false));
+			$arrContactFields[] = array('name' => 'Address:', 'value' => $this->lblAddress->Render(false) . $this->lstAddress->RenderWithError(false) . '&nbsp;' . $this->lblNewAddress->RenderWithError(false));
+		 
 		if ($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as $field) {
-				$arrContactFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+				if(!$this->blnEditMode || $field['blnView']){
+					$arrContactFields[] = array('name' => $field['lbl']->Name . ":", 'value' => $field['lbl']->RenderWithError(false) . $field['input']->RenderWithError(false));
+				}
 			}
 		}		
 	
@@ -87,11 +89,13 @@
 							<td style="vertical-align:top;">
 								<table cellpadding="0" cellspacing="0">
 								<?php
-									for ($i=0;$i<ceil(count($arrContactFields)/2);$i++) {
-										echo('<tr>');
-										echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'</td>');
-										echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'</td>');
-										echo('</tr>');
+									if(isset($arrContactFields)){
+										for ($i=0;$i<ceil(count($arrContactFields)/2);$i++) {
+											echo('<tr>');
+											echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'</td>');
+											echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'</td>');
+											echo('</tr>');
+										}
 									}
 								?>
 								</table>
@@ -99,11 +103,13 @@
 							<td style="vertical-align:top;">
 								<table cellpadding="0" cellspacing="0">
 								<?php
-									for ($i=ceil(count($arrContactFields)/2);$i<count($arrContactFields);$i++) {
-										echo('<tr>');
-										echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'</td>');
-										echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'</td>');
-										echo('</tr>');
+									if(isset($arrContactFields)){
+										for ($i=ceil(count($arrContactFields)/2);$i<count($arrContactFields);$i++) {
+											echo('<tr>');
+											echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'</td>');
+											echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'</td>');
+											echo('</tr>');
+										}
 									}
 								?>				
 								</table>

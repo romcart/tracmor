@@ -68,6 +68,10 @@
 		// Tab Index
 		protected $intTabIndex;
 		
+		// Set true if the Built-in Fields of Address has to be rendered
+		public $blnViewBuiltInFields;
+		public $blnEditBuiltInFields;
+		
 		protected function Form_Create() {
 			
 			$this->intTabIndex = 1;
@@ -110,7 +114,10 @@
 			$this->UpdateAddressControls();
 			
 			// Create all custom contact fields
-			$this->customFields_Create();		
+			$this->customFields_Create();	
+			
+			$this->UpdateBuiltInFields();
+			
 
 			// Create/Setup Button Action controls
 			$this->btnEdit_Create();
@@ -296,12 +303,8 @@
 			if ($this->objAddress->objCustomFieldArray) {
 				// Create the Custom Field Controls - labels and inputs (text or list) for each
 				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAddress->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-				if ($this->arrCustomFields) {
-					foreach ($this->arrCustomFields as $field) {
-						$field['input']->TabIndex = $this->intTabIndex++;
-					}
-				}
 			}
+			$this->UpdateCustomFields();
 		}				
 		
 		// Setup Edit Button
@@ -550,6 +553,7 @@
 			$this->lblCountry->Display = true;
 			$this->lblPostalCode->Display = true;
 			
+			
 			// Display custom field labels
 			if ($this->arrCustomFields) {
 				CustomField::DisplayLabels($this->arrCustomFields);
@@ -587,6 +591,12 @@
 			$this->lstCountry->Display = true;
 			$this->txtPostalCode->Display = true;
 			
+			//If the user is not authorized to edit built-in fields, the fields are render as labels.
+			if(!$this->blnEditBuiltInFields){
+				$this->DisplayLabels();
+			}
+	
+			
 			// Display custom field inputs
 	    if ($this->arrCustomFields) {
 	    	CustomField::DisplayInputs($this->arrCustomFields);
@@ -595,7 +605,46 @@
 			// Display Cancel and Save buttons
 			$this->btnCancel->Display = true;
 			$this->btnSave->Display = true;		
-		}				
+		}	
+		//Set display logic of the BuiltInFields in View Access and Edit Access 
+		protected function UpdateBuiltInFields() {
+		//Set View Display Logic of Built-In Fields  
+		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,1);
+		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			$this->blnViewBuiltInFields=true;
+		}
+		else{
+			$this->blnViewBuiltInFields=false;
+		}
+
+		//Set Edit Display Logic of Built-In Fields	
+		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
+		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag){
+			$this->blnEditBuiltInFields=true;
+		}
+		else{
+			$this->blnEditBuiltInFields=false;
+		}
+		}
+		//Set display logic for the CustomFields
+		protected function UpdateCustomFields(){
+			if($this->arrCustomFields){
+				foreach ($this->arrCustomFields as $objCustomField) {
+				//Set NextTabIndex only if the custom field is show
+					if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+						$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
+					}
+					//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+					if (!$this->blnEditMode && !$objCustomField['blnEdit']){				
+						$objCustomField['lbl']->Display=true;
+						$objCustomField['input']->Display=false;
+						if(($objCustomField['blnRequired'])){
+							$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+						}			
+					}			
+				}
+			}
+		}					
 	}
 	AddressEditForm::Run('AddressEditForm', __DOCROOT__ . __SUBDIRECTORY__ . '/contacts/address_edit.tpl.php');
 ?>
