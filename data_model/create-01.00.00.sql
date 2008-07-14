@@ -1,9 +1,3 @@
-DROP DATABASE IF EXISTS tracmor;
-
-CREATE DATABASE tracmor;
-
-USE tracmor;
-
 CREATE TABLE category (
   category_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   short_description VARCHAR(255)   NOT NULL,
