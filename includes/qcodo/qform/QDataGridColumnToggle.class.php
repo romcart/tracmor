@@ -208,9 +208,6 @@
 	          if ($objColumn->HtmlEntities)
 	            $strHtml = QApplication::HtmlEntities($strHtml);
 	          
-	          // For IE
-	          if (QApplication::IsBrowser(QBrowserType::InternetExplorer) && ($strHtml == ''))
-	          	$strHtml = '&nbsp;';
 	          $strHtml = str_replace('"', "'", $strHtml);
 	          //$strHtml = $this->StripControls($strHtml);
 	          $strHtml = strip_tags($strHtml);
