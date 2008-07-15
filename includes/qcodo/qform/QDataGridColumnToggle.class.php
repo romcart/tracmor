@@ -122,18 +122,6 @@
 			
 			$this->objForm->RenderCsvBegin(false);
 			
-			$this->objParentControl->PageNumber = 1;
-			$this->objParentControl->ItemsPerPage = 2147483647;
-			$this->objParentControl->DataBind();
-			
-			if ($this->objParentControl->DataSource) {
-				foreach ($this->objParentControl->DataSource as $objObject) {
-					$arrRows[] = $this->PrintCsvRow($objObject);
-				}
-			}
-			
-			ob_end_clean();
-			
 			session_cache_limiter('must-revalidate');    // force a "no cache" effect
       header("Pragma: hack"); // IE chokes on "no cache", so set to something, anything, else.
       $ExpStr = "Expires: " . gmdate("D, d M Y H:i:s", time()) . " GMT";
@@ -141,11 +129,23 @@
 			header('Content-Type: text/csv');
 			header('Content-Disposition: csv; filename=export.csv');
 			
-			$this->PrintCsvHeader();
+			for ($i=1; $i <= ($this->objParentControl->TotalItemCount); $i++) {
 			
-			if ($arrRows) {
-				foreach ($arrRows as $strRow) {
-					print $strRow;
+				$this->objParentControl->PageNumber = $i;
+				$this->objParentControl->ItemsPerPage = 1;
+				$this->objParentControl->DataBind();
+				
+				if ($i==1) {
+					ob_end_clean();
+					$this->PrintCsvHeader();
+				}
+				
+				if ($this->objParentControl->DataSource) {
+					foreach ($this->objParentControl->DataSource as $objObject) {
+						$this->PrintCsvRow($objObject);
+						@ob_flush();
+						flush();
+					}
 				}
 			}
 			
