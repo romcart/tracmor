@@ -55,7 +55,7 @@
 			</tr>
 			<tr>
 				<td>
-				  <table>
+					<table>
 						<tr>
 							<td class="record_field_name">Role Name: </td>
 							<td class="record_field_edit"><?php $this->txtShortDescription->RenderWithError(); ?></td>
@@ -69,7 +69,6 @@
 			</tr>
 			<tr>
 				<td>
-				  <div class="title">&nbsp;Module Permissions</div>
 					<table>
 						<tr>
 							<th></th>
@@ -162,30 +161,6 @@
 							<td class="role_table_cell"><?php $this->arrControls['reports']['view']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['reports']['edit']->RenderWithName(); ?></td>
 							<td class="role_table_cell"><?php $this->arrControls['reports']['delete']->RenderWithName(); ?></td>
-						</tr>
-					</table>
-					<br/>
-					<div class="title">&nbsp;Transaction Permissions</div>
-					<table>
-            <tr>
-							<td class="role_table_left">Move</td>
-							<td class="role_table_cell"><?php $this->arrControls['move']->RenderWithName(); ?></td>
-						</tr>
-						<tr>
-							<td class="role_table_left">Check In/Out</td>
-							<td class="role_table_cell"><?php $this->arrControls['check_in_out']->RenderWithName(); ?></td>
-						</tr>
-						<tr>
-							<td class="role_table_left">Reserve/Unreserve</td>
-							<td class="role_table_cell"><?php $this->arrControls['reserve_unreserve']->RenderWithName(); ?></td>
-						</tr>
-						<tr>
-							<td class="role_table_left">Take Out</td>
-							<td class="role_table_cell"><?php $this->arrControls['take_out']->RenderWithName(); ?></td>
-						</tr>
-						<tr>
-							<td class="role_table_left">Restock</td>
-							<td class="role_table_cell"><?php $this->arrControls['restock']->RenderWithName(); ?></td>
 						</tr>
 					</table>
 				</td>
