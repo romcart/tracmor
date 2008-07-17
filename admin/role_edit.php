@@ -245,6 +245,170 @@ class RoleEditForm extends RoleEditFormBase {
 			$arrExplode = explode("-", $strControlIdModuleId);
 			$this->lstEdit_Change($this->FormId, $arrExplode[0], $arrExplode[1]);
 		}
+		// Create control for Move
+		$objControl = new QListBox($this);
+		$objControl->Width = 100;
+		$objAllItem = new QListItem('All', 1);
+		$objOwnerItem = new QListItem('Owner', 2);
+		$objNoneItem = new QListItem('None', 3);
+		$objControl->ActionParameter = 1;
+		if ($this->blnEditMode) {
+  		$objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::RoleTransactionTypeAuthorization()->RoleId, $this->objRole->RoleId), QQ::Equal(QQN::RoleTransactionTypeAuthorization()->TransactionTypeId, 1)));
+  		if ($objRoleTransactionTypeAuthorization) {
+  		  // Select the Proper Authorization Level
+  			if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 1) {
+  				$objAllItem->Selected = true;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = true;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = true;
+  			}
+  		}
+		}
+		$objControl->AddItem($objAllItem);
+		$objControl->AddItem($objOwnerItem);
+		$objControl->AddItem($objNoneItem);				
+		$this->arrControls['move'] = $objControl;
+		
+		// Create control for Check In/Out
+		$objControl = new QListBox($this);
+		$objControl->Width = 100;
+		$objAllItem = new QListItem('All', 1);
+		$objOwnerItem = new QListItem('Owner', 2);
+		$objNoneItem = new QListItem('None', 3);
+		$objControl->ActionParameter = 2;
+		if ($this->blnEditMode) {
+  		$objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::RoleTransactionTypeAuthorization()->RoleId, $this->objRole->RoleId), QQ::Equal(QQN::RoleTransactionTypeAuthorization()->TransactionTypeId, 2)));
+  		if ($objRoleTransactionTypeAuthorization) {
+  		  // Select the Proper Authorization Level
+  			if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 1) {
+  				$objAllItem->Selected = true;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = true;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = true;
+  			}
+  		}
+		}
+		$objControl->AddItem($objAllItem);
+		$objControl->AddItem($objOwnerItem);
+		$objControl->AddItem($objNoneItem);				
+		$this->arrControls['check_in_out'] = $objControl;
+		
+		// Create control for Reserve/Unreserve
+		$objControl = new QListBox($this);
+		$objControl->Width = 100;
+		$objAllItem = new QListItem('All', 1);
+		$objOwnerItem = new QListItem('Owner', 2);
+		$objNoneItem = new QListItem('None', 3);
+		$objControl->ActionParameter = 3;
+		if ($this->blnEditMode) {
+  		$objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::RoleTransactionTypeAuthorization()->RoleId, $this->objRole->RoleId), QQ::Equal(QQN::RoleTransactionTypeAuthorization()->TransactionTypeId, 8)));
+  		if ($objRoleTransactionTypeAuthorization) {
+  		  // Select the Proper Authorization Level
+  			if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 1) {
+  				$objAllItem->Selected = true;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = true;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = true;
+  			}
+  		}
+		}
+		$objControl->AddItem($objAllItem);
+		$objControl->AddItem($objOwnerItem);
+		$objControl->AddItem($objNoneItem);				
+		$this->arrControls['reserve_unreserve'] = $objControl;
+		
+		// Create control for Take Out
+		$objControl = new QListBox($this);
+		$objControl->Width = 100;
+		$objAllItem = new QListItem('All', 1);
+		$objOwnerItem = new QListItem('Owner', 2);
+		$objNoneItem = new QListItem('None', 3);
+		$objControl->ActionParameter = 4;
+		if ($this->blnEditMode) {
+  		$objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::RoleTransactionTypeAuthorization()->RoleId, $this->objRole->RoleId), QQ::Equal(QQN::RoleTransactionTypeAuthorization()->TransactionTypeId, 5)));
+  		if ($objRoleTransactionTypeAuthorization) {
+  		  // Select the Proper Authorization Level
+  			if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 1) {
+  				$objAllItem->Selected = true;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = true;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = true;
+  			}
+  		}
+		}
+		$objControl->AddItem($objAllItem);
+		$objControl->AddItem($objOwnerItem);
+		$objControl->AddItem($objNoneItem);				
+		$this->arrControls['take_out'] = $objControl;
+		
+		// Create control for Restock
+		$objControl = new QListBox($this);
+		$objControl->Width = 100;
+		$objAllItem = new QListItem('All', 1);
+		$objOwnerItem = new QListItem('Owner', 2);
+		$objNoneItem = new QListItem('None', 3);
+		$objControl->ActionParameter = 5;
+		if ($this->blnEditMode) {
+  		$objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::RoleTransactionTypeAuthorization()->RoleId, $this->objRole->RoleId), QQ::Equal(QQN::RoleTransactionTypeAuthorization()->TransactionTypeId, 4)));
+  		if ($objRoleTransactionTypeAuthorization) {
+  		  // Select the Proper Authorization Level
+  			if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 1) {
+  				$objAllItem->Selected = true;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = true;
+  				$objNoneItem->Selected = false;
+  			}
+  			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+  				$objAllItem->Selected = false;
+  				$objOwnerItem->Selected = false;
+  				$objNoneItem->Selected = true;
+  			}
+  		}
+		}
+		$objControl->AddItem($objAllItem);
+		$objControl->AddItem($objOwnerItem);
+		$objControl->AddItem($objNoneItem);				
+		$this->arrControls['restock'] = $objControl;
 	}
 	protected function lblHeaderRole_Create() {
 		$this->lblHeaderRole = new QLabel($this);
@@ -812,7 +976,6 @@ protected function pnlAssets_Create($intModule){
 				}
 			}
 		}
-			
 		// If creating a new Role, manually give access to the Home module
 		if (!$this->blnEditMode) {
 			$objRoleModule = new RoleModule();
@@ -820,7 +983,50 @@ protected function pnlAssets_Create($intModule){
 			$objRoleModule->RoleId = $this->objRole->RoleId;
 			$objRoleModule->AccessFlag = true;
 			$objRoleModule->Save();
-
+      
+			// Create a new RoleTransactionTypeAuthorization
+			// Move
+			$objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+			$objRoleTransactionTypeAuthorization->TransactionTypeId = 1;
+			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['move']->SelectedValue;
+		  $objRoleTransactionTypeAuthorization->Save();
+		  // Check In
+		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+			$objRoleTransactionTypeAuthorization->TransactionTypeId = 2;
+			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['check_in_out']->SelectedValue;
+		  $objRoleTransactionTypeAuthorization->Save();
+		  // Check Out
+		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+			$objRoleTransactionTypeAuthorization->TransactionTypeId = 3;
+			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['check_in_out']->SelectedValue;
+		  $objRoleTransactionTypeAuthorization->Save();
+		  // Reserve
+		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+			$objRoleTransactionTypeAuthorization->TransactionTypeId = 8;
+			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['reserve_unreserve']->SelectedValue;
+		  $objRoleTransactionTypeAuthorization->Save();
+		  // Unreserve
+		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+			$objRoleTransactionTypeAuthorization->TransactionTypeId = 9;
+			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['reserve_unreserve']->SelectedValue;
+		  $objRoleTransactionTypeAuthorization->Save();
+		  // Take Out
+		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+			$objRoleTransactionTypeAuthorization->TransactionTypeId = 5;
+			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['take_out']->SelectedValue;
+		  $objRoleTransactionTypeAuthorization->Save();
+		  // Restock
+		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+			$objRoleTransactionTypeAuthorization->TransactionTypeId = 4;
+			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['restock']->SelectedValue;
+		  $objRoleTransactionTypeAuthorization->Save();
 			/*
 				// Give view, edit, and delete access for ALL for the home module
 				if ($this->objAuthorizationArray) {
@@ -833,6 +1039,74 @@ protected function pnlAssets_Create($intModule){
 				}
 				}
 				*/
+		}
+		else {
+		  $objRoleTransactionTypeAuthorizationArray = RoleTransactionTypeAuthorization::LoadArrayByRoleId($this->objRole->RoleId);
+		  if ($objRoleTransactionTypeAuthorizationArray) {
+		    foreach ($objRoleTransactionTypeAuthorizationArray as $objRoleTransactionTypeAuthorization) {
+		      if ($objRoleTransactionTypeAuthorization->TransactionTypeId == 1) {
+		        $objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['move']->SelectedValue;
+		      }
+		      elseif ($objRoleTransactionTypeAuthorization->TransactionTypeId == 2 || $objRoleTransactionTypeAuthorization->TransactionTypeId == 3) {
+		        $objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['check_in_out']->SelectedValue;
+		      }
+		      elseif ($objRoleTransactionTypeAuthorization->TransactionTypeId == 8 || $objRoleTransactionTypeAuthorization->TransactionTypeId == 9) {
+		        $objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['reserve_unreserve']->SelectedValue;
+		      }
+ 		      elseif ($objRoleTransactionTypeAuthorization->TransactionTypeId == 5) {
+ 		        $objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['take_out']->SelectedValue;
+ 		      }
+          elseif ($objRoleTransactionTypeAuthorization->TransactionTypeId == 4) {
+ 		        $objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['restock']->SelectedValue;
+ 		      }
+ 		      $objRoleTransactionTypeAuthorization->Save();
+		    }
+		  }
+		  else {
+		    // Create a new RoleTransactionTypeAuthorization
+  			// Move
+  			$objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+  			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+  			$objRoleTransactionTypeAuthorization->TransactionTypeId = 1;
+  			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['move']->SelectedValue;
+  		  $objRoleTransactionTypeAuthorization->Save();
+  		  // Check In
+  		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+  			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+  			$objRoleTransactionTypeAuthorization->TransactionTypeId = 2;
+  			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['check_in_out']->SelectedValue;
+  		  $objRoleTransactionTypeAuthorization->Save();
+  		  // Check Out
+  		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+  			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+  			$objRoleTransactionTypeAuthorization->TransactionTypeId = 3;
+  			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['check_in_out']->SelectedValue;
+  		  $objRoleTransactionTypeAuthorization->Save();
+  		  // Reserve
+  		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+  			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+  			$objRoleTransactionTypeAuthorization->TransactionTypeId = 8;
+  			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['reserve_unreserve']->SelectedValue;
+  		  $objRoleTransactionTypeAuthorization->Save();
+  		  // Unreserve
+  		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+  			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+  			$objRoleTransactionTypeAuthorization->TransactionTypeId = 9;
+  			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['reserve_unreserve']->SelectedValue;
+  		  $objRoleTransactionTypeAuthorization->Save();
+  		  // Take Out
+  		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+  			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+  			$objRoleTransactionTypeAuthorization->TransactionTypeId = 5;
+  			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['take_out']->SelectedValue;
+  		  $objRoleTransactionTypeAuthorization->Save();
+  		  // Restock
+  		  $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+  			$objRoleTransactionTypeAuthorization->RoleId = $this->objRole->RoleId;
+  			$objRoleTransactionTypeAuthorization->TransactionTypeId = 4;
+  			$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->arrControls['restock']->SelectedValue;
+  		  $objRoleTransactionTypeAuthorization->Save();
+		  }
 		}
 		/*
 			// Delete all RoleModules - this will cascade to all RoleModuleAuthorizations also
