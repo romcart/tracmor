@@ -304,6 +304,7 @@
 				// Create the Custom Field Controls - labels and inputs (text or list) for each
 				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAddress->objCustomFieldArray, $this->blnEditMode, $this, true, true);
 			}
+			
 			$this->UpdateCustomFields();
 		}				
 		
@@ -608,30 +609,30 @@
 		}	
 		//Set display logic of the BuiltInFields in View Access and Edit Access 
 		protected function UpdateBuiltInFields() {
-		//Set View Display Logic of Built-In Fields  
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,1);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
-			$this->blnViewBuiltInFields=true;
-		}
-		else{
-			$this->blnViewBuiltInFields=false;
-		}
-
-		//Set Edit Display Logic of Built-In Fields	
-		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
-		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag){
-			$this->blnEditBuiltInFields=true;
-		}
-		else{
-			$this->blnEditBuiltInFields=false;
-		}
+			//Set View Display Logic of Built-In Fields  
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,1);
+			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+				$this->blnViewBuiltInFields=true;
+			}
+			else{
+				$this->blnViewBuiltInFields=false;
+			}
+	
+			//Set Edit Display Logic of Built-In Fields	
+			$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
+			if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag){
+				$this->blnEditBuiltInFields=true;
+			}
+			else{
+				$this->blnEditBuiltInFields=false;
+			}
 		}
 		//Set display logic for the CustomFields
 		protected function UpdateCustomFields(){
 			if($this->arrCustomFields){
 				foreach ($this->arrCustomFields as $objCustomField) {
-				//Set NextTabIndex only if the custom field is show
-					if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+					//Set NextTabIndex only if the custom field is show
+					if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 						$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 					}
 					//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
@@ -644,7 +645,11 @@
 					}			
 				}
 			}
-		}					
+		}
+		
+		protected function getNextTabIndex() {
+			return $this->intTabIndex++;
+		}
 	}
 	AddressEditForm::Run('AddressEditForm', __DOCROOT__ . __SUBDIRECTORY__ . '/contacts/address_edit.tpl.php');
 ?>

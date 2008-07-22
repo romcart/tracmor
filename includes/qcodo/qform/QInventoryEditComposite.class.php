@@ -196,7 +196,7 @@ class QInventoryEditComposite extends QControl {
 	// Generate tab indexes
 	protected $intNextTabIndex = 1;
 	protected function getNextTabIndex() {
-		return ++$this->intNextTabIndex;
+		return $this->intNextTabIndex++;
 	}
 
 	// Create all Custom Fields
@@ -207,6 +207,16 @@ class QInventoryEditComposite extends QControl {
 
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objInventoryModel->objCustomFieldArray, $this->blnEditMode, $this, true, true);
+		
+		/*if($this->arrCustomFields) {
+			foreach ($this->arrCustomFields as $objCustomField) {
+			//Set NextTabIndex only if the custom field is show
+				if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+					$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
+				}
+			}
+		}*/
+		
 		$this->UpdateCustomFields();
 	}
 
@@ -905,7 +915,7 @@ class QInventoryEditComposite extends QControl {
 	protected function UpdateCustomFields(){
 		if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
 			//Set NextTabIndex only if the custom field is show
-			if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+			if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 				$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 			}
 

@@ -996,7 +996,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 	protected function UpdateCustomFields(){
 		if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
 			//Set NextTabIndex only if the custom field is show
-			if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+			if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 				$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 			}
 
@@ -1015,7 +1015,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 	protected function UpdateAddressCustomFields(){
 		if($this->arrAddressCustomFields)foreach ($this->arrAddressCustomFields as $objCustomField) {
 			//Set NextTabIndex only if the custom field is show
-			if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+			if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 				$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 			}
 
@@ -1048,7 +1048,10 @@ class CompanyEditForm extends CompanyEditFormBase {
 		else{
 			$this->btnCreateAddress->Visible=false;
 		}
-			
+	}
+	
+	protected function getNextTabIndex() {
+		return $this->intTabIndex++;
 	}
 
 }

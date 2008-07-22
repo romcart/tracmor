@@ -442,19 +442,19 @@
  				// Set all reference booleans for display logic
  				
  				//set if the custom field must show or not
- 				if($objCustomFieldArray[$i]->objRoleAuthView->AuthorizedFlag)
+ 				if(($objCustomFieldArray[$i]->objRoleAuthView && $objCustomFieldArray[$i]->objRoleAuthView->AuthorizedFlag) || !$objCustomFieldArray[$i]->objRoleAuthView)
  					$arrCustomFields[$i]['blnView']=true;
  				else
  					$arrCustomFields[$i]['blnView']=false;
  				
  				// set if the custom field is editable or not 
- 				if($objCustomFieldArray[$i]->objRoleAuthEdit->AuthorizedFlag)
+ 				if(($objCustomFieldArray[$i]->objRoleAuthEdit && $objCustomFieldArray[$i]->objRoleAuthEdit->AuthorizedFlag) || !$objCustomFieldArray[$i]->objRoleAuthEdit)
  					$arrCustomFields[$i]['blnEdit']=true;
  				else
  					$arrCustomFields[$i]['blnEdit']=false;
  					
  				//set if the custom field is requiered or not
- 				if($objCustomFieldArray[$i]->objRoleAuthEdit->EntityQtypeCustomField->CustomField->RequiredFlag)
+ 				if($objCustomFieldArray[$i]->objRoleAuthEdit && $objCustomFieldArray[$i]->objRoleAuthEdit->EntityQtypeCustomField->CustomField->RequiredFlag)
 					$arrCustomFields[$i]['blnRequired']=true;	 					
  				else
  					$arrCustomFields[$i]['blnRequired']=false;

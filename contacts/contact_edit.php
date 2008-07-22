@@ -881,7 +881,7 @@ class ContactEditForm extends ContactEditFormBase {
 		protected function UpdateCustomFields(){
 			if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
 				//Set NextTabIndex only if the custom field is show
-				if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+				if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 					$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 				}
 
@@ -919,6 +919,10 @@ class ContactEditForm extends ContactEditFormBase {
 				$this->lblNewAddress->Visible=false;
 			}
 		}
-}
-ContactEditForm::Run('ContactEditForm', __DOCROOT__ . __SUBDIRECTORY__ . '/contacts/contact_edit.tpl.php');
+		
+		protected function getNextTabIndex() {
+			return $this->intTabIndex++;
+		}
+	}
+	ContactEditForm::Run('ContactEditForm', __DOCROOT__ . __SUBDIRECTORY__ . '/contacts/contact_edit.tpl.php');
 ?>

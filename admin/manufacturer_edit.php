@@ -174,7 +174,7 @@
 		}
 		
 		protected function getNextTabIndex() {
-			return ++$this->intNextTabIndex;
+			return $this->intNextTabIndex++;
 		}
 	}
 

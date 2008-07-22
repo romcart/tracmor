@@ -1142,11 +1142,10 @@ class QAssetEditComposite extends QControl {
 //Set display logic for the CustomFields
 		protected function UpdateCustomFields(){
 			if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
-			//Set NextTabIndex only if the custom field is show
-				if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+				//Set NextTabIndex only if the custom field is show
+				if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 					$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 				}
-				
 				//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
 				if (!$this->blnEditMode && !$objCustomField['blnEdit']){				
 					$objCustomField['lbl']->Display=true;

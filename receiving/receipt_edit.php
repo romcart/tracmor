@@ -109,9 +109,11 @@
 		public $blnViewBuiltInFields;
 		public $blnEditBuiltInFields;
 		
-		
 		// Dialog
 		protected $dlgNew;
+		
+		// Generate tab indexes
+		protected $intNextTabIndex = 1;
 		
 		protected function Form_Create() {
 			
@@ -144,6 +146,10 @@
 			$this->lstToAddress_Create();
 			$this->lblNewToAddress_Create();
 			$this->txtNote_Create();
+			
+			// Create all custom asset fields - this must be here for tab ordering
+			$this->customFields_Create();
+			
 			$this->txtNewAssetCode_Create();
 			$this->txtNewInventoryModelCode_Create();
 			$this->txtQuantity_Create();
@@ -165,8 +171,7 @@
 			$this->btnAddAsset_Create();
 			$this->btnAddInventory_Create();
 			
-			// Create all custom asset fields
-			$this->customFields_Create();
+			
 			
 			//Set display logic of Built-In Fields
 			$this->UpdateBuiltInFields();
@@ -432,6 +437,7 @@
 			}
 			$this->lstFromCompany->AddAction(new QChangeEvent, new QAjaxAction('lstFromCompany_Select'));
 			$this->lstFromCompany->TabIndex=1;
+			$this->intNextTabIndex++;
 			QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->lstFromCompany->ControlId));
 		}
 
@@ -453,6 +459,7 @@
 				}
 			}
 			$this->lstFromContact->TabIndex=2;		
+			$this->intNextTabIndex++;
 		}
 
 		// Create and Setup lstToContact
@@ -470,6 +477,7 @@
 				$this->lstToContact->AddItem($objListItem);
 			}
 			$this->lstToContact->TabIndex=3;			
+			$this->intNextTabIndex++;
 		}
 
 		// Create and Setup lstToAddress
@@ -487,6 +495,7 @@
 				$this->lstToAddress->AddItem($objListItem);
 			}
 			$this->lstToAddress->TabIndex=4;	
+			$this->intNextTabIndex++;
 		}
 		
 		// Create and Setup txtReceiptNumber
@@ -508,6 +517,7 @@
 				$this->txtNote->Text = $this->objReceipt->Transaction->Note;
 			}
 			$this->txtNote->TabIndex=5;
+			$this->intNextTabIndex++;
 		}
 		
 		// Create and Setup calDueDate
@@ -529,6 +539,8 @@
 				$this->calDueDate->MinimumYear = $this->dttNow->Year;
 			}
 			$this->calDueDate->Required = true;
+			$this->calDueDate->TabIndex=6;
+			$this->intNextTabIndex++;
 			
 		}
 		
@@ -540,7 +552,8 @@
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtNewAssetCode->CausesValidation = false;
-			$this->txtNewAssetCode->TabIndex=6;
+			$this->txtNewAssetCode->TabIndex=$this->intNextTabIndex++;
+			
 		}
 
 		// Create the text field to enter new inventory_model codes to add to the transaction
@@ -645,7 +658,7 @@
 			$this->btnAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->btnAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnAddAsset->CausesValidation = false;
-			$this->btnAddAsset->TabIndex=7;
+			$this->btnAddAsset->TabIndex=$this->intNextTabIndex++;;
 		}
 		
 		// Setup Add Inventory Button
@@ -2382,6 +2395,10 @@
 		protected function UpdateCustomFields(){
 			if($this->arrCustomFields){
 				foreach ($this->arrCustomFields as $objCustomField) {	
+					//Set NextTabIndex only if the custom field is show
+					if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+						$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
+					}
 					//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
 					if (!$this->blnEditMode && !$objCustomField['blnEdit']){				
 						$objCustomField['lbl']->Display=true;
@@ -2394,43 +2411,47 @@
 			}
 			
 		}
-			//Set display logic of the GreenPlusButton of Company
-	protected function UpdateCompanyAccess() {
-		//checks if the entity  has edit authorization
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Company,2);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
-			$this->lblNewFromCompany->Visible=true;
+		//Set display logic of the GreenPlusButton of Company
+		protected function UpdateCompanyAccess() {
+			//checks if the entity  has edit authorization
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Company,2);
+			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+				$this->lblNewFromCompany->Visible=true;
+			}
+			else{
+				$this->lblNewFromCompany->Visible=false;
+			}
+				
 		}
-		else{
-			$this->lblNewFromCompany->Visible=false;
+			//Set display logic of the GreenPlusButton of Contact
+		protected function UpdateContactAccess() {
+			//checks if the entity  has edit authorization
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Contact,2);
+			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+				$this->lblNewFromContact->Visible=true;
+				$this->lblNewToContact->Visible=true;
+			}
+			else{
+				$this->lblNewFromContact->Visible=false;
+				$this->lblNewToContact->Visible=false;
+			}
+				
 		}
-			
-	}
-		//Set display logic of the GreenPlusButton of Contact
-	protected function UpdateContactAccess() {
-		//checks if the entity  has edit authorization
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Contact,2);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
-			$this->lblNewFromContact->Visible=true;
-			$this->lblNewToContact->Visible=true;
+		//Set display logic of the GreenPlusButton of Address
+		protected function UpdateAddressAccess() {
+			//checks if the entity 4 (AssetModel) has edit authorization
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
+			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+				$this->lblNewToAddress->Visible=true;
+			}
+			else{
+				$this->lblNewToAddress->Visible=false;
+			}
 		}
-		else{
-			$this->lblNewFromContact->Visible=false;
-			$this->lblNewToContact->Visible=false;
+		
+		protected function getNextTabIndex() {
+			return $this->intNextTabIndex++;
 		}
-			
-	}
-	//Set display logic of the GreenPlusButton of Address
-	protected function UpdateAddressAccess() {
-		//checks if the entity 4 (AssetModel) has edit authorization
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
-			$this->lblNewToAddress->Visible=true;
-		}
-		else{
-			$this->lblNewToAddress->Visible=false;
-		}
-	}
 		
 	}
 

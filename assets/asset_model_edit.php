@@ -96,7 +96,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			
 		// Set a variable which defines whether the built-in fields must be rendered or not.
 		$this->UpdateBuiltInFields();
-
+		
 		// Create all custom asset fields
 		$this->customFields_Create();
 
@@ -307,7 +307,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->btnSave->AddAction(new QClickEvent(), new QServerAction('btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QServerAction('btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		$this->btnSave->TabIndex= ++$this->intNextTabIndex;
+		$this->btnSave->TabIndex= $this->intNextTabIndex++;
 			
 	}
 
@@ -317,7 +317,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->btnCancel->Text = 'Cancel';
 		$this->btnCancel->AddAction(new QClickEvent(), new QAjaxAction('btnCancel_Click'));
 		$this->btnCancel->CausesValidation = false;
-		$this->btnCancel->TabIndex = ++$this->intNextTabIndex;
+		$this->btnCancel->TabIndex = $this->intNextTabIndex++;
 	}
 
 	// Setup Edit Button
@@ -563,7 +563,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	}
 
 	protected function getNextTabIndex() {
-		return ++$this->intNextTabIndex;
+		return $this->intNextTabIndex++;
 	}
 
 	//Set display logic of the BuiltInFields in View Access and Edit Access
@@ -588,10 +588,9 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function UpdateCustomFields(){
 		if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
 			//Set NextTabIndex only if the custom field is show
-			if($objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+			if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 				$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 			}
-
 			//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
 			if (!$this->blnEditMode && !$objCustomField['blnEdit']){
 				$objCustomField['lbl']->Display=true;
@@ -602,7 +601,6 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			}
 		}
 	}
-
 }
 
 // Go ahead and run this form object to render the page and its event handlers, using
