@@ -50,7 +50,7 @@
 		if ($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as $field) {
 					if(!$this->blnEditMode || $field['blnView'])
-						$arrAssetFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));				
+						$arrAssetModelFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));				
 				}
 				
 		}
