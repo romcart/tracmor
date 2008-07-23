@@ -61,7 +61,7 @@ class QAdvancedSearchComposite extends QControl {
 	    $this->objParentObject = $objParentObject;
 	    $this->intEntityQtypeId = $intEntityQtypeId;
 	    
-	    if ($objParentObject instanceof AssetListForm || $objParentObject instanceof QAssetSearchComposite) {
+	    if ($objParentObject instanceof AssetListForm) {
 	    	$this->txtAssetModelCode_Create();
 	    	$this->lstReservedBy_Create();
 	    	$this->lstCheckedOutBy_Create();
@@ -88,7 +88,7 @@ class QAdvancedSearchComposite extends QControl {
       
 	}
 	public function ParsePostData() {
-		if ($this->objParentObject instanceof AssetListForm || $this->objParentObject instanceof QAssetSearchComposite) {
+		if ($this->objParentObject instanceof AssetListForm) {
 			$this->strAssetModelCode = $this->txtAssetModelCode->Text;
 		}
 		if ($this->objParentObject instanceof ShipmentListForm) {
@@ -139,10 +139,10 @@ class QAdvancedSearchComposite extends QControl {
   protected function txtAssetModelCode_Create() {
     $this->txtAssetModelCode = new QTextBox($this);
 		$this->txtAssetModelCode->Name = 'Asset Model Code';
-    $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+    $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
     $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
     // if ($this->objParentObject instanceof AssetListFormBase) {
-    if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
+    if (get_class($this->objParentObject) == 'AssetListForm') {
     	$this->txtAssetModelCode->Visible = true;
     }
     else {
@@ -281,7 +281,7 @@ class QAdvancedSearchComposite extends QControl {
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 		$this->objCustomFieldArray = CustomField::LoadObjCustomFieldArray($this->intEntityQtypeId, false, null);
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
-		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCustomFieldArray, false, $this->objParentObject, false, true, true);
+		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCustomFieldArray, false, $this, false, true, true);
 	}
 	
 	public function lstDateModified_Select($strFormId, $strControlId, $strParameter) {
@@ -305,7 +305,7 @@ class QAdvancedSearchComposite extends QControl {
 	}
 	
 	public function ClearControls() {
-		if ($this->objParentObject instanceof AssetListForm || $this->objParentObject instanceof QAssetSearchComposite) {
+		if ($this->objParentObject instanceof AssetListForm) {
 			$this->txtAssetModelCode->Text = '';
 			$this->lstCheckedOutBy->SelectedIndex = 0;
 			$this->lstReservedBy->SelectedIndex = 0;

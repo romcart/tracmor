@@ -45,10 +45,7 @@
 		// Shortcut Menu
 		protected $ctlShortcutMenu;
 		
-		// Search Menu
-		protected $ctlSearchMenu;
-		
-		/*// Basic Inputs
+		// Basic Inputs
 		protected $lstCategory;
 		protected $lstManufacturer;
 		protected $lstLocation;
@@ -84,92 +81,91 @@
 		protected $strDateModified;
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
-		protected $blnAttachment;*/
+		protected $blnAttachment;
 		
 		protected function Form_Create() {
 			
 			$this->ctlHeaderMenu_Create();
 			$this->ctlShortcutMenu_Create();
-			$this->ctlSearchMenu_Create();
 			
-/*			$this->dtgAsset = new QDataGrid($this);
+			$this->dtgAsset = new QDataGrid($this);
 			$this->dtgAsset->Name = 'asset_list';
-  		$this->dtgAsset->CellPadding = 5;
-  		$this->dtgAsset->CellSpacing = 0;
-  		$this->dtgAsset->CssClass = "datagrid";
-      		
-      // Disable AJAX for the datagrid
-      $this->dtgAsset->UseAjax = false;
-      
-      // Allow for column toggling
-      $this->dtgAsset->ShowColumnToggle = true;
-      
-      // Allow for CSV Export
-      $this->dtgAsset->ShowExportCsv = true;
-      
-      // Enable Pagination, and set to 20 items per page
-      $objPaginator = new QPaginator($this->dtgAsset);
-      $this->dtgAsset->Paginator = $objPaginator;
-      $this->dtgAsset->ItemsPerPage = 20;
-      
-      $this->dtgAsset->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHoverTips($_CONTROL) ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->AssetModel->Category->__toString() ?>', 'SortByCommand="asset__asset_model_id__category_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__category_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?=$_ITEM->AssetModel->AssetModelCode ?>', 'SortByCommand="asset__asset_model_id__asset_model_code"', 'ReverseSortByCommand="asset__asset_model_id__asset_model_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
-      
-      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
-      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
-      if ($objCustomFieldArray) {
-      	foreach ($objCustomFieldArray as $objCustomField) {
-      		//Only add the custom field column if the role has authorization to view it.
-      		if($objCustomField->objRoleAuthView && $objCustomField->objRoleAuthView->AuthorizedFlag){
-      			$this->dtgAsset->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
-      		}
-      	}
-      }
-      
-      // Column to originally sort by (Asset Model)
-      $this->dtgAsset->SortColumnIndex = 2;
-      $this->dtgAsset->SortDirection = 0;
-      
-      $objStyle = $this->dtgAsset->RowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#FFFFFF';
-      $objStyle->FontSize = 12;
-
-      $objStyle = $this->dtgAsset->AlternateRowStyle;
-      $objStyle->BackColor = '#EFEFEF';
-
-      $objStyle = $this->dtgAsset->HeaderRowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';
-      
-      $this->dtgAsset->SetDataBinder('dtgAsset_Bind');
-      
-      $this->lstCategory_Create();
-      $this->lstManufacturer_Create();
-      $this->lstLocation_Create();
-      $this->txtShortDescription_Create();
-      $this->txtAssetCode_Create();
-      $this->chkOffsite_Create();
-      $this->lblAssetModelId_Create();
-      $this->btnSearch_Create();
-      $this->btnClear_Create();
-      $this->ctlAdvanced_Create();
-      $this->lblAdvanced_Create();*/
+	  		$this->dtgAsset->CellPadding = 5;
+	  		$this->dtgAsset->CellSpacing = 0;
+	  		$this->dtgAsset->CssClass = "datagrid";
+	      		
+	      // Disable AJAX for the datagrid
+	      $this->dtgAsset->UseAjax = false;
+	      
+	      // Allow for column toggling
+	      $this->dtgAsset->ShowColumnToggle = true;
+	      
+	      // Allow for CSV Export
+	      $this->dtgAsset->ShowExportCsv = true;
+	      
+	      // Enable Pagination, and set to 20 items per page
+	      $objPaginator = new QPaginator($this->dtgAsset);
+	      $this->dtgAsset->Paginator = $objPaginator;
+	      $this->dtgAsset->ItemsPerPage = 20;
+	      
+	      $this->dtgAsset->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+	      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHoverTips($_CONTROL) ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+	      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+	      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->AssetModel->Category->__toString() ?>', 'SortByCommand="asset__asset_model_id__category_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__category_id__short_description DESC"', 'CssClass="dtg_column"'));
+	      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
+	      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
+	      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?=$_ITEM->AssetModel->AssetModelCode ?>', 'SortByCommand="asset__asset_model_id__asset_model_code"', 'ReverseSortByCommand="asset__asset_model_id__asset_model_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+	      
+	      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+	      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
+	      if ($objCustomFieldArray) {
+	      	foreach ($objCustomFieldArray as $objCustomField) {
+	      		//Only add the custom field column if the role has authorization to view it.
+	      		if($objCustomField->objRoleAuthView && $objCustomField->objRoleAuthView->AuthorizedFlag){
+	      			$this->dtgAsset->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+	      		}
+	      	}
+	      }
+	      
+	      // Column to originally sort by (Asset Model)
+	      $this->dtgAsset->SortColumnIndex = 2;
+	      $this->dtgAsset->SortDirection = 0;
+	      
+	      $objStyle = $this->dtgAsset->RowStyle;
+	      $objStyle->ForeColor = '#000000';
+	      $objStyle->BackColor = '#FFFFFF';
+	      $objStyle->FontSize = 12;
+	
+	      $objStyle = $this->dtgAsset->AlternateRowStyle;
+	      $objStyle->BackColor = '#EFEFEF';
+	
+	      $objStyle = $this->dtgAsset->HeaderRowStyle;
+	      $objStyle->ForeColor = '#000000';
+	      $objStyle->BackColor = '#EFEFEF';
+	      $objStyle->CssClass = 'dtg_header';
+	      
+	      $this->dtgAsset->SetDataBinder('dtgAsset_Bind');
+	      
+	      $this->lstCategory_Create();
+	      $this->lstManufacturer_Create();
+	      $this->lstLocation_Create();
+	      $this->txtShortDescription_Create();
+	      $this->txtAssetCode_Create();
+	      $this->chkOffsite_Create();
+	      $this->lblAssetModelId_Create();
+	      $this->btnSearch_Create();
+	      $this->btnClear_Create();
+	      $this->ctlAdvanced_Create();
+	      $this->lblAdvanced_Create();
 				
 	      	
-			if (QApplication::QueryString('intAssetModelId')) {
-				$this->lblAssetModelId->Text = QApplication::QueryString('intAssetModelId');
-				$this->blnSearch = true;
-			}
+		if (QApplication::QueryString('intAssetModelId')) {
+			$this->lblAssetModelId->Text = QApplication::QueryString('intAssetModelId');
+			$this->blnSearch = true;
+		}
   	}
   	
-		/*protected function dtgAsset_Bind() {
+		protected function dtgAsset_Bind() {
 			
 			// If the search button has been pressed or the AssetModelId was sent in the query string from the asset models page
 			if ($this->blnSearch) {
@@ -210,7 +206,7 @@
 				$this->dtgAsset->ShowHeader = true;
 			}
 			$this->blnSearch = false;
-    }*/
+    }
   	
   	 // protected function Form_Exit() {
   	  // Output database profiling - it shows you the queries made to create this page
@@ -226,17 +222,12 @@
   	// Create and Setp the Shortcut Menu Composite Control
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
-  	}
+  	}  	
   	
-  	// Create and Setup the Asset Search Composite Control
-  	protected function ctlSearchMenu_Create() {
-  		$this->ctlSearchMenu = new QAssetSearchComposite($this);
-  	}
-  	
-  	/*protected function ctlAdvanced_Create() {
+  	protected function ctlAdvanced_Create() {
   		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 1);
   		$this->ctlAdvanced->Display = false;
-  	}*/
+  	}
 
 
 		
@@ -244,7 +235,7 @@
 		 *	CREATE INPUT METHODS
 		*************************/
   	
-/*  	protected function lstLocation_Create() {
+  	protected function lstLocation_Create() {
   		$this->lstLocation = new QListBox($this);
   		$this->lstLocation->Name = 'Location';
   		$this->lstLocation->AddItem('- ALL -', null);
@@ -306,13 +297,13 @@
 	  	$this->lblAssetModelId = new QLabel($this);
 	  	$this->lblAssetModelId->Text = '';
 	  	$this->lblAssetModelId->Visible = false;
-	  }*/
+	  }
 	  
 	  /**************************
 	   *	CREATE BUTTON METHODS
 	  **************************/
 		
-	  /*protected function btnSearch_Create() {
+	  protected function btnSearch_Create() {
 			$this->btnSearch = new QButton($this);
 			$this->btnSearch->Name = 'search';
 			$this->btnSearch->Text = 'Search';
@@ -338,10 +329,9 @@
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
-	  }*/
+	  }
 
-/* THIS WAS ALREADY COMMENTED OUT BEFORE MOVING THIS TO A COMPOSITE CONTROL
-    // This method (declared as public) will help with the checkbox column rendering
+/*    // This method (declared as public) will help with the checkbox column rendering
     public function chkSelected_Render(Asset $objAsset) {
         // In order to keep track whether or not an Asset's Checkbox has been rendered,
         // we will use explicitly defined control ids.
@@ -370,7 +360,7 @@
         return $chkSelected->Render(false);
     }	  */
 	  
-/*	  protected function btnSearch_Click() {
+	  protected function btnSearch_Click() {
 	  	$this->blnSearch = true;
 			$this->dtgAsset->PageNumber = 1;
 	  }
@@ -456,7 +446,7 @@
 					}
 				}
 			}
-	  }*/
+	  }
 	}  
 
 	// Go ahead and run this form object to generate the page and event handlers, using

@@ -368,7 +368,6 @@
 	 				// Create input for each custom field (either text or list)
 	 				// Create text inputs
 	 				if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text' || CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'textarea') {
-	 					
 	 					$arrCustomFields[$i]['input'] = new QTextBox($objForm);
 	 					$arrCustomFields[$i]['input']->Name = $objCustomFieldArray[$i]->ShortDescription;
 	 					$arrCustomFields[$i]['input']->Required = false;
@@ -386,12 +385,7 @@
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	 					elseif ($blnSearch) {
-	 						if ($objForm instanceof QControl) {
-	 							$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QServerControlAction($objForm, 'btnSearch_Click'));
-	 						}
-	 						else {
-	 							$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-	 						}
+	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	      		
@@ -439,6 +433,7 @@
  				if ($blnEditMode && $objCustomFieldArray[$i]->CustomFieldSelection) {
  					$arrCustomFields[$i]['CustomFieldSelectionId'] = $objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldSelectionId;
  				}
+			
  				
  				//Set an RoleEntityQtypeCustomFieldAuthorization object of View Authorization and for Edit Authorization for each custom field
  				$arrCustomFields[$i]['ViewAuth']=$objCustomFieldArray[$i]->objRoleAuthView;
