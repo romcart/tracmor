@@ -223,7 +223,7 @@
       $strColumnsHtml = implode('","', $arrColumnText);
       $strColumnsHtml = '"' . $strColumnsHtml . '"' . "\r\n";
       
-      return $strColumnsHtml;
+      print $strColumnsHtml;
     }
     
     protected function StripControls($strHtml) {
