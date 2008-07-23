@@ -25,7 +25,7 @@
 	$arrAdvancedSearchFields = array();
 	
 	// Show Asset Model Code for Asset Search
-	if (get_class($this->objParentObject) == 'AssetListForm') {
+	if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
 		$arrAdvancedSearchFields[] = array('name' => 'Asset Model Code:',  'value' => $this->txtAssetModelCode->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Reserved By:', 'value' => $this->lstReservedBy->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Checked Out By:', 'value' => $this->lstCheckedOutBy->RenderWithError(false));
@@ -56,7 +56,7 @@
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
 			////Display Custom Field if the role has "View" access
-			if(($field['blnView'])){
+			if(( $field['blnView'])){
 				$arrAdvancedSearchFields[] = array('name' => $field['input']->Name.':', 'value' => $field['input']->RenderWithError(false));
 			}
 		}
