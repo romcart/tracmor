@@ -814,12 +814,12 @@ protected function pnlAssets_Create($intModule){
 		}
 			
 		// If creating a new Role, manually give access to the Home module
-		if (!$this->blnEditMode) {
-			$objRoleModule = new RoleModule();
-			$objRoleModule->ModuleId = 1;
-			$objRoleModule->RoleId = $this->objRole->RoleId;
-			$objRoleModule->AccessFlag = true;
-			$objRoleModule->Save();
+		//if (!$this->blnEditMode) {
+		//	$objRoleModule = new RoleModule();
+		//	$objRoleModule->ModuleId = 1;
+		//	$objRoleModule->RoleId = $this->objRole->RoleId;
+		//	$objRoleModule->AccessFlag = true;
+		//	$objRoleModule->Save();
 
 			/*
 				// Give view, edit, and delete access for ALL for the home module
@@ -833,7 +833,7 @@ protected function pnlAssets_Create($intModule){
 				}
 				}
 				*/
-		}
+		//}
 		/*
 			// Delete all RoleModules - this will cascade to all RoleModuleAuthorizations also
 			if ($this->blnEditMode) {

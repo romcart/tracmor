@@ -2887,8 +2887,7 @@ INSERT INTO `role_module`
             `role_id`,
             `module_id`,
             `access_flag`)
-VALUES     (1,1,1,1),
-           (2,1,2,1),
+VALUES     (2,1,2,1),
            (3,1,3,1),
            (4,1,4,1),
            (5,1,5,1),
