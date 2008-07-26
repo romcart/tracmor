@@ -126,13 +126,13 @@
       header("Pragma: hack"); // IE chokes on "no cache", so set to something, anything, else.
       $ExpStr = "Expires: " . gmdate("D, d M Y H:i:s", time()) . " GMT";
       header($ExpStr);
-			header('Content-Type: text/csv');
+      header('Content-Type: text/csv');
 			header('Content-Disposition: csv; filename=export.csv');
 			
-			for ($i=1; $i <= ($this->objParentControl->TotalItemCount); $i++) {
+			for ($i=1; $i <= (ceil($this->objParentControl->TotalItemCount/200)); $i++) {
 			
 				$this->objParentControl->PageNumber = $i;
-				$this->objParentControl->ItemsPerPage = 1;
+				$this->objParentControl->ItemsPerPage = 200;
 				$this->objParentControl->DataBind();
 				
 				if ($i==1) {
@@ -147,9 +147,10 @@
 						flush();
 					}
 				}
+				
+				$this->ParentControl->DataSource = null;
 			}
 			
-			$this->ParentControl->DataSource = null;
 			QApplication::$JavaScriptArray = array();
 			QApplication::$JavaScriptArrayHighPriority = array();
 			$this->objForm->RenderCsvEnd(false);
