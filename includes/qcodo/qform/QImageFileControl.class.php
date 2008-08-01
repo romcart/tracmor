@@ -59,7 +59,8 @@
 		  if (array_key_exists($this->strControlId, $_FILES) && ($_FILES[$this->strControlId]['tmp_name'])) {
 		    // It was -- update this Control's value with the new value passed in via the POST arguments
 		    if ($_FILES[$this->strControlId]['name']) {
-			    $this->strFileName = $_FILES[$this->strControlId]['name'];
+			    $explodedFilename = explode(".",$_FILES[$this->strControlId]['name']);
+		    	$this->strFileName = "asset_model.".$explodedFilename[count($explodedFilename)-1];
 			    $this->strType = $_FILES[$this->strControlId]['type'];
 			    $this->intSize = QType::Cast($_FILES[$this->strControlId]['size'], QType::Integer);
 			    $this->strFile = $_FILES[$this->strControlId]['tmp_name'];
@@ -75,6 +76,7 @@
 			
 			if((strpos($this->strType, "image")) !== false) {
 				move_uploaded_file($this->strFile, $this->strUploadPath.$this->strFileName);
+				
 				if ($this->boolBuildThumbs) {
 				    $this->CreateThumbnail(  $this->strUploadPath.$this->strFileName,
 				                            $this->strThumbUploadPath.$this->strThumbPrefix.$this->strFileName,
@@ -193,24 +195,25 @@
 				// Check the MIME type of the file
 				if(strpos($this->strType, "image") === false) {
 					$this->strValidationError = sprintf("%s is not an image", $this->strFileName);
-					$returnValue = false;
+					return false;
 				}
 				// Check that there is only one period in the filename, separating name from extension
 				$explosion = explode(".", $this->strFileName);
+
 				if (count($explosion) != 2) {
 					$this->strValidationError = "Please upload a well formed filename: xxxxx.xxx";
-					$returnValue = false;
+					return false;
 				}
 				/*$fileTemp = fopen($this->strFile, "r");
 				$fileBinary = fread($fileTemp, filesize($this->strFile));*/
 				if (!@getimagesize($this->strFile)) {
-					$returnValue = false;
 					$this->strValidationError = "That is not a valid image file.";
+					return false;
 				}
 				// Check for jpg, jpeg, gif, or png extensions
-				if ($explosion[1] != "jpg" && $explosion[1] != "JPG" && $explosion[1] != "jpeg" && $explosion[1] != "JPEG" && $explosion[1] != "png" && $explosion[1] != "PNG" && $explosion[1] != "gif" && $explosion[1] != "GIF") {
+				if ($explosion[count($explosion) -1] != "jpg" && $explosion[count($explosion) -1] != "JPG" && $explosion[count($explosion) -1] != "jpeg" && $explosion[count($explosion) -1] != "JPEG" && $explosion[count($explosion) -1] != "png" && $explosion[count($explosion) -1] != "PNG" && $explosion[count($explosion) -1] != "gif" && $explosion[count($explosion) -1] != "GIF") {
 					$this->strValidationError = "Invalid file type. Image must be either .jpg, .gif, or .png";
-					$returnValue = false;
+					return false;
 				}
 			}
 			// Only if it is a required field, check if it is empty.
