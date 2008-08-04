@@ -72,6 +72,18 @@
 			// Properly Escape All Input Parameters using Database->SqlVariable()
 			$intModuleId = $objDatabase->SqlVariable(QApplication::$objRoleModule->ModuleId, true);
 			$intRoleId = $objDatabase->SqlVariable(QApplication::$objRoleModule->RoleId, true);
+			
+			// Load an array of TransactionTypeAuthorizations where transaction level authorization is 'None' to match with shortcuts later.
+			$intTransactionTypeIdArray = array();
+			$objRoleTransactionTypeAuthorizationArray = RoleTransactionTypeAuthorization::LoadArrayByRoleId(QApplication::$objRoleModule->RoleId);
+			if ($objRoleTransactionTypeAuthorizationArray) {
+			  foreach ($objRoleTransactionTypeAuthorizationArray as $objRoleTransactionTypeAuthorization) {
+			    if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+			      $intTransactionTypeIdArray[] = $objRoleTransactionTypeAuthorization->TransactionTypeId;
+			    }
+			  }
+			}
+			
 			$objViewRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, 1);
 			if (!$objViewRoleModuleAuthorization) {
 				throw new Exception('No valid RoleModuleAuthorization for this User Role.');
@@ -106,6 +118,9 @@
 			else {
 				$strAuthorizationSql = 'AND `shortcut`.`authorization_id` != 1 AND `shortcut`.`authorization_id` != 2';
 			}
+			
+			// If the transaction level authorization is 'None' for a user role the shortcuts will be hidden in the module pages.
+			if (count($intTransactionTypeIdArray)) $strAuthorizationSql .= ' AND (`shortcut`.`transaction_type_id` NOT IN ('.implode(", ",$intTransactionTypeIdArray).') OR `shortcut`.`transaction_type_id` IS NULL)';
 			
 			//Set the entities sql according to the Module
 			

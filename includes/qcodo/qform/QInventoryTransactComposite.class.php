@@ -272,6 +272,23 @@ class QInventoryTransactComposite extends QControl {
 					$this->lstSourceLocation->Enabled = false;
 					$this->txtQuantity->Enabled = false;
 				}
+				if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
+				  $objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::LoadByRoleIdTransactionTypeId(QApplication::$objUserAccount->RoleId,$this->intTransactionTypeId);
+          if ($objRoleTransactionTypeAuthorization) {
+            // If the user has 'None' privileges for this transaction
+            if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+      			  $this->txtNewInventoryModelCode->Warning = "You do not have privileges for this transaction.";
+      			  $this->lstSourceLocation->Enabled = false;
+					    $this->txtQuantity->Enabled = false;
+    			  }
+    			  // Check the user is the owner (if he has owner-only privileges)
+      			elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2 && $objInventoryModel->CreatedBy != QApplication::$objUserAccount->UserAccountId) {
+      			  $this->txtNewInventoryModelCode->Warning = "You are not the owner of this inventory.";
+      			  $this->lstSourceLocation->Enabled = false;
+					    $this->txtQuantity->Enabled = false;
+      			}
+          }
+				}
 			}
 			else {
 				$this->txtNewInventoryModelCode->Warning = 'That is not a valid inventory code.';
@@ -290,7 +307,15 @@ class QInventoryTransactComposite extends QControl {
 		// Assign the values from the user submitted form input
 		$intNewInventoryLocationId = $this->lstSourceLocation->SelectedValue;
 		$intTransactionQuantity = $this->txtQuantity->Text;
-		
+		// Create array of TransactionType (key) and AuthorizationLevel (value) by RoleId
+		$objRoleTransactionTypeAuthorizationArray = RoleTransactionTypeAuthorization::LoadArrayByRoleId(QApplication::$objUserAccount->RoleId);
+		$intAuthorizationLevelIdArray = array();
+		if ($objRoleTransactionTypeAuthorizationArray) {
+		  foreach ($objRoleTransactionTypeAuthorizationArray as $objRoleTransactionTypeAuthorization) {
+		    $intAuthorizationLevelIdArray[$objRoleTransactionTypeAuthorization->TransactionTypeId] = $objRoleTransactionTypeAuthorization->AuthorizationLevelId;
+		  }
+		}
+			  
 		// If transaction is a move or take out
 		if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
 			if ($intNewInventoryLocationId) {
@@ -303,6 +328,7 @@ class QInventoryTransactComposite extends QControl {
 						}
 					}
 				}
+				
 				if (!$blnError) {
 					$objNewInventoryLocation = InventoryLocation::LoadLocations($intNewInventoryLocationId);
 					// This should not be possible because the list is populated with existing InventoryLocations
@@ -350,6 +376,21 @@ class QInventoryTransactComposite extends QControl {
 						$this->txtNewInventoryModelCode->Warning = "That Inventory has already been added.";
 					}
 				}
+			}
+			if (!$blnError) {
+			  $objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::LoadByRoleIdTransactionTypeId(QApplication::$objUserAccount->RoleId,4);
+        if ($objRoleTransactionTypeAuthorization) {
+          // If the user has 'None' privileges for this transaction
+          if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+      		  $this->txtNewInventoryModelCode->Warning = "You do not have privileges for this transaction.";
+      		  $blnError = true;
+    			}
+    			// Check the user is the owner (if he has owner-only privileges)
+      		elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2 && $objNewInventoryModel->CreatedBy != QApplication::$objUserAccount->UserAccountId) {
+      		  $this->txtNewInventoryModelCode->Warning = "You are not the owner of this inventory.";
+      		  $blnError = true;
+      		}
+        }
 			}
 			
 			if (!$blnError) {

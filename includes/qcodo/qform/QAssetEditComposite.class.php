@@ -463,6 +463,7 @@ class QAssetEditComposite extends QControl {
 		$this->btnMove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnMove->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objAsset, $this->btnMove, 2);
+		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnMove, 1);
 	}
 	
 	// Setup Checkout Button
@@ -478,6 +479,7 @@ class QAssetEditComposite extends QControl {
 			$this->btnCheckOut->Display = false;
 		}
 		QApplication::AuthorizeControl($this->objAsset, $this->btnCheckOut, 2);
+		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnCheckOut, 3);
 	}
 	
 	// Setup Check In Button
@@ -494,6 +496,7 @@ class QAssetEditComposite extends QControl {
 			$this->btnCheckIn->Display = false;
 		}
 		QApplication::AuthorizeControl($this->objAsset, $this->btnCheckIn, 2);
+		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnCheckIn, 2);
 	}
 	
 	// Setup Reserve Button
@@ -509,6 +512,7 @@ class QAssetEditComposite extends QControl {
 			$this->btnReserve->Display = false;
 		}
 		QApplication::AuthorizeControl($this->objAsset, $this->btnReserve, 2);
+		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnReserve, 8);
 	}
 	
 	// Setup Reserve Button
@@ -525,6 +529,7 @@ class QAssetEditComposite extends QControl {
 			$this->btnUnreserve->Display = false;
 		}
 		QApplication::AuthorizeControl($this->objAsset, $this->btnUnreserve, 2);
+		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnUnreserve, 9);
 	}
 	
 	// Setup Ship Button
@@ -1146,6 +1151,7 @@ class QAssetEditComposite extends QControl {
 				if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 					$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 				}
+				
 				//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
 				if (!$this->blnEditMode && !$objCustomField['blnEdit']){				
 					$objCustomField['lbl']->Display=true;

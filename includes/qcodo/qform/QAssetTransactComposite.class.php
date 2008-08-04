@@ -242,7 +242,7 @@ class QAssetTransactComposite extends QControl {
 			}
 			
 			if (!$blnError) {
-				$objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
+			  $objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
 				if (!($objNewAsset instanceof Asset)) {
 					$blnError = true;
 					$this->txtNewAssetCode->Warning = "That asset code does not exist.";
@@ -332,6 +332,23 @@ class QAssetTransactComposite extends QControl {
 						}
 					}
 				}
+				
+				if (!$blnError && ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2 || $this->intTransactionTypeId == 3 || $this->intTransactionTypeId == 8 || $this->intTransactionTypeId == 9)) {
+				  $objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::LoadByRoleIdTransactionTypeId(QApplication::$objUserAccount->RoleId, $this->intTransactionTypeId);
+          if ($objRoleTransactionTypeAuthorization) {
+            // If the user has 'None' privileges for this transaction
+            if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+    				  $blnError = true;
+    					$this->txtNewAssetCode->Warning = "You do not have privileges for this transaction.";
+  					}
+  					// Check the user is the owner (if he has owner-only privileges)
+    				elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2 && $objNewAsset->CreatedBy != QApplication::$objUserAccount->UserAccountId) {
+    				  $blnError = true;
+    					$this->txtNewAssetCode->Warning = "You are not the owner of this asset.";
+    				}
+          }
+				}
+				
 				if (!$blnError && $objNewAsset instanceof Asset)  {
 					$this->objAssetArray[] = $objNewAsset;
 					$this->txtNewAssetCode->Text = null;
