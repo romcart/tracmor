@@ -3070,16 +3070,16 @@ INSERT INTO `shortcut` (module_id, authorization_id, transaction_type_id, short_
 (3,1,NULL,'Inventory','../inventory/inventory_model_list.php','inventory.png',2,0),
 (3,2,1,'Move Inventory','../inventory/inventory_edit.php?intTransactionTypeId=1', 'inventory_move.png',2,0),
 (3,2,5,'Take Out Inventory','../inventory/inventory_edit.php?intTransactionTypeId=5', 'inventory_takeout.png',2,0),
-(3,2,4,'Restock Inventory','../inventory/inventory_edit.php?intTransactionTypeId=4', 'inventory_restock.png',2,0)
+(3,2,4,'Restock Inventory','../inventory/inventory_edit.php?intTransactionTypeId=4', 'inventory_restock.png',2,0),
 (4,2,NULL,'Create Company','../contacts/company_edit.php','company_create.png',7,1),
 (4,1,NULL,'Companies','../contacts/company_list.php','company.png',7,0),
-(4,2,NULL,'Create Contact','../contacts/contact_edit.php','contact_create.png',8,1);
-(4,1,NULL,'Contacts','../contacts/contact_list.php','contact.png',8,0);
-(5,2,NULL,'Schedule Shipment','../shipping/shipment_edit.php','shipment_schedule.png',10,1);
-(5,1,NULL,'Shipments','../shipping/shipment_list.php','shipment.png',10,0);
-(6,2,NULL,'Schedule Receipt','../receiving/receipt_edit.php','receipt_schedule.png',11,1);
-(6,1,NULL,'Receipts','../receiving/receipt_list.php','receipt.png',11,0);
-(7,1,NULL,'Asset Audit Reports','../reports/asset_audit_list.php','receipt.png',1,0);
+(4,2,NULL,'Create Contact','../contacts/contact_edit.php','contact_create.png',8,1),
+(4,1,NULL,'Contacts','../contacts/contact_list.php','contact.png',8,0),
+(5,2,NULL,'Schedule Shipment','../shipping/shipment_edit.php','shipment_schedule.png',10,1),
+(5,1,NULL,'Shipments','../shipping/shipment_list.php','shipment.png',10,0),
+(6,2,NULL,'Schedule Receipt','../receiving/receipt_edit.php','receipt_schedule.png',11,1),
+(6,1,NULL,'Receipts','../receiving/receipt_list.php','receipt.png',11,0),
+(7,1,NULL,'Asset Audit Reports','../reports/asset_audit_list.php','receipt.png',1,0),
 (7,1,NULL,'Inventory Audit Reports','../reports/inventory_audit_list.php','receipt.png',2,0);
 
 SET FOREIGN_KEY_CHECKS = 1;
