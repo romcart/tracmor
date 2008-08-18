@@ -38,43 +38,49 @@
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
-		<div class="title">&nbsp;Inventory Search</div>
+<!-- Begin Search Menu -->
+<?php
+	$this->ctlSearchMenu->Render();
+?>
+<!-- End Search  Menu -->
+<!--
+    <div class="title">&nbsp;Inventory Search</div>
 		<table style="border:1px solid #AAAAAA;background-color:#EEEEEE;font-family:verdana;font-size:10px;color:#444444;height:40px" width="100%">
 			<tr>
 				<td style="vertical-align:top;" noWrap>
-					<?php $this->txtShortDescription->RenderWithNameLeft("Width=150") ?>
+					<?php //$this->txtShortDescription->RenderWithNameLeft("Width=150") ?>
 				</td>
 				<td style="vertical-align:top;" noWrap>
-					<?php $this->txtInventoryModelCode->RenderWithNameLeft("Width=150") ?>
+					<?php //$this->txtInventoryModelCode->RenderWithNameLeft("Width=150") ?>
 				</td>
 				<td style="vertical-align:top;" noWrap>
-					<?php $this->lstLocation->RenderWithNameLeft("Width=150") ?>
+					<?php //$this->lstLocation->RenderWithNameLeft("Width=150") ?>
 				</td>
 				<td style="vertical-align:top;padding-right:8px;"align="right" noWrap>
-					<?php $this->btnSearch->Render() ?>&nbsp;<?php $this->btnClear->Render() ?>
+					<?php //$this->btnSearch->Render() ?>&nbsp;<?php //$this->btnClear->Render() ?>
 				</td>
 			</tr>
 			<tr>
 				<td style="vertical-align:top;" noWrap>
-					<?php $this->lstCategory->RenderWithNameLeft("Width=150") ?>
+					<?php //$this->lstCategory->RenderWithNameLeft("Width=150") ?>
 				</td>
 				<td style="vertical-align:top;" noWrap>
-					<?php $this->lstManufacturer->RenderWithNameLeft("Width=150") ?>
+					<?php //$this->lstManufacturer->RenderWithNameLeft("Width=150") ?>
 				</td>
 				<td></td>
 				<td>
-					<?php $this->lblAdvanced->Render(); ?>
+					<?php //$this->lblAdvanced->Render(); ?>
 				</td>
 			</tr>
 			<tr>
 			  <td style="vertical-align:top;" colspan="4" nowrap>
-			  	<?php $this->ctlAdvanced->Render(); ?>
+			  	<?php //$this->ctlAdvanced->Render(); ?>
 			  </td>
 			</tr>
 		</table>		
 
-		<?php $this->dtgInventoryModel->Render() ?>
+		<?php //$this->dtgInventoryModel->Render() ?>
 		<br />
-
+    -->
 	<?php $this->RenderEnd() ?>
 	<?php 	require_once('../includes/footer.inc.php'); ?>

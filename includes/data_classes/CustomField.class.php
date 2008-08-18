@@ -385,7 +385,12 @@
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	 					elseif ($blnSearch) {
-	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+	 						if ($objForm instanceof QControl) {
+	 							$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QServerControlAction($objForm, 'btnSearch_Click'));
+	 						}
+	 						else {
+	 							$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+	 						}
 	 						$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	 					}
 	      		

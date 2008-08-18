@@ -43,9 +43,12 @@
 		protected $ctlHeaderMenu;
 		
 		// Shortcut Menu
-		protected $ctlShortcutMenu;		
+		protected $ctlShortcutMenu;
+
+		// Search Menu
+		protected $ctlSearchMenu;	
 		
-		// Basic Inputs
+		/*// Basic Inputs
 		protected $lstCategory;
 		protected $lstManufacturer;
 		protected $lstLocation;
@@ -76,13 +79,14 @@
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
 		protected $blnAttachment;
+		*/
 		
 		protected function Form_Create() {
 			
 			$this->ctlHeaderMenu_Create();
 			$this->ctlShortcutMenu_Create();			
-			
-			$this->dtgInventoryModel = new QDataGrid($this);
+			$this->ctlSearchMenu_Create();
+			/*$this->dtgInventoryModel = new QDataGrid($this);
 			$this->dtgInventoryModel->Name = 'inventory_model_list';
   		$this->dtgInventoryModel->CellPadding = 5;
   		$this->dtgInventoryModel->CellSpacing = 0;
@@ -147,9 +151,10 @@
       $this->btnClear_Create();
       $this->ctlAdvanced_Create();
       $this->lblAdvanced_Create();
+      */
   	}
   	
-		protected function dtgInventoryModel_Bind() {
+		/*protected function dtgInventoryModel_Bind() {
 			
 			// If the search button has been pressed
 			if ($this->blnSearch) {
@@ -186,7 +191,7 @@
 			}
 			$this->blnSearch = false;
     }  	
-  	
+  	*/
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {
   		$this->ctlHeaderMenu = new QHeaderMenu($this);
@@ -197,16 +202,21 @@
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
   	}    
     
-  	protected function ctlAdvanced_Create() {
+  	// Create and Setup the Invnetory Search Composite Control
+  	protected function ctlSearchMenu_Create() {
+  		//require_once(__QCODO__ . '/qform/QInventorySearchComposite.class.php');
+  	  $this->ctlSearchMenu = new QInventorySearchComposite($this, null, false);
+  	}
+  	/*protected function ctlAdvanced_Create() {
   		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 2);
   		$this->ctlAdvanced->Display = false;
-  	}
+  	}*/
 
 		/*************************
 		 *	CREATE INPUT METHODS
 		*************************/
   	
-  	protected function lstLocation_Create() {
+  	/*protected function lstLocation_Create() {
   		$this->lstLocation = new QListBox($this);
   		$this->lstLocation->Name = 'Location';
   		$this->lstLocation->AddItem('- ALL -', null);
@@ -253,7 +263,7 @@
 	   *	CREATE BUTTON METHODS
 	  **************************/
 		
-	  protected function btnSearch_Create() {
+	  /*protected function btnSearch_Create() {
 			$this->btnSearch = new QButton($this);
 			$this->btnSearch->Name = 'search';
 			$this->btnSearch->Text = 'Search';
@@ -352,7 +362,8 @@
 					}
 				}
 			}
-	  }	   	
+	  }
+	  */	   	
 	}
 
 	// Go ahead and run this form object to generate the page and event handlers, using
