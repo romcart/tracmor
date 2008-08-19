@@ -129,8 +129,8 @@
 			$this->btnPrintLabels = new QButton($this);
 			$this->btnPrintLabels->Text = 'Print Labels';
 			$this->btnPrintLabels->AddAction(new QClickEvent(), new QJavaScriptAction("document.getElementById('warning_loading').innerHTML = 'Please wait... loading.';"));
-			$this->btnPrintLabels->AddAction(new QClickEvent(), new QAjaxAction('btnPrintLabels_Click'));
 			$this->btnPrintLabels->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnPrintLabels));
+			$this->btnPrintLabels->AddAction(new QClickEvent(), new QAjaxAction('btnPrintLabels_Click'));
 			$this->btnPrintLabels->Display = false;
 			//$this->blnPrintLabels = false;
 		}
@@ -308,6 +308,7 @@
 		  }
 		  else {
 		    $this->lstLabelStock->Warning = "Please select one";
+		    $this->lstLabelStock->Enabled = true;
 		  }
 		}
 		
@@ -347,7 +348,7 @@
 		      }
 		      elseif ($this->intCurrentBarCodeLabel < $intBarCodeArrayCount) {
 		        $arrTD[] = sprintf("<td width=\"%spx\"><img src=\"../includes/php/tcpdf/images/tmp/%s_%s.png\" height=\"%s\" border=\"0\" align=\"left\" /></td>", $intCellWidth, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
-		        $image = ImageCreateFromPNG(sprintf("http://localhost/tracmor/includes/php/barcode.php?code=%s&encoding=128&scale=1",  $this->strBarCodeArray[$this->intCurrentBarCodeLabel++]));
+ 		        $image = ImageCreateFromPNG(sprintf("http://%s/includes/php/barcode.php?code=%s&encoding=128&scale=1", $_SERVER['PATH_TRANSLATED'],  $this->strBarCodeArray[$this->intCurrentBarCodeLabel++]));
 		        ImagePNG($image, sprintf("../includes/php/tcpdf/images/tmp/%s_%s.png", $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		        imagedestroy($image);
 		      }
@@ -477,6 +478,7 @@
   	  }
 		  else {
 		    $this->lstLabelStock->Warning = "Please select one";
+		    $this->lstLabelStock->Enabled = true;
 		  }
 		}
 	}
