@@ -348,7 +348,7 @@
 		      }
 		      elseif ($this->intCurrentBarCodeLabel < $intBarCodeArrayCount) {
 		        $arrTD[] = sprintf("<td width=\"%spx\"><img src=\"../includes/php/tcpdf/images/tmp/%s_%s.png\" height=\"%s\" border=\"0\" align=\"left\" /></td>", $intCellWidth, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
- 		        $image = ImageCreateFromPNG(sprintf("http://%s/includes/php/barcode.php?code=%s&encoding=128&scale=1", $_SERVER['PATH_TRANSLATED'],  $this->strBarCodeArray[$this->intCurrentBarCodeLabel++]));
+ 		        $image = ImageCreateFromPNG(sprintf("http://%s/includes/php/barcode.php?code=%s&encoding=128&scale=1", $_SERVER['SERVER_NAME'] . __SUBDIRECTORY__,  $this->strBarCodeArray[$this->intCurrentBarCodeLabel++]));
 		        ImagePNG($image, sprintf("../includes/php/tcpdf/images/tmp/%s_%s.png", $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		        imagedestroy($image);
 		      }
