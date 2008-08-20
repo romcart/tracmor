@@ -24,4 +24,7 @@
 	DEFINE('AWS_SECRET_KEY', '');
 	DEFINE('AWS_BUCKET', '');
 	
+	// Location of tmp directory
+	DEFINE('__TRACMOR_TMP__', '/tmp');
+	
 ?>

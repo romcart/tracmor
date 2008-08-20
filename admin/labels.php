@@ -270,7 +270,7 @@
 		  
       // Delete temporary images
       for ($i = 1; $i <= $this->intCurrentBarCodeLabel; $i++) {
-        @unlink("../includes/php/tcpdf/images/tmp/".$_SESSION['intUserAccountId']."_".$i.".png");
+        @unlink("../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_".$i.".png");
       }
       // Reset variables
       $this->intCurrentBarCodeLabel = 0;
@@ -314,7 +314,8 @@
 		
 		// Create and Setup the table per each page for Bar Code Label Generation
 		protected function CreateTableByBarCodeArray() {
-		  $strTable = "<table width=\"510px\" height=\"100%\" border=\"1\" style=\"text-align:center\">";
+		  //$strTable = "<table width=\"510px\" height=\"100%\" border=\"1\" style=\"text-align:center\">";
+		  $strTable = "<table height=\"100%\" border=\"1\" style=\"text-align:center\">";
 		  $intBarCodeArrayCount = count($this->strBarCodeArray);
 		  switch ($this->lstLabelStock->SelectedValue) {
   		  case 1:
@@ -344,25 +345,25 @@
 		    while ($j < $intNumberInTableRow) {
 		      // If Label Offset set
 		      if ($i < $this->lstLabelOffset->SelectedValue && $this->intCurrentBarCodeLabel == 0) {
-		        $arrTD[] = sprintf("<td width=\"%spx\"><img src=\"../includes/php/tcpdf/images/_blank.png\" height=\"%s\" /></td>", $intCellWidth, $intImageHeight);
+		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../includes/php/tcpdf/images/_blank.png\" height=\"%s\" /></td>", $intCellWidth, $intImageHeight);
 		      }
 		      elseif ($this->intCurrentBarCodeLabel < $intBarCodeArrayCount) {
-		        $arrTD[] = sprintf("<td width=\"%spx\"><img src=\"../includes/php/tcpdf/images/tmp/%s_%s.png\" height=\"%s\" border=\"0\" align=\"left\" /></td>", $intCellWidth, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
+		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../%s/%s_%s.png\" height=\"%s\" border=\"0\" align=\"center\" /></td>", $intCellWidth, __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
  		        $image = ImageCreateFromPNG(sprintf("http://%s/includes/php/barcode.php?code=%s&encoding=128&scale=1", $_SERVER['SERVER_NAME'] . __SUBDIRECTORY__,  $this->strBarCodeArray[$this->intCurrentBarCodeLabel++]));
-		        ImagePNG($image, sprintf("../includes/php/tcpdf/images/tmp/%s_%s.png", $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+		        ImagePNG($image, sprintf("../%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		        imagedestroy($image);
 		      }
 		      else {
 		        if (!isset($arrImageSize)) {
-		          $arrImageSize = getimagesize(sprintf("../includes/php/tcpdf/images/tmp/%s_%s.png", $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+		          $arrImageSize = getimagesize(sprintf("../%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		          $arrImageSize[0] = ceil($arrImageSize[0]*($intImageHeight/$arrImageSize[1]));
 		        }
-		        $arrTD[] = sprintf("<td width=\"%spx\"><img src=\"../includes/php/tcpdf/images/_blank.png\" width=\"%s\" height=\"%s\" /></td>", $intCellWidth, $arrImageSize[0], $intImageHeight);
+		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../includes/php/tcpdf/images/_blank.png\" width=\"%s\" height=\"%s\" /></td>", $intCellWidth, $arrImageSize[0], $intImageHeight);
 		      }
 		      $j++;
 		      $i++;
 		    }
-		    $strTable .= implode(sprintf("<td width=\"%spx\"></td>", $intBlankSpace), $arrTD)."</tr>";
+		    $strTable .= implode(sprintf("<td width=\"%spx\" style=\"text-align:center\"></td>", $intBlankSpace), $arrTD)."</tr>";
 		  }
 		  
 		  $strTable .= "</table>";
@@ -452,7 +453,7 @@
               }
               
               // Close and save PDF document
-              $pdf->Output("../includes/php/tcpdf/images/tmp/".$_SESSION['intUserAccountId']."_BarCodes.pdf", "F");
+              $pdf->Output("../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_BarCodes.pdf", "F");
               // Cleaning up
               $this->btnCancel_Click();
               
@@ -467,7 +468,7 @@
               $this->ctlSearchMenu->$arrDataGridObjectNameId[0]->chkSelectAll->Checked = false;
               
               // Open generated PDF in new window
-    		      QApplication::ExecuteJavaScript("window.open('../includes/php/tcpdf/images/tmp/".$_SESSION['intUserAccountId']."_BarCodes.pdf','Barcodes','resizeable,menubar=1,scrollbar=1,left=0,top=0,width=800,height=600');");
+    		      QApplication::ExecuteJavaScript("window.open('../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_BarCodes.pdf','Barcodes','resizeable,menubar=1,scrollbar=1,left=0,top=0,width=800,height=600');");
             }
           }
           else {
