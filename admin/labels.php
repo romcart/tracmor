@@ -314,7 +314,6 @@
 		
 		// Create and Setup the table per each page for Bar Code Label Generation
 		protected function CreateTableByBarCodeArray() {
-		  //$strTable = "<table width=\"510px\" height=\"100%\" border=\"1\" style=\"text-align:center\">";
 		  $strTable = "<table height=\"100%\" border=\"1\" style=\"text-align:center\">";
 		  $intBarCodeArrayCount = count($this->strBarCodeArray);
 		  switch ($this->lstLabelStock->SelectedValue) {
@@ -322,8 +321,8 @@
     		  // Labels per row for Avery 6577 (5/8" x 3")
   		    $intNumberInTableRow = 2; // Cells per row
   		    $intImageHeight = 41; // Bar Code Image Height
-  		    $intCellWidth = 215; // Cell Width
-  		    $intBlankSpace = 59; // Blank Cell Width
+  		    $intCellWidth = 246; // Cell Width
+  		    $intBlankSpace = 56; // Blank Cell Width
     		  break;
   		  case 2:
     		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
@@ -348,7 +347,7 @@
 		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../includes/php/tcpdf/images/_blank.png\" height=\"%s\" /></td>", $intCellWidth, $intImageHeight);
 		      }
 		      elseif ($this->intCurrentBarCodeLabel < $intBarCodeArrayCount) {
-		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../%s/%s_%s.png\" height=\"%s\" border=\"0\" align=\"center\" /></td>", $intCellWidth, __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
+		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"..%s/%s_%s.png\" height=\"%s\" border=\"0\" align=\"center\" /></td>", $intCellWidth, __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
  		        $image = ImageCreateFromPNG(sprintf("http://%s/includes/php/barcode.php?code=%s&encoding=128&scale=1", $_SERVER['SERVER_NAME'] . __SUBDIRECTORY__,  urlencode($this->strBarCodeArray[$this->intCurrentBarCodeLabel++])));
 		        ImagePNG($image, sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		        imagedestroy($image);
@@ -367,6 +366,7 @@
 		  }
 		  
 		  $strTable .= "</table>";
+		  //echo($strTable); exit;
 		  // If the user clicked Cancel button or clicked outside of the modal dialog
 		  if ($_SESSION["intGeneratingStatus"] != -1 || !($this->dlgPrintLabels->Visible && $this->dlgPrintLabels->Display)) {
 		    // xx% Complete
