@@ -431,7 +431,7 @@
           		    $pdf->SetFontSize(3);
           		    $pdf->setCellHeightRatio(2.85);
           		    // Set margins
-                  $pdf->SetMargins(0, 12, 0);
+                  $pdf->SetMargins(0, 10, 0);
               	  break;
           		  case 2:
             		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
