@@ -232,7 +232,7 @@ function CheckDuplicateCode(strNewCode, arrUnderTest, strLocation) {
       return 1;
     }
   }
-  return 0;  
+  return 0;
 }
 function AddAuditLocation() {
   var strLocation = document.getElementById('location').value;
@@ -265,7 +265,7 @@ function AddAuditAsset() {
     document.getElementById('warning').innerHTML = "";
     document.getElementById('result').innerHTML += "&nbsp;&nbsp;" + strAssetCode + "<br />";
     arrayAssetCode[i++] = strAssetCode;
-    document.getElementById('asset_code').value = ""; 
+    document.getElementById('asset_code').value = "";
     document.getElementById('asset_code').focus();
   }
   else {
@@ -317,7 +317,7 @@ function AddAuditInventoryLocation() {
       for (j=0; j<arrCheckedInventoryQuantity.length; j++) {
         var CheckedInventoryQuantitySplitted = arrCheckedInventoryQuantity[j].split("|");
         document.getElementById('inventory_code').value = CheckedInventoryQuantitySplitted[0];
-        document.getElementById('quantity').value = CheckedInventoryQuantitySplitted[1];        
+        document.getElementById('quantity').value = CheckedInventoryQuantitySplitted[1];
         AddAuditInventory();
       }
       strCheckedInventoryQuantity = '';
@@ -344,7 +344,7 @@ function AddAuditInventory() {
     document.getElementById('result').innerHTML += "&nbsp;&nbsp;" + strInventoryCode + " Quantity: " + intQuantity + "<br />";
     arrayInventoryCode[i++] = strInventoryCode + "|" + intQuantity;
     document.getElementById('inventory_code').value = "";
-    document.getElementById('quantity').value = ""; 
+    document.getElementById('quantity').value = "";
     document.getElementById('inventory_code').focus();
   }
   else {
@@ -381,9 +381,41 @@ function NextLocationInventory() {
   }
   return false;
 }
-function MenuSubmit(intMinValue,intMaxValue) {
-  var intMenuId = document.main_form.menu_id.value;
-  if (intMenuId == '') return;
+function MenuSubmit(intMinValue,intMaxValue,intKeyCode) {
+  var intMenuId = 0;
+  switch (intKeyCode) {
+    case 49: case 97:
+      intMenuId = 1;
+      break;
+    case 50: case 98:
+      intMenuId = 2;
+      break;
+    case 51: case 99:
+      intMenuId = 3;
+      break;
+    case 52: case 100:
+      intMenuId = 4;
+      break;
+    case 53: case 101:
+      intMenuId = 5;
+      break;
+    case 54: case 102:
+      intMenuId = 6;
+      break;
+    case 55: case 103:
+      intMenuId = 7;
+      break;
+    case 56: case 104:
+      intMenuId = 8;
+      break;
+    case 57: case 105:
+      intMenuId = 9;
+      break;
+    default:
+      return;
+  }
+  document.main_form.menu_id.value = intMenuId;
+  if (intMenuId == 0) return;
   if (isNaN(parseInt(intMenuId))) {
     document.main_form.menu_id.value='';
     alert("That is not a valid menu option");

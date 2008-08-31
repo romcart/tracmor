@@ -7,7 +7,8 @@ if ($_POST && $_POST['method'] == 'asset_menu' && is_numeric($_POST['menu_id']))
 }
 
 $strTitle = "Asset Menu";
-$strBodyOnLoad = "document.main_form.menu_id.value=''; document.main_form.menu_id.focus();";
+$strBodyOnLoad = "document.main_form.menu_id.value='';";
+$strBodyOnKeyUp = " onkeyup=\"javascript:MenuSubmit(1, 5, event.keyCode);\"";
 
 require_once('./includes/header.inc.php');
 ?>
@@ -21,7 +22,7 @@ require_once('./includes/header.inc.php');
   </ol>
   <form method="post" name="main_form">
   <input type="hidden" name="method" value="asset_menu">
-  <input type="text" name="menu_id" onkeyup="javascript:MenuSubmit(1,5);" size="3">
+  <input type="hidden" name="menu_id" value="">
   </form>
 
 <?php

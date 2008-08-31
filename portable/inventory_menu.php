@@ -8,7 +8,8 @@ if ($_POST && $_POST['method'] == 'inventory_menu' && is_numeric($_POST['menu_id
 }
 
 $strTitle = "Inventory Menu";
-$strBodyOnLoad = "document.main_form.menu_id.value=''; document.main_form.menu_id.focus();";
+$strBodyOnLoad = "document.main_form.menu_id.value='';";
+$strBodyOnKeyUp = " onkeyup=\"javascript:MenuSubmit(1, 4, event.keyCode);\"";
 
 require_once('./includes/header.inc.php');
 ?>
@@ -19,10 +20,10 @@ require_once('./includes/header.inc.php');
   <li><a href="authenticate.php?menu_id=8">Restock Inventory</a></li>
   <li><a href="authenticate.php?menu_id=9">Inventory Audit</a></li>
   </ol>
-  
+
   <form method="post" name="main_form">
   <input type="hidden" name="method" value="inventory_menu">
-  <input type="text" name="menu_id" onkeyup="javascript:MenuSubmit(1,4);" size="3">
+  <input type="hidden" name="menu_id" value="">
   </form>
 
 <?php
