@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,11 +22,11 @@
 	// Include prepend.inc to load Qcodo
 	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
 	QApplication::Authenticate();
-	
+
 	class AdminLabelsForm extends QForm {
 		// Header Menu
 		protected $ctlHeaderMenu;
-		
+
 		// Drop-down select list
 		protected $lstLabelTypeControl;
 		// Modal dialog for printing labels
@@ -36,20 +36,20 @@
 		protected $btnPrint;
 		protected $btnCancel;
 		protected $txtWarning;
-		
+
 		// Search Menu
 		protected $ctlSearchMenu;
 		// Buttons
 		protected $btnPrintLabels;
 		//protected $blnPrintLabels;
-		
-		// Array of ObjectIds of checked items 
+
+		// Array of ObjectIds of checked items
 		protected $intObjectIdArray;
 		protected $strBarCodeArray;
 		protected $intCurrentBarCodeLabel;
 		protected $intLabelsPerPage;
 		protected $strTablesBufferArray;
-		
+
 		protected function Form_Create() {
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
@@ -60,12 +60,12 @@
 			// Create Modal Window for Printing Labels
 			$this->dlgPrintLabels_Create();
 		}
-		
+
 		// Create and Setup the Header Composite Control
 		protected function ctlHeaderMenu_Create() {
 			$this->ctlHeaderMenu = new QHeaderMenu($this);
 		}
-		
+
 		// Create and Setup the Label Type drop-down select list
 		protected function lstLabelTypeControl_Create() {
 			$this->lstLabelTypeControl = new QListBox($this);
@@ -77,12 +77,12 @@
 			$this->lstLabelTypeControl->AddItem(new QListItem('Users',4));
 			$this->lstLabelTypeControl->AddAction(new QChangeEvent(), new QServerAction('lstLabelTypeControl_Change'));
 		}
-		
+
 		// Create and Setup the Modal Window for Printing Labels
 		protected function dlgPrintLabels_Create() {
 		  $this->dlgPrintLabels = new QDialogBox($this);
       $this->dlgPrintLabels->Text = '';
-      
+
       // Let's setup some basic appearance options
       $this->dlgPrintLabels->Width = '300px';
       $this->dlgPrintLabels->Height = '100px';
@@ -93,12 +93,12 @@
       $this->dlgPrintLabels->BackColor = '#ffffff';
       // Make sure this Dislog Box is "hidden"
       $this->dlgPrintLabels->Display = false;
-      
+
       /* If you try to make moveable - error "qc.regDB is not a function"
       $this->dlgPrintLabels->Position = QPosition::Absolute;
       $this->dlgPrintLabels->AddControlToMove();
       */
-      
+
       // Add some controls into modal window
       $this->lstLabelStock = new QListBox($this->dlgPrintLabels);
       $this->lstLabelStock->Width = 200;
@@ -123,7 +123,7 @@
 			$this->txtWarning->Display = false;
 			$this->dlgPrintLabels->Template = 'labels_printing_labels.tpl.php';
 		}
-  	
+
   	// Create and Setup the Print Labels Button
 		protected function btnPrintLabels_Create() {
 			$this->btnPrintLabels = new QButton($this);
@@ -134,7 +134,7 @@
 			$this->btnPrintLabels->Display = false;
 			//$this->blnPrintLabels = false;
 		}
-		
+
 		// Create and display the search on change Label Type
 		protected function lstLabelTypeControl_Change() {
       // Create and display search control
@@ -150,7 +150,7 @@
   		    break;
   		  case 4:
   		    $this->ctlSearchMenu = new QUserSearchComposite($this, null, true);
-  		    break;  
+  		    break;
   		  default:
   		    break;
   		}
@@ -170,7 +170,7 @@
   		  $this->btnPrintLabels->Enabled = true;
       }
   	}
-		
+
 		// Print Lables button click action
 		protected function btnPrintLabels_Click() {
 			//if ($this->blnPrintLabels) {
@@ -181,7 +181,7 @@
   			$_SESSION["intGeneratingStatus"] = 0;
   			set_time_limit(0);
   			$blnError = false;
-  			// Array[0] - DataGrid Object name; array[1] - Id; array[2] - used for Bar Code Label Generation 
+  			// Array[0] - DataGrid Object name; array[1] - Id; array[2] - used for Bar Code Label Generation
   			$arrDataGridObjectNameId = $this->ctlSearchMenu->GetDataGridObjectNameId();
     		$this->intObjectIdArray = $this->ctlSearchMenu->$arrDataGridObjectNameId[0]->GetSelected($arrDataGridObjectNameId[1]);
     		$objCheckedArray = array();
@@ -202,12 +202,12 @@
       		    break;
       		  case 4:
       		    $objCheckedArray = UserAccount::QueryArray(QQ::In(QQN::UserAccount()->UserAccountId, $this->intObjectIdArray));
-      		    break;  
+      		    break;
       		  default:
       		    $this->btnPrintLabels->Warning = "Please select Label Type.<br/>";
       		    $this->intObjectIdArray = array();
       		    $blnError = true;
-      		    break;  
+      		    break;
     		  }
     		  $objArrayById = array();
       		// Create array of objects where the key is Id
@@ -222,7 +222,7 @@
     		else {
     		  $blnError = true;
     		}
-  		  
+
         if (!$blnError) {
           $this->btnPrintLabels->Warning = "";
           $this->lstLabelStock->SelectedValue = 0;
@@ -247,7 +247,7 @@
 			}*/
 			QApplication::ExecuteJavaScript("document.getElementById('warning_loading').innerHTML = '';");
 		}
-		
+
 		// Cancel button click action
 		protected function btnCancel_Click() {
 		  // Terminate PDF generating
@@ -255,7 +255,7 @@
 		  $this->dlgPrintLabels->HideDialogBox();
 		  $this->btnPrint->Enabled = true;
 		  $this->btnPrintLabels->Enabled = true;
-		  
+
 		  /*
 		  // Uncheck all items but SelectAll checkbox
       foreach ($this->GetAllControls() as $objControl) {
@@ -267,7 +267,7 @@
       // Uncheck SelectAll checkbox
       $this->ctlSearchMenu->$arrDataGridObjectNameId[0]->chkSelectAll->Checked = false;
       */
-		  
+
       // Delete temporary images
       for ($i = 1; $i <= $this->intCurrentBarCodeLabel; $i++) {
         @unlink("../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_".$i.".png");
@@ -279,7 +279,7 @@
       $this->txtWarning->Text = "";
   		$this->txtWarning->Display = false;
     }
-		
+
 		// Create the Label Offset drop-down menu on change Label Stock
 		protected function lstLabelStock_Change() {
 		  if ($this->lstLabelStock->SelectedValue) {
@@ -300,7 +300,7 @@
   		      throw new QCallerException('Label Stock Not Provided');
   		      break;
   		  }
-  		  
+
   		  for ($i = 1; $i < $this->intLabelsPerPage; $i++) {
           $this->lstLabelOffset->AddItem(new QListItem($i, $i));
         }
@@ -311,7 +311,7 @@
 		    $this->lstLabelStock->Enabled = true;
 		  }
 		}
-		
+
 		// Create and Setup the table per each page for Bar Code Label Generation
 		protected function CreateTableByBarCodeArray() {
 		  $strTable = "<table height=\"100%\" border=\"1\" style=\"text-align:center\">";
@@ -332,10 +332,10 @@
   		    $intBlankSpace = 30; // Blank Cell Width
     		  break;
   		  default:
-  		    throw new QCallerException('Label Stock Not Provided'); 
+  		    throw new QCallerException('Label Stock Not Provided');
   		  break;
   		}
-		  
+
 		  $i = 0;
 		  while ($i < $this->intLabelsPerPage) {
 		    $strTable .= "<tr>";
@@ -349,7 +349,29 @@
 		      elseif ($this->intCurrentBarCodeLabel < $intBarCodeArrayCount) {
 		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"..%s/%s_%s.png\" height=\"%s\" border=\"0\" align=\"center\" /></td>", $intCellWidth, __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
  		        $image = ImageCreateFromPNG(sprintf("http://%s/includes/php/barcode.php?code=%s&encoding=128&scale=1", $_SERVER['SERVER_NAME'] . __SUBDIRECTORY__,  urlencode($this->strBarCodeArray[$this->intCurrentBarCodeLabel++])));
-		        ImagePNG($image, sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+		        // Get image width
+ 		        $intImageSx = imagesx($image);
+ 		        // Get image height
+		        $intImageSy = imagesy($image);
+		        // Scale
+		        $intRatio = $intImageHeight / $intImageSy;
+		        // Create new image
+		        $new_image = imagecreate($intCellWidth - 2, $intImageHeight);
+		        // Background Color
+		        $background = imagecolorallocate($new_image, 255, 255, 255); // White
+		        //$background = imagecolorallocate($new_image, 0, 0, 0); // Black
+		        // If the width of scalable image less then the width of the cell
+		        if (($intImageSx * $intRatio) < ($intCellWidth - 2)) {
+		          // Add some blank to the right and left
+		          imagecopyresampled($new_image, $image, ceil(($intCellWidth - $intImageSx * $intRatio)/2), 0, 0, 0, ceil($intImageSx * $intRatio), $intImageHeight, $intImageSx, $intImageSy);
+		        }
+		        else {
+		          $intRatio = ($intCellWidth - 2) / $intImageSx;
+		          // Add some blank to the top and bottom
+		          imagecopyresampled($new_image, $image, 0, ceil(($intImageHeight - $intImageSy * $intRatio)/2), 0, 0, $intCellWidth - 2, ceil($intImageSy * $intRatio), $intImageSx, $intImageSy);
+		        }
+ 		        ImagePNG($new_image, sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+		        imagedestroy($new_image);
 		        imagedestroy($image);
 		      }
 		      else {
@@ -364,25 +386,25 @@
 		    }
 		    $strTable .= implode(sprintf("<td width=\"%spx\" style=\"text-align:center\"></td>", $intBlankSpace), $arrTD)."</tr>";
 		  }
-		  
+
 		  $strTable .= "</table>";
-		  //echo($strTable); exit;
+
 		  // If the user clicked Cancel button or clicked outside of the modal dialog
 		  if ($_SESSION["intGeneratingStatus"] != -1 || !($this->dlgPrintLabels->Visible && $this->dlgPrintLabels->Display)) {
 		    // xx% Complete
 		    $_SESSION["intGeneratingStatus"] = ceil($this->intCurrentBarCodeLabel / $intBarCodeArrayCount * 100);
 		    return $strTable;
 		  }
-		  else 
+		  else
 		    return;
 		}
-		
+
 		// Print button click action
 		protected function btnPrint_Click() {
 		  if ($this->lstLabelStock->SelectedValue) {
-		    
+
 			  $this->lstLabelStock->Warning = "";
-		    
+
         set_time_limit(0);
         // If the user clicked Cancel button
         if ($_SESSION["intGeneratingStatus"] != -1) {
@@ -398,33 +420,33 @@
             else {
               include_once('../includes/php/tcpdf/config/lang/eng.php');
               include_once('../includes/php/tcpdf/tcpdf.php');
-              
+
               $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
               // Set document information
               $pdf->SetCreator("Tracmor");
               $pdf->SetAuthor("Tracmor");
               $pdf->SetTitle("Bar Codes");
-              
+
               // Disable header and footer
               $pdf->setPrintHeader(false);
               $pdf->setPrintFooter(false);
-              
+
               // Disable auto page breaks
               $pdf->SetAutoPageBreak(false);
-              
+
               // Set some language-dependent strings
               $pdf->setLanguageArray($l);
-              
+
               // Set the color used for all drawing operations (lines, rectangles and cell borders).
               $pdf->SetDrawColor(255); // white
               // Set Cell Padding
               $pdf->SetCellPadding(0);
               // Set Cell Spacing
               $pdf->SetLineWidth(0);
-              
+
               // Initialize document
               $pdf->AliasNbPages();
-              
+
               switch ($this->lstLabelStock->SelectedValue) {
           		  case 1:
             		  // Labels per row for Avery 6577 (5/8" x 3")
@@ -441,22 +463,22 @@
                   $pdf->SetMargins(0, 18, 0);
             		  break;
           		  default:
-          		    throw new QCallerException('Label Stock Not Provided'); 
+          		    throw new QCallerException('Label Stock Not Provided');
           		  break;
           		}
-              
+
               foreach ($this->strTablesBufferArray as $strTableBuffer) {
                 // add a page
                 $pdf->AddPage();
                 // output the HTML content
                 $pdf->writeHTML($strTableBuffer);
               }
-              
+
               // Close and save PDF document
               $pdf->Output("../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_BarCodes.pdf", "F");
               // Cleaning up
               $this->btnCancel_Click();
-              
+
               // Uncheck all items but SelectAll checkbox
               foreach ($this->GetAllControls() as $objControl) {
                 if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
@@ -466,7 +488,7 @@
               $arrDataGridObjectNameId = $this->ctlSearchMenu->GetDataGridObjectNameId();
               // Uncheck SelectAll checkbox
               $this->ctlSearchMenu->$arrDataGridObjectNameId[0]->chkSelectAll->Checked = false;
-              
+
               // Open generated PDF in new window
     		      QApplication::ExecuteJavaScript("window.open('../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_BarCodes.pdf','Barcodes','resizeable,menubar=1,scrollbar=1,left=0,top=0,width=800,height=600');");
             }
@@ -485,5 +507,5 @@
 	}
 
 	// Go ahead and run this form object to generate the page
-	AdminLabelsForm::Run('AdminLabelsForm', 'labels.tpl.php');	
+	AdminLabelsForm::Run('AdminLabelsForm', 'labels.tpl.php');
 ?>
