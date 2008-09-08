@@ -270,7 +270,7 @@
 
       // Delete temporary images
       for ($i = 1; $i <= $this->intCurrentBarCodeLabel; $i++) {
-        @unlink("../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_".$i.".png");
+        @unlink(".." . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_".$i.".png");
       }
       // Reset variables
       $this->intCurrentBarCodeLabel = 0;
@@ -321,15 +321,15 @@
     		  // Labels per row for Avery 6577 (5/8" x 3")
   		    $intNumberInTableRow = 2; // Cells per row
   		    $intImageHeight = 41; // Bar Code Image Height
-  		    $intCellWidth = 246; // Cell Width
-  		    $intBlankSpace = 56; // Blank Cell Width
+  		    $intCellWidth = 290; // Cell Width
+  		    $intBlankSpace = 18; // Blank Cell Width
     		  break;
   		  case 2:
     		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
   		    $intNumberInTableRow = 4; // Cells per row
   		    $intImageHeight = 60; // Bar Code Image Height
-  		    $intCellWidth = 125; // Cell Width
-  		    $intBlankSpace = 30; // Blank Cell Width
+  		    $intCellWidth = 130; // Cell Width
+  		    $intBlankSpace = 26; // Blank Cell Width
     		  break;
   		  default:
   		    throw new QCallerException('Label Stock Not Provided');
@@ -349,6 +349,8 @@
 		      elseif ($this->intCurrentBarCodeLabel < $intBarCodeArrayCount) {
 		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"..%s/%s_%s.png\" height=\"%s\" border=\"0\" align=\"center\" /></td>", $intCellWidth, __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
  		        $image = ImageCreateFromPNG(sprintf("http://%s/includes/php/barcode.php?code=%s&encoding=128&scale=1", $_SERVER['SERVER_NAME'] . __SUBDIRECTORY__,  urlencode($this->strBarCodeArray[$this->intCurrentBarCodeLabel++])));
+ 		        
+ 		        /*
 		        // Get image width
  		        $intImageSx = imagesx($image);
  		        // Get image height
@@ -371,12 +373,14 @@
 		          imagecopyresampled($new_image, $image, 0, ceil(($intImageHeight - $intImageSy * $intRatio)/2), 0, 0, $intCellWidth - 2, ceil($intImageSy * $intRatio), $intImageSx, $intImageSy);
 		        }
  		        ImagePNG($new_image, sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
-		        imagedestroy($new_image);
+ 		        imagedestroy($new_image);
+ 		        */
+ 		        ImagePNG($image, sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		        imagedestroy($image);
 		      }
 		      else {
 		        if (!isset($arrImageSize)) {
-		          $arrImageSize = getimagesize(sprintf("../%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+		          $arrImageSize = getimagesize(sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		          $arrImageSize[0] = ceil($arrImageSize[0]*($intImageHeight/$arrImageSize[1]));
 		        }
 		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../includes/php/tcpdf/images/_blank.png\" width=\"%s\" height=\"%s\" /></td>", $intCellWidth, $arrImageSize[0], $intImageHeight);
@@ -388,7 +392,7 @@
 		  }
 
 		  $strTable .= "</table>";
-
+		  
 		  // If the user clicked Cancel button or clicked outside of the modal dialog
 		  if ($_SESSION["intGeneratingStatus"] != -1 || !($this->dlgPrintLabels->Visible && $this->dlgPrintLabels->Display)) {
 		    // xx% Complete
@@ -451,16 +455,16 @@
           		  case 1:
             		  // Labels per row for Avery 6577 (5/8" x 3")
           		    $pdf->SetFontSize(3);
-          		    $pdf->setCellHeightRatio(2.85);
+          		    $pdf->setCellHeightRatio(4.15);
           		    // Set margins
-                  $pdf->SetMargins(0, 10, 0);
+                  $pdf->SetMargins(0, 13, 0);
               	  break;
           		  case 2:
             		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
           		    $pdf->SetFontSize(28);
-          		    $pdf->setCellHeightRatio(1.4);
+          		    $pdf->setCellHeightRatio(2.48);
           		    // Set margins
-                  $pdf->SetMargins(0, 18, 0);
+                  $pdf->SetMargins(0, 20, 0);
             		  break;
           		  default:
           		    throw new QCallerException('Label Stock Not Provided');
@@ -475,7 +479,7 @@
               }
 
               // Close and save PDF document
-              $pdf->Output("../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_BarCodes.pdf", "F");
+              $pdf->Output(".." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId']."_BarCodes.pdf", "F");
               // Cleaning up
               $this->btnCancel_Click();
 
@@ -490,7 +494,7 @@
               $this->ctlSearchMenu->$arrDataGridObjectNameId[0]->chkSelectAll->Checked = false;
 
               // Open generated PDF in new window
-    		      QApplication::ExecuteJavaScript("window.open('../" . __TRACMOR_TMP__ . "/".$_SESSION['intUserAccountId']."_BarCodes.pdf','Barcodes','resizeable,menubar=1,scrollbar=1,left=0,top=0,width=800,height=600');");
+    		      QApplication::ExecuteJavaScript("window.open('.." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId']."_BarCodes.pdf','Barcodes','resizeable,menubar=1,scrollbar=1,left=0,top=0,width=800,height=600');");
             }
           }
           else {

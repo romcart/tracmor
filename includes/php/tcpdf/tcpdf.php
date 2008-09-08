@@ -2,9 +2,9 @@
 //============================================================+
 // File name   : tcpdf.php
 // Begin       : 2002-08-03
-// Last Update : 2008-08-28
+// Last Update : 2008-09-05
 // Author      : Nicola Asuni - info@tecnick.com - http://www.tcpdf.org
-// Version     : 4.0.022
+// Version     : 4.0.023
 // License     : GNU LGPL (http://www.gnu.org/copyleft/lesser.html)
 // 	----------------------------------------------------------------------------
 //  Copyright (C) 2002-2008  Nicola Asuni - Tecnick.com S.r.l.
@@ -118,7 +118,7 @@
  * @copyright 2004-2008 Nicola Asuni - Tecnick.com S.r.l (www.tecnick.com) Via Della Pace, 11 - 09044 - Quartucciu (CA) - ITALY - www.tecnick.com - info@tecnick.com
  * @link http://www.tcpdf.org
  * @license http://www.gnu.org/copyleft/lesser.html LGPL
- * @version 4.0.022
+ * @version 4.0.023
  */
 
 /**
@@ -148,14 +148,14 @@ if (!class_exists('TCPDF')) {
 	/**
 	 * define default PDF document producer
 	 */ 
-	define('PDF_PRODUCER','TCPDF 4.0.022 (http://www.tcpdf.org)');
+	define('PDF_PRODUCER','TCPDF 4.0.023 (http://www.tcpdf.org)');
 	
 	/**
 	* This is a PHP class for generating PDF documents without requiring external extensions.<br>
 	* TCPDF project (http://www.tcpdf.org) has been originally derived in 2002 from the Public Domain FPDF class by Olivier Plathey (http://www.fpdf.org), but now is almost entirely rewritten.<br>
 	* @name TCPDF
 	* @package com.tecnick.tcpdf
-	* @version 4.0.022
+	* @version 4.0.023
 	* @author Nicola Asuni - info@tecnick.com
 	* @link http://www.tcpdf.org
 	* @license http://www.gnu.org/copyleft/lesser.html LGPL
@@ -3559,22 +3559,22 @@ if (!class_exists('TCPDF')) {
 			}
 			// set pointer to align the successive text/objects
 			switch($align) {
-				case 'T':{
+				case 'T': {
 					$this->y = $y;
 					$this->x = $this->img_rb_x;
 					break;
 				}
-				case 'M':{
+				case 'M': {
 					$this->y = $y + round($h/2);
 					$this->x = $this->img_rb_x;
 					break;
 				}
-				case 'B':{
+				case 'B': {
 					$this->y = $this->img_rb_y;
 					$this->x = $this->img_rb_x;
 					break;
 				}
-				case 'N':{
+				case 'N': {
 					$this->SetY($this->img_rb_y);
 					break;
 				}
@@ -8958,6 +8958,8 @@ if (!class_exists('TCPDF')) {
 			$html = preg_replace('/[\s]*<th/', '<th', $html);
 			$html = preg_replace('/[\s]*<\/td>[\s]*/', '</td>', $html);
 			$html = preg_replace('/[\s]*<td/', '<td', $html);
+			$html = preg_replace('/<\/th>/', '<span></span></th>', $html);
+			$html = preg_replace('/<\/td>/', '<span></span></td>', $html);
 			// pattern for generic tag
 			$tagpattern = '/(<[^>]+>)/Uu';
 			// explodes the string
@@ -9194,6 +9196,7 @@ if (!class_exists('TCPDF')) {
 		
 		/**
 		 * Allows to preserve some HTML formatting (limited support).<br />
+		 * IMPORTANT: The HTML must be well formatted - try to clean-up it using an application like HTML-Tidy before submitting.
 		 * Supported tags are: a, b, blockquote, br, dd, del, div, dl, dt, em, font, h1, h2, h3, h4, h5, h6, hr, i, img, li, ol, p, small, span, strong, sub, sup, table, td, th, tr, u, ul, 
 		 * @param string $html text to display
 		 * @param boolean $ln if true add a new line after text (default = true)
@@ -9250,9 +9253,20 @@ if (!class_exists('TCPDF')) {
 			$dom = $this->getHtmlDomArray($html);
 			$maxel = count($dom);
 			$key = 0;
-			while ($key < $maxel) {				
+			while ($key < $maxel) {
 				if ($dom[$key]['tag'] OR ($key == 0)) {
-					if (isset($dom[$key]['fontname']) OR isset($dom[$key]['fontstyle']) OR isset($dom[$key]['fontsize'])) {
+					if ((($dom[$key]['value'] == 'table') OR ($dom[$key]['value'] == 'tr')) AND (isset($dom[$key]['align']))) {
+						$dom[$key]['align'] = ($this->rtl)?'R':'L';
+					}
+					// vertically align image in line
+					if ((!$this->newline) AND ($dom[$key]['value'] == 'img') 
+						AND (isset($dom[$key]['attribute']['height']))
+						AND ($dom[$key]['attribute']['height'] > 0)
+						) {
+						$this->y += (($curfontsize / $this->k) - $this->pixelsToUnits($dom[$key]['attribute']['height']));
+						$minstartliney = min($this->y, $minstartliney);
+					} elseif (isset($dom[$key]['fontname']) OR isset($dom[$key]['fontstyle']) OR isset($dom[$key]['fontsize'])) {
+						// account for different font size
 						$pfontname = $curfontname;
 						$pfontstyle = $curfontstyle;
 						$pfontsize = $curfontsize;
@@ -9417,7 +9431,11 @@ if (!class_exists('TCPDF')) {
 								$cellw = ($colspan * ($table_width / $dom[$table_el]['cols']));
 							}
 							$cellw -= $cellspacing;
-							$cell_content = $dom[$key]['content'];
+							if (isset($dom[$key]['content'])) {
+								$cell_content = $dom[$key]['content'];
+							} else {
+								$cell_content = "&nbsp;";
+							}
 							$tagtype = $dom[$key]['value'];
 							$parentid = $key;
 							while (($key < $maxel) AND (!(($dom[$key]['tag']) AND (!$dom[$key]['opening']) AND ($dom[$key]['value'] == $tagtype) AND ($dom[$key]['parent'] == $parentid)))) {
@@ -9750,36 +9768,52 @@ if (!class_exists('TCPDF')) {
 						if (!isset($tag['attribute']['height'])) {
 							$tag['attribute']['height'] = 0;
 						}
-						if (!isset($tag['attribute']['align'])) {
-							$align = 'N';
-						} else {
-							switch($tag['attribute']['align']) {
-								case 'top':{
-									$align = 'T';
-									break;
-								}
-								case 'middle':{
-									$align = 'M';
-									break;
-								}
-								case 'bottom':{
-									$align = 'B';
-									break;
-								}
-								default:{
-									$align = 'N';
-									break;
-								}
+						//if (!isset($tag['attribute']['align'])) {
+							// the only alignment supported is "bottom"
+							// further development is required for other modes.
+							$tag['attribute']['align'] = 'bottom';
+						//} 
+						switch($tag['attribute']['align']) {
+							case 'top': {
+								$align = 'T';
+								break;
+							}
+							case 'middle': {
+								$align = 'M';
+								break;
+							}
+							case 'bottom': {
+								$align = 'B';
+								break;
+							}
+							default: {
+								$align = 'B';
+								break;
 							}
 						}
 						$fileinfo = pathinfo($tag['attribute']['src']);
 						if (isset($fileinfo['extension']) AND (!empty($fileinfo['extension']))) {
 							$type = strtolower($fileinfo['extension']);
 						}
+						$prevy = $this->y;
 						if (($type == "eps") OR ($type == "ai")) {
 							$this->ImageEps($tag['attribute']['src'], $this->GetX(), $this->GetY(), $this->pixelsToUnits($tag['attribute']['width']), $this->pixelsToUnits($tag['attribute']['height']), '', true, $align);
 						} else {
 							$this->Image($tag['attribute']['src'], $this->GetX(), $this->GetY(), $this->pixelsToUnits($tag['attribute']['width']), $this->pixelsToUnits($tag['attribute']['height']), '', '', $align);
+						}
+						switch($align) {
+							case 'T': {
+								$this->y = $prevy;
+								break;
+							}
+							case 'M': {
+								$this->y = (($this->img_rb_y + $prevy - ($tag['fontsize'] / $this->k)) / 2) ;
+								break;
+							}
+							case 'B': {
+								$this->y = $this->img_rb_y - ($tag['fontsize'] / $this->k);
+								break;
+							}
 						}
 					}
 					break;
@@ -10122,7 +10156,7 @@ if (!class_exists('TCPDF')) {
 		 * Add vertical spaces if needed.
 		 * @param int $n number of spaces to add
 		 * @param boolean $cell if true add the default cMargin space to each new line (default false).
-         * @param string $h The height of the break. By default, the value equals the height of the last printed cell.
+		 * @param string $h The height of the break. By default, the value equals the height of the last printed cell.
 		 * @access protected
 		 */
 		protected function addHTMLVertSpace($n, $cell=false, $h='') {
