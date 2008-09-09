@@ -349,8 +349,7 @@
 		      elseif ($this->intCurrentBarCodeLabel < $intBarCodeArrayCount) {
 		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"..%s/%s_%s.png\" height=\"%s\" border=\"0\" align=\"center\" /></td>", $intCellWidth, __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
  		        $image = ImageCreateFromPNG(sprintf("http://%s/includes/php/barcode.php?code=%s&encoding=128&scale=1", $_SERVER['SERVER_NAME'] . __SUBDIRECTORY__,  urlencode($this->strBarCodeArray[$this->intCurrentBarCodeLabel++])));
- 		        
- 		        /*
+
 		        // Get image width
  		        $intImageSx = imagesx($image);
  		        // Get image height
@@ -358,10 +357,11 @@
 		        // Scale
 		        $intRatio = $intImageHeight / $intImageSy;
 		        // Create new image
-		        $new_image = imagecreate($intCellWidth - 2, $intImageHeight);
+		        $new_image = imagecreatetruecolor($intCellWidth - 2, $intImageHeight);
 		        // Background Color
 		        $background = imagecolorallocate($new_image, 255, 255, 255); // White
 		        //$background = imagecolorallocate($new_image, 0, 0, 0); // Black
+		        imagefilledrectangle($new_image, 0, 0, $intCellWidth - 2, $intImageHeight, $background);
 		        // If the width of scalable image less then the width of the cell
 		        if (($intImageSx * $intRatio) < ($intCellWidth - 2)) {
 		          // Add some blank to the right and left
@@ -374,8 +374,8 @@
 		        }
  		        ImagePNG($new_image, sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
  		        imagedestroy($new_image);
- 		        */
- 		        ImagePNG($image, sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+
+ 		        //ImagePNG($image, sprintf("..%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		        imagedestroy($image);
 		      }
 		      else {
@@ -392,7 +392,7 @@
 		  }
 
 		  $strTable .= "</table>";
-		  
+
 		  // If the user clicked Cancel button or clicked outside of the modal dialog
 		  if ($_SESSION["intGeneratingStatus"] != -1 || !($this->dlgPrintLabels->Visible && $this->dlgPrintLabels->Display)) {
 		    // xx% Complete
