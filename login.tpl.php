@@ -119,6 +119,5 @@
 	</tr>
 </table>
 
-<table align='center' cellpadding='5'><tr><td bgcolor='#CCCCCC'><strong>PHP Version:</strong></td><td bgcolor='#EEEEEE'><?php echo(phpversion()) ?></td></tr><tr><td bgcolor='#CCCCCC'><strong>MySql Version:</strong></td><td bgcolor='#EEEEEE'><?php echo(mysqli_get_client_info()); ?></td></tr><tr><td bgcolor='#CCCCCC'><strong>Qcodo Version:</strong></td><td bgcolor='#EEEEEE'>0.3.32 (Qcodo Beta 3)</td></tr><tr><td bgcolor='#CCCCCC'><strong>Build Date:</strong></td><td bgcolor='#EEEEEE'>Mon Aug 18 22:07:10 PDT 2008</td></tr></table>
 <?php $this->RenderEnd(); ?>
 <?php require_once(__INCLUDES__ . '/footer.inc.php'); ?>
