@@ -115,12 +115,12 @@
 			$objExpansionMap[Company::ExpandAddress][Address::ExpandStateProvince] = true;
 			$objExpansionMap[Company::ExpandAddress][Address::ExpandCountry] = true;
 			
-			$this->dtgCompany->TotalItemCount = Company::CountBySearch($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
+			$this->dtgCompany->TotalItemCount = Company::CountBySearchHelper($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgCompany->TotalItemCount == 0) {
 				$this->dtgCompany->ShowHeader = false;
 			}
 			else {
-				$this->dtgCompany->DataSource = Company::LoadArrayBySearch($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgCompany->SortInfo, $this->dtgCompany->LimitInfo, $objExpansionMap);
+				$this->dtgCompany->DataSource = Company::LoadArrayBySearchHelper($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgCompany->SortInfo, $this->dtgCompany->LimitInfo, $objExpansionMap);
 				$this->dtgCompany->ShowHeader = true;
 			}
 			$this->blnSearch = false;

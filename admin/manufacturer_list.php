@@ -74,7 +74,7 @@
 				$this->dtgManufacturer->DataSource = Manufacturer::LoadAll($objClauses);
 				$this->dtgManufacturer->ShowHeader = true;*/
 
-				$this->dtgManufacturer->DataSource = Manufacturer::LoadAllWithCustomFields($this->dtgManufacturer->SortInfo, $this->dtgManufacturer->LimitInfo, $objExpansionMap);
+				$this->dtgManufacturer->DataSource = Manufacturer::LoadAllWithCustomFieldsHelper($this->dtgManufacturer->SortInfo, $this->dtgManufacturer->LimitInfo, $objExpansionMap);
 				$this->dtgManufacturer->ShowHeader = true;
 			}
 		}

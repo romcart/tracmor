@@ -112,12 +112,12 @@
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgContact->TotalItemCount = Contact::CountBySearch($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
+			$this->dtgContact->TotalItemCount = Contact::CountBySearchHelper($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgContact->TotalItemCount == 0) {
 				$this->dtgContact->ShowHeader = false;
 			}
 			else {
-				$this->dtgContact->DataSource = Contact::LoadArrayBySearch($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgContact->SortInfo, $this->dtgContact->LimitInfo, $objExpansionMap);
+				$this->dtgContact->DataSource = Contact::LoadArrayBySearchHelper($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgContact->SortInfo, $this->dtgContact->LimitInfo, $objExpansionMap);
 				$this->dtgContact->ShowHeader = true;
 			}
 			$this->blnSearch = false;

@@ -149,12 +149,12 @@
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgShipment->TotalItemCount = Shipment::CountBySearch($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strShipmentDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
+			$this->dtgShipment->TotalItemCount = Shipment::CountBySearchHelper($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strShipmentDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgShipment->TotalItemCount == 0) {
 				$this->dtgShipment->ShowHeader = false;
 			}
 			else {
-				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearch($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strShipmentDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
+				$this->dtgShipment->DataSource = Shipment::LoadArrayBySearchHelper($strToCompany, $strToContact, $strFromCompany, $strFromContact, $strShipmentNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strTrackingNumber, $intCourierId, $strNote, $strShipmentDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgShipment->SortInfo, $this->dtgShipment->LimitInfo, $objExpansionMap);
 				$this->dtgShipment->ShowHeader = true;
 			}
 			$this->blnSearch = false;

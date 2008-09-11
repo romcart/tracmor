@@ -222,13 +222,13 @@ class QInventorySearchComposite extends QControl {
     $objExpansionMap[InventoryModel::ExpandManufacturer] = true;
 
     // If the search form has been posted
-		$this->dtgInventoryModel->TotalItemCount = InventoryModel::CountBySearch($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
+		$this->dtgInventoryModel->TotalItemCount = InventoryModel::CountBySearchHelper($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 		if ($this->dtgInventoryModel->TotalItemCount == 0) {
 			$this->dtgInventoryModel->ShowHeader = false;
 		}
 		else {
 			$this->dtgInventoryModel->ShowHeader = true;
-			$this->dtgInventoryModel->DataSource = InventoryModel::LoadArrayBySearch($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgInventoryModel->SortInfo, $this->dtgInventoryModel->LimitInfo, $objExpansionMap);
+			$this->dtgInventoryModel->DataSource = InventoryModel::LoadArrayBySearchHelper($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgInventoryModel->SortInfo, $this->dtgInventoryModel->LimitInfo, $objExpansionMap);
 		}
 		$this->blnSearch = false;
   }

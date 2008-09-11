@@ -624,7 +624,7 @@
 		// Protected Update Methods
 		protected function UpdateCustomFieldFields() {
 			
-			// If switching from select to text or textarea, delete any CustomFieldValues that may exist
+		  // If switching from select to text or textarea, delete any CustomFieldValues that may exist
 			if ($this->blnEditMode && $this->objCustomField->CustomFieldQtypeId == 2 && ($this->lstCustomFieldQtype->SelectedValue == 1 || $this->lstCustomFieldQtype->SelectedValue == 3)) {
 				$objCustomFieldValueArray = CustomFieldValue::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
 				if ($objCustomFieldValueArray) {
@@ -686,6 +686,13 @@
 							$objRoleEntityCustomAuth->Delete();
 						}
 						
+						// If the helper table exists for that EntityQtype then will delete the column in the helper table
+						if ($strHelperTableArray = CustomFieldValue::GetHelperTableByEntityQtypeId($objEntityQtypeCustomField->EntityQtypeId)) {
+						  $strHelperTable = $strHelperTableArray[0];
+						  $objDatabase = CustomField::GetDatabase();
+						  $strQuery = sprintf("ALTER TABLE %s DROP `cfv_%s`;", $strHelperTable,  $this->objCustomField->CustomFieldId);
+						  $objDatabase->NonQuery($strQuery);
+						}
 						// Delete the EntityQtypeCustomField last
 						$objEntityQtypeCustomField->Delete();
 					}
@@ -694,7 +701,8 @@
 			
 			// Insert the new EntityQtypeCustomFields
 			if ($this->lstCustomFieldQtype->SelectedItems) {
-				foreach ($this->lstEntityQtype->SelectedItems as $objEntityQtypeItem) {
+			  
+			  foreach ($this->lstEntityQtype->SelectedItems as $objEntityQtypeItem) {
 					// If the field doesn't already exist, then it needs to be created
 					if (!($objEntityQtypeCustomField = EntityQtypeCustomField::LoadByEntityQtypeIdCustomFieldId($objEntityQtypeItem->Value, $this->objCustomField->CustomFieldId))) {
 						$objEntityQtypeCustomField = new EntityQtypeCustomField();
@@ -702,7 +710,15 @@
 						$objEntityQtypeCustomField->EntityQtypeId = $objEntityQtypeItem->Value;
 						$objEntityQtypeCustomField->Save();
 						
-						//// Insert the new EntityQtypeCustomField to the RoleEntityQTypeCustomFieldAuthorization table, to all the roles, with authorized_flag set to true, one for View Auth and another for Edit Auth
+						// If the helper table exists for that EntityQtype then create new column in the helper table
+						if ($strHelperTableArray = CustomFieldValue::GetHelperTableByEntityQtypeId($objEntityQtypeItem->Value)) {
+						  $strHelperTable = $strHelperTableArray[0];
+						  $objDatabase = CustomField::GetDatabase();
+						  $strQuery = sprintf("ALTER TABLE %s ADD `cfv_%s` TEXT DEFAULT NULL;", $strHelperTable,  $this->objCustomField->CustomFieldId);
+						  $objDatabase->NonQuery($strQuery);
+						}
+						
+						// Insert the new EntityQtypeCustomField to the RoleEntityQTypeCustomFieldAuthorization table, to all the roles, with authorized_flag set to true, one for View Auth and another for Edit Auth
 						foreach(Role::LoadAll() as $objRole){
 							//Insert the view Auth
 							$objRoleEntityQtypeCustomFieldAuth = new RoleEntityQtypeCustomFieldAuthorization();
@@ -722,11 +738,28 @@
 						}
 						
 					}
+					// If this field is a required field
+          if ($this->objCustomField->RequiredFlag) {
+            // Add the DefaultValue into the helper table
+  					if ($strHelperTableArray = CustomFieldValue::GetHelperTableByEntityQtypeId($objEntityQtypeItem->Value)) {
+  					  $strHelperTable = $strHelperTableArray[0];
+              // If the custom field is text or textarea
+  					  if ($this->objCustomField->CustomFieldQtypeId != 2) {
+    				    $txtDefaultValue = $this->txtDefaultValue->Text;
+    				  }
+    				  // Else the custom field is SELECT list
+    				  else {
+    				    $txtDefaultValue = CustomFieldValue::LoadByCustomFieldValueId($this->objCustomField->DefaultCustomFieldValueId);
+    				  }
+    				  $objDatabase = CustomField::GetDatabase();
+  					  $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `cfv_%s` is NULL;", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
+    				  $objDatabase->NonQuery($strQuery);
+    				}
+          }
 				}
 			}
 		}
 		
-
 		protected function DeleteEntityQtypeCustomFields(){
 			$objEntityQtypeCustomFieldArray = EntityQtypeCustomField::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
 			if ($objEntityQtypeCustomFieldArray) {
@@ -738,8 +771,16 @@
 							$objRoleEntityCustomAuth->Delete();
 						}
 						
+						// If the helper table exists for that EntityQtype delete the columns in the helper table
+						if ($strHelperTableArray = CustomFieldValue::GetHelperTableByEntityQtypeId($objEntityQtypeCustomField->EntityQtypeId)) {
+						  $strHelperTable = $strHelperTableArray[0];
+						  $objDatabase = CustomField::GetDatabase();
+						  $strQuery = sprintf("ALTER TABLE %s DROP `cfv_%s`;", $strHelperTable,  $objEntityQtypeCustomField->CustomFieldId);
+						  $objDatabase->NonQuery($strQuery);
+						}
+						
 						// Delete the EntityQtypeCustomField last
-						//$objEntityQtypeCustomField->Delete();
+						$objEntityQtypeCustomField->Delete();
 				}
 			}
 		}

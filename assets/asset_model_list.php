@@ -161,8 +161,8 @@
       
       // If the search form has been posted
       // if ($intCategoryId || $intManufacturerId || $strDescription || $strAssetModelCode) {
-    	$this->dtgAssetModel->TotalItemCount = AssetModel::CountBySearch($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
-			$this->dtgAssetModel->DataSource = AssetModel::LoadArrayBySearch($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAssetModel->SortInfo, $this->dtgAssetModel->LimitInfo, $objExpansionMap);
+    	$this->dtgAssetModel->TotalItemCount = AssetModel::CountBySearchHelper($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
+			$this->dtgAssetModel->DataSource = AssetModel::LoadArrayBySearchHelper($intCategoryId, $intManufacturerId, $strDescription, $strAssetModelCode, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAssetModel->SortInfo, $this->dtgAssetModel->LimitInfo, $objExpansionMap);
 			$this->blnSearch = false;
     }
 

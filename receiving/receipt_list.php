@@ -139,12 +139,12 @@
 			
 			// QApplication::$Database[1]->EnableProfiling();
 			
-			$this->dtgReceipt->TotalItemCount = Receipt::CountBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDueDate, $strReceiptDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
+			$this->dtgReceipt->TotalItemCount = Receipt::CountBySearchHelper($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDueDate, $strReceiptDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgReceipt->TotalItemCount == 0) {
 				$this->dtgReceipt->ShowHeader = false;
 			}
 			else {
-				$this->dtgReceipt->DataSource = Receipt::LoadArrayBySearch($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDueDate, $strReceiptDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgReceipt->SortInfo, $this->dtgReceipt->LimitInfo, $objExpansionMap);
+				$this->dtgReceipt->DataSource = Receipt::LoadArrayBySearchHelper($strFromCompany, $strFromContact, $strReceiptNumber, $strAssetCode, $strInventoryModelCode, $intStatus, $strNote, $strDueDate, $strReceiptDate, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgReceipt->SortInfo, $this->dtgReceipt->LimitInfo, $objExpansionMap);
 				$this->dtgReceipt->ShowHeader = true;
 			}
 			$this->blnSearch = false;
