@@ -321,15 +321,15 @@
     		  // Labels per row for Avery 6577 (5/8" x 3")
   		    $intNumberInTableRow = 2; // Cells per row
   		    $intImageHeight = 41; // Bar Code Image Height
-  		    $intCellWidth = 290; // Cell Width
-  		    $intBlankSpace = 18; // Blank Cell Width
+  		    $intCellWidth = 258; // Cell Width
+  		    $intBlankSpace = 10; // Blank Cell Width
     		  break;
   		  case 2:
     		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
   		    $intNumberInTableRow = 4; // Cells per row
   		    $intImageHeight = 60; // Bar Code Image Height
-  		    $intCellWidth = 130; // Cell Width
-  		    $intBlankSpace = 26; // Blank Cell Width
+  		    $intCellWidth = 126; // Cell Width
+  		    $intBlankSpace = 10; // Blank Cell Width
     		  break;
   		  default:
   		    throw new QCallerException('Label Stock Not Provided');
@@ -458,16 +458,16 @@
           		  case 1:
             		  // Labels per row for Avery 6577 (5/8" x 3")
           		    $pdf->SetFontSize(3);
-          		    $pdf->setCellHeightRatio(4.15);
+          		    $pdf->setCellHeightRatio(1.93);
           		    // Set margins
-                  $pdf->SetMargins(0, 13, 0);
+                  $pdf->SetMargins(12, 25, 12);
               	  break;
           		  case 2:
             		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
-          		    $pdf->SetFontSize(28);
-          		    $pdf->setCellHeightRatio(2.48);
+          		    $pdf->SetFontSize(3);
+          		    $pdf->setCellHeightRatio(10.2);
           		    // Set margins
-                  $pdf->SetMargins(0, 20, 0);
+                  $pdf->SetMargins(10, 30, 10);
             		  break;
           		  default:
           		    throw new QCallerException('Label Stock Not Provided');
