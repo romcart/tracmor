@@ -745,7 +745,7 @@ class QAssetEditComposite extends QControl {
 			}
 			
 			// Assign input values to custom fields
-			if ($this->arrCustomFields) {
+			if ($this->arrCustomFields && !$blnError) {
 				
 				// Save the values from all of the custom field controls to save the asset
 				CustomField::SaveControls($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objAsset->AssetId, 1);
@@ -788,6 +788,7 @@ class QAssetEditComposite extends QControl {
 				}
 				
 			}
+			
 			elseif (!$blnError) {
 				
 				// Commit the above transactions to the database
@@ -797,7 +798,6 @@ class QAssetEditComposite extends QControl {
 				$strRedirect = "asset_edit.php?intAssetId=" . $this->objAsset->AssetId;
 				QApplication::Redirect($strRedirect);
 			}
-			
 		}
 		catch (QOptimisticLockingException $objExc) {
 			
