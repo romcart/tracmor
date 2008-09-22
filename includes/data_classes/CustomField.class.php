@@ -268,6 +268,7 @@
 					$strHelperTable = '`contact_custom_field_helper`';
 					break;
 				case 10: 
+					$strPrimaryKey = 'shipment_id';
 					$strId = 'shipment`.`shipment_id';
 					$strHelperTable = '`shipment_custom_field_helper`';
 					break;

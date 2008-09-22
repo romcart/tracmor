@@ -263,12 +263,13 @@
 				parent::Save($blnForceInsert, $blnForceUpdate);
 
 				// If we have no errors then will add the data to the helper table
-  			$objDatabase = Shipment::GetDatabase();
-  			$strQuery = sprintf('INSERT INTO `shipment_custom_field_helper` (`shipment_id`) VALUES (%s);', $this->ShipmentId);
-  			$objDatabase->NonQuery($strQuery);
+	  			$objDatabase = Shipment::GetDatabase();
+  				$strQuery = sprintf('INSERT INTO `shipment_custom_field_helper` (`shipment_id`) VALUES (%s);', $this->ShipmentId);
+  				$objDatabase->NonQuery($strQuery);
 			}
 			else {
 				$this->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
+				parent::Save($blnForceInsert, $blnForceUpdate);
 			}
 		}
 
