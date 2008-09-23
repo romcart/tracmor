@@ -2,7 +2,10 @@
 
 require_once('../includes/prepend.inc.php');
 
-$intEntityQtypeId = 10;
+//$intEntityQtypeId = 10;
+$arrEntityQtypeId = array(1,2,4,5,6,7,8,10,11);
+
+foreach ($arrEntityQtypeId as $intEntityQtypeId) {
 
 switch ($intEntityQtypeId) {
 				case 1: 
@@ -63,7 +66,7 @@ switch ($intEntityQtypeId) {
 				  throw new Exception('Not a valid EntityQtypeId.');
 }
 $blnNoAlterTable = false;
-echo ($intEntityQtypeId);
+
 $objEntityQtypeCustomFieldArray = EntityQtypeCustomField::LoadArrayByEntityQtypeId($intEntityQtypeId, QQ::Clause(QQ::Expand(QQN::EntityQtypeCustomField()->CustomField)));
 
 if ($objEntityQtypeCustomFieldArray) {
@@ -152,6 +155,8 @@ if ($objArray) {
 }
 elseif ($blnNoAlterTable) {
   echo "There are no SQL statements.";
+}
+
 }
 
 ?>
