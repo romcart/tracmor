@@ -482,7 +482,8 @@ class QInventoryTransactComposite extends QControl {
 						
 						// Remove the inventory quantity from the source for moves and take outs
 						if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
-							$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
+							//$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
+							$objInventoryLocation->Quantity = $objInventoryLocation->GetVirtualAttribute('actual_quantity') - $objInventoryLocation->intTransactionQuantity;
 							$objInventoryLocation->Save();
 						}
 						
@@ -490,6 +491,7 @@ class QInventoryTransactComposite extends QControl {
 						if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 4) {
 						$objNewInventoryLocation = InventoryLocation::LoadByLocationIdInventoryModelId($DestinationLocationId, $objInventoryLocation->InventoryModelId);
 							if ($objNewInventoryLocation) {
+								//$objNewInventoryLocation->Quantity = $objNewInventoryLocation->GetVirtualAttribute('actual_quantity') + $objInventoryLocation->intTransactionQuantity;
 								$objNewInventoryLocation->Quantity = $objNewInventoryLocation->Quantity + $objInventoryLocation->intTransactionQuantity;
 							}
 							else {

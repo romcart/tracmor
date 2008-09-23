@@ -82,6 +82,7 @@
 					`creation_date`,
 					`modified_by`,
 					`modified_date`,
+					`inventory_location`.`quantity` AS `__actual_quantity`,
 					(`inventory_location`.`quantity` - IFNULL((SELECT SUM(`inventory_transaction`.`quantity`) AS `pending_quantity` FROM `inventory_transaction` AS `inventory_transaction` WHERE `inventory_transaction`.`inventory_location_id` = `inventory_location`.`inventory_location_id` AND `inventory_transaction`.`source_location_id` > 5 AND `inventory_transaction`.`destination_location_id` IS NULL), 0)) AS `quantity`
 				FROM
 					`inventory_location`
@@ -170,6 +171,7 @@
 					`inventory_location`.`creation_date` AS `creation_date`,
 					`inventory_location`.`modified_by` AS `modified_by`,
 					`inventory_location`.`modified_date` AS `modified_date`,
+					`inventory_location`.`quantity` AS `__actual_quantity`,
 					(`inventory_location`.`quantity` - IFNULL((SELECT SUM(`inventory_transaction`.`quantity`) AS `pending_quantity` FROM `inventory_transaction` AS `inventory_transaction` WHERE `inventory_transaction`.`inventory_location_id` = `inventory_location`.`inventory_location_id` AND `inventory_transaction`.`source_location_id` > 5 AND `inventory_transaction`.`destination_location_id` IS NULL), 0)) AS `quantity`
 					%s
 				FROM
@@ -248,7 +250,7 @@
 					 * @return integer
 					 */
 					return $this->intTransactionQuantity;
-
+					
 				default:
 					try {
 						return parent::__get($strName);

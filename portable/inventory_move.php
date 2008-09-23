@@ -140,7 +140,8 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 				$DestinationLocationId = $objDestinationLocation->LocationId;
 				
 				// Remove the inventory quantity from the source for moves and take outs
-				$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
+				//$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
+				$objInventoryLocation->Quantity = $objInventoryLocation->GetVirtualAttribute('actual_quantity') - $objInventoryLocation->intTransactionQuantity;
 				$objInventoryLocation->Save();
 					
 				// Add the new quantity where it belongs for moves and restocks
