@@ -2,7 +2,7 @@
 
 require_once('../includes/prepend.inc.php');
 
-$intEntityQtypeId = 2;
+$intEntityQtypeId = 10;
 
 switch ($intEntityQtypeId) {
 				case 1: 
@@ -63,7 +63,7 @@ switch ($intEntityQtypeId) {
 				  throw new Exception('Not a valid EntityQtypeId.');
 }
 $blnNoAlterTable = false;
-
+echo ($intEntityQtypeId);
 $objEntityQtypeCustomFieldArray = EntityQtypeCustomField::LoadArrayByEntityQtypeId($intEntityQtypeId, QQ::Clause(QQ::Expand(QQN::EntityQtypeCustomField()->CustomField)));
 
 if ($objEntityQtypeCustomFieldArray) {
@@ -85,7 +85,7 @@ if ($objEntityQtypeCustomFieldArray) {
 	foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
 		$strAlias = $objEntityQtypeCustomField->CustomFieldId;
 		$arrCustomFieldSql['strSelect'] .= sprintf(', `cfv_%s`.`short_description` AS `%s`', $strAlias, '__' . $strAlias);
-		$arrCustomFieldSql['strFrom'] .= sprintf('LEFT JOIN (`custom_field_selection` AS `cfs_%s` JOIN `custom_field_value` AS `cfv_%s` ON `cfv_%s`.`custom_field_id` = %s AND `cfs_%s`.`custom_field_value_id` = `cfv_%s`.`custom_field_value_id` AND `cfs_%s`.`entity_qtype_id` = %s) ON `cfs_%s`.`entity_id` = `%s`', $strAlias, $strAlias, $strAlias, $strAlias, $strAlias, $strAlias, $strAlias, 1, $strAlias, $strId);
+		$arrCustomFieldSql['strFrom'] .= sprintf('LEFT JOIN (`custom_field_selection` AS `cfs_%s` JOIN `custom_field_value` AS `cfv_%s` ON `cfv_%s`.`custom_field_id` = %s AND `cfs_%s`.`custom_field_value_id` = `cfv_%s`.`custom_field_value_id` AND `cfs_%s`.`entity_qtype_id` = %s) ON `cfs_%s`.`entity_id` = `%s`', $strAlias, $strAlias, $strAlias, $strAlias, $strAlias, $strAlias, $strAlias, $intEntityQtypeId, $strAlias, $strId);
 		$arrCustomFieldSql['strInsertColumnHeader'] .= sprintf(', %s', 'cfv_' . $strAlias);
 	}
 }
