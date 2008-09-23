@@ -262,6 +262,7 @@
 					COUNT(DISTINCT inventory_model.inventory_model_id) AS row_count
 				FROM
 					`inventory_model` AS `inventory_model`
+					LEFT JOIN `inventory_location` AS `inventory_location` ON `inventory_model` . `inventory_model_id` = `inventory_location` . `inventory_model_id`
 					%s
 					%s
 					%s
