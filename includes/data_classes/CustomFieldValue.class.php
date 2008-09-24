@@ -75,7 +75,7 @@
   				      $strTableName = $strHelperTableArray[1];
       				  
   				      // Update the data into helper table
-      				  $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `%s_id`='%s';", $strHelperTable, $objCustomField->CustomFieldId, $this->ShortDescription, $strTableName, $objCustomFieldSelection->EntityId);
+      				  $strQuery = sprintf("UPDATE %s SET `cfv_%s`=%s WHERE `%s_id`='%s';", $strHelperTable, $objCustomField->CustomFieldId, $objDatabase->SqlVariable($this->ShortDescription), $strTableName, $objCustomFieldSelection->EntityId);
         			  $objDatabase->NonQuery($strQuery);
       				}
   				  }
