@@ -407,7 +407,7 @@
 			}
 
 			if ($arrCustomFields) {
-				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchSql($arrCustomFields);
+				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchHelperSql($arrCustomFields, EntityQtype::Contact);
 			}
 
 			// Generate Authorization SQL based on the QApplication::$objRoleModule

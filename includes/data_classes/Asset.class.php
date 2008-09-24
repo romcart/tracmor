@@ -671,7 +671,7 @@
 			}
 
 			if ($arrCustomFields) {
-				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchHelperSql($arrCustomFields);
+				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchHelperSql($arrCustomFields, EntityQtype::Asset);
 			}
 
 			// Generate Authorization SQL based on the QApplication::$objRoleModule

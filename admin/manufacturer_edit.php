@@ -173,6 +173,12 @@
 			}
 		}
 		
+		// Protected Update Methods
+		protected function UpdateManufacturerFields() {
+			$this->objManufacturer->ShortDescription = $this->txtShortDescription->Text;
+			$this->objManufacturer->LongDescription = $this->txtLongDescription->Text;
+		}
+		
 		protected function getNextTabIndex() {
 			return $this->intNextTabIndex++;
 		}

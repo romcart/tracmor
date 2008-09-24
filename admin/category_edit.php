@@ -184,6 +184,14 @@
 				}
 			}
 		}
+		
+		// Protected Update Methods
+		protected function UpdateCategoryFields() {
+			$this->objCategory->ShortDescription = $this->txtShortDescription->Text;
+			$this->objCategory->LongDescription = $this->txtLongDescription->Text;
+			$this->objCategory->AssetFlag = $this->chkAssetFlag->Checked;
+			$this->objCategory->InventoryFlag = $this->chkInventoryFlag->Checked;
+		}
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using

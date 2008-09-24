@@ -268,8 +268,7 @@
 			', $objQueryExpansion->GetFromSql("", "\n					"), $arrAttachmentSql['strFrom'], $arrCustomFieldSql['strFrom'],
 			$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 			$arrSearchSql['strAuthorizationSql']);
-
-			//echo($strQuery); exit;
+			
 			$objDbResult = $objDatabase->Query($strQuery);
 			$strDbRow = $objDbResult->FetchRow();
 			return QType::Cast($strDbRow[0], QType::Integer);
@@ -397,13 +396,14 @@
 				%s
 				%s
 				%s
+				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'],
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
-				$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+				$arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strDescriptionSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],
 				$strOrderBy, $strLimitSuffix);
-
+				
 			$objDbResult = $objDatabase->Query($strQuery);
 			return AssetModel::InstantiateDbResult($objDbResult);
 
@@ -435,7 +435,7 @@
 			}
 
 			if ($arrCustomFields) {
-				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchSql($arrCustomFields);
+				$arrSearchSql['strCustomFieldsSql'] = CustomField::GenerateSearchHelperSql($arrCustomFields, EntityQtype::AssetModel);
 			}
 			if ($strDateModified) {
 				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {
