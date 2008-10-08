@@ -138,5 +138,6 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
   <div id="result"></div>
 
 <?php
+}
 require_once('./includes/footer.inc.php');
 ?>
