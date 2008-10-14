@@ -209,6 +209,11 @@ class QAssetSearchComposite extends QControl {
 	}
 	
 	public function dtgAsset_Bind() {
+		
+		if (QApplication::QueryString('intAssetModelId')) {
+			$this->lblAssetModelId->Text = QApplication::QueryString('intAssetModelId');
+			$this->blnSearch = true;
+		}
 			
 		// If the search button has been pressed or the AssetModelId was sent in the query string from the asset models page
 		if ($this->blnSearch) {

@@ -163,10 +163,10 @@
       $this->lblAdvanced_Create();*/
 				
 	      	
-			if (QApplication::QueryString('intAssetModelId')) {
+			/*if (QApplication::QueryString('intAssetModelId')) {
 				$this->lblAssetModelId->Text = QApplication::QueryString('intAssetModelId');
 				$this->blnSearch = true;
-			}
+			}*/
   	}
   	
 		/*protected function dtgAsset_Bind() {
