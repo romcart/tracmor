@@ -129,17 +129,24 @@ require_once('./includes/header.inc.php');
 <?php
 if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 ?>
-  Asset Code: <input type="text" id="asset_code" size="10">
-  <br /><br />
-  Destination Location: <input type="text" id="destination_location" onkeypress="javascript:if(event.keyCode=='13') AddAssetLocation();" size ="20">
-  <input type="button" value="Add Asset" onclick="javascript:AddAssetLocation();">
-  <br /><br />
-  <form method="post" name="main_form" onsubmit="javascript:return CompleteReceipt();">
-  <input type="hidden" name="method" value="complete_transaction">
-  <input type="hidden" name="result" value="">
-  <input type="submit" value="Complete Receipt">
-  </form>
-  <div id="result"></div>
+<table border=0 style="padding-top:16px;">
+	<tr>
+		<td align="right"><h2>Asset Code:</h2></td>
+		<td valign="top"><input type="text" id="asset_code" size="10" onkeypress="javascript:if(event.keyCode=='13') document.getElementById('destination_location').focus();" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
+	</tr>
+	<tr>
+		<td align="right"><h2>Destination Location:</h2></td>
+		<td><input type="text" id="destination_location" onkeypress="javascript:if(event.keyCode=='13') AddAssetLocation();" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
+	</tr>	
+	<form method="post" name="main_form" onsubmit="javascript:return CompleteReceipt();">
+	<input type="hidden" name="method" value="complete_transaction">
+	<input type="hidden" name="result" value="">
+	<tr>
+		<td colspan="2" align="center"><input type="submit" value="Complete Receipt" style="width:216px;height:56px;font-size:24;"></td>
+	</tr>
+	</form>
+</table><p>
+<div id="result" style="font-size:24;width:100%;border-top:1px solid #CCCCCC;"></div>
 
 <?php
 }

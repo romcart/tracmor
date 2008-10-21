@@ -26,8 +26,8 @@ require_once('./includes/header.inc.php');
 ?>
   <div id="warning"><?php echo $strWarning; ?></div>
   <ol>
-  <li><a href="asset_menu.php">Manage Assets</a></li>
-  <li><a href="inventory_menu.php">Manage Inventory</a></li>
+  <li style="margin-top:.5em;margin-bottom:.5em"><input type="button" onclick="document.location.href='asset_menu.php';" value="Manage Assets" style="width:90%;height:56px;font-size:24;"></li>
+  <li style="margin-top:.5em;margin-bottom:.5em"><input type="button" onclick="document.location.href='inventory_menu.php';" value="Manage Inventory" style="width:90%;height:56px;font-size:24;"></li>
   </ol>
 
   <form method="post" name="main_form">

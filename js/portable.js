@@ -400,7 +400,8 @@ function MenuSubmit(intMinValue,intMaxValue,intKeyCode) {
       intMenuId = 5;
       break;
     case 54: case 102:
-      intMenuId = 6;
+      //intMenuId = 6;
+      document.location.href='index.php';
       break;
     case 55: case 103:
       intMenuId = 7;
