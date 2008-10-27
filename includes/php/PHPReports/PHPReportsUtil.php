@@ -44,7 +44,7 @@
 		if(!is_null($sPath))
 			return $sPath;
 		// put your distro path here
-		return "c:/xampp/htdocs/tracmor/includes/php/PHPReports/";
+		return __INCLUDES__ . "/php/PHPReports/";
 	}
 
 	/******************************************************************************
