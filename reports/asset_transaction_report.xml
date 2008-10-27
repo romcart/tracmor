@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE REPORT SYSTEM "PHPReport.dtd">
+<REPORT MARGINWIDTH="5" MARGINHEIGHT="5">
+	<TITLE><REPLACE_WITH_TITLE/></TITLE>
+   <BACKGROUND_COLOR>#FFFFFF</BACKGROUND_COLOR>
+	<NO_DATA_MSG>No data was found, check your query</NO_DATA_MSG>
+	<REPLACE_WITH_DOCUMENT_INFO/>
+   <PAGE BORDER="0" CELLSPACING="0" CELLPADDING="3">
+		<HEADER>
+			<ROW>
+				<COL CELLCLASS="HEADER" COLSPAN="50">
+					<XHTML>
+						<TABLE BORDER="0" CELLPADDING="2" CELLSPACING="0" WIDTH="100%">
+							<TR>
+								<TD CLASS="HEADER" colspan="4">
+									<b>Asset Transaction Report</b>
+								</TD>
+							</TR>
+						</TABLE>
+					</XHTML>
+				</COL>
+			</ROW>
+			<REPLACE_WITH_PARAMETERS/>
+		</HEADER>
+		<FOOTER>
+			<ROW>
+				<COL ALIGN="RIGHT" COLSPAN="50" TYPE="EXPRESSION" CELLCLASS="FOOTER">"Total Asset Transactions: ".$this->getRowCount()</COL>
+			</ROW>
+			<ROW>
+				<COL ALIGN="RIGHT" COLSPAN="50" TYPE="EXPRESSION" CELLCLASS="FOOTER">"Total Transactions: ".$this->getEnvObj("TotalTransactions")</COL>
+			</ROW>
+		</FOOTER>
+	</PAGE>
+	<GROUPS>
+    <REPLACE_WITH_GROUP_INFO/>
+	</GROUPS>
+</REPORT>
