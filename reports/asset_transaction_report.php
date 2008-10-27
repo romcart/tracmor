@@ -21,7 +21,7 @@
 
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(7);
-	ini_set("include_path",ini_get("include_path"). PATH_SEPARATOR . __INCLUDES__ . "/php/PHPReports/;");
+	ini_set("include_path",ini_get("include_path"). PATH_SEPARATOR . __INCLUDES__ . "/php/PHPReports/" . PATH_SEPARATOR);
 	require_once('PHPReportMaker.php');
 	$_SESSION["phpReportsLanguage"] = null;
 
