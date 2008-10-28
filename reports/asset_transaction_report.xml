@@ -10,10 +10,10 @@
 			<ROW>
 				<COL CELLCLASS="HEADER" COLSPAN="50">
 					<XHTML>
-						<TABLE BORDER="0" CELLPADDING="2" CELLSPACING="0" WIDTH="100%">
+						<TABLE BORDER="0" CELLPADDING="2" CELLSPACING="0">
 							<TR>
-								<TD CLASS="HEADER" colspan="4">
-									<b>Asset Transaction Report</b>
+								<TD CLASS="report_title" colspan="4">
+									Asset Transaction Report
 								</TD>
 							</TR>
 						</TABLE>
@@ -24,10 +24,10 @@
 		</HEADER>
 		<FOOTER>
 			<ROW>
-				<COL ALIGN="RIGHT" COLSPAN="50" TYPE="EXPRESSION" CELLCLASS="FOOTER">"Total Asset Transactions: ".$this->getRowCount()</COL>
+				<COL ALIGN="RIGHT" COLSPAN="50" TYPE="EXPRESSION" CELLCLASS="report_total">"Total Asset Transactions: ".$this->getRowCount()</COL>
 			</ROW>
 			<ROW>
-				<COL ALIGN="RIGHT" COLSPAN="50" TYPE="EXPRESSION" CELLCLASS="FOOTER">"Total Transactions: ".$this->getEnvObj("TotalTransactions")</COL>
+				<COL ALIGN="RIGHT" COLSPAN="50" TYPE="EXPRESSION" CELLCLASS="report_total">"Total Transactions: ".$this->getEnvObj("TotalTransactions")</COL>
 			</ROW>
 		</FOOTER>
 	</PAGE>

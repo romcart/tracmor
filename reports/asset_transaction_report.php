@@ -327,8 +327,8 @@
           $intCustomFieldCount = 0;
           foreach ($this->chkCustomFieldArray as $chkCustomField) {
             if ($chkCustomField->Checked) {
-              $strXmlColNameByCustomField .= "<COL>".$chkCustomField->Text."</COL>";
-              $strXmlFieldByCustomField .= "<COL TYPE='FIELD'>__".$chkCustomField->ActionParameter."</COL>";
+              $strXmlColNameByCustomField .= "<COL CELLCLASS='report_column_header'>".$chkCustomField->Text."</COL>";
+              $strXmlFieldByCustomField .= "<COL TYPE='FIELD' CELLCLASS='report_cell'>__".$chkCustomField->ActionParameter."</COL>";
               $intCustomFieldCount++;
             }
           }
@@ -336,23 +336,22 @@
             <GROUP NAME='transaction_id' EXPRESSION='transaction_id' PAGEBREAK='FALSE'>
               <HEADER>
                 <ROW>
-                  <COL ALIGN='LEFT'>Transaction:</COL>
-                  <COL ALIGN='LEFT' TYPE='EXPRESSION' COLSPAN='".(3 + $intCustomFieldCount)."'><LINK TYPE='EXPRESSION'>'". __SUBDIRECTORY__ ."/common/transaction_edit.php?intTransactionId='.\$this->getValue('transaction_id')</LINK>\$this->getValue('asset_transaction__transaction_id__transaction_type_id__short_description').' by '.(\$this->getValue('asset_transaction__transaction_id__modified_by')?\$this->getValue('asset_transaction__transaction_id__modified_by__first_name').' '.\$this->getValue('asset_transaction__transaction_id__modified_by__last_name').' on '.\$this->getValue('asset_transaction__transaction_id__modified_date'):\$this->getValue('asset_transaction__transaction_id__created_by__first_name').' '.\$this->getValue('asset_transaction__transaction_id__created_by__last_name').' on '.\$this->getValue('asset_transaction__transaction_id__creation_date'))</COL>
+                  <COL ALIGN='LEFT' TYPE='EXPRESSION' COLSPAN='".(4 + $intCustomFieldCount)."' CELLCLASS='report_section_heading'>\$this->getValue('asset_transaction__transaction_id__transaction_type_id__short_description').' by '.(\$this->getValue('asset_transaction__transaction_id__modified_by')?\$this->getValue('asset_transaction__transaction_id__modified_by__first_name').' '.\$this->getValue('asset_transaction__transaction_id__modified_by__last_name').' on '.\$this->getValue('asset_transaction__transaction_id__modified_date'):\$this->getValue('asset_transaction__transaction_id__created_by__first_name').' '.\$this->getValue('asset_transaction__transaction_id__created_by__last_name').' on '.\$this->getValue('asset_transaction__transaction_id__creation_date'))</COL>
                 </ROW>
                 <ROW>
-                  <COL>Asset Code:</COL>
-                  <COL>Asset Model:</COL>
-                  <COL>From:</COL>
-                  <COL>To:</COL>
+                  <COL CELLCLASS='report_column_header'>Asset Code:</COL>
+                  <COL CELLCLASS='report_column_header'>Asset Model:</COL>
+                  <COL CELLCLASS='report_column_header'>From:</COL>
+                  <COL CELLCLASS='report_column_header'>To:</COL>
                   $strXmlColNameByCustomField
                 </ROW>
               </HEADER>
               <FIELDS>
                 <ROW>
-                  <COL TYPE='FIELD'><LINK TYPE='EXPRESSION'>'". __SUBDIRECTORY__ ."/assets/asset_edit.php?intAssetId='.\$this->getValue('asset_transaction__asset_id__asset_id')</LINK>asset_transaction__asset_id__asset_code</COL>
-                  <COL TYPE='FIELD'><LINK TYPE='EXPRESSION'>'". __SUBDIRECTORY__ ."/assets/asset_model_edit.php?intAssetModelId='.\$this->getValue('asset_transaction__asset_id__asset_model_id__asset_model_id')</LINK>asset_transaction__asset_id__asset_model_id__short_description</COL>
-                  <COL TYPE='FIELD'>asset_transaction__source_location_id__short_description</COL>
-                  <COL TYPE='FIELD'>asset_transaction__destination_location_id__short_description</COL>
+                  <COL TYPE='FIELD' CELLCLASS='report_cell'><LINK TYPE='EXPRESSION'>'". __SUBDIRECTORY__ ."/assets/asset_edit.php?intAssetId='.\$this->getValue('asset_transaction__asset_id__asset_id')</LINK>asset_transaction__asset_id__asset_code</COL>
+                  <COL TYPE='FIELD' CELLCLASS='report_cell'><LINK TYPE='EXPRESSION'>'". __SUBDIRECTORY__ ."/assets/asset_model_edit.php?intAssetModelId='.\$this->getValue('asset_transaction__asset_id__asset_model_id__asset_model_id')</LINK>asset_transaction__asset_id__asset_model_id__short_description</COL>
+                  <COL TYPE='FIELD' CELLCLASS='report_cell'>asset_transaction__source_location_id__short_description</COL>
+                  <COL TYPE='FIELD' CELLCLASS='report_cell'>asset_transaction__destination_location_id__short_description</COL>
                   $strXmlFieldByCustomField
                 </ROW>
               </FIELDS>
