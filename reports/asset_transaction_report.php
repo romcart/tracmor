@@ -41,6 +41,7 @@
 		protected $lstReservedBy;
 		protected $lstTransactionDate;
 		protected $lstSortByDate;
+		protected $lstGenerateOptions;
 		protected $dtpTransactionDateFirst;
 		protected $dtpTransactionDateLast;
 		protected $txtShortDescription;
@@ -84,6 +85,7 @@
       $this->lstManufacturer_Create();
       $this->lstUserCheckedOutReserved_Create();
       $this->lstTransactionDate_Create();
+      $this->lstGenerateOptions_Create();
       $this->dtpTransactionDateFirst_Create();
       $this->dtpTransactionDateLast_Create();
       $this->lstSortByDate_Create();
@@ -115,7 +117,13 @@
 		 *	CREATE INPUT METHODS
 		*************************/
 
-  	protected function lstCategory_Create() {
+  	protected function lstGenerateOptions_Create() {
+  	  $this->lstGenerateOptions = new QListBox($this);
+  	  $this->lstGenerateOptions->AddItem('Report', null);
+  	  $this->lstGenerateOptions->AddItem('Print View', 'print');
+  	}
+
+		protected function lstCategory_Create() {
 	  	$this->lstCategory = new QListBox($this);
 			$this->lstCategory->Name = 'Category';
 			$this->lstCategory->AddItem('- ALL -', null);
@@ -165,7 +173,7 @@
 			// Because the enter key will also call form.submit() on some browsers, which we
       // absolutely DON'T want to have happen, let's be sure to terminate any additional
       // actions on EnterKey
-      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
+      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnGenerate_Click'));
       $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
 	  }
@@ -173,14 +181,14 @@
 	  protected function txtAssetCode_Create() {
 	  	$this->txtAssetCode = new QTextBox($this);
 	  	$this->txtAssetCode->Name = 'Asset Code';
-	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
+	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnGenerate_Click'));
 	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 
 	  protected function txtAssetModelCode_Create() {
 	  	$this->txtAssetModelCode = new QTextBox($this);
 	  	$this->txtAssetModelCode->Name = 'Asset Model Code';
-	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
+	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnGenerate_Click'));
 	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 
@@ -259,8 +267,8 @@
 			$this->btnGenerate = new QButton($this);
 			$this->btnGenerate->Name = 'Generate';
 			$this->btnGenerate->Text = 'Generate';
-			$this->btnGenerate->AddAction(new QClickEvent(), new QServerAction('btnGenerate_Click'));
-			$this->btnGenerate->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
+			$this->btnGenerate->AddAction(new QClickEvent(), new QAjaxAction('btnGenerate_Click'));
+			$this->btnGenerate->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnGenerate_Click'));
 			$this->btnGenerate->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 
@@ -357,7 +365,7 @@
               </FIELDS>
             </GROUP>";
 
-					$arrDBInfo = unserialize(DB_CONNECTION_1);
+          $arrDBInfo = unserialize(DB_CONNECTION_1);
 
           $oRpt->setSQL($sSql);
           $oRpt->setUser($arrDBInfo['username']);
@@ -365,19 +373,41 @@
           $oRpt->setConnection($arrDBInfo['server']);
           $oRpt->setDatabaseInterface('mysql');
           $oRpt->setDatabase($arrDBInfo['database']);
-          $oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,null,$oGroups);
           $oRpt->setNoDataMsg("No data was found, check your query");
           $oRpt->setPageSize(200000000);
-          // The head of the final html will be write by the Qform
-          $oRpt->setBody(false);
           // Start the output buffer
           ob_start();
+          if ($this->lstGenerateOptions->SelectedValue == "print") {
+            $this->lblReport->Text = "";
+            $oDocs = "<CSS>../css/tracmor.css</CSS>";
+            $fOut = fopen(".." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId'] . "_asset_transaction_report.htm", "w");
+            $oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,$oDocs,$oGroups);
+            $oRpt->run();
+            fwrite($fOut, ob_get_contents());
+            ob_end_clean();
+            fclose($fOut);
+            // Open generated Report in new window
+    		    QApplication::ExecuteJavaScript("window.open('.." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId']."_asset_transaction_report.htm','AssetTransactionReport','resizeable=yes,menubar=yes,scrollbars=yes,left=0,top=0,width=800,height=600');");
+          }
+          else {
+            // The head of the final html will be write by the Qform
+            $oRpt->setBody(false);
+            $oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,null,$oGroups);
+            $oRpt->run();
+            // Put the output buffer content in the Qlabel
+            $this->lblReport->Text = ob_get_contents();
+            // Clean the output buffer
+            ob_end_clean();
+          }
+          // Begin rendering the QForm
+          //$this->RenderBegin(false);
+          //ob_end_clean();
           // Process the report
-          $oRpt->run();
-          // Put the output buffer content in the Qlabel
-          $this->lblReport->Text = ob_get_contents();
-          // Clean the output buffer
-          ob_end_clean();
+          //$oOut = $oRpt->createOutputPlugin("csv");
+          //$oRpt->setOutputPlugin($oOut);
+          //$this->RenderEnd(false);
+          //exit();
+
         }
         else {
           $this->lblReport->Text = "";
