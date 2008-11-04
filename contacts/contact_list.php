@@ -110,6 +110,9 @@
 			// Expand to include the primary address, State/Province, and Country
 			$objExpansionMap[Contact::ExpandCompany] = true;
 			
+			// Expand to include primary address
+			$objExpansionMap[Contact::ExpandAddress] = true;
+			
 			// QApplication::$Database[1]->EnableProfiling();
 			
 			$this->dtgContact->TotalItemCount = Contact::CountBySearchHelper($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
@@ -229,7 +232,7 @@
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Title', '<?= $_ITEM->Title ?>', 'Width=200', 'SortByCommand="title ASC"', 'ReverseSortByCommand="title DESC"', 'CssClass="dtg_column"'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Company', '<?= $_ITEM->Company->__toStringWithLink("bluelink") ?>', 'SortByCommand="contact__company_id__short_description ASC"', 'ReverseSortByCommand="contact__company_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Email', '<?= $_ITEM->Email ?>', 'SortByCommand="email ASC"', 'ReverseSortByCommand="email DESC"', 'CssClass="dtg_column"'));
-      $this->dtgContact->AddColumn(new QDataGridColumnExt('Address', '<?= $_ITEM->Address ?>', 'SortByCommand="contact__address_id__short_description ASC"', 'ReverseSortByCommand="contact__address_id__short_description DESC"', 'CssClass="dtg_column"'));
+      $this->dtgContact->AddColumn(new QDataGridColumnExt('Address', '<?= ($_ITEM->Address instanceof Address) ? $_ITEM->Address->__toStringWithLink("bluelink") : "" ?>', 'SortByCommand="contact__address_id__short_description ASC"', 'ReverseSortByCommand="contact__address_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       
       // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
       $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(8, false);
