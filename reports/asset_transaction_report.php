@@ -121,6 +121,7 @@
   	  $this->lstGenerateOptions = new QListBox($this);
   	  $this->lstGenerateOptions->AddItem('Report', null);
   	  $this->lstGenerateOptions->AddItem('Print View', 'print');
+  	  $this->lstGenerateOptions->AddItem('CSV Export', 'csv');
   	}
 
 		protected function lstCategory_Create() {
@@ -169,11 +170,11 @@
 
 	  protected function txtShortDescription_Create() {
 	    $this->txtShortDescription = new QTextBox($this);
-			$this->txtShortDescription->Name = 'Model';
+			$this->txtShortDescription->Name = 'Asset Model';
 			// Because the enter key will also call form.submit() on some browsers, which we
       // absolutely DON'T want to have happen, let's be sure to terminate any additional
       // actions on EnterKey
-      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnGenerate_Click'));
+      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
       $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
 	  }
@@ -181,14 +182,14 @@
 	  protected function txtAssetCode_Create() {
 	  	$this->txtAssetCode = new QTextBox($this);
 	  	$this->txtAssetCode->Name = 'Asset Code';
-	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnGenerate_Click'));
+	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
 	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 
 	  protected function txtAssetModelCode_Create() {
 	  	$this->txtAssetModelCode = new QTextBox($this);
 	  	$this->txtAssetModelCode->Name = 'Asset Model Code';
-	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnGenerate_Click'));
+	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
 	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 
@@ -267,8 +268,8 @@
 			$this->btnGenerate = new QButton($this);
 			$this->btnGenerate->Name = 'Generate';
 			$this->btnGenerate->Text = 'Generate';
-			$this->btnGenerate->AddAction(new QClickEvent(), new QAjaxAction('btnGenerate_Click'));
-			$this->btnGenerate->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnGenerate_Click'));
+			$this->btnGenerate->AddAction(new QClickEvent(), new QServerAction('btnGenerate_Click'));
+			$this->btnGenerate->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
 			$this->btnGenerate->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 
@@ -375,10 +376,11 @@
           $oRpt->setDatabase($arrDBInfo['database']);
           $oRpt->setNoDataMsg("No data was found, check your query");
           $oRpt->setPageSize(200000000);
-          // Start the output buffer
-          ob_start();
+
           if ($this->lstGenerateOptions->SelectedValue == "print") {
-            $this->lblReport->Text = "";
+          	// Start the output buffer
+          	ob_start();
+          	$this->lblReport->Text = "";
             $oDocs = "<CSS>../css/tracmor.css</CSS>";
             $fOut = fopen(".." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId'] . "_asset_transaction_report.htm", "w");
             $oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,$oDocs,$oGroups);
@@ -387,7 +389,28 @@
             ob_end_clean();
             fclose($fOut);
             // Open generated Report in new window
-    		    QApplication::ExecuteJavaScript("window.open('.." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId']."_asset_transaction_report.htm','AssetTransactionReport','resizeable=yes,menubar=yes,scrollbars=yes,left=0,top=0,width=800,height=600');");
+    		    QApplication::ExecuteJavaScript("window.open('.." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId']."_asset_transaction_report.htm','AssetTransactionReport','resizeable=yes,menubar=yes,scrollbars=yes,left=0,top=0,width=800,height=600');history.go(-1);");
+    		    exit();
+          }
+          else if ($this->lstGenerateOptions->SelectedValue == "csv") {		
+			$this->RenderCsvBegin(false);
+			session_cache_limiter('must-revalidate');    // force a "no cache" effect
+    		header("Pragma: hack"); // IE chokes on "no cache", so set to something, anything, else.
+			$ExpStr = "Expires: " . gmdate("D, d M Y H:i:s", time()) . " GMT";
+			header($ExpStr);
+			header('Content-Type: text/csv');
+			header('Content-Disposition: csv; filename=export.csv');
+			ob_end_clean();
+			$oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,null,$oGroups);
+          	$oOut = $oRpt->createOutputPlugin("csv");
+          	$oRpt->setOutputPlugin($oOut);			
+			$oRpt->run();
+			ob_get_contents();
+			@ob_flush();
+			flush();
+			
+			$this->RenderCsvEnd(false);
+			exit();
           }
           else {
             // The head of the final html will be write by the Qform

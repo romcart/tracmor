@@ -40,52 +40,34 @@
 		<td width="100%" valign="top">
     <div class="title">&nbsp;Asset Transaction Reports</div>
 		<table style="border:1px solid #AAAAAA;background-color:#EEEEEE;font-family:verdana;font-size:10;color:#444444;height:40" width="100%">
-			<tr>
-			 <td colspan="3">
-			   <table>
-			     <tr>
-			       <td class="item_label">Transaction Type:</span></td>
-			       <td><?php $this->chkMove->Render(); ?></td>
-			       <td><?php $this->chkCheckIn->Render(); ?></td>
-			       <td><?php $this->chkCheckOut->Render(); ?></td>
-			       <td><?php $this->chkReserve->Render(); ?></td>
-			       <td><?php $this->chkUnreserve->Render(); ?></td>
-			     </tr>
-			     <tr>
-			       <td class="item_label">Custom Fields:</span></td>
-			       <td colspan="5"><?php $this->pnlCustomFields->Render(); ?></td>
-			     </tr>
-			   </table>
-			 </td>
-			</tr>
 		  <tr>
 				<td style="vertical-align:top;" noWrap>
 					<?php $this->txtShortDescription->RenderWithNameLeft("Width=150") ?>
 				</td>
 				<td style="vertical-align:top;" noWrap>
-					<?php $this->txtAssetCode->RenderWithNameLeft("Width=150") ?>
-				</td>
-				<td style="vertical-align:top;" noWrap>
 					<?php $this->txtAssetModelCode->RenderWithNameLeft("Width=150") ?>
 				</td>
-			</tr>
-			<tr>
-        <td style="vertical-align:top;" noWrap>
-          <?php $this->lstUser->RenderWithNameLeft("Width=150") ?>
-        </td>
-        <td style="vertical-align:top;" noWrap>
-          <?php $this->lstCheckedOutBy->RenderWithNameLeft("Width=150") ?>
-        </td>
-        <td style="vertical-align:top;" noWrap>
-          <?php $this->lstReservedBy->RenderWithNameLeft("Width=150") ?>
-        </td>
-			</tr>
-			<tr>
 				<td style="vertical-align:top;" noWrap>
-					<?php $this->lstCategory->RenderWithNameLeft("Width=150") ?>
+					<?php $this->lstGenerateOptions->Render("Width=90"); ?>&nbsp;<?php $this->btnGenerate->Render() ?>&nbsp;<?php $this->btnClear->Render() ?>
 				</td>
+			</tr>
+			<tr>
+        <td style="vertical-align:top;" noWrap>
+			<?php $this->txtAssetCode->RenderWithNameLeft("Width=150") ?>
+        </td>
+        <td style="vertical-align:top;" noWrap>
+			<?php $this->lstCategory->RenderWithNameLeft("Width=150") ?>
+        </td>
+        <td style="vertical-align:top;" noWrap>
+          
+        </td>
+			</tr>
+			<tr>
 				<td style="vertical-align:top;" noWrap>
 					<?php $this->lstManufacturer->RenderWithNameLeft("Width=150") ?>
+				</td>
+				<td style="vertical-align:top;" noWrap>
+					<?php $this->lstUser->RenderWithNameLeft("Width=150") ?>
 				</td>
 			</tr>
 			<tr>
@@ -101,8 +83,25 @@
 			   <?php $this->lstSortByDate->RenderWithNameLeft("Width=100"); ?>
 			  </td>
 			  <td style="vertical-align:top;padding-right:8;" align="right" noWrap>
-      	  <?php $this->lstGenerateOptions->Render("Width=90"); ?>&nbsp;<?php $this->btnGenerate->Render() ?>&nbsp;<?php $this->btnClear->Render() ?>
       	</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<table>
+				     <tr>
+				       <td class="item_label">Transaction Type:</span></td>
+				       <td><?php $this->chkMove->Render(); ?></td>
+				       <td><?php $this->chkCheckIn->Render(); ?></td>
+				       <td><?php $this->chkCheckOut->Render(); ?></td>
+				       <td><?php $this->chkReserve->Render(); ?></td>
+				       <td><?php $this->chkUnreserve->Render(); ?></td>
+				     </tr>
+				     <tr>
+				       <td class="item_label">Custom Fields:</span></td>
+				       <td colspan="5"><?php $this->pnlCustomFields->Render(); ?></td>
+				     </tr>
+				   </table>
+				</td>
 			</tr>
 	 </table>
     <?php $this->lblReport->RenderWithError(); ?>
