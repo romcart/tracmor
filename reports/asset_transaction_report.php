@@ -413,7 +413,10 @@
 			exit();
           }
           else {
-            // The head of the final html will be write by the Qform
+            // Start the output buffer
+          	ob_start();
+          	
+          	// The head of the final html will be write by the Qform
             $oRpt->setBody(false);
             $oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,null,$oGroups);
             $oRpt->run();
