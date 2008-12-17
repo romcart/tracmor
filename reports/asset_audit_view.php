@@ -86,15 +86,28 @@
       $this->dtgAudit->ShowExportCsv = true;
       
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->ShortDescription ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId, false))));
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId, false), 'CssClass' => 'dtg_column')));
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->Asset->AssetCode ?>',
-  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode, false))));
+  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode, false), 'CssClass' => 'dtg_column')));
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->Asset->AssetModel->ShortDescription ?>',
-  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription, false))));
+  			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription, false), 'CssClass' => 'dtg_column')));
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('PDT Count', '<?= $_ITEM->Count ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Count), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Count, false))));
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->Count), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->Count, false), 'CssClass' => 'dtg_column')));
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('System Count', '<?= $_ITEM->SystemCount ?>',
-  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->SystemCount), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->SystemCount, false))));
+  			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->SystemCount), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->SystemCount, false), 'CssClass' => 'dtg_column')));
+  			
+  		$objStyle = $this->dtgAudit->RowStyle;
+	    $objStyle->ForeColor = '#000000';
+	    $objStyle->BackColor = '#FFFFFF';
+	    $objStyle->FontSize = 12;
+	
+	    $objStyle = $this->dtgAudit->AlternateRowStyle;
+	    $objStyle->BackColor = '#EFEFEF';
+	
+	    $objStyle = $this->dtgAudit->HeaderRowStyle;
+	    $objStyle->ForeColor = '#000000';
+	    $objStyle->BackColor = '#EFEFEF';
+	    $objStyle->CssClass = 'dtg_header';	
   			
   		$this->dtgAudit->SetDataBinder('dtgAudit_Bind');
   	}
@@ -122,6 +135,7 @@
       	$this->dtgAudit->ShowHeader = true;
       }
       
+      $this->dtgAudit->TotalItemCount = count($objAuditScanArray);
   	  $this->dtgAudit->DataSource = $objAuditScanArray;
   	}
   	
