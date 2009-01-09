@@ -103,7 +103,7 @@ if (!defined("K_TCPDF_EXTERNAL_CONFIG")) {
 	/**
 	 * page format
 	 */
-	define ("PDF_PAGE_FORMAT", "A4");
+	define ("PDF_PAGE_FORMAT", "Letter");
 	
 	/**
 	 * page orientation (P=portrait, L=landscape)
