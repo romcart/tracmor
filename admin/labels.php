@@ -103,8 +103,8 @@
       $this->lstLabelStock = new QListBox($this->dlgPrintLabels);
       $this->lstLabelStock->Width = 200;
       $this->lstLabelStock->AddItem(new QListItem('- Select One -', 0));
-			$this->lstLabelStock->AddItem(new QListItem('Avery 6577 (5/8" x 3")', 1));
-			$this->lstLabelStock->AddItem(new QListItem('Avery 6576 (1-1/4" x 1-3/4")', 2));
+			$this->lstLabelStock->AddItem(new QListItem('Avery 6571/6577 (5/8" x 3")', 1));
+			$this->lstLabelStock->AddItem(new QListItem('Avery 6570/6576 (1-1/4" x 1-3/4")', 2));
 			$this->lstLabelStock->AddAction(new QChangeEvent(), new QAjaxAction('lstLabelStock_Change'));
 			$this->lstLabelOffset = new QListBox($this->dlgPrintLabels);
 			$this->lstLabelOffset->Width = 200;
@@ -465,9 +465,9 @@
           		  case 1:
             		  // Labels per row for Avery 6577 (5/8" x 3")
           		    $pdf->SetFontSize(3);
-          		    $pdf->setCellHeightRatio(1.93);
+          		    $pdf->setCellHeightRatio(2.3); // was 1.93
           		    // Set margins
-                  $pdf->SetMargins(12, 25, 12);
+                  $pdf->SetMargins(12, 12, 12);
               	  break;
           		  case 2:
             		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
