@@ -328,7 +328,7 @@
     		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
   		    $intNumberInTableRow = 4; // Cells per row
   		    $intImageHeight = 60; // Bar Code Image Height
-  		    $intCellWidth = 130; // Cell Width
+  		    $intCellWidth = 129; // Cell Width
   		    $intBlankSpace = 10; // Blank Cell Width
     		  break;
   		  default:
@@ -434,6 +434,13 @@
               $pdf->SetAuthor("Tracmor");
               $pdf->SetTitle("Bar Codes");
 
+				// Set PDF viewer preferences
+				$arrPreferences = array(
+					// Prevent Acrobat from scaling the page
+          			'PrintScaling' => 'None', // None, AppDefault 
+				);
+              	$pdf->setViewerPreferences($arrPreferences); 
+				
               // Disable header and footer
               $pdf->setPrintHeader(false);
               $pdf->setPrintFooter(false);
@@ -465,9 +472,9 @@
           		  case 2:
             		  // Labels per row for Avery 6576 (1-1/4" x 1-3/4")
           		    $pdf->SetFontSize(3);
-          		    $pdf->setCellHeightRatio(11.0); // was 10.2
+          		    $pdf->setCellHeightRatio(10.2);
           		    // Set margins
-                  $pdf->SetMargins(10, 16, 10);
+                  $pdf->SetMargins(12, 16, 12);
             		  break;
           		  default:
           		    throw new QCallerException('Label Stock Not Provided');
