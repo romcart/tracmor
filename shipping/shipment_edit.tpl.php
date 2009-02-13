@@ -57,20 +57,23 @@
 				&nbsp;
 				<?php $this->lblPackingListLink->Render(); ?>
 				<?php
+
+					$this->btnEdit->Render();
+					$this->btnSave->RenderWithError();
+					echo('&nbsp;');
+					$this->atcAttach->RenderWithError();
+					$this->btnCancel->RenderWithError();
+					
 					if (!$this->objShipment->ShippedFlag) { 
-						$this->btnEdit->Render();
-						$this->btnSave->RenderWithError();
-						echo('&nbsp;');
-						$this->atcAttach->RenderWithError();
+
 						echo('&nbsp;');
 						$this->btnCompleteShipment->RenderWithError();
 						echo('&nbsp;');
-						$this->btnDelete->RenderWithError();
-						$this->btnCancel->RenderWithError();
+						if ($this->blnEditMode) {
+							$this->btnDelete->RenderWithError();
+						}
 					}
 					else {
-						$this->atcAttach->RenderWithError();
-						echo('&nbsp;');
 						$this->btnCancelCompleteShipment->RenderWithError();
 					}
 				?>

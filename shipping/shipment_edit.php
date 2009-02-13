@@ -356,11 +356,11 @@
 			
 			if (!$this->objShipment->ShippedFlag) {
 				// Shipping Buttons
-				$this->btnSave_Create();
-				$this->btnCancel_Create();
-				$this->btnEdit_Create();
 				$this->btnDelete_Create();
 			}
+			$this->btnSave_Create();
+			$this->btnCancel_Create();
+			$this->btnEdit_Create();			
 			$this->atcAttach_Create();
 			
 			// Complete Shipment Buttons
@@ -3840,7 +3840,8 @@
 			$this->objShipment->ToContactId = $this->lstToContact->SelectedValue;
 			$this->objShipment->FromCompanyId = $this->lstFromCompany->SelectedValue;
 			$this->objShipment->FromContactId = $this->lstFromContact->SelectedValue;
-			$this->objShipment->ShipDate = $this->calShipDate->DateTime;
+			if (!$this->objShipment->ShippedFlag)
+				$this->objShipment->ShipDate = $this->calShipDate->DateTime;
 			$this->objShipment->FromAddressId = $this->lstFromAddress->SelectedValue;
 			$this->objShipment->ToCompanyId = $this->lstToCompany->SelectedValue;
 			$this->objShipment->ToAddressId = $this->lstToAddress->SelectedValue;
@@ -4281,13 +4282,15 @@
 			
 			if (!$this->objShipment->ShippedFlag) {
 				//$this->lblAdvanced->Display = false;
-				$this->btnSave->Display = false;
-				$this->btnCancel->Display = false;
 				$this->btnCancelCompleteShipment->Display = false;
 			}
 			else {
 				$this->btnCancelCompleteShipment->Display = true;
 			}
+			
+			$this->btnSave->Display = false;
+			$this->btnCancel->Display = false;
+			
 			if ($this->blnEditMode) {
 				
 				$this->dtgAssetTransact->RemoveColumnByName('Action');
@@ -4339,9 +4342,9 @@
 				CustomField::DisplayLabels($this->arrCustomFields);
 			}
 			
-			if (!$this->objShipment->ShippedFlag) {
-				$this->btnEdit->Display = true;
-			}
+			//if (!$this->objShipment->ShippedFlag) {
+			$this->btnEdit->Display = true;
+			//}
 			$this->atcAttach->btnUpload->Display = true;
 
 			// This is not necessary, because this method is only being called in EditMode
@@ -4439,74 +4442,78 @@
 			
 			
 			// Show Inputs
-			$this->calShipDate->Display = true;
-			$this->lstFromCompany->Display = true;
-			$this->lstFromContact->Display = true;
-			$this->lstFromAddress->Display = true;
-			$this->lstToCompany->Display = true;
-			$this->lstToContact->Display = true;
-			$this->lstToAddress->Display = true;
-			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
-				$this->txtShipmentNumber->Display = true;
+			if (!$this->objShipment->ShippedFlag) {
+				$this->calShipDate->Display = true;
+				$this->lstFromCompany->Display = true;
+				$this->lstFromContact->Display = true;
+				$this->lstFromAddress->Display = true;
+				$this->lstToCompany->Display = true;
+				$this->lstToContact->Display = true;
+				$this->lstToAddress->Display = true;
+			
+			
+				if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
+					$this->txtShipmentNumber->Display = true;
+				}
+			
+				$this->lstCourier->Display = true;
+				$this->txtTrackingNumber->Display = true;
+				$this->txtNewAssetCode->Display = true;
+				//$this->lblAdvanced->Display = true;
+				$this->btnAddAsset->Display = true;
+				$this->txtNewInventoryModelCode->Display = true;
+				$this->btnLookup->Display = true;
+				$this->lstSourceLocation->Display = true;
+				$this->txtQuantity->Display = true;
+				$this->btnAddInventory->Display = true;
+			
+				$this->txtToPhone->Display = true;
+				if ($this->lstBillTransportationTo->SelectedValue === 1) {
+					$this->lstShippingAccount->Display = true;
+				} else if ($this->blnEditMode) {
+					$this->txtRecipientThirdPartyAccount->Display = true;
+				}
+				$this->lstBillTransportationTo->Display = true;
+				$this->txtReference->Display = true;
+				$this->txtFedexNotifySenderEmail->Display = true;
+				$this->txtFedexNotifyRecipientEmail->Display = true;
+				$this->txtFedexNotifyOtherEmail->Display = true;			
+				$this->lstFxServiceType->Display = true;
+				$this->lstPackageType->Display = true;
+				$this->txtPackageWeight->Display = true;
+				$this->lstWeightUnit->Display = true;
+				$this->txtPackageLength->Display = true;
+				$this->txtPackageWidth->Display = true;
+				$this->txtPackageHeight->Display = true;
+				$this->lstLengthUnit->Display = true;
+				$this->txtValue->Display = true;
+				$this->lstCurrencyUnit->Display = true;
+				$this->lblNewFromCompany->Display = true;
+				$this->lblNewFromContact->Display = true;
+				$this->lblNewFromAddress->Display = true;
+				$this->lblNewToCompany->Display = true;
+				$this->lblNewToContact->Display = true;
+				$this->lblNewToAddress->Display = true;
+				$this->txtHoldAtLocationAddress->Display = true;
+				$this->txtHoldAtLocationCity->Display = true;
+				$this->lstHoldAtLocationState->Display = true;
+				$this->txtHoldAtLocationPostalCode->Display = true;
+				
+				// Enable Fedex Notification Checkboxes (because they're disabled, not hidden)
+				$this->chkFedexNotifySenderShipFlag->Enabled = true;
+				$this->chkFedexNotifySenderExceptionFlag->Enabled = true;
+				$this->chkFedexNotifySenderDeliveryFlag->Enabled = true;
+				$this->chkFedexNotifyRecipientShipFlag->Enabled = true;
+				$this->chkFedexNotifyRecipientExceptionFlag->Enabled = true;
+				$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = true;
+				$this->chkFedexNotifyOtherShipFlag->Enabled = true;
+				$this->chkFedexNotifyOtherExceptionFlag->Enabled = true;
+				$this->chkFedexNotifyOtherDeliveryFlag->Enabled = true;			
+				
+				//Enable FedEx Special Services Checkboxes (because they're disabled, not hidden)
+				$this->chkSaturdayDeliveryFlag->Enabled = true;
+				$this->chkHoldAtLocationFlag->Enabled = true;
 			}
-			$this->lstCourier->Display = true;
-			$this->txtNote->Display = true;
-			$this->txtTrackingNumber->Display = true;
-			$this->txtNewAssetCode->Display = true;
-			//$this->lblAdvanced->Display = true;
-			$this->btnAddAsset->Display = true;
-			$this->txtNewInventoryModelCode->Display = true;
-			$this->btnLookup->Display = true;
-			$this->lstSourceLocation->Display = true;
-			$this->txtQuantity->Display = true;
-			$this->btnAddInventory->Display = true;
-			
-			$this->txtToPhone->Display = true;
-			if ($this->lstBillTransportationTo->SelectedValue === 1) {
-				$this->lstShippingAccount->Display = true;
-			} else if ($this->blnEditMode) {
-				$this->txtRecipientThirdPartyAccount->Display = true;
-			}
-			$this->lstBillTransportationTo->Display = true;
-			$this->txtReference->Display = true;
-			$this->txtFedexNotifySenderEmail->Display = true;
-			$this->txtFedexNotifyRecipientEmail->Display = true;
-			$this->txtFedexNotifyOtherEmail->Display = true;			
-			$this->lstFxServiceType->Display = true;
-			$this->lstPackageType->Display = true;
-			$this->txtPackageWeight->Display = true;
-			$this->lstWeightUnit->Display = true;
-			$this->txtPackageLength->Display = true;
-			$this->txtPackageWidth->Display = true;
-			$this->txtPackageHeight->Display = true;
-			$this->lstLengthUnit->Display = true;
-			$this->txtValue->Display = true;
-			$this->lstCurrencyUnit->Display = true;
-			$this->lblNewFromCompany->Display = true;
-			$this->lblNewFromContact->Display = true;
-			$this->lblNewFromAddress->Display = true;
-			$this->lblNewToCompany->Display = true;
-			$this->lblNewToContact->Display = true;
-			$this->lblNewToAddress->Display = true;
-			$this->txtHoldAtLocationAddress->Display = true;
-			$this->txtHoldAtLocationCity->Display = true;
-			$this->lstHoldAtLocationState->Display = true;
-			$this->txtHoldAtLocationPostalCode->Display = true;
-			
-			// Enable Fedex Notification Checkboxes (because they're disabled, not hidden)
-			$this->chkFedexNotifySenderShipFlag->Enabled = true;
-			$this->chkFedexNotifySenderExceptionFlag->Enabled = true;
-			$this->chkFedexNotifySenderDeliveryFlag->Enabled = true;
-			$this->chkFedexNotifyRecipientShipFlag->Enabled = true;
-			$this->chkFedexNotifyRecipientExceptionFlag->Enabled = true;
-			$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = true;
-			$this->chkFedexNotifyOtherShipFlag->Enabled = true;
-			$this->chkFedexNotifyOtherExceptionFlag->Enabled = true;
-			$this->chkFedexNotifyOtherDeliveryFlag->Enabled = true;			
-			
-			//Enable FedEx Special Services Checkboxes (because they're disabled, not hidden)
-			$this->chkSaturdayDeliveryFlag->Enabled = true;
-			$this->chkHoldAtLocationFlag->Enabled = true;
 			
 			if ($this->blnEditMode) {
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
@@ -4515,10 +4522,13 @@
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			}
 			
-				//If the user is not authorized to edit built-in fields, the fields are render as labels.
-			if(!$this->blnEditBuiltInFields)	
+			// If the user is not authorized to edit built-in fields, the fields are render as labels.
+			// Also used if editing a completed shipment
+			if(!$this->blnEditBuiltInFields || $this->objShipment->ShippedFlag)	
 				$this->DisplayLabels();	
 				
+			$this->pnlNote->Display = false;	
+			$this->txtNote->Display = true;	
 			$this->btnEdit->Display = false;
 			$this->atcAttach->btnUpload->Display = false;
 			$this->btnSave->Display = true;
