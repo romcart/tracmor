@@ -380,6 +380,7 @@ class QAssetEditComposite extends QControl {
 	protected function lblParentAssetCode_Create() {
 		$this->lblParentAssetCode = new QLabel($this);
 		$this->lblParentAssetCode->Name = 'Parent Asset';
+		$this->lblParentAssetCode->HtmlEntities = false;
 	}
 
 	// Create the Auto Generate Asset Code Checkbox
@@ -1171,7 +1172,12 @@ class QAssetEditComposite extends QControl {
 		}
 		$this->lblAssetCode->Text = $this->objAsset->AssetCode;
 		$this->lblHeaderAssetCode->Text = $this->objAsset->AssetCode;
-		$this->lblParentAssetCode->Text = $this->objAsset->ParentAssetCode;
+		if ($this->objAsset->ParentAssetCode && $objParentAssetCode = Asset::LoadByAssetCode($this->objAsset->ParentAssetCode)) {
+  		$this->lblParentAssetCode->Text = $objParentAssetCode->__toStringWithLink("bluelink");
+		}
+		else {
+		  $this->lblParentAssetCode->Text = "";
+		}
 		if ($this->objAsset->ModifiedDate) {
 			$this->lblModifiedDate->Text = $this->objAsset->ModifiedDate . ' by ' . $this->objAsset->ModifiedByObject->__toStringFullName();
 		}
