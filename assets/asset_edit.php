@@ -340,21 +340,21 @@ CREATE FIELD METHODS
 		// Render the remove button column in the datagrid
 		public function RemoveColumn_Render(Asset $objAsset) {
 
-      $strControlId = 'btnChildAssetsRemove' . $objAsset->AssetId;
-      $btnChildAssetsRemove = $this->GetControl($strControlId);
-      if (!$btnChildAssetsRemove) {
+      $strControlId = 'btnRemove' . $objAsset->AssetId;
+      $btnRemove = $this->GetControl($strControlId);
+      if (!$btnRemove) {
           // Create the Remove button for this row in the DataGrid
           // Use ActionParameter to specify the ID of the asset
-          $btnChildAssetsRemove = new QButton($this->ctlAssetTransact->dtgAssetTransact, $strControlId);
-          $btnChildAssetsRemove->Text = 'Remove';
-          $btnChildAssetsRemove->ActionParameter = $objAsset->AssetId;
-          $btnChildAssetsRemove->AddAction(new QClickEvent(), new QAjaxAction('btnChildAssetsRemove_Click'));
-          $btnChildAssetsRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnChildAssetsRemove_Click'));
-          $btnChildAssetsRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-          $btnChildAssetsRemove->CausesValidation = false;
+          $btnRemove = new QButton($this->ctlAssetTransact->dtgAssetTransact, $strControlId);
+          $btnRemove->Text = 'Remove';
+          $btnRemove->ActionParameter = $objAsset->AssetId;
+          $btnRemove->AddAction(new QClickEvent(), new QAjaxAction('btnRemove_Click'));
+          $btnRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnRemove_Click'));
+          $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+          $btnRemove->CausesValidation = false;
       }
 
-      return $btnChildAssetsRemove->Render(false);
+      return $btnRemove->Render(false);
 		}
 
 		// Remove button click action for each asset in the datagrid
