@@ -46,6 +46,8 @@
 
 		protected $ctlAssetEdit;
 		protected $ctlAssetTransact;
+		protected $ctlAssetSearchTool;
+		protected $dlgAssetSearchTool;
 		protected $intTransactionTypeId;
 
 		// Child assets datagrid
@@ -56,6 +58,7 @@
 		protected $btnReassign;
 		protected $btnLinkToParent;
 		protected $btnUnlink;
+		protected $btnAddChild;
 
 		// These are needed for the hovertips in the Shipping/Receiving datagrid
 		public $objAssetTransactionArray;
@@ -95,6 +98,8 @@
 			$this->btnReassign_Create();
 			$this->btnLinkToParent_Create();
 			$this->btnUnlink_Create();
+			$this->btnAddChild_Create();
+			$this->dlgAssetSearchTool_Create();;
 		}
 
 		// Datagrid values must be assigned here because they are not encoded like all other controls
@@ -282,6 +287,55 @@ CREATE FIELD METHODS
 			$this->ctlAssetTransact = new QAssetTransactComposite($this);
 		}
 
+		// Create and Setup the Modal Window for Printing Labels
+		protected function dlgAssetSearchTool_Create() {
+		  $this->dlgAssetSearchTool = new QDialogBox($this);
+      $this->dlgAssetSearchTool->Text = '';
+
+      // Let's setup some basic appearance options
+      $this->dlgAssetSearchTool->Width = '900px';
+      $this->dlgAssetSearchTool->Height = '470px';
+      $this->dlgAssetSearchTool->Overflow = QOverflow::Auto;
+      $this->dlgAssetSearchTool->Padding = '10px';
+      $this->dlgAssetSearchTool->FontSize = '12px';
+      //$this->dlgAssetSearchTool->FontNames = QFontFamily::Georgia;
+      $this->dlgAssetSearchTool->BackColor = '#ffffff';
+      // Make sure this Dislog Box is "hidden"
+      $this->dlgAssetSearchTool->Display = false;
+
+      /* If you try to make moveable - error "qc.regDB is not a function"
+      $this->dlgAssetSearchTool->Position = QPosition::Absolute;
+      $this->dlgAssetSearchTool->AddControlToMove();
+      */
+
+      // Add some controls into modal window
+      /*$this->lstLabelStock = new QListBox($this->dlgAssetSearchTool);
+      $this->lstLabelStock->Width = 200;
+      $this->lstLabelStock->AddItem(new QListItem('- Select One -', 0));
+			$this->lstLabelStock->AddItem(new QListItem('Avery 6571/6577 (5/8" x 3")', 1));
+			$this->lstLabelStock->AddItem(new QListItem('Avery 6570/6576 (1-1/4" x 1-3/4")', 2));
+			$this->lstLabelStock->AddAction(new QChangeEvent(), new QAjaxAction('lstLabelStock_Change'));
+			$this->lstLabelOffset = new QListBox($this->dlgAssetSearchTool);
+			$this->lstLabelOffset->Width = 200;
+			$this->lstLabelOffset->AddItem(new QListItem('None', 0, 1));
+			$this->btnPrint = new QButton($this->dlgAssetSearchTool);
+			$this->btnPrint->Text = "Print";
+			$this->btnPrint->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnPrint));
+			$this->btnPrint->AddAction(new QClickEvent(), new QToggleEnableAction($this->lstLabelStock, false));
+			$this->btnPrint->AddAction(new QClickEvent(), new QAjaxAction('btnPrint_Click'));
+			$this->btnCancel = new QButton($this->dlgAssetSearchTool);
+			$this->btnCancel->Text = "Cancel";
+			$this->btnCancel->AddAction(new QClickEvent(), new QAjaxAction('btnCancel_Click'));
+			$this->btnCancel->AddAction(new QClickEvent(), new QJavaScriptAction("document.getElementById('warning_loading').innerHTML = '';"));
+			$this->txtWarning = new QLabel($this->dlgAssetSearchTool);
+			$this->txtWarning->Text = "Please wait... PDF Generating: 0% Complete";
+			$this->txtWarning->Display = false;
+			*/
+      $this->ctlAssetSearchTool = new QAssetSearchComposite($this->dlgAssetSearchTool, null, true);
+			$this->ctlAssetSearchTool->dtgAsset->ItemsPerPage = 10;
+      $this->dlgAssetSearchTool->Template = 'asset_search_tool.tpl.php';
+		}
+
 		protected function btnChildAssetsRemove_Create() {
 		  $this->btnChildAssetsRemove = new QButton($this);
 		  $this->btnChildAssetsRemove->Text = "Remove";
@@ -309,6 +363,14 @@ CREATE FIELD METHODS
 		  $this->btnUnlink = new QButton($this);
 		  $this->btnUnlink->Text = "Unlink";
 		  $this->btnUnlink->Enabled = false;
+		}
+
+		protected function btnAddChild_Create() {
+		  $this->btnAddChild = new QButton($this);
+		  $this->btnAddChild->Text = "Add Child";
+		  $this->btnAddChild->AddAction(new QClickEvent(), new QAjaxAction('btnAddChild_Click'));
+		  $this->btnAddChild->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddChild_Click'));
+		  $this->btnAddChild->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
 		// Originally taken from AssetEditFormBase.inc
@@ -368,6 +430,10 @@ CREATE FIELD METHODS
 					}
 				}
 			}
+		}
+
+		protected function btnAddChild_Click() {
+		  $this->dlgAssetSearchTool->ShowDialogBox();
 		}
 
 		// Display the edit form

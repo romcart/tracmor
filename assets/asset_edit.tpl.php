@@ -40,10 +40,12 @@
 		<?php $this->ctlAssetEdit->Render(); ?>
 		<br class="item_divider" />
 		<div class="title">Child Assets</div>
+	  <?php $this->btnAddChild->Render(); ?>
 	  <?php $this->dtgChildAssets->RenderWithError(); ?>
 	  <?php $this->btnChildAssetsRemove->Render() . "&nbsp;" . $this->btnReassign->Render() . "&nbsp;" . $this->btnLinkToParent->Render() . "&nbsp;" . $this->btnUnlink->Render(); ?>
     <br class="item_divider" />
 	  <?php if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
     <br class="item_divider" />
+    <?php $this->dlgAssetSearchTool->Render(); ?>
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>
