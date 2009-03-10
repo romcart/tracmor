@@ -242,7 +242,7 @@ class QAssetEditComposite extends QControl {
 		$this->txtParentAssetCode = new QTextBox($this);
 		$this->txtParentAssetCode->Name = 'Parent Asset';
 		$this->txtParentAssetCode->Required = false;
-		$this->txtParentAssetCode->CausesValidation = false;
+		$this->txtParentAssetCode->CausesValidation = true;
 		$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
   	$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
    	$this->txtParentAssetCode->TabIndex = $this->GetNextTabIndex();;
@@ -809,23 +809,34 @@ class QAssetEditComposite extends QControl {
 				}
 
 				if (!$blnError && $this->txtParentAssetCode->Text) {
-				  if ($this->txtParentAssetCode->Text != $this->objAsset->AssetCode) {
-    				$ParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
-    				if ($ParentAsset) {
-    				  // If the parent asset is currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved
-    				  if ($ParentAsset->CheckedOutFlag || $ParentAsset->ReservedFlag || $ParentAsset->LocationId == 2 && $ParentAsset->LocationId == 3 || $ParentAsset->LocationId == 5 || AssetTransaction::PendingTransaction($ParentAsset->AssetId)) {
-    				    $blnError = true;
-    					  $this->txtParentAssetCode->Warning = "Parent asset code must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved. Please try another.";
-    				  }
-    				}
-    				else {
-    				  $blnError = true;
-    					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
-    				}
+				  // Check if the parent asset code is already a child asset of this asset
+				  $arrChildAsset = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+				  foreach ($arrChildAsset as $objChildAsset) {
+				    if ($objChildAsset->AssetCode == $this->txtParentAssetCode->Text) {
+				      $blnError = true;
+				      $this->txtParentAssetCode->Warning = "Parent asset code is already a child of this asset. Please try another.";
+				      break;
+				    }
 				  }
-				  else {
-				    $blnError = true;
-    				$this->txtParentAssetCode->Warning = "Parent asset code must not be the same as asset code. Please try another.";
+				  if (!$blnError) {
+  				  if ($this->txtParentAssetCode->Text != $this->objAsset->AssetCode) {
+      				$ParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
+      				if ($ParentAsset) {
+      				  // If the parent asset is currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved
+      				  if ($ParentAsset->CheckedOutFlag || $ParentAsset->ReservedFlag || $ParentAsset->LocationId == 2 && $ParentAsset->LocationId == 3 || $ParentAsset->LocationId == 5 || AssetTransaction::PendingTransaction($ParentAsset->AssetId)) {
+      				    $blnError = true;
+      					  $this->txtParentAssetCode->Warning = "Parent asset code must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved. Please try another.";
+      				  }
+      				}
+      				else {
+      				  $blnError = true;
+      					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
+      				}
+  				  }
+  				  else {
+  				    $blnError = true;
+      				$this->txtParentAssetCode->Warning = "Parent asset code must not be the same as asset code. Please try another.";
+  				  }
 				  }
 				}
 
@@ -1098,57 +1109,62 @@ class QAssetEditComposite extends QControl {
 	// Enable the transaction buttons where appropriate, depending on the status of the asset
 	public function EnableTransactionButtons() {
 		if ($this->blnEditMode) {
-			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
-				$this->btnMove->Enabled = true;
+		  if ($this->objAsset->LinkedFlag) {
+			  $this->DisableTransactionButtons();
 			}
 			else {
-				$this->btnMove->Enabled = false;
-			}
-			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
-				$this->btnCheckIn->Enabled = true;
-				$this->btnCheckOut->Enabled = true;
-			}
-			elseif ($this->objAsset->CheckedOutFlag) {
-				$objUserAccount = $this->objAsset->GetLastTransactionUser();
-				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
-					$this->btnCheckIn->Enabled = true;
-					$this->btnCheckOut->Enabled = true;
-				}
-				else {
-					$this->btnCheckIn->Enabled = false;
-					$this->btnCheckOut->Enabled = false;
-				}
-			}
-			else {
-				$this->btnCheckIn->Enabled = false;
-				$this->btnCheckOut->Enabled = false;
-			}
-			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
-				$this->btnUnreserve->Enabled = true;
-				$this->btnReserve->Enabled = true;
-			}
-			elseif ($this->objAsset->ReservedFlag) {
-				$objUserAccount = $this->objAsset->GetLastTransactionUser();
-				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
-					$this->btnUnreserve->Enabled = true;
-					$this->btnReserve->Enabled = true;
-				}
-				else {
-					$this->btnUnreserve->Enabled = false;
-					$this->btnReserve->Enabled = false;
-				}
-			}
-			else {
-				$this->btnUnreserve->Enabled = false;
-				$this->btnReserve->Enabled = false;
-			}
-			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
-				$this->btnShip->Enabled = true;
-				$this->btnReceive->Enabled = true;
-			}
-			else {
-				$this->btnShip->Enabled = false;
-				$this->btnReceive->Enabled = false;
+  			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+  				$this->btnMove->Enabled = true;
+  			}
+  			else {
+  				$this->btnMove->Enabled = false;
+  			}
+  			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+  				$this->btnCheckIn->Enabled = true;
+  				$this->btnCheckOut->Enabled = true;
+  			}
+  			elseif ($this->objAsset->CheckedOutFlag) {
+  				$objUserAccount = $this->objAsset->GetLastTransactionUser();
+  				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
+  					$this->btnCheckIn->Enabled = true;
+  					$this->btnCheckOut->Enabled = true;
+  				}
+  				else {
+  					$this->btnCheckIn->Enabled = false;
+  					$this->btnCheckOut->Enabled = false;
+  				}
+  			}
+  			else {
+  				$this->btnCheckIn->Enabled = false;
+  				$this->btnCheckOut->Enabled = false;
+  			}
+  			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+  				$this->btnUnreserve->Enabled = true;
+  				$this->btnReserve->Enabled = true;
+  			}
+  			elseif ($this->objAsset->ReservedFlag) {
+  				$objUserAccount = $this->objAsset->GetLastTransactionUser();
+  				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
+  					$this->btnUnreserve->Enabled = true;
+  					$this->btnReserve->Enabled = true;
+  				}
+  				else {
+  					$this->btnUnreserve->Enabled = false;
+  					$this->btnReserve->Enabled = false;
+  				}
+  			}
+  			else {
+  				$this->btnUnreserve->Enabled = false;
+  				$this->btnReserve->Enabled = false;
+  			}
+  			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+  				$this->btnShip->Enabled = true;
+  				$this->btnReceive->Enabled = true;
+  			}
+  			else {
+  				$this->btnShip->Enabled = false;
+  				$this->btnReceive->Enabled = false;
+  			}
 			}
 		}
 	}
@@ -1267,6 +1283,8 @@ class QAssetEditComposite extends QControl {
 	  	case "dtgAssetTransaction": return $this->dtgAssetTransaction;
 	  		break;
 	  	case "dlgNewAssetModel": return $this->dlgNewAssetModel;
+	  	  break;
+	  	case "btnSaveDisplay": return $this->btnSave->Display;
 	  	  break;
       default:
         try {

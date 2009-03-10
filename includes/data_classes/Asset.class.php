@@ -701,6 +701,26 @@
 			*/
 		}
 
+		public function LoadChildLinkedArrayByParentAssetCode($strParentAssetCode) {
+		  $objLinkedAssetArray = array();
+		  $objChildAssetArray = Asset::LoadArrayByParentAssetCodeLinkedFlag($strParentAssetCode, 1);
+		  if ($objChildAssetArray && count($objChildAssetArray)) {
+        foreach ($objChildAssetArray as $objLinkedAsset) {
+        	$objLinkedAssetArray[] = $objLinkedAsset;
+        	$objNewLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objLinkedAsset->AssetCode);
+        	if ($objNewLinkedAssetArray) {
+          	foreach ($objNewLinkedAssetArray as $objLinkedAsset2) {
+          	  $objLinkedAssetArray[] = $objLinkedAsset2;
+          	}
+        	}
+        }
+        return $objLinkedAssetArray;
+		  }
+		  else {
+		    return false;
+		  }
+		}
+
 		/**
 		 * Override method to perform a property "Set"
 		 * This will set the property $strName to be $mixValue

@@ -71,28 +71,32 @@
 		// Status of Asset Search Tool
 		protected $intDlgStatus;
 
+		protected $blnEditChild;
+
 		// These are needed for the hovertips in the Shipping/Receiving datagrid
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
 
 		// Override the Form_Create method in AssetEditFormBase.inc
 		protected function Form_Create() {
-      $this->lblChildAssets_Create();
-			$this->lblAssetCode_Create();
-			// Create Buttons
-			$this->btnChildAssetsRemove_Create();
-			$this->btnReassign_Create();
-			$this->btnLinkToParent_Create();
-			$this->btnUnlink_Create();
-			$this->AddChild_Create();
-			$this->dlgAssetSearchTool_Create();
+      // Assign the Transaction Type from the query string, if it exists.
+			$this->intTransactionTypeId = QApplication::QueryString('intTransactionTypeId');
+
+		  if (!$this->intTransactionTypeId) {
+  		  $this->lblChildAssets_Create();
+  			$this->lblAssetCode_Create();
+  			// Create Buttons
+  			$this->btnChildAssetsRemove_Create();
+  			$this->btnReassign_Create();
+  			$this->btnLinkToParent_Create();
+  			$this->btnUnlink_Create();
+  			$this->AddChild_Create();
+  			$this->dlgAssetSearchTool_Create();
+		  }
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
 			$this->ctlShortcutMenu_Create();
-
-			// Assign the Transaction Type from the query string, if it exists.
-			$this->intTransactionTypeId = QApplication::QueryString('intTransactionTypeId');
 
 			$this->ctlAssetEdit_Create();
 			// Create the two composite controls
@@ -111,7 +115,9 @@
 				$this->DisplayEdit(true);
 			}
 			// Create Child Assets Datagrid
-			$this->dtgChildAssets_Create();
+			if (!$this->intTransactionTypeId) {
+			  $this->dtgChildAssets_Create();
+			}
 		}
 
 		// Datagrid values must be assigned here because they are not encoded like all other controls
@@ -140,7 +146,11 @@
 				}
 			}
 
-			$this->dtgChildAssets->SetDataBinder('dtgChildAssets_Bind');
+			if (!$this->intTransactionTypeId && $this->ctlAssetEdit->Display) {
+        $this->dtgChildAssets->SetDataBinder('dtgChildAssets_Bind');
+      }
+
+			$this->DisplayChildAssets();
 		}
 
 		// Setup the Child Assets datagrid
@@ -160,7 +170,7 @@
 	    $this->dtgChildAssets->ItemsPerPage = 20;
 
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15'));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => 15, 'HtmlEntities' => false)));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn(' ', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => 15, 'HtmlEntities' => false)));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->AssetModelCode, false), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->AssetModelCode), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription, false), 'CssClass' => "dtg_column")));
@@ -307,6 +317,7 @@ CREATE FIELD METHODS
 		protected function lblAssetCode_Create() {
 		  $this->lblAssetCode = new QLabel($this);
 		  $this->lblAssetCode->Text = "Asset Code:";
+		  $this->lblAssetCode->Display = false;
 		}
 
 		// Create and Setup the Modal Window for Printing Labels
@@ -340,6 +351,7 @@ CREATE FIELD METHODS
 		  $this->btnChildAssetsRemove = new QButton($this);
 		  $this->btnChildAssetsRemove->Text = "Remove";
 		  $this->btnChildAssetsRemove->Enabled = false;
+		  $this->btnChildAssetsRemove->Display = false;
 		  $this->btnChildAssetsRemove->AddAction(new QClickEvent(), new QConfirmAction('Are you SURE you want to REMOVE this Asset?'));
   		$this->btnChildAssetsRemove->AddAction(new QClickEvent(), new QAjaxAction('btnChildAssetsRemove_Click'));
   		$this->btnChildAssetsRemove->AddAction(new QEnterKeyEvent(), new QConfirmAction('Are you SURE you want to REMOVE this Asset?'));
@@ -351,52 +363,51 @@ CREATE FIELD METHODS
 		  $this->btnReassign = new QButton($this);
 		  $this->btnReassign->Text = "Reassign";
 		  $this->btnReassign->Enabled = false;
+		  $this->btnReassign->Display = false;
 		}
 
 		protected function btnLinkToParent_Create() {
 		  $this->btnLinkToParent = new QButton($this);
 		  $this->btnLinkToParent->Text = "Link to Parent";
 		  $this->btnLinkToParent->Enabled = false;
+		  $this->btnLinkToParent->Display = false;
+		  $this->btnLinkToParent->AddAction(new QClickEvent(), new QAjaxAction('btnLinkToParent_Click'));
+		  $this->btnLinkToParent->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnLinkToParent_Click'));
+		  $this->btnLinkToParent->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
 		protected function btnUnlink_Create() {
 		  $this->btnUnlink = new QButton($this);
 		  $this->btnUnlink->Text = "Unlink";
 		  $this->btnUnlink->Enabled = false;
+		  $this->btnUnlink->Display = false;
+		  $this->btnUnlink->AddAction(new QClickEvent(), new QAjaxAction('btnUnlink_Click'));
+		  $this->btnUnlink->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnUnlink_Click'));
+		  $this->btnUnlink->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
 		protected function AddChild_Create() {
 		  $this->btnAddChild = new QButton($this);
 		  $this->btnAddChild->Text = "Add Child";
+		  $this->btnAddChild->Display = false;
 		  $this->btnAddChild->AddAction(new QClickEvent(), new QAjaxAction('btnAddChild_Click'));
 		  $this->btnAddChild->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddChild_Click'));
 		  $this->btnAddChild->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
 		  $this->txtAddChild = new QTextBox($this);
 		  $this->txtAddChild->Width = 200;
+		  $this->txtAddChild->Display = false;
 		  $this->txtAddChild->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddChild_Click'));
 		  $this->txtAddChild->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
 		  $this->lblAddChild = new QLabel($this);
 		  $this->lblAddChild->HtmlEntities = false;
+		  $this->lblAddChild->Display = false;
 		  $this->lblAddChild->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
 		  //$this->lblAddChild->CssClass = 'add_icon';
 		  $this->lblAddChild->AddAction(new QClickEvent(), new QAjaxAction('lblAddChild_Click'));
 		  $this->lblAddChild->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddChild_Click'));
 		  $this->lblAddChild->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		}
-
-		protected function ChildAssetBlock_Display($blnDisplay = false) {
-		  $this->lblChildAssets->Display = $blnDisplay;
-		  $this->lblAssetCode->Display = $blnDisplay;
-		  $this->txtAddChild->Display = $blnDisplay;
-		  $this->lblAddChild->Display = $blnDisplay;
-		  $this->btnAddChild->Display = $blnDisplay;
-		  $this->dtgChildAssets->Display = $blnDisplay;
-		  $this->btnChildAssetsRemove->Display = $blnDisplay;
-		  $this->btnReassign->Display = $blnDisplay;
-		  $this->btnLinkToParent->Display = $blnDisplay;
-		  $this->btnUnlink->Display = $blnDisplay;
 		}
 
 		// Originally taken from AssetEditFormBase.inc
@@ -418,16 +429,15 @@ CREATE FIELD METHODS
 				$objCaller->strTitleVerb = QApplication::Translate('Edit');
 				$objCaller->blnEditMode = true;
 				if ($objCaller->objAsset->CheckedOutFlag || $objCaller->objAsset->ReservedFlag || $objCaller->objAsset->LocationId == 2 || $objCaller->objAsset->LocationId == 3 || $objCaller->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objCaller->objAsset->AssetId)) {
-				  $this->ChildAssetBlock_Display(false);
+				  $this->blnEditChild = false;
 				}
 				else {
-				  $this->ChildAssetBlock_Display(true);
+				  $this->blnEditChild = true;
 				}
 			} else {
 				$objCaller->objAsset = new Asset();
 				$objCaller->strTitleVerb = QApplication::Translate('Create');
 				$objCaller->blnEditMode = false;
-				$this->ChildAssetBlock_Display(true);
 			}
 			QApplication::AuthorizeEntity($objCaller->objAsset, $objCaller->blnEditMode);
 		}
@@ -500,11 +510,7 @@ CREATE FIELD METHODS
 		  $this->dlgAssetSearchTool->ShowDialogBox();
 		  $this->intDlgStatus = 2;
 		  // Uncheck all items but SelectAll checkbox
-      foreach ($this->GetAllControls() as $objControl) {
-        if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
-          $objControl->Checked = false;
-        }
-      }
+      $this->UncheckAllItems();
 		}
 
 		protected  function btnChildAssetsRemove_Click() {
@@ -515,7 +521,55 @@ CREATE FIELD METHODS
           $objAsset->Save();
         }
       }
-      $this->dtgChildAssets_Bind();
+		}
+
+		protected function btnLinkToParent_Click() {
+		  $this->btnUnlink->Warning = "";
+		  $blnError = false;
+		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
+		  if (count($arrAssetId)) {
+		    $arrCheckedAsset = array();
+		    $objSelectedChildAssetArray = Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $arrAssetId));
+		    foreach ($objSelectedChildAssetArray as $objAsset) {
+          if ($objAsset->LocationId != $this->objAsset->LocationId) {
+            $blnError = true;
+      		  $this->btnUnlink->Warning .= "The child asset (" . $objAsset->AssetCode . ") must be in the same location as the parent asset.<br />";
+          }
+		      elseif ($objAsset->CheckedOutFlag || $objAsset->ReservedFlag || $objAsset->LocationId == 2 && $objAsset->LocationId == 3 || $objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objAsset->AssetId)) {
+      		  $blnError = true;
+      		  $this->btnUnlink->Warning .= "Child asset code (" . $objAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+      		}
+      		elseif ($this->objAsset->CheckedOutFlag || $this->objAsset->ReservedFlag || $this->objAsset->LocationId == 2 && $this->objAsset->LocationId == 3 || $this->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+      		  $blnError = true;
+      		  $this->btnUnlink->Warning .= "Parent asset code (" . $objAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+      		}
+      		else {
+      		  $objAsset->LinkedFlag = true;
+      		  $arrCheckedAsset[] = $objAsset;
+      		}
+		    }
+		    if (!$blnError) {
+		      foreach ($arrCheckedAsset as $objAsset) {
+		        $objAsset->Save();
+		      }
+		    }
+		    $this->UncheckAllItems();
+		  }
+		  else {
+		    $this->btnUnlink->Warning = "No selected assets.";
+		  }
+		}
+
+		protected function btnUnlink_Click() {
+		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
+		  if (count($arrAssetId)) {
+		    $objSelectedChildAssetArray = Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $arrAssetId));
+		    foreach ($objSelectedChildAssetArray as $objAsset) {
+      		$objAsset->LinkedFlag = false;
+      		$objAsset->Save();
+		    }
+		    $this->UncheckAllItems();
+		  }
 		}
 
 		protected function btnAssetSearchToolAdd_Click() {
@@ -568,20 +622,55 @@ CREATE FIELD METHODS
       }
 
       // Uncheck all items but SelectAll checkbox
-      foreach ($this->GetAllControls() as $objControl) {
-        if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
-          $objControl->Checked = false;
-        }
-      }
+      $this->UncheckAllItems();
 		}
 
 		// Display the edit form
 		public function DisplayEdit($blnDisplay) {
 			if ($blnDisplay) {
 				$this->ctlAssetEdit->Display = true;
+				$this->DisplayChildAssets();
 			}
 			else {
 				$this->ctlAssetEdit->Display = false;
+				$this->DisplayChildAssets();
+			}
+		}
+
+		// Display the Child Assets form
+		public function DisplayChildAssets() {
+			if ($this->ctlAssetEdit->btnSaveDisplay && $this->blnEditChild) {
+  		  $this->lblChildAssets->Display = true;
+			  $this->lblAssetCode->Display = true;
+  		  $this->txtAddChild->Display = true;
+  		  $this->lblAddChild->Display = true;
+  		  $this->btnAddChild->Display = true;
+			  $this->btnChildAssetsRemove->Display = true;
+  		  $this->btnReassign->Display = true;
+  		  $this->btnLinkToParent->Display = true;
+  		  $this->btnUnlink->Display = true;
+			}
+			else {
+			  if ($this->intTransactionTypeId) {
+			    $this->lblChildAssets->Display = false;
+			    $this->dtgChildAssets->Display = false;
+			  }
+			  elseif (!$this->ctlAssetEdit->Display) {
+			    $this->lblChildAssets->Visible = false;
+			    $this->dtgChildAssets->Visible = false;
+			  }
+			  else {
+			    $this->lblChildAssets->Visible = true;
+			    $this->dtgChildAssets->Visible = true;
+			  }
+  		  $this->lblAssetCode->Display = false;
+  		  $this->txtAddChild->Display = false;
+  		  $this->lblAddChild->Display = false;
+  		  $this->btnAddChild->Display = false;
+			  $this->btnChildAssetsRemove->Display = false;
+  		  $this->btnReassign->Display = false;
+  		  $this->btnLinkToParent->Display = false;
+  		  $this->btnUnlink->Display = false;
 			}
 		}
 
@@ -606,6 +695,15 @@ CREATE FIELD METHODS
 		  if ($bitLinkedFlag)
 		    return '<img src="../images/icons/locked.png" border="0">';
 		  return ' ';
+		}
+
+		// Uncheck all items but SelectAll checkbox
+		public function UncheckAllItems() {
+		  foreach ($this->GetAllControls() as $objControl) {
+        if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+          $objControl->Checked = false;
+        }
+      }
 		}
 	}
 

@@ -38,6 +38,7 @@
 		</td>
 		<td width="100%" valign="top">
 		<?php $this->ctlAssetEdit->Render(); ?>
+		<?php if (!$this->intTransactionTypeId) { ?>
 		<br class="item_divider" />
 		<?php $this->lblChildAssets->Render(); ?>
 	  <table>
@@ -48,10 +49,11 @@
 	   </tr>
 	  </table>
 	  <?php $this->dtgChildAssets->RenderWithError(); ?>
-	  <?php $this->btnChildAssetsRemove->Render() . "&nbsp;" . $this->btnReassign->Render() . "&nbsp;" . $this->btnLinkToParent->Render() . "&nbsp;" . $this->btnUnlink->Render(); ?>
-    <br class="item_divider" />
-	  <?php if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
+	  <?php $this->btnChildAssetsRemove->Render() . "&nbsp;" . $this->btnReassign->Render() . "&nbsp;" . $this->btnLinkToParent->Render() . "&nbsp;" . $this->btnUnlink->RenderWithError(); ?>
     <br class="item_divider" />
     <?php $this->dlgAssetSearchTool->Render(); ?>
+	  <?php }
+	  if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
+    <br class="item_divider" />
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>
