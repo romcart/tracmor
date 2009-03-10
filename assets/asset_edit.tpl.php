@@ -39,8 +39,14 @@
 		<td width="100%" valign="top">
 		<?php $this->ctlAssetEdit->Render(); ?>
 		<br class="item_divider" />
-		<div class="title">Child Assets</div>
-	  <?php $this->btnAddChild->Render(); ?>
+		<?php $this->lblChildAssets->Render(); ?>
+	  <table>
+	   <tr>
+	     <td width="275px" valign="top"><?php $this->lblAssetCode->Render(); ?>&nbsp;<?php $this->txtAddChild->RenderWithError(); ?></td>
+	     <td valign="top"><?php $this->lblAddChild->Render(); ?></td>
+	     <td valign="top"><?php $this->btnAddChild->Render(); ?></td>
+	   </tr>
+	  </table>
 	  <?php $this->dtgChildAssets->RenderWithError(); ?>
 	  <?php $this->btnChildAssetsRemove->Render() . "&nbsp;" . $this->btnReassign->Render() . "&nbsp;" . $this->btnLinkToParent->Render() . "&nbsp;" . $this->btnUnlink->Render(); ?>
     <br class="item_divider" />

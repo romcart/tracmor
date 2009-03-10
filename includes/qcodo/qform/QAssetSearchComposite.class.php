@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,7 +23,7 @@
 <?php
 
 class QAssetSearchComposite extends QControl {
-	
+
 	// Basic Inputs
 	protected $lstCategory;
 	protected $lstManufacturer;
@@ -33,19 +33,19 @@ class QAssetSearchComposite extends QControl {
 	protected $chkOffsite;
 	protected $lblAssetModelId;
 	protected $arrCustomFields;
-	
+
 	// Buttons
 	protected $btnSearch;
 	protected $blnSearch;
 	protected $btnClear;
-	
+
 	// Advanced Label/Link
 	protected $lblAdvanced;
 	// Boolean that toggles Advanced Search display
 	protected $blnAdvanced;
 	// Advanced Search Composite control
 	protected $ctlAdvanced;
-	
+
 	// Search Values
 	protected $intLocationId;
 	protected $intAssetModelId;
@@ -61,13 +61,13 @@ class QAssetSearchComposite extends QControl {
 	protected $strDateModifiedFirst;
 	protected $strDateModifiedLast;
 	protected $blnAttachment;
-	
+
 	public $dtgAsset;
 	public $objParentObject;
-	
+
 	// We want to override the constructor in order to setup the subcontrols
 	public function __construct($objParentObject, $strControlId = null, $blnShowCheckboxes = false) {
-		
+
     // First, call the parent to do most of the basic setup
     try {
         parent::__construct($objParentObject, $strControlId);
@@ -75,32 +75,32 @@ class QAssetSearchComposite extends QControl {
         $objExc->IncrementOffset();
         throw $objExc;
     }
-    
+
     $this->objParentObject = $objParentObject;
-    
+
 		$this->dtgAsset = new QDataGrid($this);
 		$this->dtgAsset->Name = 'asset_list';
 		$this->dtgAsset->CellPadding = 5;
 		$this->dtgAsset->CellSpacing = 0;
 		$this->dtgAsset->CssClass = "datagrid";
-    		
+
     // Disable AJAX for the datagrid
     $this->dtgAsset->UseAjax = false;
-    
+
     // Allow for column toggling
     $this->dtgAsset->ShowColumnToggle = true;
-    
+
     // Allow for CSV Export
     $this->dtgAsset->ShowExportCsv = true;
-    
+
     // Add a 'Select All' checkbox
     $this->dtgAsset->ShowCheckboxes = false;
-    
+
     // Enable Pagination, and set to 20 items per page
     $objPaginator = new QPaginator($this->dtgAsset);
     $this->dtgAsset->Paginator = $objPaginator;
     $this->dtgAsset->ItemsPerPage = 20;
-    
+
     // If the user wants the checkboxes column
     if ($blnShowCheckboxes) {
     	// This will render all of the necessary controls and actions. chkSelected_Render expects a unique ID for each row of the database.
@@ -113,7 +113,7 @@ class QAssetSearchComposite extends QControl {
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?=$_ITEM->AssetModel->AssetModelCode ?>', 'SortByCommand="asset__asset_model_id__asset_model_code"', 'ReverseSortByCommand="asset__asset_model_id__asset_model_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
-    
+
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
     $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
     if ($objCustomFieldArray) {
@@ -124,11 +124,11 @@ class QAssetSearchComposite extends QControl {
     		}
     	}
     }
-    
+
     // Column to originally sort by (Asset Model)
     $this->dtgAsset->SortColumnIndex = 2;
     $this->dtgAsset->SortDirection = 0;
-    
+
     $objStyle = $this->dtgAsset->RowStyle;
     $objStyle->ForeColor = '#000000';
     $objStyle->BackColor = '#FFFFFF';
@@ -141,9 +141,9 @@ class QAssetSearchComposite extends QControl {
     $objStyle->ForeColor = '#000000';
     $objStyle->BackColor = '#EFEFEF';
     $objStyle->CssClass = 'dtg_header';
-    
+
     $this->dtgAsset->SetDataBinder('dtgAsset_Bind', $this);
-    
+
     $this->lstCategory_Create();
     $this->lstManufacturer_Create();
     $this->lstLocation_Create();
@@ -156,11 +156,11 @@ class QAssetSearchComposite extends QControl {
     $this->ctlAdvanced_Create();
     $this->lblAdvanced_Create();
 	}
-	
+
 	public function ParsePostData() {
-		
+
 	}
-	
+
 	public function GetDataGridObjectNameId() {
 	  $strToReturn = array();
 	  // DataGrid name
@@ -171,22 +171,22 @@ class QAssetSearchComposite extends QControl {
 	  $strToReturn[2] = "AssetCode";
 	  return $strToReturn;
 	}
-	
+
 	public function GetJavaScriptAction() {
 			return "onchange";
 	}
-	
+
 	public function Validate() {return true;}
-	
+
 	protected function GetControlHtml() {
-		
+
 		$strStyle = $this->GetStyleAttributes();
 		if ($strStyle) {
 			$strStyle = sprintf('style="%s"', $strStyle);
 		}
-		
+
 		$strAttributes = $this->GetAttributes();
-		
+
 		// Store the Output Buffer locally
 		$strAlreadyRendered = ob_get_contents();
 		ob_clean();
@@ -198,28 +198,28 @@ class QAssetSearchComposite extends QControl {
 
 		// Restore the output buffer and return evaluated template
 		print($strAlreadyRendered);
-		
+
 		$strToReturn =  sprintf('<span id="%s" %s%s>%s</span>',
 		$this->strControlId,
 		$strStyle,
 		$strAttributes,
 		$strTemplateEvaluated);
-		
-		return $strToReturn;		
+
+		return $strToReturn;
 	}
-	
+
 	public function dtgAsset_Bind() {
-		
+
 		if (QApplication::QueryString('intAssetModelId')) {
 			$this->lblAssetModelId->Text = QApplication::QueryString('intAssetModelId');
 			$this->blnSearch = true;
 		}
-			
+
 		// If the search button has been pressed or the AssetModelId was sent in the query string from the asset models page
 		if ($this->blnSearch) {
 			$this->assignSearchValues();
 		}
-		
+
 		$strAssetCode = $this->strAssetCode;
 		$intLocationId = $this->intLocationId;
 		$intAssetModelId = $this->intAssetModelId;
@@ -235,10 +235,10 @@ class QAssetSearchComposite extends QControl {
 		$strDateModified = $this->strDateModified;
 		$blnAttachment = $this->blnAttachment;
 		$arrCustomFields = $this->arrCustomFields;
-				
+
 		// Enable Profiling
     //QApplication::$Database[1]->EnableProfiling();
-    
+
 
     // Expand the Asset object to include the AssetModel, Category, Manufacturer, and Location Objects
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandCategory] = true;
@@ -255,16 +255,16 @@ class QAssetSearchComposite extends QControl {
 		}
 		$this->blnSearch = false;
   }
-  
+
   protected function ctlAdvanced_Create() {
 		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 1);
 		$this->ctlAdvanced->Display = false;
 	}
-	
+
 	/*************************
 	*	CREATE INPUT METHODS
 	*************************/
-  	
+
 	protected function lstLocation_Create() {
 		$this->lstLocation = new QListBox($this);
 		$this->lstLocation->Name = 'Location';
@@ -279,9 +279,9 @@ class QAssetSearchComposite extends QControl {
 			}
 		}
     $this->lstLocation->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
-    $this->lstLocation->AddAction(new QEnterKeyEvent(), new QTerminateAction());  		
+    $this->lstLocation->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	}
-  
+
   protected function lstCategory_Create() {
   	$this->lstCategory = new QListBox($this);
 		$this->lstCategory->Name = 'Category';
@@ -290,7 +290,7 @@ class QAssetSearchComposite extends QControl {
 			$this->lstCategory->AddItem($objCategory->ShortDescription, $objCategory->CategoryId);
 		}
   }
-  
+
   protected function lstManufacturer_Create() {
     $this->lstManufacturer = new QListBox($this);
 		$this->lstManufacturer->Name = 'Manufacturer';
@@ -299,7 +299,7 @@ class QAssetSearchComposite extends QControl {
 			$this->lstManufacturer->AddItem($objManufacturer->ShortDescription, $objManufacturer->ManufacturerId);
 		}
   }
-  
+
   protected function txtShortDescription_Create() {
     $this->txtShortDescription = new QTextBox($this);
 		$this->txtShortDescription->Name = 'Model';
@@ -310,29 +310,29 @@ class QAssetSearchComposite extends QControl {
     $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
   }
-  
+
   protected function txtAssetCode_Create() {
   	$this->txtAssetCode = new QTextBox($this);
   	$this->txtAssetCode->Name = 'Asset Code';
   	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
   	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
-  
+
   protected function chkOffsite_Create() {
   	$this->chkOffsite = new QCheckBox($this);
   	$this->chkOffsite->Text = 'Show Offsite Assets';
   }
-  
+
   protected function lblAssetModelId_Create() {
   	$this->lblAssetModelId = new QLabel($this);
   	$this->lblAssetModelId->Text = '';
   	$this->lblAssetModelId->Visible = false;
   }
-  
+
   /**************************
    *	CREATE BUTTON METHODS
   **************************/
-	
+
   protected function btnSearch_Create() {
 		$this->btnSearch = new QButton($this);
 		$this->btnSearch->Name = 'search';
@@ -341,16 +341,16 @@ class QAssetSearchComposite extends QControl {
 		$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
 		$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
-  
+
   protected function btnClear_Create() {
   	$this->btnClear = new QButton($this);
 		$this->btnClear->Name = 'clear';
 		$this->btnClear->Text = 'Clear';
 		$this->btnClear->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnClear_Click'));
 		$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
-		$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
+		$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
-  
+
   protected function lblAdvanced_Create() {
   	$this->lblAdvanced = new QLabel($this);
   	$this->lblAdvanced->Name = 'Advanced';
@@ -360,12 +360,12 @@ class QAssetSearchComposite extends QControl {
   	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
   	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
   }
-  
+
   public function btnSearch_Click() {
   	$this->blnSearch = true;
 		$this->dtgAsset->PageNumber = 1;
   }
-  
+
   public function btnClear_Click() {
   	if ($this->intAssetModelId) {
   		QApplication::Redirect('asset_list.php');
@@ -379,7 +379,7 @@ class QAssetSearchComposite extends QControl {
 	  	$this->chkOffsite->Checked = false;
 	  	$this->lstLocation->SelectedIndex = 0;
 	  	$this->ctlAdvanced->ClearControls();
-	  	
+
 	  	// Set search variables to null
 	  	$this->intCategoryId = null;
 	  	$this->intManufacturerId = null;
@@ -404,22 +404,22 @@ class QAssetSearchComposite extends QControl {
 	  	$this->blnSearch = false;
   	}
   }
-  
+
   public function lblAdvanced_Click() {
   	if ($this->blnAdvanced) {
-  		
+
   		$this->blnAdvanced = false;
   		$this->lblAdvanced->Text = 'Advanced Search';
-  		
+
   		$this->ctlAdvanced->ClearControls();
-  		
+
   	}
   	else {
   		$this->blnAdvanced = true;
   		$this->lblAdvanced->Text = 'Hide Advanced';
   	}
   }
-  
+
   protected function assignSearchValues() {
   	$this->intCategoryId = $this->lstCategory->SelectedValue;
 		$this->intManufacturerId = $this->lstManufacturer->SelectedValue;
@@ -435,7 +435,7 @@ class QAssetSearchComposite extends QControl {
 		$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 		$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
 		$this->blnAttachment = $this->ctlAdvanced->Attachment;
-		
+
 		$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 		if ($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as &$field) {
@@ -448,7 +448,7 @@ class QAssetSearchComposite extends QControl {
 			}
 		}
   }
-	
+
 	// And our public getter/setters
   public function __get($strName) {
 	  switch ($strName) {
@@ -463,7 +463,7 @@ class QAssetSearchComposite extends QControl {
         }
 	  }
   }
-  
+
   /////////////////////////
 	// Public Properties: SET
 	/////////////////////////

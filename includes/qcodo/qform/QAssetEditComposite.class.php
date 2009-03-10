@@ -242,7 +242,7 @@ class QAssetEditComposite extends QControl {
 		$this->txtParentAssetCode = new QTextBox($this);
 		$this->txtParentAssetCode->Name = 'Parent Asset';
 		$this->txtParentAssetCode->Required = false;
-		$this->txtParentAssetCode->CausesValidation = true;
+		$this->txtParentAssetCode->CausesValidation = false;
 		$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
   	$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
    	$this->txtParentAssetCode->TabIndex = $this->GetNextTabIndex();;
@@ -782,8 +782,7 @@ class QAssetEditComposite extends QControl {
 				}
 
 				if (!$blnError) {
-
-					// Location can only be decided when creating an asset. Otherwise they must conduct a transaction.
+          // Location can only be decided when creating an asset. Otherwise they must conduct a transaction.
 					if (!$this->blnEditMode) {
 						$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
 					}
