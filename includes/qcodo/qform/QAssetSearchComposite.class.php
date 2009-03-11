@@ -113,6 +113,7 @@ class QAssetSearchComposite extends QControl {
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?=$_ITEM->AssetModel->AssetModelCode ?>', 'SortByCommand="asset__asset_model_id__asset_model_code"', 'ReverseSortByCommand="asset__asset_model_id__asset_model_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Code', '<?=$_ITEM->ParentAssetCode ?>', 'SortByCommand="parent_asset_code ASC"', 'ReverseSortByCommand="parent_asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
     $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);

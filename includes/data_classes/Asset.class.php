@@ -514,6 +514,7 @@
 					`asset`.`asset_model_id` AS `asset_model_id`,
 					`asset`.`location_id` AS `location_id`,
 					`asset`.`asset_code` AS `asset_code`,
+					`asset`.`parent_asset_code` AS `parent_asset_code`,
 					`asset`.`image_path` AS `image_path`,
 					`asset`.`checked_out_flag` AS `checked_out_flag`,
 					`asset`.`reserved_flag` AS `reserved_flag`,

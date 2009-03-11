@@ -73,6 +73,8 @@
 
 		protected $blnEditChild;
 
+		protected $intAssetIdArray;
+
 		// These are needed for the hovertips in the Shipping/Receiving datagrid
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
@@ -364,6 +366,9 @@ CREATE FIELD METHODS
 		  $this->btnReassign->Text = "Reassign";
 		  $this->btnReassign->Enabled = false;
 		  $this->btnReassign->Display = false;
+		  $this->btnReassign->AddAction(new QClickEvent(), new QAjaxAction('btnReassign_Click'));
+		  $this->btnReassign->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReassign_Click'));
+		  $this->btnReassign->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
 		protected function btnLinkToParent_Create() {
@@ -428,12 +433,12 @@ CREATE FIELD METHODS
 
 				$objCaller->strTitleVerb = QApplication::Translate('Edit');
 				$objCaller->blnEditMode = true;
-				if ($objCaller->objAsset->CheckedOutFlag || $objCaller->objAsset->ReservedFlag || $objCaller->objAsset->LocationId == 2 || $objCaller->objAsset->LocationId == 3 || $objCaller->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objCaller->objAsset->AssetId)) {
+				/*if ($objCaller->objAsset->CheckedOutFlag || $objCaller->objAsset->ReservedFlag || $objCaller->objAsset->LocationId == 2 || $objCaller->objAsset->LocationId == 3 || $objCaller->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objCaller->objAsset->AssetId)) {
 				  $this->blnEditChild = false;
 				}
 				else {
-				  $this->blnEditChild = true;
-				}
+				  */$this->blnEditChild = true;
+				//}
 			} else {
 				$objCaller->objAsset = new Asset();
 				$objCaller->strTitleVerb = QApplication::Translate('Create');
@@ -482,9 +487,9 @@ CREATE FIELD METHODS
   		    if ($objChildAsset->ParentAssetCode) {
   		      $this->txtAddChild->Warning = "That asset code already have the parent asset code. Please try another.";
   		    }
-  		    elseif ($objChildAsset->CheckedOutFlag || $objChildAsset->ReservedFlag || $objChildAsset->LocationId == 2 && $objChildAsset->LocationId == 3 || $objChildAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objChildAsset->AssetId)) {
+  		    /*elseif ($objChildAsset->CheckedOutFlag || $objChildAsset->ReservedFlag || $objChildAsset->LocationId == 2 && $objChildAsset->LocationId == 3 || $objChildAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objChildAsset->AssetId)) {
   		      $this->txtAddChild->Warning = "Child asset code must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved. Please try another.";
-  		    }
+  		    }*/
   		    elseif ($objChildAsset->AssetCode == $this->objAsset->AssetCode) {
   		      $this->txtAddChild->Warning = "That asset code does not exist. Please try another.";
   		    }
@@ -507,10 +512,23 @@ CREATE FIELD METHODS
 		}
 
 		protected function lblAddChild_Click() {
-		  $this->dlgAssetSearchTool->ShowDialogBox();
-		  $this->intDlgStatus = 2;
 		  // Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
+      $this->dlgAssetSearchTool->ShowDialogBox();
+		  $this->intDlgStatus = 2;
+		}
+
+		protected function btnReassign_Click() {
+		  $this->intAssetIdArray = $this->dtgChildAssets->GetSelected("AssetId");
+		  if (count($this->intAssetIdArray) > 0) {
+		    // Uncheck all items but SelectAll checkbox
+        $this->UncheckAllItems();
+        $this->dlgAssetSearchTool->ShowDialogBox();
+		    $this->intDlgStatus = 1;
+		  }
+      else {
+        $this->btnUnlink->Warning = "No selected assets.";
+      }
 		}
 
 		protected  function btnChildAssetsRemove_Click() {
@@ -541,7 +559,7 @@ CREATE FIELD METHODS
       		}
       		elseif ($this->objAsset->CheckedOutFlag || $this->objAsset->ReservedFlag || $this->objAsset->LocationId == 2 && $this->objAsset->LocationId == 3 || $this->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
       		  $blnError = true;
-      		  $this->btnUnlink->Warning .= "Parent asset code (" . $objAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+      		  $this->btnUnlink->Warning .= "Parent asset code (" . $this->objAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
       		}
       		else {
       		  $objAsset->LinkedFlag = true;
@@ -575,9 +593,44 @@ CREATE FIELD METHODS
 		protected function btnAssetSearchToolAdd_Click() {
 		  $this->btnAssetSearchToolAdd->Warning = "";
       switch ($this->intDlgStatus) {
+        // Reassign
         case '1' :
-
+          $intSelectedAssetId = $this->ctlAssetSearchTool->dtgAsset->GetSelected("AssetId");
+          if (count($intSelectedAssetId) > 1) {
+            $this->btnAssetSearchToolAdd->Warning = "You must select only one parent asset.";
+          }
+          elseif (count($intSelectedAssetId) != 1) {
+            $this->btnAssetSearchToolAdd->Warning = "No selected assets.";
+          }
+          else {
+            if ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
+              $objChildAssetArray = array();
+              $blnError = false;
+              foreach (Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $this->intAssetIdArray)) as $objChildAsset) {
+                if ($objChildAsset->AssetCode != $objAsset->AssetCode) {
+                  $objChildAsset->ParentAssetCode = $objAsset->AssetCode;
+                  $objChildAsset->LinkedFlag = false;
+                  $objChildAssetArray[] = $objChildAsset;
+                }
+                else{
+                  $this->btnAssetSearchToolAdd->Warning = "Parent and child asset codes cannot be the same.";
+                  $blnError = true;
+                  break;
+                }
+              }
+              if (!$blnError) {
+                foreach ($objChildAssetArray as $objChildAsset) {
+                  $objChildAsset->Save();
+                }
+                $this->intAssetIdArray = array();
+                $this->dlgAssetSearchTool->HideDialogBox();
+                $this->dtgChildAssets_Bind();
+              }
+            }
+          }
+          $this->UncheckAllItems();
           break;
+        // Add child assets using popup
         case '2' :
           $intSelectedAssetCount = 0;
           $blnError = false;
@@ -589,8 +642,8 @@ CREATE FIELD METHODS
     		      $this->btnAssetSearchToolAdd->Warning .= "Asset code (" . $objNewChildAsset->AssetCode . ") already have the parent asset code. Please try another.<br />";
     		      $blnError = true;
             }
-            elseif (!($objNewChildAsset->CheckedOutFlag || $objNewChildAsset->ReservedFlag || $objNewChildAsset->LocationId == 2 && $objNewChildAsset->LocationId == 3 || $objNewChildAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objNewChildAsset->AssetId))) {
-              if ($objNewChildAsset->AssetCode != $this->objAsset->AssetCode) {
+            elseif /*(!($objNewChildAsset->CheckedOutFlag || $objNewChildAsset->ReservedFlag || $objNewChildAsset->LocationId == 2 && $objNewChildAsset->LocationId == 3 || $objNewChildAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objNewChildAsset->AssetId))) {
+              if*/ ($objNewChildAsset->AssetCode != $this->objAsset->AssetCode) {
                 $objNewChildAsset->LinkedFlag = false;
                 $objNewChildAsset->ParentAssetCode = $this->objAsset->AssetCode;
                 $arrCheckedAssets[] = $objNewChildAsset;
@@ -599,11 +652,11 @@ CREATE FIELD METHODS
                 $this->btnAssetSearchToolAdd->Warning .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be the same as asset code.<br />";
                 $blnError = true;
               }
-            }
+            /*}
             else {
               $this->btnAssetSearchToolAdd->Warning .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
               $blnError = true;
-            }
+            }*/
           }
           if ($intSelectedAssetCount == 0) {
             $this->btnAssetSearchToolAdd->Warning .= "No selected assets.<br />";
