@@ -79,6 +79,9 @@
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
 
+		public $objChildAssetArray;
+		public $objRemovedChildAssetArray;
+
 		// Override the Form_Create method in AssetEditFormBase.inc
 		protected function Form_Create() {
       // Assign the Transaction Type from the query string, if it exists.
@@ -193,16 +196,17 @@
 	    $objStyle->CssClass = 'dtg_header';
 
 	    $this->dtgChildAssets->ShowHeader = false;
+	    if (!isset($this->objAsset)) {
+	      $this->SetupAsset($this);
+	    }
+	    $this->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
 		}
 
 		protected function dtgChildAssets_Bind() {
-		  if (!isset($this->objAsset)) {
-	      $this->SetupAsset($this);
-	    }
-	    $this->dtgChildAssets->TotalItemCount = Asset::CountByParentAssetCode($this->objAsset->AssetCode);
+		  $this->dtgChildAssets->TotalItemCount = count($this->objChildAssetArray);
 	    if ($this->dtgChildAssets->TotalItemCount) {
 	      $this->dtgChildAssets->ShowHeader = true;
-	      $this->dtgChildAssets->DataSource = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode, QQ::Clause($this->dtgChildAssets->OrderByClause));
+	      $this->dtgChildAssets->DataSource = $this->objChildAssetArray;
 	      $this->btnChildAssetsRemove->Enabled = true;
 	      $this->btnReassign->Enabled = true;
 	      $this->btnLinkToParent->Enabled = true;
@@ -496,7 +500,8 @@ CREATE FIELD METHODS
   		    else {
   		      $objChildAsset->LinkedFlag = false;
   		      $objChildAsset->ParentAssetCode = $this->objAsset->AssetCode;
-  		      $objChildAsset->Save();
+  		      //$objChildAsset->Save();
+  		      array_push($this->objChildAssetArray, $objChildAsset);
 
   		      $this->txtAddChild->Text = "";
   		      $this->dtgChildAssets_Bind();
@@ -531,14 +536,31 @@ CREATE FIELD METHODS
       }
 		}
 
-		protected  function btnChildAssetsRemove_Click() {
-      foreach ($this->dtgChildAssets->GetSelected("AssetId") as $intAssetId) {
-        if ($objAsset = Asset::LoadByAssetId($intAssetId)) {
-          $objAsset->ParentAssetCode = "";
-          $objAsset->LinkedFlag = false;
-          $objAsset->Save();
+		protected function btnChildAssetsRemove_Click() {
+		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
+		  if (count($arrAssetId)) {
+		    if (!is_array($this->objRemovedChildAssetArray)) {
+		      $this->objRemovedChildAssetArray = array();
+		    }
+		    $objNewChildAssetArray = array();
+        foreach ($this->objChildAssetArray as $objChildAsset) {
+          $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
         }
-      }
+        foreach ($arrAssetId as $intAssetId) {
+          $objRemovedChildAsset = $objNewChildAssetArray[$intAssetId];
+          unset($objNewChildAssetArray[$intAssetId]);
+          $objRemovedChildAsset->ParentAssetCode = "";
+          $objRemovedChildAsset->LinkedFlag = false;
+          array_push($this->objRemovedChildAssetArray, $objRemovedChildAsset);
+        }
+        $this->objChildAssetArray = array();
+		    foreach ($objNewChildAssetArray as $objChildAsset) {
+		      array_push($this->objChildAssetArray, $objChildAsset);
+		    }
+		  }
+		  else {
+		    $this->btnUnlink->Warning = "No selected assets.";
+		  }
 		}
 
 		protected function btnLinkToParent_Click() {
@@ -546,14 +568,20 @@ CREATE FIELD METHODS
 		  $blnError = false;
 		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
 		  if (count($arrAssetId)) {
-		    $arrCheckedAsset = array();
-		    $objSelectedChildAssetArray = Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $arrAssetId));
+		    $objNewChildAssetArray = array();
+        foreach ($this->objChildAssetArray as $objChildAsset) {
+          $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
+        }
+		    $objSelectedChildAssetArray = array();
+		    foreach ($arrAssetId as $intAssetId) {
+		      $objSelectedChildAssetArray[] = $objNewChildAssetArray[$intAssetId];
+		    }
 		    foreach ($objSelectedChildAssetArray as $objAsset) {
           if ($objAsset->LocationId != $this->objAsset->LocationId) {
             $blnError = true;
       		  $this->btnUnlink->Warning .= "The child asset (" . $objAsset->AssetCode . ") must be in the same location as the parent asset.<br />";
           }
-		      elseif ($objAsset->CheckedOutFlag || $objAsset->ReservedFlag || $objAsset->LocationId == 2 && $objAsset->LocationId == 3 || $objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objAsset->AssetId)) {
+          elseif ($objAsset->CheckedOutFlag || $objAsset->ReservedFlag || $objAsset->LocationId == 2 && $objAsset->LocationId == 3 || $objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objAsset->AssetId)) {
       		  $blnError = true;
       		  $this->btnUnlink->Warning .= "Child asset code (" . $objAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
       		}
@@ -563,12 +591,13 @@ CREATE FIELD METHODS
       		}
       		else {
       		  $objAsset->LinkedFlag = true;
-      		  $arrCheckedAsset[] = $objAsset;
+      		  $objNewChildAssetArray[$objAsset->AssetId] = $objAsset;
       		}
 		    }
 		    if (!$blnError) {
-		      foreach ($arrCheckedAsset as $objAsset) {
-		        $objAsset->Save();
+		      $this->objChildAssetArray = array();
+		      foreach ($objNewChildAssetArray as $objChildAsset) {
+		        array_push($this->objChildAssetArray, $objChildAsset);
 		      }
 		    }
 		    $this->UncheckAllItems();
@@ -581,11 +610,19 @@ CREATE FIELD METHODS
 		protected function btnUnlink_Click() {
 		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
 		  if (count($arrAssetId)) {
-		    $objSelectedChildAssetArray = Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $arrAssetId));
-		    foreach ($objSelectedChildAssetArray as $objAsset) {
-      		$objAsset->LinkedFlag = false;
-      		$objAsset->Save();
+		    $objNewChildAssetArray = array();
+        foreach ($this->objChildAssetArray as $objChildAsset) {
+          $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
+        }
+
+        foreach ($arrAssetId as $intAssetId) {
+      		$objNewChildAssetArray[$intAssetId]->LinkedFlag = false;
 		    }
+		    $this->objChildAssetArray = array();
+        foreach ($objNewChildAssetArray as $objChildAsset) {
+           array_push($this->objChildAssetArray, $objChildAsset);
+        }
+
 		    $this->UncheckAllItems();
 		  }
 		}
@@ -604,24 +641,39 @@ CREATE FIELD METHODS
           }
           else {
             if ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
-              $objChildAssetArray = array();
               $blnError = false;
-              foreach (Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $this->intAssetIdArray)) as $objChildAsset) {
+              $objNewChildAssetArray = array();
+              foreach ($this->objChildAssetArray as $objChildAsset) {
+                $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
+              }
+              if (!is_array($this->objRemovedChildAssetArray)) {
+      		      $this->objRemovedChildAssetArray = array();
+      		    }
+
+      		    $objNewRemovedAssetArray = array();
+              foreach ($this->intAssetIdArray as $intAssetId) {
+                $objChildAsset = $objNewChildAssetArray[$intAssetId];
                 if ($objChildAsset->AssetCode != $objAsset->AssetCode) {
                   $objChildAsset->ParentAssetCode = $objAsset->AssetCode;
                   $objChildAsset->LinkedFlag = false;
-                  $objChildAssetArray[] = $objChildAsset;
+                  $objNewRemovedAssetArray[] = $objChildAsset;
+                  unset($objNewChildAssetArray[$intAssetId]);
                 }
                 else{
                   $this->btnAssetSearchToolAdd->Warning = "Parent and child asset codes cannot be the same.";
                   $blnError = true;
-                  break;
                 }
               }
               if (!$blnError) {
-                foreach ($objChildAssetArray as $objChildAsset) {
-                  $objChildAsset->Save();
+                foreach ($objNewRemovedAssetArray as $objNewRemovedAsset) {
+                  array_push($this->objRemovedChildAssetArray, $objNewRemovedAsset);
                 }
+
+                $this->objChildAssetArray = array();
+                foreach ($objNewChildAssetArray as $objNewChildAsset) {
+                  array_push($this->objChildAssetArray, $objNewChildAsset);
+                }
+
                 $this->intAssetIdArray = array();
                 $this->dlgAssetSearchTool->HideDialogBox();
                 $this->dtgChildAssets_Bind();
@@ -663,7 +715,8 @@ CREATE FIELD METHODS
           }
           elseif (!$blnError) {
             foreach ($arrCheckedAssets as $objAsset) {
-            	$objAsset->Save();
+            	//$objAsset->Save();
+            	array_push($this->objChildAssetArray, $objAsset);
             }
             $this->dlgAssetSearchTool->HideDialogBox();
             $this->dtgChildAssets_Bind();
@@ -757,6 +810,24 @@ CREATE FIELD METHODS
           $objControl->Checked = false;
         }
       }
+		}
+
+		public function SaveChildAssets() {
+		  if (count($this->objChildAssetArray)) {
+  		  foreach ($this->objChildAssetArray as $objChildAsset) {
+  		    $objChildAsset->Save();
+  		  }
+		  }
+		  if (count($this->objRemovedChildAssetArray)) {
+  		  foreach ($this->objRemovedChildAssetArray as $objChildAsset) {
+  		    $objChildAsset->Save();
+  		  }
+		  }
+		}
+
+		public function RefreshChildAssets() {
+		  $this->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+		  $this->dtgChildAssets_Bind();
 		}
 	}
 

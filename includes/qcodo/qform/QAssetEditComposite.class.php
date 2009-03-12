@@ -427,8 +427,8 @@ class QAssetEditComposite extends QControl {
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
 		$this->btnSave->Text = 'Save';
-		$this->btnSave->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
-		$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
+		$this->btnSave->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
+		$this->btnSave->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnSave->CausesValidation = true;
 		$this->btnSave->TabIndex=$this->GetNextTabIndex();
@@ -787,8 +787,12 @@ class QAssetEditComposite extends QControl {
 						$this->objAsset->LocationId = $this->lstLocation->SelectedValue;
 					}
 
+					// Save child assets
+					$this->objParentObject->SaveChildAssets();
+
 					// Object should be saved only if it is new, to obtain the proper AssetId to add to the custom field tables
 					$this->objAsset->Save();
+
 				}
 			}
 
@@ -845,6 +849,9 @@ class QAssetEditComposite extends QControl {
 					// Update the values of all fields for an Ajax reload
 					$this->UpdateAssetFields();
 
+					// Save child assets
+					$this->objParentObject->SaveChildAssets();
+
 					// If asset is not new, it must be saved after updating the assetfields
 					$this->objAsset->Save();
 
@@ -895,6 +902,7 @@ class QAssetEditComposite extends QControl {
 			$this->displayLabels();
 			$this->EnableTransactionButtons();
 			$this->UpdateAssetControls();
+			$this->objParentObject->RefreshChildAssets();
 		}
 		else {
 			QApplication::Redirect('asset_list.php');
