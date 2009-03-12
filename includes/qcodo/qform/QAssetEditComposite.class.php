@@ -427,8 +427,8 @@ class QAssetEditComposite extends QControl {
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
 		$this->btnSave->Text = 'Save';
-		$this->btnSave->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
-		$this->btnSave->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSave_Click'));
+		$this->btnSave->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
+		$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnSave->CausesValidation = true;
 		$this->btnSave->TabIndex=$this->GetNextTabIndex();
