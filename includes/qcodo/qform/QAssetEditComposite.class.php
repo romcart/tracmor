@@ -793,6 +793,7 @@ class QAssetEditComposite extends QControl {
 					// Object should be saved only if it is new, to obtain the proper AssetId to add to the custom field tables
 					$this->objAsset->Save();
 
+					$this->objParentObject->RefreshChildAssets();
 				}
 			}
 
@@ -872,6 +873,8 @@ class QAssetEditComposite extends QControl {
 					$this->displayLabels();
 					// Enable the appropriate transaction buttons
 					$this->EnableTransactionButtons();
+
+					$this->objParentObject->RefreshChildAssets();
 				}
 
 			}

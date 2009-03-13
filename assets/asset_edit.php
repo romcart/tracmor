@@ -174,13 +174,13 @@
 	    $this->dtgChildAssets->Paginator = $objPaginator;
 	    $this->dtgChildAssets->ItemsPerPage = 20;
 
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15'));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15', 'Display=false'));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn(' ', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => 15, 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->AssetModelCode, false), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->AssetModelCode), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription, false), 'CssClass' => "dtg_column")));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array(/*'OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode, false), */'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array(/*'OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->AssetModelCode, false), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->AssetModelCode), */'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array(/*'OrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription, false), */'CssClass' => "dtg_column")));
 
-	    $this->dtgChildAssets->SortColumnIndex = 2;
+	    //$this->dtgChildAssets->SortColumnIndex = 2;
 
 	    $objStyle = $this->dtgChildAssets->RowStyle;
 	    $objStyle->ForeColor = '#000000';
@@ -326,7 +326,7 @@ CREATE FIELD METHODS
 		  $this->lblAssetCode->Display = false;
 		}
 
-		// Create and Setup the Modal Window for Printing Labels
+		// Create and Setup the Modal Window for Asset Search Tool
 		protected function dlgAssetSearchTool_Create() {
 		  $this->dlgAssetSearchTool = new QDialogBox($this);
       $this->dlgAssetSearchTool->Text = '';
@@ -350,7 +350,6 @@ CREATE FIELD METHODS
 			$this->btnAssetSearchToolAdd->AddAction(new QClickEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
 			$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
 			$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-
 		}
 
 		protected function btnChildAssetsRemove_Create() {
@@ -755,6 +754,8 @@ CREATE FIELD METHODS
   		  $this->btnReassign->Display = true;
   		  $this->btnLinkToParent->Display = true;
   		  $this->btnUnlink->Display = true;
+  		  $this->dtgChildAssets->GetColumn(0)->Display = true;
+  		  $this->dtgChildAssets_Bind();
 			}
 			else {
 			  if ($this->intTransactionTypeId) {
@@ -827,6 +828,7 @@ CREATE FIELD METHODS
 
 		public function RefreshChildAssets() {
 		  $this->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+		  $this->dtgChildAssets->GetColumn(0)->Display = false;
 		  $this->dtgChildAssets_Bind();
 		}
 	}

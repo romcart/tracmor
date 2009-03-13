@@ -356,6 +356,15 @@ class QAssetTransactComposite extends QControl {
 				if (!$blnError && $objNewAsset instanceof Asset)  {
 					$this->objAssetArray[] = $objNewAsset;
 					$this->txtNewAssetCode->Text = null;
+					// Load all linked assets
+					$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objNewAsset->AssetCode);
+					if ($objLinkedAssetArray) {
+					  $strAssetCodeArray = array();
+					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+					    $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+					  }
+					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+					}
 				}
 			}
 		}
@@ -538,6 +547,15 @@ class QAssetTransactComposite extends QControl {
 		$this->objAssetArray = null;
 		if ($this->blnEditMode && $this->objAsset instanceof Asset) {
 			$this->objAssetArray[] = Asset::Load($this->objAsset->AssetId);
+			// Load all child assets
+			$objLinkedAssetArray = Asset::LoadArrayByParentAssetCodeLinkedFlag($this->objAsset->AssetCode, 1);
+			if ($objLinkedAssetArray) {
+			  $strAssetCodeArray = array();
+				foreach ($objLinkedAssetArray as $objLinkedAsset) {
+				  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+				}
+				$this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+			}
 		}
 
 	}

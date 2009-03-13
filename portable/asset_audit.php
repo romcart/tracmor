@@ -39,6 +39,10 @@ if ($_POST) {
       				$blnError = true;
       				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
       			}
+      			elseif ($objNewAsset->LinkedFlag) {
+      			  $blnError = true;
+      			  $strWarning .= $strAssetCode." - That asset code has linked to parent asset " . $objNewAsset->ParentAssetCode . ".<br />";
+      			}
       			elseif (!$blnError && $objNewAsset instanceof Asset)  {
       			  $intAssetIdArray[] = $objNewAsset->AssetId;
       			  $objAuditScan = new AuditScan();
@@ -51,13 +55,32 @@ if ($_POST) {
               else {
                 $objAuditScan->SystemCount = 1;
               }
-    				  $objAuditScanArray[] = $objAuditScan;
+              $objAuditScanArray[] = $objAuditScan;
+
+              // Load an array of linked child assets and add to array
+              $objLinkedChildAssetArray = Asset::LoadArrayByParentAssetCodeLinkedFlag($objNewAsset->AssetCode, true);
+              if ($objLinkedChildAssetArray) {
+                foreach ($objLinkedChildAssetArray as $objLinkedChildAsset) {
+                  $intAssetIdArray[] = $objLinkedChildAsset->AssetId;
+                  $objAuditScan = new AuditScan();
+                  $objAuditScan->LocationId = $objDestinationLocation->LocationId;
+                  $objAuditScan->EntityId = $objLinkedChildAsset->AssetId;
+                  $objAuditScan->Count = 1;
+                  if ($objDestinationLocation->LocationId != $objLinkedChildAsset->LocationId) {
+                    $objAuditScan->SystemCount = 0;
+                  }
+                  else {
+                    $objAuditScan->SystemCount = 1;
+                  }
+                  $objAuditScanArray[] = $objAuditScan;
+                }
+              }
     			  }
           }
         }
   		}
   	}
-  	
+
   	// Submit
   	if (!$blnError) {
   	  // Add missing assets that should have been at a location covered by the audit session but were not scanned
@@ -84,18 +107,18 @@ if ($_POST) {
 				$objDatabase = QApplication::$Database[1];
 				// Begin a MySQL Transaction to be either committed or rolled back
 				$objDatabase->TransactionBegin();
-				
+
 				$objAudit = new Audit();
         $objAudit->EntityQtypeId = 1; // Asset
         $objAudit->Save();
-        
+
     	  foreach ($objAuditScanArray as $objAuditScan) {
     	  	$objAuditScan->AuditId = $objAudit->AuditId;
     	  	$objAuditScan->Save();
     	  }
-    	  
+
     	  $objDatabase->TransactionCommit();
-    	   
+
     	  $strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
     		//Remove that flag when transaction is compelete or exists some errors
         unset($_SESSION['intUserAccountId']);
@@ -108,7 +131,7 @@ if ($_POST) {
   	}
   }
   elseif ($_POST['method'] == 'next_location') {
-    // Load locations that have already been added 
+    // Load locations that have already been added
     if ($_POST['main_result']) {
       $strCheckedLocationAsset = $_POST['main_result'];
     }
@@ -155,7 +178,7 @@ if ($_POST) {
             $blnError = true;
             $strWarning .= $_POST['location']." - That location has already been added.<br />";
             break;
-          }         	
+          }
         }
   	  }
   	}
@@ -172,7 +195,7 @@ if ($_POST) {
         $strCheckedLocationAsset = $_POST['location'].":".$_POST['result'];
       }
     }
-    
+
     if ($blnError && is_array($arrCheckedAssetCode)) {
       $strJavaScriptCode .= " strCheckedAssetCode = '".implode("#",$arrCheckedAssetCode)."';";
       $strJavaScriptCode .= " document.getElementById('location').value = '".$_POST['location']."';";
@@ -189,7 +212,7 @@ require_once('./includes/header.inc.php');
   <div id="warning"><?php echo $strWarning; ?></div>
 <?php
 if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
-?>  
+?>
 <table border=0 style="padding-top:16px;">
 	<tr>
 		<td align="right"><h2>Location:</h2><input style="display:none;" type="button" value="Add Location" id="btn_add_location" onclick="javascript:AddAuditLocation();"></td>
@@ -210,7 +233,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 	</form>
 	<form method="post" name="main_form" onsubmit="javascript:return AssetsAuditDone();">
 	<input type="hidden" name="method" value="complete_transaction">
-	<input type="hidden" name="result" value="<?php echo $strCheckedLocationAsset; ?>">	
+	<input type="hidden" name="result" value="<?php echo $strCheckedLocationAsset; ?>">
 	<tr>
 		<td colspan="2" align="center"><input type="submit" value="Done" style="width:216px;height:56px;font-size:24;"></td>
 	</tr>
