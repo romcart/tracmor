@@ -985,14 +985,15 @@ protected function pnlAssets_Create($intModule){
 				}
 			}
 		}
-		// If creating a new Role, manually give access to the Home module
-		if (!$this->blnEditMode) {
-			$objRoleModule = new RoleModule();
-			$objRoleModule->ModuleId = 1;
-			$objRoleModule->RoleId = $this->objRole->RoleId;
-			$objRoleModule->AccessFlag = true;
-			$objRoleModule->Save();
-		}
+		
+		// Home module not implemented yet.  When it is,  uncomment the code below
+		//if (!$this->blnEditMode) {
+		//	$objRoleModule = new RoleModule();
+		//	$objRoleModule->ModuleId = 1;
+		//	$objRoleModule->RoleId = $this->objRole->RoleId;
+		//	$objRoleModule->AccessFlag = true;
+		//	$objRoleModule->Save();
+		//}
 	}
 
 

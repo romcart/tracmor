@@ -90,13 +90,36 @@
 			else {
 				QApplication::Login($objUserAccount);
 				
-				// If the user has access to the assets module, send them there. Otherwise, send them to the home module.
-				$objRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 2);
-				if ($objRoleModule->AccessFlag) {
+				$objAssetRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 2);
+				$objInventoryRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 3);
+				$objContactsRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 4);
+				$objShippingRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 5);
+				$objReceivingRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 6);
+				$objReportsRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 7);
+				
+				// If the user has access to the assets module, send them there, otherwise...
+				if ($objAssetRoleModule->AccessFlag) {
 					QApplication::Redirect('./assets/');
 				}
-				else {
-					Qapplication::Redirect('./home/');
+				// If the user has access to the inventory module, send them there. 
+				else if ($objInventoryRoleModule->AccessFlag) {
+					Qapplication::Redirect('./inventory/');
+				} 
+				// If the user has access to the contacts module, send them there. 
+				else if ($objContactsRoleModule->AccessFlag) {
+					Qapplication::Redirect('./contacts/');
+				}
+				// If the user has access to the shipping module, send them there. 
+				else if ($objShippingRoleModule->AccessFlag) {
+					Qapplication::Redirect('./shipping/');
+				}
+				// If the user has access to the receiving module, send them there. 
+				else if ($objReceivingRoleModule->AccessFlag) {
+					Qapplication::Redirect('./receiving/');
+				}
+				// If the user has access to the reports module, send them there. 
+				else if ($objReportsRoleModule->AccessFlag) {
+					Qapplication::Redirect('./reports/');
 				}
 			}
 		}
