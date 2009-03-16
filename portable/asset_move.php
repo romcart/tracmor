@@ -29,7 +29,11 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			if (!($objNewAsset instanceof Asset)) {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
-			}				
+			}
+			elseif ($objNewAsset->LinkedFlag) {
+			  $blnError = true;
+			  $strWarning .= $strAssetCode." - That asset code has linked to parent asset.";
+			}
 			// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
 			elseif ($objNewAsset->LocationId == 2) {
 				$blnError = true;
@@ -56,7 +60,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			else {
 			  $arrCheckedAssetCode[] = $strAssetCode;
 			}
-			
+
 			if (!$blnError && $objNewAsset instanceof Asset)  {
 				$objAssetArray[] = $objNewAsset;
 			}
@@ -65,7 +69,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			$strWarning .= "Please enter an asset code.<br />";
 		}
 	}
-	
+
 	if (!$blnError) {
     $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
     if (!$objDestinationLocation) {
@@ -74,13 +78,13 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     }
     else {
   	  $intDestinationLocationId = $objDestinationLocation->LocationId;
-  	  
+
   	   // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
   	  $objTransaction = new Transaction();
   		$objTransaction->EntityQtypeId = EntityQtype::Asset;
   		$objTransaction->TransactionTypeId = 1; // Move
   		$objTransaction->Save();
-  	  
+
   	  foreach ($objAssetArray as $objAsset) {
     			$objAssetTransaction = new AssetTransaction();
     			$objAssetTransaction->AssetId = $objAsset->AssetId;
@@ -88,8 +92,24 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
     			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
     			$objAssetTransaction->Save();
-    			
-    			$objAsset->LocationId = $intDestinationLocationId;
+
+    			$objLinkedAssetArrayByNewAsset = Asset::LoadChildLinkedArrayByParentAssetCode($objAsset->AssetCode);
+					if ($objLinkedAssetArrayByNewAsset) {
+  					foreach ($objLinkedAssetArrayByNewAsset as $objLinkedAsset) {
+  	          $objLinkedAsset->LocationId = $intDestinationLocationId;
+  	          $objLinkedAsset->Save();
+
+  	          // Create the new assettransaction object and save it
+    					$objAssetTransaction = new AssetTransaction();
+    					$objAssetTransaction->AssetId = $objLinkedAsset->AssetId;
+    					$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
+    					$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
+    					$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
+    					$objAssetTransaction->Save();
+  	        }
+					}
+
+	        $objAsset->LocationId = $intDestinationLocationId;
     			$objAsset->Save();
     		}
   		$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
@@ -97,7 +117,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
       unset($_SESSION['intUserAccountId']);
       $arrCheckedAssetCode = "";
       $blnTransactionComplete = true;
-    }    
+    }
 	}
 	else {
 	  $strWarning .= "This transaction has not been completed.<br />";
@@ -126,7 +146,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 	</tr>
 	<form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">
 	<input type="hidden" name="method" value="complete_transaction">
-	<input type="hidden" name="result" value="">	
+	<input type="hidden" name="result" value="">
 	<tr>
 		<td align="right"><h2>Destination Location:</h2></td>
 		<td><input type="text" name="destination_location" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>

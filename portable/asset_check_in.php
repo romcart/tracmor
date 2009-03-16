@@ -29,7 +29,11 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			if (!($objNewAsset instanceof Asset)) {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
-			}				
+			}
+			elseif ($objNewAsset->LinkedFlag) {
+			  $blnError = true;
+			  $strWarning .= $strAssetCode." - That asset code has linked to parent asset.";
+			}
 			// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
 			elseif ($objNewAsset->LocationId == 2) {
 				$blnError = true;
@@ -71,7 +75,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			$strWarning .= "Please enter an asset code.<br />";
 		}
 	}
-	
+
 	if (!$blnError) {
     $objDestinationLocation = Location::LoadByShortDescription($_POST['destination_location']);
     if (!$objDestinationLocation) {
@@ -80,13 +84,13 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     }
     else {
   	  $intDestinationLocationId = $objDestinationLocation->LocationId;
-  	  
+
   	  // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
   	  $objTransaction = new Transaction();
   		$objTransaction->EntityQtypeId = EntityQtype::Asset;
   		$objTransaction->TransactionTypeId = 2; // Check in
   		$objTransaction->Save();
-  	  
+
   	  foreach ($objAssetArray as $objAsset) {
     		$objAssetTransaction = new AssetTransaction();
     		$objAssetTransaction->AssetId = $objAsset->AssetId;
@@ -94,7 +98,24 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     		$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
     		$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
     		$objAssetTransaction->Save();
-    		
+
+    		$objLinkedAssetArrayByNewAsset = Asset::LoadChildLinkedArrayByParentAssetCode($objAsset->AssetCode);
+				if ($objLinkedAssetArrayByNewAsset) {
+  				foreach ($objLinkedAssetArrayByNewAsset as $objLinkedAsset) {
+  	        $objLinkedAsset->CheckedOutFlag = false;
+  	        $objLinkedAsset->LocationId = $intDestinationLocationId;
+  	        $objLinkedAsset->Save();
+
+  	        // Create the new assettransaction object and save it
+    				$objAssetTransaction = new AssetTransaction();
+    				$objAssetTransaction->AssetId = $objLinkedAsset->AssetId;
+    				$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
+    				$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
+    				$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
+    				$objAssetTransaction->Save();
+  	      }
+				}
+
     		$objAsset->CheckedOutFlag = false;
     		$objAsset->LocationId = $intDestinationLocationId;
     		$objAsset->Save();
@@ -104,7 +125,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
       unset($_SESSION['intUserAccountId']);
       $blnTransactionComplete = true;
       $arrCheckedAssetCode = "";
-    }    
+    }
 	}
 	else {
 	  $strWarning .= "This transaction has not been completed.<br />";

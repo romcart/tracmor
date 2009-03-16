@@ -87,6 +87,11 @@ class QAssetEditComposite extends QControl {
 	// Dialog Box
 	protected $dlgNewAssetModel;
 
+	// Uses for dtgChildAssets DataSource
+	public $objChildAssetArray;
+	// New or Removed Child Assets
+	public $objRemovedChildAssetArray;
+
 	// We want to override the constructor in order to setup the subcontrols
 	public function __construct($objParentObject, $strControlId = null) {
 	    // First, call the parent to do most of the basic setup
@@ -788,7 +793,7 @@ class QAssetEditComposite extends QControl {
 					}
 
 					// Save child assets
-					$this->objParentObject->SaveChildAssets();
+					$this->SaveChildAssets();
 
 					// Object should be saved only if it is new, to obtain the proper AssetId to add to the custom field tables
 					$this->objAsset->Save();
@@ -851,7 +856,7 @@ class QAssetEditComposite extends QControl {
 					$this->UpdateAssetFields();
 
 					// Save child assets
-					$this->objParentObject->SaveChildAssets();
+					$this->SaveChildAssets();
 
 					// If asset is not new, it must be saved after updating the assetfields
 					$this->objAsset->Save();
@@ -1283,6 +1288,18 @@ class QAssetEditComposite extends QControl {
 		}
 	}
 
+	public function SaveChildAssets() {
+		  if (count($this->objChildAssetArray)) {
+  		  foreach ($this->objChildAssetArray as $objChildAsset) {
+  		    $objChildAsset->Save();
+  		  }
+		  }
+		  if (count($this->objRemovedChildAssetArray)) {
+  		  foreach ($this->objRemovedChildAssetArray as $objChildAsset) {
+  		    $objChildAsset->Save();
+  		  }
+		  }
+		}
 
   // And our public getter/setters
   public function __get($strName) {

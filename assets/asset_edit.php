@@ -79,15 +79,19 @@
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
 
-		public $objChildAssetArray;
-		public $objRemovedChildAssetArray;
-
 		// Override the Form_Create method in AssetEditFormBase.inc
 		protected function Form_Create() {
       // Assign the Transaction Type from the query string, if it exists.
 			$this->intTransactionTypeId = QApplication::QueryString('intTransactionTypeId');
 
-		  if (!$this->intTransactionTypeId) {
+		  // Create the Header Menu
+			$this->ctlHeaderMenu_Create();
+			// Create the Shortcut Menu
+			$this->ctlShortcutMenu_Create();
+
+			$this->ctlAssetEdit_Create();
+
+			if (!$this->intTransactionTypeId) {
   		  $this->lblChildAssets_Create();
   			$this->lblAssetCode_Create();
   			// Create Buttons
@@ -98,12 +102,7 @@
   			$this->AddChild_Create();
   			$this->dlgAssetSearchTool_Create();
 		  }
-			// Create the Header Menu
-			$this->ctlHeaderMenu_Create();
-			// Create the Shortcut Menu
-			$this->ctlShortcutMenu_Create();
 
-			$this->ctlAssetEdit_Create();
 			// Create the two composite controls
 			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
 				$this->ctlAssetTransact_Create();
@@ -199,14 +198,14 @@
 	    if (!isset($this->objAsset)) {
 	      $this->SetupAsset($this);
 	    }
-	    $this->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+	    $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
 		}
 
 		protected function dtgChildAssets_Bind() {
-		  $this->dtgChildAssets->TotalItemCount = count($this->objChildAssetArray);
+		  $this->dtgChildAssets->TotalItemCount = count($this->ctlAssetEdit->objChildAssetArray);
 	    if ($this->dtgChildAssets->TotalItemCount) {
 	      $this->dtgChildAssets->ShowHeader = true;
-	      $this->dtgChildAssets->DataSource = $this->objChildAssetArray;
+	      $this->dtgChildAssets->DataSource = $this->ctlAssetEdit->objChildAssetArray;
 	      $this->btnChildAssetsRemove->Enabled = true;
 	      $this->btnReassign->Enabled = true;
 	      $this->btnLinkToParent->Enabled = true;
@@ -500,7 +499,7 @@ CREATE FIELD METHODS
   		      $objChildAsset->LinkedFlag = false;
   		      $objChildAsset->ParentAssetCode = $this->objAsset->AssetCode;
   		      //$objChildAsset->Save();
-  		      array_push($this->objChildAssetArray, $objChildAsset);
+  		      array_push($this->ctlAssetEdit->objChildAssetArray, $objChildAsset);
 
   		      $this->txtAddChild->Text = "";
   		      $this->dtgChildAssets_Bind();
@@ -538,11 +537,11 @@ CREATE FIELD METHODS
 		protected function btnChildAssetsRemove_Click() {
 		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
 		  if (count($arrAssetId)) {
-		    if (!is_array($this->objRemovedChildAssetArray)) {
-		      $this->objRemovedChildAssetArray = array();
+		    if (!is_array($this->ctlAssetEdit->objRemovedChildAssetArray)) {
+		      $this->ctlAssetEdit->objRemovedChildAssetArray = array();
 		    }
 		    $objNewChildAssetArray = array();
-        foreach ($this->objChildAssetArray as $objChildAsset) {
+        foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
           $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
         }
         foreach ($arrAssetId as $intAssetId) {
@@ -550,11 +549,11 @@ CREATE FIELD METHODS
           unset($objNewChildAssetArray[$intAssetId]);
           $objRemovedChildAsset->ParentAssetCode = "";
           $objRemovedChildAsset->LinkedFlag = false;
-          array_push($this->objRemovedChildAssetArray, $objRemovedChildAsset);
+          array_push($this->ctlAssetEdit->objRemovedChildAssetArray, $objRemovedChildAsset);
         }
-        $this->objChildAssetArray = array();
+        $this->ctlAssetEdit->objChildAssetArray = array();
 		    foreach ($objNewChildAssetArray as $objChildAsset) {
-		      array_push($this->objChildAssetArray, $objChildAsset);
+		      array_push($this->ctlAssetEdit->objChildAssetArray, $objChildAsset);
 		    }
 		  }
 		  else {
@@ -568,7 +567,7 @@ CREATE FIELD METHODS
 		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
 		  if (count($arrAssetId)) {
 		    $objNewChildAssetArray = array();
-        foreach ($this->objChildAssetArray as $objChildAsset) {
+        foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
           $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
         }
 		    $objSelectedChildAssetArray = array();
@@ -594,9 +593,9 @@ CREATE FIELD METHODS
       		}
 		    }
 		    if (!$blnError) {
-		      $this->objChildAssetArray = array();
+		      $this->ctlAssetEdit->objChildAssetArray = array();
 		      foreach ($objNewChildAssetArray as $objChildAsset) {
-		        array_push($this->objChildAssetArray, $objChildAsset);
+		        array_push($this->ctlAssetEdit->objChildAssetArray, $objChildAsset);
 		      }
 		    }
 		    $this->UncheckAllItems();
@@ -610,16 +609,16 @@ CREATE FIELD METHODS
 		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
 		  if (count($arrAssetId)) {
 		    $objNewChildAssetArray = array();
-        foreach ($this->objChildAssetArray as $objChildAsset) {
+        foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
           $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
         }
 
         foreach ($arrAssetId as $intAssetId) {
       		$objNewChildAssetArray[$intAssetId]->LinkedFlag = false;
 		    }
-		    $this->objChildAssetArray = array();
+		    $this->ctlAssetEdit->objChildAssetArray = array();
         foreach ($objNewChildAssetArray as $objChildAsset) {
-           array_push($this->objChildAssetArray, $objChildAsset);
+           array_push($this->ctlAssetEdit->objChildAssetArray, $objChildAsset);
         }
 
 		    $this->UncheckAllItems();
@@ -642,11 +641,11 @@ CREATE FIELD METHODS
             if ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
               $blnError = false;
               $objNewChildAssetArray = array();
-              foreach ($this->objChildAssetArray as $objChildAsset) {
+              foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
                 $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
               }
-              if (!is_array($this->objRemovedChildAssetArray)) {
-      		      $this->objRemovedChildAssetArray = array();
+              if (!is_array($this->ctlAssetEdit->objRemovedChildAssetArray)) {
+      		      $this->ctlAssetEdit->objRemovedChildAssetArray = array();
       		    }
 
       		    $objNewRemovedAssetArray = array();
@@ -665,12 +664,12 @@ CREATE FIELD METHODS
               }
               if (!$blnError) {
                 foreach ($objNewRemovedAssetArray as $objNewRemovedAsset) {
-                  array_push($this->objRemovedChildAssetArray, $objNewRemovedAsset);
+                  array_push($this->ctlAssetEdit->objRemovedChildAssetArray, $objNewRemovedAsset);
                 }
 
-                $this->objChildAssetArray = array();
+                $this->ctlAssetEdit->objChildAssetArray = array();
                 foreach ($objNewChildAssetArray as $objNewChildAsset) {
-                  array_push($this->objChildAssetArray, $objNewChildAsset);
+                  array_push($this->ctlAssetEdit->objChildAssetArray, $objNewChildAsset);
                 }
 
                 $this->intAssetIdArray = array();
@@ -715,7 +714,7 @@ CREATE FIELD METHODS
           elseif (!$blnError) {
             foreach ($arrCheckedAssets as $objAsset) {
             	//$objAsset->Save();
-            	array_push($this->objChildAssetArray, $objAsset);
+            	array_push($this->ctlAssetEdit->objChildAssetArray, $objAsset);
             }
             $this->dlgAssetSearchTool->HideDialogBox();
             $this->dtgChildAssets_Bind();
@@ -813,21 +812,8 @@ CREATE FIELD METHODS
       }
 		}
 
-		public function SaveChildAssets() {
-		  if (count($this->objChildAssetArray)) {
-  		  foreach ($this->objChildAssetArray as $objChildAsset) {
-  		    $objChildAsset->Save();
-  		  }
-		  }
-		  if (count($this->objRemovedChildAssetArray)) {
-  		  foreach ($this->objRemovedChildAssetArray as $objChildAsset) {
-  		    $objChildAsset->Save();
-  		  }
-		  }
-		}
-
 		public function RefreshChildAssets() {
-		  $this->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+		  $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
 		  $this->dtgChildAssets->GetColumn(0)->Display = false;
 		  $this->dtgChildAssets_Bind();
 		}

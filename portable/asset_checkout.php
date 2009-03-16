@@ -29,7 +29,11 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			if (!($objNewAsset instanceof Asset)) {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
-			}				
+			}
+			elseif ($objNewAsset->LinkedFlag) {
+			  $blnError = true;
+			  $strWarning .= $strAssetCode." - That asset code has linked to parent asset.";
+			}
 			// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
 			elseif ($objNewAsset->LocationId == 2) {
 				$blnError = true;
@@ -56,7 +60,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			else {
 			  $arrCheckedAssetCode[] = $strAssetCode;
 			}
-			
+
 			if (!$blnError && $objNewAsset instanceof Asset)  {
 				$objAssetArray[] = $objNewAsset;
 			}
@@ -65,16 +69,16 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			$strWarning .= "Please enter an asset code.<br />";
 		}
 	}
-	
+
 	if (!$blnError) {
     // There is a 1 to Many relationship between Transaction and AssetTransaction so each Transaction can have many AssetTransactions.
   	$objTransaction = new Transaction();
   	$objTransaction->EntityQtypeId = EntityQtype::Asset;
   	$objTransaction->TransactionTypeId = 3; // Check Out
   	$objTransaction->Save();
-  	  
+
   	$intDestinationLocationId = 1; // Check Out
-  		
+
   	foreach ($objAssetArray as $objAsset) {
 			$objAssetTransaction = new AssetTransaction();
     	$objAssetTransaction->AssetId = $objAsset->AssetId;
@@ -82,7 +86,24 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     	$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
     	$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
     	$objAssetTransaction->Save();
-    		
+
+    	$objLinkedAssetArrayByNewAsset = Asset::LoadChildLinkedArrayByParentAssetCode($objAsset->AssetCode);
+			if ($objLinkedAssetArrayByNewAsset) {
+  			foreach ($objLinkedAssetArrayByNewAsset as $objLinkedAsset) {
+  	      $objLinkedAsset->CheckedOutFlag = true;
+  	      $objLinkedAsset->LocationId = $intDestinationLocationId;
+  	      $objLinkedAsset->Save();
+
+  	      // Create the new assettransaction object and save it
+    			$objAssetTransaction = new AssetTransaction();
+    			$objAssetTransaction->AssetId = $objLinkedAsset->AssetId;
+    			$objAssetTransaction->TransactionId = $objTransaction->TransactionId;
+    			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
+    			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
+    			$objAssetTransaction->Save();
+  	    }
+			}
+
     	$objAsset->LocationId = $intDestinationLocationId;
     	$objAsset->CheckedOutFlag = true;
     	$objAsset->Save();
@@ -120,12 +141,12 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 	</tr>
 	<form method="post" name="main_form" onsubmit="javascript:return CompleteCheckOut();">
 	<input type="hidden" name="method" value="complete_transaction">
-	<input type="hidden" name="result" value="">	
+	<input type="hidden" name="result" value="">
 	<tr>
 		<td colspan="2" align="center"><input type="submit" value="Complete Check Out" style="width:236px;height:56px;font-size:24;"></td>
 	</tr>
 	</form>
-</table><p>	
+</table><p>
 <div id="result" style="font-size:24;width:100%;border-top:1px solid #CCCCCC;"></div>
 
 <?php
