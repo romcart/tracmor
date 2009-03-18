@@ -345,7 +345,7 @@ CREATE FIELD METHODS
       $this->dlgAssetSearchTool->Position = QPosition::Absolute;
       $this->dlgAssetSearchTool->AddControlToMove();
 
-      $this->ctlAssetSearchTool = new QAssetSearchComposite($this->dlgAssetSearchTool, null, true, true);
+      $this->ctlAssetSearchTool = new QAssetSearchComposite($this->dlgAssetSearchTool, null, true, true, true);
 			$this->ctlAssetSearchTool->dtgAsset->ItemsPerPage = 10;
 			$this->btnAssetSearchToolAdd = new QButton($this->ctlAssetSearchTool);
 			$this->btnAssetSearchToolAdd->Text = "Add Selected";

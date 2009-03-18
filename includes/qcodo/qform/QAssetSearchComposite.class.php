@@ -64,12 +64,14 @@ class QAssetSearchComposite extends QControl {
 
 	// Use Ajax
 	protected $blnUseAjax;
+	// Do not create any links in DataGrid
+	protected $blnRemoveAllLinks;
 
 	public $dtgAsset;
 	public $objParentObject;
 
 	// We want to override the constructor in order to setup the subcontrols
-	public function __construct($objParentObject, $strControlId = null, $blnShowCheckboxes = false, $blnUseAjax = false) {
+	public function __construct($objParentObject, $strControlId = null, $blnShowCheckboxes = false, $blnUseAjax = false, $blnRemoveAllLinks = false) {
 
     // First, call the parent to do most of the basic setup
     try {
@@ -81,6 +83,7 @@ class QAssetSearchComposite extends QControl {
 
     $this->objParentObject = $objParentObject;
     $this->blnUseAjax = $blnUseAjax;
+    $this->blnRemoveAllLinks = $blnRemoveAllLinks;
 
 		$this->dtgAsset = new QDataGrid($this);
 		$this->dtgAsset->Name = 'asset_list';
@@ -88,7 +91,7 @@ class QAssetSearchComposite extends QControl {
 		$this->dtgAsset->CellSpacing = 0;
 		$this->dtgAsset->CssClass = "datagrid";
 
-    // Disable AJAX for the datagrid
+    // Enable/Disable AJAX for the datagrid
     $this->dtgAsset->UseAjax = $this->blnUseAjax;
 
     // Allow for column toggling
@@ -111,8 +114,14 @@ class QAssetSearchComposite extends QControl {
     	$this->dtgAsset->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
     }
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHoverTips($_CONTROL) ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+    if ($this->blnRemoveAllLinks) {
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->AssetCode ?> <?= $_ITEM->ToStringHoverTips($_CONTROL) ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->AssetModel->ShortDescription ?>', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+    }
+    else {
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHoverTips($_CONTROL) ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+      $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+    }
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->AssetModel->Category->__toString() ?>', 'SortByCommand="asset__asset_model_id__category_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__category_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
