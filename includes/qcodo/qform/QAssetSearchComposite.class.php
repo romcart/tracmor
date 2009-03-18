@@ -62,11 +62,14 @@ class QAssetSearchComposite extends QControl {
 	protected $strDateModifiedLast;
 	protected $blnAttachment;
 
+	// Use Ajax
+	protected $blnUseAjax;
+
 	public $dtgAsset;
 	public $objParentObject;
 
 	// We want to override the constructor in order to setup the subcontrols
-	public function __construct($objParentObject, $strControlId = null, $blnShowCheckboxes = false) {
+	public function __construct($objParentObject, $strControlId = null, $blnShowCheckboxes = false, $blnUseAjax = false) {
 
     // First, call the parent to do most of the basic setup
     try {
@@ -77,6 +80,7 @@ class QAssetSearchComposite extends QControl {
     }
 
     $this->objParentObject = $objParentObject;
+    $this->blnUseAjax = $blnUseAjax;
 
 		$this->dtgAsset = new QDataGrid($this);
 		$this->dtgAsset->Name = 'asset_list';
@@ -85,7 +89,7 @@ class QAssetSearchComposite extends QControl {
 		$this->dtgAsset->CssClass = "datagrid";
 
     // Disable AJAX for the datagrid
-    $this->dtgAsset->UseAjax = false;
+    $this->dtgAsset->UseAjax = $this->blnUseAjax;
 
     // Allow for column toggling
     $this->dtgAsset->ShowColumnToggle = true;
@@ -279,7 +283,12 @@ class QAssetSearchComposite extends QControl {
 				$this->lstLocation->AddItem($objLocation->ShortDescription, $objLocation->LocationId);
 			}
 		}
-    $this->lstLocation->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+		if ($this->blnUseAjax) {
+		  $this->lstLocation->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSearch_Click'));
+		}
+    else {
+      $this->lstLocation->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+    }
     $this->lstLocation->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	}
 
@@ -307,7 +316,12 @@ class QAssetSearchComposite extends QControl {
 		// Because the enter key will also call form.submit() on some browsers, which we
     // absolutely DON'T want to have happen, let's be sure to terminate any additional
     // actions on EnterKey
-    $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+    if ($this->blnUseAjax) {
+      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSearch_Click'));
+    }
+    else {
+      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+    }
     $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
   }
@@ -315,7 +329,12 @@ class QAssetSearchComposite extends QControl {
   protected function txtAssetCode_Create() {
   	$this->txtAssetCode = new QTextBox($this);
   	$this->txtAssetCode->Name = 'Asset Code';
-  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+  	if ($this->blnUseAjax) {
+  	  $this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSearch_Click'));
+  	}
+  	else {
+  	  $this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+  	}
   	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
 
@@ -338,8 +357,14 @@ class QAssetSearchComposite extends QControl {
 		$this->btnSearch = new QButton($this);
 		$this->btnSearch->Name = 'search';
 		$this->btnSearch->Text = 'Search';
-		$this->btnSearch->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSearch_Click'));
-		$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+		if ($this->blnUseAjax) {
+		  $this->btnSearch->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnSearch_Click'));
+		  $this->btnSearch->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSearch_Click'));
+		}
+		else {
+		  $this->btnSearch->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+		  $this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+		}
 		$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
 
@@ -347,8 +372,14 @@ class QAssetSearchComposite extends QControl {
   	$this->btnClear = new QButton($this);
 		$this->btnClear->Name = 'clear';
 		$this->btnClear->Text = 'Clear';
-		$this->btnClear->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnClear_Click'));
-		$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSearch_Click'));
+		if ($this->blnUseAjax) {
+		  $this->btnClear->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnClear_Click'));
+		  $this->btnClear->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnClear_Click'));
+		}
+		else {
+		  $this->btnClear->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnClear_Click'));
+		  $this->btnClear->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnClear_Click'));
+		}
 		$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
 
@@ -401,8 +432,12 @@ class QAssetSearchComposite extends QControl {
 	  			$field['value'] = null;
 	  		}
 	  	}
-	  	$this->dtgAsset->SortColumnIndex = 1;
+	  	$this->dtgAsset->SortColumnIndex = 2;
+	  	$this->dtgAsset->SortDirection = 0;
 	  	$this->blnSearch = false;
+	  	if ($this->blnUseAjax) {
+	  	  $this->btnSearch_Click();
+	  	}
   	}
   }
 
@@ -448,6 +483,10 @@ class QAssetSearchComposite extends QControl {
 				}
 			}
 		}
+  }
+
+  public function Refresh() {
+    $this->btnClear_Click();
   }
 
 	// And our public getter/setters

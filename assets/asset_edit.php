@@ -342,7 +342,10 @@ CREATE FIELD METHODS
       $this->dlgAssetSearchTool->CssClass = 'modal_dialog';
       $this->dlgAssetSearchTool->Template = 'asset_search_tool.tpl.php';
 
-      $this->ctlAssetSearchTool = new QAssetSearchComposite($this->dlgAssetSearchTool, null, true);
+      $this->dlgAssetSearchTool->Position = QPosition::Absolute;
+      $this->dlgAssetSearchTool->AddControlToMove();
+
+      $this->ctlAssetSearchTool = new QAssetSearchComposite($this->dlgAssetSearchTool, null, true, true);
 			$this->ctlAssetSearchTool->dtgAsset->ItemsPerPage = 10;
 			$this->btnAssetSearchToolAdd = new QButton($this->ctlAssetSearchTool);
 			$this->btnAssetSearchToolAdd->Text = "Add Selected";
@@ -517,6 +520,9 @@ CREATE FIELD METHODS
 		protected function lblAddChild_Click() {
 		  // Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
+      if ($this->intDlgStatus) {
+        $this->ctlAssetSearchTool->Refresh();
+      }
       $this->dlgAssetSearchTool->ShowDialogBox();
 		  $this->intDlgStatus = 2;
 		}
@@ -526,6 +532,9 @@ CREATE FIELD METHODS
 		  if (count($this->intAssetIdArray) > 0) {
 		    // Uncheck all items but SelectAll checkbox
         $this->UncheckAllItems();
+        if ($this->intDlgStatus) {
+          $this->ctlAssetSearchTool->Refresh();
+        }
         $this->dlgAssetSearchTool->ShowDialogBox();
 		    $this->intDlgStatus = 1;
 		  }

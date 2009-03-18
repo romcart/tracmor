@@ -249,7 +249,7 @@ class QAssetTransactComposite extends QControl {
 				}
 				elseif ($objNewAsset->LinkedFlag) {
 				  $blnError = true;
-				  $this->txtNewAssetCode->Warning = "That asset code has linked to parent asset.";
+				  $this->txtNewAssetCode->Warning = "That asset is linked to a parent asset.";
 				}
 				// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
 				elseif ($objNewAsset->LocationId == 2) {
@@ -548,7 +548,7 @@ class QAssetTransactComposite extends QControl {
 		if ($this->blnEditMode && $this->objAsset instanceof Asset) {
 			$this->objAssetArray[] = Asset::Load($this->objAsset->AssetId);
 			// Load all child assets
-			$objLinkedAssetArray = Asset::LoadArrayByParentAssetCodeLinkedFlag($this->objAsset->AssetCode, 1);
+			$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($this->objAsset->AssetCode);
 			if ($objLinkedAssetArray) {
 			  $strAssetCodeArray = array();
 				foreach ($objLinkedAssetArray as $objLinkedAsset) {
