@@ -517,7 +517,7 @@ CREATE FIELD METHODS
 		  }
 		}
 
-		public function lblAddChild_Click() {
+		protected function lblAddChild_Click() {
 		  // Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
       if ($this->intDlgStatus) {
