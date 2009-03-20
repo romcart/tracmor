@@ -45,13 +45,14 @@ class QAssetEditComposite extends QControl {
 	protected $chkAutoGenerateAssetCode;
 	protected $lblNewAssetModel;
 	protected $lblParentAssetCode;
+	protected $lblIconParentAssetCode;
 	public $lblShipmentReceipt;
 
 
 	// Inputs
 	public $lstAssetModel;
 	protected $txtAssetCode;
-	protected $txtParentAssetCode;
+	public $txtParentAssetCode;
 	protected $lstLocation;
 	protected $lstCreatedByObject;
 	protected $lstModifiedByObject;
@@ -117,6 +118,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblModifiedDate_Create();
 		$this->lblNewAssetModel_Create();
 		$this->lblParentAssetCode_Create();
+		$this->lblIconParentAssetCode_Create();
 		$this->lblAssetModel_Create();
 		$this->UpdateAssetLabels();
 
@@ -246,12 +248,24 @@ class QAssetEditComposite extends QControl {
 	protected function txtParentAssetCode_Create() {
 		$this->txtParentAssetCode = new QTextBox($this);
 		$this->txtParentAssetCode->Name = 'Parent Asset';
+		$this->txtParentAssetCode->Width = '230';
 		$this->txtParentAssetCode->Required = false;
 		$this->txtParentAssetCode->CausesValidation = true;
 		$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
   	$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
    	$this->txtParentAssetCode->TabIndex = $this->GetNextTabIndex();;
    	$this->intNextTabIndex++;
+	}
+
+	// Create the clickable label
+	protected function lblIconParentAssetCode_Create() {
+	  $this->lblIconParentAssetCode = new QLabel($this);
+		$this->lblIconParentAssetCode->HtmlEntities = false;
+		$this->lblIconParentAssetCode->Display = false;
+		$this->lblIconParentAssetCode->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+		$this->lblIconParentAssetCode->AddAction(new QClickEvent(), new QAjaxAction('lblIconParentAssetCode_Click'));
+		$this->lblIconParentAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblIconParentAssetCode_Click'));
+		$this->lblIconParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	}
 
 	// Create and Setup lstAssetModel
@@ -1033,6 +1047,7 @@ class QAssetEditComposite extends QControl {
 		$this->btnSave->Display = false;
 
 		// Display Labels for Viewing mode
+		$this->lblIconParentAssetCode->Display = false;
 		$this->lblAssetModelCode->Display = true;
 		$this->lblLocation->Display = true;
 		$this->lblAssetCode->Display = true;
@@ -1081,6 +1096,7 @@ class QAssetEditComposite extends QControl {
     $this->lblAssetModelCode->Display = true;
 
     $this->txtParentAssetCode->Display = true;
+    $this->lblIconParentAssetCode->Display = true;
     $this->lblParentAssetCode->Display = false;
 
     // Do not display Edit and Delete buttons
@@ -1286,6 +1302,10 @@ class QAssetEditComposite extends QControl {
 		else{
 			$this->lblNewAssetModel->Visible=false;
 		}
+	}
+
+	public function lblIconParentAssetCode_Click() {
+	  $this->objParentObject->lblIconParentAssetCode_Click();
 	}
 
 	public function SaveChildAssets() {

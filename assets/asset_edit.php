@@ -342,8 +342,8 @@ CREATE FIELD METHODS
       $this->dlgAssetSearchTool->CssClass = 'modal_dialog';
       $this->dlgAssetSearchTool->Template = 'asset_search_tool.tpl.php';
 
-      $this->dlgAssetSearchTool->Position = QPosition::Absolute;
-      $this->dlgAssetSearchTool->AddControlToMove();
+      //$this->dlgAssetSearchTool->Position = QPosition::Absolute;
+      //$this->dlgAssetSearchTool->AddControlToMove();
 
       $this->ctlAssetSearchTool = new QAssetSearchComposite($this->dlgAssetSearchTool, null, true, true, true);
 			$this->ctlAssetSearchTool->dtgAsset->ItemsPerPage = 10;
@@ -517,12 +517,13 @@ CREATE FIELD METHODS
 		  }
 		}
 
-		protected function lblAddChild_Click() {
+		public function lblAddChild_Click() {
 		  // Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
       if ($this->intDlgStatus) {
         $this->ctlAssetSearchTool->Refresh();
       }
+      $this->btnAssetSearchToolAdd->Text = "Add Selected";
       $this->dlgAssetSearchTool->ShowDialogBox();
 		  $this->intDlgStatus = 2;
 		}
@@ -535,6 +536,7 @@ CREATE FIELD METHODS
         if ($this->intDlgStatus) {
           $this->ctlAssetSearchTool->Refresh();
         }
+        $this->btnAssetSearchToolAdd->Text = "Reassign";
         $this->dlgAssetSearchTool->ShowDialogBox();
 		    $this->intDlgStatus = 1;
 		  }
@@ -729,6 +731,29 @@ CREATE FIELD METHODS
             $this->dtgChildAssets_Bind();
           }
           break;
+        // Add Parent Asset Code
+        case '3' :
+          $intSelectedAssetId = $this->ctlAssetSearchTool->dtgAsset->GetSelected("AssetId");
+          if (count($intSelectedAssetId) > 1) {
+            $this->btnAssetSearchToolAdd->Warning = "You must select only one parent asset.";
+          }
+          elseif (count($intSelectedAssetId) != 1) {
+            $this->btnAssetSearchToolAdd->Warning = "No selected assets.";
+          }
+          else {
+            if (!($objParentAsset = Asset::LoadByAssetId($intSelectedAssetId[0]))) {
+              $this->btnAssetSearchToolAdd->Warning = "That asset code does not exist. Please try another.";
+
+            }
+            elseif ($objParentAsset->AssetCode == $this->objAsset->AssetCode) {
+        			$this->btnAssetSearchToolAdd->Warning = "Parent asset code must not be the same as asset code. Please try another.";
+            }
+            else {
+              $this->ctlAssetEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
+              $this->dlgAssetSearchTool->HideDialogBox();
+            }
+          }
+          break;
         default :
           $this->btnAssetSearchToolAdd->Warning = "Error: unknown action";
           break;
@@ -825,6 +850,17 @@ CREATE FIELD METHODS
 		  $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
 		  $this->dtgChildAssets->GetColumn(0)->Display = false;
 		  $this->dtgChildAssets_Bind();
+		}
+
+		public function lblIconParentAssetCode_Click() {
+		  // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+      if ($this->intDlgStatus) {
+        $this->ctlAssetSearchTool->Refresh();
+      }
+      $this->btnAssetSearchToolAdd->Text = "Add Parent Asset";
+      $this->dlgAssetSearchTool->ShowDialogBox();
+		  $this->intDlgStatus = 3;
 		}
 	}
 
