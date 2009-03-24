@@ -337,7 +337,7 @@ CREATE FIELD METHODS
       $this->dlgAssetSearchTool->Padding = '10px';
       $this->dlgAssetSearchTool->FontSize = '12px';
       $this->dlgAssetSearchTool->BackColor = '#ffffff';
-      // Make sure this Dislog Box is "hidden"
+      // Make sure this Dialog Box is "hidden"
       $this->dlgAssetSearchTool->Display = false;
       $this->dlgAssetSearchTool->CssClass = 'modal_dialog';
       $this->dlgAssetSearchTool->Template = 'asset_search_tool.tpl.php';
