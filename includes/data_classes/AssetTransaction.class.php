@@ -549,5 +549,40 @@
      $strDbRow = $objDbResult->FetchRow();
      return QType::Cast($strDbRow[0], QType::Integer);
 		}
+
+		/**
+		 * Load an array (excluding transactions for linked assets) of AssetTransaction objects,
+		 * by TransactionId Index(es)
+		 * @param integer $intTransactionId
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return AssetTransaction[]
+		*/
+		public static function LoadArrayByTransactionIdLinkedFlag($intTransactionId, $objOptionalClauses = null) {
+			// Call AssetTransaction::QueryArray to perform the LoadArrayByTransactionId query
+			try {
+				return AssetTransaction::QueryArray(QQ::AndCondition(
+				  QQ::Equal(QQN::AssetTransaction()->TransactionId, $intTransactionId),
+				  QQ::NotEqual(QQN::AssetTransaction()->Asset->LinkedFlag, true))
+					,
+					$objOptionalClauses);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Count AssetTransactions (excluding transactions for linked assets)
+		 * by TransactionId Index(es)
+		 * @param integer $intTransactionId
+		 * @return int
+		*/
+		public static function CountByTransactionIdLinkedFlag($intTransactionId) {
+			// Call AssetTransaction::QueryCount to perform the CountByTransactionId query
+			return AssetTransaction::QueryCount(QQ::AndCondition(
+				QQ::Equal(QQN::AssetTransaction()->TransactionId, $intTransactionId),
+				QQ::NotEqual(QQN::AssetTransaction()->Asset->LinkedFlag, true))
+			);
+		}
 	}
 ?>

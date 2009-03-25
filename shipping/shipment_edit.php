@@ -18,7 +18,7 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
+
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(5);
 	require_once(__FORMBASE_CLASSES__ . '/ShipmentEditFormBase.class.php');
@@ -26,8 +26,8 @@
 	require('../contacts/ContactEditPanel.class.php');
 	require('../contacts/AddressEditPanel.class.php');
 	require_once('./fedexdc.class.php');
-	
-	
+
+
 	/**
 	 * This is a quick-and-dirty draft form object to do Create, Edit, and Delete functionality
 	 * of the Shipment class.  It extends from the code-generated
@@ -37,26 +37,26 @@
 	 * here by overriding existing or implementing new methods, properties and variables.
 	 *
 	 * Additional qform control objects can also be defined and used here, as well.
-	 * 
+	 *
 	 * @package Application
 	 * @subpackage FormDraftObjects
-	 * 
+	 *
 	 */
 	class ShipmentEditForm extends ShipmentEditFormBase {
-		
+
 		// Header Tabs
 		protected $ctlHeaderMenu;
-		
+
 		// Shortcut Menu
 		protected $ctlShortcutMenu;
-		
+
 		// Qpanel
 		protected $pnlFedExShipment;
-		
+
 		// Booleans
 		protected $blnModifyAssets = false;
 		protected $blnModifyInventory = false;
-		
+
 		// Inputs
 		protected $txtShipmentNumber;
 		protected $txtNote;
@@ -110,7 +110,7 @@
 		public $lstToCompany;
 		public $lstToContact;
 		public $lstToAddress;
-		
+
 		// Buttons
 		protected $btnEdit;
 		protected $atcAttach;
@@ -128,7 +128,7 @@
 		protected $btnCancelExchange;
 		protected $btnSaveDueDate;
 		protected $btnCancelDueDate;
-		
+
 		// Labels
 		protected $lblHeaderShipment;
 		protected $lblTrackingNumber;
@@ -176,16 +176,16 @@
 		protected $lblHoldAtLocationState;
 		protected $lblHoldAtLocationPostalCode;
 		protected $dlgNew;
-		
+
 		// Datagrids
 		protected $dtgAssetTransact;
 		protected $dtgInventoryTransact;
-		
+
 		// Arrays
 		protected $arrAssetTransactionToDelete;
 		protected $arrInventoryTransactionToDelete;
 		protected $objCompanyArray;
-		
+
 		// Objects
 		protected $objAssetTransactionArray;
 		protected $objInventoryTransactionArray;
@@ -193,43 +193,43 @@
 		protected $dttNow;
 		protected $dttFiveDaysFromNow;
 		protected $objFedexShipment;
-		
+
 		// Integers
 		protected $intNewTempId = 1;
-		
+
 		// Custom Field Objects
-		public $arrCustomFields;	
+		public $arrCustomFields;
 
 		// Set true if the Built-in Fields has to be rendered
 		public $blnViewBuiltInFields;
 		public $blnEditBuiltInFields;
 
 		protected function Form_Create() {
-			
+
 			// Call SetupShipment to either Load/Edit Existing or Create New
 			$this->SetupShipment();
-			
+
 			// If the courier is FedEx, load the FedexShipment object
 			if ($this->blnEditMode) {
 				if ($this->objShipment->CourierId === 1) {
 					$this->objFedexShipment = FedexShipment::LoadByShipmentId($this->objShipment->ShipmentId);
 				}
 			}
-			
+
 			$this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
-			
+
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
-			$this->ctlShortcutMenu_Create();			
-			
+			$this->ctlShortcutMenu_Create();
+
 			// FedEx Shipment Panel
 			$this->pnlFedExShipment_Create();
-			
+
 			// Packing List Link
 			$this->lblPackingListLink_Create();
 			$this->lblFedexShippingLabelLink_Create();
-			
+
 			// Shipping Labels
 			$this->lblShipmentNumber_Create();
 			$this->lblHeaderShipment_Create();
@@ -268,7 +268,7 @@
 			$this->lblWeightUnit_Create();
 			$this->lblLengthUnit_Create();
 			$this->lblCurrencyUnit_Create();
-			
+
 			// Shipping Inputs
 			$this->dlgExchange_Create();
 			$this->dlgDueDate_Create();
@@ -291,10 +291,10 @@
 			$this->txtFedexNotifyRecipientEmail_Create();
 			$this->txtFedexNotifyOtherEmail_Create();
 			$this->chkFedexNotifySenderShipFlag_Create();
-			$this->chkFedexNotifySenderExceptionFlag_Create();			
+			$this->chkFedexNotifySenderExceptionFlag_Create();
 			$this->chkFedexNotifySenderDeliveryFlag_Create();
 			$this->chkFedexNotifyRecipientShipFlag_Create();
-			$this->chkFedexNotifyRecipientExceptionFlag_Create();			
+			$this->chkFedexNotifyRecipientExceptionFlag_Create();
 			$this->chkFedexNotifyRecipientDeliveryFlag_Create();
 			$this->chkFedexNotifyOtherShipFlag_Create();
 			$this->chkFedexNotifyOtherExceptionFlag_Create();
@@ -342,7 +342,7 @@
 			$this->btnSaveDueDate_Create();
 			$this->btnCancelDueDate_Create();
 			$this->pnlAttachments_Create();
-			
+
 			// Create all custom asset fields
 			$this->customFields_Create();
 			//Set display logic of Built-In Fields
@@ -350,33 +350,33 @@
 			$this->UpdateAddressAccess();
 			$this->UpdateCompanyAccess();
 			$this->UpdateContactAccess();
-			
+
 			// New entities Dialog
 			$this->dlgNew_Create();
-			
+
 			if (!$this->objShipment->ShippedFlag) {
 				// Shipping Buttons
 				$this->btnDelete_Create();
 			}
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
-			$this->btnEdit_Create();			
+			$this->btnEdit_Create();
 			$this->atcAttach_Create();
-			
+
 			// Complete Shipment Buttons
 			$this->btnCompleteShipment_Create();
 			$this->btnCancelShipment_Create();
 			$this->btnCancelCompleteShipment_Create();
-			
+
 			// Shipping Datagrids
 			$this->dtgAssetTransact_Create();
 			$this->dtgInventoryTransact_Create();
-			
-			
-			
+
+
+
 			// Load the objAssetTransactionArray and objInventoryTransactionArray for the first time
 			if ($this->blnEditMode) {
-				
+
 				$objClauses = array();
 				if ($objClause = $this->dtgAssetTransact->OrderByClause)
 					array_push($objClauses, $objClause);
@@ -388,7 +388,7 @@
 					array_push($objClauses, $objClause);
 				$this->objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($this->objShipment->TransactionId, $objClauses);
 				$objClauses = null;
-				
+
 				$objClauses = array();
 				if ($objClause = $this->dtgInventoryTransact->OrderByClause)
 					array_push($objClauses, $objClause);
@@ -397,7 +397,7 @@
 				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->InventoryLocation->InventoryModel));
 					array_push($objClauses, $objClause);
 				$this->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->objShipment->TransactionId, $objClauses);
-				
+
 				// If shipped, display labels. Otherwise, we don't need to call DisplayLabels because only labels are on the QPanel.
 				$this->DisplayLabels();
 			}
@@ -405,9 +405,9 @@
 			elseif (!$this->blnEditMode) {
 				$this->DisplayInputs();
 			}
-			
-			
-			
+
+
+
 			// Check if there is an Asset or InventoryModel ID in the query string to automatically add them - they would be coming from AssetEdit or InventoryEdit
 			if (!$this->blnEditMode) {
 				$intAssetId = QApplication::QueryString('intAssetId');
@@ -430,13 +430,13 @@
 					}
 				}
 			}
-			
-			
+
+
 		}
-		
+
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
 		protected function Form_PreRender() {
-			
+
 			// Load the data for the AssetTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyAssets || $this->blnEditMode) {
 				$this->blnModifyAssets = false;
@@ -449,10 +449,10 @@
 					$this->dtgAssetTransact->ShowHeader = false;
 				}
 			}
-			
+
 			// Load the data for the InventoryTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyInventory || $this->blnEditMode) {
-				$this->blnModifyInventory = false;	
+				$this->blnModifyInventory = false;
 				$this->dtgInventoryTransact->TotalItemCount = count($this->objInventoryTransactionArray);
 				if ($this->dtgInventoryTransact->TotalItemCount > 0) {
 					$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
@@ -463,16 +463,16 @@
 				}
 			}
 		}
-		
+
 		protected function SetupShipment() {
 			parent::SetupShipment();
 			QApplication::AuthorizeEntity($this->objShipment, $this->blnEditMode);
-		}				
-		
+		}
+
 		//**************
 		// CREATE PANELS
 		//**************
-		
+
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {
   		$this->ctlHeaderMenu = new QHeaderMenu($this);
@@ -481,8 +481,8 @@
   	// Create and Setp the Shortcut Menu Composite Control
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
-  	}		
-  	
+  	}
+
   	// Create and Setup the FedEx Shipment Panel
   	protected function pnlFedExShipment_Create() {
   		$this->pnlFedExShipment = new QPanel($this);
@@ -490,7 +490,7 @@
   		$this->pnlFedExShipment->Template = 'pnl_fedex_shipment.inc.php';
   		$this->pnlFedExShipment->Display = ($this->blnEditMode && $this->objShipment->CourierId===1) ? true : false;
   	}
-  	
+
   	// Create and Setup the Modal Dialog Box
   	protected function dlgExchange_Create() {
   		$this->dlgExchange = new QDialogBox($this);
@@ -504,7 +504,7 @@
   		$this->dlgExchange->MatteClickable = false;
   		$this->dlgExchange->SetCustomStyle('overflow', 'auto');
     }
-    
+
     // Create and Setup the Due Date Modal Dialog Box
     protected function dlgDueDate_Create() {
     	$this->dlgDueDate = new QDialogBox($this);
@@ -518,7 +518,7 @@
     	$this->dlgDueDate->MatteClickable = false;
     	$this->dlgDueDate->SetCustomStyle('overflow', 'auto');
     }
-  	
+
 		//**************
 		// CREATE LABELS
 		//**************
@@ -531,7 +531,7 @@
 				$this->lblPackingListLink->Text = $this->objShipment->__toStringPackingListLink("bluelink");
 			}
 		}
-		
+
 		// Create and Setup lblFedexShippingLabelLink
 		protected function lblFedexShippingLabelLink_Create() {
 			$this->lblFedexShippingLabelLink = new QLabel($this);
@@ -540,15 +540,15 @@
 				$this->lblFedexShippingLabelLink->Text = $this->objShipment->__toStringFedexShippingLabelLink("bluelink");
 			}
 		}
-		
+
 		// Create and Setup lblTrackingNumber
 		protected function lblTrackingNumber_Create() {
 			$this->lblTrackingNumber = new QLabel($this);
 			$this->lblTrackingNumber->Name = 'Tracking Number';
 			$this->lblTrackingNumber->HtmlEntities = false;
 			$this->lblTrackingNumber->Text = $this->objShipment->__toStringTrackingNumber();
-		}		
-		
+		}
+
 		// Create and Setup lblShipmentNumber
 		protected function lblShipmentNumber_Create() {
 			$this->lblShipmentNumber = new QLabel($this);
@@ -560,7 +560,7 @@
 				$this->lblShipmentNumber->Text = $this->objShipment->ShipmentNumber;
 			}
 		}
-		
+
 		// Create and Setup lblHeaderShipment
 		protected function lblHeaderShipment_Create() {
 			$this->lblHeaderShipment = new QLabel($this);
@@ -570,7 +570,7 @@
 				$this->lblHeaderShipment->Text = 'Schedule Shipment';
 			}
 		}
-		
+
 		// Create and Setup lblShipDate
 		protected function lblShipDate_Create() {
 			$this->lblShipDate = new QLabel($this);
@@ -579,7 +579,7 @@
 				$this->lblShipDate->Text = $this->objShipment->ShipDate->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblFromCompany
 		protected function lblFromCompany_Create() {
 			$this->lblFromCompany = new QLabel($this);
@@ -587,8 +587,8 @@
 			if ($this->blnEditMode && $this->objShipment->FromCompanyId) {
 				$this->lblFromCompany->Text = $this->objShipment->FromCompany->__toString();
 			}
-		}	
-		
+		}
+
 		// Create and Setup lblFromContact
 		protected function lblFromContact_Create() {
 			$this->lblFromContact = new QLabel($this);
@@ -597,7 +597,7 @@
 				$this->lblFromContact->Text = $this->objShipment->FromContact->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblFrom Address
 		protected function lblFromAddress_Create() {
 			$this->lblFromAddress = new QLabel($this);
@@ -614,8 +614,8 @@
 			$this->lblFromAddressFull->Name = 'Full Address';
 			if ($this->blnEditMode && $this->objShipment->FromAddressId)
 			$this->lblFromAddressFull->Text = $this->objShipment->FromAddress->__ToStringFullAddress();
-		}		
-		
+		}
+
 		// Create and Setup lblToCompany
 		protected function lblToCompany_Create() {
 			$this->lblToCompany = new QLabel($this);
@@ -624,7 +624,7 @@
 				$this->lblToCompany->Text = $this->objShipment->ToCompany->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblToContact
 		protected function lblToContact_Create() {
 			$this->lblToContact = new QLabel($this);
@@ -633,7 +633,7 @@
 				$this->lblToContact->Text = $this->objShipment->ToContact->__toString();
 			}
 		}
-		
+
 		// Create and Setp lblToAddress
 		protected function lblToAddress_Create() {
 			$this->lblToAddress = new QLabel($this);
@@ -642,7 +642,7 @@
 				$this->lblToAddress->Text = $this->objShipment->ToAddress->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblToAddressFull
 		protected function lblToAddressFull_Create() {
 			$this->lblToAddressFull = new QLabel($this);
@@ -651,14 +651,14 @@
 			if ($this->blnEditMode && $this->objShipment->ToAddressId)
 			$this->lblToAddressFull->Text = $this->objShipment->ToAddress->__ToStringFullAddress();
 		}
-		
+
 		// Create and Setup lblCourier
 		protected function lblCourier_Create() {
 			$this->lblCourier = new QLabel($this);
 			$this->lblCourier->Name = 'Courier';
 			$this->lblCourier->Text = ($this->objShipment->CourierId) ? $this->objShipment->Courier->__toString() : 'Other';
 		}
-		
+
 		// Create and Setup lblToPhone
 		protected function lblToPhone_Create() {
 			$this->lblToPhone = new QLabel($this->pnlFedExShipment);
@@ -667,7 +667,7 @@
 				$this->lblToPhone->Text = $this->objFedexShipment->ToPhone;
 			}
 		}
-		
+
 		// Create and Setup lblBillTransportationTo
 		protected function lblBillTransportationTo_Create() {
 			$this->lblBillTransportationTo = new QLabel($this->pnlFedExShipment);
@@ -677,7 +677,7 @@
 				$this->lblBillTransportationTo->Text = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::ground_pay_type($this->objFedexShipment->PayType) : FedExDC::express_pay_type($this->objFedexShipment->PayType);
 			}
 		}
-		
+
 		// Create and Setup lblReference
 		protected function lblReference_Create() {
 			$this->lblReference = new QLabel($this->pnlFedExShipment);
@@ -686,7 +686,7 @@
 				$this->lblReference->Text = $this->objFedexShipment->Reference;
 			}
 		}
-		
+
 		// Create and Setup lblFedexNotifySenderEmail
 		protected function lblFedexNotifySenderEmail_Create() {
 			$this->lblFedexNotifySenderEmail = new QLabel($this->pnlFedExShipment);
@@ -695,7 +695,7 @@
 				$this->lblFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
 			}
 		}
-		
+
 		// Create and Setup lblFedexNotifyRecipientEmail
 		protected function lblFedexNotifyRecipientEmail_Create() {
 			$this->lblFedexNotifyRecipientEmail = new QLabel($this->pnlFedExShipment);
@@ -712,8 +712,8 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->lblFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
 			}
-		}		
-		
+		}
+
 		// Create and Setup lblHoldAtLocationAddress
 		protected function lblHoldAtLocationAddress_Create() {
 			$this->lblHoldAtLocationAddress = new QLabel($this->pnlFedExShipment);
@@ -731,7 +731,7 @@
 				$this->lblHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
 			}
 		}
-				
+
 		// Create and Setup lblHoldAtLocationState
 		protected function lblHoldAtLocationState_Create() {
 			$this->lblHoldAtLocationState = new QLabel($this->pnlFedExShipment);
@@ -740,7 +740,7 @@
 				$this->lblHoldAtLocationState->Text = $this->objFedexShipment->HoldAtLocationStateObject->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblHoldAtLocationPostalCode
 		protected function lblHoldAtLocationPostalCode_Create() {
 			$this->lblHoldAtLocationPostalCode = new QLabel($this->pnlFedExShipment);
@@ -749,7 +749,7 @@
 				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
 			}
 		}
-		
+
 		// Create and Setup lblAdvanced
 		protected function lblAdvanced_Create() {
 			$this->lblAdvanced = new QLabel($this);
@@ -765,7 +765,7 @@
 			}
 			//$this->lblAdvanced->TabIndex = 29;
 		}
-		
+
 		// Create and Setup lblSenderLabel
 		protected function lblSenderLabel_Create() {
 			$this->lblSenderLabel = new QLabel($this->pnlFedExShipment);
@@ -781,7 +781,7 @@
 			}
 			$this->lblSenderLabel->HtmlEntities=false;
 		}
-		
+
 		// Create and Setup lblPayerAccount
 		protected function lblPayerAccount_Create() {
 			$this->lblPayerAccount = new QLabel($this->pnlFedExShipment);
@@ -795,7 +795,7 @@
 				}
 			}
 		}
-		
+
 		// Create and Setup lblFxServiceType
 		protected function lblFxServiceType_Create() {
 			$this->lblFxServiceType = new QLabel($this->pnlFedExShipment);
@@ -804,7 +804,7 @@
 				$this->lblFxServiceType->Text = $this->objFedexShipment->FedexServiceType->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblPackageType
 		protected function lblPackageType_Create() {
 			$this->lblPackageType = new QLabel($this->pnlFedExShipment);
@@ -813,7 +813,7 @@
 				$this->lblPackageType->Text = $this->objFedexShipment->PackageType->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblPackageWeight
 		protected function lblPackageWeight_Create() {
 			$this->lblPackageWeight = new QLabel($this->pnlFedExShipment);
@@ -830,7 +830,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->lblPackageLength->Text = $this->objFedexShipment->PackageLength;
 			}
-		}		
+		}
 
 		// Create and Setup lblPackageWidth
 		protected function lblPackageWidth_Create() {
@@ -839,8 +839,8 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->lblPackageWidth->Text = $this->objFedexShipment->PackageWidth;
 			}
-		}		
-		
+		}
+
 		// Create and Setup lblPackageHeight
 		protected function lblPackageHeight_Create() {
 			$this->lblPackageHeight = new QLabel($this->pnlFedExShipment);
@@ -848,7 +848,7 @@
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->lblPackageHeight->Text = $this->objFedexShipment->PackageHeight;
 			}
-		}	
+		}
 
 		// Create and Setup lblValue
 		protected function lblValue_Create() {
@@ -858,7 +858,7 @@
 				$this->lblValue->Text = $this->objFedexShipment->DeclaredValue;
 			}
 		}
-		
+
 		// Create and Setup lblWeightUnit
 		protected function lblWeightUnit_Create() {
 			$this->lblWeightUnit = new QLabel ($this->pnlFedExShipment);
@@ -867,45 +867,45 @@
 				$this->lblWeightUnit->Text = $this->objFedexShipment->WeightUnit->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblLengthUnit
 		protected function lblLengthUnit_Create() {
 			$this->lblLengthUnit = new QLabel ($this->pnlFedExShipment);
 			$this->lblLengthUnit->Name = 'Length Unit';
 			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LengthUnitId) {
 				$this->lblLengthUnit->Text = $this->objFedexShipment->LengthUnit->__toString();
-			}			
+			}
 		}
-		
+
 		// Create and Setup lblCurrencyUnit
 		protected function lblCurrencyUnit_Create() {
 			$this->lblCurrencyUnit = new QLabel ($this->pnlFedExShipment);
 			$this->lblCurrencyUnit->Name = 'Currency Unit';
 			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->CurrencyUnitId) {
 				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
-			}				
+			}
 		}
-		
+
 		protected function lblNewFromCompany_Create() {
 			$this->lblNewFromCompany = new QLabel($this);
-			$this->lblNewFromCompany->HtmlEntities = false; 
+			$this->lblNewFromCompany->HtmlEntities = false;
 			$this->lblNewFromCompany->Text = '<img src="../images/add.png">';
 			$this->lblNewFromCompany->ToolTip = "New Company";
 			$this->lblNewFromCompany->CssClass = "add_icon";
 			$this->lblNewFromCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromCompany_Click'));
 			$this->lblNewFromCompany->ActionParameter = $this->lstFromCompany->ControlId;
 		}
-		
+
 		protected function lblNewFromContact_Create() {
 			$this->lblNewFromContact = new QLabel($this);
-			$this->lblNewFromContact->HtmlEntities = false; 
+			$this->lblNewFromContact->HtmlEntities = false;
 			$this->lblNewFromContact->Text = '<img src="../images/add.png">';
 			$this->lblNewFromContact->ToolTip = "New Contact";
 			$this->lblNewFromContact->CssClass = "add_icon";
 			$this->lblNewFromContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromContact_Click'));
 			$this->lblNewFromContact->ActionParameter = $this->lstFromContact->ControlId;
 		}
-		
+
 		protected function lblNewFromAddress_Create() {
 			$this->lblNewFromAddress = new QLabel($this);
 			$this->lblNewFromAddress->HtmlEntities = false;
@@ -915,7 +915,7 @@
 			$this->lblNewFromAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromAddress_Click'));
 			$this->lblNewFromAddress->ActionParameter = $this->lstFromAddress->ControlId;
 		}
-		
+
 		protected function lblNewToCompany_Create() {
 			$this->lblNewToCompany = new QLabel($this);
 			$this->lblNewToCompany->HtmlEntities = false;
@@ -925,7 +925,7 @@
 			$this->lblNewToCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewToCompany_Click'));
 			$this->lblNewToCompany->ActionParameter = $this->lstToCompany->ControlId;
 		}
-		
+
 		protected function lblNewToContact_Create() {
 			$this->lblNewToContact = new QLabel($this);
 			$this->lblNewToContact->HtmlEntities = false;
@@ -935,7 +935,7 @@
 			$this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
 			$this->lblNewToContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewToContact_Click'));
 		}
-		
+
 		protected function lblNewToAddress_Create() {
 			$this->lblNewToAddress = new QLabel($this);
 			$this->lblNewToAddress->HtmlEntities = false;
@@ -945,7 +945,7 @@
 			$this->lblNewToAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewToAddress_Click'));
 			$this->lblNewToAddress->ActionParameter = $this->lstToAddress->ControlId;
 		}
-		
+
 		// Create and Setup pnlNote
 		protected function pnlNote_Create() {
 			$this->pnlNote = new QPanel($this);
@@ -955,11 +955,11 @@
 				$this->pnlNote->Text = nl2br($this->objShipment->Transaction->Note);
 			}
 		}
-		
+
 		//**************
 		// CREATE INPUTS
 		//**************
-		
+
 		// Create and Setup txtTrackingNumber
 		protected function txtTrackingNumber_Create() {
 			$this->txtTrackingNumber = new QTextBox($this);
@@ -974,7 +974,7 @@
 			//}
 			$this->txtTrackingNumber->TabIndex = 8;
 		}
-		
+
 		// Create and Setup calShipDate
 		protected function calShipDate_Create() {
 			$this->calShipDate = new QDateTimePickerExt($this);
@@ -987,7 +987,7 @@
 				$this->calShipDate->DateTime = new QDateTime(QDateTime::Now);
 			}
 			$this->calShipDate->Required = true;
-			
+
 			$this->dttNow = new QDateTime(QDateTime::Now);
 			$this->calShipDate->MinimumYear = $this->dttNow->Year;
 			$this->calShipDate->MinimumMonth = $this->dttNow->Month;
@@ -997,7 +997,7 @@
       		// 7 Days: 604800
       		// 10 Days: 864000
       		// 200 Days: 17280000
-      
+
       		$intDayOfWeek = date('w', time());
       		// Sunday - just add five days
       		if ($intDayOfWeek == 0) {
@@ -1014,14 +1014,14 @@
       		$this->calShipDate->MaximumYear = $this->dttFiveDaysFromNow->Year;
       		$this->calShipDate->MaximumMonth = $this->dttFiveDaysFromNow->Month;
       		$this->calShipDate->MaximumDay = $this->dttFiveDaysFromNow->Day;
-      
+
      		 $this->calShipDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
  			if (!$this->blnEditMode) {
  				QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->calShipDate->ControlId));
  			}
  			$this->calShipDate->TabIndex=10;
 		}
-		
+
 		// Create and Setup lstFromCompany
 		protected function lstFromCompany_Create() {
 			$this->lstFromCompany = new QListBox($this);
@@ -1039,10 +1039,10 @@
 			}
 
 			$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFromCompany_Select'));
-			//$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
+			//$this->lstFromCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));
 			$this->lstFromCompany->TabIndex=1;
 		}
-		
+
 		// Create and Setup lstFromContact
 		protected function lstFromContact_Create() {
 			$this->lstFromContact = new QListBox($this);
@@ -1058,10 +1058,10 @@
 					$objListItem->Selected = true;
 				$this->lstFromContact->AddItem($objListItem);
 			}
-			$this->lstFromContact->AddAction(new QChangeEvent(), new QAjaxAction('lstFromContact_Select'));	
+			$this->lstFromContact->AddAction(new QChangeEvent(), new QAjaxAction('lstFromContact_Select'));
 			$this->lstFromContact->TabIndex=2;
 		}
-		
+
 		// Create and Setup lstFromAddress
 		protected function lstFromAddress_Create() {
 			$this->lstFromAddress = new QListBox($this);
@@ -1077,11 +1077,11 @@
 					$objListItem->Selected = true;
 				$this->lstFromAddress->AddItem($objListItem);
 			}
-			$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFromAddress_Select'));	
-			//$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));	
+			$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFromAddress_Select'));
+			//$this->lstFromAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Update'));
 			$this->lstFromAddress->TabIndex=3;
 		}
-		
+
 		// Create and Setup lstToCompany
 		protected function lstToCompany_Create() {
 			$this->lstToCompany = new QListBox($this);
@@ -1099,13 +1099,13 @@
 			$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstToCompany_Select'));
 			$this->lstToCompany->TabIndex=4;
 		}
-		
+
 		// Create and Setup lstToContact
 		protected function lstToContact_Create() {
 			$this->lstToContact = new QListBox($this);
 			$this->lstToContact->Name = QApplication::Translate('To Contact');
 			$this->lstToContact->Required = true;
-			
+
 			if (!$this->blnEditMode) {
 				$this->lstToContact->Enabled = false;
 			}
@@ -1123,11 +1123,11 @@
 					$this->lstToContact->AddItem($objListItem);
 				}
 			}
-			
+
 			$this->lstToContact->AddAction(new QChangeEvent(), new QAjaxAction('lstToContact_Select'));
 			$this->lstToContact->TabIndex=5;
-		}		
-		
+		}
+
 		// Create and Setup lstToAddress
 		protected function lstToAddress_Create() {
 			$this->lstToAddress = new QListBox($this);
@@ -1150,10 +1150,10 @@
 					$this->lstToAddress->Enabled = true;
 				}
 			}
-			$this->lstToAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstToAddress_Select'));		
+			$this->lstToAddress->AddAction(new QChangeEvent(), new QAjaxAction('lstToAddress_Select'));
 			$this->lstToAddress->TabIndex=6;
 		}
-		
+
 		// Create and Setup txtShipmentNumber
 		protected function txtShipmentNumber_Create() {
 			$this->txtShipmentNumber = new QTextBox($this);
@@ -1163,7 +1163,7 @@
 			}
 			$this->txtShipmentNumber->Required = true;
 		}
-		
+
 		// Create and Setup lstCourier
 		protected function lstCourier_Create() {
 			$this->lstCourier = new QListBox($this);
@@ -1171,12 +1171,12 @@
 			$this->lstCourier->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstCourier->AddItem('- Select One -', null);
-			$objCourierArray = Courier::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Courier()->ShortDescription)));				
+			$objCourierArray = Courier::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Courier()->ShortDescription)));
 			if ($objCourierArray) foreach ($objCourierArray as $objCourier) {
 				if ($objCourier->ActiveFlag) {
 					$objListItem = new QListItem($objCourier->__toString(), $objCourier->CourierId);
 					if (($this->objShipment->CourierId) && ($this->objShipment->CourierId == $objCourier->CourierId))
-						$objListItem->Selected = true;				
+						$objListItem->Selected = true;
 					$this->lstCourier->AddItem($objListItem);
 				}
 			}
@@ -1189,7 +1189,7 @@
 			$this->lstCourier->AddAction(new QChangeEvent(), new QAjaxAction('lstCourier_Select'));
 			$this->lstCourier->TabIndex=7;
 		}
-				
+
 		// Create and Setup txtNote
 		protected function txtNote_Create() {
 			$this->txtNote = new QTextBox($this);
@@ -1201,7 +1201,7 @@
 			}
 			$this->txtNote->TabIndex=9;
 		}
-		
+
 		// Create and Setup txtToPhone
 		protected function txtToPhone_Create() {
 			$this->txtToPhone = new QTextBox($this->pnlFedExShipment);
@@ -1214,7 +1214,7 @@
 			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtToPhone->TabIndex=11;
 		}
-		
+
 		// Create and Setup lstBillTransportationTo
 		protected function lstBillTransportationTo_Create() {
 			$this->lstBillTransportationTo = new QListBox($this->pnlFedExShipment);
@@ -1222,7 +1222,7 @@
 			$this->lstBillTransportationTo->Required = false;
 			//if (!$this->blnEditMode)
 			//	$this->lstBillTransportationTo->AddItem('- Select One -', null);
-			
+
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				// FedexServiceTypeId 6 is FedEx Ground
 				$objPayTypeArray = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::get_ground_pay_types() : FedExDC::get_express_pay_types();
@@ -1232,17 +1232,17 @@
 				}
 				$this->lstBillTransportationTo->SelectedValue = $this->objFedexShipment->PayType;
 			} else {
-				$objPayTypeArray = FedExDC::get_express_pay_types();				
+				$objPayTypeArray = FedExDC::get_express_pay_types();
 				if ($objPayTypeArray) foreach ($objPayTypeArray as $key => $value) {
 					$objListItem = new QListItem($value, $key);
 					$this->lstBillTransportationTo->AddItem($objListItem);
 				}
 			}
-		
+
 			$this->lstBillTransportationTo->AddAction(new QChangeEvent(), new QAjaxAction('lstBillTransportationTo_Select'));
 			$this->lstBillTransportationTo->TabIndex=12;
 		}
-		
+
 		// Create and Setup lstShippingAccount
 		protected function lstShippingAccount_Create() {
 			$this->lstShippingAccount = new QListBox($this->pnlFedExShipment);
@@ -1250,9 +1250,9 @@
 			$this->lstShippingAccount->Required = false;
 			if (!$this->blnEditMode)
 				$this->lstShippingAccount->AddItem('- Select One -', null);
-			$objShippingAccountArray = ShippingAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::ShippingAccount()->ShortDescription)));				
+			$objShippingAccountArray = ShippingAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::ShippingAccount()->ShortDescription)));
 			if ($objShippingAccountArray) foreach ($objShippingAccountArray as $objShippingAccount) {
-				$objListItem = new QListItem($objShippingAccount->__toString(), $objShippingAccount->ShippingAccountId);			
+				$objListItem = new QListItem($objShippingAccount->__toString(), $objShippingAccount->ShippingAccountId);
 				$this->lstShippingAccount->AddItem($objListItem);
 				if (!$this->blnEditMode && count($objShippingAccountArray) === 1)
 					$objListItem->Selected = true;
@@ -1261,7 +1261,7 @@
 			//$this->lstShippingAccount->AddAction(new QChangeEvent(), new QAjaxAction('lstShippingAccount_Select'));
 			$this->lstShippingAccount->TabIndex=13;
 		}
-		
+
 		// Create and Setup txtRecipientThirdPartyAccount
 		protected function txtRecipientThirdPartyAccount_Create() {
 			$this->txtRecipientThirdPartyAccount = new QTextBox($this->pnlFedExShipment);
@@ -1272,7 +1272,7 @@
 			$this->txtRecipientThirdPartyAccount->Display=false;
 			$this->txtRecipientThirdPartyAccount->TabIndex = 14;
 		}
-		
+
 		// Create and Setup txtReference
 		protected function txtReference_Create() {
 			$this->txtReference = new QTextBox($this->pnlFedExShipment);
@@ -1282,7 +1282,7 @@
 			}
 			$this->txtReference->TabIndex = 15;
 		}
-		
+
 		// Create and Setup txtFedexNotifySenderEmail
 		protected function txtFedexNotifySenderEmail_Create() {
 			$this->txtFedexNotifySenderEmail = new QTextBox($this->pnlFedExShipment);
@@ -1292,7 +1292,7 @@
 			}
 			$this->txtFedexNotifySenderEmail->TabIndex = 32;
 		}
-		
+
 		// Create and Setup txtFedexNotifyRecipientEmail
 		protected function txtFedexNotifyRecipientEmail_Create() {
 			$this->txtFedexNotifyRecipientEmail = new QTextBox($this->pnlFedExShipment);
@@ -1302,7 +1302,7 @@
 			}
 			$this->txtFedexNotifyRecipientEmail->TabIndex = 36;
 		}
-		
+
 		// Create and Setup txtFedexNotifyOtherEmail
 		protected function txtFedexNotifyOtherEmail_Create() {
 			$this->txtFedexNotifyOtherEmail = new QTextBox($this->pnlFedExShipment);
@@ -1311,23 +1311,23 @@
 				$this->txtFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
 			}
 			$this->txtFedexNotifyOtherEmail->TabIndex = 40;
-		}		
-		
+		}
+
 		// Create and Setup lstFxServiceType
 		protected function lstFxServiceType_Create() {
 			$this->lstFxServiceType = new QListBox($this->pnlFedExShipment);
 			$this->lstFxServiceType->Name = QApplication::Translate('FedEx Service Type');
 			$this->lstFxServiceType->AddItem('- Select One -', null);
-			
+
 			$objFedexServiceTypeArr = FedexServiceType::LoadAll(QQ::Clause(QQ::OrderBy(QQN::FedexServiceType()->ShortDescription)));
 			if ($objFedexServiceTypeArr) foreach ($objFedexServiceTypeArr as $objFedexServiceType) {
 				$objListItem = new QListItem($objFedexServiceType->ShortDescription, $objFedexServiceType->FedexServiceTypeId);
 				if (($this->blnEditMode && $this->objFedexShipment) && $this->objFedexShipment->FedexServiceTypeId == $objFedexServiceType->FedexServiceTypeId) {
 					$objListItem->Selected = true;
 				}
-				
+
 				$this->lstFxServiceType->AddItem($objListItem);
-			}			
+			}
 			/*if (!$this->blnEditMode) {
 				$this->lstFxServiceType->Required = false;
 				$this->lstFxServiceType->Enabled = false;
@@ -1338,19 +1338,19 @@
 			}
 			*/
 			$this->lstFxServiceType->TabIndex=16;
-			
+
 			$this->lstFxServiceType->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Select'));
 		}
-		
+
 		// Create and Setup lstPackageType
 		protected function lstPackageType_Create() {
 			$this->lstPackageType = new QListBox($this->pnlFedExShipment);
 			$this->lstPackageType->Name = QApplication::Translate('Package Type');
-			
+
 			$this->LoadPackageTypes();
 			$this->lstPackageType->TabIndex = 17;
 		}
-		
+
 		// Create and Setup txtPackageWeight
 		protected function txtPackageWeight_Create() {
 			$this->txtPackageWeight = new QFloatTextBox($this->pnlFedExShipment);
@@ -1383,8 +1383,8 @@
 			}
 			$this->lstWeightUnit->SetCustomStyle('Width','120px');
 			$this->lstWeightUnit->TabIndex = 19;
-		}		
-		
+		}
+
 		// Create and Setup txtPackageLength
 		protected function txtPackageLength_Create() {
 			$this->txtPackageLength = new QFloatTextBox($this->pnlFedExShipment);
@@ -1394,8 +1394,8 @@
 			}
 			$this->txtPackageLength->CausesValidation = true;
 			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QTerminateAction());	
-			$this->txtPackageLength->SetCustomStyle('Width','30px');				
+			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->txtPackageLength->SetCustomStyle('Width','30px');
 			$this->txtPackageLength->TabIndex = 20;
 		}
 
@@ -1423,7 +1423,7 @@
 			$this->txtPackageHeight->CausesValidation = true;
 			$this->txtPackageHeight->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
 			$this->txtPackageHeight->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtPackageHeight->SetCustomStyle('Width','30px');	
+			$this->txtPackageHeight->SetCustomStyle('Width','30px');
 			$this->txtPackageHeight->TabIndex = 22;
 		}
 
@@ -1443,10 +1443,10 @@
 				}
 				$this->lstLengthUnit->AddItem($objListItem);
 			}
-			$this->lstLengthUnit->SetCustomStyle('Width','60px');	
+			$this->lstLengthUnit->SetCustomStyle('Width','60px');
 			$this->lstLengthUnit->TabIndex = 23;
-		}		
-		
+		}
+
 		// Create and Setup txtValue
 		protected function txtValue_Create() {
 			$this->txtValue = new QFloatTextBox($this->pnlFedExShipment);
@@ -1478,7 +1478,7 @@
 			}
 			$this->lstCurrencyUnit->SetCustomStyle('Width','60px');
 			$this->lstCurrencyUnit->TabIndex = 25;
-		}		
+		}
 
 		// Create and Setup chkSaturdayDeliveryFlag
 		protected function chkSaturdayDeliveryFlag_Create() {
@@ -1489,18 +1489,18 @@
 			}
 			$this->chkSaturdayDeliveryFlag->TabIndex = 26;
 		}
-		
+
 		protected function chkHoldAtLocationFlag_Create() {
 			$this->chkHoldAtLocationFlag = new QCheckBox($this->pnlFedExShipment);
 			$this->chkHoldAtLocationFlag->Name = QApplication::Translate('Hold at Location');
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->chkHoldAtLocationFlag->Checked = $this->objFedexShipment->HoldAtLocationFlag;
 			}
-			
+
 			$this->chkHoldAtLocationFlag->AddAction(new QClickEvent(), new QAjaxAction('chkHoldAtLocationFlag_Click'));
 			$this->chkHoldAtLocationFlag->TabIndex = 27;
 		}
-		
+
 		protected function txtHoldAtLocationAddress_Create() {
 			$this->txtHoldAtLocationAddress = new QTextBox($this->pnlFedExShipment);
 			$this->txtHoldAtLocationAddress->Name = QApplication::Translate('Hold at Location Address');
@@ -1509,7 +1509,7 @@
 			}
 			$this->txtHoldAtLocationAddress->TabIndex = 28;
 		}
-		
+
 		protected function txtHoldAtLocationCity_Create() {
 			$this->txtHoldAtLocationCity = new QTextBox($this->pnlFedExShipment);
 			$this->txtHoldAtLocationCity->Name = QApplication::Translate('Hold at Location City');
@@ -1518,7 +1518,7 @@
 			}
 			$this->txtHoldAtLocationCity->TabIndex = 29;
 		}
-		
+
 		protected function lstHoldAtLocationState_Create() {
 			$this->lstHoldAtLocationState = new QListBox($this->pnlFedExShipment);
 			$this->lstHoldAtLocationState->Name = QApplication::Translate('Hold at Location State');
@@ -1533,7 +1533,7 @@
 			}
 			$this->lstHoldAtLocationState->TabIndex = 30;
 		}
-		
+
 		protected function txtHoldAtLocationPostalCode_Create() {
 			$this->txtHoldAtLocationPostalCode = new QTextBox($this->pnlFedExShipment);
 			$this->txtHoldAtLocationPostalCode->Name = QApplication::Translate('Hold at Location Postal Code');
@@ -1542,7 +1542,7 @@
 			}
 			$this->txtHoldAtLocationPostalCode->TabIndex = 31;
 		}
-		
+
 		// Create and Setup chkFedexNotifySenderShipFlag
 		protected function chkFedexNotifySenderShipFlag_Create() {
 			$this->chkFedexNotifySenderShipFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1552,7 +1552,7 @@
 			}
 			$this->chkFedexNotifySenderShipFlag->TabIndex = 33;
 		}
-		
+
 		// Create and Setup chkFedexNotifySenderExceptionFlag
 		protected function chkFedexNotifySenderExceptionFlag_Create() {
 			$this->chkFedexNotifySenderExceptionFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1562,7 +1562,7 @@
 			}
 			$this->chkFedexNotifySenderExceptionFlag->TabIndex = 34;
 		}
-		
+
 		// Create and Setup chkFedexNotifySenderDeliveryFlag
 		protected function chkFedexNotifySenderDeliveryFlag_Create() {
 			$this->chkFedexNotifySenderDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1572,7 +1572,7 @@
 			}
 			$this->chkFedexNotifySenderDeliveryFlag->TabIndex = 35;
 		}
-				
+
 		// Create and Setup chkFedexNotifyRecipientShipFlag
 		protected function chkFedexNotifyRecipientShipFlag_Create() {
 			$this->chkFedexNotifyRecipientShipFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1582,7 +1582,7 @@
 			}
 			$this->chkFedexNotifyRecipientShipFlag->TabIndex = 37;
 		}
-		
+
 		// Create and Setup chkFedexNotifyRecipientExceptionFlag
 		protected function chkFedexNotifyRecipientExceptionFlag_Create() {
 			$this->chkFedexNotifyRecipientExceptionFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1592,7 +1592,7 @@
 			}
 			$this->chkFedexNotifyRecipientExceptionFlag->TabIndex = 38;
 		}
-		
+
 		// Create and Setup chkFedexNotifyRecipientDeliveryFlag
 		protected function chkFedexNotifyRecipientDeliveryFlag_Create() {
 			$this->chkFedexNotifyRecipientDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1602,7 +1602,7 @@
 			}
 			$this->chkFedexNotifyRecipientDeliveryFlag->TabIndex = 39;
 		}
-		
+
 		// Create and Setup chkFedexNotifyOtherShipFlag
 		protected function chkFedexNotifyOtherShipFlag_Create() {
 			$this->chkFedexNotifyOtherShipFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1612,7 +1612,7 @@
 			}
 			$this->chkFedexNotifyOtherShipFlag->TabIndex = 41;
 		}
-		
+
 		// Create and Setup chkFedexNotifyOtherExceptionFlag
 		protected function chkFedexNotifyOtherExceptionFlag_Create() {
 			$this->chkFedexNotifyOtherExceptionFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1622,7 +1622,7 @@
 			}
 			$this->chkFedexNotifyOtherExceptionFlag->TabIndex = 42;
 		}
-		
+
 		// Create and Setup chkFedexNotifyOtherDeliveryFlag
 		protected function chkFedexNotifyOtherDeliveryFlag_Create() {
 			$this->chkFedexNotifyOtherDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
@@ -1631,8 +1631,8 @@
 				$this->chkFedexNotifyOtherDeliveryFlag->Checked = $this->objFedexShipment->NotifyOtherDeliveryFlag;
 			}
 			$this->chkFedexNotifyOtherDeliveryFlag->TabIndex = 43;
-		}		
-		
+		}
+
 		// Create the text field to enter new asset codes to add to the transaction
 		// Eventually this field will receive information from the AML
 		protected function txtNewAssetCode_Create() {
@@ -1643,7 +1643,7 @@
 			$this->txtNewAssetCode->CausesValidation = false;
 			$this->txtNewAssetCode->TabIndex=44;
 		}
-		
+
 		// Create the text field to enter new inventory_model codes to add to the transaction
 		// Eventually this field will receive information from the AML
 		protected function txtNewInventoryModelCode_Create() {
@@ -1653,7 +1653,7 @@
 			$this->txtNewInventoryModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnLookup_Click'));
 			$this->txtNewInventoryModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
+
 		// Create and Setup lstSourceLocation
 		protected function lstSourceLocation_Create() {
 			$this->lstSourceLocation = new QListBox($this);
@@ -1663,7 +1663,7 @@
 			$this->lstSourceLocation->CausesValidation = false;
 			$this->lstSourceLocation->Enabled = false;
 		}
-		
+
 		protected function txtQuantity_Create() {
 			$this->txtQuantity = new QTextBox($this);
 			$this->txtQuantity->Name = 'Quantity';
@@ -1672,7 +1672,7 @@
 			$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtQuantity->Enabled = false;
 		}
-		
+
 		protected function chkScheduleReceipt_Create() {
 			$this->chkScheduleReceipt = new QCheckBox($this);
 			$this->chkScheduleReceipt->Name = 'Schedule Receipt';
@@ -1680,7 +1680,7 @@
 			$this->chkScheduleReceipt->Display = false;
 			$this->chkScheduleReceipt->AddAction(new QClickEvent(), new QAjaxAction('chkScheduleReceipt_Click'));
 		}
-		
+
 		protected function rblAssetType_Create() {
 			$this->rblAssetType = new QRadioButtonList($this);
 			$this->rblAssetType->HtmlEntities = false;
@@ -1694,13 +1694,13 @@
 				$this->rblAssetType->AddAction(new QChangeEvent(), new QToggleDisplayAction($this->chkAutoGenerateAssetCode));
 			}
 		}
-		
+
 		protected function txtReceiptAssetCode_Create() {
 			$this->txtReceiptAssetCode = new QTextBox($this->dlgExchange);
 			$this->txtReceiptAssetCode->Name = 'Asset Code';
 			//$this->txtReceiptAssetCode->Display = false;
 		}
-		
+
 		protected function chkAutoGenerateAssetCode_Create() {
 			$this->chkAutoGenerateAssetCode = new QCheckBox($this->dlgExchange);
 			$this->chkAutoGenerateAssetCode->Name = 'Auto Generate';
@@ -1711,60 +1711,60 @@
 			}
 			//$this->chkAutoGenerateAssetCode->Display = false;
 		}
-		
+
 		protected function dtpScheduleReceiptDueDate_Create() {
 			$this->dtpScheduleReceiptDueDate = new QDateTimePicker($this->dlgDueDate);
 			$this->dtpScheduleReceiptDueDate->Name = 'Due Date';
 			$this->dtpScheduleReceiptDueDate->DateTimePickerType = QDateTimePickerType::Date;
 			$this->dtpScheduleReceiptDueDate->MinimumYear = date('Y');
 		}
-		
+
 		//******************
 		// CREATE DATAGRIDS
 		//******************
-		
+
 		// Setup the AssetTransact datagrid
 		protected function dtgAssetTransact_Create() {
-			
+
 			$this->dtgAssetTransact = new QDataGrid($this);
 			$this->dtgAssetTransact->CellPadding = 5;
 			$this->dtgAssetTransact->CellSpacing = 0;
 			$this->dtgAssetTransact->CssClass = "datagrid";
-			
+
 	    // Enable AJAX - this won't work while using the DB profiler
 	    $this->dtgAssetTransact->UseAjax = false;
-	
+
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgAssetTransact);
 	    $this->dtgAssetTransact->Paginator = $objPaginator;
 	    $this->dtgAssetTransact->ItemsPerPage = 20;
-	    
+
     	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?> <?= $_ITEM->ToStringHovertips($_CONTROL) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => "200", 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->SourceLocation->__toString() ?>', array('CssClass' => "dtg_column")));
-	    
+
 	    if (!$this->blnEditMode) {
     		$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    }
-	
+
 	    $objStyle = $this->dtgAssetTransact->RowStyle;
 	    $objStyle->ForeColor = '#000000';
 	    $objStyle->BackColor = '#FFFFFF';
 	    $objStyle->FontSize = 12;
-	
+
 	    $objStyle = $this->dtgAssetTransact->AlternateRowStyle;
 	    $objStyle->BackColor = '#EFEFEF';
-	
+
 	    $objStyle = $this->dtgAssetTransact->HeaderRowStyle;
 	    $objStyle->ForeColor = '#000000';
 	    $objStyle->BackColor = '#EFEFEF';
 	    $objStyle->CssClass = 'dtg_header';
-	    
+
 	    $this->dtgAssetTransact->ShowHeader = false;
 		}
-		
+
 		// Render the advanced listbox in the AssetTransact datagrid
 		public function AdvancedColumn_Render(AssetTransaction $objAssetTransaction) {
 			if (!$objAssetTransaction->Asset->TempId) {
@@ -1784,7 +1784,7 @@
 				$lstAdvanced->AddAction(new QChangeEvent(), new QAjaxAction('lstAdvancedColumn_Change'));
 				$lstAdvanced->Width = 200;
 			}
-			
+
 			if ($objAssetTransaction->ScheduleReceiptFlag) {
 				if ($objAssetTransaction->NewAssetFlag) {
 					$lstAdvanced->SelectedValue = 2;
@@ -1796,11 +1796,11 @@
 			else {
 				$lstAdvanced->SelectedValue = 0;
 			}
-			
-			
+
+
 			return $lstAdvanced->Render(false);
 		}
-		
+
 		public function DueDateColumn_Render(AssetTransaction $objAssetTransaction) {
 			$strControlId = 'lblDueDate' . $objAssetTransaction->Asset->TempId;
 			$lblDueDate = $this->GetControl($strControlId);
@@ -1824,13 +1824,13 @@
 	  		$lblDueDate->SetCustomStyle('cursor', 'pointer');
 				$lblDueDate->AddAction(new QClickEvent(), new QAjaxAction('lblDueDate_Click'));
 			}
-			
+
 			return $lblDueDate->Render(false);
 		}
-		
+
 		// Render the remove button column in the AssetTransact datagrid
 		public function RemoveAssetColumn_Render(AssetTransaction $objAssetTransaction) {
-			
+
 			// Assign the asset a TempId and increment it by one
 			// Only if it wasn't already created when making the advanced label
 			if (!$objAssetTransaction->Asset->TempId) {
@@ -1851,26 +1851,26 @@
           $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
           $btnRemove->CausesValidation = false;
       }
-      
+
       return $btnRemove->Render(false);
-		}		
-		
+		}
+
 		// Setup the InventoryTransact datagrid
 		protected function dtgInventoryTransact_Create() {
-			
+
 			$this->dtgInventoryTransact = new QDataGrid($this);
 			$this->dtgInventoryTransact->CellPadding = 5;
 			$this->dtgInventoryTransact->CellSpacing = 0;
 			$this->dtgInventoryTransact->CssClass = "datagrid";
-			
+
 	    // Enable AJAX - this won't work while using the DB profiler
 	    $this->dtgInventoryTransact->UseAjax = false;
-	
+
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgInventoryTransact);
 	    $this->dtgInventoryTransact->Paginator = $objPaginator;
 	    $this->dtgInventoryTransact->ItemsPerPage = 20;
-	    
+
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Inventory Code', '<?= $_ITEM->InventoryLocation->InventoryModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Inventory Model', '<?= $_ITEM->InventoryLocation->InventoryModel->ShortDescription ?>', array('Width' => "200", 'CssClass' => "dtg_column")));
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Source Location', '<?= $_ITEM->SourceLocation->__toString() ?>', array('CssClass' => "dtg_column")));
@@ -1878,26 +1878,26 @@
 	    if (!$this->blnEditMode) {
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    }
-	
+
 	    $objStyle = $this->dtgInventoryTransact->RowStyle;
 	    $objStyle->ForeColor = '#000000';
 	    $objStyle->BackColor = '#FFFFFF';
 	    $objStyle->FontSize = 12;
-	
+
 	    $objStyle = $this->dtgInventoryTransact->AlternateRowStyle;
 	    $objStyle->BackColor = '#EFEFEF';
-	
+
 	    $objStyle = $this->dtgInventoryTransact->HeaderRowStyle;
 	    $objStyle->ForeColor = '#000000';
 	    $objStyle->BackColor = '#EFEFEF';
 	    $objStyle->CssClass = 'dtg_header';
-	    
+
 	    $this->dtgInventoryTransact->ShowHeader = false;
 		}
-		
+
 		// Render the Remove Button Column in the Inventory Transaction datagrid
 		public function RemoveInventoryColumn_Render(InventoryTransaction $objInventoryTransaction) {
-			
+
 	    $strControlId = 'btnRemoveInventory' . $objInventoryTransaction->InventoryLocation->InventoryLocationId;
       $btnRemove = $this->GetControl($strControlId);
       if (!$btnRemove) {
@@ -1912,12 +1912,12 @@
         $btnRemove->CausesValidation = false;
 	    }
 	    return $btnRemove->Render(false);
-		}		
-		
+		}
+
 		//****************
 		// CREATE BUTTONS
 		//****************
-		
+
 		// Create and Setup btnCompleteShipment
 		protected function btnCompleteShipment_Create() {
 			$this->btnCompleteShipment = new QButton($this);
@@ -1926,7 +1926,7 @@
 			$this->btnCompleteShipment->CausesValidation = true;
 			QApplication::AuthorizeControl($this->objShipment, $this->btnCompleteShipment, 2);
 		}
-		
+
 		// Create and Setup btnCancelShipment
 		protected function btnCancelShipment_Create() {
 			$this->btnCancelShipment = new QButton($this);
@@ -1936,7 +1936,7 @@
 			$this->btnCancelShipment->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objShipment, $this->btnCancelShipment, 2);
 		}
-		
+
 		// Create and Setup btnCancelCompleteShipment
 		protected function btnCancelCompleteShipment_Create() {
 			$this->btnCancelCompleteShipment = new QButton($this);
@@ -1945,7 +1945,7 @@
 			$this->btnCancelCompleteShipment->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objShipment, $this->btnCancelCompleteShipment, 2);
 		}
-		
+
 		// Setup btnSave
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
@@ -1955,7 +1955,7 @@
 			$this->btnSave->CausesValidation = true;
 			//$this->btnSave->TabIndex=15;
 		}
-		
+
 		// Setup btnEdit
 		protected function btnEdit_Create() {
 			$this->btnEdit = new Qbutton($this);
@@ -1973,7 +1973,7 @@
 			$this->btnCancel->CausesValidation = false;
 			//$this->btnCancel->TabIndex=16;
 		}
-		
+
 		// Setup btnDelete
 		protected function btnDelete_Create() {
 			$this->btnDelete = new QButton($this);
@@ -1982,18 +1982,18 @@
 			$this->btnDelete->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objShipment, $this->btnDelete, 3);
 		}
-		
+
 		// Setup Attach File Asset Button
 		protected function atcAttach_Create() {
 			$this->atcAttach = new QAttach($this, null, EntityQtype::Shipment, $this->objShipment->ShipmentId);
 			QApplication::AuthorizeControl($this->objShipment, $this->atcAttach, 2);
 		}
-		
+
 		// Setup Attachments Panel
 		public function pnlAttachments_Create() {
 			$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Shipment, $this->objShipment->ShipmentId);
-		}		
-		
+		}
+
 		// Setup AddAsset Button
 		protected function btnAddAsset_Create() {
 			$this->btnAddAsset = new QButton($this);
@@ -2004,7 +2004,7 @@
 			$this->btnAddAsset->CausesValidation = false;
 			$this->btnAddAsset->TabIndex=45;
 		}
-		
+
 		// Create the lookup button
 		protected function btnLookup_Create() {
 			$this->btnLookup = new QButton($this);
@@ -2014,7 +2014,7 @@
 			$this->btnLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnLookup->CausesValidation = false;
 		}
-		
+
 		// Setup Add Inventory Button
 		protected function btnAddInventory_Create() {
 			$this->btnAddInventory = new QButton($this);
@@ -2024,7 +2024,7 @@
 			$this->btnAddInventory->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnAddInventory->CausesValidation = false;
 		}
-		
+
 		// Create Save Exchange Button
 		protected function btnSaveExchange_Create() {
 			$this->btnSaveExchange = new QButton($this->dlgExchange);
@@ -2033,7 +2033,7 @@
 			$this->btnSaveExchange->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSaveExchange_Click'));
 			$this->btnSaveExchange->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
+
 		// Create Cancel Exchange Button
 		protected function btnCancelExchange_Create() {
 			$this->btnCancelExchange = new QButton($this->dlgExchange);
@@ -2042,7 +2042,7 @@
 			$this->btnCancelExchange->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCancelExchange_Click'));
 			$this->btnCancelExchange->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
+
 		// Create Save Due Date Button
 		protected function btnSaveDueDate_Create() {
 			$this->btnSaveDueDate = new QButton($this->dlgDueDate);
@@ -2051,7 +2051,7 @@
 			$this->btnSaveDueDate->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSaveDueDate_Click'));
 			$this->btnSaveDueDate->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
+
 		// Create Cancel Exchange Button
 		protected function btnCancelDueDate_Create() {
 			$this->btnCancelDueDate = new QButton($this->dlgDueDate);
@@ -2060,21 +2060,21 @@
 			$this->btnCancelDueDate->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCancelDueDate_Click'));
 			$this->btnCancelDueDate->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
+
 		// Create all Custom Company Fields
 		protected function customFields_Create() {
-		
+
 			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 			$this->objShipment->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(10, $this->blnEditMode, $this->objShipment->ShipmentId);
-			
+
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			if ($this->objShipment->objCustomFieldArray) {
 				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-				
+
 			}
 			$this->UpdateCustomFields();
 		}
-		
+
 		// New Entity (Company, Contact, Address Dialog Box)
 		protected function dlgNew_Create() {
 			$this->dlgNew = new QDialogBox($this);
@@ -2086,15 +2086,15 @@
 			$this->dlgNew->BackColor = '#FFFFFF';
 			$this->dlgNew->MatteClickable = false;
 			$this->dlgNew->CssClass = "modal_dialog";
-		}		
+		}
 
 		//******************
 		// ONSELECT METHODS
 		// These methods are run every time a value is selected in their respective inputs
 		//******************
-		
+
 		// This is run every time a 'From Company' is selected
-		// It loads the values for the 'From Address' and 'From Contact' drop-downs for the selected company 
+		// It loads the values for the 'From Address' and 'From Contact' drop-downs for the selected company
 		protected function lstFromCompany_Select() {
 			if ($this->lstFromCompany->SelectedValue) {
 				// this SelectedValue is incorrect - it still thinks Fictional, INC. is selected
@@ -2153,7 +2153,7 @@
 				}
 			}
 		}
-		
+
 		// This is run every time a 'From Contact' is selected
 		// It loads the value for the 'Sender Email' for the FedEx shipment notification
 		protected function lstFromContact_Select() {
@@ -2168,9 +2168,9 @@
 				}
 			}
 		}
-		
+
 		// This is run every time a 'To Company' is selected
-		// It loads the values for the 'To Address' and 'To Contact' drop-downs for the selected company 
+		// It loads the values for the 'To Address' and 'To Contact' drop-downs for the selected company
 		protected function lstToCompany_Select() {
 			if ($this->lstToCompany->SelectedValue) {
 				$objCompany = Company::Load($this->lstToCompany->SelectedValue);
@@ -2203,7 +2203,7 @@
 					// Load the values for the 'To Address' List
 					if ($this->lstToAddress) {
 						$objToAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
-						
+
 						if ($this->lstToAddress->SelectedValue) {
 							$SelectedAddressId = $this->lstToAddress->SelectedValue;
 						}
@@ -2230,35 +2230,35 @@
 				}
 			}
 		}
-		
+
 		// This method is run when a Courier is selected
 		// Decides whether to display tracking number text box and display the FedEx shipment panel
 		protected function lstCourier_Select() {
 			// If FedEx is selected (currently the only other choice is 'Other', where the value is null)
 			if ($this->lstCourier->SelectedValue === 1) {
-				// make sure tracking number text box is not displayed 
+				// make sure tracking number text box is not displayed
 				// FIXME: this is not currently done the "Qcodo way"
 				QApplication::ExecuteJavascript('document.getElementById("trackingNumber").style.display="none";');
-				
+
 				// make sure the Hold At Location checkbox is unchecked
 				$this->chkHoldAtLocationFlag->Checked = false;
-				
+
 				// Set the recipient phone if necessary
 				$this->lstToContact_Select();
-				
+
 				// Show the FedEx shipment panel
 				$this->pnlFedExShipment->Display = true;
-				
+
 			} else {
 				// Not FedEx so hide FedEx shipment panel and display tracking number text box
 				// FIXME: this is not currently done the "Qcodo way"
 				QApplication::ExecuteJavascript('document.getElementById("trackingNumber").style.display="";');
-				
+
 				// Hide FedEx shipment panel
 				$this->pnlFedExShipment->Display = false;
 			}
 		}
-		
+
 		protected function lstFxServiceType_Select() {
 			// Reload lstPackageType
 			$strSelectedPackageType = ($this->lstPackageType->SelectedValue) ? $this->lstPackageType->SelectedValue : null;
@@ -2266,8 +2266,8 @@
 			$this->LoadPackageTypes();
 			if ($strSelectedPackageType)
 				$this->lstPackageType->SelectedValue = $strSelectedPackageType;
-			
-			
+
+
 			//Reload lstBillTransportationTo
 			$strSelectedBillTransportationTo = ($this->lstBillTransportationTo->SelectedName) ? $this->lstBillTransportationTo->SelectedName : null;
 			$this->lstBillTransportationTo->RemoveAllItems();
@@ -2282,19 +2282,19 @@
 				}
 			}
 		}
-		
+
 		protected function lstFxServiceType_Update() {
-			
+
 			$this->lstFxServiceType->RemoveAllItems();
 			$this->lstFxServiceType->Enabled = false;
-			$this->lstFxServiceType->Required = false;			
+			$this->lstFxServiceType->Required = false;
 
 			if ($this->lstCourier->SelectedValue == 1 && $this->lstToAddress->SelectedValue && $this->lstFromAddress->SelectedValue && $this->lstShippingAccount->SelectedValue)
-			{			
+			{
 				$this->lstFxServiceType->Enabled = true;
 				$this->lstFxServiceType->Required = true;
 				$this->lstFxServiceType->AddItem('- Select One -', null);
-				
+
 				$objFedexServiceTypeArr = FedexServiceType::LoadAll(QQ::Clause(QQ::OrderBy(QQN::FedexServiceType()->ShortDescription)));
 				if ($objFedexServiceTypeArr) foreach ($objFedexServiceTypeArr as $objFedexServiceType) {
 					$objListItem = new QListItem($objFedexServiceType->ShortDescription, $objFedexServiceType->FedexServiceTypeId);
@@ -2308,16 +2308,16 @@
 
 		// Fill the txtToPhone field with the ToContact's phone number if it exists
 		protected function lstToContact_Select() {
-			
+
 			if ($this->lstToContact->SelectedValue) {
 				$objContact = Contact::Load($this->lstToContact->SelectedValue);
 				if ($objContact) {
 					if ($objContact->PhoneOffice) {
 						$this->txtToPhone->Text = $objContact->PhoneOffice;
 					} else {
-						$this->txtToPhone->Text = '';	
+						$this->txtToPhone->Text = '';
 					}
-					
+
 					if ($objContact->Email) {
 						$this->txtFedexNotifyRecipientEmail->Text = $objContact->Email;
 					} else {
@@ -2336,8 +2336,8 @@
 			else {
 				$this->lblFromAddressFull->Text = '';
 			}
-		}		
-		
+		}
+
 		// Set the To Address Label text when it is selected from the drop-down
 		protected function lstToAddress_Select() {
 			$objAddress = Address::Load($this->lstToAddress->SelectedValue);
@@ -2349,7 +2349,7 @@
 			}
 			//$this->lstFxServiceType_Update();
 		}
-		
+
 		// Enables/Disables the ShippingAccountOther text box when a choice is selected from the listbox
 		protected function lstShippingAccount_Select() {
 			if ($this->lstShippingAccount->SelectedValue) {
@@ -2361,7 +2361,7 @@
 			}
 			$this->lstFxServiceType_Update();
 		}
-		
+
 		// This method, along with QDateTimePickerExt.inc, allow for a min and max date availble to be selected
 		// This method has not been tested rigorously, but will work for the five day period for this form.
 		protected function calShipDate_Select($strFormId, $strControlId, $strParameter) {
@@ -2372,7 +2372,7 @@
 			    $this->calShipDate->MinimumDay = 1;
 			    $this->calShipDate->MaximumMonth = $this->dttFiveDaysFromNow->Month;
 			    $this->calShipDate->MaximumDay = $this->dttFiveDaysFromNow->Day;
-				} 
+				}
 				elseif($this->calShipDate->DateTime->Year == $this->dttNow->Year) {
 			    $this->calShipDate->MinimumMonth = $this->dttNow->Month ;
 			    $this->calShipDate->MinimumDay = $this->dttNow->Day;
@@ -2383,11 +2383,11 @@
 			    elseif ($this->calShipDate->DateTime->Year < $this->dttFiveDaysFromNow->Year) {
 			    	$this->calShipDate->MaximumMonth = 12;
 			    }
-				}            
+				}
 				if($this->calShipDate->DateTime->Month > $this->dttNow->Month) {
 			    $this->calShipDate->MinimumDay = 1;
 				}
-			} 
+			}
 			else {
 			  $this->calShipDate->DateTime = new QDateTime(QDateTime::Now);
 			  $this->calShipDate->MinimumYear = $this->dttNow->Year;
@@ -2395,7 +2395,7 @@
 			  $this->calShipDate->MinimumDay = $this->dttNow->Day;
 			}
 		}
-		
+
 		// Switches between displaying Sender Account or Recipient/third party account inputs
 		protected function lstBillTransportationTo_Select() {
 			if ($this->lstBillTransportationTo->SelectedValue) {
@@ -2406,16 +2406,16 @@
 				} else {
 					$this->lstShippingAccount->Display=FALSE;
 					$this->txtRecipientThirdPartyAccount->Display=TRUE;
-					$this->lblSenderLabel->Text = 'Account #';					
+					$this->lblSenderLabel->Text = 'Account #';
 				}
 			}
 		}
-		
+
 		//************************
 		// ONCLICK BUTTON METHODS
 		// These methods are run when buttons are clicked
 		//************************
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewFromCompany_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -2427,7 +2427,7 @@
 				$pnlEdit->txtShortDescription->Focus();
 			}
 		}
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewFromContact_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -2439,7 +2439,7 @@
 				$pnlEdit->lstCompany->Focus();
 			}
 		}
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewFromAddress_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -2451,7 +2451,7 @@
 				$pnlEdit->lstCompany->Focus();
 			}
 		}
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewToCompany_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -2463,7 +2463,7 @@
 				$pnlEdit->txtShortDescription->Focus();
 			}
 		}
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewToContact_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -2480,7 +2480,7 @@
 				}
 			}
 		}
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewToAddress_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -2497,7 +2497,7 @@
 				}
 			}
 		}
-		
+
 		// When 'Hold at Location' checkbox is clicked,  show HAL panel
 		public function chkHoldAtLocationFlag_Click($strFormId, $strControlId, $strParameter) {
 			if ($this->chkHoldAtLocationFlag->Checked) {
@@ -2506,7 +2506,7 @@
 				QApplication::ExecuteJavascript('document.getElementById("HAL").style.display="none";');
 			}
 		}
-		
+
 		// Cancel editing an existing shipment, or cancel adding a new shipment and return to the list page
 		protected function btnCancel_Click($strFormId, $strControlId, $strParameter) {
 			if ($this->blnEditMode) {
@@ -2518,23 +2518,23 @@
 			else {
 				QApplication::Redirect('shipment_list.php');
 			}
-		}		
-		
+		}
+
 		// Edit an existing shipment by displaying inputs and hiding the labels
 		protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 			$this->DisplayInputs();
-			
+
 			$this->UpdateBuiltInFields();
 			$this->UpdateCustomFields();
-		}		
-		
+		}
+
 		// AddAsset Button Click
 		public function btnAddAsset_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$strAssetCode = $this->txtNewAssetCode->Text;
 			$blnDuplicate = false;
-			$blnError = false;	
-			
+			$blnError = false;
+
 			if ($strAssetCode) {
 				// Begin error checking
 				if ($this->objAssetTransactionArray) {
@@ -2545,18 +2545,23 @@
 						}
 					}
 				}
-				
+
 				if (!$blnError) {
 					$objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
 					if (!($objNewAsset instanceof Asset)) {
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset code does not exist.";
 					}
+					// Cannot ship any linked assets
+					elseif ($objNewAsset->LinkedFlag) {
+					  $blnError = true;
+						$this->txtNewAssetCode->Warning = "That asset is linked to a parent asset.";
+					}
 					// Cannot ship any assets that are checked out
 					elseif ($objNewAsset->LocationId == 1) {
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset is checked out.";
-					}					
+					}
 					// Cannot ship any assets that have already been shipped
 					elseif ($objNewAsset->LocationId == 2) {
 						$blnError = true;
@@ -2566,7 +2571,7 @@
 					elseif ($objNewAsset->LocationId == 5) {
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset is currently scheduled to be received.";
-					}					
+					}
 					elseif ($objNewAsset->CheckedOutFlag) {
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset is checked out.";
@@ -2579,7 +2584,26 @@
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "You do not have authorization to perform a transaction on this asset.";
 					}
-					
+					else {
+					  $objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objNewAsset->AssetCode);
+					  $strAssetCodeArray = array();
+					  if ($objLinkedAssetArray) {
+					    foreach ($objLinkedAssetArray as $objLinkedAsset) {
+					      if (!QApplication::AuthorizeEntityBoolean($objLinkedAsset, 2)) {
+					        $blnError = true;
+						      $this->txtNewAssetCode->Warning = sprintf("You do not have authorization to perform a transaction on linked asset %s.", $objLinkedAsset->AssetCode);
+						      break;
+					      }
+					      else {
+					        $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+					      }
+					    }
+					    if (!$blnError) {
+					      $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+					    }
+					  }
+					}
+
 					if ($objNewAsset && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
 						if ($objPendingShipment->TransactionId != $this->objShipment->TransactionId) {
 							$blnError = true;
@@ -2649,10 +2673,10 @@
 				$blnError = true;
 			}
 		}
-		
+
 		// Advanced listbox change action for each AssetTransaction in the datagrid
 		public function lstAdvancedColumn_Change($strFormId, $strControlId, $strParameter) {
-			
+
 			$intTempId = $strParameter;
 			$lstAdvanced = $this->GetControl($strControlId);
 			if ($this->objAssetTransactionArray) {
@@ -2688,14 +2712,14 @@
 				$this->blnModifyAssets = true;
 			}
 		}
-		
+
 		// Due Date Click Action for each AssetTransaction in the datagrid
 		public function lblDueDate_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$intTempId = $strParameter;
 			$this->dlgDueDate->ActionParameter = $intTempId;
 			$this->dlgDueDate->ShowDialogBox();
-			
+
 			//$lblDueDate = $this->GetControl($strControlId);
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -2709,10 +2733,10 @@
 					}
 				}
 			}
-			
+
 			$this->blnModifyAssets = true;
 		}
-		
+
 		// Remove button click action for each asset in the datagrid
 		public function btnRemoveAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
 
@@ -2730,7 +2754,7 @@
 				}
 			}
 		}
-		
+
 		// Remove button click action for each InventoryLocation in the datagrid
 		public function btnRemoveInventory_Click($strFormId, $strControlId, $strParameter) {
 
@@ -2747,18 +2771,18 @@
 				}
 			}
 		}
-		
+
 		// Lookup Button Click - looks up an inventory model, loads the inventorylocation listbox
 		// Enables InventoryLocation list and txtQuantity
 		public function btnLookup_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			// Assign the value submitted from the form
 			$strInventoryModelCode = $this->txtNewInventoryModelCode->Text;
-			
+
 			if ($strInventoryModelCode) {
 				// Load the inventory model object based on the inventory_model_code submitted
 				$objInventoryModel = InventoryModel::LoadByInventoryModelCode($strInventoryModelCode);
-				
+
 				if ($objInventoryModel) {
 					// Load the array of InventoryLocations based on the InventoryModelId of the InventoryModel object
 					$InventorySourceLocationArray = InventoryLocation::LoadArrayByInventoryModelIdLocations($objInventoryModel->InventoryModelId);
@@ -2789,16 +2813,16 @@
 				$this->txtNewInventoryModelCode->Warning = 'Please enter an inventory code.';
 			}
 		}
-		
+
 		// Add Inventory Button Click
 		public function btnAddInventory_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$blnError = false;
-			
+
 			// Assign the values from the user submitted form input
 			$intNewInventoryLocationId = $this->lstSourceLocation->SelectedValue;
 			$intTransactionQuantity = $this->txtQuantity->Text;
-			
+
 			if ($intNewInventoryLocationId) {
 				// Begin error checking
 				if ($this->objInventoryTransactionArray) {
@@ -2828,7 +2852,7 @@
 						$blnError = true;
 						$this->txtQuantity->Warning = "You do not have authorization to perform a transaction on this inventory model.";
 					}
-					
+
 					// Check to see if that InventoryLocation has some quantity scheduled for shipment
 					// If so, make sure that there is enough inventory available to add the new quantity.
 					// This can be made faster by making a more targeted SQL query
@@ -2869,7 +2893,7 @@
 				$this->txtNewInventoryModelCode->Warning = "Please select a source location.";
 				$blnError = true;
 			}
-			
+
 			if (!$blnError && $objNewInventoryLocation instanceof InventoryLocation)  {
 				$objInventoryTransaction = new InventoryTransaction();
 				$objInventoryTransaction->InventoryLocationId = $objNewInventoryLocation->InventoryLocationId;
@@ -2882,15 +2906,15 @@
 				$this->txtQuantity->Text = null;
 				$this->lstSourceLocation->Enabled = false;
 				$this->txtQuantity->Enabled = false;
-				$this->blnModifyInventory = true;				
+				$this->blnModifyInventory = true;
 			}
-		}		
-		
+		}
+
 		// Save 'Complete Shipment' fields and mark ShippedFlag as true
 		protected function btnCompleteShipment_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$blnError = false;
-			
+
 			if ($this->objAssetTransactionArray && $this->objInventoryTransactionArray) {
 				$intEntityQtypeId = EntityQtype::AssetInventory;
 			}
@@ -2904,7 +2928,7 @@
 				$blnError = true;
 				$this->btnCompleteShipment->Warning = 'There are no assets or inventory in this shipment.';
 			}
-			
+
 			// If Courier is Fedex, validate Fedex inputs
 			if ($this->objShipment->CourierId === 1) {
 				if (!$this->lstPackageType->SelectedValue) {
@@ -2917,7 +2941,7 @@
 					$this->lblPackageWeight->Warning = "Please enter a weight for this package.";
 					$this->txtPackageWeight->Warning = "Please enter a weight for this package.";
 				}
-				
+
 				//if (!$this->lstWeightUnit->SelectedValue) {
 				//	$blnError = true;
 				//	$this->lstWeightUnit->Warning = "Please select a weight unit.";
@@ -2931,33 +2955,33 @@
 				//	$this->lstCurrencyUnit->Warning = "Please select a currency type.";
 				//}
 			}
-			
+
 			if (!$blnError) {
-				
+
 				try {
 					// Get an instance of the database
 					$objDatabase = QApplication::$Database[1];
 					// Begin a MySQL Transaction to be either committed or rolled back
 					$objDatabase->TransactionBegin();
-					
+
 					if (!$this->blnEditMode) {
 						// this is a new shipment so save the transaction & shipment before completing
-						
+
 						// Create the new transaction object and save it
 						$this->objTransaction = new Transaction();
 						$this->objTransaction->EntityQtypeId = $intEntityQtypeId;
 						$this->objTransaction->TransactionTypeId = 6;
 						$this->objTransaction->Note = $this->txtNote->Text;
 						$this->objTransaction->Save();
-					
+
 						$this->UpdateShipmentFields();
 						$this->objShipment->Save(true);
-						
+
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
 							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
 						}
-						
+
 						// If the courier is FedEx, create new fedexShipment
 						if ($this->lstCourier->SelectedValue === 1) {
 							if (!($this->objFedexShipment instanceof FedexShipment)) {
@@ -2966,30 +2990,30 @@
 							$this->objFedexShipment->ShipmentId = $this->objShipment->ShipmentId;
 							$this->UpdateFedexFields();
 							$this->objFedexShipment->Save(true);
-						}					
+						}
 					}
-					
+
 					// If courier is FedEx, initiate communication with FedEx
 					if(!$blnError && $this->objShipment->CourierId == 1) {
 						if (!$this->FedEx()) {
 							$blnError = true;
 							$objDatabase->TransactionRollback();
 							return;
-						}	
+						}
 					}
-					
+
 					if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
-						
+
 						$objTransaction = '';
 						$objReceipt = '';
-						
+
 						// Assign a destinationLocation to the AssetTransaction, and change the Location of the asset
 						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 							if ($objAssetTransaction->Asset instanceof Asset) {
-							
+
 								// LocationId #2 == Shipped
 								$DestinationLocationId = 2;
-								
+
 								$objAssetTransaction->Asset->LocationId = $DestinationLocationId;
 								$objAssetTransaction->Asset->Save();
 								if (!$this->blnEditMode) {
@@ -2997,11 +3021,23 @@
 									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
 								}
 								$objAssetTransaction->DestinationLocationId = $DestinationLocationId;
-								
+								/*if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+								  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+                    // Load the last AssetTransaction
+								    if ($objLinkedAssetTransaction = AssetTransaction::LoadArrayByAssetId($objLinkedAsset->AssetId, QQ::Clause(QQ::OrderBy(QQN::AssetTransaction()->AssetTransactionId, false)))) {
+                      $objLinkedAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
+                      $objLinkedAssetTransaction->DestinationLocationId = $DestinationLocationId;
+                      $objLinkedAssetTransaction->Save();
+                    }
+                    $objLinkedAsset->LocationId = $DestinationLocationId;
+                    $objLinkedAsset->Save();
+								  }
+								}*/
+
 								if ($objAssetTransaction->ScheduleReceiptFlag) {
-									
+
 									if ($objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset && $objAssetTransaction->NewAsset->AssetId == null) {
-										// We have to create the new asset before we can 
+										// We have to create the new asset before we can
 										$objReceiptAsset = new Asset();
 										$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
 										$objReceiptAsset->LocationId = $objAssetTransaction->NewAsset->LocationId;
@@ -3012,14 +3048,14 @@
 											$objReceiptAsset->AssetCode = $objAssetTransaction->NewAsset->AssetCode;
 										}
 										$objReceiptAsset->Save();
-										
+
 										// Assign any default custom field values
 										CustomField::AssignNewEntityDefaultValues(1, $objReceiptAsset->AssetId);
-										
+
 										// Associate the new Asset with the AssetTransaction
 										$objAssetTransaction->NewAsset = $objReceiptAsset;
 									}
-									
+
 									// If it doesn't exist, create a new transaction object and receipt object
 									if (!($objTransaction instanceof Transaction) && !($objReceipt instanceof Receipt)) {
 										$objTransaction = new Transaction();
@@ -3044,10 +3080,10 @@
 										if ($objAssetTransaction->ScheduleReceiptDueDate) {
 											$objReceipt->DueDate = $objAssetTransaction->ScheduleReceiptDueDate;
 										}
-										
+
 										$objReceipt->Save();
 									}
-									
+
 									$objReceiptAssetTransaction = new AssetTransaction();
 									// If this is a return
 									if (!$objAssetTransaction->NewAssetId) {
@@ -3068,43 +3104,43 @@
 									// It should not be true on the new AssetTransaction, but only on the AssetTransaction that caused the new asset to be created.
 									// $objReceiptAssetTransaction->NewAssetFlag = true;
 									$objReceiptAssetTransaction->Save();
-									
+
 								}
-								$objAssetTransaction->Save();	
-								
+								$objAssetTransaction->Save();
+
 								if ($objAssetTransaction->ScheduleReceiptFlag) {
 									// Set the Receipt Asset Transaction as child of the Shipment Asset Transaction
 									$objAssetTransaction->AssociateChildAssetTransaction($objReceiptAssetTransaction);
 								}
-								
-								
+
+
 								$objReceipt = null;
 								$objTransaction = null;
 							}
 						}
 					}
-					
+
 					if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
 						// Assign different source and destinations depending on transaction type
 						foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
-							
+
 							// LocationId #2 == Shipped
 							$DestinationLocationId = 2;
-							
+
 							if (!$this->blnEditMode) {
 								$objInventoryTransaction->TransactionId = $this->objTransaction->TransactionId;
 							}
-							
+
 							// Remove the inventory quantity from the source
 							$objInventoryTransaction->InventoryLocation->Quantity = $objInventoryTransaction->InventoryLocation->Quantity - $objInventoryTransaction->Quantity;
 							$objInventoryTransaction->InventoryLocation->Save();
-												
+
 							// Finish the InventoryTransaction and save it
 							$objInventoryTransaction->DestinationLocationId = $DestinationLocationId;
 							$objInventoryTransaction->Save();
 						}
 					}
-					
+
 					if ($this->blnEditMode) {
 						$this->UpdateShipmentFields();
 						if ($this->objShipment->CourierId === 1) {
@@ -3115,17 +3151,17 @@
 						// Update $this->objShipment with FedEx tracking number
 						$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
 					}
-					
+
 					$this->objShipment->ShippedFlag = true;
 					// $this->objShipment->Save(false, true);
 					$this->objShipment->Save();
 					$objDatabase->TransactionCommit();
-					
+
 					QApplication::Redirect(sprintf('../shipping/shipment_edit.php?intShipmentId=%s', $this->objShipment->ShipmentId));
 				}
 				catch (QExtendedOptimisticLockingException $objExc) {
 					$objDatabase->TransactionRollback();
-					
+
 					if ($objExc->Class == 'Shipment') {
 						$this->btnCancelShipment->Warning = sprintf('This shipment has been modified by another user. You must <a href="shipment_edit.php?intShipmentId=%s">Refresh</a> to complete this shipment.', $this->objShipment->ShipmentId);
 					}
@@ -3135,23 +3171,23 @@
 				}
 			}
 		}
-		
+
 		// Cancel/Delete entire incomplete shipment
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$objCustomFieldArray = $this->objShipment->objCustomFieldArray;
-			
+
 			// Just delete the transaction and MySQL CASCADE down to shipment, asset_transaction, and inventory_transaction
 			$this->objTransaction = Transaction::Load($this->objShipment->TransactionId);
 			$this->objTransaction->Delete();
 			CustomField::DeleteTextValues($objCustomFieldArray);
-			
+
 			QApplication::Redirect('../shipping/shipment_list.php');
 		}
-		
+
 		// Cancel/Delete Completed Shipment
 		protected function btnCancelCompleteShipment_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			// Determine the entity type(s) of this transaction
 			if ($this->objAssetTransactionArray && $this->objInventoryTransactionArray) {
 				$intEntityQtypeId = EntityQtype::AssetInventory;
@@ -3166,18 +3202,18 @@
 				$this->btnCancelCompleteShipment->Warning = 'There are no assets or inventory in this shipment.';
 				return;
 			}
-			
+
 			try {
 				// Get an instance of the database
 				$objDatabase = QApplication::$Database[1];
 				// Begin a MySQL Transaction to be either committed or rolled back
 				$objDatabase->TransactionBegin();
-				
+
 				// Assets
 				if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
 				// Set the DestinationLocation of the AssetTransction to null and set the Asset's location to the SourceLocationId of the Asset Transaction
 					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-						
+
 						if ($objNewerAssetTransaction = $objAssetTransaction->NewerTransaction()) {
 							// If this is an automatically scheduled return receipt, then we just delete it also
 							if ($objAssetTransaction->ScheduleReceiptFlag && $objNewerAssetTransaction->DestinationLocationId == null) {
@@ -3195,7 +3231,7 @@
 								return;
 							}
 						}
-						
+
 						// If this is an automatically scheduled exchange receipt, then we delete the asset, which will cascade to the asset_transaction as well
 						if ($objAssetTransaction->NewAssetFlag && $objAssetTransaction->NewAsset instanceof Asset) {
 							$objChildAssetTransactionArray = $objAssetTransaction->GetChildAssetTransactionArray();
@@ -3210,32 +3246,32 @@
 							// The new asset no longer exists
 							$objAssetTransaction->NewAssetId = null;
 						}
-						
+
 						// Set the destination location to null
 						$objAssetTransaction->DestinationLocationId = null;
 						$objAssetTransaction->Save();
-						
+
 						// Return the asset to its original location
 						$objAssetTransaction->Asset->LocationId = $objAssetTransaction->SourceLocationId;
 						$objAssetTransaction->Asset->Save();
 					}
 				}
-				
+
 				// Inventory
 				if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
 					// Set the DestinationLocation of the InventoryTransaction to null and add the inventory quantity back to the source
 					foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
-						
+
 						// Set the destination location to null
 						$objInventoryTransaction->DestinationLocationId = null;
 						$objInventoryTransaction->Save();
-						
+
 						// Add the inventory back to it's source location
 						$objInventoryTransaction->InventoryLocation->Quantity += $objInventoryTransaction->Quantity;
 						$objInventoryTransaction->InventoryLocation->Save();
 					}
 				}
-				
+
 				// Cancel FedEx Shipment
 				if ($this->objShipment->CourierId == 1) {
 					if (!$this->FedExCancel()) {
@@ -3243,7 +3279,7 @@
 						return;
 					}
 				}
-				
+
 				// Set all 'Complete Shipment' information to null
 				// $this->objShipment->PackageTypeId = null;
 				// $this->objShipment->PackageWeight = null;
@@ -3255,24 +3291,24 @@
 				// $this->objShipment->Value = null;
 				// $this->objShipment->CurrencyUnitId = null;
 				// $this->objShipment->NotificationFlag = null;
-				
+
 				// Set the TrackingNumber back to null
 				$this->objShipment->TrackingNumber = null;
-				
+
 				// Set the shipment as pending
 				$this->objShipment->ShippedFlag = false;
 				$this->objShipment->Save();
-				
+
 				// Commit the transaction to the database
 				$objDatabase->TransactionCommit();
-				
+
 				QApplication::Redirect('../shipping/shipment_edit.php?intShipmentId='.$this->objShipment->ShipmentId);
 			}
 			catch (QExtendedOptimisticLockingException $objExc) {
-				
+
 				// Roll back the database transaction
 				$objDatabase->TransactionRollback();
-				
+
 				// Output error message
 				if ($objExc->Class == 'Shipment') {
 					$this->btnCancelCompleteShipment->Warning = sprintf('This shipment has been modified by another user. You must <a href="shipment_edit.php?intShipmentId=%s">Refresh</a> to edit this shipment.', $this->objShipment->ShipmentId);
@@ -3282,13 +3318,13 @@
 				}
 			}
 		}
-		
+
 		// Save new or existing shipment
 		// This does not complete a shipment
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$blnError = false;
-			
+
 			if ($this->objAssetTransactionArray && $this->objInventoryTransactionArray) {
 				$intEntityQtypeId = EntityQtype::AssetInventory;
 			}
@@ -3302,7 +3338,7 @@
 				$blnError = true;
 				$this->btnCancel->Warning = 'There are no assets or inventory in this shipment.';
 			}
-			
+
 			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
 				if ($objShipment = Shipment::LoadByShipmentNumber($this->txtShipmentNumber->Text)) {
 					if ($objShipment->ShipmentId != $this->objShipment->ShipmentId) {
@@ -3311,9 +3347,9 @@
 					}
 				}
 			}
-			
+
 			if($this->lstFxServiceType->SelectedValue)
-			{			
+			{
 				$objtoFxAddress = Address::Load($this->lstToAddress->SelectedValue);
 				if (!$objtoFxAddress || !$objtoFxAddress->PostalCode || !$objtoFxAddress->CountryId || !$objtoFxAddress->Address1) {
 					$blnError = true;
@@ -3324,7 +3360,7 @@
 					$blnError = true;
 					$this->lstFxServiceType->Warning = "Not a valid From Address.";
 				}
-				
+
 				$objfromFxContact = Contact::Load($this->lstFromContact->SelectedValue);
 				if (!$objfromFxContact) {
 					$blnError = true;
@@ -3339,14 +3375,14 @@
 					$blnError = true;
 					$this->lstFxServiceType->Warning = "The Shipping Company must have a telephone number.";
 				}
-		
+
 				$objShippingAccount = ShippingAccount::Load($this->lstShippingAccount->SelectedValue);
 				if (!$objShippingAccount) {
 					$blnError = true;
 					$this->lstFxServiceType->Warning = "Not a valid Shipping Account.";
-				}			
+				}
 /*				$fed = new FedExDC($objShippingAccount->Value);
-				
+
 				$aRet = $fed->subscribe(
 					array(
 						1 => $this->lblShipmentNumber->Text, // Don't really need this but can be used for ref
@@ -3360,7 +3396,7 @@
 						4015 => $this->FxStrip($objfromFxCompany->Telephone),
 					)
 				);
-				
+
 				if ($error = $fed->getError()) {
 					$blnError = true;
 					$this->lstFxServiceType->Warning = $error;
@@ -3373,24 +3409,24 @@
 					$this->objShipment->FedexMeterNumber = $aRet[498];
 				}*/
 			}
-			
+
 			if (!$blnError) {
-				
+
 				if (!$this->blnEditMode) {
-					
+
 					try {
 						// Get an instance of the database
 						$objDatabase = QApplication::$Database[1];
 						// Begin a MySQL Transaction to be either committed or rolled back
 						$objDatabase->TransactionBegin();
-						
+
 						// Create the new transaction object and save it
 						$this->objTransaction = new Transaction();
 						$this->objTransaction->EntityQtypeId = $intEntityQtypeId;
 						$this->objTransaction->TransactionTypeId = 6;
 						$this->objTransaction->Note = $this->txtNote->Text;
 						$this->objTransaction->Save();
-						
+
 						if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
 						// Assign different source and destinations depending on transaction type
 							foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -3412,19 +3448,29 @@
 											$objReceiptAsset->AssetCode = $objAssetTransaction->NewAsset->AssetCode;
 										}
 										$objReceiptAsset->Save();
-										
+
 										// Assign any default custom field values
 										CustomField::AssignNewEntityDefaultValues(1, $objReceiptAsset->AssetId);
-										
+
 										// Associate the new Asset with the AssetTransaction
 										$objAssetTransaction->NewAsset = $objReceiptAsset;
 									}
 									// $objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 									$objAssetTransaction->Save();
+									$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode);
+									if ($objLinkedAssetArray) {
+									  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+									    $objLinkedAssetTransaction = new AssetTransaction();
+          						$objLinkedAssetTransaction->AssetId = $objLinkedAsset->AssetId;
+          						$objLinkedAssetTransaction->SourceLocationId = $objLinkedAsset->LocationId;
+          						$objLinkedAssetTransaction->TransactionId = $objAssetTransaction->TransactionId;
+          						$objLinkedAssetTransaction->Save();
+									  }
+									}
 								}
 							}
 						}
-						
+
 						if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
 							// Assign different source and destinations depending on transaction type
 							foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
@@ -3436,16 +3482,16 @@
 								$objInventoryTransaction->Save();
 							}
 						}
-					
+
 						$this->UpdateShipmentFields();
 						$this->objShipment->ShippedFlag = false;
 						$this->objShipment->Save();
-						
+
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
 							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
-						}				
-				
+						}
+
 						// If the courier is FedEx, create new fedexShipment
 						if ($this->lstCourier->SelectedValue === 1) {
 							$this->objFedexShipment = new FedexShipment();
@@ -3453,15 +3499,15 @@
 							$this->UpdateFedexFields();
 							$this->objFedexShipment->Save();
 						}
-								
+
 						$objDatabase->TransactionCommit();
 						QApplication::Redirect('shipment_list.php');
 					}
 					catch (QExtendedOptimisticLockingException $objExc) {
-						
+
 						// Rollback the database
 						$objDatabase->TransactionRollback();
-						
+
 						if ($objExc->Class == 'Asset') {
 							// $this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
 							$this->btnRemoveAssetTransaction_Click($this->FormId, null, $objExc->EntityId);
@@ -3486,18 +3532,18 @@
 					}
 				}
 				elseif ($this->blnEditMode) {
-					
+
 					try {
 						// Get an instance of the database
 						$objDatabase = QApplication::$Database[1];
 						// Begin a MySQL Transaction to be either committed or rolled back
 						$objDatabase->TransactionBegin();
-					
+
 						$this->objTransaction = Transaction::Load($this->objShipment->TransactionId);
 						$this->objTransaction->EntityQtypeId = $intEntityQtypeId;
 						$this->objTransaction->Note = $this->txtNote->Text;
 						$this->objTransaction->Save();
-						
+
 						// Remove AssetTransactions that were removed when editing
 						if ($this->arrAssetTransactionToDelete) {
 							foreach ($this->arrAssetTransactionToDelete as $intAssetTransactionId) {
@@ -3517,7 +3563,7 @@
 								}
 							}
 						}
-						
+
 						// Save new AssetTransactions
 						if ($this->objAssetTransactionArray) {
 							foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -3532,7 +3578,7 @@
 									// $objAssetTransaction->Asset->LocationId = $DestinationLocationId;
 									// $objAssetTransaction->Asset->Save();
 								}
-								
+
 								if ($objAssetTransaction->ScheduleReceiptFlag && $objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset && !$objAssetTransaction->NewAssetId) {
 									$objReceiptAsset = new Asset();
 									$objReceiptAsset->AssetModelId = $objAssetTransaction->NewAsset->AssetModelId;
@@ -3544,18 +3590,18 @@
 										$objReceiptAsset->AssetCode = $objAssetTransaction->NewAsset->AssetCode;
 									}
 									$objReceiptAsset->Save();
-									
+
 									// Assign any default custom field values
 									CustomField::AssignNewEntityDefaultValues(1, $objReceiptAsset->AssetId);
-									
+
 									// Associate the new Asset with the AssetTransaction
 									$objAssetTransaction->NewAsset = $objReceiptAsset;
-								}								
-								
+								}
+
 								$objAssetTransaction->Save();
 							}
 						}
-						
+
 						// Remove InventoryTransactions
 						if ($this->arrInventoryTransactionToDelete) {
 							foreach ($this->arrInventoryTransactionToDelete as $intInventoryTransactionId) {
@@ -3571,7 +3617,7 @@
 								}
 							}
 						}
-						
+
 						// Save InventoryTransactions
 						if ($this->objInventoryTransactionArray) {
 							foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
@@ -3589,16 +3635,16 @@
 								}
 							}
 						}
-						
+
 						$this->UpdateShipmentFields();
 						// $this->objShipment->Save(false, true);
 						$this->objShipment->Save();
-						
+
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
 							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
 						}
-						
+
 						// If the courier is FedEx, save the fedexShipment
 						if ($this->lstCourier->SelectedValue === 1) {
 							if ($this->objFedexShipment) {
@@ -3617,12 +3663,12 @@
 							$this->objFedexShipment->Delete();
 							$this->objFedexShipment = null;
 						}
-						
+
 						$objDatabase->TransactionCommit();
 						$this->UpdateShipmentLabels();
 						$this->SetupShipment();
 						$this->DisplayLabels();
-						
+
 						if ($this->objShipment->CourierId == 1) {
 							$this->txtTrackingNumber->Enabled = false;
 							$this->lstPackageType->Enabled = true;
@@ -3631,15 +3677,15 @@
 							$this->txtTrackingNumber->Enabled = true;
 							$this->lstPackageType->Enabled = false;
 						}
-						
-						// Reload lstPackageType 
+
+						// Reload lstPackageType
 						$this->lstPackageType->RemoveAllItems();
 						$this->LoadPackageTypes();
 					}
 					catch (QExtendedOptimisticLockingException $objExc) {
-						
+
 						$objDatabase->TransactionRollback();
-						
+
 						if ($objExc->Class == 'Shipment') {
 							$this->btnCancel->Warning = sprintf('This shipment has been modified by another user. You must <a href="shipment_edit.php?intShipmentId=%s">Refresh</a> to edit this shipment.', $this->objShipment->ShipmentId);
 						}
@@ -3669,7 +3715,7 @@
 				}
 			}
 		}
-		
+
 		// Save Exchange Button Click
 		protected function btnSaveExchange_Click($strFormId, $strControlId, $strParameter) {
 			$intTempId = $this->dlgExchange->ActionParameter;
@@ -3715,7 +3761,7 @@
 									$strAssetCode = $this->txtReceiptAssetCode->Text;
 								}*/
 								$objReceiptAsset->AssetCode = $strAssetCode;
-								$objAssetTransaction->NewAsset = $objReceiptAsset;								
+								$objAssetTransaction->NewAsset = $objReceiptAsset;
 							}
 						}
 					}
@@ -3726,10 +3772,10 @@
 				}
 			}
 		}
-		
+
 		// Cancel Exchange Button Click
 		protected function btnCancelExchange_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$intTempId = $this->dlgExchange->ActionParameter;
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -3742,12 +3788,12 @@
 					}
 				}
 			}
-			
+
 			$this->dlgExchange->ActionParameter = null;
 			$this->dlgExchange->HideDialogBox();
 			$this->dtpScheduleReceiptDueDate->DateTime = null;
 		}
-		
+
 		// Save Due Date Button Click
 		protected function btnSaveDueDate_Click($strFormId, $strControlId, $strParameter) {
 			$intTempId = $this->dlgDueDate->ActionParameter;
@@ -3761,21 +3807,21 @@
 				}
 			}
 			$this->blnModifyAssets = true;
-			
+
 			$this->dlgDueDate->HideDialogBox();
 			$this->dlgDueDate->ActionParameter = null;
 			$this->dtpScheduleReceiptDueDate->DateTime = null;
-			
+
 		}
-		
+
 		// Cancel Due Date Button Click
 		protected function btnCancelDueDate_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$this->dlgDueDate->HideDialogBox();
 			$this->blnModifyAssets = true;
 			$this->dtpScheduleReceiptDueDate->DateTime = null;
 		}
-		
+
 		// This method triggers if the Advanced label gets clicked. It shows or hides the advanced fields for scheduling receipts
 		protected function lblAdvanced_Click($strFormId, $strControlId, $strParameter) {
 			if ($this->lblAdvanced->Text == 'Show Advanced') {
@@ -3797,7 +3843,7 @@
 				$this->lblAdvanced->Text = 'Show Advanced';
 			}
 		}
-		
+
 		// This method triggers when the Schedule Receipt checkbox gets clicked
 		protected function chkScheduleReceipt_Click($strFormId, $strControlId, $strParameter) {
 			if ($this->chkScheduleReceipt->Checked) {
@@ -3811,11 +3857,11 @@
 				$this->chkAutoGenerateAssetCode->Enabled = false;
 			}
 		}
-		
+
 		//*****************
 		// CUSTOM METHODS
 		//*****************
-		
+
 		// Protected Update Methods
 		// This assigns the new values to the Shipment Object
 		protected function UpdateShipmentFields() {
@@ -3823,7 +3869,7 @@
 				//$this->objShipment->TransactionId = $this->objTransaction->TransactionId;
 				$this->objShipment->Transaction = $this->objTransaction;
 			}
-			
+
 			if ($this->blnEditMode) {
 				if (!$this->objTransaction) {
 					$this->objTransaction = Transaction::Load($this->objShipment->TransactionId);
@@ -3849,7 +3895,7 @@
 			//if (!$this->lstCourier->SelectedValue) {
 				$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
 			//}
-			
+
 			// Reload the Assets and inventory locations so that they don't trigger an OLE if completing the shipment without reloading after adding an asset or inventory.
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -3862,7 +3908,7 @@
 				}
 			}
 		}
-		
+
 		// This resets control values when Cancel is clicked
 		protected function UpdateShipmentControls() {
 			$this->lstToContact->SelectedValue = $this->objShipment->ToContactId;
@@ -3899,7 +3945,7 @@
 				$this->chkFedexNotifyRecipientDeliveryFlag->Checked = $this->objFedexShipment->NotifyRecipientDeliveryFlag;
 				$this->chkFedexNotifyOtherShipFlag->Checked = $this->objFedexShipment->NotifyOtherShipFlag;
 				$this->chkFedexNotifyOtherExceptionFlag->Checked = $this->objFedexShipment->NotifyOtherExceptionFlag;
-				$this->chkFedexNotifyOtherDeliveryFlag->Checked = $this->objFedexShipment->NotifyOtherDeliveryFlag;				
+				$this->chkFedexNotifyOtherDeliveryFlag->Checked = $this->objFedexShipment->NotifyOtherDeliveryFlag;
 				$this->lstFxServiceType->SelectedValue = $this->objFedexShipment->FedexServiceTypeId;
 				$this->lstPackageType->SelectedValue = $this->objFedexShipment->PackageTypeId;
 				$this->txtPackageWeight->Text = $this->objFedexShipment->PackageWeight;
@@ -3919,13 +3965,13 @@
 			}
 			$this->arrCustomFields = CustomField::UpdateControls($this->objShipment->objCustomFieldArray, $this->arrCustomFields);
 		}
-		
+
 		// Update FedEx Shipment Information
 		// Assigns new values to the fedexShipment object
 		protected function UpdateFedexFields() {
 			$this->objFedexShipment->ToPhone = $this->txtToPhone->Text;
 			$this->objFedexShipment->PayType = $this->lstBillTransportationTo->SelectedValue;
-			
+
 			if ($this->lstBillTransportationTo->SelectedValue === 1) {
 				$this->objFedexShipment->ShippingAccountId = $this->lstShippingAccount->SelectedValue;
 				$this->objFedexShipment->PayerAccountNumber = null;
@@ -3933,7 +3979,7 @@
 				$this->objFedexShipment->PayerAccountNumber = $this->txtRecipientThirdPartyAccount->Text;
 				$this->objFedexShipment->ShippingAccountId = null;
 			}
-			
+
 			$this->objFedexShipment->Reference = $this->txtReference->Text;
 			$this->objFedexShipment->NotifySenderEmail = $this->txtFedexNotifySenderEmail->Text;
 			$this->objFedexShipment->NotifyRecipientEmail = $this->txtFedexNotifyRecipientEmail->Text;
@@ -3946,7 +3992,7 @@
 			$this->objFedexShipment->NotifyRecipientDeliveryFlag = $this->chkFedexNotifyRecipientDeliveryFlag->Checked;
 			$this->objFedexShipment->NotifyOtherShipFlag = $this->chkFedexNotifyOtherShipFlag->Checked;
 			$this->objFedexShipment->NotifyOtherExceptionFlag = $this->chkFedexNotifyOtherExceptionFlag->Checked;
-			$this->objFedexShipment->NotifyOtherDeliveryFlag = $this->chkFedexNotifyOtherDeliveryFlag->Checked;			
+			$this->objFedexShipment->NotifyOtherDeliveryFlag = $this->chkFedexNotifyOtherDeliveryFlag->Checked;
 			$this->objFedexShipment->FedexServiceTypeId = $this->lstFxServiceType->SelectedValue;
 			$this->objFedexShipment->PackageTypeId = $this->lstPackageType->SelectedValue;
 			$this->objFedexShipment->PackageWeight = $this->txtPackageWeight->Text;
@@ -3964,26 +4010,26 @@
 			$this->objFedexShipment->HoldAtLocationState = $this->lstHoldAtLocationState->SelectedValue;
 			$this->objFedexShipment->HoldAtLocationPostalCode = $this->txtHoldAtLocationPostalCode->Text;
 		}
-		
+
 		// Load the Package Type options for the Shipment
 		protected function LoadPackageTypes() {
 			$this->lstPackageType->AddItem('- Select One -', null);
 			$objPackageTypeArray = PackageType::LoadAll(QQ::Clause(QQ::OrderBy(QQN::PackageType()->ShortDescription)));
 			if ($objPackageTypeArray) foreach ($objPackageTypeArray as $objPackageType) {
-		
+
 				// FedexServiceTypeId 6 = 'FedEx Ground', PackageTypeId 1 = 'Other Packaging'
 				// For FedEx Ground shipments, allow only 'Other Packaging'
 				if ($this->lstFxServiceType->SelectedValue == 6 && $objPackageType->PackageTypeId !== 1) {
 					continue;
 				}
 				$objListItem = new QListItem($objPackageType->__toString(), $objPackageType->PackageTypeId);
-				
+
 				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->PackageType) && ($this->objFedexShipment->PackageType->PackageTypeId == $objPackageType->PackageTypeId))
 					$objListItem->Selected = true;
 				$this->lstPackageType->AddItem($objListItem);
 			}
 		}
-		
+
 		// Load the Pay Type options for the Shipment
 		protected function LoadPayTypes() {
 			$objPayTypeArray = ($this->lstFxServiceType->SelectedValue == 6) ? FedExDC::get_ground_pay_types() : FedExDC::get_express_pay_types();
@@ -3992,13 +4038,13 @@
 				$this->lstBillTransportationTo->AddItem($objListItem);
 			}
 		}
-		
-		// Fedex	
+
+		// Fedex
 		protected function FedEx(){
-			
+
 			// create new FedExDC object
 			// $fed = new FedExDC($this->objShipment->ShippingAccount->Value);
-			
+
 			$fxWeightUnit = WeightUnit::Load($this->lstWeightUnit->SelectedValue);
 			$fxLengthUnit = LengthUnit::Load($this->lstLengthUnit->SelectedValue);
 			if ($fxLengthUnit) {
@@ -4007,15 +4053,15 @@
 			else {
 				$fxLengthUnitShortDescription = '';
 			}
-			
+
 			// Package Type
 			$fxPackageType = PackageType::Load($this->lstPackageType->SelectedValue);
-			
+
 			//$fxPackageCount // Not implemented yet - FIXME
-			
+
 			$shipdate = $this->FxStrip($this->calShipDate->DateTime->__toString(QDateTime::FormatSoap));
 			$shipdate = substr($shipdate,0,8);
-			
+
 			// create new FedExDC object
 			// $fed = new FedExDC($this->objShipment->ShippingAccount->Value, $this->objShipment->FedexMeterNumber);
 			if ($this->objFedexShipment->ShippingAccountId) {
@@ -4026,19 +4072,19 @@
 				$objFedexAccount = ShippingAccount::Load(QApplication::$TracmorSettings->FedexAccountId);
 				$fed = new FedExDC($objFedexAccount->AccessId, $objFedexAccount->AccessCode);
 			}
-			
+
 			if ($this->objFedexShipment->ToPhone) {
 				$strRecipientPhone = $this->objFedexShipment->ToPhone;
 			}
 			else {
 				$strRecipientPhone = '';
 			}
-							
+
 			if(($this->objShipment->FromAddress->__toStringCountryAbbreviation() != $this->objShipment->ToAddress->__toStringCountryAbbreviation()) && ($this->objShipment->FromAddress->__toStringCountryAbbreviation() <> 'US' || $this->objShipment->ToAddress->__toStringCountryAbbreviation() != 'CA') && ($this->objShipment->ToAddress->__toStringCountryAbbreviation() != 'US' || $this->objShipment->FromAddress->__toStringCountryAbbreviation() != 'CA'))
 			{
-				$fxIntlSSN = ''; //$this->objShipment->FromContact->Social								//Sender's SSN				
+				$fxIntlSSN = ''; //$this->objShipment->FromContact->Social								//Sender's SSN
 				$fxCurrencyUnit = CurrencyUnit::Load($this->lstCurrencyUnit->SelectedValue);
-				$fxIntlCurrencyUnit = $fxCurrencyUnit->ShortDescription;								//Recipient Currency				
+				$fxIntlCurrencyUnit = $fxCurrencyUnit->ShortDescription;								//Recipient Currency
 				$fxIntlCustomsValue = number_format(round($this->txtValue->Text,2), 2, '.', '');		//Total Customs Value
 				$fxIntlDutiesPayType = '1';																//Duties Pay Type
 				$fxIntlTermsofSale = '1';																//Terms of Sale
@@ -4046,12 +4092,12 @@
 			}
 			else
 			{
-				$fxIntlSSN = '';																		//Sender's SSN				
-				$fxIntlCurrencyUnit = '';																//Recipient Currency			
+				$fxIntlSSN = '';																		//Sender's SSN
+				$fxIntlCurrencyUnit = '';																//Recipient Currency
 				$fxIntlCustomsValue = '';																//Total Customs Value
 				$fxIntlDutiesPayType = '';																//Duties Pay Type
 				$fxIntlTermsofSale = '';																//Terms of Sale
-				$fxIntlPartiestoTransation = '';														//Parties to Transaction			
+				$fxIntlPartiestoTransation = '';														//Parties to Transaction
 			}
 
 				$fdx_arr = array(
@@ -4079,8 +4125,8 @@
 						59 => round($this->txtPackageLength->Text,0),									//Package Length
 						23 => $this->lstBillTransportationTo->SelectedValue,							//Recipient Pay Type
 						20 => ($this->lstBillTransportationTo->SelectedValue !== 1) ? 					//Payer Account Number
-							  $this->txtRecipientThirdPartyAccount->Text : 
-							  '', 
+							  $this->txtRecipientThirdPartyAccount->Text :
+							  '',
 						75 => strtoupper($fxWeightUnit->ShortDescription),								//Weight Units
 						1116 => strtoupper(substr($fxLengthUnitShortDescription,0,1)),					//Volume Units
 						1273 => $fxPackageType->Value,													//Packaging Type ; 01 = Customer Packaging
@@ -4107,7 +4153,7 @@
 						1266 => ($this->chkSaturdayDeliveryFlag->Checked) ? 'Y' : 'N',					//Saturday Delivery
 						1200 => ($this->chkHoldAtLocationFlag->Checked) ? 'Y' : 'N',					//Hold at Location flag
 						44 => ($this->chkHoldAtLocationFlag->Checked) ? 								//Hold at Location Address
-							  $this->txtHoldAtLocationAddress->Text : 
+							  $this->txtHoldAtLocationAddress->Text :
 							  '',
 						46 => ($this->chkHoldAtLocationFlag->Checked) ?									//Hold at Location City
 							  $this->txtHoldAtLocationCity->Text :
@@ -4130,21 +4176,21 @@
 				);
 
 			if($this->objFedexShipment->FedexServiceType->Value	== '92')
-			{	
+			{
 				$ship_Ret = $fed->ground_ship($fdx_arr);
 			}
 			else
 			{
 				$ship_Ret = $fed->express_ship($fdx_arr);
 			}
-		
-			if($error = $fed->getError()) 
+
+			if($error = $fed->getError())
 			{
 				$blnError = true;
 				$this->btnCompleteShipment->Warning = $error;
 				return false;
 			}
-			else 
+			else
 			{
 				// decode and save label
 				$this->txtTrackingNumber->Text = $ship_Ret[29];
@@ -4155,10 +4201,10 @@
 				return true;
 			}
 		}
-		
+
 		// Cancel a FedEx shipment using the FedExDC class
 		protected function FedExCancel(){
-			
+
 			// Create the new Fedex object
 			if ($this->objFedexShipment->ShippingAccountId) {
 				$fed = new FedExDC($this->objFedexShipment->ShippingAccount->AccessId, $this->objFedexShipment->ShippingAccount->AccessCode);
@@ -4168,19 +4214,19 @@
 				$objFedexAccount = ShippingAccount::Load(QApplication::$TracmorSettings->FedexAccountId);
 				$fed = new FedExDC($objFedexAccount->AccessId, $objFedexAccount->AccessCode);
 			}
-			
+
 			// create new FedExDC object
 			//$fed = new FedExDC($this->objShipment->ShippingAccount->Value, QApplication::$TracmorSettings->FedexMeterNumber);
-			
+
 			// Populate an array with the necessary information
 			$fdx_arr = array(
 					1 => $this->objShipment->ShipmentNumber,											//Shipment #
 					29 => $this->objShipment->TrackingNumber											//Tracking Number
 			);
-			
+
 			// If ground service
 			// if($this->objShipment->FedexServiceType->Value	== '92')
-			if ($this->objFedexShipment->FedexServiceType->Value == '92') {	
+			if ($this->objFedexShipment->FedexServiceType->Value == '92') {
 				$cancel_Ret = $fed->ground_cancel($fdx_arr);
 			}
 			// If express service
@@ -4196,21 +4242,21 @@
 			else {
 				return true;
 			}
-		}		
-		
+		}
+
 		// Strip function -- remove '-' and '(' and ')'
 		protected function FxStrip($txtValue) {
 			$txtValue = str_replace('-','',$txtValue);
 			$txtValue = str_replace('(','',$txtValue);
 			$txtValue = str_replace(')','',$txtValue);
 			$txtValue = str_replace(' ','',$txtValue);
-			
+
 			return $txtValue;
 		}
 
 
 		protected function DisplayLabels() {
-			
+
 			// Hide Inputs
 			$this->calShipDate->Display = false;
 			$this->lstFromCompany->Display = false;
@@ -4260,7 +4306,7 @@
 			$this->txtHoldAtLocationCity->Display = false;
 			$this->lstHoldAtLocationState->Display = false;
 			$this->txtHoldAtLocationPostalCode->Display = false;
-			
+
 			// Disable (instead of hiding) Fedex Notification checkboxes
 			$this->chkFedexNotifySenderShipFlag->Enabled = false;
 			$this->chkFedexNotifySenderExceptionFlag->Enabled = false;
@@ -4270,16 +4316,16 @@
 			$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = false;
 			$this->chkFedexNotifyOtherShipFlag->Enabled = false;
 			$this->chkFedexNotifyOtherExceptionFlag->Enabled = false;
-			$this->chkFedexNotifyOtherDeliveryFlag->Enabled = false;			
-			
+			$this->chkFedexNotifyOtherDeliveryFlag->Enabled = false;
+
 			// Disable (instead of hiding) FedEx Special Services checkboxes
 			$this->chkSaturdayDeliveryFlag->Enabled = false;
 			$this->chkHoldAtLocationFlag->Enabled = false;
-			
+
 /*			if ($this->lblAdvanced->Text == 'Hide Advanced') {
 				$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
 			}*/
-			
+
 			if (!$this->objShipment->ShippedFlag) {
 				//$this->lblAdvanced->Display = false;
 				$this->btnCancelCompleteShipment->Display = false;
@@ -4287,18 +4333,18 @@
 			else {
 				$this->btnCancelCompleteShipment->Display = true;
 			}
-			
+
 			$this->btnSave->Display = false;
 			$this->btnCancel->Display = false;
-			
+
 			if ($this->blnEditMode) {
-				
+
 				$this->dtgAssetTransact->RemoveColumnByName('Action');
 				$this->dtgInventoryTransact->RemoveColumnByName('Action');
 				$this->dtgAssetTransact->RemoveColumnByName('Advanced');
 				$this->dtgAssetTransact->RemoveColumnByName('Due Date');
 			}
-			
+
 			// Display Labels
 			$this->lblShipDate->Display = true;
 			$this->lblFromCompany->Display = true;
@@ -4336,12 +4382,12 @@
 			$this->lblHoldAtLocationCity->Display = true;
 			$this->lblHoldAtLocationState->Display = true;
 			$this->lblHoldAtLocationPostalCode->Display = true;
-			
+
 			// Display custom field labels
 			if ($this->arrCustomFields) {
 				CustomField::DisplayLabels($this->arrCustomFields);
 			}
-			
+
 			//if (!$this->objShipment->ShippedFlag) {
 			$this->btnEdit->Display = true;
 			//}
@@ -4352,7 +4398,7 @@
 				$this->btnCompleteShipment->Enabled = true;
 			}
 		}
-		
+
 		// Update the 'Text' values for all shipment labels for an ajax reload
 		protected function UpdateShipmentLabels() {
 			$this->lblShipDate->Text = $this->objShipment->ShipDate->__toString();
@@ -4368,7 +4414,7 @@
 			$this->lblCourier->Text = ($this->objShipment->CourierId) ? $this->objShipment->Courier->__toString() : "Other";
 			$this->lblTrackingNumber->Text = $this->objShipment->__toStringTrackingNumber();
 			$this->pnlNote->Text = nl2br($this->objShipment->Transaction->Note);
-			
+
 			if ($this->objFedexShipment) {
 				$this->lblToPhone->Text = $this->objFedexShipment->ToPhone;
 				$this->lblBillTransportationTo->Text = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::ground_pay_type($this->objFedexShipment->PayType) : FedExDC::express_pay_type($this->objFedexShipment->PayType);
@@ -4392,16 +4438,16 @@
 				$this->lblHoldAtLocationState->Text = ($this->objFedexShipment->HoldAtLocationStateObject) ? $this->objFedexShipment->HoldAtLocationStateObject->__toString() : '';
 				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
 			}
-			
+
 			// Update custom labels
 			if ($this->arrCustomFields) {
 				CustomField::UpdateLabels($this->arrCustomFields);
 			}
-			
-		}		
-		
+
+		}
+
 		protected function DisplayInputs() {
-			
+
 			// Hide Labels
 			$this->lblShipDate->Display = false;
 			$this->lblFromCompany->Display = false;
@@ -4416,8 +4462,8 @@
 			$this->lblCourier->Display = false;
 			$this->pnlNote->Display = false;
 			$this->lblTrackingNumber->Display = false;
-			
-			
+
+
 			$this->lblToPhone->Display = false;
 			$this->lblBillTransportationTo->Display = false;
 			$this->lblPayerAccount->Display = false;
@@ -4439,8 +4485,8 @@
 			$this->lblHoldAtLocationCity->Display = false;
 			$this->lblHoldAtLocationState->Display = false;
 			$this->lblHoldAtLocationPostalCode->Display = false;
-			
-			
+
+
 			// Show Inputs
 			if (!$this->objShipment->ShippedFlag) {
 				$this->calShipDate->Display = true;
@@ -4450,12 +4496,12 @@
 				$this->lstToCompany->Display = true;
 				$this->lstToContact->Display = true;
 				$this->lstToAddress->Display = true;
-			
-			
+
+
 				if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
 					$this->txtShipmentNumber->Display = true;
 				}
-			
+
 				$this->lstCourier->Display = true;
 				$this->txtTrackingNumber->Display = true;
 				$this->txtNewAssetCode->Display = true;
@@ -4466,7 +4512,7 @@
 				$this->lstSourceLocation->Display = true;
 				$this->txtQuantity->Display = true;
 				$this->btnAddInventory->Display = true;
-			
+
 				$this->txtToPhone->Display = true;
 				if ($this->lstBillTransportationTo->SelectedValue === 1) {
 					$this->lstShippingAccount->Display = true;
@@ -4477,7 +4523,7 @@
 				$this->txtReference->Display = true;
 				$this->txtFedexNotifySenderEmail->Display = true;
 				$this->txtFedexNotifyRecipientEmail->Display = true;
-				$this->txtFedexNotifyOtherEmail->Display = true;			
+				$this->txtFedexNotifyOtherEmail->Display = true;
 				$this->lstFxServiceType->Display = true;
 				$this->lstPackageType->Display = true;
 				$this->txtPackageWeight->Display = true;
@@ -4498,7 +4544,7 @@
 				$this->txtHoldAtLocationCity->Display = true;
 				$this->lstHoldAtLocationState->Display = true;
 				$this->txtHoldAtLocationPostalCode->Display = true;
-				
+
 				// Enable Fedex Notification Checkboxes (because they're disabled, not hidden)
 				$this->chkFedexNotifySenderShipFlag->Enabled = true;
 				$this->chkFedexNotifySenderExceptionFlag->Enabled = true;
@@ -4508,27 +4554,27 @@
 				$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = true;
 				$this->chkFedexNotifyOtherShipFlag->Enabled = true;
 				$this->chkFedexNotifyOtherExceptionFlag->Enabled = true;
-				$this->chkFedexNotifyOtherDeliveryFlag->Enabled = true;			
-				
+				$this->chkFedexNotifyOtherDeliveryFlag->Enabled = true;
+
 				//Enable FedEx Special Services Checkboxes (because they're disabled, not hidden)
 				$this->chkSaturdayDeliveryFlag->Enabled = true;
 				$this->chkHoldAtLocationFlag->Enabled = true;
 			}
-			
+
 			if ($this->blnEditMode) {
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			}
-			
+
 			// If the user is not authorized to edit built-in fields, the fields are render as labels.
 			// Also used if editing a completed shipment
-			if(!$this->blnEditBuiltInFields || $this->objShipment->ShippedFlag)	
-				$this->DisplayLabels();	
-				
-			$this->pnlNote->Display = false;	
-			$this->txtNote->Display = true;	
+			if(!$this->blnEditBuiltInFields || $this->objShipment->ShippedFlag)
+				$this->DisplayLabels();
+
+			$this->pnlNote->Display = false;
+			$this->txtNote->Display = true;
 			$this->btnEdit->Display = false;
 			$this->atcAttach->btnUpload->Display = false;
 			$this->btnSave->Display = true;
@@ -4536,69 +4582,69 @@
 			if ($this->blnEditMode) {
 				$this->btnCompleteShipment->Enabled = false;
 			}
-			
+
 			// Display custom field inputs
 	    if ($this->arrCustomFields) {
 	    	CustomField::DisplayInputs($this->arrCustomFields);
 	    }
 		}
-		
+
 		// This method is run when the company edit dialog box is closed
 		public function CloseNewPanel($blnUpdates) {
 			$this->dlgNew->HideDialogBox();
 		}
-		
+
 		public function CloseNewFromCompanyPanel($blnUpdates) {
 			$this->lstFromCompany_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
-		
+
 		public function CloseNewToCompanyPanel($blnUpdates) {
 			$this->lstToCompany_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
-		
+
 		public function CloseNewToContactPanel($blnUpdates) {
 			$this->lstToContact->Enabled = true;
 			$this->lstToContact_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
-		
+
 		public function CloseNewToAddressPanel($blnUpdates) {
 			$this->lstToAddress->Enabled = true;
 			$this->lstToAddress_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
-	//Set display logic of the BuiltInFields in View Access and Edit Access 
+	//Set display logic of the BuiltInFields in View Access and Edit Access
 		protected function UpdateBuiltInFields() {
-		//Set View Display Logic of Built-In Fields  
+		//Set View Display Logic of Built-In Fields
 		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Shipment,1);
 		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag)
 			$this->blnViewBuiltInFields=true;
 		else
 			$this->blnViewBuiltInFields=false;
 
-		//Set Edit Display Logic of Built-In Fields	
+		//Set Edit Display Logic of Built-In Fields
 		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Shipment,2);
 		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag)
 			$this->blnEditBuiltInFields=true;
 		else
 			$this->blnEditBuiltInFields=false;
 
-		
+
 		}
 		//Set display logic for the CustomFields
 		protected function UpdateCustomFields(){
 			if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
-						
+
 				//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
 				if (!$this->blnEditMode && !$objCustomField['blnEdit'] && $objCustomField['blnRequired']){
 					$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 					$objCustomField['lbl']->Display=true;
-					$objCustomField['input']->Display=false;			
-				}			
+					$objCustomField['input']->Display=false;
+				}
 			}
-			
+
 		}
 		//Set display logic of the GreenPlusButton of Address
 	protected function UpdateAddressAccess() {
@@ -4612,7 +4658,7 @@
 			$this->lblNewFromAddress->Visible=false;
 			$this->lblNewToAddress->Visible=false;
 		}
-			
+
 	}
 		//Set display logic of the GreenPlusButton of Company
 	protected function UpdateCompanyAccess() {
@@ -4626,7 +4672,7 @@
 			$this->lblNewFromCompany->Visible=false;
 			$this->lblNewToCompany->Visible=false;
 		}
-			
+
 	}
 		//Set display logic of the GreenPlusButton of Contact
 	protected function UpdateContactAccess() {
@@ -4640,7 +4686,7 @@
 			$this->lblNewFromContact->Visible=false;
 			$this->lblNewToContact->Visible=false;
 		}
-			
+
 	}
 	}
 
