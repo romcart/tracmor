@@ -335,7 +335,6 @@ CREATE FIELD METHODS
       $this->dlgAssetSearchTool->Height = '470px';
       $this->dlgAssetSearchTool->Overflow = QOverflow::Auto;
       $this->dlgAssetSearchTool->Padding = '10px';
-      $this->dlgAssetSearchTool->FontSize = '12px';
       $this->dlgAssetSearchTool->BackColor = '#ffffff';
       // Make sure this Dialog Box is "hidden"
       $this->dlgAssetSearchTool->Display = false;
