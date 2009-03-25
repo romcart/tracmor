@@ -104,6 +104,7 @@
 			$this->pnlColumnToggleMenu->Width = '130px';
 			$this->pnlColumnToggleMenu->BorderWidth = 1;
 			$this->pnlColumnToggleMenu->SetCustomStyle('padding', '2px');
+			$this->pnlColumnToggleMenu->SetCustomStyle('font-size', '10px');
 			$this->pnlColumnToggleMenu->BackColor = 'white';
 			$this->pnlColumnToggleMenu->Template = __INCLUDES__.'/qcodo/qform/pnl_column_toggle.tpl.php';
 			$this->pnlColumnToggleMenu->Display = false;

@@ -93,8 +93,11 @@ class QAssetSearchComposite extends QControl {
 
     // Enable/Disable AJAX for the datagrid
     $this->dtgAsset->UseAjax = $this->blnUseAjax;
+    
+    $this->dtgAsset->ShowColumnToggle = true;
+    $this->dtgAsset->ShowExportCsv = true;
 
-    if (!$blnRemoveAllLinks) {
+    /*if (!$blnRemoveAllLinks) {
       // Allow for column toggling
       $this->dtgAsset->ShowColumnToggle = true;
 
@@ -107,7 +110,7 @@ class QAssetSearchComposite extends QControl {
 
       // Disallow for CSV Export
       $this->dtgAsset->ShowExportCsv = false;
-    }
+    }*/
 
     // Add a 'Select All' checkbox
     $this->dtgAsset->ShowCheckboxes = false;

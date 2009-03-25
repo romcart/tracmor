@@ -147,6 +147,11 @@
 				
 		protected function pnlColumnToggleButton_Create() {
 			
+			$strParent = 'QControl';
+			if ($this->objParentControl->ParentControl instanceof QDialogBox) {
+				$strParent = 'QDialogBox';
+			}
+			
 			// Create the panel for the toggle button
 			$this->pnlColumnToggleButton = new QPanel($this);
 			$this->pnlColumnToggleButton->HorizontalAlign = QTextAlign::Right;
@@ -158,7 +163,7 @@
 			$this->lblColumnToggleButton->SetCustomStyle('cursor', 'pointer');
 			$this->lblColumnToggleButton->AddAction(new QMouseOverEvent(), new QJavaScriptAction("this.style.backgroundColor='#0000CC'; this.style.color='#FFFFFF'"));
 			$this->lblColumnToggleButton->AddAction(new QMouseOutEvent(), new QJavaScriptAction("this.style.backgroundColor=''; this.style.color=''"));
-			$this->lblColumnToggleButton->AddAction(new QClickEvent(), new QJavaScriptAction(sprintf('toggleColumnToggleDisplay(event, \'%s\', \'%s\')', $this->objColumnToggle->pnlColumnToggleMenu->ControlId, $this->pnlColumnToggleButton->ControlId)));
+			$this->lblColumnToggleButton->AddAction(new QClickEvent(), new QJavaScriptAction(sprintf('toggleColumnToggleDisplay(event, \'%s\', \'%s\', \'%s\')', $this->objColumnToggle->pnlColumnToggleMenu->ControlId, $this->pnlColumnToggleButton->ControlId, $strParent)));
 		}
 		
 		protected function GetPaginatorRowHtml($objPaginator) {
