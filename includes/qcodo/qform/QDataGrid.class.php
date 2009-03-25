@@ -148,7 +148,7 @@
 		protected function pnlColumnToggleButton_Create() {
 			
 			$strParent = 'QControl';
-			if ($this->objParentControl->ParentControl instanceof QDialogBox) {
+			if ($this->objParentControl && $this->objParentControl->ParentControl instanceof QDialogBox) {
 				$strParent = 'QDialogBox';
 			}
 			
