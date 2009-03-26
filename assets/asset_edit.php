@@ -92,7 +92,7 @@
 
 			$this->ctlAssetEdit_Create();
 
-			if (!$this->intTransactionTypeId) {
+			if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) {
   		  $this->lblChildAssets_Create();
   			$this->lblAssetCode_Create();
   			// Create Buttons
@@ -101,7 +101,8 @@
   			$this->btnLinkToParent_Create();
   			$this->btnUnlink_Create();
   			$this->AddChild_Create();
-  			$this->dlgAssetSearchTool_Create();
+  			$this->ctlAssetSearchTool_Create();
+  			//$this->dlgAssetSearchTool_Create();
 		  }
 
 			// Create the two composite controls
@@ -326,39 +327,8 @@ CREATE FIELD METHODS
 		  $this->lblAssetCode->Display = false;
 		}
 
-		// Create and Setup the Modal Window for Asset Search Tool
-		protected function dlgAssetSearchTool_Create() {
-		  $this->dlgAssetSearchTool = new QDialogBox($this);
-      $this->dlgAssetSearchTool->Text = '';
-
-      // Let's setup some basic appearance options
-      $this->dlgAssetSearchTool->Width = '900px';
-      $this->dlgAssetSearchTool->Height = '470px';
-      $this->dlgAssetSearchTool->Overflow = QOverflow::Auto;
-      $this->dlgAssetSearchTool->Padding = '10px';
-      $this->dlgAssetSearchTool->BackColor = '#ffffff';
-      // Make sure this Dialog Box is "hidden"
-      $this->dlgAssetSearchTool->Display = false;
-      $this->dlgAssetSearchTool->CssClass = 'modal_dialog';
-      $this->dlgAssetSearchTool->Template = 'asset_search_tool.tpl.php';
-
-      //$this->dlgAssetSearchTool->Position = QPosition::Absolute;
-      //$this->dlgAssetSearchTool->AddControlToMove();
-
-      $this->ctlAssetSearchTool = new QAssetSearchComposite($this->dlgAssetSearchTool, null, true, true, true);
-			$this->ctlAssetSearchTool->dtgAsset->ItemsPerPage = 10;
-
-			$this->btnAssetSearchToolAdd = new QButton($this->dlgAssetSearchTool);
-			$this->btnAssetSearchToolAdd->Text = "Add Selected";
-			$this->btnAssetSearchToolAdd->AddAction(new QClickEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
-			$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
-			$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-
-			$this->btnAssetSearchToolCancel = new QButton($this->dlgAssetSearchTool);
-			$this->btnAssetSearchToolCancel->Text = "Cancel";
-			$this->btnAssetSearchToolCancel->AddAction(new QClickEvent(), new QAjaxAction('btnAssetSearchToolCancel_Click'));
-			$this->btnAssetSearchToolCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAssetSearchToolCancel_Click'));
-			$this->btnAssetSearchToolCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		protected function ctlAssetSearchTool_Create() {
+		  $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
 		}
 
 		protected function btnChildAssetsRemove_Create() {
@@ -531,7 +501,7 @@ CREATE FIELD METHODS
         $this->ctlAssetSearchTool->Refresh();
       }
       $this->btnAssetSearchToolAdd->Text = "Add Selected";
-      $this->dlgAssetSearchTool->ShowDialogBox();
+      $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		  $this->intDlgStatus = 2;
 		}
 
@@ -544,7 +514,7 @@ CREATE FIELD METHODS
           $this->ctlAssetSearchTool->Refresh();
         }
         $this->btnAssetSearchToolAdd->Text = "Reassign";
-        $this->dlgAssetSearchTool->ShowDialogBox();
+        $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		    $this->intDlgStatus = 1;
 		  }
       else {
@@ -643,12 +613,12 @@ CREATE FIELD METHODS
 		  }
 		}
 
-		protected function btnAssetSearchToolAdd_Click() {
+		public function btnAssetSearchToolAdd_Click() {
 		  $this->btnAssetSearchToolCancel->Warning = "";
       switch ($this->intDlgStatus) {
         // Reassign
         case '1' :
-          $intSelectedAssetId = $this->ctlAssetSearchTool->dtgAsset->GetSelected("AssetId");
+          $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
           if (count($intSelectedAssetId) > 1) {
             $this->btnAssetSearchToolCancel->Warning = "You must select only one parent asset.";
           }
@@ -691,7 +661,7 @@ CREATE FIELD METHODS
                 }
 
                 $this->intAssetIdArray = array();
-                $this->dlgAssetSearchTool->HideDialogBox();
+                $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
                 $this->dtgChildAssets_Bind();
               }
             }
@@ -703,7 +673,7 @@ CREATE FIELD METHODS
           $intSelectedAssetCount = 0;
           $blnError = false;
           $arrCheckedAssets = array();
-          foreach ($this->ctlAssetSearchTool->dtgAsset->GetSelected("AssetId") as $intAssetId) {
+          foreach ($this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId") as $intAssetId) {
             $intSelectedAssetCount++;
             $objNewChildAsset = Asset::LoadByAssetId($intAssetId);
             if ($objNewChildAsset && $objNewChildAsset->ParentAssetCode) {
@@ -734,13 +704,13 @@ CREATE FIELD METHODS
             	//$objAsset->Save();
             	array_push($this->ctlAssetEdit->objChildAssetArray, $objAsset);
             }
-            $this->dlgAssetSearchTool->HideDialogBox();
+            $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
             $this->dtgChildAssets_Bind();
           }
           break;
         // Add Parent Asset Code
         case '3' :
-          $intSelectedAssetId = $this->ctlAssetSearchTool->dtgAsset->GetSelected("AssetId");
+          $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
           if (count($intSelectedAssetId) > 1) {
             $this->btnAssetSearchToolCancel->Warning = "You must select only one parent asset.";
           }
@@ -757,7 +727,7 @@ CREATE FIELD METHODS
             }
             else {
               $this->ctlAssetEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
-              $this->dlgAssetSearchTool->HideDialogBox();
+              $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
             }
           }
           break;
@@ -768,11 +738,6 @@ CREATE FIELD METHODS
 
       // Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
-		}
-
-		protected function btnAssetSearchToolCancel_Click() {
-		  $this->btnAssetSearchToolCancel->Warning = "";
-		  $this->dlgAssetSearchTool->HideDialogBox();
 		}
 
 		// Display the edit form
@@ -871,7 +836,7 @@ CREATE FIELD METHODS
         $this->ctlAssetSearchTool->Refresh();
       }
       $this->btnAssetSearchToolAdd->Text = "Add Parent Asset";
-      $this->dlgAssetSearchTool->ShowDialogBox();
+      $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		  $this->intDlgStatus = 3;
 		}
 	}

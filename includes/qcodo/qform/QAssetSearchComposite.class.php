@@ -93,7 +93,7 @@ class QAssetSearchComposite extends QControl {
 
     // Enable/Disable AJAX for the datagrid
     $this->dtgAsset->UseAjax = $this->blnUseAjax;
-    
+
     $this->dtgAsset->ShowColumnToggle = true;
     $this->dtgAsset->ShowExportCsv = true;
 

@@ -36,7 +36,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			}
 			elseif ($objNewAsset->LinkedFlag) {
 			  $blnError = true;
-			  $strWarning .= $strAssetCode." - That asset code has linked to parent asset.";
+			  $strWarning .= $strAssetCode." - That asset code is linked to a parent asset.";
 			}
 			// Asset must either be 'To Be Received' or 'Shipped'
 			elseif (!($objNewAsset->LocationId == 5 || $objNewAsset->LocationId == 2)) {
@@ -94,15 +94,19 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     	$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
     	$objAssetTransaction->Save();
 
-    	// Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
-			/*$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
-			// Move the asset to the new location
-			$objAssetTransaction->Asset->LocationId = $intDestinationLocationId;
-			$objAssetTransaction->Asset->Save();
-			$objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
-			*/
-			$objAsset->LocationId = $intDestinationLocationId;
+    	$objAsset->LocationId = $intDestinationLocationId;
 			$objAsset->Save();
+
+			if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAsset->AssetCode)) {
+  		  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+  		    $objLinkedAsset->LocationId = $intDestinationLocationId;
+  		    $objLinkedAsset->Save();
+  		    if ($objChildPendingReceipt = AssetTransaction::PendingReceipt($objLinkedAsset->AssetId)) {
+  		      $objChildPendingReceipt->DestinationLocationId = $intDestinationLocationId;
+  		      $objChildPendingReceipt->Save();
+  		    }
+  		  }
+  		}
     }
 
   	foreach ($arrPendingReceiptId as $intReceiptId) {

@@ -247,7 +247,15 @@
 				$this->blnModifyAssets = false;
 				$this->dtgAssetTransact->TotalItemCount = count($this->objAssetTransactionArray);
 				if ($this->dtgAssetTransact->TotalItemCount > 0) {
-					$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
+				  // Create new array without child assets
+				  $objAssetTransactionArray = array();
+				  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+				    if (!$objAssetTransaction->Asset->LinkedFlag) {
+				      $objAssetTransactionArray[] = $objAssetTransaction;
+				    }
+				  }
+				  $this->dtgAssetTransact->TotalItemCount = count($objAssetTransactionArray);
+					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;
 					$this->dtgAssetTransact->ShowHeader = true;
 				}
 				else {
@@ -1398,6 +1406,8 @@
 
 			$intTempId = $strParameter;
 			if ($this->objAssetTransactionArray) {
+				// Clone objAssetTransactionArray to search child assets
+			  $objNewAssetTransactionArray = array_merge($this->objAssetTransactionArray, array());
 				foreach ($this->objAssetTransactionArray as $key => $value) {
 					if ($value->Asset->TempId == $intTempId) {
 						// Prepare to delete from the database when the Save button is clicked
@@ -1406,6 +1416,15 @@
 						}
 						$this->blnModifyAssets = true;
 						unset ($this->objAssetTransactionArray[$key]);
+						// If the asset in transaction have some children
+						foreach ($objNewAssetTransactionArray as $key2 => $value2) {
+						  if ($value2->Asset->ParentAssetCode = $value->Asset->AssetCode) {
+						    if ($this->blnEditMode) {
+						      $this->arrAssetTransactionToDelete[] = $value2->AssetTransactionId;
+						    }
+						    unset ($this->objAssetTransactionArray[$key2]);
+						  }
+						}
 					}
 				}
 			}
@@ -1502,7 +1521,17 @@
 					// This boolean later lets us know if we need to flip the ReceivedFlag
 					$blnAllAssetsReceived = true;
 					$this->dtgAssetTransact->Warning = "";
-					foreach ($this->objAssetTransactionArray as &$objAssetTransaction) {
+					$objAssetTransactionArray = array();
+					$objLinkedAssetTransactionArray = array();
+					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+					  if (!$objAssetTransaction->Asset->LinkedFlag) {
+					    $objAssetTransactionArray[] = $objAssetTransaction;
+					  }
+					  else {
+					    $objLinkedAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
+					  }
+					}
+			    foreach ($objAssetTransactionArray as &$objAssetTransaction) {
 						if ($objAssetTransaction->AssetTransactionId == $intAssetTransactionId) {
 							// Get the value of the location where this Asset is being received to
 							$lstLocationAssetReceived = $this->GetControl('lstLocationAssetReceived' . $objAssetTransaction->AssetTransactionId);
@@ -1520,20 +1549,15 @@
   								// Move the asset to the new location
   								$objAssetTransaction->Asset->LocationId = $lstLocationAssetReceived->SelectedValue;
   								$objAssetTransaction->Asset->Save();
-  								if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
-  								  foreach ($objLinkedAssetArray as $objLinkedAsset) {
-  								    $objNewAssetTransaction = AssetTransaction::LoadArrayByAssetId($objLinkedAsset->AssetId, QQ::Clause(QQ::OrderBy(QQN::AssetTransaction()->AssetTransactionId, false)));
-  								    // Load the last AssetTransaction
-  								    $objNewAssetTransaction[0]->DestinationLocationId = $lstLocationAssetReceived->SelectedValue;
-  								    $objNewAssetTransaction[0]->Save();
-  								    // Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
-      								$objAssetTransaction = AssetTransaction::Load($objNewAssetTransaction[0]->AssetTransactionId);
-      								// Move the asset to the new location
-      								$objLinkedAsset->LocationId = $lstLocationAssetReceived->SelectedValue;
-      								$objLinkedAsset->Save();
-  								  }
-  								}
-  								$objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
+                  if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode))
+    								foreach ($objLinkedAssetArray as $objLinkedAsset) {
+          						$objLinkedAssetTransaction = $objLinkedAssetTransactionArray[$objLinkedAsset->AssetCode];
+          					  $objLinkedAssetTransaction->DestinationLocationId = $lstLocationAssetReceived->SelectedValue;
+          						$objLinkedAssetTransaction->Save();
+          						$objLinkedAssetTransaction->Asset->LocationId = $lstLocationAssetReceived->SelectedValue;
+          						$objLinkedAssetTransaction->Asset->Save();
+          					}
+        				  $objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
 							  }
 							}
 							else {

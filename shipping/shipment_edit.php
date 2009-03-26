@@ -442,7 +442,15 @@
 				$this->blnModifyAssets = false;
 				$this->dtgAssetTransact->TotalItemCount = count($this->objAssetTransactionArray);
 				if ($this->dtgAssetTransact->TotalItemCount > 0) {
-					$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
+				  // Create new array without child assets
+				  $objAssetTransactionArray = array();
+				  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+				    if (!$objAssetTransaction->Asset->LinkedFlag) {
+				      $objAssetTransactionArray[] = $objAssetTransaction;
+				    }
+				  }
+				  $this->dtgAssetTransact->TotalItemCount = count($objAssetTransactionArray);
+					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;
 					$this->dtgAssetTransact->ShowHeader = true;
 				}
 				else {
@@ -2587,6 +2595,7 @@
 					else {
 					  $objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objNewAsset->AssetCode);
 					  $strAssetCodeArray = array();
+					  $objCheckedLinkedAssetArray = array();
 					  if ($objLinkedAssetArray) {
 					    foreach ($objLinkedAssetArray as $objLinkedAsset) {
 					      if (!QApplication::AuthorizeEntityBoolean($objLinkedAsset, 2)) {
@@ -2596,6 +2605,7 @@
 					      }
 					      else {
 					        $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+					        $objCheckedLinkedAssetArray[] = $objLinkedAsset;
 					      }
 					    }
 					    if (!$blnError) {
@@ -2665,6 +2675,14 @@
 						}*/
 						$this->objAssetTransactionArray[] = $objNewAssetTransaction;
 						$this->blnModifyAssets = true;
+
+						foreach ($objCheckedLinkedAssetArray as $objCheckedLinkedAsset) {
+						  $objPendingShipment = AssetTransaction::PendingShipment($objCheckedLinkedAsset->AssetId);
+						  $objLinkedAssetTransaction = new AssetTransaction();
+  						$objLinkedAssetTransaction->AssetId = $objCheckedLinkedAsset->AssetId;
+  						$objLinkedAssetTransaction->SourceLocationId = $objCheckedLinkedAsset->LocationId;
+  						$this->objAssetTransactionArray[] = $objLinkedAssetTransaction;
+						}
 					}
 				}
 			}
@@ -2742,6 +2760,8 @@
 
 			$intTempId = $strParameter;
 			if ($this->objAssetTransactionArray) {
+			  // Clone objAssetTransactionArray to search child assets
+			  $objNewAssetTransactionArray = array_merge($this->objAssetTransactionArray, array());
 				foreach ($this->objAssetTransactionArray as $key => $value) {
 					if ($value->Asset->TempId == $intTempId) {
 						// Prepare to delete from the database when the Save button is clicked
@@ -2750,6 +2770,15 @@
 						}
 						$this->blnModifyAssets = true;
 						unset ($this->objAssetTransactionArray[$key]);
+						// If the asset in transaction have some children
+						foreach ($objNewAssetTransactionArray as $key2 => $value2) {
+						  if ($value2->Asset->ParentAssetCode = $value->Asset->AssetCode) {
+						    if ($this->blnEditMode) {
+						      $this->arrAssetTransactionToDelete[] = $value2->AssetTransactionId;
+						    }
+						    unset ($this->objAssetTransactionArray[$key2]);
+						  }
+						}
 					}
 				}
 			}
@@ -3021,18 +3050,6 @@
 									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
 								}
 								$objAssetTransaction->DestinationLocationId = $DestinationLocationId;
-								/*if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
-								  foreach ($objLinkedAssetArray as $objLinkedAsset) {
-                    // Load the last AssetTransaction
-								    if ($objLinkedAssetTransaction = AssetTransaction::LoadArrayByAssetId($objLinkedAsset->AssetId, QQ::Clause(QQ::OrderBy(QQN::AssetTransaction()->AssetTransactionId, false)))) {
-                      $objLinkedAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
-                      $objLinkedAssetTransaction->DestinationLocationId = $DestinationLocationId;
-                      $objLinkedAssetTransaction->Save();
-                    }
-                    $objLinkedAsset->LocationId = $DestinationLocationId;
-                    $objLinkedAsset->Save();
-								  }
-								}*/
 
 								if ($objAssetTransaction->ScheduleReceiptFlag) {
 
@@ -3457,7 +3474,7 @@
 									}
 									// $objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 									$objAssetTransaction->Save();
-									$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode);
+									/*$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode);
 									if ($objLinkedAssetArray) {
 									  foreach ($objLinkedAssetArray as $objLinkedAsset) {
 									    $objLinkedAssetTransaction = new AssetTransaction();
@@ -3466,7 +3483,7 @@
           						$objLinkedAssetTransaction->TransactionId = $objAssetTransaction->TransactionId;
           						$objLinkedAssetTransaction->Save();
 									  }
-									}
+									}*/
 								}
 							}
 						}
