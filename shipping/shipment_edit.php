@@ -2698,6 +2698,10 @@
 			$intTempId = $strParameter;
 			$lstAdvanced = $this->GetControl($strControlId);
 			if ($this->objAssetTransactionArray) {
+			  $objNewAssetTransactionArray = array();
+			  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+			    $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
+			  }
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 					if ($objAssetTransaction->Asset->TempId == $intTempId) {
 						$lblDueDate = $this->GetControl('lblDueDate' . $intTempId);
@@ -2708,6 +2712,16 @@
 							$objAssetTransaction->NewAssetId = null;
 							$objAssetTransaction->NewAsset = null;
 							$lblDueDate->Visible = false;
+
+							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+							    $objLinkedAssetTransaction->ScheduleReceiptFlag = false;
+    							$objLinkedAssetTransaction->NewAssetFlag = false;
+    							$objLinkedAssetTransaction->NewAssetId = null;
+    							$objLinkedAssetTransaction->NewAsset = null;
+							  }
+							}
 						}
 						// Return
 						elseif ($lstAdvanced->SelectedValue == 1) {
@@ -2716,6 +2730,16 @@
 							$objAssetTransaction->NewAssetId = null;
 							$objAssetTransaction->NewAsset = null;
 							$lblDueDate->Visible = true;
+
+							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+							    $objLinkedAssetTransaction->ScheduleReceiptFlag = true;
+    							$objLinkedAssetTransaction->NewAssetFlag = false;
+    							$objLinkedAssetTransaction->NewAssetId = null;
+    							$objLinkedAssetTransaction->NewAsset = null;
+							  }
+							}
 						}
 						// Exchange
 						elseif ($lstAdvanced->SelectedValue == 2) {
@@ -2724,6 +2748,14 @@
 							$this->dlgExchange->ActionParameter = $intTempId;
 							$this->dlgExchange->ShowDialogBox();
 							$lblDueDate->Visible = true;
+
+							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+							    $objLinkedAssetTransaction->ScheduleReceiptFlag = true;
+    							$objLinkedAssetTransaction->NewAssetFlag = true;
+							  }
+							}
 						}
 					}
 				}
@@ -3035,13 +3067,20 @@
 
 						$objTransaction = '';
 						$objReceipt = '';
-
+            $objNewAssetTransactionArray = array();
+            foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+              $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
+            }
 						// Assign a destinationLocation to the AssetTransaction, and change the Location of the asset
 						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 							if ($objAssetTransaction->Asset instanceof Asset) {
 
 								// LocationId #2 == Shipped
 								$DestinationLocationId = 2;
+
+								if ($objAssetTransaction->ScheduleReceiptFlag && $objAssetTransaction->Asset->LinkedFlag) {
+								  $objAssetTransaction = $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode];
+								}
 
 								$objAssetTransaction->Asset->LocationId = $DestinationLocationId;
 								$objAssetTransaction->Asset->Save();
@@ -3051,7 +3090,7 @@
 								}
 								$objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 
-								if ($objAssetTransaction->ScheduleReceiptFlag) {
+								if ($objAssetTransaction->ScheduleReceiptFlag && !$objAssetTransaction->Asset->LinkedFlag) {
 
 									if ($objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset && $objAssetTransaction->NewAsset->AssetId == null) {
 										// We have to create the new asset before we can
@@ -3121,6 +3160,33 @@
 									// It should not be true on the new AssetTransaction, but only on the AssetTransaction that caused the new asset to be created.
 									// $objReceiptAssetTransaction->NewAssetFlag = true;
 									$objReceiptAssetTransaction->Save();
+
+									// Load all child assets
+									if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+									  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+									    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+									    $objLinkedReceiptAssetTransaction = new AssetTransaction();
+									    // If this is a return
+									    if (!$objAssetTransaction->NewAssetId) {
+									      $objLinkedReceiptAssetTransaction->AssetId = $objLinkedAssetTransaction->AssetId;
+									      $objLinkedReceiptAssetTransaction->TransactionId = $objTransaction->TransactionId;
+    									$objLinkedReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->DestinationLocationId;
+    									$objLinkedReceiptAssetTransaction->Save();
+									    }
+									    // If this is an exchange
+									    else {
+                        // Both the shipmentAssetTranscation (objAssetTransaction and the objReceiptAssetTransaction were involved in creating a new asset
+    										// Asset Transactions where NewAssetFlag = true but AssetId is NULL are receipt asset transactions for exchanges.
+    										$objLinkedReceiptAssetTransaction->AssetId = $objAssetTransaction->NewAssetId;
+    										//$objLinkedReceiptAssetTransaction->NewAssetFlag = true;
+    										//$objLinkedAssetTransaction->NewAssetFlag = true;
+    										//$objLinkedAssetTransaction->Save();
+									    }
+
+
+    									$objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode] = $objLinkedAssetTransaction;
+									  }
+									}
 
 								}
 								$objAssetTransaction->Save();

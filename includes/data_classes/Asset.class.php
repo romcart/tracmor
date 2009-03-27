@@ -702,6 +702,12 @@
 			*/
 		}
 
+		/**
+		 * Loads array of Child Linked Asset Objects
+		 *
+		 * @param string $strParentAssetCode Asset Code of the parent asset to load linked assets
+		 * @return mixed
+		 */
 		public function LoadChildLinkedArrayByParentAssetCode($strParentAssetCode) {
 		  $objLinkedAssetArray = array();
 		  $objChildAssetArray = Asset::LoadArrayByParentAssetCodeLinkedFlag($strParentAssetCode, 1);
@@ -720,6 +726,25 @@
 		  else {
 		    return false;
 		  }
+		}
+
+		/**
+		 * Set the child's parent_asset_code to NULL by Parent Asset Code
+		 *
+		 * @param string $strAssetCode
+		 */
+		public function ResetParentAssetCodeToNullByAssetCode($strAssetCode) {
+		  $strQuery = sprintf("
+				UPDATE
+					`asset` AS `asset`
+				SET
+				  `asset`.`parent_asset_code` = NULL
+				WHERE
+				  `asset`.`parent_asset_code` = '%s'
+			", $strAssetCode);
+
+		  $objDatabase = QApplication::$Database[1];
+		  $objDatabase->NonQuery($strQuery);
 		}
 
 		/**
