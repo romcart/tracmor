@@ -738,7 +738,8 @@
 				UPDATE
 					`asset` AS `asset`
 				SET
-				  `asset`.`parent_asset_code` = NULL
+				  `asset`.`parent_asset_code` = NULL,
+				  `asset`.`linked_flag` = '0'
 				WHERE
 				  `asset`.`parent_asset_code` = '%s'
 			", $strAssetCode);
