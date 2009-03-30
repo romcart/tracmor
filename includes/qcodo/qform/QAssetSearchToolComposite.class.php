@@ -35,6 +35,8 @@ class QAssetSearchToolComposite extends QControl {
   public $btnAssetSearchToolAdd;
 	public $btnAssetSearchToolCancel;
 
+	public $lblWarning;
+
   // We want to override the constructor in order to setup the subcontrols
 	public function __construct($objParentObject, $strControlId = null) {
 
@@ -100,7 +102,6 @@ class QAssetSearchToolComposite extends QControl {
     $this->dlgAssetSearchTool->Display = false;
     $this->dlgAssetSearchTool->CssClass = 'modal_dialog';
     $this->dlgAssetSearchTool->AutoRenderChildren = true;
-    //$this->dlgAssetSearchTool->Template = 'asset_search_tool.tpl.php';
 
     //$this->dlgAssetSearchTool->Position = QPosition::Absolute;
     //$this->dlgAssetSearchTool->AddControlToMove();
@@ -110,15 +111,30 @@ class QAssetSearchToolComposite extends QControl {
 
 		$this->btnAssetSearchToolAdd = new QButton($this->dlgAssetSearchTool);
 		$this->btnAssetSearchToolAdd->Text = "Add Selected";
-		$this->btnAssetSearchToolAdd->AddAction(new QClickEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
-		$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
-		$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		if ($this->objParentObject instanceof QControl) {
+  		$this->btnAssetSearchToolAdd->AddAction(new QClickEvent(), new QAjaxControlAction($this->objParentObject, 'btnAssetSearchToolAdd_Click'));
+  		$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->objParentObject, 'btnAssetSearchToolAdd_Click'));
+		}
+		else {
+		  $this->btnAssetSearchToolAdd->AddAction(new QClickEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
+  		$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
+		}
+    $this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
 		$this->btnAssetSearchToolCancel = new QButton($this->dlgAssetSearchTool);
 		$this->btnAssetSearchToolCancel->Text = "Cancel";
 		$this->btnAssetSearchToolCancel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnAssetSearchToolCancel_Click'));
 		$this->btnAssetSearchToolCancel->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnAssetSearchToolCancel_Click'));
 		$this->btnAssetSearchToolCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+
+		// Add break line after buttons
+		$lblBreak = new QLabel($this->dlgAssetSearchTool);
+		$lblBreak->HtmlEntities = false;
+		$lblBreak->Text = "<br />";
+
+		$this->lblWarning = new QLabel($this->dlgAssetSearchTool);
+		$this->lblWarning->Text = "";
+		$this->lblWarning->CssClass = "warning";
 	}
 
 	/*

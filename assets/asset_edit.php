@@ -47,7 +47,6 @@
 		protected $ctlAssetEdit;
 		protected $ctlAssetTransact;
 		protected $ctlAssetSearchTool;
-		protected $dlgAssetSearchTool;
 		protected $intTransactionTypeId;
 
 		// Child assets datagrid
@@ -59,8 +58,6 @@
 		protected $btnLinkToParent;
 		protected $btnUnlink;
 		protected $btnAddChild;
-		protected $btnAssetSearchToolAdd;
-		protected $btnAssetSearchToolCancel;
 
 		// Text box
 		protected $txtAddChild;
@@ -102,7 +99,6 @@
   			$this->btnUnlink_Create();
   			$this->AddChild_Create();
   			$this->ctlAssetSearchTool_Create();
-  			//$this->dlgAssetSearchTool_Create();
 		  }
 
 			// Create the two composite controls
@@ -500,7 +496,7 @@ CREATE FIELD METHODS
       if ($this->intDlgStatus) {
         $this->ctlAssetSearchTool->Refresh();
       }
-      $this->btnAssetSearchToolAdd->Text = "Add Selected";
+      $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Selected";
       $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		  $this->intDlgStatus = 2;
 		}
@@ -513,7 +509,7 @@ CREATE FIELD METHODS
         if ($this->intDlgStatus) {
           $this->ctlAssetSearchTool->Refresh();
         }
-        $this->btnAssetSearchToolAdd->Text = "Reassign";
+        $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Reassign";
         $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		    $this->intDlgStatus = 1;
 		  }
@@ -614,16 +610,16 @@ CREATE FIELD METHODS
 		}
 
 		public function btnAssetSearchToolAdd_Click() {
-		  $this->btnAssetSearchToolCancel->Warning = "";
+		  $this->ctlAssetSearchTool->lblWarning->Text = "";
       switch ($this->intDlgStatus) {
         // Reassign
         case '1' :
           $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
           if (count($intSelectedAssetId) > 1) {
-            $this->btnAssetSearchToolCancel->Warning = "You must select only one parent asset.";
+            $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one parent asset.";
           }
           elseif (count($intSelectedAssetId) != 1) {
-            $this->btnAssetSearchToolCancel->Warning = "No selected assets.";
+            $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
           }
           else {
             if ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
@@ -646,7 +642,7 @@ CREATE FIELD METHODS
                   unset($objNewChildAssetArray[$intAssetId]);
                 }
                 else{
-                  $this->btnAssetSearchToolCancel->Warning = "Parent and child asset codes cannot be the same.";
+                  $this->ctlAssetSearchTool->lblWarning->Text = "Parent and child asset codes cannot be the same.";
                   $blnError = true;
                 }
               }
@@ -677,7 +673,7 @@ CREATE FIELD METHODS
             $intSelectedAssetCount++;
             $objNewChildAsset = Asset::LoadByAssetId($intAssetId);
             if ($objNewChildAsset && $objNewChildAsset->ParentAssetCode) {
-    		      $this->btnAssetSearchToolCancel->Warning .= "Asset code (" . $objNewChildAsset->AssetCode . ") already have the parent asset code. Please try another.<br />";
+    		      $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") already have the parent asset code. Please try another.<br />";
     		      $blnError = true;
             }
             elseif /*(!($objNewChildAsset->CheckedOutFlag || $objNewChildAsset->ReservedFlag || $objNewChildAsset->LocationId == 2 && $objNewChildAsset->LocationId == 3 || $objNewChildAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objNewChildAsset->AssetId))) {
@@ -687,17 +683,17 @@ CREATE FIELD METHODS
                 $arrCheckedAssets[] = $objNewChildAsset;
               }
               else {
-                $this->btnAssetSearchToolCancel->Warning .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be the same as asset code.<br />";
+                $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be the same as asset code.<br />";
                 $blnError = true;
               }
             /*}
             else {
-              $this->btnAssetSearchToolCancel->Warning .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+              $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
               $blnError = true;
             }*/
           }
           if ($intSelectedAssetCount == 0) {
-            $this->btnAssetSearchToolCancel->Warning .= "No selected assets.<br />";
+            $this->ctlAssetSearchTool->lblWarning->Text .= "No selected assets.<br />";
           }
           elseif (!$blnError) {
             foreach ($arrCheckedAssets as $objAsset) {
@@ -712,18 +708,18 @@ CREATE FIELD METHODS
         case '3' :
           $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
           if (count($intSelectedAssetId) > 1) {
-            $this->btnAssetSearchToolCancel->Warning = "You must select only one parent asset.";
+            $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one parent asset.";
           }
           elseif (count($intSelectedAssetId) != 1) {
-            $this->btnAssetSearchToolCancel->Warning = "No selected assets.";
+            $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
           }
           else {
             if (!($objParentAsset = Asset::LoadByAssetId($intSelectedAssetId[0]))) {
-              $this->btnAssetSearchToolCancel->Warning = "That asset code does not exist. Please try another.";
+              $this->ctlAssetSearchTool->lblWarning->Text = "That asset code does not exist. Please try another.";
 
             }
             elseif ($objParentAsset->AssetCode == $this->objAsset->AssetCode) {
-        			$this->btnAssetSearchToolCancel->Warning = "Parent asset code must not be the same as asset code. Please try another.";
+        			$this->ctlAssetSearchTool->lblWarning->Text = "Parent asset code must not be the same as asset code. Please try another.";
             }
             else {
               $this->ctlAssetEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
@@ -732,7 +728,7 @@ CREATE FIELD METHODS
           }
           break;
         default :
-          $this->btnAssetSearchToolCancel->Warning = "Error: unknown action";
+          $this->ctlAssetSearchTool->lblWarning->Text = "Error: unknown action";
           break;
       }
 
@@ -835,7 +831,7 @@ CREATE FIELD METHODS
       if ($this->intDlgStatus) {
         $this->ctlAssetSearchTool->Refresh();
       }
-      $this->btnAssetSearchToolAdd->Text = "Add Parent Asset";
+      $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Parent Asset";
       $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		  $this->intDlgStatus = 3;
 		}

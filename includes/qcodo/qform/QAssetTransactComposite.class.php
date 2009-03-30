@@ -42,6 +42,8 @@ class QAssetTransactComposite extends QControl {
 	protected $txtNewAssetCode;
 	protected $objTransaction;
 	protected $intTransactionTypeId;
+	protected $lblAdd;
+	protected $ctlAssetSearchTool;
 
 	public function __construct($objParentObject, $strControlId = null) {
 	    // First, call the parent to do most of the basic setup
@@ -66,9 +68,10 @@ class QAssetTransactComposite extends QControl {
     $this->txtNote_Create();
     $this->txtNewAssetCode_Create();
     $this->btnAdd_Create();
+    $this->lblAdd_Create();
     $this->btnSave_Create();
     $this->dtgAssetTransact_Create();
-
+    $this->ctlAssetSearchTool_Create();
 	}
 
 	// This method must be declared in all composite controls
@@ -151,6 +154,16 @@ class QAssetTransactComposite extends QControl {
 		$this->txtNewAssetCode->CausesValidation = false;
 	}
 
+	// Create lookup icon
+	protected function lblAdd_Create() {
+	  $this->lblAdd = new QLabel($this);
+		$this->lblAdd->HtmlEntities = false;
+		$this->lblAdd->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+	  $this->lblAdd->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblAdd_Click'));
+	  $this->lblAdd->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'lblAdd_Click'));
+	  $this->lblAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
+
 	// Create the save button
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
@@ -221,6 +234,10 @@ class QAssetTransactComposite extends QControl {
     $objStyle->CssClass = 'dtg_header';
 
 		$this->blnTransactionModified = true;
+	}
+
+	protected function ctlAssetSearchTool_Create() {
+	  $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
 	}
 
 	// Add Button Click
@@ -371,6 +388,29 @@ class QAssetTransactComposite extends QControl {
 		else {
 			$this->txtNewAssetCode->Warning = "Please enter an asset code.";
 		}
+	}
+
+	public function lblAdd_Click() {
+	  $this->ctlAssetSearchTool->lblWarning->Text = "";
+	  $this->ctlAssetSearchTool->Refresh();
+    $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add";
+    $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
+	}
+
+	public function btnAssetSearchToolAdd_Click() {
+	  $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
+    if (count($intSelectedAssetId) > 1) {
+      $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one parent asset.";
+    }
+    elseif (count($intSelectedAssetId) != 1) {
+      $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
+    }
+    elseif ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
+      $this->txtNewAssetCode->Text = $objAsset->AssetCode;
+      $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+		}
+		// Uncheck all items but SelectAll checkbox
+    $this->UncheckAllItems();
 	}
 
 	// Save Button Click
@@ -558,6 +598,15 @@ class QAssetTransactComposite extends QControl {
 			}
 		}
 
+	}
+
+	// Uncheck all items but SelectAll checkbox
+	public function UncheckAllItems() {
+	  foreach ($this->objParentObject->GetAllControls() as $objControl) {
+      if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+        $objControl->Checked = false;
+      }
+    }
 	}
 
   // And our public getter/setters
