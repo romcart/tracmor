@@ -739,7 +739,7 @@
 					`asset` AS `asset`
 				SET
 				  `asset`.`parent_asset_code` = NULL,
-				  `asset`.`linked_flag` = '0'
+				  `asset`.`linked_flag` = NULL
 				WHERE
 				  `asset`.`parent_asset_code` = '%s'
 			", $strAssetCode);

@@ -400,7 +400,7 @@ class QAssetTransactComposite extends QControl {
 	public function btnAssetSearchToolAdd_Click() {
 	  $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
     if (count($intSelectedAssetId) > 1) {
-      $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one parent asset.";
+      $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one asset.";
     }
     elseif (count($intSelectedAssetId) != 1) {
       $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
@@ -408,6 +408,7 @@ class QAssetTransactComposite extends QControl {
     elseif ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
       $this->txtNewAssetCode->Text = $objAsset->AssetCode;
       $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+      $this->txtNewAssetCode->SetFocus();
 		}
 		// Uncheck all items but SelectAll checkbox
     $this->UncheckAllItems();

@@ -110,6 +110,7 @@
 		public $lstToCompany;
 		public $lstToContact;
 		public $lstToAddress;
+		protected $ctlAssetSearchTool;
 
 		// Buttons
 		protected $btnEdit;
@@ -175,6 +176,7 @@
 		protected $lblHoldAtLocationCity;
 		protected $lblHoldAtLocationState;
 		protected $lblHoldAtLocationPostalCode;
+		protected $lblAddAsset;
 		protected $dlgNew;
 
 		// Datagrids
@@ -431,7 +433,7 @@
 				}
 			}
 
-
+      $this->ctlAssetSearchTool_Create();
 		}
 
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
@@ -489,6 +491,17 @@
   	// Create and Setp the Shortcut Menu Composite Control
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
+  	}
+
+  	protected function ctlAssetSearchTool_Create() {
+  	  $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
+
+  	  $this->lblAddAsset = new QLabel($this);
+		  $this->lblAddAsset->HtmlEntities = false;
+		  $this->lblAddAsset->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxAction('lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
   	// Create and Setup the FedEx Shipment Panel
@@ -2423,6 +2436,43 @@
 		// ONCLICK BUTTON METHODS
 		// These methods are run when buttons are clicked
 		//************************
+
+		protected function lblAddAsset_Click() {
+		  // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+      $this->ctlAssetSearchTool->Refresh();
+      $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Asset";
+      $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
+		}
+
+		public function btnAssetSearchToolAdd_Click() {
+		  $this->ctlAssetSearchTool->lblWarning->Text = "";
+      $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
+      if (count($intSelectedAssetId) > 1) {
+        $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one asset.";
+      }
+      elseif (count($intSelectedAssetId) != 1) {
+        $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
+      }
+      else {
+        if ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
+          $this->txtNewAssetCode->Text = $objAsset->AssetCode;
+          $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+          $this->txtNewAssetCode->SetFocus();
+        }
+      }
+      // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+		}
+
+		// Uncheck all items but SelectAll checkbox
+		public function UncheckAllItems() {
+		  foreach ($this->GetAllControls() as $objControl) {
+        if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+          $objControl->Checked = false;
+        }
+      }
+		}
 
 		// This is called when the 'new' label is clicked
 		public function lblNewFromCompany_Click($strFormId, $strControlId, $strParameter) {

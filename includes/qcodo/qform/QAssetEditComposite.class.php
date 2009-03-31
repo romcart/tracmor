@@ -799,6 +799,10 @@ class QAssetEditComposite extends QControl {
     				$this->txtParentAssetCode->Warning = "Parent asset code must not be the same as asset code. Please try another.";
 				  }
 				}
+				else {
+				  // If txtParentAssetCode is empty
+				  $this->objAsset->LinkedFlag = false;
+				}
 
 				if (!$blnError) {
           // Location can only be decided when creating an asset. Otherwise they must conduct a transaction.
@@ -862,6 +866,10 @@ class QAssetEditComposite extends QControl {
       				$this->txtParentAssetCode->Warning = "Parent asset code must not be the same as asset code. Please try another.";
   				  }
 				  }
+				}
+				else {
+				  // If txtParentAssetCode is empty
+				  $this->objAsset->LinkedFlag = false;
 				}
 
 				if (!$blnError) {
