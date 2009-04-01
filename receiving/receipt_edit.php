@@ -114,6 +114,8 @@
 
 		// Generate tab indexes
 		protected $intNextTabIndex = 1;
+		public $ctlAssetSearchTool;
+	  protected $lblAddAsset;
 
 		protected function Form_Create() {
 
@@ -237,6 +239,7 @@
 					}
 				}
 			}
+			$this->ctlAssetSearchTool_Create();
 		}
 
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
@@ -291,6 +294,17 @@
   	// Create and Setp the Shortcut Menu Composite Control
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
+  	}
+
+  	protected function ctlAssetSearchTool_Create() {
+  	  $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
+
+  	  $this->lblAddAsset = new QLabel($this);
+		  $this->lblAddAsset->HtmlEntities = false;
+		  $this->lblAddAsset->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxAction('lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
 		//**************
@@ -1073,6 +1087,43 @@
 		// These methods are run when buttons are clicked
 		//************************
 
+		protected function lblAddAsset_Click() {
+		  // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+      $this->ctlAssetSearchTool->Refresh();
+      $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Asset";
+      $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
+		}
+
+		public function btnAssetSearchToolAdd_Click() {
+		  $this->ctlAssetSearchTool->lblWarning->Text = "";
+      $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
+      if (count($intSelectedAssetId) > 1) {
+        $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one asset.";
+      }
+      elseif (count($intSelectedAssetId) != 1) {
+        $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
+      }
+      else {
+        if ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
+          $this->txtNewAssetCode->Text = $objAsset->AssetCode;
+          $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+          $this->txtNewAssetCode->SetFocus();
+        }
+      }
+      // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+		}
+
+		// Uncheck all items but SelectAll checkbox
+		public function UncheckAllItems() {
+		  foreach ($this->GetAllControls() as $objControl) {
+        if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+          $objControl->Checked = false;
+        }
+      }
+		}
+
 		// This is called when the 'new' label is clicked
 		public function lblNewFromCompany_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -1156,6 +1207,7 @@
 				$this->chkAutoGenerateAssetCode->Checked = false;
 				$this->chkAutoGenerateAssetCode->Display = false;
 				$this->txtNewAssetCode->Enabled = true;
+				$this->lblAddAsset->Display = true;
 			}
 			// If adding a new receipt to the receipt
 			elseif ($this->rblAssetType->SelectedValue == 'new') {
@@ -1170,6 +1222,7 @@
 				if (QApplication::$TracmorSettings->MinAssetCode) {
 					$this->chkAutoGenerateAssetCode->Display = true;
 				}
+				$this->lblAddAsset->Display = false;
 			}
 		}
 
@@ -1193,6 +1246,10 @@
 				if ($objDuplicate = Asset::LoadByAssetCode($strAssetCode)) {
 					$blnError = true;
 					$this->txtNewAssetCode->Warning = 'That asset code already exists. Choose another.';
+				}
+				elseif (!$this->lstAssetModel->SelectedValue) {
+				  $blnError = true;
+					$this->txtNewAssetCode->Warning = 'You must select one asset model.';
 				}
 				if (!$blnError) {
 					$objNewAsset = new Asset();
@@ -1310,7 +1367,7 @@
 						}
 						// Check that the asset isn't in a pending shipment. This should be impossible, as you can not add items to a shipment that are TBR (to be received) or shipped.
 						// This means that they will be caught be the error checker above where LocationId must be 5 or 2
-						elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
+						elseif (!$blnError && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = 'That asset is in a pending shipment.';
 
