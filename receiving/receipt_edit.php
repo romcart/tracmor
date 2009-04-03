@@ -171,6 +171,7 @@
 			$this->atcAttach_Create();
 			$this->pnlAttachments_Create();
 			$this->btnAddAsset_Create();
+			$this->ctlAssetSearchTool_Create();
 			$this->btnAddInventory_Create();
 
 
@@ -239,7 +240,6 @@
 					}
 				}
 			}
-			$this->ctlAssetSearchTool_Create();
 		}
 
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
@@ -2386,6 +2386,7 @@
 			$this->lstAssetModel->Display = false;
 			$this->chkAutoGenerateAssetCode->Display = false;
 			$this->btnAddAsset->Display = false;
+			$this->lblAddAsset->Display = false;
 			$this->txtNewInventoryModelCode->Display = false;
 			$this->txtQuantity->Display = false;
 			$this->btnAddInventory->Display = false;
@@ -2460,6 +2461,7 @@
 				$this->chkAutoGenerateAssetCode->Checked = false;
 				$this->chkAutoGenerateAssetCode->Display = false;
 				$this->btnAddAsset->Display = true;
+				$this->lblAddAsset->Display = true;
 				$this->txtNewInventoryModelCode->Display = true;
 				$this->txtQuantity->Display = true;
 				$this->btnAddInventory->Display = true;

@@ -337,6 +337,7 @@
 			$this->rblAssetType_Create();
 			$this->chkScheduleReceipt_Create();
 			$this->btnAddAsset_Create();
+			$this->ctlAssetSearchTool_Create();
 			$this->btnLookup_Create();
 			$this->btnAddInventory_Create();
 			$this->btnSaveExchange_Create();
@@ -432,8 +433,6 @@
 					}
 				}
 			}
-
-      $this->ctlAssetSearchTool_Create();
 		}
 
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
@@ -4406,6 +4405,7 @@
 			$this->txtTrackingNumber->Display = false;
 			$this->txtNewAssetCode->Display = false;
 			$this->btnAddAsset->Display = false;
+			$this->lblAddAsset->Display = false;
 			$this->btnLookup->Display = false;
 			$this->btnAddInventory->Display = false;
 			$this->txtNewInventoryModelCode->Display = false;
@@ -4640,6 +4640,7 @@
 				$this->txtNewAssetCode->Display = true;
 				//$this->lblAdvanced->Display = true;
 				$this->btnAddAsset->Display = true;
+				$this->lblAddAsset->Display = true;
 				$this->txtNewInventoryModelCode->Display = true;
 				$this->btnLookup->Display = true;
 				$this->lstSourceLocation->Display = true;
