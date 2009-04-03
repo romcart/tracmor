@@ -26,7 +26,7 @@ class QInventorySearchToolComposite extends QControl {
 
   // Parent Object
   protected $objParentObject;
-  public $ctlAssetSearch;
+  public $ctlInventorySearch;
 
   // Dialog Box
   public $dlgInventorySearchTool;
@@ -106,8 +106,8 @@ class QInventorySearchToolComposite extends QControl {
     //$this->dlgInventorySearchTool->Position = QPosition::Absolute;
     //$this->dlgInventorySearchTool->AddControlToMove();
 
-    $this->ctlAssetSearch = new QAssetSearchComposite($this->dlgInventorySearchTool, null, true, true, true);
-		$this->ctlAssetSearch->dtgAsset->ItemsPerPage = 10;
+    $this->ctlInventorySearch = new QInventorySearchComposite($this->dlgInventorySearchTool, null, true, true, true);
+		$this->ctlInventorySearch->dtgInventoryModel->ItemsPerPage = 10;
 
 		$this->btnInventorySearchToolAdd = new QButton($this->dlgInventorySearchTool);
 		$this->btnInventorySearchToolAdd->Text = "Add Selected";

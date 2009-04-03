@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,18 +23,19 @@
 <?php
 
 class QInventoryTransactComposite extends QControl {
-	
+
 	public $blnEditMode;
 	public $objParentObject;
 	public $strTitleVerb;
 	public $objInventoryLocationArray;
 	public $dtgInventoryTransact;
 	public $objInventoryModel;
-	
+
 	protected $btnLookup;
 	protected $btnSave;
 	protected $btnCancel;
 	protected $btnAdd;
+	protected $lblLookup;
 	protected $btnRemove;
 	protected $lstDestinationLocation;
 	protected $txtNote;
@@ -44,7 +45,8 @@ class QInventoryTransactComposite extends QControl {
 	protected $objTransaction;
 	protected $objInventoryTransaction;
 	protected $intTransactionTypeId;
-	
+	protected $ctlInventorySearchTool;
+
 	public function __construct($objParentObject, $strControlId = null) {
 	    // First, call the parent to do most of the basic setup
     try {
@@ -53,7 +55,7 @@ class QInventoryTransactComposite extends QControl {
         $objExc->IncrementOffset();
         throw $objExc;
     }
-    
+
     // Assign the parent object (InventoryModelEditForm from inventory_edit.php)
     $this->objParentObject = $objParentObject;
     // This is necessary for blnEditMode, but not much else.
@@ -62,7 +64,7 @@ class QInventoryTransactComposite extends QControl {
 
     // Create the blank InventoryLocationArray
     $this->objInventoryLocationArray = array();
-    
+
     $this->lstSourceLocation_Create();
     $this->txtNote_Create();
     $this->txtNewInventoryModelCode_Create();
@@ -71,26 +73,26 @@ class QInventoryTransactComposite extends QControl {
     $this->btnLookup_Create();
     $this->btnSave_Create();
     $this->btnCancel_Create();
-    $this->btnAdd_Create();    
+    $this->btnAdd_Create();
     $this->dtgInventoryTransact_Create();
-    
+    $this->ctlInventorySearchTool_Create();
 	}
-	
+
 	// This method must be declared in all composite controls
 	public function ParsePostData() {}
-	
+
 	public function GetJavaScriptAction() {return "onchange";}
-	
+
 	public function Validate() {return true;}
-	
+
 	protected function GetControlHtml() {
-		
+
 		$strStyle = $this->GetStyleAttributes();
 		if ($strStyle) {
 			$strStyle = sprintf('style="%s"', $strStyle);
 		}
 		$strAttributes = $this->GetAttributes();
-		
+
 		// Store the Output Buffer locally
 		$strAlreadyRendered = ob_get_contents();
 		ob_clean();
@@ -102,16 +104,27 @@ class QInventoryTransactComposite extends QControl {
 
 		// Restore the output buffer and return evaluated template
 		print($strAlreadyRendered);
-		
+
 		$strToReturn =  sprintf('<span id="%s" %s%s>%s</span>',
 		$this->strControlId,
 		$strStyle,
 		$strAttributes,
 		$strTemplateEvaluated);
-		
+
 		return $strToReturn;
 	}
-	
+
+	protected function ctlInventorySearchTool_Create() {
+	  $this->ctlInventorySearchTool = new QInventorySearchToolComposite($this);
+
+	  $this->lblLookup = new QLabel($this);
+		$this->lblLookup->HtmlEntities = false;
+		$this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+	  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblLookup_Click'));
+	  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'lblLookup_Click'));
+	  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
+
 	// Create and Setup lstDestinationLocation
 	protected function lstDestinationLocation_Create() {
 		$this->lstDestinationLocation = new QListBox($this);
@@ -125,7 +138,7 @@ class QInventoryTransactComposite extends QControl {
 		}
 		$this->lstDestinationLocation->CausesValidation = false;
 	}
-	
+
 	// Create the Note text field
 	protected function txtNote_Create() {
 		$this->txtNote = new QTextBox($this);
@@ -136,7 +149,7 @@ class QInventoryTransactComposite extends QControl {
 		$this->txtNote->Required = false;
 		$this->txtNote->CausesValidation = false;
 	}
-	
+
 	// Create the text field to enter new inventory_model codes to add to the transaction
 	// Eventually this field will receive information from the AML
 	protected function txtNewInventoryModelCode_Create() {
@@ -145,7 +158,7 @@ class QInventoryTransactComposite extends QControl {
 		$this->txtNewInventoryModelCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnLookup_Click'));
 		$this->txtNewInventoryModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	}
-	
+
 	// Create and Setup lstSourceLocation
 	protected function lstSourceLocation_Create() {
 		$this->lstSourceLocation = new QListBox($this);
@@ -163,7 +176,7 @@ class QInventoryTransactComposite extends QControl {
 		$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->txtQuantity->Enabled = false;
 	}
-	
+
 	// Create the lookup button
 	protected function btnLookup_Create() {
 		$this->btnLookup = new QButton($this);
@@ -173,7 +186,7 @@ class QInventoryTransactComposite extends QControl {
 		$this->btnLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnLookup->CausesValidation = false;
 	}
-	
+
 	// Create the save button
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
@@ -203,15 +216,15 @@ class QInventoryTransactComposite extends QControl {
 		$this->btnAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnAdd->CausesValidation = false;
 	}
-	
+
 	// Setup the datagrid
 	protected function dtgInventoryTransact_Create() {
-		
+
 		$this->dtgInventoryTransact = new QDataGrid($this);
 		$this->dtgInventoryTransact->CellPadding = 5;
 		$this->dtgInventoryTransact->CellSpacing = 0;
 		$this->dtgInventoryTransact->CssClass = "datagrid";
-		
+
     // Enable AJAX - this won't work while using the DB profiler
     $this->dtgInventoryTransact->UseAjax = true;
 
@@ -219,7 +232,7 @@ class QInventoryTransactComposite extends QControl {
     $objPaginator = new QPaginator($this->dtgInventoryTransact);
     $this->dtgInventoryTransact->Paginator = $objPaginator;
     $this->dtgInventoryTransact->ItemsPerPage = 20;
-    
+
     $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Inventory Code', '<?= $_ITEM->InventoryModel->__toStringWithLink("bluelink") ?>', 'SortByCommand="inventory_location__inventory_model_id__inventory_model_code ASC"', 'ReverseSortByCommand="inventory_location__inventory_model_id__inventory_model_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
     $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Inventory Model', '<?= $_ITEM->InventoryModel->ShortDescription ?>', 'Width=200', 'SortByCommand="inventory_location__inventory_model_id__short_description ASC"', 'ReverseSortByCommand="inventory_location__inventory_model_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Source Location', '<?= $_ITEM->Location->__toString() ?>', 'CssClass="dtg_column"'));
@@ -239,18 +252,18 @@ class QInventoryTransactComposite extends QControl {
     $objStyle->BackColor = '#EFEFEF';
     $objStyle->CssClass = 'dtg_header';
 	}
-	
+
 	// Lookup Button Click
 	// This button is only displayed for move or take out transactions
 	public function btnLookup_Click($strFormId, $strControlId = null, $strParameter = null) {
-		
+
 		// Assign the value submitted from the form
 		$strInventoryModelCode = $this->txtNewInventoryModelCode->Text;
-		
+
 		if ($strInventoryModelCode) {
 			// Load the inventory model object based on the inventory_model_code submitted
 			$objInventoryModel = InventoryModel::LoadByInventoryModelCode($strInventoryModelCode);
-			
+
 			if ($objInventoryModel) {
 				// Load the array of InventoryLocations based on the InventoryModelId of the InventoryModel object
 				$InventorySourceLocationArray = InventoryLocation::LoadArrayByInventoryModelIdLocations($objInventoryModel->InventoryModelId);
@@ -298,12 +311,12 @@ class QInventoryTransactComposite extends QControl {
 			$this->txtNewInventoryModelCode->Warning = 'Please enter an inventory code.';
 		}
 	}
-	
+
 	// Add Button Click
 	public function btnAdd_Click($strFormId, $strControlId, $strParameter) {
-		
+
 		$blnError = false;
-		
+
 		// Assign the values from the user submitted form input
 		$intNewInventoryLocationId = $this->lstSourceLocation->SelectedValue;
 		$intTransactionQuantity = $this->txtQuantity->Text;
@@ -315,7 +328,7 @@ class QInventoryTransactComposite extends QControl {
 		    $intAuthorizationLevelIdArray[$objRoleTransactionTypeAuthorization->TransactionTypeId] = $objRoleTransactionTypeAuthorization->AuthorizationLevelId;
 		  }
 		}
-			  
+
 		// If transaction is a move or take out
 		if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
 			if ($intNewInventoryLocationId) {
@@ -328,7 +341,7 @@ class QInventoryTransactComposite extends QControl {
 						}
 					}
 				}
-				
+
 				if (!$blnError) {
 					$objNewInventoryLocation = InventoryLocation::LoadLocations($intNewInventoryLocationId);
 					// This should not be possible because the list is populated with existing InventoryLocations
@@ -362,7 +375,7 @@ class QInventoryTransactComposite extends QControl {
 		}
 		// Restock transaction
 		elseif ($this->intTransactionTypeId == 4) {
-			
+
 			// Check for duplicate inventory code
 			$strNewInventoryModelCode = $this->txtNewInventoryModelCode->Text;
 			if (!($objNewInventoryModel = InventoryModel::LoadByInventoryModelCode($strNewInventoryModelCode))) {
@@ -392,10 +405,10 @@ class QInventoryTransactComposite extends QControl {
       		}
         }
 			}
-			
+
 			if (!$blnError) {
 				// Create a new InventoryLocation for the time being
-				// Before saving we will check to see if it already exists 
+				// Before saving we will check to see if it already exists
 				$objNewInventoryLocation = new InventoryLocation();
 				$objNewInventoryLocation->InventoryModelId = $objNewInventoryModel->InventoryModelId;
 				$objNewInventoryLocation->Quantity = 0;
@@ -403,12 +416,12 @@ class QInventoryTransactComposite extends QControl {
 				$objNewInventoryLocation->LocationId = 4;
 			}
 		}
-		
+
 		if (!$blnError && isset($objNewInventoryModel) && !QApplication::AuthorizeEntityBoolean($objNewInventoryModel, 2)) {
 			$blnError = true;
 			$this->txtNewInventoryModelCode->Warning = "You do not have authorization to perform a transaction on this inventory model.";
 		}
-		
+
 		if (!$blnError && $objNewInventoryLocation instanceof InventoryLocation)  {
 			$objNewInventoryLocation->intTransactionQuantity = $intTransactionQuantity;
 			$this->objInventoryLocationArray[] = $objNewInventoryLocation;
@@ -419,21 +432,45 @@ class QInventoryTransactComposite extends QControl {
 				$this->lstSourceLocation->Enabled = false;
 				$this->txtQuantity->Enabled = false;
 			}
-		}		
+		}
 	}
-	
+
+	public function lblLookup_Click() {
+	  $this->ctlInventorySearchTool->lblWarning->Text = "";
+	  $this->ctlInventorySearchTool->Refresh();
+    $this->ctlInventorySearchTool->btnInventorySearchToolAdd->Text = "Add";
+    $this->ctlInventorySearchTool->dlgInventorySearchTool->ShowDialogBox();
+	}
+
+	public function btnInventorySearchToolAdd_Click() {
+	  $intSelectedInventoryModelId = $this->ctlInventorySearchTool->ctlInventorySearch->dtgInventoryModel->GetSelected("InventoryId");
+    if (count($intSelectedInventoryModelId) > 1) {
+      $this->ctlInventorySearchTool->lblWarning->Text = "You must select only one inventory.";
+    }
+    elseif (count($intSelectedInventoryModelId) != 1) {
+      $this->ctlInventorySearchTool->lblWarning->Text = "No selected inventories.";
+    }
+    elseif ($objInventoryModel = InventoryModel::LoadByInventoryModelId($intSelectedInventoryModelId[0])) {
+      $this->txtNewInventoryModelCode->Text = $objInventoryModel->InventoryModelCode;
+      $this->ctlInventorySearchTool->dlgInventorySearchTool->HideDialogBox();
+      $this->txtNewInventoryModelCode->SetFocus();
+		}
+		// Uncheck all items but SelectAll checkbox
+    $this->UncheckAllItems();
+	}
+
 	// Save Button Click
 	public function btnSave_Click($strFormId, $strControlId, $strParameter) {
 		if ($this->objInventoryLocationArray) {
 			$blnError = false;
-			
+
 			// If it is a move or a restock, lstDestinationLocation cannot be null
 			if (($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 4) && !$this->lstDestinationLocation->SelectedValue) {
-				
+
 				$this->lstDestinationLocation->Warning = 'You must select a destination location.';
 				$blnError = true;
 			}
-			
+
 			foreach ($this->objInventoryLocationArray as $objInventoryLocation) {
 				// TransactionTypeId = 1 is for moves
 				if ($this->intTransactionTypeId == 1) {
@@ -443,25 +480,25 @@ class QInventoryTransactComposite extends QControl {
 					}
 				}
 			}
-			
+
 			if (!$blnError) {
-				
+
 				try {
-				
+
 					// Get an instance of the database
 					$objDatabase = QApplication::$Database[1];
 					// Begin a MySQL Transaction to be either committed or rolled back
-					$objDatabase->TransactionBegin();								
+					$objDatabase->TransactionBegin();
 					// Create the new transaction object and save it
 					$this->objTransaction = new Transaction();
 					$this->objTransaction->EntityQtypeId = EntityQtype::Inventory;
 					$this->objTransaction->TransactionTypeId = $this->intTransactionTypeId;
 					$this->objTransaction->Note = $this->txtNote->Text;
 					$this->objTransaction->Save();
-					
+
 					// Assign different source and destinations depending on transaction type
 					foreach ($this->objInventoryLocationArray as $objInventoryLocation) {
-						
+
 						// Move
 						if ($this->intTransactionTypeId == 1) {
 							$SourceLocationId = $objInventoryLocation->LocationId;
@@ -479,14 +516,14 @@ class QInventoryTransactComposite extends QControl {
 							// LocationId = 3 - 'Taken Out'
 							$DestinationLocationId = 3;
 						}
-						
+
 						// Remove the inventory quantity from the source for moves and take outs
 						if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
 							//$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
 							$objInventoryLocation->Quantity = $objInventoryLocation->GetVirtualAttribute('actual_quantity') - $objInventoryLocation->intTransactionQuantity;
 							$objInventoryLocation->Save();
 						}
-						
+
 						// Add the new quantity where it belongs for moves and restocks
 						if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 4) {
 						$objNewInventoryLocation = InventoryLocation::LoadByLocationIdInventoryModelId($DestinationLocationId, $objInventoryLocation->InventoryModelId);
@@ -502,7 +539,7 @@ class QInventoryTransactComposite extends QControl {
 							$objNewInventoryLocation->LocationId = $DestinationLocationId;
 							$objNewInventoryLocation->Save();
 						}
-											
+
 						// Create the new InventoryTransaction object and save it
 						$this->objInventoryTransaction = new InventoryTransaction();
 						if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 4) {
@@ -517,17 +554,17 @@ class QInventoryTransactComposite extends QControl {
 						$this->objInventoryTransaction->DestinationLocationId = $DestinationLocationId;
 						$this->objInventoryTransaction->Save();
 					}
-					
+
 					// Commit the above transactions to the database
 					$objDatabase->TransactionCommit();
-					
+
 					QApplication::Redirect('../common/transaction_edit.php?intTransactionId='.$this->objTransaction->TransactionId);
 				}
 				catch (QOptimisticLockingException $objExc) {
-					
+
 					// Rollback the database
 					$objDatabase->TransactionRollback();
-					
+
 					$objInventoryLocation = InventoryLocation::Load($objExc->EntityId);
 					$this->objParentObject->btnRemove_Click($this->objParentObject->FormId, 'btnRemove' . $objExc->EntityId, $objExc->EntityId);
           // Lock Exception Thrown, Report the Error
@@ -536,10 +573,10 @@ class QInventoryTransactComposite extends QControl {
 			}
 		}
 	}
-	
+
 	// Cancel Button Click
 	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
-		
+
 		if ($this->blnEditMode) {
 			$this->objParentObject->DisplayTransaction(false);
 			$this->objInventoryLocationArray = null;
@@ -551,7 +588,7 @@ class QInventoryTransactComposite extends QControl {
 			QApplication::Redirect('inventory_model_list.php');
 		}
 	}
-	
+
 	// Prepare the Transaction form display depending on transaction type
 	public function SetupDisplay($intTransactionTypeId) {
 		$this->intTransactionTypeId = $intTransactionTypeId;
@@ -581,7 +618,7 @@ class QInventoryTransactComposite extends QControl {
 				$this->txtQuantity->Enabled = true;
 				break;
 			// Take Out
-			case 5: 
+			case 5:
 				$this->lstDestinationLocation->Display = false;
 				$this->btnLookup->Display = true;
 				$this->txtNewInventoryModelCode->Text = $this->objInventoryModel->InventoryModelCode;
@@ -596,7 +633,16 @@ class QInventoryTransactComposite extends QControl {
 				break;
 		}
 	}
-	
+
+	// Uncheck all items but SelectAll checkbox
+	public function UncheckAllItems() {
+	  foreach ($this->objParentObject->GetAllControls() as $objControl) {
+      if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+        $objControl->Checked = false;
+      }
+    }
+	}
+
   // And our public getter/setters
   public function __get($strName) {
 	  switch ($strName) {
@@ -612,7 +658,7 @@ class QInventoryTransactComposite extends QControl {
         }
 	  }
   }
-  
+
 	/////////////////////////
 	// Public Properties: SET
 	/////////////////////////
@@ -640,7 +686,7 @@ class QInventoryTransactComposite extends QControl {
 				break;
 		}
 	}
-	
+
 }
 
 ?>
