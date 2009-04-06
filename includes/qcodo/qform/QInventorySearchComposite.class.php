@@ -391,8 +391,9 @@ class QInventorySearchComposite extends QControl {
   			$field['value'] = null;
   		}
   	}
+  	$this->btnSearch_Click();
   	$this->blnSearch = false;
- 	}
+  }
 
   public function lblAdvanced_Click() {
   	if ($this->blnAdvanced) {

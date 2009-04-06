@@ -453,7 +453,7 @@ class QInventoryTransactComposite extends QControl {
     elseif ($objInventoryModel = InventoryModel::LoadByInventoryModelId($intSelectedInventoryModelId[0])) {
       $this->txtNewInventoryModelCode->Text = $objInventoryModel->InventoryModelCode;
       $this->ctlInventorySearchTool->dlgInventorySearchTool->HideDialogBox();
-      $this->txtNewInventoryModelCode->SetFocus();
+      $this->btnLookup_Click($this);
 		}
 		// Uncheck all items but SelectAll checkbox
     $this->UncheckAllItems();

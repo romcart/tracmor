@@ -111,6 +111,7 @@
 		public $lstToContact;
 		public $lstToAddress;
 		protected $ctlAssetSearchTool;
+		protected $ctlInventorySearchTool;
 
 		// Buttons
 		protected $btnEdit;
@@ -118,6 +119,7 @@
 		protected $pnlAttachments;
 		protected $btnAddAsset;
 		protected $btnLookup;
+		protected $lblLookup;
 		protected $btnAddInventory;
 		protected $btnCompleteShipment;
 		protected $btnCancelShipment;
@@ -339,6 +341,7 @@
 			$this->btnAddAsset_Create();
 			$this->ctlAssetSearchTool_Create();
 			$this->btnLookup_Create();
+			$this->ctlInventorySearchTool_Create();
 			$this->btnAddInventory_Create();
 			$this->btnSaveExchange_Create();
 			$this->btnCancelExchange_Create();
@@ -501,6 +504,17 @@
 		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxAction('lblAddAsset_Click'));
 		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddAsset_Click'));
 		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  	}
+
+  	protected function ctlInventorySearchTool_Create() {
+  	  $this->ctlInventorySearchTool = new QInventorySearchToolComposite($this);
+
+  	  $this->lblLookup = new QLabel($this);
+		  $this->lblLookup->HtmlEntities = false;
+		  $this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+		  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxAction('lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
   	// Create and Setup the FedEx Shipment Panel
@@ -2444,6 +2458,14 @@
       $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		}
 
+		protected function lblLookup_Click() {
+		  // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+      $this->ctlInventorySearchTool->Refresh();
+      $this->ctlInventorySearchTool->btnInventorySearchToolAdd->Text = "Add";
+      $this->ctlInventorySearchTool->dlgInventorySearchTool->ShowDialogBox();
+		}
+
 		public function btnAssetSearchToolAdd_Click() {
 		  $this->ctlAssetSearchTool->lblWarning->Text = "";
       $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
@@ -2461,6 +2483,23 @@
         }
       }
       // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+		}
+
+		public function btnInventorySearchToolAdd_Click() {
+		  $intSelectedInventoryModelId = $this->ctlInventorySearchTool->ctlInventorySearch->dtgInventoryModel->GetSelected("InventoryId");
+      if (count($intSelectedInventoryModelId) > 1) {
+        $this->ctlInventorySearchTool->lblWarning->Text = "You must select only one inventory.";
+      }
+      elseif (count($intSelectedInventoryModelId) != 1) {
+        $this->ctlInventorySearchTool->lblWarning->Text = "No selected inventories.";
+      }
+      elseif ($objInventoryModel = InventoryModel::LoadByInventoryModelId($intSelectedInventoryModelId[0])) {
+        $this->txtNewInventoryModelCode->Text = $objInventoryModel->InventoryModelCode;
+        $this->ctlInventorySearchTool->dlgInventorySearchTool->HideDialogBox();
+        $this->btnLookup_Click($this, null, null);
+  		}
+  		// Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
 		}
 
@@ -4407,6 +4446,7 @@
 			$this->btnAddAsset->Display = false;
 			$this->lblAddAsset->Display = false;
 			$this->btnLookup->Display = false;
+			$this->lblLookup->Display = false;
 			$this->btnAddInventory->Display = false;
 			$this->txtNewInventoryModelCode->Display = false;
 			$this->lstSourceLocation->Display = false;
@@ -4643,6 +4683,7 @@
 				$this->lblAddAsset->Display = true;
 				$this->txtNewInventoryModelCode->Display = true;
 				$this->btnLookup->Display = true;
+				$this->lblLookup->Display = true;
 				$this->lstSourceLocation->Display = true;
 				$this->txtQuantity->Display = true;
 				$this->btnAddInventory->Display = true;

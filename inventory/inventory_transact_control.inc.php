@@ -62,8 +62,8 @@ $this->btnCancel->RenderWithError();
 		  <table>
 		    <tr>
 		      <td valign="top"><?php $this->txtNewInventoryModelCode->RenderWithError(); ?></td>
-		      <td valign="top"><?php $this->lblLookup->Render(); ?></td>
 		      <td valign="top"><?php $this->btnLookup->Render(); ?></td>
+		      <td valign="top"><?php $this->lblLookup->Render(); ?></td>
 		    </tr>
 		  </table>
 		</td>

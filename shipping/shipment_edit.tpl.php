@@ -200,21 +200,25 @@ $this->pnlAttachments->Render();
 <div class="title">Inventory to Ship</div>
 <table>
 	<tr>
-		<td><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
-		<td><?php $this->btnLookup->Render(); ?></td>
+		<td valign="top"><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
+		<td valign="top"><?php $this->btnLookup->Render(); ?></td>
+		<td valign="top"><?php $this->lblLookup->Render(); ?></td>
 	</tr>
 	<tr>
 		<td><?php $this->lstSourceLocation->RenderDesigned(); ?></td>
+		<td></td>
 		<td></td>
 	</tr>
 	<tr>
 		<td><?php $this->txtQuantity->RenderDesigned(); ?></td>
 		<td><?php $this->btnAddInventory->Render(); ?></td>
+		<td></td>
 	</tr>
 </table>
 <?php $this->dtgInventoryTransact->Render(); ?>
 
 <?php $this->dlgNew->Render(); ?>
 <?php $this->ctlAssetSearchTool->Render(); ?>
+<?php $this->ctlInventorySearchTool->Render(); ?>
 <?php $this->RenderEnd() ?>
 <?php include('../includes/footer.inc.php'); ?>
