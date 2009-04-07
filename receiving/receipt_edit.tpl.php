@@ -171,8 +171,8 @@ $this->pnlAttachments->Render();
 	<div class="title">Inventory to Receive</div>
 	<table>
 		<tr>
-			<td><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
-			<td></td>
+			<td valign="top"><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
+			<td valign="top"><?php $this->lblLookup->Render(); ?></td>
 		</tr>
 		<tr>
 			<td><?php $this->txtQuantity->RenderDesigned(); ?></td>
@@ -184,5 +184,6 @@ $this->pnlAttachments->Render();
 
 	<?php $this->dlgNew->Render(); ?>
 	<?php $this->ctlAssetSearchTool->Render(); ?>
+	<?php $this->ctlInventorySearchTool->Render(); ?>
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>

@@ -114,8 +114,10 @@
 
 		// Generate tab indexes
 		protected $intNextTabIndex = 1;
-		public $ctlAssetSearchTool;
+		protected $ctlAssetSearchTool;
+		protected $ctlInventorySearchTool;
 	  protected $lblAddAsset;
+	  protected $lblLookup;
 
 		protected function Form_Create() {
 
@@ -172,6 +174,7 @@
 			$this->pnlAttachments_Create();
 			$this->btnAddAsset_Create();
 			$this->ctlAssetSearchTool_Create();
+			$this->ctlInventorySearchTool_Create();
 			$this->btnAddInventory_Create();
 
 
@@ -305,6 +308,17 @@
 		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxAction('lblAddAsset_Click'));
 		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddAsset_Click'));
 		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  	}
+
+  	protected function ctlInventorySearchTool_Create() {
+  	  $this->ctlInventorySearchTool = new QInventorySearchToolComposite($this);
+
+  	  $this->lblLookup = new QLabel($this);
+		  $this->lblLookup->HtmlEntities = false;
+		  $this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+		  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxAction('lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
 		//**************
@@ -1112,6 +1126,31 @@
         }
       }
       // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+		}
+
+		protected function lblLookup_Click() {
+		  // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+      $this->ctlInventorySearchTool->Refresh();
+      $this->ctlInventorySearchTool->btnInventorySearchToolAdd->Text = "Add";
+      $this->ctlInventorySearchTool->dlgInventorySearchTool->ShowDialogBox();
+		}
+
+		public function btnInventorySearchToolAdd_Click() {
+		  $intSelectedInventoryModelId = $this->ctlInventorySearchTool->ctlInventorySearch->dtgInventoryModel->GetSelected("InventoryId");
+      if (count($intSelectedInventoryModelId) > 1) {
+        $this->ctlInventorySearchTool->lblWarning->Text = "You must select only one inventory.";
+      }
+      elseif (count($intSelectedInventoryModelId) != 1) {
+        $this->ctlInventorySearchTool->lblWarning->Text = "No selected inventories.";
+      }
+      elseif ($objInventoryModel = InventoryModel::LoadByInventoryModelId($intSelectedInventoryModelId[0])) {
+        $this->txtNewInventoryModelCode->Text = $objInventoryModel->InventoryModelCode;
+        $this->ctlInventorySearchTool->dlgInventorySearchTool->HideDialogBox();
+        $this->txtQuantity->SetFocus();
+  		}
+  		// Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
 		}
 
@@ -2388,6 +2427,7 @@
 			$this->btnAddAsset->Display = false;
 			$this->lblAddAsset->Display = false;
 			$this->txtNewInventoryModelCode->Display = false;
+			$this->lblLookup->Display = false;
 			$this->txtQuantity->Display = false;
 			$this->btnAddInventory->Display = false;
 
@@ -2464,6 +2504,7 @@
 				$this->lblAddAsset->Display = true;
 				$this->txtNewInventoryModelCode->Display = true;
 				$this->txtQuantity->Display = true;
+				$this->lblLookup->Display = true;
 				$this->btnAddInventory->Display = true;
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));

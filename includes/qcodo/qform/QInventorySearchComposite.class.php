@@ -435,6 +435,10 @@ class QInventorySearchComposite extends QControl {
 		}
   }
 
+  public function Refresh() {
+    $this->btnClear_Click();
+  }
+
 	// And our public getter/setters
   public function __get($strName) {
 	  switch ($strName) {

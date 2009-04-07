@@ -147,6 +147,10 @@ class QInventorySearchToolComposite extends QControl {
 	  $this->btnInventorySearchToolCancel->Warning = "";
 	  $this->dlgInventorySearchTool->HideDialogBox();
 	}
+
+	public function Refresh() {
+	  $this->ctlInventorySearch->Refresh();
+	}
 }
 
 ?>

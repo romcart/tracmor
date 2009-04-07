@@ -147,6 +147,10 @@ class QAssetSearchToolComposite extends QControl {
 	  $this->btnAssetSearchToolCancel->Warning = "";
 	  $this->dlgAssetSearchTool->HideDialogBox();
 	}
+
+	public function Refresh() {
+	  $this->ctlAssetSearch->Refresh();
+	}
 }
 
 ?>
