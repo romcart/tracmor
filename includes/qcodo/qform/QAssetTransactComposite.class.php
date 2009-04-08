@@ -42,7 +42,7 @@ class QAssetTransactComposite extends QControl {
 	protected $txtNewAssetCode;
 	protected $objTransaction;
 	protected $intTransactionTypeId;
-	protected $lblAdd;
+	protected $lblAddAsset;
 	protected $ctlAssetSearchTool;
 
 	public function __construct($objParentObject, $strControlId = null) {
@@ -68,7 +68,6 @@ class QAssetTransactComposite extends QControl {
     $this->txtNote_Create();
     $this->txtNewAssetCode_Create();
     $this->btnAdd_Create();
-    $this->lblAdd_Create();
     $this->btnSave_Create();
     $this->dtgAssetTransact_Create();
     $this->ctlAssetSearchTool_Create();
@@ -154,16 +153,6 @@ class QAssetTransactComposite extends QControl {
 		$this->txtNewAssetCode->CausesValidation = false;
 	}
 
-	// Create lookup icon
-	protected function lblAdd_Create() {
-	  $this->lblAdd = new QLabel($this);
-		$this->lblAdd->HtmlEntities = false;
-		$this->lblAdd->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
-	  $this->lblAdd->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblAdd_Click'));
-	  $this->lblAdd->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'lblAdd_Click'));
-	  $this->lblAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	}
-
 	// Create the save button
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
@@ -238,6 +227,13 @@ class QAssetTransactComposite extends QControl {
 
 	protected function ctlAssetSearchTool_Create() {
 	  $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
+
+	  $this->lblAddAsset = new QLabel($this);
+		$this->lblAddAsset->HtmlEntities = false;
+		$this->lblAddAsset->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+	  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
+	  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
+	  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	}
 
 	// Add Button Click
@@ -388,13 +384,6 @@ class QAssetTransactComposite extends QControl {
 		else {
 			$this->txtNewAssetCode->Warning = "Please enter an asset code.";
 		}
-	}
-
-	public function lblAdd_Click() {
-	  $this->ctlAssetSearchTool->lblWarning->Text = "";
-	  $this->ctlAssetSearchTool->Refresh();
-    $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add";
-    $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 	}
 
 	public function btnAssetSearchToolAdd_Click() {

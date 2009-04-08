@@ -765,10 +765,6 @@ class QAssetEditComposite extends QControl {
 			$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
 
 			$blnError = false;
-			/*if ($this->objAsset->ParentAssetCode && ($this->objAsset->CheckedOutFlag || $this->objAsset->ReservedFlag || $this->objAsset->LocationId == 2 || $this->objAsset->LocationId == 3 || $this->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($this->objAsset->AssetId))) {
-			  $blnError = true;
-			  $this->txtParentAssetCode->Warning = "Child asset code must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved. Please try another.";
-			}*/
 			// If a new asset is being created
 			if (!$this->blnEditMode) {
 
@@ -782,14 +778,7 @@ class QAssetEditComposite extends QControl {
 				if (!$blnError && $this->txtParentAssetCode->Text) {
 				  if ($this->txtParentAssetCode->Text != $this->objAsset->AssetCode) {
     				$ParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
-    				if ($ParentAsset) {
-    				  // If the parent asset is currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved
-    				  /*if ($ParentAsset->CheckedOutFlag || $ParentAsset->ReservedFlag || $ParentAsset->LocationId == 2 || $ParentAsset->LocationId == 3 || $ParentAsset->LocationId == 5 || AssetTransaction::PendingTransaction($ParentAsset->AssetId)) {
-    				    $blnError = true;
-    					  $this->txtParentAssetCode->Warning = "Parent asset code must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved. Please try another.";
-    				  }*/
-    				}
-    				else {
+    				if (!$ParentAsset) {
     				  $blnError = true;
     					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
     				}
@@ -849,14 +838,7 @@ class QAssetEditComposite extends QControl {
 				  if (!$blnError) {
   				  if ($this->txtParentAssetCode->Text != $this->objAsset->AssetCode) {
       				$ParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
-      				if ($ParentAsset) {
-      				  // If the parent asset is currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved
-      				  /*if ($ParentAsset->CheckedOutFlag || $ParentAsset->ReservedFlag || $ParentAsset->LocationId == 2 && $ParentAsset->LocationId == 3 || $ParentAsset->LocationId == 5 || AssetTransaction::PendingTransaction($ParentAsset->AssetId)) {
-      				    $blnError = true;
-      					  $this->txtParentAssetCode->Warning = "Parent asset code must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved. Please try another.";
-      				  }*/
-      				}
-      				else {
+      				if (!$ParentAsset) {
       				  $blnError = true;
       					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
       				}

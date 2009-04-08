@@ -305,8 +305,8 @@
   	  $this->lblAddAsset = new QLabel($this);
 		  $this->lblAddAsset->HtmlEntities = false;
 		  $this->lblAddAsset->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
-		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxAction('lblAddAsset_Click'));
-		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
 		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
@@ -316,8 +316,8 @@
   	  $this->lblLookup = new QLabel($this);
 		  $this->lblLookup->HtmlEntities = false;
 		  $this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
-		  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxAction('lblLookup_Click'));
-		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
 		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
@@ -1101,14 +1101,6 @@
 		// These methods are run when buttons are clicked
 		//************************
 
-		protected function lblAddAsset_Click() {
-		  // Uncheck all items but SelectAll checkbox
-      $this->UncheckAllItems();
-      $this->ctlAssetSearchTool->Refresh();
-      $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Asset";
-      $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
-		}
-
 		public function btnAssetSearchToolAdd_Click() {
 		  $this->ctlAssetSearchTool->lblWarning->Text = "";
       $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
@@ -1127,14 +1119,6 @@
       }
       // Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
-		}
-
-		protected function lblLookup_Click() {
-		  // Uncheck all items but SelectAll checkbox
-      $this->UncheckAllItems();
-      $this->ctlInventorySearchTool->Refresh();
-      $this->ctlInventorySearchTool->btnInventorySearchToolAdd->Text = "Add";
-      $this->ctlInventorySearchTool->dlgInventorySearchTool->ShowDialogBox();
 		}
 
 		public function btnInventorySearchToolAdd_Click() {

@@ -65,7 +65,7 @@ $this->btnCancel->RenderWithError();
 		  <table>
 		    <tr>
 		      <td><?php $this->txtNewAssetCode->RenderWithError(); ?></td>
-		      <td><?php $this->lblAdd->Render(); ?></td>
+		      <td><?php $this->lblAddAsset->Render(); ?></td>
 		      <td><?php $this->btnAdd->Render(); ?></td>
 		    </tr>
 		  </table>

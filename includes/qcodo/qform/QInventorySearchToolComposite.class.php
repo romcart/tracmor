@@ -111,6 +111,9 @@ class QInventorySearchToolComposite extends QControl {
 
 		$this->btnInventorySearchToolAdd = new QButton($this->dlgInventorySearchTool);
 		$this->btnInventorySearchToolAdd->Text = "Add Selected";
+		// If the parent object is the QControl.
+		// For example, we are loading the QInventorySearchToolComposite from QInventoryTransactComposite.
+		// In this way, we show Qcodo where to search the action methods. In this case in the parent QControl object.
 		if ($this->objParentObject instanceof QControl) {
   		$this->btnInventorySearchToolAdd->AddAction(new QClickEvent(), new QAjaxControlAction($this->objParentObject, 'btnInventorySearchToolAdd_Click'));
   		$this->btnInventorySearchToolAdd->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->objParentObject, 'btnInventorySearchToolAdd_Click'));
@@ -137,11 +140,11 @@ class QInventorySearchToolComposite extends QControl {
 		$this->lblWarning->CssClass = "warning";
 	}
 
-	/*
-	public function btnInventorySearchToolAdd_Click() {
-	  $this->objParentObject->btnInventorySearchToolAdd_Click();
+	public function lblLookup_Click() {
+    $this->Refresh();
+    $this->btnInventorySearchToolAdd->Text = "Add";
+    $this->dlgInventorySearchTool->ShowDialogBox();
 	}
-  */
 
 	public function btnInventorySearchToolCancel_Click() {
 	  $this->btnInventorySearchToolCancel->Warning = "";

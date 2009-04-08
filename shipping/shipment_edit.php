@@ -501,8 +501,8 @@
   	  $this->lblAddAsset = new QLabel($this);
 		  $this->lblAddAsset->HtmlEntities = false;
 		  $this->lblAddAsset->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
-		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxAction('lblAddAsset_Click'));
-		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
 		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
@@ -512,8 +512,8 @@
   	  $this->lblLookup = new QLabel($this);
 		  $this->lblLookup->HtmlEntities = false;
 		  $this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
-		  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxAction('lblLookup_Click'));
-		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
 		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
@@ -2458,14 +2458,6 @@
       $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		}
 
-		protected function lblLookup_Click() {
-		  // Uncheck all items but SelectAll checkbox
-      $this->UncheckAllItems();
-      $this->ctlInventorySearchTool->Refresh();
-      $this->ctlInventorySearchTool->btnInventorySearchToolAdd->Text = "Add";
-      $this->ctlInventorySearchTool->dlgInventorySearchTool->ShowDialogBox();
-		}
-
 		public function btnAssetSearchToolAdd_Click() {
 		  $this->ctlAssetSearchTool->lblWarning->Text = "";
       $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
@@ -3178,6 +3170,7 @@
 								}
 								$objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 
+								// No any actions with linked items (LinkedFlag = 1) which have been scheduled for receipt
 								if ($objAssetTransaction->ScheduleReceiptFlag && !$objAssetTransaction->Asset->LinkedFlag) {
 
 									if ($objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset && $objAssetTransaction->NewAsset->AssetId == null) {
@@ -3266,12 +3259,7 @@
                         // Both the shipmentAssetTranscation (objAssetTransaction and the objReceiptAssetTransaction were involved in creating a new asset
     										// Asset Transactions where NewAssetFlag = true but AssetId is NULL are receipt asset transactions for exchanges.
     										$objLinkedReceiptAssetTransaction->AssetId = $objAssetTransaction->NewAssetId;
-    										//$objLinkedReceiptAssetTransaction->NewAssetFlag = true;
-    										//$objLinkedAssetTransaction->NewAssetFlag = true;
-    										//$objLinkedAssetTransaction->Save();
 									    }
-
-
     									$objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode] = $objLinkedAssetTransaction;
 									  }
 									}

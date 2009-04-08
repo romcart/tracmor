@@ -111,10 +111,14 @@ class QAssetSearchToolComposite extends QControl {
 
 		$this->btnAssetSearchToolAdd = new QButton($this->dlgAssetSearchTool);
 		$this->btnAssetSearchToolAdd->Text = "Add Selected";
+		// If the parent object is the QControl.
+		// For example, we are loading the QAssetSearchToolComposite from QAssetTransactComposite.
+		// In this way, we show Qcodo where to search the action methods. In this case in the parent QControl object.
 		if ($this->objParentObject instanceof QControl) {
   		$this->btnAssetSearchToolAdd->AddAction(new QClickEvent(), new QAjaxControlAction($this->objParentObject, 'btnAssetSearchToolAdd_Click'));
   		$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->objParentObject, 'btnAssetSearchToolAdd_Click'));
 		}
+		// Else Qcodo will search the action methods in the form.
 		else {
 		  $this->btnAssetSearchToolAdd->AddAction(new QClickEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
   		$this->btnAssetSearchToolAdd->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAssetSearchToolAdd_Click'));
@@ -137,11 +141,11 @@ class QAssetSearchToolComposite extends QControl {
 		$this->lblWarning->CssClass = "warning";
 	}
 
-	/*
-	public function btnAssetSearchToolAdd_Click() {
-	  $this->objParentObject->btnAssetSearchToolAdd_Click();
+	public function lblAddAsset_Click() {
+    $this->Refresh();
+    $this->btnAssetSearchToolAdd->Text = "Add Asset";
+    $this->dlgAssetSearchTool->ShowDialogBox();
 	}
-  */
 
 	public function btnAssetSearchToolCancel_Click() {
 	  $this->btnAssetSearchToolCancel->Warning = "";

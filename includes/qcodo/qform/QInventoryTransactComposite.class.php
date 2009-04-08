@@ -120,8 +120,8 @@ class QInventoryTransactComposite extends QControl {
 	  $this->lblLookup = new QLabel($this);
 		$this->lblLookup->HtmlEntities = false;
 		$this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
-	  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblLookup_Click'));
-	  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'lblLookup_Click'));
+	  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
+	  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
 	  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	}
 
@@ -433,13 +433,6 @@ class QInventoryTransactComposite extends QControl {
 				$this->txtQuantity->Enabled = false;
 			}
 		}
-	}
-
-	public function lblLookup_Click() {
-	  $this->ctlInventorySearchTool->lblWarning->Text = "";
-	  $this->ctlInventorySearchTool->Refresh();
-    $this->ctlInventorySearchTool->btnInventorySearchToolAdd->Text = "Add";
-    $this->ctlInventorySearchTool->dlgInventorySearchTool->ShowDialogBox();
 	}
 
 	public function btnInventorySearchToolAdd_Click() {

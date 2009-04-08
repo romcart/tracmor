@@ -85,7 +85,7 @@ class QInventorySearchComposite extends QControl {
   	$this->dtgInventoryModel->CellSpacing = 0;
   	$this->dtgInventoryModel->CssClass = "datagrid";
 
-    // Disable AJAX for the datagrid
+    // Enable/Disable AJAX for the datagrid
     $this->dtgInventoryModel->UseAjax = $this->blnUseAjax;
 
     // Allow for column toggling
@@ -105,6 +105,7 @@ class QInventorySearchComposite extends QControl {
     	$this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->InventoryModelId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
     }
     $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+    // Removing any links in the column data
     if ($this->blnRemoveAllLinks) {
       $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Inventory Code', '<?= $_ITEM->InventoryModelCode; ?>', 'SortByCommand="inventory_model_code ASC"', 'ReverseSortByCommand="inventory_model_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
     }

@@ -387,7 +387,6 @@ CREATE FIELD METHODS
 		  $this->lblAddChild->HtmlEntities = false;
 		  $this->lblAddChild->Display = false;
 		  $this->lblAddChild->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
-		  //$this->lblAddChild->CssClass = 'add_icon';
 		  $this->lblAddChild->AddAction(new QClickEvent(), new QAjaxAction('lblAddChild_Click'));
 		  $this->lblAddChild->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddChild_Click'));
 		  $this->lblAddChild->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -411,12 +410,7 @@ CREATE FIELD METHODS
 
 				$objCaller->strTitleVerb = QApplication::Translate('Edit');
 				$objCaller->blnEditMode = true;
-				/*if ($objCaller->objAsset->CheckedOutFlag || $objCaller->objAsset->ReservedFlag || $objCaller->objAsset->LocationId == 2 || $objCaller->objAsset->LocationId == 3 || $objCaller->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objCaller->objAsset->AssetId)) {
-				  $this->blnEditChild = false;
-				}
-				else {
-				  */$this->blnEditChild = true;
-				//}
+				$this->blnEditChild = true;
 			} else {
 				$objCaller->objAsset = new Asset();
 				$objCaller->strTitleVerb = QApplication::Translate('Create');
@@ -465,16 +459,12 @@ CREATE FIELD METHODS
   		    if ($objChildAsset->ParentAssetCode) {
   		      $this->txtAddChild->Warning = "That asset code already have the parent asset code. Please try another.";
   		    }
-  		    /*elseif ($objChildAsset->CheckedOutFlag || $objChildAsset->ReservedFlag || $objChildAsset->LocationId == 2 && $objChildAsset->LocationId == 3 || $objChildAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objChildAsset->AssetId)) {
-  		      $this->txtAddChild->Warning = "Child asset code must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved. Please try another.";
-  		    }*/
   		    elseif ($objChildAsset->AssetCode == $this->objAsset->AssetCode) {
   		      $this->txtAddChild->Warning = "That asset code does not exist. Please try another.";
   		    }
   		    else {
   		      $objChildAsset->LinkedFlag = false;
   		      $objChildAsset->ParentAssetCode = $this->objAsset->AssetCode;
-  		      //$objChildAsset->Save();
   		      array_push($this->ctlAssetEdit->objChildAssetArray, $objChildAsset);
 
   		      $this->txtAddChild->Text = "";
@@ -498,7 +488,7 @@ CREATE FIELD METHODS
       }
       $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Selected";
       $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
-		  $this->intDlgStatus = 2;
+      $this->intDlgStatus = 2; // Add Child
 		}
 
 		protected function btnReassign_Click() {
@@ -511,7 +501,7 @@ CREATE FIELD METHODS
         }
         $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Reassign";
         $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
-		    $this->intDlgStatus = 1;
+		    $this->intDlgStatus = 1; // Reassign
 		  }
       else {
         $this->btnUnlink->Warning = "No selected assets.";
@@ -525,16 +515,21 @@ CREATE FIELD METHODS
 		      $this->ctlAssetEdit->objRemovedChildAssetArray = array();
 		    }
 		    $objNewChildAssetArray = array();
-        foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
+        // Creating the associative array with AssetId as a key
+		    foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
           $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
         }
+        // Removing all checked child assets
         foreach ($arrAssetId as $intAssetId) {
           $objRemovedChildAsset = $objNewChildAssetArray[$intAssetId];
+          // Remove child asset
           unset($objNewChildAssetArray[$intAssetId]);
           $objRemovedChildAsset->ParentAssetCode = "";
           $objRemovedChildAsset->LinkedFlag = false;
+          // Add removing child asset to objRemovedChildAssetArray
           array_push($this->ctlAssetEdit->objRemovedChildAssetArray, $objRemovedChildAsset);
         }
+        // Creating new objChildAssetArray without removing assets
         $this->ctlAssetEdit->objChildAssetArray = array();
 		    foreach ($objNewChildAssetArray as $objChildAsset) {
 		      array_push($this->ctlAssetEdit->objChildAssetArray, $objChildAsset);
@@ -551,14 +546,15 @@ CREATE FIELD METHODS
 		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
 		  if (count($arrAssetId)) {
 		    $objNewChildAssetArray = array();
-        foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
+        // Creating the associative array with AssetId as a key
+		    foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
           $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
         }
-		    $objSelectedChildAssetArray = array();
+        // Foreach checked child assets
 		    foreach ($arrAssetId as $intAssetId) {
-		      $objSelectedChildAssetArray[] = $objNewChildAssetArray[$intAssetId];
-		    }
-		    foreach ($objSelectedChildAssetArray as $objAsset) {
+		      // Load the object of the child asset from array by AssetId
+		      $objAsset = $objNewChildAssetArray[$intAssetId];
+		      // Error checking
           if ($objAsset->LocationId != $this->objAsset->LocationId) {
             $blnError = true;
       		  $this->btnUnlink->Warning .= "The child asset (" . $objAsset->AssetCode . ") must be in the same location as the parent asset.<br />";
@@ -676,21 +672,15 @@ CREATE FIELD METHODS
     		      $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") already have the parent asset code. Please try another.<br />";
     		      $blnError = true;
             }
-            elseif /*(!($objNewChildAsset->CheckedOutFlag || $objNewChildAsset->ReservedFlag || $objNewChildAsset->LocationId == 2 && $objNewChildAsset->LocationId == 3 || $objNewChildAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objNewChildAsset->AssetId))) {
-              if*/ ($objNewChildAsset->AssetCode != $this->objAsset->AssetCode) {
-                $objNewChildAsset->LinkedFlag = false;
-                $objNewChildAsset->ParentAssetCode = $this->objAsset->AssetCode;
-                $arrCheckedAssets[] = $objNewChildAsset;
-              }
-              else {
-                $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be the same as asset code.<br />";
-                $blnError = true;
-              }
-            /*}
+            elseif ($objNewChildAsset->AssetCode != $this->objAsset->AssetCode) {
+              $objNewChildAsset->LinkedFlag = false;
+              $objNewChildAsset->ParentAssetCode = $this->objAsset->AssetCode;
+              $arrCheckedAssets[] = $objNewChildAsset;
+            }
             else {
-              $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+              $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be the same as asset code.<br />";
               $blnError = true;
-            }*/
+            }
           }
           if ($intSelectedAssetCount == 0) {
             $this->ctlAssetSearchTool->lblWarning->Text .= "No selected assets.<br />";
@@ -819,8 +809,10 @@ CREATE FIELD METHODS
       }
 		}
 
+		// This method is called by btnSave_Click() or btnCancel_Click()
 		public function RefreshChildAssets() {
 		  $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+		  // Hide the column with checkboxes
 		  $this->dtgChildAssets->GetColumn(0)->Display = false;
 		  $this->dtgChildAssets_Bind();
 		}
@@ -833,7 +825,7 @@ CREATE FIELD METHODS
       }
       $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Parent Asset";
       $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
-		  $this->intDlgStatus = 3;
+		  $this->intDlgStatus = 3; // Adding the Parent Asset Code
 		}
 	}
 
