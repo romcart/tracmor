@@ -73,6 +73,8 @@
 
 		protected $intAssetIdArray;
 
+		protected $pnlAddChildAsset;
+
 		// These are needed for the hovertips in the Shipping/Receiving datagrid
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
@@ -90,8 +92,7 @@
 			$this->ctlAssetEdit_Create();
 
 			if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) {
-  		  $this->lblChildAssets_Create();
-  			$this->lblAssetCode_Create();
+			  $this->lblChildAssets_Create();
   			// Create Buttons
   			$this->btnChildAssetsRemove_Create();
   			$this->btnReassign_Create();
@@ -317,11 +318,6 @@ CREATE FIELD METHODS
 		  $this->lblChildAssets->CssClass = "title";
 		}
 
-		protected function lblAssetCode_Create() {
-		  $this->lblAssetCode = new QLabel($this);
-		  $this->lblAssetCode->Text = "Asset Code:";
-		  $this->lblAssetCode->Display = false;
-		}
 
 		protected function ctlAssetSearchTool_Create() {
 		  $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
@@ -370,22 +366,26 @@ CREATE FIELD METHODS
 		}
 
 		protected function AddChild_Create() {
-		  $this->btnAddChild = new QButton($this);
+		  $this->pnlAddChildAsset = new QPanel($this);
+		  $this->pnlAddChildAsset->Display = false;
+		  $this->pnlAddChildAsset->Template = "asset_pnl_add_child_asset.tpl.php";
+
+		  $this->lblAssetCode = new QLabel($this->pnlAddChildAsset);
+		  $this->lblAssetCode->Text = "Asset Code:";
+
+		  $this->btnAddChild = new QButton($this->pnlAddChildAsset);
 		  $this->btnAddChild->Text = "Add Child";
-		  $this->btnAddChild->Display = false;
 		  $this->btnAddChild->AddAction(new QClickEvent(), new QAjaxAction('btnAddChild_Click'));
 		  $this->btnAddChild->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddChild_Click'));
 		  $this->btnAddChild->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
-		  $this->txtAddChild = new QTextBox($this);
+		  $this->txtAddChild = new QTextBox($this->pnlAddChildAsset);
 		  $this->txtAddChild->Width = 200;
-		  $this->txtAddChild->Display = false;
 		  $this->txtAddChild->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddChild_Click'));
 		  $this->txtAddChild->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
-		  $this->lblAddChild = new QLabel($this);
+		  $this->lblAddChild = new QLabel($this->pnlAddChildAsset);
 		  $this->lblAddChild->HtmlEntities = false;
-		  $this->lblAddChild->Display = false;
 		  $this->lblAddChild->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
 		  $this->lblAddChild->AddAction(new QClickEvent(), new QAjaxAction('lblAddChild_Click'));
 		  $this->lblAddChild->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblAddChild_Click'));
@@ -743,9 +743,7 @@ CREATE FIELD METHODS
 			if ($this->ctlAssetEdit->btnSaveDisplay && $this->blnEditChild) {
   		  $this->lblChildAssets->Display = true;
 			  $this->lblAssetCode->Display = true;
-  		  $this->txtAddChild->Display = true;
-  		  $this->lblAddChild->Display = true;
-  		  $this->btnAddChild->Display = true;
+  		  $this->pnlAddChildAsset->Display = true;
 			  $this->btnChildAssetsRemove->Display = true;
   		  $this->btnReassign->Display = true;
   		  $this->btnLinkToParent->Display = true;
@@ -767,9 +765,7 @@ CREATE FIELD METHODS
 			    $this->dtgChildAssets->Visible = true;
 			  }
   		  $this->lblAssetCode->Display = false;
-  		  $this->txtAddChild->Display = false;
-  		  $this->lblAddChild->Display = false;
-  		  $this->btnAddChild->Display = false;
+  		  $this->pnlAddChildAsset->Display = false;
 			  $this->btnChildAssetsRemove->Display = false;
   		  $this->btnReassign->Display = false;
   		  $this->btnLinkToParent->Display = false;

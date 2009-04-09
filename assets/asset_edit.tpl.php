@@ -40,7 +40,7 @@
 		<?php $this->ctlAssetEdit->Render(); ?>
 		<?php if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) { ?>
 		<br class="item_divider" />
-		<?php $this->lblChildAssets->Render(); ?>
+		<?php $this->lblChildAssets->Render(); /*?>
 	  <table>
 	   <tr>
 	     <td width="275px" valign="top"><?php $this->lblAssetCode->Render(); ?>&nbsp;<?php $this->txtAddChild->RenderWithError(); ?></td>
@@ -48,7 +48,9 @@
 	     <td valign="top"><?php $this->btnAddChild->Render(); ?></td>
 	   </tr>
 	  </table>
-	  <?php $this->dtgChildAssets->RenderWithError(); ?>
+	  <?php*/
+    $this->pnlAddChildAsset->Render();
+    $this->dtgChildAssets->RenderWithError(); ?>
 	  <?php $this->btnChildAssetsRemove->Render() . "&nbsp;" . $this->btnReassign->Render() . "&nbsp;" . $this->btnLinkToParent->Render() . "&nbsp;" . $this->btnUnlink->RenderWithError(); ?>
     <br class="item_divider" />
     <?php $this->ctlAssetSearchTool->Render();
