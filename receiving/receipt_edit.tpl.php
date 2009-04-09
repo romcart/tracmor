@@ -158,8 +158,8 @@ $this->pnlAttachments->Render();
 			<td colspan="3"><?php $this->lstAssetModel->RenderDesigned(); ?></td>
 		</tr>
 		<tr>
-			<td valign="top"><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
-			<td valign="top"><?php $this->lblAddAsset->Render(); ?></td>
+			<td valign="top" width="200px"><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
+			<td valign="top" width="20px"><?php $this->lblAddAsset->Render(); ?></td>
 			<td valign="top"><?php $this->btnAddAsset->Render(); ?></td>
 		</tr>
 		<tr>
@@ -171,8 +171,8 @@ $this->pnlAttachments->Render();
 	<div class="title">Inventory to Receive</div>
 	<table>
 		<tr>
-			<td valign="top"><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
-			<td valign="top"><?php $this->lblLookup->Render(); ?></td>
+			<td valign="top" width="200px"><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
+			<td valign="top" width="20px"><?php $this->lblLookup->Render(); ?></td>
 		</tr>
 		<tr>
 			<td><?php $this->txtQuantity->RenderDesigned(); ?></td>

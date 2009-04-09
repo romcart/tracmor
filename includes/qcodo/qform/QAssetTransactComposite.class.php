@@ -239,7 +239,7 @@ class QAssetTransactComposite extends QControl {
 	// Add Button Click
 	public function btnAdd_Click($strFormId, $strControlId, $strParameter) {
 
-		$strAssetCode = $this->txtNewAssetCode->Text;
+	  $strAssetCode = $this->txtNewAssetCode->Text;
 		$blnDuplicate = false;
 		$blnError = false;
 
@@ -376,7 +376,7 @@ class QAssetTransactComposite extends QControl {
 					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
 					    $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
 					  }
-					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+					  $this->txtNewAssetCode->Text = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 					}
 				}
 			}
@@ -388,16 +388,20 @@ class QAssetTransactComposite extends QControl {
 
 	public function btnAssetSearchToolAdd_Click() {
 	  $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
-    if (count($intSelectedAssetId) > 1) {
-      $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one asset.";
-    }
-    elseif (count($intSelectedAssetId) != 1) {
+    if (count($intSelectedAssetId) < 1) {
       $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
     }
-    elseif ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
-      $this->txtNewAssetCode->Text = $objAsset->AssetCode;
+    else {
+      $lblNewWarning = "";
+      foreach (Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $intSelectedAssetId)) as $objAsset) {
+        $this->txtNewAssetCode->Text = $objAsset->AssetCode;
+        $this->btnAdd_Click($this, null, null);
+        if ($this->txtNewAssetCode->Warning) {
+          $lblNewWarning .= sprintf("<br />%s - %s", $objAsset->AssetCode, $this->txtNewAssetCode->Warning);
+        }
+      }
+      $this->txtNewAssetCode->Warning = $lblNewWarning;
       $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
-      $this->txtNewAssetCode->SetFocus();
 		}
 		// Uncheck all items but SelectAll checkbox
     $this->UncheckAllItems();
@@ -584,7 +588,7 @@ class QAssetTransactComposite extends QControl {
 				foreach ($objLinkedAssetArray as $objLinkedAsset) {
 				  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
 				}
-				$this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+				$this->txtNewAssetCode->Text = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 			}
 		}
 

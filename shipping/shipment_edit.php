@@ -2450,30 +2450,24 @@
 		// These methods are run when buttons are clicked
 		//************************
 
-		protected function lblAddAsset_Click() {
-		  // Uncheck all items but SelectAll checkbox
-      $this->UncheckAllItems();
-      $this->ctlAssetSearchTool->Refresh();
-      $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Asset";
-      $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
-		}
-
 		public function btnAssetSearchToolAdd_Click() {
 		  $this->ctlAssetSearchTool->lblWarning->Text = "";
       $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
-      if (count($intSelectedAssetId) > 1) {
-        $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one asset.";
-      }
-      elseif (count($intSelectedAssetId) != 1) {
+      if (count($intSelectedAssetId) < 1) {
         $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
       }
       else {
-        if ($objAsset = Asset::LoadByAssetId($intSelectedAssetId[0])) {
+        $lblNewWarning = "";
+        foreach (Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $intSelectedAssetId)) as $objAsset) {
           $this->txtNewAssetCode->Text = $objAsset->AssetCode;
-          $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
-          $this->txtNewAssetCode->SetFocus();
+          $this->btnAddAsset_Click($this, null, null);
+          if ($this->txtNewAssetCode->Warning) {
+            $lblNewWarning .= sprintf("<br />%s - %s", $objAsset->AssetCode, $this->txtNewAssetCode->Warning);
+          }
         }
-      }
+        $this->txtNewAssetCode->Warning = $lblNewWarning;
+        $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+		  }
       // Uncheck all items but SelectAll checkbox
       $this->UncheckAllItems();
 		}
