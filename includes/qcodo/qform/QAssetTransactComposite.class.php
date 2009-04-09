@@ -376,7 +376,7 @@ class QAssetTransactComposite extends QControl {
 					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
 					    $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
 					  }
-					  $this->txtNewAssetCode->Text = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 					}
 				}
 			}
@@ -588,7 +588,7 @@ class QAssetTransactComposite extends QControl {
 				foreach ($objLinkedAssetArray as $objLinkedAsset) {
 				  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
 				}
-				$this->txtNewAssetCode->Text = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+				$this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 			}
 		}
 
