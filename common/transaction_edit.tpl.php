@@ -74,7 +74,7 @@
 	<br class="item_divide" />
 	<a href="../assets/asset_list.php">Asset List</a>
 	<br class="item_divide" />
-	<a href="../inventory/Inventory_model_list.php">Inventory List</a>
+	<a href="../inventory/inventory_model_list.php">Inventory List</a>
 
 	<?php $this->RenderEnd() ?>		
 	</body>
