@@ -109,5 +109,15 @@
 	        }
 		    return false;*/
 		}
+		
+		/**
+		 * Count Active UserAccounts
+		 * @return int
+		 */
+		public static function CountActive() {
+			// Call UserAccount::QueryCount to perform the Count query
+			return UserAccount::QueryCount(QQ::Equal(QQN::UserAccount()->ActiveFlag,1));
+		}
+				
 	}
 ?>

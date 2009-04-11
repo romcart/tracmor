@@ -216,6 +216,24 @@
 				$this->txtPasswordConfirm->Text = "";
 			}
 			
+			$intUserLimit = (is_numeric(QApplication::$TracmorSettings->UserLimit)) ? QApplication::$TracmorSettings->UserLimit : 99999;			
+			
+			// Do not allow creation of a new active user if user limit will be exceeded
+			if (!$this->blnEditMode && $this->chkActiveFlag->Checked) {
+				if (UserAccount::CountActive() >= $intUserLimit) {
+					$blnError = true;
+					$this->chkActiveFlag->Warning = "You have exceeded your user limit.";
+				}
+			}
+			
+			// Do not allow activation of a disabled user if the user limit will be exceeded
+			if ($this->blnEditMode && $this->chkActiveFlag->Checked && !$this->objUserAccount->ActiveFlag) {
+				if (UserAccount::CountActive() >= $intUserLimit) {
+					$blnError = true;
+					$this->chkActiveFlag->Warning = "You have exceeded your user limit.";
+				}				
+			}
+			
 			if (!$blnError) {
 				
 				try {
