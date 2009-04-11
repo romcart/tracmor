@@ -2959,72 +2959,21 @@ INSERT INTO `role_entity_qtype_built_in_authorization` (`role_entity_built_in_id
 (15, 1, 11, 1, 1, 1, '2008-07-11 22:14:47', NULL, NULL),
 (16, 1, 11, 2, 1, 1, '2008-07-11 22:14:47', NULL, NULL);
 
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (1,'company_id');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (2,'image_upload_prefix');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (3,'fedex_gateway_URI');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description,
-            VALUE)
-VALUES     (4,'company_logo','empty.gif');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (5,'packing_list_terms');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (6,'packing_list_logo');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (7,'min_asset_code');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (8,'fedex_account_id');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (9,'autodetect_tracking_numbers');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (10,'custom_shipment_numbers');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (11,'custom_receipt_numbers');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description)
-VALUES     (12,'receive_to_last_location');
-
-INSERT INTO `admin_setting`
-           (setting_id,
-            short_description,
-            VALUE)
-VALUES     (13,'portable_pin_required','1');
+INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
+(1,'company_id',NULL),
+(2,'image_upload_prefix',NULL),
+(3,'fedex_gateway_URI',NULL),
+(4,'company_logo','empty.gif'),
+(5,'packing_list_terms',NULL),
+(6,'packing_list_logo',NULL),
+(7,'min_asset_code',NULL),
+(8,'fedex_account_id',NULL),
+(9,'autodetect_tracking_numbers',NULL),
+(10,'custom_shipment_numbers',NULL),
+(11,'custom_receipt_numbers',NULL),
+(12,'receive_to_last_location',NULL),
+(13,'portable_pin_required','1'),
+(14,'user_limit',NULL);
 
 INSERT INTO fedex_service_type
            (`fedex_service_type_id`,
