@@ -1107,9 +1107,8 @@
 			$this->lstToContact->Required = true;
 			
 			if (!$this->blnEditMode) {
-				$this->lstToContact->Enabled = false;
-			}
-			elseif ($this->blnEditMode && $this->lstToCompany->SelectedValue) {
+				$this->lstToContact->AddItem('- Select One -', null);
+			} elseif ($this->blnEditMode && $this->lstToCompany->SelectedValue) {
 				$this->lstToContact->Enabled = true;
 				$this->lstToCompany_Select();
 			}
@@ -1134,7 +1133,7 @@
 			$this->lstToAddress->Name = QApplication::Translate('To Address');
 			$this->lstToAddress->Required = true;
 			if (!$this->blnEditMode) {
-				$this->lstToAddress->Enabled = false;
+				$this->lstToAddress->AddItem('- Select One -', null);
 			}
 			elseif ($this->blnEditMode && $this->lstToCompany->SelectedValue) {
 				$objToAddressArray = Address::LoadArrayByCompanyId($this->objShipment->ToCompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
