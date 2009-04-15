@@ -234,6 +234,18 @@
 				}				
 			}
 			
+			// Do not allow duplicate usernames
+			if ($this->blnEditMode) {
+				$objUserAccountDuplicate = UserAccount::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::UserAccount()->Username, $this->txtUsername->Text), QQ::NotEqual(QQN::UserAccount()->UserAccountId, $this->objUserAccount->UserAccountId)));
+			}
+			else {
+				$objUserAccountDuplicate = UserAccount::QuerySingle(QQ::Equal(QQN::UserAccount()->Username, $this->txtUsername->Text));
+			}
+			if ($objUserAccountDuplicate) {
+				$blnError = true;
+				$this->btnCancel->Warning = 'A user account already exists with that username. Please choose another.';
+			}			
+			
 			if (!$blnError) {
 				
 				try {
