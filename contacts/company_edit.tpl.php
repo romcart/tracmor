@@ -109,8 +109,8 @@
 							<?php
 								if(isset($arrCompanyFields))for ($i=0;$i<ceil(count($arrCompanyFields)/2);$i++) {
 									echo('<tr>');
-									echo('<td class="record_field_name">'. $arrCompanyFields[$i]['name'] .'&nbsp;</td>');
-									echo('<td class="record_field_value">'. $arrCompanyFields[$i]['value'] .'&nbsp;</td>');
+									echo('<td class="record_field_name" nowrap>'. $arrCompanyFields[$i]['name'] .'&nbsp;</td>');
+									echo('<td class="record_field_value" nowrap>'. $arrCompanyFields[$i]['value'] .'&nbsp;</td>');
 									echo('</tr>');
 								}
 							?>
@@ -121,8 +121,8 @@
 							<?php
 								if(isset($arrCompanyFields))for ($i=ceil(count($arrCompanyFields)/2);$i<count($arrCompanyFields);$i++) {
 									echo('<tr>');
-									echo('<td class="record_field_name">'. $arrCompanyFields[$i]['name'] .'&nbsp;</td>');
-									echo('<td class="record_field_value">'. $arrCompanyFields[$i]['value'] .'&nbsp;</td>');
+									echo('<td class="record_field_name" nowrap>'. $arrCompanyFields[$i]['name'] .'&nbsp;</td>');
+									echo('<td class="record_field_value" nowrap>'. $arrCompanyFields[$i]['value'] .'&nbsp;</td>');
 									echo('</tr>');
 								}
 							?>				

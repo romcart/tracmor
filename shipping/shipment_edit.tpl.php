@@ -90,16 +90,16 @@
 								</tr>
 								
 								<tr>
-									<td class="record_field_name">Company:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); $this->lblNewFromCompany->RenderWithError(); ?></td>
+									<td class="record_field_name" nowrap>Company:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); $this->lblNewFromCompany->RenderWithError(); ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Contact:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); $this->lblNewFromContact->RenderWithError();  ?></td>
+									<td class="record_field_name" nowrap>Contact:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); $this->lblNewFromContact->RenderWithError();  ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Address:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstFromAddress->RenderWithError();$this->lblFromAddress->Render();  $this->lblNewFromAddress->RenderWithError(); ?><br><?php $this->lblFromAddressFull->Render(); ?></td>
+									<td class="record_field_name" nowrap>Address:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->lstFromAddress->RenderWithError();$this->lblFromAddress->Render();  $this->lblNewFromAddress->RenderWithError(); ?><br><?php $this->lblFromAddressFull->Render(); ?></td>
 								</tr>
 							</table>
 							<br class="item_divider" />
@@ -108,16 +108,16 @@
 									<td colspan="2" class="record_subheader">Recipient Information</td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Company:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstToCompany->RenderWithError();$this->lblToCompany->Render(); $this->lblNewToCompany->RenderWithError(); ?></td>
+									<td class="record_field_name" nowrap>Company:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->lstToCompany->RenderWithError();$this->lblToCompany->Render(); $this->lblNewToCompany->RenderWithError(); ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Contact:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render();  $this->lblNewToContact->RenderWithError(); ?></td>
+									<td class="record_field_name" nowrap>Contact:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render();  $this->lblNewToContact->RenderWithError(); ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Address:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); $this->lblNewToAddress->RenderWithError(); ?><br><?php $this->lblToAddressFull->Render(); ?></td>
+									<td class="record_field_name" nowrap>Address:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); $this->lblNewToAddress->RenderWithError(); ?><br><?php $this->lblToAddressFull->Render(); ?></td>
 								</tr>						
 							</table>
 						</td>
@@ -139,28 +139,28 @@
 								?>
 
 								<tr>
-									<td class="record_field_name">Shipping Courier:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstCourier->RenderWithError();$this->lblCourier->Render(); ?>&nbsp;</td>
+									<td class="record_field_name" nowrap>Shipping Courier:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->lstCourier->RenderWithError();$this->lblCourier->Render(); ?>&nbsp;</td>
 								</tr>
 								<?php $tnDisplay = ($this->blnEditMode && $this->objShipment->CourierId===1 && !$this->objShipment->ShippedFlag) ? "display:none;" : ""; ?>
 								<tr id="trackingNumber" style="<?php echo($tnDisplay); ?>">
-									<td class="record_field_name">Tracking Number:&nbsp;</td>
-									<td class="record_field_value"><?php $this->txtTrackingNumber->RenderWithError();$this->lblTrackingNumber->Render(); ?>&nbsp;</td>
+									<td class="record_field_name" nowrap>Tracking Number:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->txtTrackingNumber->RenderWithError();$this->lblTrackingNumber->Render(); ?>&nbsp;</td>
 								</tr>								
 								<tr>
-									<td class="record_field_name">Note:&nbsp;</td>
-									<td class="record_field_value"><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?>&nbsp;</td>
+									<td class="record_field_name" nowrap>Note:&nbsp;</td>
+									<td class="record_field_value" nowrap><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?>&nbsp;</td>
 								</tr>									
 								<tr>
-									<td class="record_field_name">Ship Date:&nbsp;</td>
+									<td class="record_field_name" nowrap>Ship Date:&nbsp;</td>
 									<td class="record_field_value"><?php $this->calShipDate->RenderWithError();$this->lblShipDate->Render(); ?>&nbsp;</td>
 								</tr>
 								<?php if (!empty($arrShipmentFields)) {
 									foreach ($arrShipmentFields as $field) {
 										?>
 										<tr>
-											<td class="record_field_name"><?php echo $field['name']; ?></td>
-											<td class="record_field_value"><?php echo $field['value']; ?></td>
+											<td class="record_field_name" nowrap><?php echo $field['name']; ?></td>
+											<td class="record_field_value" nowrap><?php echo $field['value']; ?></td>
 										</tr>
 										<?php
 									}

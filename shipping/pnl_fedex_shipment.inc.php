@@ -35,8 +35,8 @@
 					<td style="vertical-align:top;">
 						<table cellpadding="0" cellspacing="0">
 							<tr>
-								<td class="record_field_name">Recipient Phone:&nbsp;</td>
-								<td class="record_field_value"><?php $this->txtToPhone->RenderWithError(); $this->lblToPhone->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>Recipient Phone:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->txtToPhone->RenderWithError(); $this->lblToPhone->Render(); ?>&nbsp;</td>
 							</tr>
 						</table>
 						<br class="item_divider" />
@@ -45,16 +45,16 @@
 								<td colspan="2" class="fedex_subheader">Billing Details</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Bill to:&nbsp;</td>
-								<td class="record_field_value"><?php $this->lstBillTransportationTo->RenderWithError(); $this->lblBillTransportationTo->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>Bill to:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->lstBillTransportationTo->RenderWithError(); $this->lblBillTransportationTo->Render(); ?>&nbsp;</td>
 							</tr>
 							<tr>
-								<td class="record_field_name"><?php $this->lblSenderLabel->Render(); ?>:&nbsp;</td>
-								<td class="record_field_value"><?php $this->lstShippingAccount->RenderWithError();$this->txtRecipientThirdPartyAccount->RenderWithError(); $this->lblPayerAccount->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap><?php $this->lblSenderLabel->Render(); ?>:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->lstShippingAccount->RenderWithError();$this->txtRecipientThirdPartyAccount->RenderWithError(); $this->lblPayerAccount->Render(); ?>&nbsp;</td>
 							</tr>			
 							<tr>
-								<td class="record_field_name">Your reference:&nbsp;</td>
-								<td class="record_field_value"><?php $this->txtReference->RenderWithError(); $this->lblReference->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>Your reference:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->txtReference->RenderWithError(); $this->lblReference->Render(); ?>&nbsp;</td>
 							</tr>			
 						</table>
 						<br class="item_divider" />
@@ -63,24 +63,24 @@
 								<td colspan="2" class="fedex_subheader">Package & Shipment Details</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Service Type:&nbsp;</td>
-								<td class="record_field_value"><?php $this->lstFxServiceType->RenderWithError(); $this->lblFxServiceType->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>Service Type:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->lstFxServiceType->RenderWithError(); $this->lblFxServiceType->Render(); ?>&nbsp;</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Package Type:&nbsp;</td>
-								<td class="record_field_value"><?php $this->lstPackageType->RenderWithError(); $this->lblPackageType->RenderWithError(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>Package Type:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->lstPackageType->RenderWithError(); $this->lblPackageType->RenderWithError(); ?>&nbsp;</td>
 							</tr>	
 							<tr>
-								<td class="record_field_name">Estimated Weight:&nbsp;</td>
-								<td class="record_field_value"><?php $this->txtPackageWeight->RenderWithError(); $this->lblPackageWeight->RenderWithError(); ?>&nbsp;<?php $this->lstWeightUnit->RenderWithError(); ?>&nbsp;<?php $this->lblWeightUnit->Render(); ?></td>
+								<td class="record_field_name" nowrap>Estimated Weight:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->txtPackageWeight->RenderWithError(); $this->lblPackageWeight->RenderWithError(); ?>&nbsp;<?php $this->lstWeightUnit->RenderWithError(); ?>&nbsp;<?php $this->lblWeightUnit->Render(); ?></td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Dimensions:&nbsp;</td>
-								<td class="record_field_value">L&nbsp;<?php $this->txtPackageLength->RenderWithError(); $this->lblPackageLength->Render(); ?>&nbsp;W&nbsp;<?php $this->txtPackageWidth->RenderWithError(); $this->lblPackageWidth->Render(); ?>&nbsp;H&nbsp;<?php $this->txtPackageHeight->RenderWithError(); $this->lblPackageHeight->Render(); ?>&nbsp;<?php $this->lstLengthUnit->RenderWithError(); ?>&nbsp;<?php $this->lblLengthUnit->Render(); ?></td>
+								<td class="record_field_name" nowrap>Dimensions:&nbsp;</td>
+								<td class="record_field_value" nowrap>L&nbsp;<?php $this->txtPackageLength->RenderWithError(); $this->lblPackageLength->Render(); ?>&nbsp;W&nbsp;<?php $this->txtPackageWidth->RenderWithError(); $this->lblPackageWidth->Render(); ?>&nbsp;H&nbsp;<?php $this->txtPackageHeight->RenderWithError(); $this->lblPackageHeight->Render(); ?>&nbsp;<?php $this->lstLengthUnit->RenderWithError(); ?>&nbsp;<?php $this->lblLengthUnit->Render(); ?></td>
 							</tr>		
 							<tr>
-								<td class="record_field_name">Declared Value:&nbsp;</td>
-								<td class="record_field_value"><?php $this->txtValue->RenderWithError(); $this->lblValue->Render(); ?>&nbsp;<?php $this->lstCurrencyUnit->RenderWithError(); ?>&nbsp;<?php $this->lblCurrencyUnit->Render(); ?></td>
+								<td class="record_field_name" nowrap>Declared Value:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->txtValue->RenderWithError(); $this->lblValue->Render(); ?>&nbsp;<?php $this->lstCurrencyUnit->RenderWithError(); ?>&nbsp;<?php $this->lblCurrencyUnit->Render(); ?></td>
 							</tr>
 						</table>								
 					</td>
@@ -91,32 +91,32 @@
 								<td colspan="2" class="fedex_subheader">Special Services</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Saturday Delivery:&nbsp;</td>
-								<td class="record_field_value"><?php $this->chkSaturdayDeliveryFlag->RenderWithError(); ?></td>
+								<td class="record_field_name" nowrap>Saturday Delivery:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->chkSaturdayDeliveryFlag->RenderWithError(); ?></td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Hold at Location:&nbsp;</td>
-								<td class="record_field_value"><?php $this->chkHoldAtLocationFlag->RenderWithError(); ?></td>
+								<td class="record_field_name" nowrap>Hold at Location:&nbsp;</td>
+								<td class="record_field_value" nowrap><?php $this->chkHoldAtLocationFlag->RenderWithError(); ?></td>
 							</tr>									
 						</table>
 						<?php $HALDisplay = ($this->blnEditMode && $this->objShipment->CourierId===1 && $this->objFedexShipment->HoldAtLocationFlag) ? "" : "display:none;"; ?>
 						<table style="<?php echo($HALDisplay); ?>" cellpadding="0" cellspacing="0" id="HAL">
 							<tr><td></td><td><div style="font-size:8pt;">Enter the address of the FedEx location where the package is to be held. This service is not available at every FedEx location. Contact your local FedEx office for more details.</div></tr>
 							<tr>
-								<td class="record_field_name">Address</td>
-								<td class="record_field_value"><?php $this->txtHoldAtLocationAddress->RenderWithError(); $this->lblHoldAtLocationAddress->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>Address</td>
+								<td class="record_field_value" nowrap><?php $this->txtHoldAtLocationAddress->RenderWithError(); $this->lblHoldAtLocationAddress->Render(); ?>&nbsp;</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">City</td>
-								<td class="record_field_value"><?php $this->txtHoldAtLocationCity->RenderWithError(); $this->lblHoldAtLocationCity->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>City</td>
+								<td class="record_field_value" nowrap><?php $this->txtHoldAtLocationCity->RenderWithError(); $this->lblHoldAtLocationCity->Render(); ?>&nbsp;</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">State</td>
-								<td class="record_field_value"><?php $this->lstHoldAtLocationState->RenderWithError(); $this->lblHoldAtLocationState->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>State</td>
+								<td class="record_field_value" nowrap><?php $this->lstHoldAtLocationState->RenderWithError(); $this->lblHoldAtLocationState->Render(); ?>&nbsp;</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Postal Code</td>
-								<td class="record_field_value"><?php $this->txtHoldAtLocationPostalCode->RenderWithError(); $this->lblHoldAtLocationPostalCode->Render(); ?>&nbsp;</td>
+								<td class="record_field_name" nowrap>Postal Code</td>
+								<td class="record_field_value" nowrap><?php $this->txtHoldAtLocationPostalCode->RenderWithError(); $this->lblHoldAtLocationPostalCode->Render(); ?>&nbsp;</td>
 							</tr>														
 						</table>
 						<br class="item_divider" />		
@@ -125,22 +125,22 @@
 								<td colspan="2" class="fedex_subheader">Shipment Notifications</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Sender:&nbsp;</td>
-								<td class="record_field_value">
+								<td class="record_field_name" nowrap>Sender:&nbsp;</td>
+								<td class="record_field_value" nowrap>
 									<?php $this->txtFedexNotifySenderEmail->RenderWithError(); $this->lblFedexNotifySenderEmail->Render(); ?>&nbsp;<br>
 									<?php $this->chkFedexNotifySenderShipFlag->RenderWithError(); ?>Ship&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifySenderExceptionFlag->RenderWithError(); ?>Exception&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifySenderDeliveryFlag->RenderWithError(); ?>Delivery
 								</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Recipient:&nbsp;</td>
-								<td class="record_field_value">
+								<td class="record_field_name" nowrap>Recipient:&nbsp;</td>
+								<td class="record_field_value" nowrap>
 									<?php $this->txtFedexNotifyRecipientEmail->RenderWithError(); $this->lblFedexNotifyRecipientEmail->Render(); ?>&nbsp;<br>
 									<?php $this->chkFedexNotifyRecipientShipFlag->RenderWithError(); ?>Ship&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyRecipientExceptionFlag->RenderWithError(); ?>Exception&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyRecipientDeliveryFlag->RenderWithError(); ?>Delivery
 								</td>
 							</tr>
 							<tr>
-								<td class="record_field_name">Other:&nbsp;</td>
-								<td class="record_field_value">
+								<td class="record_field_name" nowrap>Other:&nbsp;</td>
+								<td class="record_field_value" nowrap>
 									<?php $this->txtFedexNotifyOtherEmail->RenderWithError(); $this->lblFedexNotifyOtherEmail->Render(); ?>&nbsp;<br>
 									<?php $this->chkFedexNotifyOtherShipFlag->RenderWithError(); ?>Ship&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyOtherExceptionFlag->RenderWithError(); ?>Exception&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyOtherDeliveryFlag->RenderWithError(); ?>Delivery
 								</td>

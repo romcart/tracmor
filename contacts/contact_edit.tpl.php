@@ -92,8 +92,8 @@
 									if(isset($arrContactFields)){
 										for ($i=0;$i<ceil(count($arrContactFields)/2);$i++) {
 											echo('<tr>');
-											echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'</td>');
-											echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'</td>');
+											echo('<td class="record_field_name" nowrap>'. $arrContactFields[$i]['name'] .'</td>');
+											echo('<td class="record_field_value" nowrap>'. $arrContactFields[$i]['value'] .'</td>');
 											echo('</tr>');
 										}
 									}
@@ -106,8 +106,8 @@
 									if(isset($arrContactFields)){
 										for ($i=ceil(count($arrContactFields)/2);$i<count($arrContactFields);$i++) {
 											echo('<tr>');
-											echo('<td class="record_field_name">'. $arrContactFields[$i]['name'] .'</td>');
-											echo('<td class="record_field_value">'. $arrContactFields[$i]['value'] .'</td>');
+											echo('<td class="record_field_name" nowrap>'. $arrContactFields[$i]['name'] .'</td>');
+											echo('<td class="record_field_value" nowrap>'. $arrContactFields[$i]['value'] .'</td>');
 											echo('</tr>');
 										}
 									}

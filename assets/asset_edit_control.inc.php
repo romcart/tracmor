@@ -94,8 +94,8 @@
 							if(isset($arrAssetFields)){
 								for ($i=0;$i<ceil(count($arrAssetFields)/2);$i++) {
 									echo('<tr>');
-									echo('<td class="record_field_name">'. $arrAssetFields[$i]['name'] .'&nbsp;</td>');
-									echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'</td>');
+									echo('<td class="record_field_name" nowrap>'. $arrAssetFields[$i]['name'] .'&nbsp;</td>');
+									echo('<td class="record_field_value" nowrap>'. $arrAssetFields[$i]['value'] .'</td>');
 									echo('</tr>');
 								}
 							}
@@ -108,8 +108,8 @@
 							if($arrAssetFields){
 								for ($i=ceil(count($arrAssetFields)/2);$i<count($arrAssetFields);$i++) {
 									echo('<tr>');
-									echo('<td class="record_field_name">'. $arrAssetFields[$i]['name'] .'&nbsp;</td>');
-									echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'&nbsp;</td>');
+									echo('<td class="record_field_name" nowrap>'. $arrAssetFields[$i]['name'] .'&nbsp;</td>');
+									echo('<td class="record_field_value" nowrap>'. $arrAssetFields[$i]['value'] .'&nbsp;</td>');
 									echo('</tr>');
 								}
 							}
