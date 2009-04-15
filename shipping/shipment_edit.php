@@ -2463,6 +2463,7 @@
           $this->btnAddAsset_Click($this, null, null);
           if ($this->txtNewAssetCode->Warning) {
             $lblNewWarning .= sprintf("<br />%s - %s", $objAsset->AssetCode, $this->txtNewAssetCode->Warning);
+            $this->txtNewAssetCode->Warning = "";
           }
         }
         $this->txtNewAssetCode->Warning = $lblNewWarning;
