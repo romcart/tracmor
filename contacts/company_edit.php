@@ -711,24 +711,21 @@ class CompanyEditForm extends CompanyEditFormBase {
 					$this->txtAddressShortDescription->Warning = 'Address Name is a required field.';
 					return;
 				}
-					
-				// Enforce unique company name when creating new company
-				if (Company::LoadByShortDescription($this->txtShortDescription->Text)) {
-					$this->txtShortDescription->Warning = 'A company with that name already exists. Please try another';
-					$blnError = true;
-					return;
-				}
 			}
 
-			// Enforce unique company name when editing a company
+			// Do not allow duplicate Company names
 			if ($this->blnEditMode) {
-				if ($this->txtShortDescription->Text != $this->objCompany->ShortDescription && Company::LoadByShortDescription($this->txtShortDescription->Text)) {
-					$this->txtShortDescription->Warning = 'A company with that name already exists. Please try another';
-					$blnError = true;
-					return;
-				}
+				$objCompanyDuplicate = Company::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::Company()->ShortDescription, $this->txtShortDescription->Text), QQ::NotEqual(QQN::Company()->CompanyId, $this->objCompany->CompanyId)));
+			} else {
+				$objCompanyDuplicate = Company::QuerySingle(QQ::Equal(QQN::Company()->ShortDescription, $this->txtShortDescription->Text));
 			}
-
+			
+			if ($objCompanyDuplicate) {
+				$blnError = true;
+				$this->txtShortDescription->Warning = 'A company with that name already exists. Please try another';
+				return;
+			}			
+			
 			$this->UpdateCompanyFields();
 			$this->objCompany->Save();
 			// Assign input values to custom fields
