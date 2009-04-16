@@ -85,10 +85,21 @@
 		// Control ServerActions
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 			
-			if ($objLocation = Location::LoadByShortDescription($this->txtShortDescription->Text)) {
-				$this->txtShortDescription->Warning = 'This Location Name is already in use. Please try another.';
+			$blnError = false;
+			
+			// Do not allow duplicate Location names
+			if ($this->blnEditMode) {
+				$objLocationDuplicate = Location::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::Location()->ShortDescription, $this->txtShortDescription->Text), QQ::NotEqual(QQN::Location()->LocationId, $this->objLocation->LocationId)));
 			}
 			else {
+				$objLocationDuplicate = Location::QuerySingle(QQ::Equal(QQN::Location()->ShortDescription, $this->txtShortDescription->Text));
+			}
+			if ($objLocationDuplicate) {
+				$blnError = true;
+				$this->txtShortDescription->Warning = 'This Location Name is already in use. Please try another.';
+			}				
+			
+			if (!$blnError) {
 			
 				try {
 					$this->UpdateLocationFields();
