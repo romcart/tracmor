@@ -119,7 +119,7 @@ class QInventoryTransactComposite extends QControl {
 
 	  $this->lblLookup = new QLabel($this);
 		$this->lblLookup->HtmlEntities = false;
-		$this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+		$this->lblLookup->Text = '<img src="../images/icons/inventory_lookup.png" border="0" style="cursor:pointer;">';
 	  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
 	  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
 	  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
