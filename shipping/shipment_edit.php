@@ -2638,7 +2638,7 @@
 					// Cannot ship any linked assets
 					elseif ($objNewAsset->LinkedFlag) {
 					  $blnError = true;
-						$this->txtNewAssetCode->Warning = "That asset is linked to a parent asset.";
+						$this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
 					}
 					// Cannot ship any assets that are checked out
 					elseif ($objNewAsset->LocationId == 1) {
@@ -2675,7 +2675,7 @@
 					    foreach ($objLinkedAssetArray as $objLinkedAsset) {
 					      if (!QApplication::AuthorizeEntityBoolean($objLinkedAsset, 2)) {
 					        $blnError = true;
-						      $this->txtNewAssetCode->Warning = sprintf("You do not have authorization to perform a transaction on linked asset %s.", $objLinkedAsset->AssetCode);
+						      $this->txtNewAssetCode->Warning = sprintf("You do not have authorization to perform a transaction on locked asset %s.", $objLinkedAsset->AssetCode);
 						      break;
 					      }
 					      else {
@@ -2684,7 +2684,7 @@
 					      }
 					    }
 					    if (!$blnError) {
-					      $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+					      $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 					    }
 					  }
 					}

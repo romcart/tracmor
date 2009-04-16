@@ -347,7 +347,7 @@ CREATE FIELD METHODS
 
 		protected function btnLinkToParent_Create() {
 		  $this->btnLinkToParent = new QButton($this);
-		  $this->btnLinkToParent->Text = "Link to Parent";
+		  $this->btnLinkToParent->Text = "Lock to Parent";
 		  $this->btnLinkToParent->Enabled = false;
 		  $this->btnLinkToParent->Display = false;
 		  $this->btnLinkToParent->AddAction(new QClickEvent(), new QAjaxAction('btnLinkToParent_Click'));
@@ -357,7 +357,7 @@ CREATE FIELD METHODS
 
 		protected function btnUnlink_Create() {
 		  $this->btnUnlink = new QButton($this);
-		  $this->btnUnlink->Text = "Unlink";
+		  $this->btnUnlink->Text = "Unlock";
 		  $this->btnUnlink->Enabled = false;
 		  $this->btnUnlink->Display = false;
 		  $this->btnUnlink->AddAction(new QClickEvent(), new QAjaxAction('btnUnlink_Click'));

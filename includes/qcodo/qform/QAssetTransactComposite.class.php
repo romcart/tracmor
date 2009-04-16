@@ -262,7 +262,7 @@ class QAssetTransactComposite extends QControl {
 				}
 				elseif ($objNewAsset->LinkedFlag) {
 				  $blnError = true;
-				  $this->txtNewAssetCode->Warning = "That asset is linked to a parent asset.";
+				  $this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
 				}
 				// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
 				elseif ($objNewAsset->LocationId == 2) {
@@ -376,7 +376,7 @@ class QAssetTransactComposite extends QControl {
 					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
 					    $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
 					  }
-					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 					}
 				}
 			}
@@ -589,7 +589,7 @@ class QAssetTransactComposite extends QControl {
 				foreach ($objLinkedAssetArray as $objLinkedAsset) {
 				  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
 				}
-				$this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are linked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+				$this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 			}
 		}
 

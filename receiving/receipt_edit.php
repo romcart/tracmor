@@ -1326,7 +1326,7 @@
 							$this->txtNewAssetCode->Warning = "That asset code does not exist.";
 						}
 						elseif ($objNewAsset->LinkedFlag) {
-						  $this->txtNewAssetCode->Warning = "That asset is linked to a parent asset.";
+						  $this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
 						}
 						elseif ($objNewAsset->CheckedOutFlag) {
 							$blnError = true;
@@ -1350,7 +1350,7 @@
 						  foreach ($objLinkedAssetArray as $objLinkedAsset) {
                 if (!QApplication::AuthorizeEntityBoolean($objLinkedAsset, 2)) {
                   $blnError = true;
-							    $this->txtNewAssetCode->Warning = sprintf("You do not have authorization to perform a transaction on linked asset %s.", $objLinkedAsset->AssetCode);
+							    $this->txtNewAssetCode->Warning = sprintf("You do not have authorization to perform a transaction on locked asset %s.", $objLinkedAsset->AssetCode);
 							    break;
                 }
                 else {
@@ -1621,7 +1621,7 @@
 							if ($lstLocationAssetReceived && $lstLocationAssetReceived->SelectedValue) {
 							  if ($objAssetTransaction->Asset->LinkedFlag) {
 							    $blnError = true;
-								  $this->dtgAssetTransact->Warning .= sprintf("Asset Code %s is linked to a parent asset.<br />",$objAssetTransaction->Asset->AssetCode);
+								  $this->dtgAssetTransact->Warning .= sprintf("Asset Code %s is locked to a parent asset.<br />",$objAssetTransaction->Asset->AssetCode);
 							  }
 							  else {
   								// Set the DestinationLocation of the AssetTransaction

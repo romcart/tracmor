@@ -41,7 +41,7 @@ if ($_POST) {
       			}
       			elseif ($objNewAsset->LinkedFlag) {
       			  $blnError = true;
-      			  $strWarning .= $strAssetCode." - That asset code has linked to parent asset " . $objNewAsset->ParentAssetCode . ".<br />";
+      			  $strWarning .= $strAssetCode." - That asset is locked to parent asset " . $objNewAsset->ParentAssetCode . ".<br />";
       			}
       			elseif (!$blnError && $objNewAsset instanceof Asset)  {
       			  $intAssetIdArray[] = $objNewAsset->AssetId;

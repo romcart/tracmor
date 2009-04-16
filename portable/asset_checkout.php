@@ -32,7 +32,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			}
 			elseif ($objNewAsset->LinkedFlag) {
 			  $blnError = true;
-			  $strWarning .= $strAssetCode." - That asset code has linked to parent asset.";
+			  $strWarning .= $strAssetCode." - That asset is locked to a parent asset.";
 			}
 			// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
 			elseif ($objNewAsset->LocationId == 2) {
