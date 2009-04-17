@@ -171,8 +171,6 @@
 			$this->btnAddAsset_Create();
 			$this->btnAddInventory_Create();
 			
-			
-			
 			//Set display logic of Built-In Fields
 			$this->UpdateBuiltInFields();
 			
@@ -180,6 +178,9 @@
 			$this->UpdateAddressAccess();
 			$this->UpdateCompanyAccess();
 			$this->UpdateContactAccess();
+			
+			// Check prerequisites for scheduling receipts
+			$this->CheckPrerequisites();
 			
 			// Create the datagrids
 			$this->dtgAssetTransact_Create();
@@ -469,6 +470,7 @@
 			$this->lstToContact->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstToContact->AddItem('- Select One -', null);
+			
 			$objToContactArray = Contact::LoadArrayByCompanyId(QApplication::$TracmorSettings->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
 			if ($objToContactArray) foreach ($objToContactArray as $objToContact) {
 				$objListItem = new QListItem($objToContact->__toString(), $objToContact->ContactId);
@@ -2445,6 +2447,16 @@
 				$this->lblNewToAddress->Visible=true;
 			}
 			else{
+				$this->lblNewToAddress->Visible=false;
+			}
+		}
+		
+		// Check that the prerequisites are met to allow scheduling receipts
+		protected function CheckPrerequisites() {
+			// Check that the 'Default Company' admin setting is set and valid
+			if (!Company::Load(QApplication::$TracmorSettings->CompanyId)) {
+				$this->lstToContact->Warning = $this->lstToAddress->Warning = 'Default Shipping/Receiving Company not set';
+				$this->lblNewToContact->Visible=false;
 				$this->lblNewToAddress->Visible=false;
 			}
 		}
