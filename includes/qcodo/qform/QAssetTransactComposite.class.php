@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,18 +23,18 @@
 <?php
 
 class QAssetTransactComposite extends QControl {
-	
+
 	public $blnEditMode;
 	public $objParentObject;
 	public $strTitleVerb;
 	public $objAssetArray;
 	public $dtgAssetTransact;
 	public $objAsset;
-	
+
 	public $blnTransactionModified;
 	protected $lstLocation;
 	protected $txtNote;
-	protected $objAssetTransaction;	
+	protected $objAssetTransaction;
 	protected $btnSave;
 	protected $btnCancel;
 	protected $btnAdd;
@@ -42,7 +42,9 @@ class QAssetTransactComposite extends QControl {
 	protected $txtNewAssetCode;
 	protected $objTransaction;
 	protected $intTransactionTypeId;
-	
+	protected $lblAddAsset;
+	protected $ctlAssetSearchTool;
+
 	public function __construct($objParentObject, $strControlId = null) {
 	    // First, call the parent to do most of the basic setup
     try {
@@ -51,16 +53,16 @@ class QAssetTransactComposite extends QControl {
         $objExc->IncrementOffset();
         throw $objExc;
     }
-    
+
     // Assign the parent object (AssetEditForm from asset_edit.php)
     $this->objParentObject = $objParentObject;
-    
+
     // Setup the Asset, which assigns objAsset and blnEditMode
     $this->objParentObject->SetupAsset($this);
 
     // Create an empty Asset Array
     $this->objAssetArray = array();
-    
+
     $this->btnCancel_Create();
     $this->lstLocation_Create();
     $this->txtNote_Create();
@@ -68,27 +70,27 @@ class QAssetTransactComposite extends QControl {
     $this->btnAdd_Create();
     $this->btnSave_Create();
     $this->dtgAssetTransact_Create();
-    
+    $this->ctlAssetSearchTool_Create();
 	}
-  
+
 	// This method must be declared in all composite controls
 	public function ParsePostData() {
 	}
-	
+
 	public function GetJavaScriptAction() {
 			return "onchange";
 	}
-	
+
 	public function Validate() {return true;}
-	
+
 	protected function GetControlHtml() {
-		
+
 		$strStyle = $this->GetStyleAttributes();
 		if ($strStyle) {
 			$strStyle = sprintf('style="%s"', $strStyle);
 		}
 		$strAttributes = $this->GetAttributes();
-		
+
 		// Store the Output Buffer locally
 		$strAlreadyRendered = ob_get_contents();
 		ob_clean();
@@ -100,16 +102,16 @@ class QAssetTransactComposite extends QControl {
 
 		// Restore the output buffer and return evaluated template
 		print($strAlreadyRendered);
-		
+
 		$strToReturn =  sprintf('<span id="%s" %s%s>%s</span>',
 		$this->strControlId,
 		$strStyle,
 		$strAttributes,
 		$strTemplateEvaluated);
-		
+
 		return $strToReturn;
 	}
-	
+
 	// I'm pretty sure that this is not necessary
 	// Create the Asset Code label
 	protected function lblAssetCode_Create() {
@@ -117,7 +119,7 @@ class QAssetTransactComposite extends QControl {
 		$this->lblAssetCode->Name = 'Asset Code';
 		$this->lblAssetCode->Text = $this->objAsset->AssetCode;
 	}
-	
+
 	// Create the Note text field
 	protected function txtNote_Create() {
 		$this->txtNote = new QTextBox($this);
@@ -127,7 +129,7 @@ class QAssetTransactComposite extends QControl {
 		$this->txtNote->Rows = 4;
 		$this->txtNote->CausesValidation = false;
 	}
-	
+
 	// Create and Setup lstLocation
 	protected function lstLocation_Create() {
 		$this->lstLocation = new QListBox($this);
@@ -140,7 +142,7 @@ class QAssetTransactComposite extends QControl {
 		}
 		$this->lstLocation->CausesValidation = false;
 	}
-	
+
 	// Create the text field to enter new asset codes to add to the transaction
 	// Eventually this field will receive information from the AML
 	protected function txtNewAssetCode_Create() {
@@ -150,7 +152,7 @@ class QAssetTransactComposite extends QControl {
 		$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->txtNewAssetCode->CausesValidation = false;
 	}
-	
+
 	// Create the save button
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
@@ -180,15 +182,15 @@ class QAssetTransactComposite extends QControl {
 		$this->btnAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnAdd->CausesValidation = false;
 	}
-	
+
 	// Setup the datagrid
 	protected function dtgAssetTransact_Create() {
-		
+
 		$this->dtgAssetTransact = new QDataGrid($this);
 		$this->dtgAssetTransact->CellPadding = 5;
 		$this->dtgAssetTransact->CellSpacing = 0;
 		$this->dtgAssetTransact->CssClass = "datagrid";
-		
+
     // Enable AJAX - this won't work while using the DB profiler
     $this->dtgAssetTransact->UseAjax = true;
 
@@ -196,7 +198,7 @@ class QAssetTransactComposite extends QControl {
     $objPaginator = new QPaginator($this->dtgAssetTransact);
     $this->dtgAssetTransact->Paginator = $objPaginator;
     $this->dtgAssetTransact->ItemsPerPage = 20;
-    
+
     $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
     $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->ShortDescription, false), 'Width' => 200, 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
     $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Current Location', '<?= $_ITEM->Location->__toString() ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
@@ -219,17 +221,28 @@ class QAssetTransactComposite extends QControl {
     $objStyle->ForeColor = '#000000';
     $objStyle->BackColor = '#EFEFEF';
     $objStyle->CssClass = 'dtg_header';
-    
+
 		$this->blnTransactionModified = true;
 	}
-	
+
+	protected function ctlAssetSearchTool_Create() {
+	  $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
+
+	  $this->lblAddAsset = new QLabel($this);
+		$this->lblAddAsset->HtmlEntities = false;
+		$this->lblAddAsset->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+	  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
+	  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
+	  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
+
 	// Add Button Click
 	public function btnAdd_Click($strFormId, $strControlId, $strParameter) {
-		
-		$strAssetCode = $this->txtNewAssetCode->Text;
+
+	  $strAssetCode = $this->txtNewAssetCode->Text;
 		$blnDuplicate = false;
 		$blnError = false;
-		
+
 		if ($strAssetCode) {
 			// Begin error checking
 			if ($this->objAssetArray) {
@@ -240,13 +253,17 @@ class QAssetTransactComposite extends QControl {
 					}
 				}
 			}
-			
+
 			if (!$blnError) {
 			  $objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
 				if (!($objNewAsset instanceof Asset)) {
 					$blnError = true;
 					$this->txtNewAssetCode->Warning = "That asset code does not exist.";
-				}				
+				}
+				elseif ($objNewAsset->LinkedFlag) {
+				  $blnError = true;
+				  $this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
+				}
 				// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
 				elseif ($objNewAsset->LocationId == 2) {
 					$blnError = true;
@@ -332,7 +349,7 @@ class QAssetTransactComposite extends QControl {
 						}
 					}
 				}
-				
+
 				if (!$blnError && ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2 || $this->intTransactionTypeId == 3 || $this->intTransactionTypeId == 8 || $this->intTransactionTypeId == 9)) {
 				  $objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::LoadByRoleIdTransactionTypeId(QApplication::$objUserAccount->RoleId, $this->intTransactionTypeId);
           if ($objRoleTransactionTypeAuthorization) {
@@ -348,23 +365,54 @@ class QAssetTransactComposite extends QControl {
     				}
           }
 				}
-				
+
 				if (!$blnError && $objNewAsset instanceof Asset)  {
 					$this->objAssetArray[] = $objNewAsset;
 					$this->txtNewAssetCode->Text = null;
+					// Load all linked assets
+					$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objNewAsset->AssetCode);
+					if ($objLinkedAssetArray) {
+					  $strAssetCodeArray = array();
+					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+					    $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+					  }
+					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+					}
 				}
 			}
 		}
 		else {
 			$this->txtNewAssetCode->Warning = "Please enter an asset code.";
 		}
-	}	
-	
+	}
+
+	public function btnAssetSearchToolAdd_Click() {
+	  $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
+    if (count($intSelectedAssetId) < 1) {
+      $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
+    }
+    else {
+      $lblNewWarning = "";
+      foreach (Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $intSelectedAssetId)) as $objAsset) {
+        $this->txtNewAssetCode->Text = $objAsset->AssetCode;
+        $this->btnAdd_Click($this, null, null);
+        if ($this->txtNewAssetCode->Warning) {
+          $lblNewWarning .= sprintf("<br />%s - %s", $objAsset->AssetCode, $this->txtNewAssetCode->Warning);
+          $this->txtNewAssetCode->Warning = "";
+        }
+      }
+      $this->txtNewAssetCode->Warning = $lblNewWarning;
+      $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+		}
+		// Uncheck all items but SelectAll checkbox
+    $this->UncheckAllItems();
+	}
+
 	// Save Button Click
 	public function btnSave_Click($strFormId, $strControlId, $strParameter) {
 		if ($this->objAssetArray) {
 			$blnError = false;
-			
+
 			foreach ($this->objAssetArray as $asset) {
 				// TransactionTypeId = 1 is for moves
 				if ($this->intTransactionTypeId == 1) {
@@ -373,17 +421,17 @@ class QAssetTransactComposite extends QControl {
 						$blnError = true;
 					}
 				}
-				
+
 				// For all transactions except Unreserve, make sure the asset is not already reserved
 				if ($this->intTransactionTypeId != 9 && $asset->ReservedFlag) {
 					$this->btnCancel->Warning = sprintf('The Asset %s is reserved.',$asset->AssetCode);
 					$blnError = true;
-				}	
-							
+				}
+
 			}
-			
+
 			if (!$blnError) {
-				
+
 				if (($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2) && is_null($this->lstLocation->SelectedValue)) {
 					$this->lstLocation->Warning = 'Location is required.';
 					$blnError = true;
@@ -394,13 +442,13 @@ class QAssetTransactComposite extends QControl {
 				}
 			}
 			if (!$blnError) {
-				
+
 				try {
 					// Get an instance of the database
 					$objDatabase = QApplication::$Database[1];
 					// Begin a MySQL Transaction to be either committed or rolled back
 					$objDatabase->TransactionBegin();
-					
+
 					// Create the new transaction object and save it
 					$this->objTransaction = new Transaction();
 					// Entity Qtype is Asset
@@ -408,13 +456,18 @@ class QAssetTransactComposite extends QControl {
 					$this->objTransaction->TransactionTypeId = $this->intTransactionTypeId;
 					$this->objTransaction->Note = $this->txtNote->Text;
 					$this->objTransaction->Save();
-					
+
 					// Assign different source and destinations depending on transaction type
 					foreach ($this->objAssetArray as $asset) {
 						if ($asset instanceof Asset) {
-							
+
 							$SourceLocationId = $asset->LocationId;
-							
+              // Load all linked assets
+							$objLinkedAssetArrayByNewAsset = Asset::LoadChildLinkedArrayByParentAssetCode($asset->AssetCode);
+							if (!$objLinkedAssetArrayByNewAsset) {
+							  $objLinkedAssetArrayByNewAsset = array();
+							}
+
 							if ($this->intTransactionTypeId == 1) {
 								$DestinationLocationId = $this->lstLocation->SelectedValue;
 							}
@@ -434,9 +487,25 @@ class QAssetTransactComposite extends QControl {
 								$DestinationLocationId = $asset->LocationId;
 								$asset->ReservedFlag = false;
 							}
+
 							$asset->LocationId = $DestinationLocationId;
+							// Transact all child linked assets
+							foreach ($objLinkedAssetArrayByNewAsset as $objLinkedAsset) {
+	              $objLinkedAsset->CheckedOutFlag = $asset->CheckedOutFlag;
+	              $objLinkedAsset->ReservedFlag = $asset->ReservedFlag;
+	              $objLinkedAsset->LocationId = $asset->LocationId;
+	              $objLinkedAsset->Save();
+
+	              // Create the new assettransaction object and save it
+  							$this->objAssetTransaction = new AssetTransaction();
+  							$this->objAssetTransaction->AssetId = $objLinkedAsset->AssetId;
+  							$this->objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
+  							$this->objAssetTransaction->SourceLocationId = $SourceLocationId;
+  							$this->objAssetTransaction->DestinationLocationId = $DestinationLocationId;
+  							$this->objAssetTransaction->Save();
+	            }
 							$asset->Save();
-							
+
 							// Create the new assettransaction object and save it
 							$this->objAssetTransaction = new AssetTransaction();
 							$this->objAssetTransaction->AssetId = $asset->AssetId;
@@ -446,17 +515,17 @@ class QAssetTransactComposite extends QControl {
 							$this->objAssetTransaction->Save();
 						}
 					}
-					
+
 					// Commit the above transactions to the database
 					$objDatabase->TransactionCommit();
-					
+
 					QApplication::Redirect('../common/transaction_edit.php?intTransactionId='.$this->objTransaction->TransactionId);
 				}
 				catch (QOptimisticLockingException $objExc) {
-					
+
 					// Rollback the database
 					$objDatabase->TransactionRollback();
-					
+
 					$objAsset = Asset::Load($objExc->EntityId);
 					$this->objParentObject->btnRemove_Click($this->objParentObject->FormId, 'btnRemove' . $objExc->EntityId, $objExc->EntityId);
           // Lock Exception Thrown, Report the Error
@@ -465,10 +534,10 @@ class QAssetTransactComposite extends QControl {
 			}
 		}
 	}
-	
+
 	// Cancel Button Click
 	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
-		
+
 		if ($this->blnEditMode) {
 			$this->objParentObject->DisplayTransaction(false);
 			$this->objAssetArray = null;
@@ -482,7 +551,7 @@ class QAssetTransactComposite extends QControl {
 		}
 
 	}
-	
+
 	// Prepare the Transaction form display depending on transaction type
 	public function SetupDisplay($intTransactionTypeId) {
 		$this->intTransactionTypeId = $intTransactionTypeId;
@@ -496,7 +565,7 @@ class QAssetTransactComposite extends QControl {
 				$this->lstLocation->Display = true;
 				break;
 			// Check Out
-			case 3: 
+			case 3:
 				$this->lstLocation->Display = false;
 				break;
 			// Reserve
@@ -508,15 +577,33 @@ class QAssetTransactComposite extends QControl {
 				$this->lstLocation->Display = false;
 				break;
 		}
-		
+
 		// Redeclare in case the asset has been edited
 		$this->objAssetArray = null;
 		if ($this->blnEditMode && $this->objAsset instanceof Asset) {
 			$this->objAssetArray[] = Asset::Load($this->objAsset->AssetId);
+			// Load all child assets
+			$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($this->objAsset->AssetCode);
+			if ($objLinkedAssetArray) {
+			  $strAssetCodeArray = array();
+				foreach ($objLinkedAssetArray as $objLinkedAsset) {
+				  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+				}
+				$this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+			}
 		}
-		
+
 	}
-	
+
+	// Uncheck all items but SelectAll checkbox
+	public function UncheckAllItems() {
+	  foreach ($this->objParentObject->GetAllControls() as $objControl) {
+      if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+        $objControl->Checked = false;
+      }
+    }
+	}
+
   // And our public getter/setters
   public function __get($strName) {
 	  switch ($strName) {
@@ -534,7 +621,7 @@ class QAssetTransactComposite extends QControl {
         }
 	  }
   }
-  
+
 	/////////////////////////
 	// Public Properties: SET
 	/////////////////////////
@@ -565,7 +652,7 @@ class QAssetTransactComposite extends QControl {
 				break;
 		}
 	}
-	
+
 }
 
 ?>

@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,9 +20,9 @@
  */
 
 	include('../includes/header.inc.php');
-	
+
 	$this->RenderBegin();
-	
+
 	// Custom Fields
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
@@ -33,7 +33,7 @@
 	}
 ?>
 <!-- Begin Header Menu -->
-<?php 
+<?php
 	$this->ctlHeaderMenu->Render();
 ?>
 <!-- End Header Menu -->
@@ -53,7 +53,7 @@
 	<table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
 		<tr>
 			<td class="record_header">
-				<?php 
+				<?php
 					$this->btnEdit->Render();
 					$this->btnSave->RenderWithError();
 					echo('&nbsp;');
@@ -103,8 +103,8 @@
 								<tr>
 									<td colspan="2" class="record_subheader">Receipt Information</td>
 								</tr>
-								
-								
+
+
 								<?php if (QApplication::$TracmorSettings->CustomReceiptNumbers) { ?>
 								<tr>
 									<td class="record_field_name" nowrap>Receipt Number&nbsp;</td>
@@ -139,51 +139,51 @@
 							</table>
 						</td>
 					</tr>
-				</table>				
+				</table>
 			</td>
 		</tr>
 	</table>
-	
+
 <?php
 $this->pnlAttachments->Render();
-?>	
-	
+?>
+
 	<br class="item_divider" />
 	<div class="title">Assets to Receive</div>
 	<table>
 		<tr>
-			<td><?php $this->rblAssetType->RenderDesigned('DisplayName=false'); ?></td>
-			<td></td>
+			<td colspan="3"><?php $this->rblAssetType->RenderDesigned('DisplayName=false'); ?></td>
 		</tr>
 		<tr>
-			<td><?php $this->lstAssetModel->RenderDesigned(); ?></td>
-			<td></td>
+			<td colspan="3"><?php $this->lstAssetModel->RenderDesigned(); ?></td>
 		</tr>
 		<tr>
-			<td><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
-			<td><?php $this->btnAddAsset->Render(); ?></td>
+			<td valign="top" width="200px"><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
+			<td valign="top" width="20px"><?php $this->lblAddAsset->Render(); ?></td>
+			<td valign="top"><?php $this->btnAddAsset->Render(); ?></td>
 		</tr>
 		<tr>
-			<td><?php $this->chkAutoGenerateAssetCode->RenderDesigned('DisplayName=false'); ?></td>
-			<td></td>
+			<td colspan="3"><?php $this->chkAutoGenerateAssetCode->RenderDesigned('DisplayName=false'); ?></td>
 		</tr>
 	</table>
 		<?php $this->dtgAssetTransact->RenderWithError(); ?>
 		<br class="item_divider" />
-	<div class="title">Inventory to Receive</div>	
+	<div class="title">Inventory to Receive</div>
 	<table>
 		<tr>
-			<td><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
-			<td></td>
+			<td valign="top" width="200px"><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
+			<td valign="top" width="20px"><?php $this->lblLookup->Render(); ?></td>
 		</tr>
 		<tr>
 			<td><?php $this->txtQuantity->RenderDesigned(); ?></td>
 			<td><?php $this->btnAddInventory->Render(); ?></td>
 		</tr>
-	</table>	
+	</table>
 		<?php $this->dtgInventoryTransact->RenderWithError(); ?>
 		<br class="item_divider" />
 
 	<?php $this->dlgNew->Render(); ?>
+	<?php $this->ctlAssetSearchTool->Render(); ?>
+	<?php $this->ctlInventorySearchTool->Render(); ?>
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>

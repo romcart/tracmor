@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,24 +18,24 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-	
+
 	// Build array of all fields to display
 	$arrAssetViewFields = array();
-	
+
 	//Only display the built-in fields if the user is authorized according to FLA(Field-Level-Authorization)
 	// Built-in fields for Assets are:
-	// Asset Code 
+	// Asset Code
 	// Asset Model
-		
-		if (!$this->blnEditMode){ 
+
+		if (!$this->blnEditMode){
 			$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lstAssetModel->RenderWithError(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));
 		}
-		else{ 
+		else{
 			$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lstAssetModel->Render(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false) . $this->lblAssetModel->Render(false));
-		}			
-		
+		}
+
 		$arrAssetFields[] = array('name' => 'Asset Code:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
-	
+
 		$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false) . '&nbsp;');
 		$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . '&nbsp;');
 		$arrAssetFields[] = array('name' => 'Asset Model Code:',  'value' => $this->lblAssetModelCode->Render(false) . '&nbsp;');
@@ -45,33 +45,35 @@
 		else {
 			$arrAssetFields[] = array('name' => 'Location:', 'value' => $this->lblLocation->RenderWithError(false));
 		}
-		
+
 		// Only display 'Reserved By' if the asset is reserved
 		if ($this->lblReservedBy->Visible) {
 			$arrAssetFields[] = array('name' => 'Reserved By:', 'value' => $this->lblReservedBy->Render(false));
 		}
-	
+
 	// Custom Fields
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
 			if(!$this->blnEditMode || $field['blnView'])
-				$arrAssetFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));				
+				$arrAssetFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));
 		}
 	}
-	
+
+	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . '&nbsp;' . $this->lblIconParentAssetCode->Render(false));
+
 	// Display Metadata fields in Edit mode only
 	if ($this->blnEditMode) {
 		$arrAssetFields[] = array('name' => 'Date Created:', 'value' => $this->lblCreationDate->Render(false));
 		$arrAssetFields[] = array('name' => 'Date Modified:', 'value' => $this->lblModifiedDate->Render(false));
 	}
-	
+
 ?>
 
 <div class="title">Assets: <?php $this->lblHeaderAssetCode->Render(); ?></div>
 <table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
 	<tr>
 		<td class="record_header">
-			<?php 
+			<?php
 				$this->btnEdit->Render();
 				$this->btnSave->RenderWithError();
 				echo('&nbsp;');

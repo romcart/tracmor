@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -33,13 +33,13 @@ switch ($this->intTransactionTypeId) {
 		break;
 	case 3:  // Check Out
 		$strTransactionHeader = '<div class="title">Check Out Assets</div>';
-		break;	
+		break;
 	case 8:  // Reserve
 		$strTransactionHeader = '<div class="title">Reserve Assets</div>';
-		break;	
+		break;
 	case 9:  // Unreserve
 		$strTransactionHeader = '<div class="title">Unreserve Assets</div>';
-		break;	
+		break;
 }
 
 echo($strTransactionHeader);
@@ -61,7 +61,16 @@ $this->btnCancel->RenderWithError();
 	</tr>
 	<tr>
 		<td class="record_field_name">Asset Code:</td>
-		<td><?php $this->txtNewAssetCode->RenderWithError(); ?>&nbsp;<?php $this->btnAdd->Render(); ?></td>
+		<td>
+		  <table>
+		    <tr>
+		      <td valign="top" width="200px"><?php $this->txtNewAssetCode->RenderWithError(); ?></td>
+		      <td valign="top" width="20px"><?php $this->lblAddAsset->Render(); ?></td>
+		      <td valign="top"><?php $this->btnAdd->Render(); ?></td>
+		    </tr>
+		  </table>
+		</td>
 	</tr>
 </table>
 <?php $this->dtgAssetTransact->RenderWithError(); ?>
+<?php $this->ctlAssetSearchTool->Render(); ?>

@@ -16,10 +16,10 @@ function resizeWindow(toggleMenuId, toggleButtonId) {
 
 // This function is run when the ColumnToggleButton is clicked
 // Positions and Displays the column toggle menu
-function toggleColumnToggleDisplay(e, toggleMenuId, toggleButtonId) {
+function toggleColumnToggleDisplay(e, toggleMenuId, toggleButtonId, strParent) {
 	
 	// Set the position of the toggle menu based on the location of the menu button
-	setPosition(toggleButtonId, toggleMenuId);
+	setPosition(toggleButtonId, toggleMenuId, strParent);
 	
 	// Display/Hide the column toggle menu
 	qc.getW(toggleMenuId).toggleDisplay();
@@ -51,10 +51,17 @@ function toggleColumnToggleDisplay(e, toggleMenuId, toggleButtonId) {
 }
 
 // Based on the position of the button (strLabelControlId), this positions the column toggle menu (strPanelControlId)
-function setPosition(strLabelControlId, strPanelControlId) {
-	
+function setPosition(strLabelControlId, strPanelControlId, strParent) {
+
 	 var objLabel = document.getElementById(strLabelControlId);
 	 var arrCurrentLabelPosition = findPosition(objLabel.offsetParent);
+	 // If the parent of the parent of the datagrid is a QDialogBox then we need to account for that QDialogBox's positioning
+	 // Otherwise it would position itself relative to the edge of the dialog, not the screen
+	 if (strParent == 'QDialogBox') {
+	 	var arrCurrentDialogPosition = findPosition(objLabel.offsetParent.offsetParent.offsetParent);
+	 }
+	 //alert("arrCurrentDialogPosition[0]: " + arrCurrentDialogPosition[0] + " arrCurrentDialogPosition[1]: " + arrCurrentDialogPosition[1]);
+	 
 	 
 	 var objToggleMenu = document.getElementById(strPanelControlId);
 	 var strMenuWidth = objToggleMenu.offsetWidth;
@@ -64,8 +71,17 @@ function setPosition(strLabelControlId, strPanelControlId) {
 	 	strMenuWidth = getWidth(objToggleMenu);
 	 }
 	 objToggleMenu.style.position = 'absolute';
-	 objToggleMenu.style.left = (arrCurrentLabelPosition[0] + objLabel.offsetParent.offsetWidth - strMenuWidth) + 'px';
-	 objToggleMenu.style.top = (arrCurrentLabelPosition[1] + objLabel.offsetParent.offsetHeight) + 'px';
+	 // If this is a modal dialog then we will account for that dialog's position on the screen here
+	 if (strParent == 'QDialogBox') {
+	 	 objToggleMenu.style.left = (arrCurrentLabelPosition[0] + objLabel.offsetParent.offsetWidth - strMenuWidth - arrCurrentDialogPosition[0]) + 'px';
+	 	 objToggleMenu.style.top = (arrCurrentLabelPosition[1] + objLabel.offsetParent.offsetHeight - arrCurrentDialogPosition[1]) + 'px';
+	 }
+	 // If the parent is a QControl like a QForm and just exists on the page normally
+	 else {
+		 objToggleMenu.style.left = (arrCurrentLabelPosition[0] + objLabel.offsetParent.offsetWidth - strMenuWidth) + 'px';
+		 objToggleMenu.style.top = (arrCurrentLabelPosition[1] + objLabel.offsetParent.offsetHeight) + 'px';
+	 }
+	 //alert("arrCurrentLabelPosition[0]: " + arrCurrentLabelPosition[0] + " arrCurrentLabelPosition[1]: " + arrCurrentLabelPosition[1] + " offsetWidth: " + objLabel.offsetParent.offsetWidth + " strMenuWidth: " + strMenuWidth + " offsetHeight: " + objLabel.offsetParent.offsetHeight + " style.left: " + objToggleMenu.style.left + " style.top " + objToggleMenu.style.top);
 
 }
 

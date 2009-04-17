@@ -514,6 +514,7 @@
 					`asset`.`asset_model_id` AS `asset_model_id`,
 					`asset`.`location_id` AS `location_id`,
 					`asset`.`asset_code` AS `asset_code`,
+					`asset`.`parent_asset_code` AS `parent_asset_code`,
 					`asset`.`image_path` AS `image_path`,
 					`asset`.`checked_out_flag` AS `checked_out_flag`,
 					`asset`.`reserved_flag` AS `reserved_flag`,
@@ -699,6 +700,52 @@
 			    AND `custom_field_value_5` . `custom_field_id` = 5
 			    AND `custom_field_value_5` . `custom_field_value_id` = 6
 			*/
+		}
+
+		/**
+		 * Loads array of Child Linked Asset Objects
+		 *
+		 * @param string $strParentAssetCode Asset Code of the parent asset to load linked assets
+		 * @return mixed
+		 */
+		public function LoadChildLinkedArrayByParentAssetCode($strParentAssetCode) {
+		  $objLinkedAssetArray = array();
+		  $objChildAssetArray = Asset::LoadArrayByParentAssetCodeLinkedFlag($strParentAssetCode, 1);
+		  if ($objChildAssetArray && count($objChildAssetArray)) {
+        foreach ($objChildAssetArray as $objLinkedAsset) {
+        	$objLinkedAssetArray[] = $objLinkedAsset;
+        	$objNewLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objLinkedAsset->AssetCode);
+        	if ($objNewLinkedAssetArray) {
+          	foreach ($objNewLinkedAssetArray as $objLinkedAsset2) {
+          	  $objLinkedAssetArray[] = $objLinkedAsset2;
+          	}
+        	}
+        }
+        return $objLinkedAssetArray;
+		  }
+		  else {
+		    return false;
+		  }
+		}
+
+		/**
+		 * Set the child's parent_asset_code to NULL by Parent Asset Code
+		 *
+		 * @param string $strAssetCode
+		 */
+		public function ResetParentAssetCodeToNullByAssetCode($strAssetCode) {
+		  $strQuery = sprintf("
+				UPDATE
+					`asset` AS `asset`
+				SET
+				  `asset`.`parent_asset_code` = NULL,
+				  `asset`.`linked_flag` = NULL
+				WHERE
+				  `asset`.`parent_asset_code` = '%s'
+			", $strAssetCode);
+
+		  $objDatabase = QApplication::$Database[1];
+		  $objDatabase->NonQuery($strQuery);
 		}
 
 		/**
