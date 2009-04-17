@@ -165,7 +165,7 @@
 		public static function GenerateAssetCode() {
 			$intMinAssetCode = QApplication::$TracmorSettings->MinAssetCode;
 
-			$strQuery = "SELECT MAX(CAST(asset_code AS UNSIGNED)) AS max_asset_code FROM asset WHERE asset_code > $intMinAssetCode AND asset_code REGEXP '^[0-9]+$'";
+			$strQuery = "SELECT MAX(CAST(asset_code AS UNSIGNED)) AS max_asset_code FROM asset WHERE asset_code >= $intMinAssetCode AND asset_code REGEXP '^[0-9]+$'";
 
 			$objDatabase = QApplication::$Database[1];
 
