@@ -197,7 +197,7 @@
 	    if (!isset($this->objAsset)) {
 	      $this->SetupAsset($this);
 	    }
-	    $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+	    $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
 		}
 
 		protected function dtgChildAssets_Bind() {
@@ -254,7 +254,7 @@
 			$this->ctlAssetEdit->dtgShipmentReceipt->TotalItemCount = AssetTransaction::CountShipmentReceiptByAssetId($this->ctlAssetEdit->objAsset->AssetId);
 
 			if ($this->ctlAssetEdit->dtgShipmentReceipt->TotalItemCount === 0) {
-				$this->ctlAssetEdit->lblShipmentReceipt->Display = false;
+				//$this->ctlAssetEdit->lblShipmentReceipt->Display = false;
 				$this->ctlAssetEdit->dtgShipmentReceipt->ShowHeader = false;
 			}
 			else {
@@ -456,7 +456,7 @@ CREATE FIELD METHODS
 		  if ($this->txtAddChild->Text) {
   		  $objChildAsset = Asset::LoadByAssetCode($this->txtAddChild->Text);
   		  if ($objChildAsset) {
-  		    if ($objChildAsset->ParentAssetCode) {
+  		    if ($objChildAsset->ParentAssetId) {
   		      $this->txtAddChild->Warning = "That asset code already have the parent asset code. Please try another.";
   		    }
   		    elseif ($objChildAsset->AssetCode == $this->objAsset->AssetCode) {
@@ -464,7 +464,7 @@ CREATE FIELD METHODS
   		    }
   		    else {
   		      $objChildAsset->LinkedFlag = false;
-  		      $objChildAsset->ParentAssetCode = $this->objAsset->AssetCode;
+  		      $objChildAsset->ParentAssetId = $this->objAsset->AssetId;
   		      array_push($this->ctlAssetEdit->objChildAssetArray, $objChildAsset);
 
   		      $this->txtAddChild->Text = "";
@@ -524,7 +524,7 @@ CREATE FIELD METHODS
           $objRemovedChildAsset = $objNewChildAssetArray[$intAssetId];
           // Remove child asset
           unset($objNewChildAssetArray[$intAssetId]);
-          $objRemovedChildAsset->ParentAssetCode = "";
+          $objRemovedChildAsset->ParentAssetId = "";
           $objRemovedChildAsset->LinkedFlag = false;
           // Add removing child asset to objRemovedChildAssetArray
           array_push($this->ctlAssetEdit->objRemovedChildAssetArray, $objRemovedChildAsset);
@@ -632,7 +632,7 @@ CREATE FIELD METHODS
               foreach ($this->intAssetIdArray as $intAssetId) {
                 $objChildAsset = $objNewChildAssetArray[$intAssetId];
                 if ($objChildAsset->AssetCode != $objAsset->AssetCode) {
-                  $objChildAsset->ParentAssetCode = $objAsset->AssetCode;
+                  $objChildAsset->ParentAssetId = $objAsset->AssetId;
                   $objChildAsset->LinkedFlag = false;
                   $objNewRemovedAssetArray[] = $objChildAsset;
                   unset($objNewChildAssetArray[$intAssetId]);
@@ -668,13 +668,13 @@ CREATE FIELD METHODS
           foreach ($this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId") as $intAssetId) {
             $intSelectedAssetCount++;
             $objNewChildAsset = Asset::LoadByAssetId($intAssetId);
-            if ($objNewChildAsset && $objNewChildAsset->ParentAssetCode) {
+            if ($objNewChildAsset && $objNewChildAsset->ParentAssetId) {
     		      $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") already have the parent asset code. Please try another.<br />";
     		      $blnError = true;
             }
             elseif ($objNewChildAsset->AssetCode != $this->objAsset->AssetCode) {
               $objNewChildAsset->LinkedFlag = false;
-              $objNewChildAsset->ParentAssetCode = $this->objAsset->AssetCode;
+              $objNewChildAsset->ParentAssetId = $this->objAsset->AssetId;
               $arrCheckedAssets[] = $objNewChildAsset;
             }
             else {
@@ -708,7 +708,7 @@ CREATE FIELD METHODS
               $this->ctlAssetSearchTool->lblWarning->Text = "That asset code does not exist. Please try another.";
 
             }
-            elseif ($objParentAsset->AssetCode == $this->objAsset->AssetCode) {
+            elseif ($objParentAsset->AssetId == $this->objAsset->AssetId) {
         			$this->ctlAssetSearchTool->lblWarning->Text = "Parent asset code must not be the same as asset code. Please try another.";
             }
             else {
@@ -807,7 +807,8 @@ CREATE FIELD METHODS
 
 		// This method is called by btnSave_Click() or btnCancel_Click()
 		public function RefreshChildAssets() {
-		  $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+		  $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
+		  $this->ctlAssetEdit->objRemovedChildAssetArray = array();
 		  // Hide the column with checkboxes
 		  $this->dtgChildAssets->GetColumn(0)->Display = false;
 		  $this->dtgChildAssets_Bind();

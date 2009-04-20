@@ -514,7 +514,7 @@
 					`asset`.`asset_model_id` AS `asset_model_id`,
 					`asset`.`location_id` AS `location_id`,
 					`asset`.`asset_code` AS `asset_code`,
-					`asset`.`parent_asset_code` AS `parent_asset_code`,
+					`asset`.`parent_asset_id` AS `parent_asset_id`,
 					`asset`.`image_path` AS `image_path`,
 					`asset`.`checked_out_flag` AS `checked_out_flag`,
 					`asset`.`reserved_flag` AS `reserved_flag`,
@@ -705,16 +705,16 @@
 		/**
 		 * Loads array of Child Linked Asset Objects
 		 *
-		 * @param string $strParentAssetCode Asset Code of the parent asset to load linked assets
+		 * @param int $intParentAssetId AssetId of the parent asset to load linked assets
 		 * @return mixed
 		 */
-		public function LoadChildLinkedArrayByParentAssetCode($strParentAssetCode) {
+		public function LoadChildLinkedArrayByParentAssetId($intParentAssetId) {
 		  $objLinkedAssetArray = array();
-		  $objChildAssetArray = Asset::LoadArrayByParentAssetCodeLinkedFlag($strParentAssetCode, 1);
+		  $objChildAssetArray = Asset::LoadArrayByParentAssetIdLinkedFlag($intParentAssetId, 1);
 		  if ($objChildAssetArray && count($objChildAssetArray)) {
         foreach ($objChildAssetArray as $objLinkedAsset) {
         	$objLinkedAssetArray[] = $objLinkedAsset;
-        	$objNewLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objLinkedAsset->AssetCode);
+        	$objNewLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objLinkedAsset->AssetId);
         	if ($objNewLinkedAssetArray) {
           	foreach ($objNewLinkedAssetArray as $objLinkedAsset2) {
           	  $objLinkedAssetArray[] = $objLinkedAsset2;
@@ -733,16 +733,16 @@
 		 *
 		 * @param string $strAssetCode
 		 */
-		public function ResetParentAssetCodeToNullByAssetCode($strAssetCode) {
+		public function ResetParentAssetIdToNullByAssetId($intAssetId) {
 		  $strQuery = sprintf("
 				UPDATE
 					`asset` AS `asset`
 				SET
-				  `asset`.`parent_asset_code` = NULL,
+				  `asset`.`parent_asset_id` = NULL,
 				  `asset`.`linked_flag` = NULL
 				WHERE
-				  `asset`.`parent_asset_code` = '%s'
-			", $strAssetCode);
+				  `asset`.`parent_asset_id` = '%s'
+			", $intAssetId);
 
 		  $objDatabase = QApplication::$Database[1];
 		  $objDatabase->NonQuery($strQuery);

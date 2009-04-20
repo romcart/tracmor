@@ -2667,7 +2667,7 @@
 						$this->txtNewAssetCode->Warning = "You do not have authorization to perform a transaction on this asset.";
 					}
 					else {
-					  $objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objNewAsset->AssetCode);
+					  $objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objNewAsset->AssetId);
 					  $strAssetCodeArray = array();
 					  $objCheckedLinkedAssetArray = array();
 					  if ($objLinkedAssetArray) {
@@ -2787,7 +2787,7 @@
 							$objAssetTransaction->NewAsset = null;
 							$lblDueDate->Visible = false;
 
-							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
 							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
 							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
 							    $objLinkedAssetTransaction->ScheduleReceiptFlag = false;
@@ -2805,7 +2805,7 @@
 							$objAssetTransaction->NewAsset = null;
 							$lblDueDate->Visible = true;
 
-							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
 							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
 							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
 							    $objLinkedAssetTransaction->ScheduleReceiptFlag = true;
@@ -2823,7 +2823,7 @@
 							$this->dlgExchange->ShowDialogBox();
 							$lblDueDate->Visible = true;
 
-							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
 							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
 							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
 							    $objLinkedAssetTransaction->ScheduleReceiptFlag = true;
@@ -2878,7 +2878,7 @@
 						unset ($this->objAssetTransactionArray[$key]);
 						// If the asset in transaction have some children
 						foreach ($objNewAssetTransactionArray as $key2 => $value2) {
-						  if ($value2->Asset->ParentAssetCode = $value->Asset->AssetCode) {
+						  if ($value2->Asset->ParentAssetId = $value->Asset->AssetId) {
 						    if ($this->blnEditMode) {
 						      $this->arrAssetTransactionToDelete[] = $value2->AssetTransactionId;
 						    }
@@ -3237,7 +3237,7 @@
 									$objReceiptAssetTransaction->Save();
 
 									// Load all child assets
-									if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode)) {
+									if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
 									  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
 									    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
 									    $objLinkedReceiptAssetTransaction = new AssetTransaction();
@@ -3610,7 +3610,7 @@
 									}
 									// $objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 									$objAssetTransaction->Save();
-									/*$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode);
+									/*$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId);
 									if ($objLinkedAssetArray) {
 									  foreach ($objLinkedAssetArray as $objLinkedAsset) {
 									    $objLinkedAssetTransaction = new AssetTransaction();

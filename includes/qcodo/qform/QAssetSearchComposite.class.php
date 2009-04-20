@@ -123,7 +123,7 @@ class QAssetSearchComposite extends QControl {
     // If the user wants the checkboxes column
     if ($blnShowCheckboxes) {
     	// This will render all of the necessary controls and actions. chkSelected_Render expects a unique ID for each row of the database.
-    	$this->dtgAsset->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+    	$this->dtgAsset->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
     }
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
     // Removing any links in the column data
@@ -138,8 +138,8 @@ class QAssetSearchComposite extends QControl {
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->AssetModel->Category->__toString() ?>', 'SortByCommand="asset__asset_model_id__category_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__category_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
-    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?=$_ITEM->AssetModel->AssetModelCode ?>', 'SortByCommand="asset__asset_model_id__asset_model_code"', 'ReverseSortByCommand="asset__asset_model_id__asset_model_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
-    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Code', '<?=$_ITEM->ParentAssetCode ?>', 'SortByCommand="parent_asset_code ASC"', 'ReverseSortByCommand="parent_asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?= $_ITEM->AssetModel->AssetModelCode ?>', 'SortByCommand="asset__asset_model_id__asset_model_code"', 'ReverseSortByCommand="asset__asset_model_id__asset_model_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Code', '<?= $_CONTROL->objParentControl->ParentAsset__toString($_ITEM) ?>', 'SortByCommand="asset__parent_asset_id__asset_code ASC"', 'ReverseSortByCommand="asset__parent_asset_id__asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
     $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
@@ -270,6 +270,7 @@ class QAssetSearchComposite extends QControl {
     // Expand the Asset object to include the AssetModel, Category, Manufacturer, and Location Objects
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandCategory] = true;
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandManufacturer] = true;
+    $objExpansionMap[Asset::ExpandParentAsset] = true;
     $objExpansionMap[Asset::ExpandLocation] = true;
 
 		$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
@@ -509,6 +510,16 @@ class QAssetSearchComposite extends QControl {
 
   public function Refresh() {
     $this->btnClear_Click();
+  }
+
+  // If the parent asset exists then return the Parent Asset Code
+  public function ParentAsset__toString($objAsset) {
+    if ($objAsset->ParentAsset instanceof Asset) {
+      return $objAsset->ParentAsset->AssetCode;
+    }
+    else {
+      return;
+    }
   }
 
 	// And our public getter/setters

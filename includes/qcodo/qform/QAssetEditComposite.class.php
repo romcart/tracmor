@@ -761,7 +761,6 @@ class QAssetEditComposite extends QControl {
 			}
 
 			$this->objAsset->AssetCode = $this->txtAssetCode->Text;
-			$this->objAsset->ParentAssetCode = $this->txtParentAssetCode->Text;
 			$this->objAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
 
 			$blnError = false;
@@ -777,10 +776,13 @@ class QAssetEditComposite extends QControl {
 
 				if (!$blnError && $this->txtParentAssetCode->Text) {
 				  if ($this->txtParentAssetCode->Text != $this->objAsset->AssetCode) {
-    				$ParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
-    				if (!$ParentAsset) {
+    				$objParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
+    				if (!$objParentAsset) {
     				  $blnError = true;
     					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
+    				}
+    				else {
+    				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
     				}
 				  }
 				  else {
@@ -791,6 +793,7 @@ class QAssetEditComposite extends QControl {
 				else {
 				  // If txtParentAssetCode is empty
 				  $this->objAsset->LinkedFlag = false;
+				  $this->objAsset->ParentAssetId = null;
 				}
 
 				if (!$blnError) {
@@ -827,7 +830,7 @@ class QAssetEditComposite extends QControl {
 
 				if (!$blnError && $this->txtParentAssetCode->Text) {
 				  // Check if the parent asset code is already a child asset of this asset
-				  $arrChildAsset = Asset::LoadArrayByParentAssetCode($this->objAsset->AssetCode);
+				  $arrChildAsset = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
 				  foreach ($arrChildAsset as $objChildAsset) {
 				    if ($objChildAsset->AssetCode == $this->txtParentAssetCode->Text) {
 				      $blnError = true;
@@ -837,10 +840,13 @@ class QAssetEditComposite extends QControl {
 				  }
 				  if (!$blnError) {
   				  if ($this->txtParentAssetCode->Text != $this->objAsset->AssetCode) {
-      				$ParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
-      				if (!$ParentAsset) {
+      				$objParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
+      				if (!$objParentAsset) {
       				  $blnError = true;
       					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
+      				}
+      				else {
+      				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
       				}
   				  }
   				  else {
@@ -852,6 +858,7 @@ class QAssetEditComposite extends QControl {
 				else {
 				  // If txtParentAssetCode is empty
 				  $this->objAsset->LinkedFlag = false;
+				  $this->objAsset->ParentAssetId = null;
 				}
 
 				if (!$blnError) {
@@ -960,7 +967,8 @@ class QAssetEditComposite extends QControl {
 			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 			// The values do not get deleted for select values
 			CustomField::DeleteTextValues($objCustomFieldArray);
-			Asset::ResetParentAssetCodeToNullByAssetCode($this->objAsset->AssetCode);
+			// ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
+			Asset::ResetParentAssetIdToNullByAssetId($this->objAsset->AssetId);
 			QApplication::Redirect('asset_list.php');
 		}
 		catch (QDatabaseExceptionBase $objExc) {
@@ -1210,8 +1218,8 @@ class QAssetEditComposite extends QControl {
 		}
 		$this->lblAssetCode->Text = $this->objAsset->AssetCode;
 		$this->lblHeaderAssetCode->Text = $this->objAsset->AssetCode;
-		if ($this->objAsset->ParentAssetCode && $objParentAssetCode = Asset::LoadByAssetCode($this->objAsset->ParentAssetCode)) {
-  		$this->lblParentAssetCode->Text = $objParentAssetCode->__toStringWithLink("bluelink");
+		if ($this->objAsset->ParentAssetId) {
+  		$this->lblParentAssetCode->Text = $this->objAsset->ParentAsset->__toStringWithLink("bluelink");
 		}
 		else {
 		  $this->lblParentAssetCode->Text = "";
@@ -1240,7 +1248,12 @@ class QAssetEditComposite extends QControl {
 	protected function UpdateAssetControls() {
 
 		$this->txtAssetCode->Text = $this->objAsset->AssetCode;
-		$this->txtParentAssetCode->Text = $this->objAsset->ParentAssetCode;
+		if ($this->objAsset->ParentAssetId) {
+		  $this->txtParentAssetCode->Text = $this->objAsset->ParentAsset->AssetCode;
+		}
+		else {
+		  $this->txtParentAssetCode->Text = "";
+		}
 		$this->arrCustomFields = CustomField::UpdateControls($this->objAsset->objCustomFieldArray, $this->arrCustomFields);
 	}
 	//Set display logic of the BuiltInFields in View Access and Edit Access

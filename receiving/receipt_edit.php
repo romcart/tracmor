@@ -187,10 +187,10 @@
 			$this->UpdateCompanyAccess();
 			$this->UpdateContactAccess();
 
-			
+
 			// Check prerequisites for scheduling receipts
 			$this->CheckPrerequisites();
-			
+
 			// Create the datagrids
 			$this->dtgAssetTransact_Create();
 			$this->dtgInventoryTransact_Create();
@@ -1282,7 +1282,7 @@
 					$this->txtNewAssetCode->Warning = 'You must select one asset model.';
 				}
 				if (!$blnError) {
-					$objNewAsset = new Asset();
+				  $objNewAsset = new Asset();
 					$objNewAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
 					$objNewAsset->LocationId = 5; // To Be Received
 					$objNewAsset->AssetCode = $strAssetCode;
@@ -1349,8 +1349,9 @@
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "You do not have authorization to perform a transaction on this asset.";
 						}
-						elseif ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objNewAsset->AssetCode)) {
-              $objCheckedLinkedAssetArray = array();
+						elseif ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objNewAsset->AssetId)) {
+              $strAssetCodeArray = array();
+						  $objCheckedLinkedAssetArray = array();
 						  foreach ($objLinkedAssetArray as $objLinkedAsset) {
                 if (!QApplication::AuthorizeEntityBoolean($objLinkedAsset, 2)) {
                   $blnError = true;
@@ -1359,7 +1360,12 @@
                 }
                 else {
                   $objCheckedLinkedAssetArray[] = $objLinkedAsset;
+                  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
                 }
+
+      					if (!$blnError) {
+      					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+      					}
               }
               if (!$blnError) {
                 foreach ($objCheckedLinkedAssetArray as $objCheckedLinkedAsset) {
@@ -1505,7 +1511,7 @@
 						unset ($this->objAssetTransactionArray[$key]);
 						// If the asset in transaction have some children
 						foreach ($objNewAssetTransactionArray as $key2 => $value2) {
-						  if ($value2->Asset->ParentAssetCode = $value->Asset->AssetCode) {
+						  if ($value2->Asset->ParentAssetId = $value->Asset->AssetId) {
 						    if ($this->blnEditMode) {
 						      $this->arrAssetTransactionToDelete[] = $value2->AssetTransactionId;
 						    }
@@ -1636,7 +1642,7 @@
   								// Move the asset to the new location
   								$objAssetTransaction->Asset->LocationId = $lstLocationAssetReceived->SelectedValue;
   								$objAssetTransaction->Asset->Save();
-                  if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAssetTransaction->Asset->AssetCode))
+                  if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId))
     								foreach ($objLinkedAssetArray as $objLinkedAsset) {
           						$objLinkedAssetTransaction = $objLinkedAssetTransactionArray[$objLinkedAsset->AssetCode];
           					  $objLinkedAssetTransaction->DestinationLocationId = $lstLocationAssetReceived->SelectedValue;
@@ -2610,7 +2616,7 @@
 			}
 		}
 
-		
+
 		// Check that the prerequisites are met to allow scheduling receipts
 		protected function CheckPrerequisites() {
 			// Check that the 'Default Company' admin setting is set and valid
@@ -2620,7 +2626,7 @@
 				$this->lblNewToAddress->Visible=false;
 			}
 		}
-		
+
 		protected function getNextTabIndex() {
 			return $this->intNextTabIndex++;
 		}

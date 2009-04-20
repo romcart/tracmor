@@ -370,7 +370,7 @@ class QAssetTransactComposite extends QControl {
 					$this->objAssetArray[] = $objNewAsset;
 					$this->txtNewAssetCode->Text = null;
 					// Load all linked assets
-					$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objNewAsset->AssetCode);
+					$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objNewAsset->AssetId);
 					if ($objLinkedAssetArray) {
 					  $strAssetCodeArray = array();
 					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
@@ -463,7 +463,7 @@ class QAssetTransactComposite extends QControl {
 
 							$SourceLocationId = $asset->LocationId;
               // Load all linked assets
-							$objLinkedAssetArrayByNewAsset = Asset::LoadChildLinkedArrayByParentAssetCode($asset->AssetCode);
+							$objLinkedAssetArrayByNewAsset = Asset::LoadChildLinkedArrayByParentAssetId($asset->AssetId);
 							if (!$objLinkedAssetArrayByNewAsset) {
 							  $objLinkedAssetArrayByNewAsset = array();
 							}
@@ -583,7 +583,7 @@ class QAssetTransactComposite extends QControl {
 		if ($this->blnEditMode && $this->objAsset instanceof Asset) {
 			$this->objAssetArray[] = Asset::Load($this->objAsset->AssetId);
 			// Load all child assets
-			$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($this->objAsset->AssetCode);
+			$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($this->objAsset->AssetId);
 			if ($objLinkedAssetArray) {
 			  $strAssetCodeArray = array();
 				foreach ($objLinkedAssetArray as $objLinkedAsset) {
