@@ -434,6 +434,9 @@ CREATE FIELD METHODS
           $btnRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnRemove_Click'));
           $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
           $btnRemove->CausesValidation = false;
+          if ($objAsset->LinkedFlag) {
+            $btnRemove->Enabled = false;
+          }
       }
 
       return $btnRemove->Render(false);
@@ -443,12 +446,21 @@ CREATE FIELD METHODS
 		public function btnRemove_Click($strFormId, $strControlId, $strParameter) {
 
 			$intAssetId = $strParameter;
+			$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($intAssetId);
 			if ($this->ctlAssetTransact->objAssetArray) {
 				foreach ($this->ctlAssetTransact->objAssetArray as $key => $value) {
-					if ($value->AssetId == $intAssetId) {
+          if ($value->AssetId == $intAssetId) {
 						unset ($this->ctlAssetTransact->objAssetArray[$key]);
 					}
-				}
+					// Removing all linked (locked) assets from the transaction
+					elseif ($objLinkedAssetArray) {
+					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+					    if ($value->AssetId == $objLinkedAsset->AssetId) {
+					      unset ($this->ctlAssetTransact->objAssetArray[$key]);
+					    }
+					  }
+					}
+			  }
 			}
 		}
 

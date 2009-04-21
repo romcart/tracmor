@@ -258,14 +258,15 @@
 				$this->dtgAssetTransact->TotalItemCount = count($this->objAssetTransactionArray);
 				if ($this->dtgAssetTransact->TotalItemCount > 0) {
 				  // Create new array without child assets
-				  $objAssetTransactionArray = array();
+				  /*$objAssetTransactionArray = array();
 				  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 				    if (!$objAssetTransaction->Asset->LinkedFlag) {
 				      $objAssetTransactionArray[] = $objAssetTransaction;
 				    }
 				  }
 				  $this->dtgAssetTransact->TotalItemCount = count($objAssetTransactionArray);
-					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;
+					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;*/
+					$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
 					$this->dtgAssetTransact->ShowHeader = true;
 				}
 				else {
@@ -850,6 +851,9 @@
 	          $btnRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnRemoveAssetTransaction_Click'));
 	          $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	          $btnRemove->CausesValidation = false;
+	          if ($objAssetTransaction->Asset->LinkedFlag) {
+              $btnRemove->Enabled = false;
+            }
 	      }
 
 	      return $btnRemove->Render(false);
@@ -872,6 +876,9 @@
 					$btnReceiveAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveAssetTransaction_Click'));
 					$btnReceiveAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 					$btnReceiveAsset->CausesValidation = false;
+					if ($objAssetTransaction->Asset->LinkedFlag) {
+            $btnReceiveAsset->Enabled = false;
+          }
 				}
 
 				QApplication::AuthorizeControl($this->objReceipt, $btnReceiveAsset, 2);
@@ -932,7 +939,9 @@
 					}
 					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveAssetTransaction'));
 					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-
+					if ($objAssetTransaction->Asset->LinkedFlag) {
+            $lstLocationAssetReceived->Enabled = false;
+          }
 				}
 				QApplication::AuthorizeControl($this->objReceipt, $lstLocationAssetReceived, 2);
 

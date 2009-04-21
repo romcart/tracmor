@@ -375,6 +375,7 @@ class QAssetTransactComposite extends QControl {
 					  $strAssetCodeArray = array();
 					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
 					    $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+					    $this->objAssetArray[] = $objLinkedAsset;
 					  }
 					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 					}
@@ -459,7 +460,7 @@ class QAssetTransactComposite extends QControl {
 
 					// Assign different source and destinations depending on transaction type
 					foreach ($this->objAssetArray as $asset) {
-						if ($asset instanceof Asset) {
+						if ($asset instanceof Asset && $asset->LinkedFlag != 1) {
 
 							$SourceLocationId = $asset->LocationId;
               // Load all linked assets
@@ -588,6 +589,7 @@ class QAssetTransactComposite extends QControl {
 			  $strAssetCodeArray = array();
 				foreach ($objLinkedAssetArray as $objLinkedAsset) {
 				  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+				  $this->objAssetArray[] = $objLinkedAsset;
 				}
 				$this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $this->objAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 			}

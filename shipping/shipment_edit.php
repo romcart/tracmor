@@ -447,14 +447,15 @@
 				$this->dtgAssetTransact->TotalItemCount = count($this->objAssetTransactionArray);
 				if ($this->dtgAssetTransact->TotalItemCount > 0) {
 				  // Create new array without child assets
-				  $objAssetTransactionArray = array();
+				  /*$objAssetTransactionArray = array();
 				  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 				    if (!$objAssetTransaction->Asset->LinkedFlag) {
 				      $objAssetTransactionArray[] = $objAssetTransaction;
 				    }
 				  }
 				  $this->dtgAssetTransact->TotalItemCount = count($objAssetTransactionArray);
-					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;
+					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;*/
+					$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
 					$this->dtgAssetTransact->ShowHeader = true;
 				}
 				else {
@@ -1816,6 +1817,9 @@
 				$lstAdvanced->AddItem('Schedule for Exchange', 2);
 				$lstAdvanced->AddAction(new QChangeEvent(), new QAjaxAction('lstAdvancedColumn_Change'));
 				$lstAdvanced->Width = 200;
+				if ($objAssetTransaction->Asset->LinkedFlag) {
+          $lstAdvanced->Enabled = false;
+        }
 			}
 
 			if ($objAssetTransaction->ScheduleReceiptFlag) {
@@ -1883,6 +1887,9 @@
           $btnRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnRemoveAssetTransaction_Click'));
           $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
           $btnRemove->CausesValidation = false;
+          if ($objAssetTransaction->Asset->LinkedFlag) {
+            $btnRemove->Enabled = false;
+          }
       }
 
       return $btnRemove->Render(false);
