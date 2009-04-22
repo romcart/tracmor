@@ -1339,6 +1339,7 @@
 							$this->txtNewAssetCode->Warning = "That asset code does not exist.";
 						}
 						elseif ($objNewAsset->LinkedFlag) {
+						  $blnError = true;
 						  $this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
 						}
 						elseif ($objNewAsset->CheckedOutFlag) {
@@ -1508,25 +1509,31 @@
 
 			$intTempId = $strParameter;
 			if ($this->objAssetTransactionArray) {
-				// Clone objAssetTransactionArray to search child assets
-			  $objNewAssetTransactionArray = array_merge($this->objAssetTransactionArray, array());
 				foreach ($this->objAssetTransactionArray as $key => $value) {
 					if ($value->Asset->TempId == $intTempId) {
 						// Prepare to delete from the database when the Save button is clicked
 						if ($this->blnEditMode) {
 							$this->arrAssetTransactionToDelete[] = $value->AssetTransactionId;
 						}
-						$this->blnModifyAssets = true;
-						unset ($this->objAssetTransactionArray[$key]);
-						// If the asset in transaction have some children
-						foreach ($objNewAssetTransactionArray as $key2 => $value2) {
-						  if ($value2->Asset->ParentAssetId = $value->Asset->AssetId) {
-						    if ($this->blnEditMode) {
-						      $this->arrAssetTransactionToDelete[] = $value2->AssetTransactionId;
-						    }
-						    unset ($this->objAssetTransactionArray[$key2]);
+						$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($value->Asset->AssetId);
+						// If the asset in transaction has some children
+						if ($objLinkedAssetArray) {
+						  $intLinkedAssetIdArray = array();
+						  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+						    $intLinkedAssetIdArray[$objLinkedAsset->AssetId] = true;
+						  }
+						  foreach ($this->objAssetTransactionArray as $key2 => $value2) {
+    						if (array_key_exists($value2->Asset->AssetId, $intLinkedAssetIdArray)) {
+    						  if ($this->blnEditMode) {
+    						    $this->arrAssetTransactionToDelete[] = $value2->AssetTransactionId;
+    						  }
+    						  unset ($this->objAssetTransactionArray[$key2]);
+    						}
 						  }
 						}
+
+						$this->blnModifyAssets = true;
+						unset ($this->objAssetTransactionArray[$key]);
 					}
 				}
 			}

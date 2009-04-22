@@ -58,7 +58,7 @@ if ($_POST) {
               $objAuditScanArray[] = $objAuditScan;
 
               // Load an array of linked child assets and add to array
-              $objLinkedChildAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objNewAsset->AssetCode);
+              $objLinkedChildAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objNewAsset->AssetId);
               if ($objLinkedChildAssetArray) {
                 foreach ($objLinkedChildAssetArray as $objLinkedChildAsset) {
                   $intAssetIdArray[] = $objLinkedChildAsset->AssetId;

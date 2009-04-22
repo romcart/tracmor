@@ -97,7 +97,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     	$objAsset->LocationId = $intDestinationLocationId;
 			$objAsset->Save();
 
-			if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetCode($objAsset->AssetCode)) {
+			if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objAsset->AssetId)) {
   		  foreach ($objLinkedAssetArray as $objLinkedAsset) {
   		    $objLinkedAsset->LocationId = $intDestinationLocationId;
   		    $objLinkedAsset->Save();
