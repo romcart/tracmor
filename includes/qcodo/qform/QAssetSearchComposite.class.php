@@ -139,7 +139,7 @@ class QAssetSearchComposite extends QControl {
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->AssetModel->Manufacturer->__toString() ?>', 'SortByCommand="asset__asset_model_id__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?= $_ITEM->AssetModel->AssetModelCode ?>', 'SortByCommand="asset__asset_model_id__asset_model_code"', 'ReverseSortByCommand="asset__asset_model_id__asset_model_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
-    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Code', '<?= $_CONTROL->objParentControl->ParentAsset__toString($_ITEM) ?>', 'SortByCommand="asset__parent_asset_id__asset_code ASC"', 'ReverseSortByCommand="asset__parent_asset_id__asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
+    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Code', '<?= $_CONTROL->objParentControl->ParentAsset__toString($_ITEM) ?>', 'SortByCommand="asset__parent_asset_id__asset_code ASC"', 'ReverseSortByCommand="asset__parent_asset_id__asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"', 'HtmlEntities="false"'));
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
     $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
@@ -515,7 +515,11 @@ class QAssetSearchComposite extends QControl {
   // If the parent asset exists then return the Parent Asset Code
   public function ParentAsset__toString($objAsset) {
     if ($objAsset->ParentAsset instanceof Asset) {
-      return $objAsset->ParentAsset->AssetCode;
+      if ($this->blnRemoveAllLinks) {
+      	return $objAsset->ParentAsset->AssetCode;
+      } else {
+		return $objAsset->ParentAsset->__toStringWithLink("bluelink");
+      }
     }
     else {
       return;
