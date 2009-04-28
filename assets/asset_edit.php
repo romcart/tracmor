@@ -175,7 +175,6 @@
 
 	    // Enable AJAX - this won't work while using the DB profiler
 	    $this->dtgChildAssets->UseAjax = true;
-	    $this->dtgChildAssets->UseAjax = false;
 
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgChildAssets);
