@@ -81,6 +81,9 @@
 
 		// Override the Form_Create method in AssetEditFormBase.inc
 		protected function Form_Create() {
+			
+			/*QApplication::$Database[1]->EnableProfiling();*/
+			
       // Assign the Transaction Type from the query string, if it exists.
 			$this->intTransactionTypeId = QApplication::QueryString('intTransactionTypeId');
 
@@ -125,7 +128,7 @@
 
 		// Datagrid values must be assigned here because they are not encoded like all other controls
 		protected function Form_PreRender() {
-
+			
 			// If an existing asset is being edited, render the Transaction datagrid
 			if ($this->ctlAssetEdit->blnEditMode) {
 
@@ -155,6 +158,12 @@
 
 			$this->DisplayChildAssets();
 		}
+		
+		/*protected function Form_Exit() {
+			//Output database profiling - it shows you the queries made to create this page
+			//This will not work on pages with the AJAX Pagination
+			QApplication::$Database[1]->OutputProfiling();
+  	}*/
 
 		// Setup the Child Assets datagrid
 		protected function dtgChildAssets_Create() {
@@ -166,6 +175,7 @@
 
 	    // Enable AJAX - this won't work while using the DB profiler
 	    $this->dtgChildAssets->UseAjax = true;
+	    $this->dtgChildAssets->UseAjax = false;
 
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgChildAssets);
@@ -197,7 +207,12 @@
 	    if (!isset($this->objAsset)) {
 	      $this->SetupAsset($this);
 	    }
-	    $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
+	    if ($this->objAsset && is_int($this->objAsset->AssetId)) {
+	    	$this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
+	    }
+	    else {
+	    	$this->ctlAssetEdit->objChildAssetArray = array();
+	    }
 		}
 
 		protected function dtgChildAssets_Bind() {
