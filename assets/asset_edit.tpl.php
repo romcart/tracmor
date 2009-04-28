@@ -45,8 +45,8 @@
     <?php $this->dtgChildAssets->RenderWithError(); ?>
 	  <?php $this->btnChildAssetsRemove->Render() . "&nbsp;" . $this->btnReassign->Render() . "&nbsp;" . $this->btnLinkToParent->Render() . "&nbsp;" . $this->btnUnlink->RenderWithError(); ?>
     <br class="item_divider" />
-    <?php $this->ctlAssetSearchTool->Render();
-		}
+    <?php }
+    $this->ctlAssetSearchTool->Render();
 	  if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
     <br class="item_divider" />
 	<?php $this->RenderEnd() ?>

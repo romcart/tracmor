@@ -91,7 +91,7 @@
 
 			$this->ctlAssetEdit_Create();
 
-			if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) {
+			if (!$this->intTransactionTypeId) {
 			  $this->lblChildAssets_Create();
   			// Create Buttons
   			$this->btnChildAssetsRemove_Create();
