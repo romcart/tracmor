@@ -215,8 +215,8 @@ class QAssetEditComposite extends QControl {
 	}
 
 	// Generate tab indexes
-	public $intNextTabIndex = 1;
-	public function GetNextTabIndex() {
+	protected $intNextTabIndex = 1;
+	protected function GetNextTabIndex() {
 		return ++$this->intNextTabIndex;
 	}
 
