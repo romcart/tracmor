@@ -124,7 +124,6 @@ class QAssetEditComposite extends QControl {
 
 		// Create Inputs
 		$this->txtAssetCode_Create();
-		$this->txtParentAssetCode_Create();
 		$this->lstAssetModel_Create();
 		$this->chkAutoGenerateAssetCode_Create();
 		$this->dlgNewAssetModel_Create();
@@ -138,6 +137,9 @@ class QAssetEditComposite extends QControl {
 
 		// Create all custom asset fields
 		$this->customFields_Create();
+
+		// Create parent asset code field
+		$this->txtParentAssetCode_Create();
 
 		// Create Buttons
 		$this->btnSave_Create();
@@ -213,8 +215,8 @@ class QAssetEditComposite extends QControl {
 	}
 
 	// Generate tab indexes
-	protected $intNextTabIndex = 1;
-	protected function getNextTabIndex() {
+	public $intNextTabIndex = 1;
+	public function GetNextTabIndex() {
 		return ++$this->intNextTabIndex;
 	}
 
@@ -226,6 +228,12 @@ class QAssetEditComposite extends QControl {
 
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this, true, true);
+
+		// Add TabIndex for all txt custom fields
+		foreach ($this->arrCustomFields as $arrCustomField) {
+		  if (array_key_exists('input', $arrCustomField))
+		    $arrCustomField['input']->TabIndex = $this->GetNextTabIndex();
+		}
 
 		//Setup Custom Fields
 		$this->UpdateCustomFields();
@@ -253,8 +261,7 @@ class QAssetEditComposite extends QControl {
 		$this->txtParentAssetCode->CausesValidation = true;
 		$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
   	$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-   	$this->txtParentAssetCode->TabIndex = $this->GetNextTabIndex();;
-   	$this->intNextTabIndex++;
+   	$this->txtParentAssetCode->TabIndex = $this->GetNextTabIndex();
 	}
 
 	// Create the clickable label
