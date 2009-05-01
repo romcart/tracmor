@@ -112,6 +112,11 @@
 								</td>
 							</tr>
 						</table>
+						<?php
+							// Warn if magic quotes are enabled
+							if (ini_get('magic_quotes_gpc') || ini_get('magic_quotes_runtime'))
+								printf('<br><font color="red" style="white-space:nowrap;"><b>WARNING:</b> magic_quotes_gpc and magic_quotes_runtime need to be disabled</font>');
+						?>
 					</td>
 				</tr>	
 			</table>
