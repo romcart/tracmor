@@ -74,12 +74,12 @@
 									<td colspan="2" class="record_subheader">Sender Information</td>
 								</tr>
 								<tr>
-									<td class="record_field_name" nowrap>Company:&nbsp;</td>
-									<td class="record_field_value" nowrap><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); $this->lblNewFromCompany->RenderWithError(); ?></td>
+									<td class="record_field_name">Company:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); $this->lblNewFromCompany->RenderWithError(); ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name" nowrap>Contact:&nbsp;</td>
-									<td class="record_field_value" nowrap><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); $this->lblNewFromContact->RenderWithError(); ?></td>
+									<td class="record_field_name">Contact:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); $this->lblNewFromContact->RenderWithError(); ?></td>
 								</tr>
 							</table>
 							<br class="item_divider" />
@@ -88,12 +88,12 @@
 									<td colspan="2" class="record_subheader">Recipient Information</td>
 								</tr>
 								<tr>
-									<td class="record_field_name" nowrap>Contact:&nbsp;</td>
-									<td class="record_field_value" nowrap><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render(); $this->lblNewToContact->RenderWithError();?></td>
+									<td class="record_field_name">Contact:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render(); $this->lblNewToContact->RenderWithError();?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name" nowrap>Address:&nbsp;</td>
-									<td class="record_field_value" nowrap><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); $this->lblNewToAddress->RenderWithError();?></td>
+									<td class="record_field_name">Address:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); $this->lblNewToAddress->RenderWithError();?></td>
 								</tr>						
 							</table>
 						</td>
@@ -107,30 +107,30 @@
 
 								<?php if (QApplication::$TracmorSettings->CustomReceiptNumbers) { ?>
 								<tr>
-									<td class="record_field_name" nowrap>Receipt Number&nbsp;</td>
-									<td class="record_field_value" nowrap><?php $this->txtReceiptNumber->RenderWithError();$this->lblReceiptNumber->Render(); ?>&nbsp;</td>
+									<td class="record_field_name">Receipt Number&nbsp;</td>
+									<td class="record_field_value"><?php $this->txtReceiptNumber->RenderWithError();$this->lblReceiptNumber->Render(); ?>&nbsp;</td>
 								</tr>
 								<?php
 								}
 								?>
 								<tr>
-									<td class="record_field_name" nowrap>Note:&nbsp;</td>
-									<td class="record_field_value" nowrap><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?>&nbsp;</td>
+									<td class="record_field_name">Note:&nbsp;</td>
+									<td class="record_field_value"><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?>&nbsp;</td>
 								</tr>									
 								<tr>
-									<td class="record_field_name" nowrap>Date Due:&nbsp;</td>
-									<td class="record_field_value" nowrap><?php $this->calDueDate->RenderWithError();$this->lblDueDate->Render(); ?>&nbsp;</td>
+									<td class="record_field_name">Date Due:&nbsp;</td>
+									<td class="record_field_value"><?php $this->calDueDate->RenderWithError();$this->lblDueDate->Render(); ?>&nbsp;</td>
 								</tr>
 								<tr style="<?php if (!$this->blnEditMode) { echo('display:none'); } ?>">
-									<td class="record_field_name" nowrap>Date Received:&nbsp;</td>
-									<td class="record_field_value" nowrap><?php $this->lblReceiptDate->Render(); ?>&nbsp;</td>
+									<td class="record_field_name">Date Received:&nbsp;</td>
+									<td class="record_field_value"><?php $this->lblReceiptDate->Render(); ?>&nbsp;</td>
 								</tr>
 								<?php if (!empty($arrReceiptFields)) {
 									foreach ($arrReceiptFields as $field) {
 										?>
 										<tr>
-											<td class="record_field_name" nowrap><?php echo $field['name']; ?></td>
-											<td class="record_field_value" nowrap><?php echo $field['value']; ?></td>
+											<td class="record_field_name"><?php echo $field['name']; ?></td>
+											<td class="record_field_value"><?php echo $field['value']; ?></td>
 										</tr>
 										<?php
 									}

@@ -26,7 +26,7 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 .item_divider { line-height: 16px; }
 .item_label { font: 12px verdana; padding-bottom: 4px; vertical-align: top; }
 .item_label_disabled { font: 12px verdana; padding-bottom: 4px; color: #999999; vertical-align: top; }
-.scrollBox { height:48px; overflow:auto; border: 1px solid #AAAAAA; background-color: #DDDDDD; }
+.scrollBox { height:48px; overflow:auto; border: 1px solid #AAAAAA; background-color: #DDDDDD;white-space:normal; }
 
 .button { font: 10px verdana; font-weight: bold; }
 .listbox { font: 12px verdana; width: 250px; border: 1px solid #999999; }
@@ -68,7 +68,7 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 	border-top:1px solid #AAAAAA;
 	padding-bottom:4px;
 }
-.record_field_value { font-size:12px;border:1px solid #000000;background-color:#EEEEEE;width:280px;padding:3px;empty-cells:show;vertical-align:top; }
+.record_field_value { font-size:12px;border:1px solid #000000;background-color:#EEEEEE;width:280px;padding:3px;empty-cells:show;vertical-align:top;white-space:nowrap; }
 .record_field_name { color:#615c5c;font-size:12px;width:120px;text-align:right;padding-right:5px;vertical-align:top;white-space:nowrap; }
 .record_field_edit { font-size:12px;width:280px;padding:3px;vertical-align:top; }
 .record_field_spacer { width: 75px;}
