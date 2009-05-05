@@ -81,9 +81,9 @@
 
 		// Override the Form_Create method in AssetEditFormBase.inc
 		protected function Form_Create() {
-			
+
 			/*QApplication::$Database[1]->EnableProfiling();*/
-			
+
       // Assign the Transaction Type from the query string, if it exists.
 			$this->intTransactionTypeId = QApplication::QueryString('intTransactionTypeId');
 
@@ -128,7 +128,7 @@
 
 		// Datagrid values must be assigned here because they are not encoded like all other controls
 		protected function Form_PreRender() {
-			
+
 			// If an existing asset is being edited, render the Transaction datagrid
 			if ($this->ctlAssetEdit->blnEditMode) {
 
@@ -158,7 +158,7 @@
 
 			$this->DisplayChildAssets();
 		}
-		
+
 		/*protected function Form_Exit() {
 			//Output database profiling - it shows you the queries made to create this page
 			//This will not work on pages with the AJAX Pagination
@@ -181,11 +181,11 @@
 	    $this->dtgChildAssets->Paginator = $objPaginator;
 	    $this->dtgChildAssets->ItemsPerPage = 20;
 
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15', 'Display=false'));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn(' ', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => 15, 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array(/*'OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode, false), */'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array(/*'OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->AssetModelCode, false), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->AssetModelCode), */'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array(/*'OrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription, false), */'CssClass' => "dtg_column")));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15px', 'Display=false'));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => "15px", 'HtmlEntities' => false)));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array('CssClass' => "dtg_column", 'Width' => "30%")));
 
 	    //$this->dtgChildAssets->SortColumnIndex = 2;
 
@@ -819,7 +819,7 @@ CREATE FIELD METHODS
 		public function DisplayLockedImage($bitLinkedFlag) {
 		  if ($bitLinkedFlag)
 		    return '<img src="../images/icons/locked.png" border="0">';
-		  return ' ';
+		  return '&nbsp;';
 		}
 
 		// Uncheck all items but SelectAll checkbox
