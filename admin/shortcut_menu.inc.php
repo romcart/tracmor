@@ -20,15 +20,14 @@
  */
 ?>
 
-			<table cellpadding="0" cellspacing="0" style="padding-left:10px" border=0>
+			<table cellpadding="0" cellspacing="0" style="margin-left:10px;" border="0">
 				<tr style="height:21px;">
-					<td style="width:5px;background-image: url(../images/moduleTab_left.gif)"><img src="../images/empty.gif" width="5" height="1"></td>
-					<td width="150" style="background-image: url(../images/moduleTab_middle.gif);font-family:arial;color:#555555;font-size:12px;font-weight:bold;">Shortcuts</td>
-					<td style="background-image: url(../images/moduleTab_middle.gif)"><img src="../images/empty.gif" width="90" height="1"></td>
-					<td style="background-image: url(../images/moduleTab_right.gif);"><img src="../images/empty.gif" width="5" height="1"></td>
+					<td style="width:5px;background-image: url(../images/moduleTab_left.gif)"><img src="../images/empty.gif" width="5" height="1" /></td>
+					<td style="width:150px;background-image: url(../images/moduleTab_middle.gif);font-family:arial;color:#555555;font-size:12px;font-weight:bold;">Shortcuts</td>
+					<td style="background-image: url(../images/moduleTab_middle.gif)"><img src="../images/empty.gif" width="90" height="1" /></td>
+					<td style="background-image: url(../images/moduleTab_right.gif);"><img src="../images/empty.gif" width="5" height="1" /></td>
 				</tr>
 				<tr>
-
 					<td colspan="4" style="border-left:1px solid #aaaaaa;border-right:1px solid #aaaaaa;border-bottom:1px solid #aaaaaa;font-family:arial;color:#555555;font-size:12px;">
 						<!-- Shortcuts  -->
 						<table cellpadding="0" cellspacing="0" align="left" style="font-family:arial;color:#555555;font-size:12;line-height:1.5" width="100%">
