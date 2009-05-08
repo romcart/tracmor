@@ -272,7 +272,7 @@ class QAssetSearchComposite extends QControl {
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandManufacturer] = true;
     $objExpansionMap[Asset::ExpandParentAsset] = true;
     $objExpansionMap[Asset::ExpandLocation] = true;
-
+	if ($this->blnSearch || !$this->blnUseAjax) {
 		$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 		if ($this->dtgAsset->TotalItemCount == 0) {
 			$this->dtgAsset->ShowHeader = false;
@@ -281,7 +281,9 @@ class QAssetSearchComposite extends QControl {
 			$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap);
 			$this->dtgAsset->ShowHeader = true;
 		}
-		$this->blnSearch = false;
+	}
+	$this->blnSearch = false;
+	
   }
 
   protected function ctlAdvanced_Create() {
