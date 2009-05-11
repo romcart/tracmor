@@ -56,6 +56,7 @@
 		// Booleans
 		protected $blnModifyAssets = false;
 		protected $blnModifyInventory = false;
+		protected $blnShowInventory = false;
 
 		// Inputs
 		protected $txtShipmentNumber;
@@ -209,6 +210,14 @@
 		public $blnEditBuiltInFields;
 
 		protected function Form_Create() {
+					
+			// check rigths for the Inventory to Ship
+			$this->blnShowInventory = true;
+			$objRoleModule = RoleModule::LoadByRoleIdModuleId(QApplication::$objUserAccount->RoleId, 3);
+			if ($objRoleModule->AccessFlag) {
+				$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId($objRoleModule->RoleModuleId, 2);
+				if ($objRoleModuleAuthorization->AuthorizationLevelId == 3) $this->blnShowInventory = false;
+			} else $this->blnShowInventory = false;
 
 			// Call SetupShipment to either Load/Edit Existing or Create New
 			$this->SetupShipment();
@@ -328,9 +337,16 @@
 			$this->lstCourier_Create();
 			$this->txtNote_Create();
 			$this->txtNewAssetCode_Create();
-			$this->txtNewInventoryModelCode_Create();
-			$this->lstSourceLocation_Create();
-			$this->txtQuantity_Create();
+			
+			if ($this->blnShowInventory) {
+				$this->txtNewInventoryModelCode_Create();
+				$this->btnLookup_Create();
+				$this->ctlInventorySearchTool_Create();
+				$this->lstSourceLocation_Create();
+				$this->txtQuantity_Create();
+				$this->btnAddInventory_Create();				
+			}	
+
 			$this->txtTrackingNumber_Create();
 			//$this->lblAdvanced_Create();
 			$this->txtReceiptAssetCode_Create();
@@ -340,9 +356,7 @@
 			$this->chkScheduleReceipt_Create();
 			$this->btnAddAsset_Create();
 			$this->ctlAssetSearchTool_Create();
-			$this->btnLookup_Create();
-			$this->ctlInventorySearchTool_Create();
-			$this->btnAddInventory_Create();
+
 			$this->btnSaveExchange_Create();
 			$this->btnCancelExchange_Create();
 			$this->btnSaveDueDate_Create();
@@ -377,8 +391,6 @@
 			// Shipping Datagrids
 			$this->dtgAssetTransact_Create();
 			$this->dtgInventoryTransact_Create();
-
-
 
 			// Load the objAssetTransactionArray and objInventoryTransactionArray for the first time
 			if ($this->blnEditMode) {

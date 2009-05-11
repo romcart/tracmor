@@ -50,6 +50,7 @@
 		// Booleans
 		protected $blnModifyAssets = false;
 		protected $blnModifyInventory = false;
+		protected $blnShowInventory = false;
 
 		// Labels
 		protected $lblHeaderReceipt;
@@ -120,6 +121,14 @@
 	  protected $lblLookup;
 
 		protected function Form_Create() {
+		
+			// check rigths for the Inventory to Ship
+			$this->blnShowInventory = true;
+			$objRoleModule = RoleModule::LoadByRoleIdModuleId(QApplication::$objUserAccount->RoleId, 3);
+			if ($objRoleModule->AccessFlag) {
+				$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId($objRoleModule->RoleModuleId, 2);
+				if ($objRoleModuleAuthorization->AuthorizationLevelId == 3) $this->blnShowInventory = false;
+			} else $this->blnShowInventory = false;
 
 			// Call Setup Receipt to either load existing or create new receipt
 			$this->SetupReceipt();
@@ -153,10 +162,15 @@
 
 			// Create all custom asset fields - this must be here for tab ordering
 			$this->customFields_Create();
+			
+			if ($this->blnShowInventory) {
+				$this->txtNewInventoryModelCode_Create();
+				$this->ctlInventorySearchTool_Create();
+				$this->txtQuantity_Create();
+				$this->btnAddInventory_Create();
+			}	
 
-			$this->txtNewAssetCode_Create();
-			$this->txtNewInventoryModelCode_Create();
-			$this->txtQuantity_Create();
+			$this->txtNewAssetCode_Create();						
 			$this->rblAssetType_Create();
 			$this->lstAssetModel_Create();
 			$this->chkAutoGenerateAssetCode_Create();
@@ -164,7 +178,7 @@
 			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
 				$this->txtReceiptNumber_Create();
 			}
-
+			
 			// Create the buttons
 			$this->btnSave_Create();
 			$this->btnEdit_Create();
@@ -174,10 +188,6 @@
 			$this->pnlAttachments_Create();
 			$this->btnAddAsset_Create();
 			$this->ctlAssetSearchTool_Create();
-			$this->ctlInventorySearchTool_Create();
-			$this->btnAddInventory_Create();
-
-
 
 			//Set display logic of Built-In Fields
 			$this->UpdateBuiltInFields();

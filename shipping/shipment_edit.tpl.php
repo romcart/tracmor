@@ -197,7 +197,7 @@ $this->pnlAttachments->Render();
 </table>
 <?php $this->dtgAssetTransact->Render(); ?>
 <br class="item_divider" />
-
+<?php if ($this->blnShowInventory) {?>
 <div class="title">Inventory to Ship</div>
 <table>
 	<tr>
@@ -216,10 +216,12 @@ $this->pnlAttachments->Render();
 		<td></td>
 	</tr>
 </table>
-<?php $this->dtgInventoryTransact->Render(); ?>
+<?php }
+$this->dtgInventoryTransact->Render(); 
+?>
 
 <?php $this->dlgNew->Render(); ?>
 <?php $this->ctlAssetSearchTool->Render(); ?>
-<?php $this->ctlInventorySearchTool->Render(); ?>
+<?php if ($this->blnShowInventory) $this->ctlInventorySearchTool->Render(); ?>
 <?php $this->RenderEnd() ?>
 <?php include('../includes/footer.inc.php'); ?>

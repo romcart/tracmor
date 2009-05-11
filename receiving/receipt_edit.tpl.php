@@ -168,6 +168,7 @@ $this->pnlAttachments->Render();
 	</table>
 		<?php $this->dtgAssetTransact->RenderWithError(); ?>
 		<br class="item_divider" />
+<?php if ($this->blnShowInventory) {?>
 	<div class="title">Inventory to Receive</div>
 	<table>
 		<tr>
@@ -179,11 +180,11 @@ $this->pnlAttachments->Render();
 			<td><?php $this->btnAddInventory->Render(); ?></td>
 		</tr>
 	</table>
-		<?php $this->dtgInventoryTransact->RenderWithError(); ?>
+		<?php } $this->dtgInventoryTransact->RenderWithError(); ?>
 		<br class="item_divider" />
 
 	<?php $this->dlgNew->Render(); ?>
 	<?php $this->ctlAssetSearchTool->Render(); ?>
-	<?php $this->ctlInventorySearchTool->Render(); ?>
+	<?php if ($this->blnShowInventory) $this->ctlInventorySearchTool->Render(); ?>
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>
