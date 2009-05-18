@@ -49,7 +49,7 @@
     if ($this->ctlAssetSearchTool) {
     	$this->ctlAssetSearchTool->Render();
     }
-	  if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
+	  if ($this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
     <br class="item_divider" />
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>

@@ -280,14 +280,13 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel = new QListBox($this);
 		$this->lstAssetModel->Name = 'Asset Model';
 		$this->lstAssetModel->Required = true;
-
 		if (!$this->blnEditMode)
 			$this->lstAssetModel->AddItem('- Select One -', null);
-		$objAssetModelArray = AssetModel::LoadAll(QQ::Clause(QQ::OrderBy(QQN::AssetModel()->ShortDescription)));
-		if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
-			$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
+		$assetModelArray = AssetModel::LoadAllIntoArray();		
+		if ($assetModelArray) foreach ($assetModelArray as $assetModel) {
+			$objListItem = new QListItem($assetModel['short_description'], $assetModel['asset_model_id']);
 			$this->lstAssetModel->AddItem($objListItem);
-			if (($this->objAsset->AssetModelId) && ($this->objAsset->AssetModelId == $objAssetModel->AssetModelId))
+			if (($this->objAsset->AssetModelId) && ($this->objAsset->AssetModelId == $assetModel['asset_model_id']))
 				$objListItem->Selected = true;
 		}
 		$this->lstAssetModel->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstAssetModel_Select'));
