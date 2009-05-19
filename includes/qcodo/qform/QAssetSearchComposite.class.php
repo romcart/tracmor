@@ -142,7 +142,7 @@ class QAssetSearchComposite extends QControl {
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Code', '<?= $_CONTROL->objParentControl->ParentAsset__toString($_ITEM) ?>', 'SortByCommand="asset__parent_asset_id__asset_code ASC"', 'ReverseSortByCommand="asset__parent_asset_id__asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"', 'HtmlEntities="false"'));
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
-    $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
+    $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);	
     if ($objCustomFieldArray) {
     	foreach ($objCustomFieldArray as $objCustomField) {
     		//Only add the custom field column if the role has authorization to view it.
@@ -170,17 +170,16 @@ class QAssetSearchComposite extends QControl {
     $objStyle->CssClass = 'dtg_header';
 
     $this->dtgAsset->SetDataBinder('dtgAsset_Bind', $this);
-
     $this->lstCategory_Create();
     $this->lstManufacturer_Create();
     $this->lstLocation_Create();
     $this->txtShortDescription_Create();
     $this->txtAssetCode_Create();
     $this->chkOffsite_Create();
-    $this->lblAssetModelId_Create();
+    $this->lblAssetModelId_Create();	
     $this->btnSearch_Create();
     $this->btnClear_Create();
-    $this->ctlAdvanced_Create();
+    $this->ctlAdvanced_Create();	
     $this->lblAdvanced_Create();
 	}
 
@@ -300,13 +299,13 @@ class QAssetSearchComposite extends QControl {
 		$this->lstLocation = new QListBox($this);
 		$this->lstLocation->Name = 'Location';
 		$this->lstLocation->AddItem('- ALL -', null);
-		foreach (Location::LoadAllLocations(true, true, 'short_description') as $objLocation) {
+		foreach (Location::LoadAllLocationsAsCustomArray(true, true, 'short_description') as $arrLocation) {
 			// Keep Shipped and To Be Received at the top of the list
-			if ($objLocation->LocationId == 2 || $objLocation->LocationId == 5) {
-				$this->lstLocation->AddItemAt(1, new QListItem($objLocation->ShortDescription, $objLocation->LocationId));
+			if ($arrLocation['location_id'] == 2 || $arrLocation['location_id'] == 5) {
+				$this->lstLocation->AddItemAt(1, new QListItem($arrLocation['short_description'], $arrLocation['location_id']));
 			}
 			else {
-				$this->lstLocation->AddItem($objLocation->ShortDescription, $objLocation->LocationId);
+				$this->lstLocation->AddItem($arrLocation['short_description'], $arrLocation['location_id']);
 			}
 		}
 		if ($this->blnUseAjax) {
@@ -322,8 +321,8 @@ class QAssetSearchComposite extends QControl {
   	$this->lstCategory = new QListBox($this);
 		$this->lstCategory->Name = 'Category';
 		$this->lstCategory->AddItem('- ALL -', null);
-		foreach (Category::LoadAllWithFlags(true, false, 'short_description') as $objCategory) {
-			$this->lstCategory->AddItem($objCategory->ShortDescription, $objCategory->CategoryId);
+		foreach (Category::LoadAllAsCustomArray(true, false, 'short_description') as $arrCategory) {
+			$this->lstCategory->AddItem($arrCategory['short_description'], $arrCategory['category_id']);
 		}
   }
 
@@ -331,8 +330,8 @@ class QAssetSearchComposite extends QControl {
     $this->lstManufacturer = new QListBox($this);
 		$this->lstManufacturer->Name = 'Manufacturer';
 		$this->lstManufacturer->AddItem('- ALL -', null);
-		foreach (Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription))) as $objManufacturer) {
-			$this->lstManufacturer->AddItem($objManufacturer->ShortDescription, $objManufacturer->ManufacturerId);
+		foreach (Manufacturer::LoadAllAsCustomArray('short_description') as $arrManufacturer) {
+			$this->lstManufacturer->AddItem($arrManufacturer['short_description'], $arrManufacturer['manufacturer_id']);
 		}
   }
 

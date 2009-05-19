@@ -73,6 +73,53 @@
 				parent::Save($blnForceInsert, $blnForceUpdate);
 			}
 		}
+		
+		public static function LoadAllAsCustomArray($strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+
+			Manufacturer::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
+
+			// Setup QueryExpansion
+			$objQueryExpansion = new QQueryExpansion();
+			if ($objExpansionMap) {
+				try {
+					Manufacturer::ExpandQuery('manufacturer', null, $objExpansionMap, $objQueryExpansion);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+			}
+			
+			$strQuery = sprintf('
+				SELECT
+					%s
+					`manufacturer`.`manufacturer_id` AS `manufacturer_id`,
+					`manufacturer`.`short_description` AS `short_description`
+					%s
+				FROM
+					`manufacturer` AS `manufacturer`
+					%s
+				WHERE
+				1=1
+				%s
+				%s
+			', $strLimitPrefix,
+				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), 
+				$objQueryExpansion->GetFromSql("", "\n					"), 
+				$strOrderBy, $strLimitSuffix);
+
+			$objDbResult = $objDatabase->Query($strQuery);
+			$objToReturn = array();
+			// If blank resultset, then return empty array
+			if (!$objDbResult)
+				return $objToReturn;			
+			$item = Array();
+			while ($objDbRow = $objDbResult->GetNextRow()) {				
+				$item['manufacturer_id'] = $objDbRow->GetColumn('manufacturer_id', 'Integer');
+				$item['short_description'] = $objDbRow->GetColumn('short_description');
+				array_push($objToReturn,$item);
+			}
+			return $objToReturn;
+		}
 
 		public static function LoadAllWithCustomFields($strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
 

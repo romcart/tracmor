@@ -79,14 +79,14 @@ class QAdvancedSearchComposite extends QControl {
 	    	$this->txtNote_Create();
 	    	$this->dtpDueDate_Create();
 	    	$this->dtpReceiptDate_Create();
-	    }
-	    $this->lstDateModified_Create();
+	    }		
+	  $this->lstDateModified_Create();
       $this->dtpDateModifiedFirst_Create();
       $this->dtpDateModifiedLast_Create();
       $this->chkAttachment_Create();
       $this->customFields_Create();
-      
 	}
+	
 	public function ParsePostData() {
 		if ($this->objParentObject instanceof AssetListForm || $this->objParentObject instanceof QAssetSearchComposite) {
 			$this->strAssetModelCode = $this->txtAssetModelCode->Text;
@@ -155,10 +155,10 @@ class QAdvancedSearchComposite extends QControl {
   	$this->lstReservedBy->Name = 'Reserved By';
   	$this->lstReservedBy->AddItem('- Select One -', null, true);
   	$this->lstReservedBy->AddItem('Any', 'any');
-  	$objUserAccountArray = UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->Username)));
+  	$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
   	if ($objUserAccountArray) {
-  		foreach ($objUserAccountArray as $objUserAccount) {
-  			$this->lstReservedBy->AddItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);
+  		foreach ($objUserAccountArray as $arrUserAccount) {
+  			$this->lstReservedBy->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
   		}
   	}
   }
@@ -168,10 +168,10 @@ class QAdvancedSearchComposite extends QControl {
   	$this->lstCheckedOutBy->Name = 'Checked Out By';
 		$this->lstCheckedOutBy->AddItem('- Select One -', null, true);
   	$this->lstCheckedOutBy->AddItem('Any', 'any');
-  	$objUserAccountArray = UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->Username)));
+  	$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
   	if ($objUserAccountArray) {
-  		foreach ($objUserAccountArray as $objUserAccount) {
-  			$this->lstCheckedOutBy->AddItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);
+  		foreach ($objUserAccountArray as $arrUserAccount) {
+  			$this->lstCheckedOutBy->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
   		}
   	}
   }

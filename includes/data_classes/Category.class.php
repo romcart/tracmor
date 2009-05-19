@@ -131,6 +131,66 @@
 			$objDbResult = $objDatabase->Query($strQuery);
 			return Category::InstantiateDbResult($objDbResult);
 		}
+		
+		/**
+		 * Load all Categories according to asset flag
+		 * If both variables are true, returns categories that are Asset OR Inventory, or both
+		 * If both flags are false, returns categories that are NOT ASSET AND NOT INVENTORY
+		 * @param bool $blnAssetFlag
+		 * @param bool $blnInventoryFlag
+		 * @param string $strOrderBy
+		 * @param string $strLimit
+		 * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
+		 * @return Category[]
+		*/
+		public static function LoadAllAsCustomArray($blnAssetFlag = true, $blnInventoryFlag = true, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
+			Category::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
+
+			if ($blnAssetFlag && $blnInventoryFlag) {
+				$sqlWhere = "`category`.`asset_flag` = 1 OR `category`.`inventory_flag` = 1";
+			}
+			elseif ($blnAssetFlag) {
+				$sqlWhere = "`category`.`asset_flag` = 1";
+			}
+			elseif ($blnInventoryFlag) {
+				$sqlWhere = "`category`.`inventory_flag` = 1";
+			}
+			else {
+				$sqlWhere = "`category`.`asset_flag` = 0 AND `category`.`inventory_flag` = 0";
+			}
+
+			// Setup the SQL Query
+			$strQuery = sprintf('
+				SELECT
+				%s
+					`category`.`category_id` AS `category_id`,
+					`category`.`short_description` AS `short_description`
+					%s
+				FROM
+					`category` AS `category`
+					%s
+				WHERE
+					%s
+				%s
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom,
+				$sqlWhere,
+				$strOrderBy, $strLimitSuffix);
+
+			// Perform the Query and Instantiate the Result
+			$objDbResult = $objDatabase->Query($strQuery);
+			$objToReturn = array();
+			// If blank resultset, then return empty array
+			if (!$objDbResult)
+				return $objToReturn;			
+			$item = Array();
+			while ($objDbRow = $objDbResult->GetNextRow()) {				
+				$item['category_id'] = $objDbRow->GetColumn('category_id', 'Integer');
+				$item['short_description'] = $objDbRow->GetColumn('short_description');
+				array_push($objToReturn,$item);
+			}
+			return $objToReturn;
+		}
 
 		/**
 		 * Count all Categories with their associated flags

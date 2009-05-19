@@ -118,6 +118,39 @@
 			// Call UserAccount::QueryCount to perform the Count query
 			return UserAccount::QueryCount(QQ::Equal(QQN::UserAccount()->ActiveFlag,1));
 		}
+		
+		public static function LoadAllAsCustomArray($strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
+			UserAccount::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
+			
+			// Setup the SQL Query
+			$strQuery = sprintf('
+				SELECT
+				%s
+					`user_account`.`user_account_id` AS `user_account_id`,
+					`user_account`.`username` AS `username`
+					%s
+				FROM
+					`user_account` AS `user_account`
+					%s
+				%s
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom,
+				$strOrderBy, $strLimitSuffix);
+
+			// Perform the Query and Instantiate the Result
+			$objDbResult = $objDatabase->Query($strQuery);
+			$objToReturn = array();
+			// If blank resultset, then return empty array
+			if (!$objDbResult)
+				return $objToReturn;			
+			$item = Array();
+			while ($objDbRow = $objDbResult->GetNextRow()) {				
+				$item['user_account_id'] = $objDbRow->GetColumn('user_account_id', 'Integer');
+				$item['username'] = $objDbRow->GetColumn('username');
+				array_push($objToReturn,$item);
+			}
+			return $objToReturn;
+		}
 				
 	}
 ?>

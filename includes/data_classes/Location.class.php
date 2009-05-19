@@ -154,5 +154,60 @@
 			$objDbResult = $objDatabase->Query($strQuery);
 			return Location::InstantiateDbResult($objDbResult);
 		}		
+		
+		public static function LoadAllLocationsAsCustomArray($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
+			Location::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
+
+			// Location #2 = 'Shipped'
+			if (!$blnShowShipped) {
+				$ShippedQuery = "AND `location_id` != 2";
+			}
+			else {
+				$ShippedQuery = "";
+			}
+			
+			// Location #5 = 'To Be Received' (TBR)
+			if (!$blnShowTBR) {
+				$TBRQuery = "AND `location_id` != 5";
+			}
+			else {
+				$TBRQuery = "";
+			}
+			
+			// Setup the SQL Query
+			$strQuery = sprintf('
+				SELECT
+				%s
+					`location`.`location_id` AS `location_id`,
+					`location`.`short_description` AS `short_description`
+					%s
+				FROM
+					`location` AS `location`
+					%s
+				WHERE
+					`location_id` != 1
+					AND `location_id` != 3
+					AND `location_id` != 4
+					%s
+					%s
+				%s
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery, 
+				$strOrderBy, $strLimitSuffix);
+
+			// Perform the Query and Instantiate the Result
+			$objDbResult = $objDatabase->Query($strQuery);
+			$objToReturn = array();
+			// If blank resultset, then return empty array
+			if (!$objDbResult)
+				return $objToReturn;			
+			$item = Array();
+			while ($objDbRow = $objDbResult->GetNextRow()) {				
+				$item['location_id'] = $objDbRow->GetColumn('location_id', 'Integer');
+				$item['short_description'] = $objDbRow->GetColumn('short_description');
+				array_push($objToReturn,$item);
+			}
+			return $objToReturn;
+		}		
 	}
 ?>
