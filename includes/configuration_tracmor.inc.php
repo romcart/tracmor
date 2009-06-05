@@ -25,6 +25,6 @@
 	DEFINE('AWS_BUCKET', '');
 	
 	// Location of tmp directory
-	DEFINE('__TRACMOR_TMP__', '/tmp');
+	DEFINE('__TRACMOR_TMP__', __DOCROOT__ . __SUBDIRECTORY__ . '/tmp');
 	
 ?>
