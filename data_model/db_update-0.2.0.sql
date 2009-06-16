@@ -204,4 +204,4 @@ ALTER TABLE `asset`
         ADD INDEX `parent_asset_id_linked` ( `parent_asset_id` , `linked_flag` ),
         ADD `linked_flag` BIT(1) DEFAULT NULL AFTER `reserved_flag`;
 
-
+INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES (14,'user_limit',NULL);
