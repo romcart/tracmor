@@ -334,12 +334,14 @@
           $strXmlColNameByCustomField = "";
           $strXmlFieldByCustomField = "";
           $intCustomFieldCount = 0;
-          foreach ($this->chkCustomFieldArray as $chkCustomField) {
-            if ($chkCustomField->Checked) {
-              $strXmlColNameByCustomField .= "<COL CELLCLASS='report_column_header'>".$chkCustomField->Text."</COL>";
-              $strXmlFieldByCustomField .= "<COL TYPE='FIELD' CELLCLASS='report_cell'>__".$chkCustomField->ActionParameter."</COL>";
-              $intCustomFieldCount++;
-            }
+          if ($this->chkCustomFieldArray) {
+	          foreach ($this->chkCustomFieldArray as $chkCustomField) {
+	            if ($chkCustomField->Checked) {
+	              $strXmlColNameByCustomField .= "<COL CELLCLASS='report_column_header'>".$chkCustomField->Text."</COL>";
+	              $strXmlFieldByCustomField .= "<COL TYPE='FIELD' CELLCLASS='report_cell'>__".$chkCustomField->ActionParameter."</COL>";
+	              $intCustomFieldCount++;
+	            }
+	          }
           }
           $oGroups = "
             <GROUP NAME='transaction_id' EXPRESSION='transaction_id' PAGEBREAK='FALSE'>
