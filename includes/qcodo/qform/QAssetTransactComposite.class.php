@@ -264,6 +264,11 @@ class QAssetTransactComposite extends QControl {
 				  $blnError = true;
 				  $this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
 				}
+				// Cannot move, check out/in, nor reserve/unreserve any assets that have been archived
+				elseif ($objNewAsset->LocationId == 6 && $this->intTransactionTypeId != 11) {
+					$blnError = true;
+					$this->txtNewAssetCode->Warning = "That asset has already been archived.";
+				}
 				// Cannot move, check out/in, nor reserve/unreserve any assets that have been shipped
 				elseif ($objNewAsset->LocationId == 2) {
 					$blnError = true;
@@ -349,8 +354,22 @@ class QAssetTransactComposite extends QControl {
 						}
 					}
 				}
+				// Archive
+				elseif ($this->intTransactionTypeId == 10) {
+					if ($objNewAsset->ArchivedFlag) {
+						$blnError = true;
+						$this->txtNewAssetCode->Warning = "That asset is already archived.";
+					}
+				}
+				// Unarchive
+				elseif ($this->intTransactionTypeId == 11) {
+					if (!$objNewAsset->ArchivedFlag) {
+						$blnError = true;
+						$this->txtNewAssetCode->Warning = "That asset is not archived.";
+					}
+				}
 
-				if (!$blnError && ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2 || $this->intTransactionTypeId == 3 || $this->intTransactionTypeId == 8 || $this->intTransactionTypeId == 9)) {
+				if (!$blnError && ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2 || $this->intTransactionTypeId == 3 || $this->intTransactionTypeId == 8 || $this->intTransactionTypeId == 9 || $this->intTransactionTypeId == 10 || $this->intTransactionTypeId == 11)) {
 				  $objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::LoadByRoleIdTransactionTypeId(QApplication::$objUserAccount->RoleId, $this->intTransactionTypeId);
           if ($objRoleTransactionTypeAuthorization) {
             // If the user has 'None' privileges for this transaction
@@ -428,12 +447,17 @@ class QAssetTransactComposite extends QControl {
 					$this->btnCancel->Warning = sprintf('The Asset %s is reserved.',$asset->AssetCode);
 					$blnError = true;
 				}
+				// For all transactions except Unarchive, make sure the asset is not already archived
+				if ($this->intTransactionTypeId != 11 && $asset->ArchivedFlag) {
+					$this->btnCancel->Warning = sprintf('The Asset %s is archived.',$asset->AssetCode);
+					$blnError = true;
+				}
 
 			}
 
 			if (!$blnError) {
 
-				if (($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2) && is_null($this->lstLocation->SelectedValue)) {
+				if (($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2 || $this->intTransactionTypeId == 11) && is_null($this->lstLocation->SelectedValue)) {
 					$this->lstLocation->Warning = 'Location is required.';
 					$blnError = true;
 				}
@@ -488,11 +512,24 @@ class QAssetTransactComposite extends QControl {
 								$DestinationLocationId = $asset->LocationId;
 								$asset->ReservedFlag = false;
 							}
+							// Archive
+							elseif ($this->intTransactionTypeId == 10) {
+								$DestinationLocationId = 6;
+								$asset->ArchivedFlag = true;
+								$asset->CheckedOutFlag = false;
+								$asset->ReservedFlag = false;
+							}
+							// Unarchive
+							elseif ($this->intTransactionTypeId == 11) {
+								$DestinationLocationId = $this->lstLocation->SelectedValue;
+								$asset->ArchivedFlag = false;
+							}
 
 							$asset->LocationId = $DestinationLocationId;
 							// Transact all child linked assets
 							foreach ($objLinkedAssetArrayByNewAsset as $objLinkedAsset) {
 	              $objLinkedAsset->CheckedOutFlag = $asset->CheckedOutFlag;
+	              $objLinkedAsset->ArchivedFlag = $asset->ArchivedFlag;
 	              $objLinkedAsset->ReservedFlag = $asset->ReservedFlag;
 	              $objLinkedAsset->LocationId = $asset->LocationId;
 	              $objLinkedAsset->Save();
@@ -576,6 +613,14 @@ class QAssetTransactComposite extends QControl {
 			// Unreserve
 			case 9:
 				$this->lstLocation->Display = false;
+				break;
+			// Archive
+			case 10:
+				$this->lstLocation->Display = false;
+				break;
+			// Unarchive
+			case 11:
+				$this->lstLocation->Display = true;
 				break;
 		}
 

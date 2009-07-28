@@ -89,7 +89,8 @@
 					AND `location_id` != 2
 					AND `location_id` != 3
 					AND `location_id` != 4
-					%s', $TBRQuery);
+					%s
+			    AND `location_id` != 6', $TBRQuery);
 
 			// Perform the Query and Return the Count
 			$objDbResult = $objDatabase->Query($strQuery);

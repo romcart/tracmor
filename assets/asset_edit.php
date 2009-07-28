@@ -585,13 +585,13 @@ CREATE FIELD METHODS
             $blnError = true;
       		  $this->btnUnlink->Warning .= "The child asset (" . $objAsset->AssetCode . ") must be in the same location as the parent asset.<br />";
           }
-          elseif ($objAsset->CheckedOutFlag || $objAsset->ReservedFlag || $objAsset->LocationId == 2 && $objAsset->LocationId == 3 || $objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objAsset->AssetId)) {
+          elseif ($objAsset->CheckedOutFlag || $objAsset->ReservedFlag || $objAsset->ArchivedFlag || $objAsset->LocationId == 2 && $objAsset->LocationId == 3 || $objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objAsset->AssetId)) {
       		  $blnError = true;
-      		  $this->btnUnlink->Warning .= "Child asset code (" . $objAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+      		  $this->btnUnlink->Warning .= "Child asset code (" . $objAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
       		}
-      		elseif ($this->objAsset->CheckedOutFlag || $this->objAsset->ReservedFlag || $this->objAsset->LocationId == 2 && $this->objAsset->LocationId == 3 || $this->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+      		elseif ($this->objAsset->CheckedOutFlag || $this->objAsset->ReservedFlag || $this->objAsset->ArchivedFlag || $this->objAsset->LocationId == 2 && $this->objAsset->LocationId == 3 || $this->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
       		  $blnError = true;
-      		  $this->btnUnlink->Warning .= "Parent asset code (" . $this->objAsset->AssetCode . ") must not be currently Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+      		  $this->btnUnlink->Warning .= "Parent asset code (" . $this->objAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
       		}
       		else {
       		  $objAsset->LinkedFlag = true;

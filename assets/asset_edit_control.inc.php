@@ -135,6 +135,7 @@ $this->pnlAttachments->Render();
 		$this->btnUnreserve->Render();
 		$this->btnShip->Render();
 		$this->btnReceive->Render();
+		$this->btnArchive->Render();
 		echo '<br class="item_divider">';
 		echo '<br class="item_divider">';
 		echo '<div class="title">Transactions</div>';
