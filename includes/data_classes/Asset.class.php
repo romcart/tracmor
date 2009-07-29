@@ -87,6 +87,17 @@
 				$strToReturn = $lblCheckedOutImage->Render(false);
 			}
 
+			elseif ($this->blnArchivedFlag) {
+				$lblArchivedImage = new QLabelExt($objControl);
+				$lblArchivedImage->HtmlEntities = false;
+				$lblArchivedImage->Text = sprintf('<img src="%s/icons/archived_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
+
+				$objHoverTip = new QHoverTip($lblArchivedImage);
+				$objHoverTip->Text = 'Archived by ' . $this->GetLastTransactionUser()->__toString();
+				$lblArchivedImage->HoverTip = $objHoverTip;
+				$strToReturn = $lblArchivedImage->Render(false);
+			}
+
 			elseif ($objPendingShipment = AssetTransaction::PendingShipment($this->AssetId)) {
 				$lblShipmentImage = new QLabelExt($objControl);
 				$lblShipmentImage->HtmlEntities = false;
@@ -320,7 +331,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearchHelper($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null) {
+		public static function CountBySearchHelper($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null, $blnArchived = false) {
 
 			// Call to QueryHelper to Get the Database Object
 			Asset::QueryHelper($objDatabase);
@@ -336,7 +347,7 @@
 				}
 			}
 
-			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $blnArchived);
 			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
 			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Asset);
 
@@ -364,8 +375,9 @@
 				  %s
 				  %s
 				  %s
+				  %s
 			', $objQueryExpansion->GetFromSql("", "\n					"), $arrAttachmentSql['strFrom'], $arrCustomFieldSql['strFrom'],
-			$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+			$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strArchivedSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -420,6 +432,7 @@
 					`asset`.`image_path` AS `image_path`,
 					`asset`.`checked_out_flag` AS `checked_out_flag`,
 					`asset`.`reserved_flag` AS `reserved_flag`,
+					`asset`.`archived_flag` AS `archived_flag`,
 					`asset`.`created_by` AS `created_by`,
 					`asset`.`creation_date` AS `creation_date`,
 					`asset`.`modified_by` AS `modified_by`,
@@ -488,7 +501,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Asset[]
      */
-		public static function LoadArrayBySearchHelper($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearchHelper($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnArchived = false) {
 
 			Asset::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
@@ -503,7 +516,7 @@
 				}
 			}
 
-			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment);
+			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $blnArchived);
 			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
 			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Asset);
 
@@ -518,6 +531,7 @@
 					`asset`.`image_path` AS `image_path`,
 					`asset`.`checked_out_flag` AS `checked_out_flag`,
 					`asset`.`reserved_flag` AS `reserved_flag`,
+					`asset`.`archived_flag` AS `archived_flag`,
 					`asset`.`created_by` AS `created_by`,
 					`asset`.`creation_date` AS `creation_date`,
 					`asset`.`modified_by` AS `modified_by`,
@@ -549,10 +563,11 @@
 				%s
 				%s
 				%s
+				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'],
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
-				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strArchivedSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],
 				$strOrderBy, $strLimitSuffix);
 
@@ -580,10 +595,10 @@
 		 * @param string $strShortDescription
 		 * @return array with seven keys, strAssetCodeSql, strLocationSql, strAssetModelSql, strCategorySql, strManufacturerSql, strAssetModelCodeSql, strShortDescriptionSql
 		 */
-	  protected static function GenerateSearchSql ($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null) {
+	  protected static function GenerateSearchSql ($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $blnIncludeArchived = null) {
 
 	  	// Define all indexes for the array to be returned
-			$arrSearchSql = array("strAssetCodeSql" => "", "strLocationSql" => "", "strAssetModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strOffsiteSql" => "", "strAssetModelCodeSql" => "", "strReservedBySql" => "", "strCheckedOutBySql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "", "strAttachmentSql" => "");
+			$arrSearchSql = array("strAssetCodeSql" => "", "strLocationSql" => "", "strAssetModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strOffsiteSql" => "", "strAssetModelCodeSql" => "", "strReservedBySql" => "", "strCheckedOutBySql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "", "strAttachmentSql" => "", "strArchivedSql" => "");
 
 			if ($strAssetCode) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()
@@ -669,6 +684,10 @@
 			}
 			if ($blnAttachment) {
 				$arrSearchSql['strAttachmentSql'] = sprintf("AND attachment.attachment_id IS NOT NULL");
+			}
+
+			if (!$blnIncludeArchived) {
+				$arrSearchSql['strArchivedSql'] = sprintf("AND `asset`.`archived_flag` IS NOT TRUE");
 			}
 
 			if ($arrCustomFields) {

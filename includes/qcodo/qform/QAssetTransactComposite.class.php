@@ -360,6 +360,14 @@ class QAssetTransactComposite extends QControl {
 						$blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset is already archived.";
 					}
+					elseif ($objNewAsset->CheckedOutFlag) {
+						$blnError = true;
+						$this->txtNewAssetCode->Warning = "That asset is checked out.";
+					}
+					elseif ($objNewAsset->ReservedFlag) {
+						$blnError = true;
+						$this->txtNewAssetCode->Warning = "That asset is reserved.";
+					}
 				}
 				// Unarchive
 				elseif ($this->intTransactionTypeId == 11) {
@@ -516,8 +524,8 @@ class QAssetTransactComposite extends QControl {
 							elseif ($this->intTransactionTypeId == 10) {
 								$DestinationLocationId = 6;
 								$asset->ArchivedFlag = true;
-								$asset->CheckedOutFlag = false;
-								$asset->ReservedFlag = false;
+								//$asset->CheckedOutFlag = false;
+								//$asset->ReservedFlag = false;
 							}
 							// Unarchive
 							elseif ($this->intTransactionTypeId == 11) {

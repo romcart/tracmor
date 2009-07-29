@@ -1188,6 +1188,7 @@ class QAssetEditComposite extends QControl {
 			$this->btnUnreserve->Enabled = false;
 			$this->btnShip->Enabled = false;
 			$this->btnReceive->Enabled = false;
+			$this->btnArchive->Enabled = false;
 		}
 	}
 
@@ -1200,9 +1201,16 @@ class QAssetEditComposite extends QControl {
 			else {
   			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && $this->objAsset->LocationId != 6 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
   				$this->btnMove->Enabled = true;
+  				$this->btnArchive->Enabled = true;
   			}
   			else {
   				$this->btnMove->Enabled = false;
+  				if ($this->objAsset->ArchivedFlag) {
+  				  $this->btnArchive->Enabled = true;
+  				}
+  				else {
+  				  $this->btnArchive->Enabled = false;
+  				}
   			}
   			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && $this->objAsset->LocationId != 6 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
   				$this->btnCheckIn->Enabled = true;

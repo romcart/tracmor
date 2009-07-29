@@ -26,8 +26,9 @@ if ($objLocation && $objLocation->ShortDescription != 'Archived') {
   $objNewLocationId = $objNewLocation->LocationId;
 
   // Update all foreign keys and links
+  // Added `modified_date`=`modified_date` to avoid the attribute "ON UPDATE CURRENT_TIMESTAMP"
   $strQuery = sprintf("UPDATE `asset`
-                      SET `location_id`='%s'
+                      SET `location_id`='%s', `modified_date`=`modified_date`
                       WHERE `location_id`='6';", $objNewLocationId);
   $objDatabase->NonQuery($strQuery);
   $strQuery = sprintf("UPDATE `audit_scan`
@@ -35,23 +36,23 @@ if ($objLocation && $objLocation->ShortDescription != 'Archived') {
                       WHERE `location_id`='6';", $objNewLocationId);
   $objDatabase->NonQuery($strQuery);
   $strQuery = sprintf("UPDATE `inventory_location`
-                      SET `location_id`='%s'
+                      SET `location_id`='%s', `modified_date`=`modified_date`
                       WHERE `location_id`='6';", $objNewLocationId);
   $objDatabase->NonQuery($strQuery);
   $strQuery = sprintf("UPDATE `asset_transaction`
-                      SET `source_location_id`='%s'
+                      SET `source_location_id`='%s', `modified_date`=`modified_date`
                       WHERE `source_location_id`='6';", $objNewLocationId);
   $objDatabase->NonQuery($strQuery);
   $strQuery = sprintf("UPDATE `asset_transaction`
-                      SET `destination_location_id`='%s'
+                      SET `destination_location_id`='%s', `modified_date`=`modified_date`
                       WHERE `destination_location_id`='6';", $objNewLocationId);
   $objDatabase->NonQuery($strQuery);
   $strQuery = sprintf("UPDATE `inventory_transaction`
-                      SET `source_location_id`='%s'
+                      SET `source_location_id`='%s', `modified_date`=`modified_date`
                       WHERE `source_location_id`='6';", $objNewLocationId);
   $objDatabase->NonQuery($strQuery);
    $strQuery = sprintf("UPDATE `inventory_transaction`
-                      SET `destination_location_id`='%s'
+                      SET `destination_location_id`='%s', `modified_date`=`modified_date`
                       WHERE `destination_location_id`='6';", $objNewLocationId);
   $objDatabase->NonQuery($strQuery);
 

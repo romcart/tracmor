@@ -101,12 +101,14 @@
 		/**
 		 * Load all Locations, except for locations 1 & 2 for checked out and shipped
 		 * @param bool $blnShowTBR boolean value to decide whether to show the 'To Be Received' location
+		 * @param bool $blnShowShipped boolean value to decide whether to show the 'Shipped' location
 		 * @param string $strOrderBy
 		 * @param string $strLimit
 		 * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
+		 * @param bool $blnShowArchived boolean value to decide whether to show the 'Archived' location
 		 * @return Location[]
 		*/
-		public static function LoadAllLocations($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadAllLocations($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnShowArchived = false) {
 			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
 			Location::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
@@ -124,6 +126,14 @@
 			}
 			else {
 				$TBRQuery = "";
+			}
+
+			// Location #6 = 'Archived'
+			if (!$blnShowArchived) {
+				$ArchivedQuery = "AND `location_id` != 6";
+			}
+			else {
+				$ArchivedQuery = "";
 			}
 
 			// Setup the SQL Query
@@ -145,11 +155,11 @@
 					`location_id` != 1
 					AND `location_id` != 3
 					AND `location_id` != 4
-					AND `location_id` != 6
+					%s
 					%s
 					%s
 				%s
-				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery,
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery, $ArchivedQuery,
 				$strOrderBy, $strLimitSuffix);
 
 			// Perform the Query and Instantiate the Result
@@ -157,7 +167,7 @@
 			return Location::InstantiateDbResult($objDbResult);
 		}
 
-		public static function LoadAllLocationsAsCustomArray($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadAllLocationsAsCustomArray($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnShowArchived = false) {
 			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
 			Location::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
@@ -177,6 +187,14 @@
 				$TBRQuery = "";
 			}
 
+			// Location #6 = 'Archived'
+			if (!$blnShowArchived) {
+				$ArchivedQuery = "AND `location_id` != 6";
+			}
+			else {
+				$ArchivedQuery = "";
+			}
+
 			// Setup the SQL Query
 			$strQuery = sprintf('
 				SELECT
@@ -191,11 +209,11 @@
 					`location_id` != 1
 					AND `location_id` != 3
 					AND `location_id` != 4
-					AND `location_id` != 6
+					%s
 					%s
 					%s
 				%s
-				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery,
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery, $ArchivedQuery,
 				$strOrderBy, $strLimitSuffix);
 
 			// Perform the Query and Instantiate the Result
