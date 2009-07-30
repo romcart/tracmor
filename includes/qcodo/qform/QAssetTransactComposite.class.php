@@ -601,6 +601,7 @@ class QAssetTransactComposite extends QControl {
 	// Prepare the Transaction form display depending on transaction type
 	public function SetupDisplay($intTransactionTypeId) {
 		$this->intTransactionTypeId = $intTransactionTypeId;
+		$this->ctlAssetSearchTool->blnSearchArchived = false;
 		switch ($this->intTransactionTypeId) {
 			// Move
 			case 1:
@@ -629,6 +630,7 @@ class QAssetTransactComposite extends QControl {
 			// Unarchive
 			case 11:
 				$this->lstLocation->Display = true;
+				$this->ctlAssetSearchTool->blnSearchArchived = true;
 				break;
 		}
 

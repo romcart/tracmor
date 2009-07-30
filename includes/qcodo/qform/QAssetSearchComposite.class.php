@@ -524,6 +524,10 @@ class QAssetSearchComposite extends QControl {
     $this->btnClear_Click();
   }
 
+  public function ChangeLocationBySelectedIndex($intSelectedIndex = 0) {
+    $this->lstLocation->SelectedIndex = $intSelectedIndex;
+  }
+
   // If the parent asset exists then return the Parent Asset Code
   public function ParentAsset__toString($objAsset) {
     if ($objAsset->ParentAsset instanceof Asset) {
