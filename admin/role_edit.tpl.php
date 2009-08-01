@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2009, Tracmor, LLC 
+ * Copyright (c)  2009, Tracmor, LLC
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,10 +21,10 @@
 
 	include('../includes/header.inc.php');
 	$this->RenderBegin();
-	
+
 ?>
 <!-- Begin Header Menu -->
-<?php 
+<?php
 	$this->ctlHeaderMenu->Render();
 ?>
 <!-- End Header Menu -->
@@ -44,7 +44,7 @@
 		<table class="datagrid" cellpadding="5" cellspacing="0" border="0">
 			<tr>
 				<td class="record_header">
-					<?php 
+					<?php
 						$this->btnSave->Render();
 						echo('&nbsp;');
 						$this->btnDelete->Render();
@@ -100,7 +100,7 @@
 							<?php $this->pnlAssets->Render();?>
 							<?php $this->pnlAssetModel->Render();?>
 							</td>
-						</tr>										
+						</tr>
 						<tr>
 							<td class="role_table_left">Inventory</td>
 							<td class="role_table_cell"><?php $this->arrControls['inventory']['access']->RenderWithName(); ?></td>
@@ -109,7 +109,7 @@
 							<td class="role_table_cell"><?php $this->arrControls['inventory']['delete']->RenderWithName(); ?></td>
 							<td><?php $this->lblInventoryAdvanced->Render(); ?></td>
 						</tr>
-						
+
 						<tr>
 			  				<td style="vertical-align:top;" colspan="5" nowrap>
 							<?php $this->pnlInventory->Render();?>
@@ -186,6 +186,10 @@
 						<tr>
 							<td class="role_table_left">Restock</td>
 							<td class="role_table_cell"><?php $this->arrControls['restock']->RenderWithName(); ?></td>
+						</tr>
+						<tr>
+							<td class="role_table_left">Archive/Unarchive</td>
+							<td class="role_table_cell"><?php $this->arrControls['archive_unarchive']->RenderWithName(); ?></td>
 						</tr>
 					</table>
 				</td>

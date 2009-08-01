@@ -56,6 +56,8 @@ if ($objLocation && $objLocation->ShortDescription != 'Archived') {
                       WHERE `destination_location_id`='6';", $objNewLocationId);
   $objDatabase->NonQuery($strQuery);
 
+  CreateRoleTransactionTypeAuthorizations();
+
   $objDatabase->NonQuery("SET FOREIGN_KEY_CHECKS = 1;");
 
   echo "Updated!";
@@ -67,6 +69,27 @@ elseif ($objLocation) {
 else {
   $strQuery = sprintf("INSERT INTO `location` VALUES (6, 'Archived', NULL, NULL, NULL, NULL, NULL);");
   $objDatabase->NonQuery($strQuery);
+  CreateRoleTransactionTypeAuthorizations();
   echo "Updated!";
+}
+
+function CreateRoleTransactionTypeAuthorizations() {
+  $intRoleTransactionTypeAuthorizationArray = RoleTransactionTypeAuthorization::CountAll();
+  if (count($intRoleTransactionTypeAuthorizationArray)) {
+    foreach (Role::LoadAll() as $objRole) {
+      // Archive
+      $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+      $objRoleTransactionTypeAuthorization->RoleId = $objRole->RoleId;
+      $objRoleTransactionTypeAuthorization->TransactionTypeId = 10;
+      $objRoleTransactionTypeAuthorization->AuthorizationLevelId = 1;
+      $objRoleTransactionTypeAuthorization->Save();
+      // Unarchive
+      $objRoleTransactionTypeAuthorization = new RoleTransactionTypeAuthorization();
+      $objRoleTransactionTypeAuthorization->RoleId = $objRole->RoleId;
+      $objRoleTransactionTypeAuthorization->TransactionTypeId = 11;
+      $objRoleTransactionTypeAuthorization->AuthorizationLevelId = 1;
+      $objRoleTransactionTypeAuthorization->Save();
+    }
+  }
 }
 ?>
