@@ -181,6 +181,8 @@ class QAdvancedSearchComposite extends QControl {
   protected function chkArchived_Create() {
   	$this->chkArchived = new QCheckBox($this);
   	$this->chkArchived->Name = 'Include Archived';
+  	$this->chkArchived->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+  	$this->chkArchived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
 
   protected function txtFromCompany_Create() {
@@ -230,7 +232,7 @@ class QAdvancedSearchComposite extends QControl {
   protected function chkAttachment_Create() {
   	$this->chkAttachment = new QCheckBox($this);
   	$this->chkAttachment->Name = 'Attachment(s)';
-  	$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+  	$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentControl, 'btnSearch_Click'));
   	$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
 

@@ -29,7 +29,6 @@
 		$arrAdvancedSearchFields[] = array('name' => 'Asset Model Code:',  'value' => $this->txtAssetModelCode->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Reserved By:', 'value' => $this->lstReservedBy->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Checked Out By:', 'value' => $this->lstCheckedOutBy->RenderWithError(false));
-		$arrAdvancedSearchFields[] = array('name' => 'Include Archived:', 'value' => $this->chkArchived->RenderWithError(false));
 	}
 
 	// Show Tracking Number for Shipment Search
@@ -52,6 +51,10 @@
 	$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->dtpDateModifiedFirst->RenderWithError(false));
 	$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->dtpDateModifiedLast->RenderWithError(false));
 	$arrAdvancedSearchFields[] = array('name' => 'Attachment(s)', 'value' => $this->chkAttachment->RenderWithError(false));
+
+	if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
+	  $arrAdvancedSearchFields[] = array('name' => 'Include Archived:', 'value' => $this->chkArchived->RenderWithError(false));
+	}
 
 	// Custom Fields
 	if ($this->arrCustomFields) {
