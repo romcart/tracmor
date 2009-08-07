@@ -39,6 +39,10 @@ if ($_POST) {
       				$blnError = true;
       				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
       			}
+      			elseif ($objNewAsset->ArchivedFlag) {
+      				$blnError = true;
+      				$strWarning .= $strAssetCode." - That asset code is invalid.<br />";
+      			}
       			elseif ($objNewAsset->LinkedFlag) {
       			  $blnError = true;
       			  $strWarning .= $strAssetCode." - That asset is locked to parent asset " . $objNewAsset->ParentAssetCode . ".<br />";
