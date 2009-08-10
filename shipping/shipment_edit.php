@@ -210,7 +210,7 @@
 		public $blnEditBuiltInFields;
 
 		protected function Form_Create() {
-					
+
 			// check rigths for the Inventory to Ship
 			$this->blnShowInventory = true;
 			$objRoleModule = RoleModule::LoadByRoleIdModuleId(QApplication::$objUserAccount->RoleId, 3);
@@ -337,15 +337,15 @@
 			$this->lstCourier_Create();
 			$this->txtNote_Create();
 			$this->txtNewAssetCode_Create();
-			
+
 			if ($this->blnShowInventory) {
 				$this->txtNewInventoryModelCode_Create();
 				$this->btnLookup_Create();
 				$this->ctlInventorySearchTool_Create();
 				$this->lstSourceLocation_Create();
 				$this->txtQuantity_Create();
-				$this->btnAddInventory_Create();				
-			}	
+				$this->btnAddInventory_Create();
+			}
 
 			$this->txtTrackingNumber_Create();
 			//$this->lblAdvanced_Create();
@@ -2657,6 +2657,11 @@
 					elseif ($objNewAsset->LinkedFlag) {
 					  $blnError = true;
 						$this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
+					}
+					// Cannot ship any archived assets
+					elseif ($objNewAsset->ArchivedFlag) {
+					  $blnError = true;
+						$this->txtNewAssetCode->Warning = "That asset is archived.";
 					}
 					// Cannot ship any assets that are checked out
 					elseif ($objNewAsset->LocationId == 1) {

@@ -121,7 +121,7 @@
 	  protected $lblLookup;
 
 		protected function Form_Create() {
-		
+
 			// check rigths for the Inventory to Ship
 			$this->blnShowInventory = true;
 			$objRoleModule = RoleModule::LoadByRoleIdModuleId(QApplication::$objUserAccount->RoleId, 3);
@@ -162,15 +162,15 @@
 
 			// Create all custom asset fields - this must be here for tab ordering
 			$this->customFields_Create();
-			
+
 			if ($this->blnShowInventory) {
 				$this->txtNewInventoryModelCode_Create();
 				$this->ctlInventorySearchTool_Create();
 				$this->txtQuantity_Create();
 				$this->btnAddInventory_Create();
-			}	
+			}
 
-			$this->txtNewAssetCode_Create();						
+			$this->txtNewAssetCode_Create();
 			$this->rblAssetType_Create();
 			$this->lstAssetModel_Create();
 			$this->chkAutoGenerateAssetCode_Create();
@@ -178,7 +178,7 @@
 			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
 				$this->txtReceiptNumber_Create();
 			}
-			
+
 			// Create the buttons
 			$this->btnSave_Create();
 			$this->btnEdit_Create();
@@ -1352,7 +1352,12 @@
 						  $blnError = true;
 						  $this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
 						}
-						elseif ($objNewAsset->CheckedOutFlag) {
+						// Cannot receive any archived assets
+  					elseif ($objNewAsset->ArchivedFlag) {
+  					  $blnError = true;
+  						$this->txtNewAssetCode->Warning = "That asset is archived.";
+  					}
+  					elseif ($objNewAsset->CheckedOutFlag) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "That asset is checked out.";
 						}
