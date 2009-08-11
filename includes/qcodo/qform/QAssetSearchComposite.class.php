@@ -61,6 +61,7 @@ class QAssetSearchComposite extends QControl {
 	protected $strDateModifiedFirst;
 	protected $strDateModifiedLast;
 	protected $blnAttachment;
+	protected $blnArchived;
 
 	// Use Ajax
 	protected $blnUseAjax;
@@ -142,7 +143,7 @@ class QAssetSearchComposite extends QControl {
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Code', '<?= $_CONTROL->objParentControl->ParentAsset__toString($_ITEM) ?>', 'SortByCommand="asset__parent_asset_id__asset_code ASC"', 'ReverseSortByCommand="asset__parent_asset_id__asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"', 'HtmlEntities="false"'));
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
-    $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);	
+    $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
     if ($objCustomFieldArray) {
     	foreach ($objCustomFieldArray as $objCustomField) {
     		//Only add the custom field column if the role has authorization to view it.
@@ -176,10 +177,10 @@ class QAssetSearchComposite extends QControl {
     $this->txtShortDescription_Create();
     $this->txtAssetCode_Create();
     $this->chkOffsite_Create();
-    $this->lblAssetModelId_Create();	
+    $this->lblAssetModelId_Create();
     $this->btnSearch_Create();
     $this->btnClear_Create();
-    $this->ctlAdvanced_Create();	
+    $this->ctlAdvanced_Create();
     $this->lblAdvanced_Create();
 	}
 
@@ -260,6 +261,7 @@ class QAssetSearchComposite extends QControl {
 		$strDateModifiedLast = $this->strDateModifiedLast;
 		$strDateModified = $this->strDateModified;
 		$blnAttachment = $this->blnAttachment;
+		$blnArchived = $this->blnArchived;
 		$arrCustomFields = $this->arrCustomFields;
 
 		// Enable Profiling
@@ -273,17 +275,17 @@ class QAssetSearchComposite extends QControl {
     $objExpansionMap[Asset::ExpandLocation] = true;
 		//if ($this->blnSearch || !$this->blnUseAjax) {
 		if ((!$this->objParentControl && $this->Display == true) || $this->objParentControl->Display == true) {
-			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
+			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnArchived);
 			if ($this->dtgAsset->TotalItemCount == 0) {
 				$this->dtgAsset->ShowHeader = false;
 			}
 			else {
-				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap);
+				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnArchived);
 				$this->dtgAsset->ShowHeader = true;
 			}
 		}
 		$this->blnSearch = false;
-	
+
   }
 
   protected function ctlAdvanced_Create() {
@@ -299,9 +301,9 @@ class QAssetSearchComposite extends QControl {
 		$this->lstLocation = new QListBox($this);
 		$this->lstLocation->Name = 'Location';
 		$this->lstLocation->AddItem('- ALL -', null);
-		foreach (Location::LoadAllLocationsAsCustomArray(true, true, 'short_description') as $arrLocation) {
-			// Keep Shipped and To Be Received at the top of the list
-			if ($arrLocation['location_id'] == 2 || $arrLocation['location_id'] == 5) {
+		foreach (Location::LoadAllLocationsAsCustomArray(true, true, 'short_description', null, null, true) as $arrLocation) {
+			// Keep Shipped, To Be Received and Archived at the top of the list
+			if ($arrLocation['location_id'] == 2 || $arrLocation['location_id'] == 5 || $arrLocation['location_id'] == 6) {
 				$this->lstLocation->AddItemAt(1, new QListItem($arrLocation['short_description'], $arrLocation['location_id']));
 			}
 			else {
@@ -452,6 +454,7 @@ class QAssetSearchComposite extends QControl {
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
 	  	$this->blnAttachment = false;
+	  	$this->blnArchived = false;
 	  	if ($this->arrCustomFields) {
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
@@ -496,6 +499,13 @@ class QAssetSearchComposite extends QControl {
 		$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 		$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
 		$this->blnAttachment = $this->ctlAdvanced->Attachment;
+		// Searching the "Archived" location overrides the "Include Archived" checkbox
+		if ($this->intLocationId != 6) {
+		  $this->blnArchived = $this->ctlAdvanced->Archived;
+		}
+		else {
+		  $this->blnArchived = true;
+		}
 
 		$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 		if ($this->arrCustomFields) {
@@ -512,6 +522,10 @@ class QAssetSearchComposite extends QControl {
 
   public function Refresh() {
     $this->btnClear_Click();
+  }
+
+  public function ChangeLocationBySelectedIndex($intSelectedIndex = 0) {
+    $this->lstLocation->SelectedIndex = $intSelectedIndex;
   }
 
   // If the parent asset exists then return the Parent Asset Code

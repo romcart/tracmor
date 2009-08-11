@@ -316,6 +316,8 @@
       if ($this->chkUnreserve->Checked) {
         $arrTransactionTypes[] = 9;
       }
+      // Archived assets will be included in the Asset Transaction Report
+      //$arrTransactionTypes[] = 10;
 
       // If checked at least one transaction type
       if (count($arrTransactionTypes)) {
@@ -394,7 +396,7 @@
     		    QApplication::ExecuteJavaScript("window.open('.." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId']."_asset_transaction_report.htm','AssetTransactionReport','resizeable=yes,menubar=yes,scrollbars=yes,left=0,top=0,width=800,height=600');history.go(-1);");
     		    exit();
           }
-          else if ($this->lstGenerateOptions->SelectedValue == "csv") {		
+          else if ($this->lstGenerateOptions->SelectedValue == "csv") {
 			$this->RenderCsvBegin(false);
 			session_cache_limiter('must-revalidate');    // force a "no cache" effect
     		header("Pragma: hack"); // IE chokes on "no cache", so set to something, anything, else.
@@ -405,19 +407,19 @@
 			ob_end_clean();
 			$oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,null,$oGroups);
           	$oOut = $oRpt->createOutputPlugin("csv");
-          	$oRpt->setOutputPlugin($oOut);			
+          	$oRpt->setOutputPlugin($oOut);
 			$oRpt->run();
 			ob_get_contents();
 			@ob_flush();
 			flush();
-			
+
 			$this->RenderCsvEnd(false);
 			exit();
           }
           else {
             // Start the output buffer
           	ob_start();
-          	
+
           	// The head of the final html will be write by the Qform
             $oRpt->setBody(false);
             $oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,null,$oGroups);

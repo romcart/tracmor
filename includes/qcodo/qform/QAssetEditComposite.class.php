@@ -72,6 +72,7 @@ class QAssetEditComposite extends QControl {
 	protected $btnUnreserve;
 	protected $btnShip;
 	protected $btnReceive;
+	protected $btnArchive;
 
 	// Transaction History Datagrid
 	public $dtgAssetTransaction;
@@ -157,6 +158,7 @@ class QAssetEditComposite extends QControl {
 			$this->btnReserve_Create();
 			$this->btnUnreserve_Create();
 			$this->btnShip_Create();
+			$this->btnArchive_Create();
 			$this->btnReceive_Create();
 			$this->UpdateAssetControls();
 			$this->EnableTransactionButtons();
@@ -282,7 +284,7 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel->Required = true;
 		if (!$this->blnEditMode)
 			$this->lstAssetModel->AddItem('- Select One -', null);
-		$assetModelArray = AssetModel::LoadAllIntoArray();		
+		$assetModelArray = AssetModel::LoadAllIntoArray();
 		if ($assetModelArray) foreach ($assetModelArray as $assetModel) {
 			$objListItem = new QListItem($assetModel['short_description'], $assetModel['asset_model_id']);
 			$this->lstAssetModel->AddItem($objListItem);
@@ -596,6 +598,29 @@ class QAssetEditComposite extends QControl {
 		if ($this->btnShip->Visible) {
 			// Check if they have the ability to create a new shipment
 			QApplication::AuthorizeControl(null, $this->btnShip, 2, 5);
+		}
+	}
+
+	// Setup Archive/Unarchive Button
+	protected function btnArchive_Create() {
+		$this->btnArchive = new QButton($this);
+		$this->btnArchive->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnArchive_Click'));
+		$this->btnArchive->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnArchive_Click'));
+		$this->btnArchive->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnArchive->CausesValidation = false;
+
+		QApplication::AuthorizeControl($this->objAsset, $this->btnArchive, 2);
+		if ($this->btnArchive->Visible) {
+			// Check if they have the ability to create a new Archivement
+			QApplication::AuthorizeControl(null, $this->btnArchive, 2, 5);
+			if ($this->objAsset->ArchivedFlag) {
+  		  $this->btnArchive->Text = 'Unarchive';
+  		  RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnArchive, 11);
+  		}
+  		else {
+  		  $this->btnArchive->Text = 'Archive';
+  		  RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnArchive, 10);
+  		}
 		}
 	}
 
@@ -1008,6 +1033,19 @@ class QAssetEditComposite extends QControl {
 		$this->objParentObject->DisplayTransaction(true, 3);
 	}
 
+	// Archive/Unarchive Button Click Actions
+	public function btnArchive_Click($strFormId, $strControlId, $strParameter) {
+		$this->objParentObject->DisplayEdit(false);
+		if ($this->objAsset->ArchivedFlag) {
+		  // 11 is the transaction_type_id for the unarchive transaction
+		  $this->objParentObject->DisplayTransaction(true, 11);
+		}
+		else {
+		  // 10 is the transaction_type_id for the archive transaction
+		  $this->objParentObject->DisplayTransaction(true, 10);
+		}
+	}
+
 	// Reserve Button Click Actions
 	public function btnReserve_Click($strFormId, $strControlId, $strParameter) {
 		$this->objParentObject->DisplayEdit(false);
@@ -1064,6 +1102,16 @@ class QAssetEditComposite extends QControl {
 		$this->btnDelete->Display = true;
 		$this->btnClone->Display = true;
 		$this->atcAttach->btnUpload->Display = true;
+		if ($this->objAsset->ArchivedFlag) {
+		  $this->btnEdit->Enabled = false;
+  		$this->btnClone->Enabled = false;
+  		$this->atcAttach->Enabled = false;
+		}
+		else {
+		  $this->btnEdit->Enabled = true;
+  		$this->btnClone->Enabled = true;
+  		$this->atcAttach->Enabled = true;
+		}
 
 		// Display custom field labels
 		if ($this->arrCustomFields) {
@@ -1140,6 +1188,7 @@ class QAssetEditComposite extends QControl {
 			$this->btnUnreserve->Enabled = false;
 			$this->btnShip->Enabled = false;
 			$this->btnReceive->Enabled = false;
+			$this->btnArchive->Enabled = false;
 		}
 	}
 
@@ -1150,17 +1199,24 @@ class QAssetEditComposite extends QControl {
 			  $this->DisableTransactionButtons();
 			}
 			else {
-  			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+  			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && $this->objAsset->LocationId != 6 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
   				$this->btnMove->Enabled = true;
+  				$this->btnArchive->Enabled = true;
   			}
   			else {
   				$this->btnMove->Enabled = false;
+  				if ($this->objAsset->ArchivedFlag) {
+  				  $this->btnArchive->Enabled = true;
+  				}
+  				else {
+  				  $this->btnArchive->Enabled = false;
+  				}
   			}
-  			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+  			if (!$this->objAsset->ReservedFlag && !$this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && $this->objAsset->LocationId != 6 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
   				$this->btnCheckIn->Enabled = true;
   				$this->btnCheckOut->Enabled = true;
   			}
-  			elseif ($this->objAsset->CheckedOutFlag) {
+  			elseif ($this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 6) {
   				$objUserAccount = $this->objAsset->GetLastTransactionUser();
   				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
   					$this->btnCheckIn->Enabled = true;
@@ -1175,11 +1231,11 @@ class QAssetEditComposite extends QControl {
   				$this->btnCheckIn->Enabled = false;
   				$this->btnCheckOut->Enabled = false;
   			}
-  			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+  			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && $this->objAsset->LocationId != 2 && $this->objAsset->LocationId != 5 && $this->objAsset->LocationId != 6 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
   				$this->btnUnreserve->Enabled = true;
   				$this->btnReserve->Enabled = true;
   			}
-  			elseif ($this->objAsset->ReservedFlag) {
+  			elseif ($this->objAsset->ReservedFlag && $this->objAsset->LocationId != 6) {
   				$objUserAccount = $this->objAsset->GetLastTransactionUser();
   				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
   					$this->btnUnreserve->Enabled = true;
@@ -1194,7 +1250,7 @@ class QAssetEditComposite extends QControl {
   				$this->btnUnreserve->Enabled = false;
   				$this->btnReserve->Enabled = false;
   			}
-  			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
+  			if (!$this->objAsset->CheckedOutFlag && !$this->objAsset->ReservedFlag && $this->objAsset->LocationId != 6 && !AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
   				$this->btnShip->Enabled = true;
   				$this->btnReceive->Enabled = true;
   			}

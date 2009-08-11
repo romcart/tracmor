@@ -40,6 +40,12 @@ switch ($this->intTransactionTypeId) {
 	case 9:  // Unreserve
 		$strTransactionHeader = '<div class="title">Unreserve Assets</div>';
 		break;
+	case 10:  // Archive
+		$strTransactionHeader = '<div class="title">Archive Assets</div>';
+		break;
+	case 11:  // Unarchive
+		$strTransactionHeader = '<div class="title">Unarchive Assets</div>';
+		break;
 }
 
 echo($strTransactionHeader);

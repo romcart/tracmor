@@ -416,6 +416,7 @@
           %s
           %s
           %s
+          OR `asset_transaction__asset_id`.`archived_flag` is TRUE
         ORDER BY
           %s
           `transaction_id`,
@@ -540,6 +541,7 @@
           %s
           %s
           %s
+          OR `asset_transaction__asset_id`.`archived_flag` is TRUE
       ', $objQueryExpansion->GetFromSql("", "\n					"), str_replace("`asset`.`asset_id`", " `asset_transaction__asset_id`.`asset_id`", $arrCustomFieldSql['strFrom']),
         $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql']
        );

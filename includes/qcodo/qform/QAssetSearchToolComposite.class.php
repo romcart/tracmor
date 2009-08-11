@@ -28,6 +28,9 @@ class QAssetSearchToolComposite extends QControl {
   protected $objParentObject;
   public $ctlAssetSearch;
 
+  // Search Archived assets
+  public $blnSearchArchived;
+
   // Dialog Box
   public $dlgAssetSearchTool;
 
@@ -48,6 +51,7 @@ class QAssetSearchToolComposite extends QControl {
         throw $objExc;
     }
 
+    $this->blnSearchArchived = false;
     $this->objParentObject = $objParentObject;
     $this->dlgAssetSearchTool_Create();
 	}
@@ -143,6 +147,10 @@ class QAssetSearchToolComposite extends QControl {
 
 	public function lblAddAsset_Click() {
     $this->Refresh();
+    if ($this->blnSearchArchived) {
+      // Change location to "Archived"
+      $this->ctlAssetSearch->ChangeLocationBySelectedIndex(3);
+    }
     $this->btnAssetSearchToolAdd->Text = "Add Asset";
     $this->dlgAssetSearchTool->ShowDialogBox();
 	}
