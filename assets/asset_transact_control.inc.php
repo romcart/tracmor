@@ -45,6 +45,7 @@ switch ($this->intTransactionTypeId) {
 		break;
 	case 11:  // Unarchive
 		$strTransactionHeader = '<div class="title">Unarchive Assets</div>';
+		$strLocationName = 'Unarchive To:';
 		break;
 }
 
