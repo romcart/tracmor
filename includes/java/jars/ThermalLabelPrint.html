@@ -1,0 +1,48 @@
+<applet code="com.tracmor.applet.ThermalLabelPrint.class"
+archive="ThermalLabelPrint.jar"
+width=700 height=695
+>
+
+  <param name="type" value="nio">
+
+  <!-- Full URL to EPL/ZPL file to be printed  -->
+  <param name="url" value="mycompany.com/labels/MyLabel.epl">
+
+
+  <!-- path to printer
+  
+  	Note: \ is escaped as \\
+
+  	Windows shared network printer example:  
+  		"\\\\COMPUTER_NAME\\SHARED_PRINTER_NAME"
+  		  	
+  	Windows printer port example:
+  		"LP1"
+  		
+  	Linux USB example (make sure to configure user permissions to access device):
+  		"/dev/usb/lp0"  
+  	
+  -->
+  <param name="printer" value="\\\\COMPUTER\\PRINTER">
+
+  <!-- can be a positive number to sleep and delete the file - sleep pause to give a chance to the printer to print
+
+  -->
+  <param name="sleepAndDelete" value="">
+
+  <!-- Optional sleep time after nio or after delete - before run
+
+  -->
+
+  <param name="justSleepAfter" value="">
+
+  <!-- a system dependent executable like a .bat or shell script or exe.
+	It is invoked with
+	1. the full path of local temp file created with the data
+	2. the printer address (the param printer)
+	as parameters
+
+  -->
+
+  <param name="run1" value="">
+</applet>
