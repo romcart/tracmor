@@ -387,7 +387,16 @@
 
 		}
 
-
+	/**
+	 * Count Active (non-archived) Assets
+	 * @return int
+	 */
+	public static function CountActive() {
+		// Call Asset:QueryCount to perform the Count query
+		$intAssetCount = Asset::QueryCount(QQ::All());
+		$intArchivedCount = Asset::QueryCount(QQ::Equal(QQN::Asset()->ArchivedFlag, 1));
+		return ($intAssetCount - $intArchivedCount);
+	}
 
     /**
      * Load an array of Asset objects

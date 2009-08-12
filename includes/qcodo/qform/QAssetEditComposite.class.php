@@ -798,6 +798,16 @@ class QAssetEditComposite extends QControl {
 			// If a new asset is being created
 			if (!$this->blnEditMode) {
 
+				// Do not allow creation of an asset if asset limit will be exceeded
+				$intAssetLimit = (is_numeric(QApplication::$TracmorSettings->AssetLimit)) ? QApplication::$TracmorSettings->AssetLimit : false;
+
+				if (!$this->blnEditMode) {
+					if ($intAssetLimit && Asset::CountActive() >= $intAssetLimit) {
+						$blnError = true;
+						$this->txtAssetCode->Warning = "Your asset limit has been reached.";
+					}
+				}
+
 				// Check to see if the asset code already exists
 				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
 				if ($AssetDuplicate) {
@@ -851,7 +861,7 @@ class QAssetEditComposite extends QControl {
 			}
 
 			if ($this->blnEditMode) {
-
+				
 				// Check to see if the asset code already exists (and is not the asset code of the asset that the user is currently editing
 				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
 				if ($AssetDuplicate && $AssetDuplicate->AssetId != $this->objAsset->AssetId) {
