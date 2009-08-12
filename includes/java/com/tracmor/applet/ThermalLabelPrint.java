@@ -123,7 +123,7 @@ public class ThermalLabelPrint extends Applet{
 			 is.close();
 			 d("copy");
 			 debug = "slp  " + ff;
-			 String sSleep = getParam("sleepAndDelete", "0");
+			 /*String sSleep = getParam("sleepAndDelete", "0");
 			 if(!sSleep.equals("")){
 				 int s = Integer.parseInt(sSleep);
 				 d("sleep "+s);
@@ -142,13 +142,13 @@ public class ThermalLabelPrint extends Applet{
 					Thread.sleep(s);
 
 				}
-			 }
+			 }*/
 
-			 String run1 = getParam("run1", "");
+			 /*String run1 = getParam("run1", "");
 			 if(!"".equals(run1)){
 				 Runtime rn = Runtime.getRuntime();
 				 rn.exec(run1, new String[]{ff.getAbsolutePath()});
-			 }
+			 }*/
 
 
 
@@ -244,7 +244,7 @@ public class ThermalLabelPrint extends Applet{
 			 d("nio copy was ok " + bb);
 
 
-			 String sSleep = getParam("justSleepAfter", "0");
+			 /*String sSleep = getParam("justSleepAfter", "0");
 			 if(!sSleep.equals("")){
 				 int s = Integer.parseInt(sSleep);
 				 d("sleep "+s);
@@ -252,9 +252,9 @@ public class ThermalLabelPrint extends Applet{
 					Thread.sleep(s);
 
 				}
-			 }
+			 }*/
 
-			 String run1 = getParam("run1", "");
+			 /*String run1 = getParam("run1", "");
 			 d("run 1 " + run1);
 			 if(!"".equals(run1)){
 				 Runtime rn = Runtime.getRuntime();
@@ -269,7 +269,7 @@ public class ThermalLabelPrint extends Applet{
 					d("Err Proc read " + "\n" + e);
 				 	u.sl(e, e);
 				 }
-			 }
+			 }*/
 
 
 

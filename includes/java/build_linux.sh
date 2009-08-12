@@ -1,11 +1,11 @@
 #!/bin/bash
 
 jar='jars/ThermalLabelPrint.jar'	# jar file
-kd='certstore.ks'					# keystore
-kspass='password'					# keystore password
-kpass='password'					# key password
-alias='tracmor'						# keystore alias
-csr='Tracmor_self_cert.csr'			# csr file
+kd='certstore.ks'			# keystore
+kspass='password'			# keystore password
+kpass='password'			# key password
+alias='tracmor'				# keystore alias
+csr='Tracmor_self_cert.csr'		# csr file
 
 rm $kd
 keytool -genkey -keystore  $kd -storepass $kspass -keypass $kpass     -alias  $alias
