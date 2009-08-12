@@ -82,19 +82,30 @@ require_once('./includes/header.inc.php');
 if (QApplication::$TracmorSettings->PortablePinRequired) {
 ?>
   <form method="post" name="main_form" onsubmit="javascript:return CheckIdPin();">
-  User ID: <input type="text" name="user_account_id" size="4"><br />
-  User PIN: <input type="text" name="portable_user_pin" onkeypress="javascript:if(event.keyCode=='13') CheckIdPin();" size="10"><br />
+  <table border=0 style="padding-top:16px;">
+    <tr>
+      <td align="right"><h2>User ID:</h2></td><td valign="top"><input type="text" name="user_account_id" style="width:120px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
+    </tr>
+    <tr>
+      <td align="right"><h2>User PIN:</h2></td><td valign="top"><input type="text" name="portable_user_pin" onkeypress="javascript:if(event.keyCode=='13') CheckIdPin();" style="width:120px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
+    </tr>
+
 <?php
 }
 else {
 ?>
   <form method="post" name="main_form">
-  User ID: <input type="text" name="user_account_id" onkeypress="javascript:if(event.keyCode=='13') document.main_form.submit();" size="4"><br />
+  <table border=1 width="100%" style="padding-top:16px;">
+    <tr>
+      <td align="right"><h2>User ID:</h2></td><td valign="top"><input type="text" name="user_account_id" onkeypress="javascript:if(event.keyCode=='13') document.main_form.submit();" style="width:120px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"><br />
 <?php
 }
 ?>
-  <input type="submit" value="Authenticate">
+  <tr>
+  	<td colspan="2" align="center"><input type="submit" value="Authenticate" style="width:216px;height:56px;font-size:24;"></td>
+  </tr>
   </form>
+  </table>  
   <p><?php echo $strError; ?></p>
 
 <?php

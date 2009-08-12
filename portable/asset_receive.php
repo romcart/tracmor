@@ -20,7 +20,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 		You will also have to change the asset.location_id to the destination location
 	*/
 	$arrAssetCodeLocation = array_unique(explode('#',$_POST['result']));
-	
+
 	$blnError = false;
 	$arrCheckedAssetCodeLocation = array();
 	$arrLocation = array();
@@ -33,6 +33,14 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			if (!($objNewAsset instanceof Asset)) {
 				$blnError = true;
 				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
+			}
+			elseif ($objNewAsset->ArchivedFlag) {
+				$blnError = true;
+				$strWarning .= $strAssetCode." - That asset code is invalid.<br />";
+			}
+			elseif ($objNewAsset->LinkedFlag) {
+			  $blnError = true;
+			  $strWarning .= $strAssetCode." - That asset is locked to a parent asset.";
 			}
 			// Asset must either be 'To Be Received' or 'Shipped'
 			elseif (!($objNewAsset->LocationId == 5 || $objNewAsset->LocationId == 2)) {
@@ -69,39 +77,46 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			    $strWarning .= $strAssetCode." - That is a duplicate asset code.<br />";
 			  }
 			}
-			
+
 			if (!$blnError && $objNewAsset instanceof Asset)  {
-				$objAssetArray[] = $objNewAsset;
-				$arrPendingReceiptId[] = $objPendingReceipt->Transaction->Receipt->ReceiptId;
-				$objAssetTransactionArray[$objNewAsset->AssetId] = $objPendingReceipt;
+			  $objAssetArray[] = $objNewAsset;
+  			$arrPendingReceiptId[] = $objPendingReceipt->Transaction->Receipt->ReceiptId;
+  			$objAssetTransactionArray[$objNewAsset->AssetId] = $objPendingReceipt;
 			}
 		}
 	}
-	
+
 	if (!$blnError) {
 	  $arrPendingReceiptId = array_unique($arrPendingReceiptId);
-  	  
+
   	foreach ($objAssetArray as $objAsset) {
   	  $objDestinationLocation = $arrLocation[$objAsset->AssetId];
   	  $intDestinationLocationId = $objDestinationLocation->LocationId;
-  	  
+
   	  // Set the DestinationLocation of the AssetTransaction
   	  $objAssetTransaction = $objAssetTransactionArray[$objAsset->AssetId];
-    		$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
-    		$objAssetTransaction->Save();
-    		
-    	// Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
-			$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
-			// Move the asset to the new location
-			$objAssetTransaction->Asset->LocationId = $intDestinationLocationId;
-			$objAssetTransaction->Asset->Save();
-			$objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
-    	}
-    	
+    	$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
+    	$objAssetTransaction->Save();
+
+    	$objAsset->LocationId = $intDestinationLocationId;
+			$objAsset->Save();
+
+			if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objAsset->AssetId)) {
+  		  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+  		    $objLinkedAsset->LocationId = $intDestinationLocationId;
+  		    $objLinkedAsset->Save();
+  		    if ($objChildPendingReceipt = AssetTransaction::PendingReceipt($objLinkedAsset->AssetId)) {
+  		      $objChildPendingReceipt->DestinationLocationId = $intDestinationLocationId;
+  		      $objChildPendingReceipt->Save();
+  		    }
+  		  }
+  		}
+    }
+
   	foreach ($arrPendingReceiptId as $intReceiptId) {
   	  Receipt::ReceiptComplete($intReceiptId);
   	}
-  	
+
   	$strWarning .= "Your transaction has successfully completed<br /><a href='index.php'>Main Menu</a> | <a href='asset_menu.php'>Manage Assets</a><br />";
   	//Remove that flag when transaction is compelete or exists some errors
     unset($_SESSION['intUserAccountId']);
@@ -129,17 +144,24 @@ require_once('./includes/header.inc.php');
 <?php
 if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 ?>
-  Asset Code: <input type="text" id="asset_code" size="10">
-  <br /><br />
-  Destination Location: <input type="text" id="destination_location" onkeypress="javascript:if(event.keyCode=='13') AddAssetLocation();" size ="20">
-  <input type="button" value="Add Asset" onclick="javascript:AddAssetLocation();">
-  <br /><br />
-  <form method="post" name="main_form" onsubmit="javascript:return CompleteReceipt();">
-  <input type="hidden" name="method" value="complete_transaction">
-  <input type="hidden" name="result" value="">
-  <input type="submit" value="Complete Receipt">
-  </form>
-  <div id="result"></div>
+<table border=0 style="padding-top:16px;">
+	<tr>
+		<td align="right"><h2>Asset Code:</h2></td>
+		<td valign="top"><input type="text" id="asset_code" size="10" onkeypress="javascript:if(event.keyCode=='13') document.getElementById('destination_location').focus();" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
+	</tr>
+	<tr>
+		<td align="right"><h2>Destination Location:</h2></td>
+		<td><input type="text" id="destination_location" onkeypress="javascript:if(event.keyCode=='13') AddAssetLocation();" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
+	</tr>
+	<form method="post" name="main_form" onsubmit="javascript:return CompleteReceipt();">
+	<input type="hidden" name="method" value="complete_transaction">
+	<input type="hidden" name="result" value="">
+	<tr>
+		<td colspan="2" align="center"><input type="submit" value="Complete Receipt" style="width:216px;height:56px;font-size:24;"></td>
+	</tr>
+	</form>
+</table><p>
+<div id="result" style="font-size:24;width:100%;border-top:1px solid #CCCCCC;"></div>
 
 <?php
 }

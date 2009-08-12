@@ -201,23 +201,30 @@
 			 */
 			public static function AuthorizationSql($strEntity) {
 				
-				// Load the RoleModuleAuthorization
-				$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, 1);
-				if (!$objRoleModuleAuthorization) {
-					throw new Exception('No valid RoleModuleAuthorization for this User Role.');
-				}
-				// Owner - Return only entities where the logged in user is the owner
-				elseif ($objRoleModuleAuthorization->AuthorizationLevelId == 2) {
-					$strToReturn = sprintf('AND `%s` . `created_by` = %s', $strEntity, QApplication::$objUserAccount->UserAccountId);
-				}
-				// None - Do not return any entities
-				elseif ($objRoleModuleAuthorization->AuthorizationLevelId == 3) {
-					$strToReturn = sprintf('AND `%s` . `created_by` = 0', $strEntity);
-				}
-				// All - Return all entities, so do not limit the query at all
-				else {
+				
+				// if $objRoleModule is empty, then they are in the administration module so they have access to everything
+				if (empty(QApplication::$objRoleModule)) {
 					$strToReturn = '';
-				}				
+				}
+				else {
+					// Load the RoleModuleAuthorization
+					$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, 1);
+					if (!$objRoleModuleAuthorization) {
+						throw new Exception('No valid RoleModuleAuthorization for this User Role.');
+					}
+					// Owner - Return only entities where the logged in user is the owner
+					elseif ($objRoleModuleAuthorization->AuthorizationLevelId == 2) {
+						$strToReturn = sprintf('AND `%s` . `created_by` = %s', $strEntity, QApplication::$objUserAccount->UserAccountId);
+					}
+					// None - Do not return any entities
+					elseif ($objRoleModuleAuthorization->AuthorizationLevelId == 3) {
+						$strToReturn = sprintf('AND `%s` . `created_by` = 0', $strEntity);
+					}
+					// All - Return all entities, so do not limit the query at all
+					else {
+						$strToReturn = '';
+					}
+				}
 				
 				return $strToReturn;
 			}		

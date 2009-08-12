@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2009, Tracmor, LLC 
  *
  * This file is part of Tracmor.  
  *
@@ -23,5 +23,8 @@
 	DEFINE('AWS_ACCESS_KEY', '');
 	DEFINE('AWS_SECRET_KEY', '');
 	DEFINE('AWS_BUCKET', '');
+	
+	// Location of tmp directory
+	DEFINE('__TRACMOR_TMP__', '/tmp');
 	
 ?>

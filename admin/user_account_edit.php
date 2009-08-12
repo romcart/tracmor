@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2009, Tracmor, LLC 
  *
  * This file is part of Tracmor.  
  *
@@ -215,6 +215,36 @@
 				$this->txtPassword->Text = "";
 				$this->txtPasswordConfirm->Text = "";
 			}
+			
+			$intUserLimit = (is_numeric(QApplication::$TracmorSettings->UserLimit)) ? QApplication::$TracmorSettings->UserLimit : 99999;			
+			
+			// Do not allow creation of a new active user if user limit will be exceeded
+			if (!$this->blnEditMode && $this->chkActiveFlag->Checked) {
+				if (UserAccount::CountActive() >= $intUserLimit) {
+					$blnError = true;
+					$this->chkActiveFlag->Warning = "You have exceeded your user limit.";
+				}
+			}
+			
+			// Do not allow activation of a disabled user if the user limit will be exceeded
+			if ($this->blnEditMode && $this->chkActiveFlag->Checked && !$this->objUserAccount->ActiveFlag) {
+				if (UserAccount::CountActive() >= $intUserLimit) {
+					$blnError = true;
+					$this->chkActiveFlag->Warning = "You have exceeded your user limit.";
+				}				
+			}
+			
+			// Do not allow duplicate usernames
+			if ($this->blnEditMode) {
+				$objUserAccountDuplicate = UserAccount::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::UserAccount()->Username, $this->txtUsername->Text), QQ::NotEqual(QQN::UserAccount()->UserAccountId, $this->objUserAccount->UserAccountId)));
+			}
+			else {
+				$objUserAccountDuplicate = UserAccount::QuerySingle(QQ::Equal(QQN::UserAccount()->Username, $this->txtUsername->Text));
+			}
+			if ($objUserAccountDuplicate) {
+				$blnError = true;
+				$this->btnCancel->Warning = 'A user account already exists with that username. Please choose another.';
+			}			
 			
 			if (!$blnError) {
 				

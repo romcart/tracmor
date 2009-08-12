@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2009, Tracmor, LLC
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -35,22 +35,23 @@
 	 * here by overriding existing or implementing new methods, properties and variables.
 	 *
 	 * Additional qform control objects can also be defined and used here, as well.
-	 * 
+	 *
 	 * @package Application
 	 * @subpackage FormDraftObjects
-	 * 
+	 *
 	 */
 	class ReceiptEditForm extends ReceiptEditFormBase {
-		
+
 		// Header Tabs
 		protected $ctlHeaderMenu;
 		// Shortcut Menu
-		protected $ctlShortcutMenu;		
+		protected $ctlShortcutMenu;
 
 		// Booleans
 		protected $blnModifyAssets = false;
 		protected $blnModifyInventory = false;
-		
+		protected $blnShowInventory = false;
+
 		// Labels
 		protected $lblHeaderReceipt;
 		protected $lblFromCompany;
@@ -65,8 +66,8 @@
 		protected $lblNewFromContact;
 		protected $lblNewToContact;
 		protected $lblNewToAddress;
-		
-		
+
+
 		// Inputs
 		protected $txtReceiptNumber;
 		protected $txtNote;
@@ -77,54 +78,66 @@
 		protected $lstAssetModel;
 		protected $chkAutoGenerateAssetCode;
 		protected $calDueDate;
-		
+
 		// Buttons
 		protected $btnEdit;
 		protected $atcAttach;
 		protected $pnlAttachments;
 		protected $btnAddAsset;
 		protected $btnAddInventory;
-		
+
 		// Datagrids
 		protected $dtgAssetTransact;
 		protected $dtgInventoryTransact;
-		
+
 		// Arrays
 		protected $arrAssetTransactionToDelete;
 		protected $arrInventoryTransactionToDelete;
-		
+
 		// Objects
 		protected $objAssetTransactionArray;
 		protected $objInventoryTransactionArray;
 		protected $objTransaction;
 		protected $dttNow;
-		
+
 		// Integers
 		protected $intNewTempId = 1;
-		
+
 		// Custom Field Objects
-		public $arrCustomFields;	
-		
+		public $arrCustomFields;
+
 			// Set true if the Built-in Fields has to be rendered
 		public $blnViewBuiltInFields;
 		public $blnEditBuiltInFields;
-		
+
 		// Dialog
 		protected $dlgNew;
-		
+
 		// Generate tab indexes
 		protected $intNextTabIndex = 1;
-		
+		protected $ctlAssetSearchTool;
+		protected $ctlInventorySearchTool;
+	  protected $lblAddAsset;
+	  protected $lblLookup;
+
 		protected function Form_Create() {
-			
+
+			// check rigths for the Inventory to Ship
+			$this->blnShowInventory = true;
+			$objRoleModule = RoleModule::LoadByRoleIdModuleId(QApplication::$objUserAccount->RoleId, 3);
+			if ($objRoleModule->AccessFlag) {
+				$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId($objRoleModule->RoleModuleId, 2);
+				if ($objRoleModuleAuthorization->AuthorizationLevelId == 3) $this->blnShowInventory = false;
+			} else $this->blnShowInventory = false;
+
 			// Call Setup Receipt to either load existing or create new receipt
 			$this->SetupReceipt();
-						
+
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
-			$this->ctlShortcutMenu_Create();			
-			
+			$this->ctlShortcutMenu_Create();
+
 			// Create the labels
 			$this->lblHeaderReceipt_Create();
 			$this->lblFromCompany_Create();
@@ -135,7 +148,7 @@
 			$this->pnlNote_Create();
 			$this->lblDueDate_Create();
 			$this->lblReceiptDate_Create();
-			
+
 			// Create the inputs
 			$this->lstFromCompany_Create();
 			$this->lblNewFromCompany_Create();
@@ -146,13 +159,18 @@
 			$this->lstToAddress_Create();
 			$this->lblNewToAddress_Create();
 			$this->txtNote_Create();
-			
+
 			// Create all custom asset fields - this must be here for tab ordering
 			$this->customFields_Create();
-			
+
+			if ($this->blnShowInventory) {
+				$this->txtNewInventoryModelCode_Create();
+				$this->ctlInventorySearchTool_Create();
+				$this->txtQuantity_Create();
+				$this->btnAddInventory_Create();
+			}
+
 			$this->txtNewAssetCode_Create();
-			$this->txtNewInventoryModelCode_Create();
-			$this->txtQuantity_Create();
 			$this->rblAssetType_Create();
 			$this->lstAssetModel_Create();
 			$this->chkAutoGenerateAssetCode_Create();
@@ -160,7 +178,7 @@
 			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
 				$this->txtReceiptNumber_Create();
 			}
-			
+
 			// Create the buttons
 			$this->btnSave_Create();
 			$this->btnEdit_Create();
@@ -169,25 +187,27 @@
 			$this->atcAttach_Create();
 			$this->pnlAttachments_Create();
 			$this->btnAddAsset_Create();
-			$this->btnAddInventory_Create();
-			
-			
-			
+			$this->ctlAssetSearchTool_Create();
+
 			//Set display logic of Built-In Fields
 			$this->UpdateBuiltInFields();
-			
+
 			// Set display logic of certain Entities
 			$this->UpdateAddressAccess();
 			$this->UpdateCompanyAccess();
 			$this->UpdateContactAccess();
-			
+
+
+			// Check prerequisites for scheduling receipts
+			$this->CheckPrerequisites();
+
 			// Create the datagrids
 			$this->dtgAssetTransact_Create();
 			$this->dtgInventoryTransact_Create();
-			
+
 			// New entities Dialog
 			$this->dlgNew_Create();
-			
+
 			// Load the objAssetTransactionArray and objInventoryTransactionArray for the first time
 			if ($this->blnEditMode) {
 
@@ -200,7 +220,7 @@
 					array_push($objClauses, $objClause);
 				$this->objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($this->objReceipt->TransactionId, $objClauses);
 				$objClauses = null;
-				
+
 				$objClauses = array();
 				if ($objClause = $this->dtgInventoryTransact->OrderByClause)
 					array_push($objClauses, $objClause);
@@ -209,13 +229,13 @@
 				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->InventoryLocation->InventoryModel));
 					array_push($objClauses, $objClause);
 				$this->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->objReceipt->TransactionId, $objClauses);
-				
+
 				$this->DisplayLabels();
 			}
 			elseif (!$this->blnEditMode) {
 				$this->DisplayInputs();
 			}
-			
+
 			// Check if there is an Asset or InventoryModel ID in the query string to automatically add them - they would be coming from AssetEdit or InventoryEdit
 			if (!$this->blnEditMode) {
 				$intAssetId = QApplication::QueryString('intAssetId');
@@ -238,15 +258,24 @@
 				}
 			}
 		}
-		
+
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
 		protected function Form_PreRender() {
-			
+
 			// Load the data for the AssetTransact datagrid
 			if ($this->blnModifyAssets || $this->blnEditMode) {
 				$this->blnModifyAssets = false;
 				$this->dtgAssetTransact->TotalItemCount = count($this->objAssetTransactionArray);
 				if ($this->dtgAssetTransact->TotalItemCount > 0) {
+				  // Create new array without child assets
+				  /*$objAssetTransactionArray = array();
+				  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+				    if (!$objAssetTransaction->Asset->LinkedFlag) {
+				      $objAssetTransactionArray[] = $objAssetTransaction;
+				    }
+				  }
+				  $this->dtgAssetTransact->TotalItemCount = count($objAssetTransactionArray);
+					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;*/
 					$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
 					$this->dtgAssetTransact->ShowHeader = true;
 				}
@@ -254,10 +283,10 @@
 					$this->dtgAssetTransact->ShowHeader = false;
 				}
 			}
-			
+
 			// Load the data for the InventoryTransact datagrid
 			if ($this->blnModifyInventory || $this->blnEditMode) {
-				$this->blnModifyInventory = false;	
+				$this->blnModifyInventory = false;
 				$this->dtgInventoryTransact->TotalItemCount = count($this->objInventoryTransactionArray);
 				if ($this->dtgInventoryTransact->TotalItemCount > 0) {
 					$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
@@ -269,12 +298,12 @@
 				}
 			}
 		}
-		
+
 		protected function SetupReceipt() {
 			parent::SetupReceipt();
 			QApplication::AuthorizeEntity($this->objReceipt, $this->blnEditMode);
 		}
-		
+
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {
   		$this->ctlHeaderMenu = new QHeaderMenu($this);
@@ -284,23 +313,45 @@
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
   	}
-		
+
+  	protected function ctlAssetSearchTool_Create() {
+  	  $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
+
+  	  $this->lblAddAsset = new QLabel($this);
+		  $this->lblAddAsset->HtmlEntities = false;
+		  $this->lblAddAsset->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+		  $this->lblAddAsset->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlAssetSearchTool, 'lblAddAsset_Click'));
+		  $this->lblAddAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  	}
+
+  	protected function ctlInventorySearchTool_Create() {
+  	  $this->ctlInventorySearchTool = new QInventorySearchToolComposite($this);
+
+  	  $this->lblLookup = new QLabel($this);
+		  $this->lblLookup->HtmlEntities = false;
+		  $this->lblLookup->Text = '<img src="../images/icons/inventory_lookup.png" border="0" style="cursor:pointer;">';
+		  $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
+		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  	}
+
 		//**************
 		// CREATE LABELS
 		//**************
-		
+
 		// Create Header Label
 		protected function lblHeaderReceipt_Create() {
 			$this->lblHeaderReceipt = new QLabel($this);
 			if ($this->blnEditMode) {
-				$this->lblHeaderReceipt->Text = sprintf('Receipt #%s',$this->objReceipt->ReceiptNumber); 
+				$this->lblHeaderReceipt->Text = sprintf('Receipt #%s',$this->objReceipt->ReceiptNumber);
 			}
 			else {
 				$this->lblHeaderReceipt->Text = 'Schedule Receipt';
 			}
-			
+
 		}
-		
+
 		// Create and Setup From Company label
 		protected function lblFromCompany_Create() {
 			$this->lblFromCompany = new QLabel($this);
@@ -309,7 +360,7 @@
 				$this->lblFromCompany->Text = $this->objReceipt->FromCompany->__toString();
 			}
 		}
-		
+
 		// Create and Setup From Contact label
 		protected function lblFromContact_Create() {
 			$this->lblFromContact = new QLabel($this);
@@ -318,7 +369,7 @@
 				$this->lblFromContact->Text = $this->objReceipt->FromContact->__toString();
 			}
 		}
-		
+
 		// Create and Setup To Contact label
 		protected function lblToContact_Create() {
 			$this->lblToContact = new QLabel($this);
@@ -327,7 +378,7 @@
 				$this->lblToContact->Text = $this->objReceipt->ToContact->__toString();
 			}
 		}
-		
+
 		// Create and Setup To Address label
 		protected function lblToAddress_Create() {
 			$this->lblToAddress = new QLabel($this);
@@ -336,7 +387,7 @@
 				$this->lblToAddress->Text = $this->objReceipt->ToAddress->__toString();
 			}
 		}
-		
+
 		// Create and Setup lblReceiptNumber
 		protected function lblReceiptNumber_Create() {
 			$this->lblReceiptNumber = new QLabel($this);
@@ -348,7 +399,7 @@
 				$this->lblReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
 			}
 		}
-		
+
 		// Create and Setup Note panel
 		protected function pnlNote_Create() {
 			$this->pnlNote = new QPanel($this);
@@ -358,7 +409,7 @@
 				$this->pnlNote->Text = nl2br($this->objReceipt->Transaction->Note);
 			}
 		}
-		
+
 		// Create and Setup Due Date Label
 		protected function lblDueDate_Create() {
 			$this->lblDueDate = new QLabel($this);
@@ -367,7 +418,7 @@
 				$this->lblDueDate->Text = $this->objReceipt->DueDate->__toString();
 			}
 		}
-		
+
 		// Create and Setup Receipt Date Label
 		protected function lblReceiptDate_Create() {
 			$this->lblReceiptDate = new QLabel($this);
@@ -376,7 +427,7 @@
 				$this->lblReceiptDate->Text = $this->objReceipt->ReceiptDate->__toString();
 			}
 		}
-		
+
 		protected function lblNewFromCompany_Create() {
 			$this->lblNewFromCompany = new QLabel($this);
 			$this->lblNewFromCompany->HtmlEntities = false;
@@ -386,7 +437,7 @@
 			$this->lblNewFromCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromCompany_Click'));
 			$this->lblNewFromCompany->ActionParameter = $this->lstFromCompany->ControlId;
 		}
-		
+
 		protected function lblNewFromContact_Create() {
 			$this->lblNewFromContact = new QLabel($this);
 			$this->lblNewFromContact->HtmlEntities = false;
@@ -396,7 +447,7 @@
 			$this->lblNewFromContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromContact_Click'));
 			$this->lblNewFromContact->ActionParameter = $this->lstFromContact->ControlId;
 		}
-		
+
 		protected function lblNewToContact_Create() {
 			$this->lblNewToContact = new QLabel($this);
 			$this->lblNewToContact->HtmlEntities = false;
@@ -406,7 +457,7 @@
 		  	$this->lblNewToContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewToContact_Click'));
 			$this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
 		}
-		
+
 		protected function lblNewToAddress_Create() {
 			$this->lblNewToAddress = new QLabel($this);
 			$this->lblNewToAddress->HtmlEntities = false;
@@ -416,7 +467,7 @@
 			$this->lblNewToAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewToAddress_Click'));
 		 	$this->lblNewToAddress->ActionParameter = $this->lstToAddress->ControlId;
 		}
-		
+
 		//*****************
 		// CREATE INPUTS
 		//*****************
@@ -458,7 +509,7 @@
 					$this->lstFromContact->AddItem($objListItem);
 				}
 			}
-			$this->lstFromContact->TabIndex=2;		
+			$this->lstFromContact->TabIndex=2;
 			$this->intNextTabIndex++;
 		}
 
@@ -476,7 +527,7 @@
 					$objListItem->Selected = true;
 				$this->lstToContact->AddItem($objListItem);
 			}
-			$this->lstToContact->TabIndex=3;			
+			$this->lstToContact->TabIndex=3;
 			$this->intNextTabIndex++;
 		}
 
@@ -494,10 +545,10 @@
 					$objListItem->Selected = true;
 				$this->lstToAddress->AddItem($objListItem);
 			}
-			$this->lstToAddress->TabIndex=4;	
+			$this->lstToAddress->TabIndex=4;
 			$this->intNextTabIndex++;
 		}
-		
+
 		// Create and Setup txtReceiptNumber
 		protected function txtReceiptNumber_Create() {
 			$this->txtReceiptNumber = new QTextBox($this);
@@ -507,7 +558,7 @@
 			}
 			$this->txtReceiptNumber->Required = true;
 		}
-		
+
 		// Create and Setup Note textbox
 		protected function txtNote_Create() {
 			$this->txtNote = new QTextBox($this);
@@ -519,7 +570,7 @@
 			$this->txtNote->TabIndex=5;
 			$this->intNextTabIndex++;
 		}
-		
+
 		// Create and Setup calDueDate
 		protected function calDueDate_Create() {
 			$this->calDueDate = new QDateTimePicker($this);
@@ -541,9 +592,9 @@
 			$this->calDueDate->Required = true;
 			$this->calDueDate->TabIndex=6;
 			$this->intNextTabIndex++;
-			
+
 		}
-		
+
 		// Create the text field to enter new asset codes to add to the transaction
 		// Eventually this field will receive information from the AML
 		protected function txtNewAssetCode_Create() {
@@ -553,7 +604,7 @@
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtNewAssetCode->CausesValidation = false;
 			$this->txtNewAssetCode->TabIndex=$this->intNextTabIndex++;
-			
+
 		}
 
 		// Create the text field to enter new inventory_model codes to add to the transaction
@@ -565,7 +616,7 @@
 			$this->txtNewInventoryModelCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddInventory_Click'));
 			$this->txtNewInventoryModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
+
 		// Create the quantity text field for new inventory
 		protected function txtQuantity_Create() {
 			$this->txtQuantity = new QTextBox($this);
@@ -574,7 +625,7 @@
 			$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddInventory_Click'));
 			$this->txtQuantity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
+
 		// Create the Asset Type Radio Button List (new or existing)
 		protected function rblAssetType_Create() {
 			$this->rblAssetType = new QRadioButtonList($this);
@@ -582,7 +633,7 @@
 			$this->rblAssetType->AddItem(new QListItem('New Asset', 'new'));
 			$this->rblAssetType->AddAction(new QChangeEvent(), new QAjaxAction('rblAssetType_Change'));
 		}
-		
+
 		// Create the Asset Model List for creating new assets
 		protected function lstAssetModel_Create() {
 			$this->lstAssetModel = new QListBox($this);
@@ -590,7 +641,7 @@
 			$this->lstAssetModel->AddItem('- Select One -', null, true);
 			$this->lstAssetModel->Display = false;
 		}
-		
+
 		// Create the Auto Generate Asset Code Checkbox
 		protected function chkAutoGenerateAssetCode_Create() {
 			$this->chkAutoGenerateAssetCode = new QCheckBox($this);
@@ -599,11 +650,11 @@
 			$this->chkAutoGenerateAssetCode->AddAction(new QClickEvent(), new QToggleEnableAction($this->txtNewAssetCode));
 			$this->chkAutoGenerateAssetCode->Display = false;
 		}
-		
+
 		//*******************
 		// CREATE BUTTONS
 		//*******************
-		
+
 		// Setup btnSave
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
@@ -617,18 +668,18 @@
 			$this->btnCancel = new QButton($this);
 			$this->btnCancel->Text = QApplication::Translate('Cancel');
 			$this->btnCancel->AddAction(new QClickEvent(), new QAjaxAction('btnCancel_Click'));
-			$this->btnCancel->CausesValidation = false;	
-		}		
-		
+			$this->btnCancel->CausesValidation = false;
+		}
+
 		// Create and Setup the Edit Button
 		protected function btnEdit_Create() {
 			$this->btnEdit = new Qbutton($this);
 			$this->btnEdit->Text = 'Edit';
 			$this->btnEdit->AddAction(new QClickEvent(), new QAjaxAction('btnEdit_Click'));
 			$this->btnEdit->CausesValidation = false;
-			QApplication::AuthorizeControl($this->objReceipt, $this->btnEdit, 2);			
+			QApplication::AuthorizeControl($this->objReceipt, $this->btnEdit, 2);
 		}
-		
+
 		// Setup btnDelete
 		protected function btnDelete_Create() {
 			$this->btnDelete = new QButton($this);
@@ -638,18 +689,18 @@
 			$this->btnDelete->CausesValidation = false;
 			QApplication::AuthorizeControl($this->objReceipt, $this->btnDelete, 3);
 		}
-		
+
 		// Setup Attach File Asset Button
 		protected function atcAttach_Create() {
 			$this->atcAttach = new QAttach($this, null, EntityQtype::Receipt, $this->objReceipt->ReceiptId);
 			QApplication::AuthorizeControl($this->objReceipt, $this->atcAttach, 2);
 		}
-		
+
 		// Setup Attachments Panel
 		public function pnlAttachments_Create() {
 			$this->pnlAttachments = new QAttachments($this, null, EntityQtype::Receipt, $this->objReceipt->ReceiptId);
-		}		
-		
+		}
+
 		// Setup AddAsset Button
 		protected function btnAddAsset_Create() {
 			$this->btnAddAsset = new QButton($this);
@@ -660,7 +711,7 @@
 			$this->btnAddAsset->CausesValidation = false;
 			$this->btnAddAsset->TabIndex=$this->intNextTabIndex++;;
 		}
-		
+
 		// Setup Add Inventory Button
 		protected function btnAddInventory_Create() {
 			$this->btnAddInventory = new QButton($this);
@@ -670,22 +721,22 @@
 			$this->btnAddInventory->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnAddInventory->CausesValidation = false;
 		}
-		
+
 		// Create all Custom Company Fields
 		protected function customFields_Create() {
-		
+
 			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 			$this->objReceipt->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(11, $this->blnEditMode, $this->objReceipt->ReceiptId);
-			
+
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			if ($this->objReceipt->objCustomFieldArray) {
 				$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-				
+
 			}
 			$this->UpdateCustomFields();
-			
+
 		}
-		
+
 		//*****************
 		// CREATE DIALOG
 		//*****************
@@ -700,12 +751,12 @@
 			$this->dlgNew->BackColor = '#FFFFFF';
 			$this->dlgNew->MatteClickable = false;
 			$this->dlgNew->CssClass = "modal_dialog";
-		}		
-		
+		}
+
 		//*****************
 		// ONSELECT METHODS
 		//*****************
-		
+
 		// This method runs every time a 'From Company' is selected
 		protected function lstFromCompany_Select() {
 			if ($this->lstFromCompany->SelectedValue) {
@@ -714,7 +765,7 @@
 					// Load the values for the 'From Contact' List
 					if ($this->lstFromContact) {
 						$objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId);
-						
+
 						if ($this->lstFromContact->SelectedValue) {
 							$SelectedContactId = $this->lstFromContact->SelectedValue;
 						}
@@ -740,50 +791,50 @@
 				}
 			}
 		}
-		
+
 		//******************
 		// CREATE DATAGRIDS
 		//******************
-		
+
 		// Setup the AssetTransact datagrid
 		protected function dtgAssetTransact_Create() {
-			
+
 			$this->dtgAssetTransact = new QDataGrid($this);
 			$this->dtgAssetTransact->CellPadding = 5;
 			$this->dtgAssetTransact->CellSpacing = 0;
 			$this->dtgAssetTransact->CssClass = "datagrid";
-			
+
 	    // Enable AJAX - this won't work while using the DB profiler
 	    $this->dtgAssetTransact->UseAjax = true;
-	
+
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgAssetTransact);
 	    $this->dtgAssetTransact->Paginator = $objPaginator;
 	    $this->dtgAssetTransact->ItemsPerPage = 20;
-	    
+
     	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => "200", 'OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetModel->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->__toStringStatus() ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	
+
 	    $objStyle = $this->dtgAssetTransact->RowStyle;
 	    $objStyle->ForeColor = '#000000';
 	    $objStyle->BackColor = '#FFFFFF';
 	    $objStyle->FontSize = 12;
-	
+
 	    $objStyle = $this->dtgAssetTransact->AlternateRowStyle;
 	    $objStyle->BackColor = '#EFEFEF';
-	
+
 	    $objStyle = $this->dtgAssetTransact->HeaderRowStyle;
 	    $objStyle->ForeColor = '#000000';
 	    $objStyle->BackColor = '#EFEFEF';
 	    $objStyle->CssClass = 'dtg_header';
-	    
+
 	    $this->dtgAssetTransact->ShowHeader = false;
 		}
-		
+
 		// Render the remove button column in the AssetTransact datagrid
 		public function RemoveAssetColumn_Render(AssetTransaction $objAssetTransaction) {
-			
+
 			// Only Display the remove button if it has not been received
 			if ($objAssetTransaction->blnReturnReceivedStatus()) {
 				return '';
@@ -804,21 +855,24 @@
 	          	$btnRemove->Text = 'Remove';
 	          }
 	          // Use ActionParameter to specify the TempId of the asset
-	          // Using TempId because newly created (but not yet saved to the db) assets all have an AssetId of 0, so we needed another unique identifier	          
+	          // Using TempId because newly created (but not yet saved to the db) assets all have an AssetId of 0, so we needed another unique identifier
 	          $btnRemove->ActionParameter = $objAssetTransaction->Asset->TempId;
 	          $btnRemove->AddAction(new QClickEvent(), new QAjaxAction('btnRemoveAssetTransaction_Click'));
 	          $btnRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnRemoveAssetTransaction_Click'));
 	          $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	          $btnRemove->CausesValidation = false;
+	          if ($objAssetTransaction->Asset->LinkedFlag) {
+              $btnRemove->Enabled = false;
+            }
 	      }
-	      
+
 	      return $btnRemove->Render(false);
 			}
 		}
-		
+
 		// Render the receive button in the AssetTransact datagrid
 		public function btnReceiveAssetTransaction_Render(AssetTransaction $objAssetTransaction) {
-			
+
 			if (!$objAssetTransaction->blnReturnReceivedStatus()) {
 				$strControlId = 'btnReceiveAssetTransaction' . $objAssetTransaction->AssetTransactionId;
 				$btnReceiveAsset = $this->GetControl($strControlId);
@@ -832,19 +886,22 @@
 					$btnReceiveAsset->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveAssetTransaction_Click'));
 					$btnReceiveAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 					$btnReceiveAsset->CausesValidation = false;
+					if ($objAssetTransaction->Asset->LinkedFlag) {
+            $btnReceiveAsset->Enabled = false;
+          }
 				}
-				
-				QApplication::AuthorizeControl($this->objReceipt, $btnReceiveAsset, 2);				
-				
+
+				QApplication::AuthorizeControl($this->objReceipt, $btnReceiveAsset, 2);
+
 				// QApplication::AuthorizeControl($this->objReceipt, $btnReceiveAsset, 2);
 				return $btnReceiveAsset->Render(false);
 			}
 		}
-		
+
 		// Render the cancel receipt button in the AssetTransact datagrid
 		// We are not using this button at all anymore
 /*		public function btnCancelAssetTransaction_Render(AssetTransaction $objAssetTransaction) {
-			
+
 			if ($objAssetTransaction->blnReturnReceivedStatus()) {
 				$strControlId = 'btnCancelAssetTransaction' . $objAssetTransaction->AssetTransactionId;
 				$btnCancelAsset = $this->GetControl($strControlId);
@@ -859,16 +916,16 @@
 					$btnCancelAsset->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 					$btnCancelAsset->CausesValidation = false;
 				}
-				
+
 				QApplication::AuthorizeControl($this->objReceipt, $btnCancelAsset, 2);
-				
+
 				return $btnCancelAsset->Render(false);
 			}
 		}*/
-		
+
 		// Render the location received list in the AssetTransact datagrid
 		public function lstLocationAssetReceived_Render(AssetTransaction $objAssetTransaction) {
-			
+
 			if (!$objAssetTransaction->blnReturnReceivedStatus()) {
 				$strControlId = 'lstLocationAssetReceived' . $objAssetTransaction->AssetTransactionId;
 				$lstLocationAssetReceived = $this->GetControl($strControlId);
@@ -883,7 +940,7 @@
 					if ($objLocationArray) {
 						// Get assets last location if the admin setting is enabled, otherwise set to null
 						$objLastLocation = (QApplication::$TracmorSettings->ReceiveToLastLocation) ? $objAssetTransaction->Asset->GetLastShippedFromLocation() : null;
-							
+
 						foreach ($objLocationArray as $objLocation) {
 							// Default to the assets last location,  if it had one
 							$blnSelected = ($objLastLocation != null && $objLocation->LocationId == $objLastLocation->LocationId);
@@ -892,58 +949,60 @@
 					}
 					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveAssetTransaction'));
 					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-					
+					if ($objAssetTransaction->Asset->LinkedFlag) {
+            $lstLocationAssetReceived->Enabled = false;
+          }
 				}
 				QApplication::AuthorizeControl($this->objReceipt, $lstLocationAssetReceived, 2);
-				
+
 				return $lstLocationAssetReceived->Render(false);
 			}
 		}
-		
 
-		
+
+
 		// Setup the InventoryTransact datagrid
 		protected function dtgInventoryTransact_Create() {
-			
+
 			$this->dtgInventoryTransact = new QDataGrid($this);
 			$this->dtgInventoryTransact->CellPadding = 5;
 			$this->dtgInventoryTransact->CellSpacing = 0;
 			$this->dtgInventoryTransact->CssClass = "datagrid";
-			
+
 	    // Enable AJAX - this won't work while using the DB profiler
 	    $this->dtgInventoryTransact->UseAjax = true;
-	
+
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgInventoryTransact);
 	    $this->dtgInventoryTransact->Paginator = $objPaginator;
 	    $this->dtgInventoryTransact->ItemsPerPage = 20;
-	    
+
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Inventory Code', '<?= $_ITEM->InventoryLocation->InventoryModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Inventory Model', '<?= $_ITEM->InventoryLocation->InventoryModel->ShortDescription ?>', array('Width' => "200", 'CssClass' => "dtg_column")));
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', array('CssClass' => "dtg_column")));
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->__toStringStatus() ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	    
+
 /*	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', 'CssClass=dtg_column'));*/
-	
+
 	    $objStyle = $this->dtgInventoryTransact->RowStyle;
 	    $objStyle->ForeColor = '#000000';
 	    $objStyle->BackColor = '#FFFFFF';
 	    $objStyle->FontSize = 12;
-	
+
 	    $objStyle = $this->dtgInventoryTransact->AlternateRowStyle;
 	    $objStyle->BackColor = '#EFEFEF';
-	
+
 	    $objStyle = $this->dtgInventoryTransact->HeaderRowStyle;
 	    $objStyle->ForeColor = '#000000';
 	    $objStyle->BackColor = '#EFEFEF';
 	    $objStyle->CssClass = 'dtg_header';
-	    
+
 	    $this->dtgInventoryTransact->ShowHeader = false;
 		}
-		
+
 		// Render the Remove Button Column in the Inventory Transaction datagrid
 		public function RemoveInventoryColumn_Render(InventoryTransaction $objInventoryTransaction) {
-			
+
 			// Only display the remove button if it has not been received
 			if ($objInventoryTransaction->blnReturnReceivedStatus()) {
 				return '';
@@ -966,10 +1025,10 @@
 		    return $btnRemove->Render(false);
 			}
 		}
-		
+
 		// Render the receive button in the InventoryTransact datagrid
 		public function btnReceiveInventoryTransaction_Render(InventoryTransaction $objInventoryTransaction) {
-			
+
 			if (!$objInventoryTransaction->blnReturnReceivedStatus()) {
 				$strControlId = 'btnReceiveInventoryTransaction' . $objInventoryTransaction->InventoryTransactionId;
 				$btnReceiveInventory = $this->GetControl($strControlId);
@@ -984,14 +1043,14 @@
 					$btnReceiveInventory->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 					$btnReceiveInventory->CausesValidation = false;
 				}
-				QApplication::AuthorizeControl($this->objReceipt, $btnReceiveInventory, 2);	
+				QApplication::AuthorizeControl($this->objReceipt, $btnReceiveInventory, 2);
 				return $btnReceiveInventory->Render(false);
 			}
 		}
-		
+
 		// Render the cancel button in the InventoryTransact datagrid
 /*		public function btnCancelInventoryTransaction_Render(InventoryTransaction $objInventoryTransaction) {
-			
+
 			if ($objInventoryTransaction->blnReturnReceivedStatus()) {
 				$strControlId = 'btnCancelInventoryTransaction' . $objInventoryTransaction->InventoryTransactionId;
 				$btnCancelInventory = $this->GetControl($strControlId);
@@ -1006,12 +1065,12 @@
 					$btnCancelInventory->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 					$btnCancelInventory->CausesValidation = false;
 				}
-				
+
 				QApplication::AuthorizeControl($this->objReceipt, $btnCancelInventory, 2);
 				return $btnCancelInventory->Render(false);
 			}
 		}*/
-		
+
 		// Render the quantity textbox in the InventoryTransact datagrid
 		public function txtQuantityReceived_Render(InventoryTransaction $objInventoryTransaction) {
 			if (!$objInventoryTransaction->blnReturnReceivedStatus()) {
@@ -1027,15 +1086,15 @@
 					$txtQuantityReceived->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveInventoryTransaction'));
 					$txtQuantityReceived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 				}
-				
-				QApplication::AuthorizeControl($this->objReceipt, $txtQuantityReceived, 2);	
+
+				QApplication::AuthorizeControl($this->objReceipt, $txtQuantityReceived, 2);
 				return $txtQuantityReceived->RenderWithNameLeft(false);
 			}
 		}
-		
+
 		// Render the location received list in the InventoryTransact datagrid
 		public function lstLocationInventoryReceived_Render(InventoryTransaction $objInventoryTransaction) {
-			
+
 			if (!$objInventoryTransaction->blnReturnReceivedStatus()) {
 				$strControlId = 'lstLocationInventoryReceived' . $objInventoryTransaction->InventoryTransactionId;
 				$lstLocationInventoryReceived = $this->GetControl($strControlId);
@@ -1055,16 +1114,65 @@
 					$lstLocationInventoryReceived->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveInventoryTransaction'));
 					$lstLocationInventoryReceived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 				}
-				QApplication::AuthorizeControl($this->objReceipt, $lstLocationInventoryReceived, 2);	
+				QApplication::AuthorizeControl($this->objReceipt, $lstLocationInventoryReceived, 2);
 				return $lstLocationInventoryReceived->Render(false);
 			}
-		}		
+		}
 
 		//************************
 		// ONCLICK BUTTON METHODS
 		// These methods are run when buttons are clicked
 		//************************
-		
+
+		public function btnAssetSearchToolAdd_Click() {
+		  $this->ctlAssetSearchTool->lblWarning->Text = "";
+      $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
+      if (count($intSelectedAssetId) < 1) {
+        $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
+      }
+      else {
+        $lblNewWarning = "";
+        foreach (Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $intSelectedAssetId)) as $objAsset) {
+          $this->txtNewAssetCode->Text = $objAsset->AssetCode;
+          $this->btnAddAsset_Click($this, null, null);
+          if ($this->txtNewAssetCode->Warning) {
+            $lblNewWarning .= sprintf("<br />%s - %s", $objAsset->AssetCode, $this->txtNewAssetCode->Warning);
+            $this->txtNewAssetCode->Warning = "";
+          }
+        }
+        $this->txtNewAssetCode->Warning = $lblNewWarning;
+        $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+		  }
+      // Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+		}
+
+		public function btnInventorySearchToolAdd_Click() {
+		  $intSelectedInventoryModelId = $this->ctlInventorySearchTool->ctlInventorySearch->dtgInventoryModel->GetSelected("InventoryId");
+      if (count($intSelectedInventoryModelId) > 1) {
+        $this->ctlInventorySearchTool->lblWarning->Text = "You must select only one inventory.";
+      }
+      elseif (count($intSelectedInventoryModelId) != 1) {
+        $this->ctlInventorySearchTool->lblWarning->Text = "No selected inventories.";
+      }
+      elseif ($objInventoryModel = InventoryModel::LoadByInventoryModelId($intSelectedInventoryModelId[0])) {
+        $this->txtNewInventoryModelCode->Text = $objInventoryModel->InventoryModelCode;
+        $this->ctlInventorySearchTool->dlgInventorySearchTool->HideDialogBox();
+        $this->txtQuantity->SetFocus();
+  		}
+  		// Uncheck all items but SelectAll checkbox
+      $this->UncheckAllItems();
+		}
+
+		// Uncheck all items but SelectAll checkbox
+		public function UncheckAllItems() {
+		  foreach ($this->GetAllControls() as $objControl) {
+        if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+          $objControl->Checked = false;
+        }
+      }
+		}
+
 		// This is called when the 'new' label is clicked
 		public function lblNewFromCompany_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -1076,7 +1184,7 @@
 				$pnlEdit->txtShortDescription->Focus();
 			}
 		}
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewFromContact_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -1088,7 +1196,7 @@
 				$pnlEdit->lstCompany->Focus();
 			}
 		}
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewToContact_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -1101,7 +1209,7 @@
 				$pnlEdit->lstCompany->Focus();
 			}
 		}
-		
+
 		// This is called when the 'new' label is clicked
 		public function lblNewToAddress_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
@@ -1114,7 +1222,7 @@
 				$pnlEdit->lstCompany->Focus();
 			}
 		}
-		
+
 		// Cancel editing an existing receipt, or cancel adding a new receipt and return to the list page
 		protected function btnCancel_Click($strFormId, $strControlId, $strParameter) {
 			if ($this->blnEditMode) {
@@ -1126,28 +1234,29 @@
 			else {
 				QApplication::Redirect('receipt_list.php');
 			}
-		}		
-		
+		}
+
 		// Edit an existing receipt by displaying inputs and hiding the labels
 		protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 			$this->DisplayInputs();
-			
+
 			$this->UpdateBuiltInFields();
 			$this->UpdateCustomFields();
-			
+
 		}
-		
+
 		// This triggers any time the Asset Type Radio Button List is changed (not clicked)
 		protected function rblAssetType_Change($strFormId, $strControlId, $strParameter) {
-			
+
 			$this->txtNewAssetCode->Text = '';
-			
+
 			// If adding an existing asset to the receipt
 			if ($this->rblAssetType->SelectedValue == 'existing') {
 				$this->lstAssetModel->Display = false;
 				$this->chkAutoGenerateAssetCode->Checked = false;
 				$this->chkAutoGenerateAssetCode->Display = false;
 				$this->txtNewAssetCode->Enabled = true;
+				$this->lblAddAsset->Display = true;
 			}
 			// If adding a new receipt to the receipt
 			elseif ($this->rblAssetType->SelectedValue == 'new') {
@@ -1162,12 +1271,13 @@
 				if (QApplication::$TracmorSettings->MinAssetCode) {
 					$this->chkAutoGenerateAssetCode->Display = true;
 				}
+				$this->lblAddAsset->Display = false;
 			}
 		}
-		
+
 		// AddAsset Button Click
 		public function btnAddAsset_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			if ($this->rblAssetType->SelectedValue == 'new') {
 				$blnError = false;
 				// Assign an empty string to the asset code for now (NULL won't work to render properly in the datagrid
@@ -1186,15 +1296,19 @@
 					$blnError = true;
 					$this->txtNewAssetCode->Warning = 'That asset code already exists. Choose another.';
 				}
+				elseif (!$this->lstAssetModel->SelectedValue) {
+				  $blnError = true;
+					$this->txtNewAssetCode->Warning = 'You must select one asset model.';
+				}
 				if (!$blnError) {
-					$objNewAsset = new Asset();
+				  $objNewAsset = new Asset();
 					$objNewAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
 					$objNewAsset->LocationId = 5; // To Be Received
 					$objNewAsset->AssetCode = $strAssetCode;
 					// Set the AssetId to 0. This is so that it can be assigned to an AssetTransaction object without being saved to the db
 					// We don't want to save this until btnSave_Click, because we don't want to create new assets that could get orphaned
 					$objNewAsset->AssetId = 0;
-					
+
 					// This can be combined with the code below it
 					$this->txtNewAssetCode->Text = null;
 					$this->txtNewAssetCode->Enabled = true;
@@ -1210,13 +1324,13 @@
 					$this->blnModifyAssets = true;
 				}
 			}
-			
+
 			elseif ($this->rblAssetType->SelectedValue == 'existing') {
-			
+
 				$strAssetCode = $this->txtNewAssetCode->Text;
 				$blnDuplicate = false;
 				$blnError = false;
-				
+
 				if ($strAssetCode) {
 					// Begin error checking
 					if ($this->objAssetTransactionArray) {
@@ -1227,14 +1341,23 @@
 							}
 						}
 					}
-					
+
 					if (!$blnError) {
 						$objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
 						if (!($objNewAsset instanceof Asset)) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "That asset code does not exist.";
 						}
-						elseif ($objNewAsset->CheckedOutFlag) {
+						elseif ($objNewAsset->LinkedFlag) {
+						  $blnError = true;
+						  $this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
+						}
+						// Cannot receive any archived assets
+  					elseif ($objNewAsset->ArchivedFlag) {
+  					  $blnError = true;
+  						$this->txtNewAssetCode->Warning = "That asset is archived.";
+  					}
+  					elseif ($objNewAsset->CheckedOutFlag) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "That asset is checked out.";
 						}
@@ -1251,8 +1374,37 @@
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "You do not have authorization to perform a transaction on this asset.";
 						}
+						elseif ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objNewAsset->AssetId)) {
+              $strAssetCodeArray = array();
+						  $objCheckedLinkedAssetArray = array();
+						  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+                if (!QApplication::AuthorizeEntityBoolean($objLinkedAsset, 2)) {
+                  $blnError = true;
+							    $this->txtNewAssetCode->Warning = sprintf("You do not have authorization to perform a transaction on locked asset %s.", $objLinkedAsset->AssetCode);
+							    break;
+                }
+                else {
+                  $objCheckedLinkedAssetArray[] = $objLinkedAsset;
+                  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+                }
+
+      					if (!$blnError) {
+      					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+      					}
+              }
+              if (!$blnError) {
+                foreach ($objCheckedLinkedAssetArray as $objCheckedLinkedAsset) {
+                  $objNewAssetTransaction = new AssetTransaction();
+    							// We can assign the AssetId for existing assets because they have already been saved to the db
+    							$objNewAssetTransaction->AssetId = $objCheckedLinkedAsset->AssetId;
+    							// The source location can either be 'Shipped'(2) or 'To Be Received'(5)
+    							$objNewAssetTransaction->SourceLocationId = $objCheckedLinkedAsset->LocationId;
+    							$this->objAssetTransactionArray[] = $objNewAssetTransaction;
+                }
+              }
+						}
 						// Check that the asset isn't already in another pending receipt
-						elseif ($objNewAsset && $objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
+						if (!$blnError && !$objNewAsset && $objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
 							if (($this->blnEditMode && $objPendingReceipt->TransactionId != $this->objReceipt->TransactionId) || !$this->blnEditMode) {
 								$blnError = true;
 								$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
@@ -1276,7 +1428,7 @@
 						}
 						// Check that the asset isn't in a pending shipment. This should be impossible, as you can not add items to a shipment that are TBR (to be received) or shipped.
 						// This means that they will be caught be the error checker above where LocationId must be 5 or 2
-						elseif ($objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
+						elseif (!$blnError && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = 'That asset is in a pending shipment.';
 
@@ -1300,11 +1452,11 @@
 				}
 			}
 		}
-		
+
 		public function btnAddInventory_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$blnError = false;
-			
+
 			// Assign the values from the user submitted form input
 			$strInventoryModelCode = $this->txtNewInventoryModelCode->Text;
 			$intTransactionQuantity = $this->txtQuantity->Text;
@@ -1339,18 +1491,18 @@
 							$objNewInventoryLocation->Quantity = 0;
 							$objNewInventoryLocation->Save();
 						}
-						
+
 						// Create the new Inventory Transaction
 						$objNewInventoryTransaction = new InventoryTransaction();
 						$objNewInventoryTransaction->InventoryLocationId = $objNewInventoryLocation->InventoryLocationId;
 						$objNewInventoryTransaction->Quantity = $intTransactionQuantity;
 						$objNewInventoryTransaction->SourceLocationId = 5;
 						$this->objInventoryTransactionArray[] = $objNewInventoryTransaction;
-						
+
 						// Reset the input values
 						$this->txtNewInventoryModelCode->Text = null;
 						$this->txtQuantity->Text = null;
-						
+
 						// This is so the datagrid knows to reload
 						$this->blnModifyInventory = true;
 					}
@@ -1364,8 +1516,8 @@
 				$blnError = true;
 				$this->txtNewInventoryModelCode->Warning = "Please enter an inventory code.";
 			}
-		}		
-		
+		}
+
 		// Remove button click action for each asset in the datagrid
 		// Item is added to an array 'ToDelete', and then deleted when the Save button is clicked
 		public function btnRemoveAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
@@ -1378,6 +1530,23 @@
 						if ($this->blnEditMode) {
 							$this->arrAssetTransactionToDelete[] = $value->AssetTransactionId;
 						}
+						$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($value->Asset->AssetId);
+						// If the asset in transaction has some children
+						if ($objLinkedAssetArray) {
+						  $intLinkedAssetIdArray = array();
+						  foreach ($objLinkedAssetArray as $objLinkedAsset) {
+						    $intLinkedAssetIdArray[$objLinkedAsset->AssetId] = true;
+						  }
+						  foreach ($this->objAssetTransactionArray as $key2 => $value2) {
+    						if (array_key_exists($value2->Asset->AssetId, $intLinkedAssetIdArray)) {
+    						  if ($this->blnEditMode) {
+    						    $this->arrAssetTransactionToDelete[] = $value2->AssetTransactionId;
+    						  }
+    						  unset ($this->objAssetTransactionArray[$key2]);
+    						}
+						  }
+						}
+
 						$this->blnModifyAssets = true;
 						unset ($this->objAssetTransactionArray[$key]);
 					}
@@ -1403,12 +1572,12 @@
 				}
 			}
 		}
-		
+
 		// Cancel Asset Click
 		// We are not using this method anymore.
 		// We cannot allow people to reverse transactions, because other users could have conducted a transaction on this asset after it was received
 /*		public function btnCancelAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$intAssetTransactionId = $strParameter;
 			if ($this->objAssetTransactionArray) {
 				try {
@@ -1416,26 +1585,26 @@
 					$objDatabase = QApplication::$Database[1];
 					// Begin a MySQL Transaction to be either committed or rolled back
 					$objDatabase->TransactionBegin();
-					
+
 					$blnError = false;
-					
+
 					foreach ($this->objAssetTransactionArray as &$objAssetTransaction) {
 						if ($objAssetTransaction->AssetTransactionId == $intAssetTransactionId) {
-							
+
 							// Set the Asset's location back to 'To Be Received'
 							$objAssetTransaction->Asset->LocationId = $objAssetTransaction->SourceLocationId;
 							$objAssetTransaction->Asset->Save();
 							$objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
-							
+
 							// Set the DestinationLocation to be null to signify it is a pending AssetTransaction
 							$objAssetTransaction->DestinationLocationId = null;
 							$objAssetTransaction->Save();
-							
+
 							// Reload the AssetTransaction to properly generate an OLE if someone else edits this AssetTransaction
 							$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
 						}
 					}
-					
+
 					// Make sure the received flag is set to false
 					if ($this->objReceipt->ReceivedFlag) {
 						$this->objReceipt->ReceivedFlag = false;
@@ -1446,10 +1615,10 @@
 					$objDatabase->TransactionCommit();
 				}
 				catch (QExtendedOptimisticLockingException $objExc) {
-					
+
 					// Rollback the database transactions if an exception was thrown
 					$objDatabase->TransactionRollback();
-					
+
 					if ($objExc->Class == 'AssetTransaction' || $objExc->Class == 'Asset') {
 						$this->dtgAssetTransact->Warning = sprintf('That asset has been added, removed, or received by another user. You must <a href="receipt_edit.php?intReceiptId=%s">Refresh</a> to edit this receipt.', $this->objReceipt->ReceiptId);
 					}
@@ -1459,15 +1628,15 @@
 				}
 			}
 		}*/
-		
+
 		// Receive asset click
 		public function btnReceiveAssetTransaction_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$blnError = false;
-			
+
 			$intAssetTransactionId = $strParameter;
 			if ($this->objAssetTransactionArray) {
-				
+
 				try {
 					// Get an instance of the database
 					$objDatabase = QApplication::$Database[1];
@@ -1475,20 +1644,45 @@
 					$objDatabase->TransactionBegin();
 					// This boolean later lets us know if we need to flip the ReceivedFlag
 					$blnAllAssetsReceived = true;
-					foreach ($this->objAssetTransactionArray as &$objAssetTransaction) {
+					$this->dtgAssetTransact->Warning = "";
+					$objAssetTransactionArray = array();
+					$objLinkedAssetTransactionArray = array();
+					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+					  if (!$objAssetTransaction->Asset->LinkedFlag) {
+					    $objAssetTransactionArray[] = $objAssetTransaction;
+					  }
+					  else {
+					    $objLinkedAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
+					  }
+					}
+			    foreach ($objAssetTransactionArray as &$objAssetTransaction) {
 						if ($objAssetTransaction->AssetTransactionId == $intAssetTransactionId) {
 							// Get the value of the location where this Asset is being received to
 							$lstLocationAssetReceived = $this->GetControl('lstLocationAssetReceived' . $objAssetTransaction->AssetTransactionId);
 							if ($lstLocationAssetReceived && $lstLocationAssetReceived->SelectedValue) {
-								// Set the DestinationLocation of the AssetTransaction
-								$objAssetTransaction->DestinationLocationId = $lstLocationAssetReceived->SelectedValue;
-								$objAssetTransaction->Save();
-								// Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
-								$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
-								// Move the asset to the new location
-								$objAssetTransaction->Asset->LocationId = $lstLocationAssetReceived->SelectedValue;
-								$objAssetTransaction->Asset->Save();
-								$objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
+							  if ($objAssetTransaction->Asset->LinkedFlag) {
+							    $blnError = true;
+								  $this->dtgAssetTransact->Warning .= sprintf("Asset Code %s is locked to a parent asset.<br />",$objAssetTransaction->Asset->AssetCode);
+							  }
+							  else {
+  								// Set the DestinationLocation of the AssetTransaction
+  								$objAssetTransaction->DestinationLocationId = $lstLocationAssetReceived->SelectedValue;
+  								$objAssetTransaction->Save();
+  								// Reload AssetTransaction to avoid Optimistic Locking Exception if this receipt is edited and saved.
+  								$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
+  								// Move the asset to the new location
+  								$objAssetTransaction->Asset->LocationId = $lstLocationAssetReceived->SelectedValue;
+  								$objAssetTransaction->Asset->Save();
+                  if ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId))
+    								foreach ($objLinkedAssetArray as $objLinkedAsset) {
+          						$objLinkedAssetTransaction = $objLinkedAssetTransactionArray[$objLinkedAsset->AssetCode];
+          					  $objLinkedAssetTransaction->DestinationLocationId = $lstLocationAssetReceived->SelectedValue;
+          						$objLinkedAssetTransaction->Save();
+          						$objLinkedAssetTransaction->Asset->LocationId = $lstLocationAssetReceived->SelectedValue;
+          						$objLinkedAssetTransaction->Asset->Save();
+          					}
+        				  $objAssetTransaction->Asset = Asset::Load($objAssetTransaction->AssetId);
+							  }
 							}
 							else {
 								$blnError = true;
@@ -1496,11 +1690,11 @@
 							}
 						}
 						// If any AssetTransaction still does not have a DestinationLocation, it is still Pending
-						if (!$objAssetTransaction->DestinationLocationId) {
+						if (!$objAssetTransaction->DestinationLocationId && !$objAssetTransaction->Asset->LinkedFlag) {
 							$blnAllAssetsReceived = false;
 						}
 					}
-				
+
 					// If all the assets have been received, check that all the inventory has been received
 					if ($blnAllAssetsReceived) {
 						$blnAllInventoryReceived = true;
@@ -1522,15 +1716,15 @@
 							$this->UpdateReceiptLabels();
 						}
 					}
-					
+
 					// Commit all of the transactions to the database
 					$objDatabase->TransactionCommit();
 				}
 				catch (QExtendedOptimisticLockingException $objExc) {
-					
+
 					// Rollback the database transactions if an exception was thrown
 					$objDatabase->TransactionRollback();
-					
+
 					if ($objExc->Class == 'AssetTransaction' || $objExc->Class == 'Asset') {
 						// Set the offending AssetTransaction DestinationLocation to null so that the value doesn't change in the datagrid
 						if ($objExc->Class == 'AssetTransaction' && $this->objAssetTransactionArray)
@@ -1547,10 +1741,10 @@
 				}
 			}
 		}
-		
+
 		// Cancel Inventory Click
 /*		public function btnCancelInventoryTransaction_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$intInventoryTransactionId = $strParameter;
 			if ($this->objInventoryTransactionArray) {
 				try {
@@ -1558,22 +1752,22 @@
 					$objDatabase = QApplication::$Database[1];
 					// Begin a MySQL Transaction to be either committed or rolled back
 					$objDatabase->TransactionBegin();
-					
+
 					foreach ($this->objInventoryTransactionArray as &$objInventoryTransaction) {
 						if ($objInventoryTransaction->InventoryTransactionId == $intInventoryTransactionId) {
-							
+
 							// Remove Quantity from InventoryLocation
 							$objNewInventoryLocation = InventoryLocation::LoadByLocationIdInventoryModelId($objInventoryTransaction->DestinationLocationId, $objInventoryTransaction->InventoryLocation->InventoryModelId);
 							$objNewInventoryLocation->Quantity -= $objInventoryTransaction->Quantity;
 							$objNewInventoryLocation->Save();
-							
+
 							// Add Quantity back to TBR InventoryLocation
 							// Have to load the inventory location before and after. See comments in btnReceiveInventoryTransaction_Click for explanation
 							$objInventoryTransaction->InventoryLocation = InventoryLocation::Load($objInventoryTransaction->InventoryLocationId);
 							$objInventoryTransaction->InventoryLocation->Quantity += $objInventoryTransaction->Quantity;
 							$objInventoryTransaction->InventoryLocation->Save();
 							$objInventoryTransaction->InventoryLocation = InventoryLocation::Load($objInventoryTransaction->InventoryLocationId);
-							
+
 							// Set InventoryTransation->DestinationLocationId back to null
 							$objInventoryTransaction->DestinationLocationId = null;
 							$objInventoryTransaction->Save();
@@ -1581,22 +1775,22 @@
 							$objInventoryTransaction = InventoryTransaction::Load($objInventoryTransaction->InventoryTransactionId);
 						}
 					}
-					
+
 					// Make sure the received flag is set to false
 					if ($this->objReceipt->ReceivedFlag) {
 						$this->objReceipt->ReceivedFlag = false;
 						$this->objReceipt->Save();
 						$this->objReceipt = Receipt::Load($this->objReceipt->ReceiptId);
-					}					
-					
+					}
+
 					// Commit all of the transactions to the database
 					$objDatabase->TransactionCommit();
 				}
 				catch (QExtendedOptimisticLockingException $objExc) {
-					
+
 					// Rollback the database transactions if an exception was thrown
 					$objDatabase->TransactionRollback();
-					
+
 					if ($objExc->Class == 'InventoryTransaction' || $objExc->Class == 'InventoryLocation') {
 						$this->dtgInventoryTransact->Warning = sprintf('That inventory has been added, removed, or received by another user. You must <a href="receipt_edit.php?intReceiptId=%s">Refresh</a> to edit this receipt.', $this->objReceipt->ReceiptId);
 					}
@@ -1606,21 +1800,21 @@
 				}
 			}
 		}*/
-		
+
 		// Receive Inventory Click - Holy Shit
 		public function btnReceiveInventoryTransaction_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$blnError = false;
-			
+
 			$intInventoryTransactionId = $strParameter;
 			if ($this->objInventoryTransactionArray) {
-				
+
 				try {
 					// Get an instance of the database
 					$objDatabase = QApplication::$Database[1];
 					// Begin a MySQL Transaction to be either committed or rolled back
 					$objDatabase->TransactionBegin();
-									
+
 					// This bool later tells us if we need to flip the ReceivedFlag for the entire Receipt
 					$blnAllInventoryReceived = true;
 					foreach ($this->objInventoryTransactionArray as &$objInventoryTransaction) {
@@ -1637,10 +1831,10 @@
 									// Set local values for user inputs
 									$intQuantity = $txtQuantityReceived->Text;
 									$intDestinationLocationId = $lstLocationInventoryReceived->SelectedValue;
-									
+
 									// Split the InventoryTransaction into two if it is only a partial receipt
 									if ($objInventoryTransaction->Quantity > $intQuantity) {
-										
+
 										$objNewInventoryTransaction = new InventoryTransaction();
 										$objNewInventoryTransaction->InventoryLocationId = $objInventoryTransaction->InventoryLocationId;
 										$objNewInventoryTransaction->TransactionId = $this->objReceipt->TransactionId;
@@ -1648,20 +1842,20 @@
 										$objNewInventoryTransaction->SourceLocationId = $objInventoryTransaction->SourceLocationId;
 										$objNewInventoryTransaction->DestinationLocationId = $intDestinationLocationId;
 										$objNewInventoryTransaction->Save();
-										
+
 										// Add the new InventoryTransaction to the InvetnoryTransaction array for immediate display in the datagrid
 										$this->objInventoryTransactionArray[] = $objNewInventoryTransaction;
-										
+
 										// Subtract the partial receipt quantity from the original InventoryTransaction
 										$objInventoryTransaction->Quantity -= $intQuantity;
-										
+
 										// If a partial receipt has taken place, then all inventory has not been received
 										$blnAllInventoryReceived = false;
 									}
 									else {
 										$objInventoryTransaction->DestinationLocationId = $intDestinationLocationId;
 									}
-									
+
 									// See if the InventoryLocation already exists
 									$objNewInventoryLocation = InventoryLocation::LoadByLocationIdInventoryModelId($intDestinationLocationId, $objInventoryTransaction->InventoryLocation->InventoryModelId);
 									// Create a new InventoryLocation if it doesn't exist already
@@ -1671,7 +1865,7 @@
 										$objNewInventoryLocation->InventoryModelId = $objInventoryTransaction->InventoryLocation->InventoryModelId;
 										$objNewInventoryLocation->Quantity = 0;
 									}
-									
+
 									// The problem here is that two different InventoryTransactions have the same InventoryLocation
 									// So if you receive two of the same InventoryModels without a reload, it generates an OLE
 									// So we were reloading one here, but not the other one, and that's the one that is changed the next time
@@ -1682,12 +1876,12 @@
 									$objInventoryTransaction->InventoryLocation->Quantity -= $intQuantity;
 									$objInventoryTransaction->InventoryLocation->Save();
 									$objInventoryTransaction->InventoryLocation = InventoryLocation::Load($objInventoryTransaction->InventoryLocationId);
-									
+
 
 									// Add the inventory that came from 'TBR' into the new location
 									$objNewInventoryLocation->Quantity += $intQuantity;
 									$objNewInventoryLocation->Save();
-									
+
 									$objInventoryTransaction->Save();
 									// Reload the InventoryTransaction to get the new timestamp so that it doesn't generate an optimistic locking exception
 									$objInventoryTransaction = InventoryTransaction::Load($objInventoryTransaction->InventoryTransactionId);
@@ -1728,15 +1922,15 @@
 							$this->UpdateReceiptLabels();
 						}
 					}
-					
+
 					// Commit all of the transactions to the database
 					$objDatabase->TransactionCommit();
 				}
 				catch (QExtendedOptimisticLockingException $objExc) {
-					
+
 					// Rollback the database transactions if an exception was thrown
 					$objDatabase->TransactionRollback();
-					
+
 					if ($objExc->Class == 'InventoryTransaction' || $objExc->Class == 'InventoryLocation') {
 						$this->dtgInventoryTransact->Warning = sprintf('That inventory has been added, removed, or received by another user. You must <a href="receipt_edit.php?intReceiptId=%s">Refresh</a> to edit this receipt.%s', $this->objReceipt->ReceiptId, $objExc->Class.$objExc->EntityId);
 					}
@@ -1746,12 +1940,12 @@
 				}
 			}
 		}
-		
+
 		// Save a new or existing receipt
 		public function btnSave_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$blnError = false;
-			
+
 			if ($this->objAssetTransactionArray && $this->objInventoryTransactionArray) {
 				$intEntityQtypeId = EntityQtype::AssetInventory;
 			}
@@ -1765,7 +1959,7 @@
 				$blnError = true;
 				$this->btnCancel->Warning = 'There are no assets nor inventory in this receipt.';
 			}
-			
+
 			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
 				if ($objReceipt = Receipt::LoadByReceiptNumber($this->txtReceiptNumber->Text)) {
 					if ($objReceipt->ReceiptId != $this->objReceipt->ReceiptId) {
@@ -1774,7 +1968,7 @@
 					}
 				}
 			}
-			
+
 			if (!$this->lstFromCompany->SelectedValue) {
 				$blnError = true;
 				$this->lstFromCompany->Warning = 'You must select a From Company';
@@ -1791,23 +1985,23 @@
 				$blnError = true;
 				$this->lstToAddress->Warning = 'You must select a To Address';
 			}
-			
+
 			if (!$blnError) {
 				if (!$this->blnEditMode) {
-					
+
 					try {
 						// Get an instance of the database
 						$objDatabase = QApplication::$Database[1];
 						// Begin a MySQL Transaction to be either committed or rolled back
 						$objDatabase->TransactionBegin();
-						
+
 						// Create the new transaction object and save it
 						$this->objTransaction = new Transaction();
 						$this->objTransaction->EntityQtypeId = $intEntityQtypeId;
 						$this->objTransaction->TransactionTypeId = 7; // Receive
 						$this->objTransaction->Note = $this->txtNote->Text;
 						$this->objTransaction->Save();
-						
+
 						if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
 						// Assign different source and destinations depending on transaction type
 							foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -1831,30 +2025,30 @@
 										$objNewAsset->AssetCode = $objAssetTransaction->Asset->AssetCode;
 										// Save the new asset
 										$objNewAsset->Save();
-										
+
 										// Assign any default custom field values
 										CustomField::AssignNewEntityDefaultValues(1, $objNewAsset->AssetId);
-										
+
 										// Assign the new asset to the AssetTransaction
 										$objAssetTransaction->Asset = $objNewAsset;
-										
+
 										$objAssetTransaction->NewAssetFlag = true;
 									}
 									else {
 										$objAssetTransaction->NewAssetFlag = false;
 										$objAssetTransaction->Asset->Save();
-									}									
+									}
 									// Create the new assettransaction object and save it
 									$objAssetTransaction->TransactionId = $this->objTransaction->TransactionId;
 									$objAssetTransaction->Save();
 								}
 							}
 						}
-						
+
 						if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
 							// Assign different source and destinations depending on transaction type
 							foreach ($this->objInventoryTransactionArray as &$objInventoryTransaction) {
-								
+
 								// Finish the InventoryTransaction and save it
 								$objInventoryTransaction->InventoryLocation->Quantity += $objInventoryTransaction->Quantity;
 								$objInventoryTransaction->InventoryLocation->Save();
@@ -1862,29 +2056,29 @@
 								$objInventoryTransaction->Save();
 							}
 						}
-					
+
 						$this->UpdateReceiptFields();
 						$this->objReceipt->ReceivedFlag = false;
 						$this->objReceipt->Save();
-						
+
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
 							CustomField::SaveControls($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objReceipt->ReceiptId, EntityQtype::Receipt);
 						}
-						
+
 						$objDatabase->TransactionCommit();
-						
+
 						QApplication::Redirect('receipt_list.php');
 					}
 					catch (QExtendedOptimisticLockingException $objExc) {
-						
+
 						// Rollback the database
 						$objDatabase->TransactionRollback();
-						
+
 						if ($objExc->Class == 'Asset') {
 							// $this->btnRemoveAssetTransaction_Click($this->FormId, 'btnRemoveAsset' . $objExc->EntityId, $objExc->EntityId);
 							$this->btnRemoveAssetTransaction_Click($this->FormId, null, $objExc->EntityId);
-							
+
 							$objAsset = Asset::Load($objExc->EntityId);
 							if ($objAsset) {
 								$this->btnCancel->Warning = sprintf('The Asset %s has been modified by another user and removed from this shipment. You may add the asset again or save the transaction without it.', $objAsset->AssetCode);
@@ -1909,19 +2103,19 @@
 					}
 				}
 				elseif ($this->blnEditMode) {
-					
+
 					try {
 						// Get an instance of the database
 						$objDatabase = QApplication::$Database[1];
 						// Begin a MySQL Transaction to be either committed or rolled back
 						$objDatabase->TransactionBegin();
-						
+
 						// This should probably be changed to $this->objReceipt->Transaction
 						$this->objTransaction = Transaction::Load($this->objReceipt->TransactionId);
 						$this->objTransaction->EntityQtypeId = $intEntityQtypeId;
 						$this->objTransaction->Note = $this->txtNote->Text;
 						$this->objTransaction->Save();
-						
+
 						// Remove AssetTransactions that were removed when editing
 						if ($this->arrAssetTransactionToDelete) {
 							foreach ($this->arrAssetTransactionToDelete as $intAssetTransactionId) {
@@ -1941,18 +2135,18 @@
 									}
 									// Delete the asset transaction
 									$objAssetTransactionToDelete->Delete();
-									
+
 									// If a new asset,  delete it
 									if (isset($intAssetIdToDelete)) {
 										$objAssetToDelete = Asset::LoadByAssetId($intAssetIdToDelete);
 										$objAssetToDelete->Delete();
 									}
-									
+
 									unset($objAssetTransactionToDelete);
 								}
 							}
 						}
-						
+
 						// Save existing AssetTransactions
 						if ($this->objAssetTransactionArray) {
 							foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -1976,10 +2170,10 @@
 										$objNewAsset->AssetCode = $objAssetTransaction->Asset->AssetCode;
 										// Save the new asset
 										$objNewAsset->Save();
-										
+
 										// Assign any default custom field values
 										CustomField::AssignNewEntityDefaultValues(1, $objNewAsset->AssetId);
-										
+
 										// Associate the new asset with the AssetTransaction
 										$objAssetTransaction->Asset = $objNewAsset;
 										$objAssetTransaction->NewAssetFlag = true;
@@ -1995,7 +2189,7 @@
 								$objAssetTransaction = AssetTransaction::Load($objAssetTransaction->AssetTransactionId);
 							}
 						}
-						
+
 						// Remove InventoryTransactions
 						if ($this->arrInventoryTransactionToDelete) {
 							foreach ($this->arrInventoryTransactionToDelete as $intInventoryTransactionId) {
@@ -2011,12 +2205,12 @@
 								}
 							}
 						}
-						
+
 						// Save InventoryTransactions
 						if ($this->objInventoryTransactionArray) {
 							foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
 								if (!$objInventoryTransaction->InventoryTransactionId) {
-								
+
 									// Reload the InventoryLocation. If it was deleted and added in the same save click, then it will throw an Optimistic Locking Exception
 									$objInventoryTransaction->InventoryLocation = InventoryLocation::Load($objInventoryTransaction->InventoryLocationId);
 									$objInventoryTransaction->InventoryLocation->Quantity += $objInventoryTransaction->Quantity;
@@ -2031,7 +2225,7 @@
 								$objInventoryTransaction = InventoryTransaction::Load($objInventoryTransaction->InventoryTransactionId);
 							}
 						}
-						
+
 						// Check to see if all Inventory and Assets have been received (if the final entity was removed from the receipt without receiving it).
 						// Only if it hasn't already been received
 						if (!$this->objReceipt->ReceivedFlag) {
@@ -2044,7 +2238,7 @@
 									}
 								}
 							}
-							
+
 							// Check to see if all inventory have been received
 							$blnAllInventoryReceived = true;
 							if ($this->objInventoryTransactionArray) {
@@ -2054,34 +2248,34 @@
 									}
 								}
 							}
-							
+
 							// If all Inventory and Assets have been received
 							if ($blnAllAssetsReceived && $blnAllInventoryReceived) {
 								// Flip the received flag for the entire Receipt
 								$this->objReceipt->ReceivedFlag = true;
-								$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);						
+								$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);
 							}
 						}
-						
+
 						$this->UpdateReceiptFields();
 						$this->UpdateReceiptLabels();
 						$this->objReceipt->Save();
-						
+
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
 							CustomField::SaveControls($this->objReceipt->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objReceipt->ReceiptId, EntityQtype::Receipt);
 						}
-						
+
 						// Reload to get new timestamp to avoid optimistic locking if edited/saved again without reload
 						$this->objReceipt = Receipt::Load($this->objReceipt->ReceiptId);
 						$this->DisplayLabels();
-						
+
 						$objDatabase->TransactionCommit();
 					}
 					catch (QExtendedOptimisticLockingException $objExc) {
-						
+
 						$objDatabase->TransactionRollback();
-						
+
 						if ($objExc->Class == 'Receipt' || $objExc->Class == 'AssetTransaction' || $objExc->Class == 'InventoryTransaction') {
 							$this->btnCancel->Warning = sprintf('This receipt has been modified by another user. You must <a href="receipt_edit.php?intReceiptId=%s">Refresh</a> to edit this receipt.', $this->objReceipt->ReceiptId);
 						}
@@ -2112,14 +2306,14 @@
 						}
 					}
 				}
-			}			
+			}
 		}
-		
+
 		// Delete a receipt
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
-			
+
 			$objCustomFieldArray = $this->objReceipt->objCustomFieldArray;
-			
+
 			$blnError = false;
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -2129,7 +2323,7 @@
 					}
 				}
 			}
-			
+
 			if ($this->objInventoryTransactionArray) {
 				foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
 					if ($objInventoryTransaction->blnReturnReceivedStatus()) {
@@ -2138,9 +2332,9 @@
 					}
 				}
 			}
-			
+
 			if (!$blnError) {
-				
+
 				// Take out the inventory from the TBR InventoryLocation
 				if ($this->objInventoryTransactionArray) {
 					foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
@@ -2148,7 +2342,7 @@
 						$objInventoryTransaction->InventoryLocation->Save();
 					}
 				}
-				
+
 				// Delete any assets that were created while scheduling this receipt
 				if ($this->objAssetTransactionArray) {
 					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -2157,19 +2351,19 @@
 						}
 					}
 				}
-				
+
 				// Load the Transaction
 				$this->objTransaction = Transaction::Load($this->objReceipt->TransactionId);
 				// Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
 				$this->objTransaction->Delete();
-				
+
 				CustomField::DeleteTextValues($objCustomFieldArray);
 
 				$this->RedirectToListPage();
 
 			}
 		}
-		
+
 		//*****************
 		// CUSTOM METHODS
 		//*****************
@@ -2189,7 +2383,7 @@
 			$this->objReceipt->ToAddressId = $this->lstToAddress->SelectedValue;
 			$this->objReceipt->DueDate = $this->calDueDate->DateTime;
 			$this->objTransaction->Note = $this->txtNote->Text;
-			
+
 			// Reload the Assets and inventory locations so that they don't trigger an OLE if edit/save adding assets or inventory multiple times
 			if ($this->objAssetTransactionArray) {
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
@@ -2200,9 +2394,9 @@
 				foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
 					$objInventoryTransaction->InventoryLocation = InventoryLocation::Load($objInventoryTransaction->InventoryLocationId);
 				}
-			}			
+			}
 		}
-		
+
 		// Resets the receipt controls on Cancel Click
 		protected function UpdateReceiptControls() {
 			$this->lstFromCompany->SelectedValue = $this->objReceipt->FromCompanyId;
@@ -2216,8 +2410,8 @@
 			$this->txtNote->Text = $this->objReceipt->Transaction->Note;
 			$this->calDueDate->DateTime = $this->objReceipt->DueDate;
 			$this->arrCustomFields = CustomField::UpdateControls($this->objReceipt->objCustomFieldArray, $this->arrCustomFields);
-		}		
-		
+		}
+
 		protected function UpdateReceiptLabels() {
 			$this->lblFromCompany->Text = $this->objReceipt->FromCompany->__toString();
 			$this->lblFromContact->Text = $this->objReceipt->FromContact->__toString();
@@ -2229,15 +2423,15 @@
 			$this->pnlNote->Text = nl2br($this->objReceipt->Transaction->Note);
 			$this->lblDueDate->Text = ($this->objReceipt->DueDate) ? $this->objReceipt->DueDate->__toString() : '';
 			$this->lblReceiptDate->Text = ($this->objReceipt->ReceiptDate) ? $this->objReceipt->ReceiptDate->__toString() : '';
-			
+
 			// Update custom labels
 			if ($this->arrCustomFields) {
 				CustomField::UpdateLabels($this->arrCustomFields);
 			}
 		}
-		
+
 		protected function DisplayLabels() {
-			
+
 			// Hide inputs
 			$this->lstFromCompany->Display = false;
 			$this->lstFromContact->Display = false;
@@ -2259,10 +2453,12 @@
 			$this->lstAssetModel->Display = false;
 			$this->chkAutoGenerateAssetCode->Display = false;
 			$this->btnAddAsset->Display = false;
+			$this->lblAddAsset->Display = false;
 			$this->txtNewInventoryModelCode->Display = false;
+			$this->lblLookup->Display = false;
 			$this->txtQuantity->Display = false;
 			$this->btnAddInventory->Display = false;
-			
+
 			// Display labels
 			$this->lblFromCompany->Display = true;
 			$this->lblFromContact->Display = true;
@@ -2284,15 +2480,15 @@
 			$this->lblNewFromContact->Display = false;
 			$this->lblNewToContact->Display = false;
 			$this->lblNewToAddress->Display = false;
-			
+
 			// Display custom field labels
 			if ($this->arrCustomFields) {
 				CustomField::DisplayLabels($this->arrCustomFields);
 			}
 		}
-		
+
 		protected function DisplayInputs() {
-			
+
 			// Hide labels
 			$this->lblFromCompany->Display = false;
 			$this->lblFromContact->Display = false;
@@ -2309,8 +2505,8 @@
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->RemoveColumnByName('&nbsp;');
 				$this->dtgInventoryTransact->RemoveColumnByName('&nbsp;');
-			}			
-			
+			}
+
 			// Display inputs
 			$this->lstFromCompany->Display = true;
 			$this->lstFromContact->Display = true;
@@ -2321,7 +2517,7 @@
 			}
 			$this->txtNote->Display = true;
 			$this->calDueDate->Display = true;
-			
+
 			if (!$this->objReceipt->ReceivedFlag) {
 				$this->rblAssetType->SelectedIndex = 0;
 				$this->rblAssetType->Display = true;
@@ -2333,8 +2529,10 @@
 				$this->chkAutoGenerateAssetCode->Checked = false;
 				$this->chkAutoGenerateAssetCode->Display = false;
 				$this->btnAddAsset->Display = true;
+				$this->lblAddAsset->Display = true;
 				$this->txtNewInventoryModelCode->Display = true;
 				$this->txtQuantity->Display = true;
+				$this->lblLookup->Display = true;
 				$this->btnAddInventory->Display = true;
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
@@ -2343,35 +2541,35 @@
 			$this->lblNewFromContact->Display = true;
 			$this->lblNewToContact->Display = true;
 			$this->lblNewToAddress->Display = true;
-			
-			
+
+
 			//If the user is not authorized to edit built-in fields, the fields are render as labels.
 			if(!$this->blnEditBuiltInFields){
 				$this->DisplayLabels();
 			}
-				
+
 			$this->btnSave->Display = true;
 			$this->btnCancel->Display = true;
-			
+
 			// Display custom field inputs
 	    if ($this->arrCustomFields) {
 	    	CustomField::DisplayInputs($this->arrCustomFields);
 	    }
 		}
-		
+
 		// This method is run when the new entity edit dialog box is closed
 		public function CloseNewPanel($blnUpdates) {
 			$this->dlgNew->HideDialogBox();
 		}
-		
+
 		public function CloseNewFromCompanyPanel($blnUpdates) {
 			$this->lstFromCompany_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
-		
-	//Set display logic of the BuiltInFields in View Access and Edit Access 
+
+	//Set display logic of the BuiltInFields in View Access and Edit Access
 		protected function UpdateBuiltInFields() {
-		//Set View Display Logic of Built-In Fields  
+		//Set View Display Logic of Built-In Fields
 		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Receipt,1);
 		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
 			$this->blnViewBuiltInFields=true;
@@ -2380,7 +2578,7 @@
 			$this->blnViewBuiltInFields=false;
 		}
 
-		//Set Edit Display Logic of Built-In Fields	
+		//Set Edit Display Logic of Built-In Fields
 		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Receipt,2);
 		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag){
 			$this->blnEditBuiltInFields=true;
@@ -2389,27 +2587,27 @@
 			$this->blnEditBuiltInFields=false;
 		}
 
-		
+
 		}
 		//Set display logic for the CustomFields
 		protected function UpdateCustomFields(){
 			if($this->arrCustomFields){
-				foreach ($this->arrCustomFields as $objCustomField) {	
+				foreach ($this->arrCustomFields as $objCustomField) {
 					//Set NextTabIndex only if the custom field is show
 					if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 						$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 					}
 					//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
-					if (!$this->blnEditMode && !$objCustomField['blnEdit']){				
+					if (!$this->blnEditMode && !$objCustomField['blnEdit']){
 						$objCustomField['lbl']->Display=true;
 						$objCustomField['input']->Display=false;
 						if(($objCustomField['blnRequired'])){
 							$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
-						}			
-					}		
+						}
+					}
 				}
 			}
-			
+
 		}
 		//Set display logic of the GreenPlusButton of Company
 		protected function UpdateCompanyAccess() {
@@ -2421,7 +2619,7 @@
 			else{
 				$this->lblNewFromCompany->Visible=false;
 			}
-				
+
 		}
 			//Set display logic of the GreenPlusButton of Contact
 		protected function UpdateContactAccess() {
@@ -2435,7 +2633,7 @@
 				$this->lblNewFromContact->Visible=false;
 				$this->lblNewToContact->Visible=false;
 			}
-				
+
 		}
 		//Set display logic of the GreenPlusButton of Address
 		protected function UpdateAddressAccess() {
@@ -2448,11 +2646,22 @@
 				$this->lblNewToAddress->Visible=false;
 			}
 		}
-		
+
+
+		// Check that the prerequisites are met to allow scheduling receipts
+		protected function CheckPrerequisites() {
+			// Check that the 'Default Company' admin setting is set and valid
+			if (!Company::Load(QApplication::$TracmorSettings->CompanyId)) {
+				$this->lstToContact->Warning = $this->lstToAddress->Warning = 'Default Shipping/Receiving Company not set';
+				$this->lblNewToContact->Visible=false;
+				$this->lblNewToAddress->Visible=false;
+			}
+		}
+
 		protected function getNextTabIndex() {
 			return $this->intNextTabIndex++;
 		}
-		
+
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using

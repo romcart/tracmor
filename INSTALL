@@ -1,0 +1,47 @@
+/////////////////////////////
+// STEP ONE - COPY TO DOCROOT
+/////////////////////////////
+
+	Copy the contents of the tracmor directory to the ROOT level of your web sites 
+	DOCROOT	(also known as DocumentRoot, webroot, wwwroot, etc., depending on which 
+	platform you are using).
+
+	Even though we're assuming the entire contents of tracmor/ is in your DOCROOT,
+	you can feel free to put it in a subdirectory WITHIN DOCROOT if you wish.
+
+/////////////////////////////////
+// STEP TWO - SET UP THE DATABASE
+/////////////////////////////////
+
+	Create a MySQL database called 'tracmor' (or another name of your choosing).  On 
+	this database,  execute first the "create" and then "data" SQL script from the 
+	tracmor/data_model directory.
+	
+////////////////////////////////////////////
+// STEP THREE - UPDATE configuration.inc.php
+////////////////////////////////////////////
+
+	Inside of tracmor/includes you'll find the configuration.inc.php file.  You'll need
+	to open it to specify the actual location of your __DOCROOT__.
+
+	IMPORTANT NOTE FOR WINDOWS USERS:
+	Please note that all paths should use standard "forward" slashes instead of
+	"backslashes".  So windows paths would look like "c:/wwwroot" instead of
+	"c:\wwwroot".
+
+	Also, if you are putting Tracmor into a SUBDIRECTORY of DOCROOT, then be sure
+	to set the __SUBDIRECTORY__ constant to whatever the subdirectory is
+	within DOCROOT.
+
+	If you are using Tracmor inside of a Virtual Directory (also known as a Directory
+	Alias), be sure to specify the __VIRTUAL_DIRECTORY__ constant, too.
+
+	Finally, be sure to update the DB_CONNECTION_1 serialized array constant with the
+	correct database connection information for your tracmor database.
+	
+
+To begin using Tracmor,  navigate to the URL corresponding to your Tracmor install in
+a web browser.  The default username and password are both 'admin'.
+
+Please register in the Tracmor forums at http://www.tracmor.com/forum to report bugs,
+request new features,  or get technical assistance with installing and using Tracmor.

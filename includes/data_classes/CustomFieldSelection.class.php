@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2009, Tracmor, LLC 
  *
  * This file is part of Tracmor.  
  *
@@ -99,6 +99,39 @@
 			$objDbResult = $objDatabase->Query($strQuery);
 			return CustomFieldSelection::InstantiateDbRow($objDbResult->GetNextRow());
 
+		}
+		
+		// This inserts/updates the data into helper tables
+		public function Save($blnForceInsert = false, $blnForceUpdate = false) {
+		  parent::Save($blnForceInsert, $blnForceUpdate);
+		  
+		  $objCustomFieldValue = $this->CustomFieldValue;
+		  if ($objCustomField = $objCustomFieldValue->CustomField) {
+			  // If helper table exists
+				if ($strHelperTableArray = CustomFieldValue::GetHelperTableByEntityQtypeId($this->EntityQtypeId)) {
+  				$strHelperTable = $strHelperTableArray[0];
+    		  $strTableName = $strHelperTableArray[1];
+				  
+    		  $objDatabase = CustomField::GetDatabase();
+				  $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' where `%s_id`='%s';", $strHelperTable, $objCustomField->CustomFieldId, $objCustomFieldValue->ShortDescription, $strTableName, $this->EntityId);
+  			  $objDatabase->NonQuery($strQuery);
+				}
+			}
+		}
+		
+		// This also deletes the data from helper tables
+		public function Delete() {
+			$objCustomFieldValue = CustomFieldValue::Load($this->CustomFieldValueId);
+			parent::Delete();
+			$objDatabase = CustomFieldSelection::GetDatabase();
+			// If the helper table exists
+			if ($objCustomFieldValue && $strHelperTableArray = CustomFieldValue::GetHelperTableByEntityQtypeId($this->EntityQtypeId)) {
+  			$strHelperTable = $strHelperTableArray[0];
+    		$strTableName = $strHelperTableArray[1];
+  				
+  			$strQuery = sprintf("UPDATE %s SET `cfv_%s`='' WHERE `%s_id`='%s';", $strHelperTable, $objCustomFieldValue->CustomFieldId, $strTableName, $this->EntityId);
+        $objDatabase->NonQuery($strQuery);
+			}
 		}
 	}
 ?>

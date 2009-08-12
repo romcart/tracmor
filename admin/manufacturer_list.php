@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2009, Tracmor, LLC 
  *
  * This file is part of Tracmor.  
  *
@@ -74,7 +74,7 @@
 				$this->dtgManufacturer->DataSource = Manufacturer::LoadAll($objClauses);
 				$this->dtgManufacturer->ShowHeader = true;*/
 
-				$this->dtgManufacturer->DataSource = Manufacturer::LoadAllWithCustomFields($this->dtgManufacturer->SortInfo, $this->dtgManufacturer->LimitInfo, $objExpansionMap);
+				$this->dtgManufacturer->DataSource = Manufacturer::LoadAllWithCustomFieldsHelper($this->dtgManufacturer->SortInfo, $this->dtgManufacturer->LimitInfo, $objExpansionMap);
 				$this->dtgManufacturer->ShowHeader = true;
 			}
 		}

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2009, Tracmor, LLC 
  *
  * This file is part of Tracmor.  
  *
@@ -183,6 +183,14 @@
 					throw new QDatabaseExceptionBase();
 				}
 			}
+		}
+		
+		// Protected Update Methods
+		protected function UpdateCategoryFields() {
+			$this->objCategory->ShortDescription = $this->txtShortDescription->Text;
+			$this->objCategory->LongDescription = $this->txtLongDescription->Text;
+			$this->objCategory->AssetFlag = $this->chkAssetFlag->Checked;
+			$this->objCategory->InventoryFlag = $this->chkInventoryFlag->Checked;
 		}
 	}
 

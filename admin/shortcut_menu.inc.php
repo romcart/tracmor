@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2009, Tracmor, LLC 
  *
  * This file is part of Tracmor.  
  *
@@ -20,15 +20,14 @@
  */
 ?>
 
-			<table cellpadding="0" cellspacing="0" style="padding-left:10px" border=0>
+			<table cellpadding="0" cellspacing="0" style="margin-left:10px;" border="0">
 				<tr style="height:21px;">
-					<td style="width:5px;background-image: url(../images/moduleTab_left.gif)"><img src="../images/empty.gif" width="5" height="1"></td>
-					<td width="150" style="background-image: url(../images/moduleTab_middle.gif);font-family:arial;color:#555555;font-size:12px;font-weight:bold;">Shortcuts</td>
-					<td style="background-image: url(../images/moduleTab_middle.gif)"><img src="../images/empty.gif" width="90" height="1"></td>
-					<td style="background-image: url(../images/moduleTab_right.gif);"><img src="../images/empty.gif" width="5" height="1"></td>
+					<td style="width:5px;background-image: url(../images/moduleTab_left.gif)"><img src="../images/empty.gif" width="5" height="1" /></td>
+					<td style="width:150px;background-image: url(../images/moduleTab_middle.gif);font-family:arial;color:#555555;font-size:12px;font-weight:bold;">Shortcuts</td>
+					<td style="background-image: url(../images/moduleTab_middle.gif)"><img src="../images/empty.gif" width="90" height="1" /></td>
+					<td style="background-image: url(../images/moduleTab_right.gif);"><img src="../images/empty.gif" width="5" height="1" /></td>
 				</tr>
 				<tr>
-
 					<td colspan="4" style="border-left:1px solid #aaaaaa;border-right:1px solid #aaaaaa;border-bottom:1px solid #aaaaaa;font-family:arial;color:#555555;font-size:12px;">
 						<!-- Shortcuts  -->
 						<table cellpadding="0" cellspacing="0" align="left" style="font-family:arial;color:#555555;font-size:12;line-height:1.5" width="100%">
@@ -59,6 +58,10 @@
 							<tr>
 								<td width="30" align="center"><img src="../images/icons/custom_fields.png" name="shortcut5"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="custom_field_list.php" class="graylink">Custom Fields</a></td>
+							</tr>
+							<tr>
+								<td width="30" align="center"><img src="../images/icons/labels.png" name="shortcut8"></td>
+								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="labels.php" class="graylink">Labels</a></td>
 							</tr>
 							<tr>
 								<td width="30" align="center"><img src="../images/icons/user_role.png" name="shortcut7"></td>

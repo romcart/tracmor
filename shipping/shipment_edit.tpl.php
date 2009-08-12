@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
+ * Copyright (c)  2009, Tracmor, LLC
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,7 +23,7 @@
 	$this->RenderBegin();
 	$this->dlgExchange->Render();
 	$this->dlgDueDate->Render();
-	
+
 	// Custom Fields
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
@@ -33,7 +33,7 @@
 	}
 ?>
 <!-- Begin Header Menu -->
-<?php 
+<?php
 	$this->ctlHeaderMenu->Render();
 ?>
 <!-- End Header Menu -->
@@ -57,20 +57,23 @@
 				&nbsp;
 				<?php $this->lblPackingListLink->Render(); ?>
 				<?php
-					if (!$this->objShipment->ShippedFlag) { 
-						$this->btnEdit->Render();
-						$this->btnSave->RenderWithError();
-						echo('&nbsp;');
-						$this->atcAttach->RenderWithError();
+
+					$this->btnEdit->Render();
+					$this->btnSave->RenderWithError();
+					echo('&nbsp;');
+					$this->atcAttach->RenderWithError();
+					$this->btnCancel->RenderWithError();
+
+					if (!$this->objShipment->ShippedFlag) {
+
 						echo('&nbsp;');
 						$this->btnCompleteShipment->RenderWithError();
 						echo('&nbsp;');
-						$this->btnDelete->RenderWithError();
-						$this->btnCancel->RenderWithError();
+						if ($this->blnEditMode) {
+							$this->btnDelete->RenderWithError();
+						}
 					}
 					else {
-						$this->atcAttach->RenderWithError();
-						echo('&nbsp;');
 						$this->btnCancelCompleteShipment->RenderWithError();
 					}
 				?>
@@ -85,6 +88,7 @@
 								<tr>
 									<td colspan="2" class="record_subheader">Sender Information</td>
 								</tr>
+
 								
 								<tr>
 									<td class="record_field_name">Company:&nbsp;</td>
@@ -162,9 +166,9 @@
 										<?php
 									}
 								};
-								
+
 								?>
-								
+
 							</table>
 						</td>
 					</tr>
@@ -172,10 +176,10 @@
 			</td>
 		</tr>
 	</table>
-	
+
 <?php
 $this->pnlAttachments->Render();
-?>	
+?>
 
 <br class="item_divider" />
 <?php $this->pnlFedExShipment->Render(); ?>
@@ -183,33 +187,41 @@ $this->pnlAttachments->Render();
 <div class="title">Assets to Ship</div>
 <table>
 	<tr>
-		<td><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
-		<td><?php $this->btnAddAsset->Render(); //$this->lblAdvanced->Render(); ?></td>
+		<td valign="top" width="200px"><?php $this->txtNewAssetCode->RenderDesigned(); ?></td>
+		<td valign="top" width="20px"><?php $this->lblAddAsset->Render(); ?></td>
+		<td valign="top"><?php $this->btnAddAsset->Render(); //$this->lblAdvanced->Render(); ?></td>
 	</tr>
 	<tr>
-		<td colspan="2"><?php //$this->chkScheduleReceipt->RenderDesigned('DisplayName=false'); //$this->rblAssetType->RenderDesigned(); //$this->txtReceiptAssetCode->RenderDesigned(); //$this->chkAutoGenerateAssetCode->RenderDesigned('DisplayName=false'); ?></td>
+		<td colspan="3"><?php //$this->chkScheduleReceipt->RenderDesigned('DisplayName=false'); //$this->rblAssetType->RenderDesigned(); //$this->txtReceiptAssetCode->RenderDesigned(); //$this->chkAutoGenerateAssetCode->RenderDesigned('DisplayName=false'); ?></td>
 	</tr>
 </table>
 <?php $this->dtgAssetTransact->Render(); ?>
 <br class="item_divider" />
-	
-<div class="title">Inventory to Ship</div>	
+<?php if ($this->blnShowInventory) {?>
+<div class="title">Inventory to Ship</div>
 <table>
 	<tr>
-		<td><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
-		<td><?php $this->btnLookup->Render(); ?></td>
+		<td valign="top" width="200px"><?php $this->txtNewInventoryModelCode->RenderDesigned(); ?></td>
+		<td valign="top" width="20px"><?php $this->btnLookup->Render(); ?></td>
+		<td valign="top"><?php $this->lblLookup->Render(); ?></td>
 	</tr>
 	<tr>
 		<td><?php $this->lstSourceLocation->RenderDesigned(); ?></td>
+		<td></td>
 		<td></td>
 	</tr>
 	<tr>
 		<td><?php $this->txtQuantity->RenderDesigned(); ?></td>
 		<td><?php $this->btnAddInventory->Render(); ?></td>
+		<td></td>
 	</tr>
 </table>
-<?php $this->dtgInventoryTransact->Render(); ?>
+<?php }
+$this->dtgInventoryTransact->Render(); 
+?>
 
 <?php $this->dlgNew->Render(); ?>
+<?php $this->ctlAssetSearchTool->Render(); ?>
+<?php if ($this->blnShowInventory) $this->ctlInventorySearchTool->Render(); ?>
 <?php $this->RenderEnd() ?>
 <?php include('../includes/footer.inc.php'); ?>

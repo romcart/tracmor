@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c)  2006, Universal Diagnostic Solutions, Inc.
+ * Copyright (c)  2009, Tracmor, LLC
  *
  * This file is part of Tracmor.
  *
@@ -415,6 +415,7 @@ class QInventoryEditComposite extends QControl {
 		$this->btnMove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnMove->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnMove, 2);
+		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objInventoryModel, $this->btnMove, 1);
 	}
 
 	// Setup Take Out Button
@@ -426,6 +427,7 @@ class QInventoryEditComposite extends QControl {
 		$this->btnTakeOut->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnTakeOut->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnTakeOut, 2);
+		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objInventoryModel, $this->btnTakeOut, 5);
 	}
 
 	// Setup Take Out Button
@@ -437,6 +439,7 @@ class QInventoryEditComposite extends QControl {
 		$this->btnRestock->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnRestock->CausesValidation = false;
 		QApplication::AuthorizeControl($this->objInventoryModel, $this->btnRestock, 2);
+		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objInventoryModel, $this->btnRestock, 4);
 	}
 
 	// Setup Ship Button
