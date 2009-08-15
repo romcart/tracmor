@@ -119,7 +119,7 @@
 								<td class="record_field_value"><?php $this->txtHoldAtLocationPostalCode->RenderWithError(); $this->lblHoldAtLocationPostalCode->Render(); ?>&nbsp;</td>
 							</tr>														
 						</table>
-						<br class="item_divider" />		
+						<br class="item_divider" />
 						<table cellpadding="0" cellspacing="0">
 							<tr>
 								<td colspan="2" class="fedex_subheader">Shipment Notifications</td>
@@ -144,7 +144,34 @@
 									<?php $this->txtFedexNotifyOtherEmail->RenderWithError(); $this->lblFedexNotifyOtherEmail->Render(); ?>&nbsp;<br>
 									<?php $this->chkFedexNotifyOtherShipFlag->RenderWithError(); ?>Ship&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyOtherExceptionFlag->RenderWithError(); ?>Exception&nbsp;&nbsp;&nbsp;<?php $this->chkFedexNotifyOtherDeliveryFlag->RenderWithError(); ?>Delivery
 								</td>
-							</tr>							
+							</tr>					
+						</table>
+						<br class="item_divider" />
+						<table cellpadding="0" cellspacing="0">
+							<tr>
+								<td colspan="2" class="fedex_subheader">Shipping Label</td>
+							</tr>
+							<tr>
+								<td class="record_field_name">Printer Type:&nbsp;</td>
+								<td class="record_field_value">
+									<?php $this->lstFedexLabelPrinterType->RenderWithError(); $this->lblFedexLabelPrinterType->Render(); ?>
+								</td>
+							</tr>
+						</table>
+						<?php $TLPDisplay = ($this->blnEditMode && $this->objShipment->CourierId===1 && $this->objFedexShipment->LabelPrinterType!='1') ? "" : "display:none;"; ?>
+						<table style="<?php echo($TLPDisplay); ?>" cellpadding="0" cellspacing="0" id="TLP">
+							<tr>
+								<td class="record_field_name">Label Format:&nbsp;</td>
+								<td class="record_field_value">
+									<?php $this->lstFedexLabelFormatType->RenderWithError(); $this->lblFedexLabelFormatType->Render(); ?>
+								</td>
+							</tr>
+							<tr>
+								<td class="record_field_name">Printer Port:&nbsp;</td>
+								<td class="record_field_value">
+									<?php $this->txtFedexThermalPrinterPort->RenderWithError(); $this->lblFedexThermalPrinterPort->Render(); ?>
+								</td>
+							</tr>
 						</table>
 					</td>
 				</tr>

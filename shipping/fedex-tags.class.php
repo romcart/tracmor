@@ -116,6 +116,31 @@ class FedExTags {
     );    
     
     /**
+    *  A List of FedEx Label Printer Types
+    *
+    * @var      FG_LPT
+    * @access   public
+    */
+    static protected $FE_LPT = array (
+        '1' => 'Laser Printer',
+        '2' => 'EPL2 Thermal Printer',
+		'5' => 'ZPL Thermal Printer'
+    );
+
+    /**
+    *  A List of FedEx Label Format Types
+    *
+    * @var      FG_LFT
+    * @access   public
+    */
+    static protected $FE_LFT = array (
+        '3' => '354 - 4x6 with Doc Tab at the bottom',
+        '4' => '435 - 4x6 without Doc Tab',
+        //'5' => 'Plain paper',
+		'6' => '354 - 4x6 with Doc Tab at the top'
+    );
+
+    /**
     *  A list of all the FedEx tags.  An attempt to make items more human readable
     *
     * @var      FE_RE
@@ -713,5 +738,55 @@ class FedExTags {
             }
         }
     }
+
+    /**
+    * get array of FedEx Label Printer Types
+    *
+    * @return   string
+    * @access   public
+    */
+    static public function get_label_printer_types() {
+        return self::$FE_LPT;
+    }
+
+    /**
+    * get array of FedEx Label Format Types
+    *
+    * @return   string
+    * @access   public
+    */
+    static public function get_label_format_types() {
+        return self::$FE_LFT;
+    }
+
+    /**
+    * get FedEx Label Printer Type
+    *
+    * @param    string $tag
+    * @return   string
+    * @access   public
+    */
+    static public function label_printer_type($in) {
+        foreach (self::$FE_LPT as $key => $value) {
+            if ($key==$in) {
+                return $value;
+            }
+        }
+	}
+
+    /**
+    * get FedEx Label Format Type
+    *
+    * @param    string $tag
+    * @return   string
+    * @access   public
+    */
+    static public function label_format_type($in) {
+        foreach (self::$FE_LFT as $key => $value) {
+            if ($key==$in) {
+                return $value;
+            }
+        }
+	}
 }
 ?>
