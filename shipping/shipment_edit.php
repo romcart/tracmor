@@ -2389,6 +2389,11 @@
 				// Set the recipient phone if necessary
 				$this->lstToContact_Select();
 
+				// If a default Fedex Label Printer Type is specified and is not 'Laser Printer', show the thermal label options
+				if (QApplication::$TracmorSettings->FedexLabelPrinterType=='2' || QApplication::$TracmorSettings->FedexLabelPrinterType=='5') {
+					QApplication::ExecuteJavascript('document.getElementById("TLP").style.display="";');
+				}
+
 				// Show the FedEx shipment panel
 				$this->pnlFedExShipment->Display = true;
 
@@ -4296,8 +4301,13 @@
 			$this->objFedexShipment->HoldAtLocationState = $this->lstHoldAtLocationState->SelectedValue;
 			$this->objFedexShipment->HoldAtLocationPostalCode = $this->txtHoldAtLocationPostalCode->Text;
 			$this->objFedexShipment->LabelPrinterType = $this->lstFedexLabelPrinterType->SelectedValue;
-			$this->objFedexShipment->LabelFormatType = $this->lstFedexLabelFormatType->SelectedValue;
-			$this->objFedexShipment->ThermalPrinterPort = $this->txtFedexThermalPrinterPort->Text;
+			if ($this->lstFedexLabelPrinterType->SelectedValue === 1) {
+				$this->objFedexShipment->LabelFormatType = '5';
+				$this->objFedexShipment->ThermalPrinterPort = null;
+			} else {
+				$this->objFedexShipment->LabelFormatType = $this->lstFedexLabelFormatType->SelectedValue;
+				$this->objFedexShipment->ThermalPrinterPort = $this->txtFedexThermalPrinterPort->Text;
+			}
 		}
 
 		// Load the Package Type options for the Shipment
@@ -4423,7 +4433,9 @@
 						1333 => '1',																	//Drop off Type ; 1 = Regular Pickup
 						1368 => 2,																		//Label Type ; 2 = 2D Common
 						1369 => $this->lstFedexLabelPrinterType->SelectedValue,							//Label Printer Type ; 1 = Laser Printer
-						1370 => ($this->lstFedexLabelPrinterType->SelectedValue == '1') ? 5 : $this->lstFedexLabelFormatType->SelectedValue, //Label Media Type ; 5 = Plain Paper
+						1370 => ($this->lstFedexLabelPrinterType->SelectedValue === 1) ? 				//Label Media Type ; 5 = Plain Paper
+								5 : 
+								$this->lstFedexLabelFormatType->SelectedValue, 
 						1401 => number_format(round($this->txtPackageWeight->Text, 1), 1, '.', ''),		//Total Package Weight
 						1201 => $this->txtFedexNotifySenderEmail->Text,									//Sender EMail
 						1202 => $this->txtFedexNotifyRecipientEmail->Text,								//Recipient EMail
