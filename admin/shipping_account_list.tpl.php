@@ -63,7 +63,19 @@
 						<tr>
 							<td class="record_field_name">FedEx&reg; Gateway URI:</td>
 							<td class="record_field_edit"><?php $this->txtFedexGatewayUri->RenderWithError(); ?></td>
-						</tr>			
+						</tr>
+						<tr>
+							<td class="record_field_name">FedEx&reg; Label Printer Type:</td>
+							<td class="record_field_edit"><?php $this->lstFedexLabelPrinterType->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">FedEx&reg; Label Format:</td>
+							<td class="record_field_edit"><?php $this->lstFedexLabelFormatType->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">FedEx&reg; Thermal Printer Port:</td>
+							<td class="record_field_edit"><?php $this->txtFedexThermalPrinterPort->RenderWithError(); ?></td>
+						</tr>
 						<tr>
 							<td class="record_field_name">Detect Tracking Numbers:</td>
 							<td class="record_field_edit"><?php $this->chkAutoDetectTrackingNumbers->RenderWithError(); ?></td>
