@@ -190,6 +190,16 @@
 			return $strToReturn;
 		}
 
+		public function __toStringFedexThermalLabelLink($CssClass = null) {
+			if ($this->CourierId == 1 && $this->ShippedFlag) {
+				return sprintf('<a href="thermal_label.php?intShipmentId=%s" target="_blank" class="%s">FedEx Shipping Label</a>', $this->ShipmentId, $CssClass);
+			}
+			else {
+				$strToReturn = '';
+			}
+			return $strToReturn;
+		}
+
 		/**
 		 * Returns the HTML needed for a shipment datagrid to show asset and inventory icons, with hovertips.
 		 *

@@ -103,6 +103,9 @@
 		protected $txtHoldAtLocationCity;
 		protected $lstHoldAtLocationState;
 		protected $txtHoldAtLocationPostalCode;
+		protected $lstFedexLabelPrinterType;
+		protected $lstFedexLabelFormatType;
+		protected $txtFedexThermalPrinterPort;
 		protected $dlgExchange;
 		protected $dlgDueDate;
 		public $lstFromCompany;
@@ -179,6 +182,9 @@
 		protected $lblHoldAtLocationCity;
 		protected $lblHoldAtLocationState;
 		protected $lblHoldAtLocationPostalCode;
+		protected $lblFedexLabelPrinterType;
+		protected $lblFedexLabelFormatType;
+		protected $lblFedexThermalPrinterPort;
 		protected $lblAddAsset;
 		protected $dlgNew;
 
@@ -267,6 +273,9 @@
 			$this->lblHoldAtLocationCity_Create();
 			$this->lblHoldAtLocationState_Create();
 			$this->lblHoldAtLocationPostalCode_Create();
+			$this->lblFedexLabelPrinterType_Create();
+			$this->lblFedexLabelFormatType_Create();
+			$this->lblFedexThermalPrinterPort_Create();
 			$this->pnlNote_Create();
 			$this->lblTrackingNumber_Create();
 			$this->lblSenderLabel_Create();
@@ -329,6 +338,9 @@
 			$this->txtHoldAtLocationCity_Create();
 			$this->lstHoldAtLocationState_Create();
 			$this->txtHoldAtLocationPostalCode_Create();
+			$this->lstFedexLabelPrinterType_Create();
+			$this->lstFedexLabelFormatType_Create();
+			$this->txtFedexThermalPrinterPort_Create();
 			$this->lstToAddress_Create();
 			$this->lblNewToAddress_Create();
 			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
@@ -583,8 +595,12 @@
 		protected function lblFedexShippingLabelLink_Create() {
 			$this->lblFedexShippingLabelLink = new QLabel($this);
 			$this->lblFedexShippingLabelLink->HtmlEntities = false;
-			if ($this->blnEditMode) {
-				$this->lblFedexShippingLabelLink->Text = $this->objShipment->__toStringFedexShippingLabelLink("bluelink");
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				if ($this->objFedexShipment->LabelPrinterType=='1') {
+					$this->lblFedexShippingLabelLink->Text = $this->objShipment->__toStringFedexShippingLabelLink("bluelink");
+				} else {
+					$this->lblFedexShippingLabelLink->Text = $this->objShipment->__toStringFedexThermalLabelLink("bluelink");
+				}
 			}
 		}
 
@@ -794,6 +810,33 @@
 			$this->lblHoldAtLocationPostalCode->Name = 'Hold at Location Postal Code';
 			if ($this->blnEditMode && $this->objFedexShipment) {
 				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
+			}
+		}
+
+		// Create and Setup lblFedexLabelPrinterType
+		protected function lblFedexLabelPrinterType_Create() {
+			$this->lblFedexLabelPrinterType = new QLabel($this->pnlFedExShipment);
+			$this->lblFedexLabelPrinterType->Name = 'FedEx Label Printer Type';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblFedexLabelPrinterType->Text =  FedExDC::label_printer_type($this->objFedexShipment->LabelPrinterType);
+			}
+		}
+
+		// Create and Setup lblFedexLabelFormatType
+		protected function lblFedexLabelFormatType_Create() {
+			$this->lblFedexLabelFormatType = new QLabel($this->pnlFedExShipment);
+			$this->lblFedexLabelFormatType->Name = 'FedEx Label Format';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblFedexLabelFormatType->Text = FedExDC::label_format_type($this->objFedexShipment->LabelFormatType);
+			}
+		}
+
+		// Create and Setup lblFedexThermalPrinterPort
+		protected function lblFedexThermalPrinterPort_Create() {
+			$this->lblFedexThermalPrinterPort = new QLabel($this->pnlFedExShipment);
+			$this->lblFedexThermalPrinterPort->Name = 'Thermal Printer Port';
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->lblFedexThermalPrinterPort->Text = $this->objFedexShipment->ThermalPrinterPort;
 			}
 		}
 
@@ -1679,6 +1722,54 @@
 			$this->chkFedexNotifyOtherDeliveryFlag->TabIndex = 43;
 		}
 
+		protected function lstFedexLabelPrinterType_Create() {
+			$this->lstFedexLabelPrinterType = new QListBox($this->pnlFedExShipment);
+			$this->lstFedexLabelPrinterType->Name = QApplication::Translate('Label Printer Type');
+
+			$objFedexLabelPrinterTypeArray = FedExDC::get_label_printer_types();
+			if ($objFedexLabelPrinterTypeArray) foreach ($objFedexLabelPrinterTypeArray as $key => $value) {
+				$objListItem = new QListItem($value, $key);
+				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LabelPrinterType) && ($this->objFedexShipment->LabelPrinterType == $key)) {
+					$objListItem->Selected = true;
+				} else if (!$this->blnEditMode && QApplication::$TracmorSettings->FedexLabelPrinterType && QApplication::$TracmorSettings->FedexLabelPrinterType == $key) {
+					$objListItem->Selected = true;
+				}
+
+				$this->lstFedexLabelPrinterType->AddItem($objListItem);
+			}
+			$this->lstFedexLabelPrinterType->AddAction(new QChangeEvent(), new QAjaxAction('lstFedexLabelPrinterType_Select'));
+			$this->lstFedexLabelPrinterType->TabIndex=44;
+		}
+
+		protected function lstFedexLabelFormatType_Create() {
+			$this->lstFedexLabelFormatType = new QListBox($this->pnlFedExShipment);
+			$this->lstFedexLabelFormatType->Name = QApplication::Translate('Label Format Type');
+			$this->lstFedexLabelFormatType->AddItem(QApplication::Translate('- Select One -'), null);
+
+			$objFedexLabelFormatTypeArray = FedExDC::get_label_format_types();
+			if ($objFedexLabelFormatTypeArray) foreach ($objFedexLabelFormatTypeArray as $key => $value) {
+				$objListItem = new QListItem($value, $key);
+				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LabelFormatType) && ($this->objFedexShipment->LabelFormatType == $key)) {
+					$objListItem->Selected = true;
+				} else if (!$this->blnEditMode && QApplication::$TracmorSettings->FedexLabelFormatType && QApplication::$TracmorSettings->FedexLabelFormatType == $key) {
+					$objListItem->Selected = true;
+				}
+				$this->lstFedexLabelFormatType->AddItem($objListItem);
+			}
+			$this->lstFedexLabelFormatType->TabIndex=45;
+		}
+
+		protected function txtFedexThermalPrinterPort_Create() {
+			$this->txtFedexThermalPrinterPort = new QTextBox($this->pnlFedExShipment);
+			$this->txtFedexThermalPrinterPort->Name = QApplication::Translate('Thermal Printer Port');
+			if ($this->blnEditMode && $this->objFedexShipment) {
+				$this->txtFedexThermalPrinterPort->Text = $this->objFedexShipment->ThermalPrinterPort;
+			} else if (!$this->blnEditMode && QApplication::$TracmorSettings->FedexThermalPrinterPort) {
+				$this->txtFedexThermalPrinterPort->Text = QApplication::$TracmorSettings->FedexThermalPrinterPort;
+			}
+			$this->txtHoldAtLocationCity->TabIndex = 46;
+		}
+
 		// Create the text field to enter new asset codes to add to the transaction
 		// Eventually this field will receive information from the AML
 		protected function txtNewAssetCode_Create() {
@@ -1687,7 +1778,7 @@
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtNewAssetCode->CausesValidation = false;
-			$this->txtNewAssetCode->TabIndex=44;
+			$this->txtNewAssetCode->TabIndex=47;
 		}
 
 		// Create the text field to enter new inventory_model codes to add to the transaction
@@ -2298,6 +2389,11 @@
 				// Set the recipient phone if necessary
 				$this->lstToContact_Select();
 
+				// If a default Fedex Label Printer Type is specified and is not 'Laser Printer', show the thermal label options
+				if (QApplication::$TracmorSettings->FedexLabelPrinterType=='2' || QApplication::$TracmorSettings->FedexLabelPrinterType=='5') {
+					QApplication::ExecuteJavascript('document.getElementById("TLP").style.display="";');
+				}
+
 				// Show the FedEx shipment panel
 				$this->pnlFedExShipment->Display = true;
 
@@ -2332,6 +2428,15 @@
 						$objListItem->Selected = true;
 					}
 				}
+			}
+		}
+
+		protected function lstFedexLabelPrinterType_Select() {
+			$strSelectedFedexLabelPrinterType = ($this->lstFedexLabelPrinterType->SelectedValue) ? $this->lstFedexLabelPrinterType->SelectedValue : null;
+			if ($strSelectedFedexLabelPrinterType == '2' || $strSelectedFedexLabelPrinterType == '5') {
+				QApplication::ExecuteJavascript('document.getElementById("TLP").style.display="";');
+			} else {
+				QApplication::ExecuteJavascript('document.getElementById("TLP").style.display="none";');
 			}
 		}
 
@@ -4145,6 +4250,9 @@
 				$this->txtHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
 				$this->lstHoldAtLocationState->SelectedValue = $this->objFedexShipment->HoldAtLocationState;
 				$this->txtHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
+				$this->lstFedexLabelPrinterType->SelectedValue = $this->objFedexShipment->LabelPrinterType;
+				$this->lstFedexLabelFormatType->SelectedValue = $this->objFedexShipment->LabelFormatType;
+				$this->txtFedexThermalPrinterPort->Text = $this->objFedexShipment->ThermalPrinterPort;
 			}
 			$this->arrCustomFields = CustomField::UpdateControls($this->objShipment->objCustomFieldArray, $this->arrCustomFields);
 		}
@@ -4192,6 +4300,14 @@
 			$this->objFedexShipment->HoldAtLocationCity = $this->txtHoldAtLocationCity->Text;
 			$this->objFedexShipment->HoldAtLocationState = $this->lstHoldAtLocationState->SelectedValue;
 			$this->objFedexShipment->HoldAtLocationPostalCode = $this->txtHoldAtLocationPostalCode->Text;
+			$this->objFedexShipment->LabelPrinterType = $this->lstFedexLabelPrinterType->SelectedValue;
+			if ($this->lstFedexLabelPrinterType->SelectedValue === 1) {
+				$this->objFedexShipment->LabelFormatType = '5';
+				$this->objFedexShipment->ThermalPrinterPort = null;
+			} else {
+				$this->objFedexShipment->LabelFormatType = $this->lstFedexLabelFormatType->SelectedValue;
+				$this->objFedexShipment->ThermalPrinterPort = $this->txtFedexThermalPrinterPort->Text;
+			}
 		}
 
 		// Load the Package Type options for the Shipment
@@ -4316,8 +4432,10 @@
 						1274 => $this->objFedexShipment->FedexServiceType->Value,						//Service Type ; 01 = Fedex Priority
 						1333 => '1',																	//Drop off Type ; 1 = Regular Pickup
 						1368 => 2,																		//Label Type ; 2 = 2D Common
-						1369 => 1,																		//Label Printer Type ; 1 = Laser Printer
-						1370 => 5,																		//Label Media Type ; 5 = Plain Paper
+						1369 => $this->lstFedexLabelPrinterType->SelectedValue,							//Label Printer Type ; 1 = Laser Printer
+						1370 => ($this->lstFedexLabelPrinterType->SelectedValue === 1) ? 				//Label Media Type ; 5 = Plain Paper
+								5 : 
+								$this->lstFedexLabelFormatType->SelectedValue, 
 						1401 => number_format(round($this->txtPackageWeight->Text, 1), 1, '.', ''),		//Total Package Weight
 						1201 => $this->txtFedexNotifySenderEmail->Text,									//Sender EMail
 						1202 => $this->txtFedexNotifyRecipientEmail->Text,								//Recipient EMail
@@ -4377,9 +4495,18 @@
 			{
 				// decode and save label
 				$this->txtTrackingNumber->Text = $ship_Ret[29];
-				$fed->label('../images/shipping_labels/fedex/' . QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . '.png');
+
+				$strLabelExtension = '.png';
+				if ($this->objFedexShipment->LabelPrinterType == '2') {
+					$strLabelExtension = '.epl';
+				} else if ($this->objFedexShipment->LabelPrinterType == '5') {
+					$strLabelExtension = '.zpl';
+				}
+
+				$strLabelMimeType = ($this->objFedexShipment->LabelPrinterType == '2' || $this->objFedexShipment->LabelPrinterType == '5') ? 'text/plain' : 'image/png';
+				$fed->label('../images/shipping_labels/fedex/' . QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension);
 				if (AWS_S3) {
-					MoveToS3(__DOCROOT__ . __IMAGE_ASSETS__ . '/shipping_labels/fedex', QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . '.png', 'image/png', '/images/shipping_labels/fedex');
+					MoveToS3(__DOCROOT__ . __IMAGE_ASSETS__ . '/shipping_labels/fedex', QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension, $strLabelMimeType, '/images/shipping_labels/fedex');
 				}
 				return true;
 			}
@@ -4491,6 +4618,9 @@
 			$this->txtHoldAtLocationCity->Display = false;
 			$this->lstHoldAtLocationState->Display = false;
 			$this->txtHoldAtLocationPostalCode->Display = false;
+			$this->lstFedexLabelPrinterType->Display = false;
+			$this->lstFedexLabelFormatType->Display = false;
+			$this->txtFedexThermalPrinterPort->Display = false;
 
 			// Disable (instead of hiding) Fedex Notification checkboxes
 			$this->chkFedexNotifySenderShipFlag->Enabled = false;
@@ -4567,6 +4697,9 @@
 			$this->lblHoldAtLocationCity->Display = true;
 			$this->lblHoldAtLocationState->Display = true;
 			$this->lblHoldAtLocationPostalCode->Display = true;
+			$this->lblFedexLabelPrinterType->Display = true;
+			$this->lblFedexLabelFormatType->Display = true;
+			$this->lblFedexThermalPrinterPort->Display = true;
 
 			// Display custom field labels
 			if ($this->arrCustomFields) {
@@ -4622,6 +4755,9 @@
 				$this->lblHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
 				$this->lblHoldAtLocationState->Text = ($this->objFedexShipment->HoldAtLocationStateObject) ? $this->objFedexShipment->HoldAtLocationStateObject->__toString() : '';
 				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
+				$this->lblFedexLabelPrinterType->Text = FedExDC::label_printer_type($this->objFedexShipment->LabelPrinterType);
+				$this->lblFedexLabelFormatType->Text = FedExDC::label_format_type($this->objFedexShipment->LabelFormatType);
+				$this->lblFedexThermalPrinterPort->Text = $this->objFedexShipment->ThermalPrinterPort;
 			}
 
 			// Update custom labels
@@ -4670,6 +4806,9 @@
 			$this->lblHoldAtLocationCity->Display = false;
 			$this->lblHoldAtLocationState->Display = false;
 			$this->lblHoldAtLocationPostalCode->Display = false;
+			$this->lblFedexLabelPrinterType->Display = false;
+			$this->lblFedexLabelFormatType->Display = false;
+			$this->lblFedexThermalPrinterPort->Display = false;
 
 
 			// Show Inputs
@@ -4731,6 +4870,9 @@
 				$this->txtHoldAtLocationCity->Display = true;
 				$this->lstHoldAtLocationState->Display = true;
 				$this->txtHoldAtLocationPostalCode->Display = true;
+				$this->lstFedexLabelPrinterType->Display = true;
+				$this->lstFedexLabelFormatType->Display = true;
+				$this->txtFedexThermalPrinterPort->Display = true;
 
 				// Enable Fedex Notification Checkboxes (because they're disabled, not hidden)
 				$this->chkFedexNotifySenderShipFlag->Enabled = true;

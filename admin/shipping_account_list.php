@@ -25,7 +25,8 @@
 	QApplication::Authenticate();
 	// Include the classfile for ShippingAccountListFormBase
 	require(__FORMBASE_CLASSES__ . '/ShippingAccountListFormBase.class.php');
-	
+	require_once('../shipping/fedexdc.class.php');
+
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the ShippingAccount class.  It extends from the code-generated
@@ -52,6 +53,9 @@
 		protected $btnNew;
 		protected $lstFedexAccount;
 		protected $txtFedexGatewayUri;
+		protected $lstFedexLabelPrinterType;
+		protected $lstFedexLabelFormatType;
+		protected $txtFedexThermalPrinterPort;
 		protected $fckPackingListTerms;
 		protected $btnNewCourier;
 		protected $dtgCourier;
@@ -74,6 +78,9 @@
 			$this->chkAutoDetectTrackingNumbers_Create();
 			$this->chkReceiveToLastLocation_Create();
 			$this->txtFedexGatewayUri_Create();
+			$this->lstFedexLabelPrinterType_Create();
+			$this->lstFedexLabelFormatType_Create();
+			$this->txtFedexThermalPrinterPort_Create();
 			$this->fckPackingListTerms_Create();
 			$this->btnNewCourier_Create();
 			$this->dtgCourier_Create();
@@ -162,11 +169,57 @@
 			$this->chkReceiveToLastLocation->Checked = QApplication::$TracmorSettings->ReceiveToLastLocation;
 		}
 		
-		// Create and Setup the MinAssetCode Text Field
+		// Create and Setup the txtFedexGatewayUri Text Field
 		protected function txtFedexGatewayUri_Create() {
 			$this->txtFedexGatewayUri = new QTextBox($this);
 			$this->txtFedexGatewayUri->Name = 'Fedex Gateway URI';
 			$this->txtFedexGatewayUri->Text = QApplication::$TracmorSettings->FedexGatewayUri;
+		}
+
+		// Create and Setup lstFedexLabelPrinterType
+		protected function lstFedexLabelPrinterType_Create() {
+			$this->lstFedexLabelPrinterType = new QListBox($this);
+			$this->lstFedexLabelPrinterType->Name = QApplication::Translate('Label Printer Type');
+			$objFedexLabelPrinterTypeArray = FedExDC::get_label_printer_types();
+			if ($objFedexLabelPrinterTypeArray) foreach ($objFedexLabelPrinterTypeArray as $key => $value) {
+				$objListItem = new QListItem($value, $key);
+				if ((QApplication::$TracmorSettings->FedexLabelPrinterType) && (QApplication::$TracmorSettings->FedexLabelPrinterType == $key))
+					$objListItem->Selected = true;
+
+				$this->lstFedexLabelPrinterType->AddItem($objListItem);
+			}
+		}
+
+		// Create and Setup lstFedexLabelFormatType
+		protected function lstFedexLabelFormatType_Create() {
+			$this->lstFedexLabelFormatType = new QListBox($this);
+			$this->lstFedexLabelFormatType->Name = QApplication::Translate('Label Format Type');
+			$this->lstFedexLabelFormatType->AddItem(QApplication::Translate('- Select One -'), null);
+			$objFedexLabelFormatTypeArray = FedExDC::get_label_format_types();
+			if ($objFedexLabelFormatTypeArray) foreach ($objFedexLabelFormatTypeArray as $key => $value) {
+				$objListItem = new QListItem($value, $key);
+				if ((QApplication::$TracmorSettings->FedexLabelFormatType) && (QApplication::$TracmorSettings->FedexLabelFormatType == $key))
+					$objListItem->Selected = true;
+
+				$this->lstFedexLabelFormatType->AddItem($objListItem);
+			}
+			if ($this->lstFedexLabelPrinterType->SelectedValue ===1) {
+				$this->lstFedexLabelFormatType->SelectedValue = 1;
+				$this->lstFedexLabelFormatType->Enabled = false;			
+			}
+			$this->lstFedexLabelPrinterType->AddAction(new QChangeEvent(), new QAjaxAction('lstFedexLabelPrinterType_Select'));
+		}
+
+		// Create and Setup txtFedexThermalPrinterPort
+		protected function txtFedexThermalPrinterPort_Create() {
+			$this->txtFedexThermalPrinterPort = new QTextBox($this);
+			$this->txtFedexThermalPrinterPort->Name = QApplication::Translate('Thermal Printer Port');
+			if ($this->lstFedexLabelPrinterType->SelectedValue ===1) {
+				$this->txtFedexThermalPrinterPort->Text = '';
+				$this->txtFedexThermalPrinterPort->Enabled=false;	
+			} else if (QApplication::$TracmorSettings->FedexThermalPrinterPort) {
+				$this->txtFedexThermalPrinterPort->Text = QApplication::$TracmorSettings->FedexThermalPrinterPort;
+			}
 		}
 		
 		// Create and Setup the MinAssetCode Text Field
@@ -292,6 +345,19 @@
       $objStyle->BackColor = '#EFEFEF';
       $objStyle->CssClass = 'dtg_header';  			
 		}
+
+		protected function lstFedexLabelPrinterType_Select() {
+			$strSelectedFedexLabelPrinterType = ($this->lstFedexLabelPrinterType->SelectedValue) ? $this->lstFedexLabelPrinterType->SelectedValue : null;
+			if ($strSelectedFedexLabelPrinterType == '2' || $strSelectedFedexLabelPrinterType == '5') {
+				$this->lstFedexLabelFormatType->Enabled=true;
+				$this->txtFedexThermalPrinterPort->Enabled=true;
+			} else {
+				$this->lstFedexLabelFormatType->SelectedIndex=0;
+				$this->lstFedexLabelFormatType->Enabled=false;
+				$this->txtFedexThermalPrinterPort->Text='';
+				$this->txtFedexThermalPrinterPort->Enabled=false;
+			}
+		}
 		
 		// Create/Setup the Save button
 		// Sets the Shipping/Receiving Company setting in the AdminSetting table
@@ -311,6 +377,9 @@
 				QApplication::$TracmorSettings->CompanyId = $intCompanyId;
 				QApplication::$TracmorSettings->FedexAccountId = $intAccountId;
 				QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
+				QApplication::$TracmorSettings->FedexLabelPrinterType = $this->lstFedexLabelPrinterType->SelectedValue;
+				QApplication::$TracmorSettings->FedexLabelFormatType = $this->lstFedexLabelFormatType->SelectedValue;
+				QApplication::$TracmorSettings->FedexThermalPrinterPort = $this->txtFedexThermalPrinterPort->Text;
 				QApplication::$TracmorSettings->PackingListTerms = $this->fckPackingListTerms->Text;
 				QApplication::$TracmorSettings->AutodetectTrackingNumbers = $this->chkAutoDetectTrackingNumbers->Checked;
 				QApplication::$TracmorSettings->ReceiveToLastLocation = $this->chkReceiveToLastLocation->Checked;
