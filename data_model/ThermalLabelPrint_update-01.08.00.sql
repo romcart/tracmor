@@ -2,7 +2,7 @@ ALTER TABLE  `fedex_shipment` ADD  `label_printer_type` INT NULL ,
 ADD  `label_format_type` INT NULL ,
 ADD  `thermal_printer_port` VARCHAR( 255 ) NULL;
 
-INSERT INTO  `tracmor`.`admin_setting` (
+INSERT INTO  `admin_setting` (
 	`short_description` ,
 	`value`
 )
