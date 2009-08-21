@@ -22,42 +22,33 @@
 	include('../includes/header.inc.php');
 	$this->RenderBegin();
 ?>
-<!-- Begin Header Menu -->
-<?php
-	$this->ctlHeaderMenu->Render();
-?>
-<!-- End Header Menu -->
-
-<!-- Begin Shortcut Menu -->
-<?php
-	include('shortcut_menu.inc.php');
-?>
-<!-- End Shortcut Menu -->
-		</td>
-		<td>
-			<img src="../images/empty.gif" width="10">
-		</td>
-		<td width="100%" valign="top">
-		<div class="title">Asset Import</div>
-		<table class="datagrid" cellpadding="5" cellspacing="0">
+		<table cellpadding="5" cellspacing="0">
 			<tr>
 				<td>
-					<table width="100%">
+					<table>
 						<tr>
-							<!--<td class="record_field_name"></td>-->
-							<td class="record_field_edit">
+							<td>
 							 <?php $this->pnlStepOne->Render(); ?>
+							 </td>
+						</tr>
+						<tr>
+							 <td>
 							 <?php $this->pnlStepTwo->Render(); ?>
+							 </td>
+						</tr>
+						<tr>
+							 <td>
 							 <?php $this->pnlStepThree->Render(); ?>
-	             <?php $this->btnCancel->Render(); ?>&nbsp;<?php $this->btnNext->Render(); ?>
+	             </td>
+						</tr>
+						<tr>
+							 <td>
+							 <?php $this->btnCancel->Render(); ?>&nbsp;<?php $this->btnNext->Render(); ?>
 							 </td>
 						</tr>
 					</table>
-					<br />
-					<br />
 				</td>
 			</tr>
    </table>
 
 <?php $this->RenderEnd() ?>
-<?php require_once('../includes/footer.inc.php'); ?>
