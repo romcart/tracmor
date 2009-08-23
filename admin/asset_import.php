@@ -45,6 +45,7 @@
 		protected $txtMapDefaultValueArray;
 		protected $strAcceptibleMimeArray;
 		protected $chkHeaderRow;
+		protected $blnHeaderRow;
 		protected $btnNext;
 		protected $btnCancel;
 		protected $intStep;
@@ -178,6 +179,12 @@
 		protected function btnNext_Click() {
 		  $blnError = false;
 		  if ($this->intStep == 1) {
+		    if ($this->chkHeaderRow->Checked) {
+		      $this->blnHeaderRow = true;
+		    }
+		    else {
+		      $this->blnHeaderRow = false;
+		    }
 		    // Check errors
 		    if ($this->lstFieldSeparator->SelectedValue == 'other' && !$this->txtFieldSeparator->Text) {
 		      $this->flcFileCsv->Warning = "Please enter the field separator.";
@@ -255,11 +262,9 @@
             $this->arrMapFields = array();
             // Load first file
             $this->FileCsvData->load($this->strFilePathArray[0]);
-            $blnHeader = false;
             // Get Headers
-            if ($this->chkHeaderRow->Checked) {
+            if ($this->blnHeaderRow) {
               $this->arrCsvHeader = $this->FileCsvData->getHeaders();
-              $blnHeader = true;
             }
             else {
               $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
@@ -267,7 +272,7 @@
             $strFirstRowArray = $this->FileCsvData->getRow(0);
             for ($i=0; $i<count($strFirstRowArray); $i++) {
               $this->arrMapFields[$i] = array();
-              if ($blnHeader) {
+              if ($this->blnHeaderRow) {
                 $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
                 //$lblHeader = new QLabel($this->pnlStepTwo);
                 //$lblHeader->Text = "  " . $this->arrCsvHeader[$i];
@@ -276,7 +281,7 @@
               else {
                 $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i);
               }
-              if ($this->arrCsvHeader[$i]) {
+              if ($this->blnHeaderRow && $this->arrCsvHeader[$i] || !$this->blnHeaderRow) {
                 $txtDefaultValue = new QTextBox($this);
                 $txtDefaultValue->Width = 100;
                 $this->txtMapDefaultValueArray[] = $txtDefaultValue;
@@ -406,7 +411,7 @@
 
 		// Cancel button click action
 		protected function btnCancel_Click() {
-
+      QApplication::Redirect("./asset_import.php");
     }
 
 	}
