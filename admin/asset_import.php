@@ -28,6 +28,7 @@
 		// Header Menu
 		protected $ctlHeaderMenu;
 
+		protected $pnlMain;
 		protected $pnlStepOne;
 		protected $pnlStepTwo;
 		protected $pnlStepThree;
@@ -36,10 +37,12 @@
     protected $lstTextDelimiter;
 		protected $txtTextDelimiter;
 		protected $flcFileCsv;
-		protected $File;
 		protected $FileCsvData;
 		protected $arrCsvHeader;
+		protected $arrMapFields;
 		protected $strFilePathArray;
+		protected $lstMapHeaderArray;
+		protected $txtMapDefaultValueArray;
 		protected $strAcceptibleMimeArray;
 		protected $chkHeaderRow;
 		protected $btnNext;
@@ -52,9 +55,10 @@
 		protected function Form_Create() {
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
+			$this->pnlMain_Create();
 			$this->pnlStepOne_Create();
-			$this->pnlStepTwo_Create();
-			$this->pnlStepThree_Create();
+			//$this->pnlStepTwo_Create();
+			//$this->pnlStepThree_Create();
 			$this->Buttons_Create();
 			$this->intStep = 1;
 			$this->arrAssetCustomField = CustomField::LoadArrayByActiveFlagEntity(1, 1);
@@ -75,8 +79,13 @@
 			$this->ctlHeaderMenu = new QHeaderMenu($this);
 		}
 
+		protected function pnlMain_Create() {
+		  $this->pnlMain = new QPanel($this);
+		  $this->pnlMain->AutoRenderChildren = true;
+		}
+
 		protected function pnlStepOne_Create() {
-			$this->pnlStepOne = new QPanel($this);
+			$this->pnlStepOne = new QPanel($this->pnlMain);
       $this->pnlStepOne->Template = "asset_import_pnl_step1.tpl.php";
 
 			// Step 1
@@ -109,19 +118,21 @@
     }
 
     protected function pnlStepTwo_Create() {
-			$this->pnlStepTwo = new QPanel($this);
-			$this->pnlStepTwo->AutoRenderChildren = true;
-			$this->pnlStepTwo->Display = false;
+			$this->pnlStepTwo = new QPanel($this->pnlMain);
+			//$this->pnlStepTwo->AutoRenderChildren = true;
+			//$this->pnlStepTwo->Display = false;
+      $this->pnlStepTwo->Template = "asset_import_pnl_step2.tpl.php";
 
       // Step 2
-      $this->lblStepTwo = new QLabel($this->pnlStepTwo);
+      /*$this->lblStepTwo = new QLabel($this->pnlStepTwo);
       $this->lblStepTwo->Text = "Step 2: Map Fields and Import<br/>";
       $this->lblStepTwo->CssClass = "title";
-      $this->lblStepTwo->HtmlEntities = false;
+      $this->lblStepTwo->HtmlEntities = false;*/
+
     }
 
     protected function pnlStepThree_Create() {
-			$this->pnlStepThree = new QPanel($this);
+			$this->pnlStepThree = new QPanel($this->pnlMain);
       $this->pnlStepThree->Display = false;
       $this->pnlStepThree->AutoRenderChildren = true;
 
@@ -167,95 +178,116 @@
 		protected function btnNext_Click() {
 		  $blnError = false;
 		  if ($this->intStep == 1) {
-		    // Step 1 complete
-        // File Not Uploaded
-  			if (!file_exists($this->flcFileCsv->File) || !$this->flcFileCsv->Size) {
-  				throw new QCallerException('FileAssetType must be a valid QFileAssetType constant value');
-  			// File Has Incorrect MIME Type (only if an acceptiblemimearray is setup)
-  			} elseif (is_array($this->strAcceptibleMimeArray) && (!array_key_exists($this->flcFileCsv->Type, $this->strAcceptibleMimeArray))) {
-  				$this->flcFileCsv->Warning = "Extension must be 'csv' or 'txt'";
-  				$blnError = true;
-  			// File Successfully Uploaded
-  			} else {
-  			  $this->flcFileCsv->Warning = "";
-  				// Setup Filename, Base Filename and Extension
-  				$strFilename = $this->flcFileCsv->FileName;
-  				$intPosition = strrpos($strFilename, '.');
+		    // Check errors
+		    if ($this->lstFieldSeparator->SelectedValue == 'other' && !$this->txtFieldSeparator->Text) {
+		      $this->flcFileCsv->Warning = "Please enter the field separator.";
+		      $blnError = true;
+		    }
+		    elseif ($this->lstTextDelimiter->SelectedValue == 'other' && !$this->txtTextDelimiter->Text) {
+		      $this->flcFileCsv->Warning = "Please enter the text delimiter.";
+		      $blnError = true;
+		    }
+		    else {
+  		    // Step 1 complete
+          // File Not Uploaded
+    			if (!file_exists($this->flcFileCsv->File) || !$this->flcFileCsv->Size) {
+    				throw new QCallerException('FileAssetType must be a valid QFileAssetType constant value');
+    			// File Has Incorrect MIME Type (only if an acceptiblemimearray is setup)
+    			} elseif (is_array($this->strAcceptibleMimeArray) && (!array_key_exists($this->flcFileCsv->Type, $this->strAcceptibleMimeArray))) {
+    				$this->flcFileCsv->Warning = "Extension must be 'csv' or 'txt'";
+    				$blnError = true;
+    			// File Successfully Uploaded
+    			} else {
+    			  $this->flcFileCsv->Warning = "";
+    				// Setup Filename, Base Filename and Extension
+    				$strFilename = $this->flcFileCsv->FileName;
+    				$intPosition = strrpos($strFilename, '.');
 
-  				/*if (is_array($this->strAcceptibleMimeArray) && array_key_exists($this->flcFileCsv->Type, $this->strAcceptibleMimeArray))
-  					$strExtension = $this->strAcceptibleMimeArray[$this->flcFileCsv->Type];
-  				else {
-  					if ($intPosition)
-  						$strExtension = substr($strFilename, $intPosition + 1);
-  					else
-  						$strExtension = null;
-  				}*/
+    				/*if (is_array($this->strAcceptibleMimeArray) && array_key_exists($this->flcFileCsv->Type, $this->strAcceptibleMimeArray))
+    					$strExtension = $this->strAcceptibleMimeArray[$this->flcFileCsv->Type];
+    				else {
+    					if ($intPosition)
+    						$strExtension = substr($strFilename, $intPosition + 1);
+    					else
+    						$strExtension = null;
+    				}*/
 
-  				//$strBaseFilename = substr($strFilename, 0, $intPosition);
-  				//$strExtension = strtolower($strExtension);
+    				//$strBaseFilename = substr($strFilename, 0, $intPosition);
+    				//$strExtension = strtolower($strExtension);
 
-  				// Save the File in a slightly more permanent temporary location
-  				$strTempFilePath = __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__ . '/'.$_SESSION['intUserAccountId'] .'.' . 'csv';
-  				copy($this->flcFileCsv->File, $strTempFilePath);
-  				$this->File = $strTempFilePath;
+    				// Save the File in a slightly more permanent temporary location
+    				//$strTempFilePath = __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__ . '/'.$_SESSION['intUserAccountId'] .'.' . 'csv';
+    				//copy($this->flcFileCsv->File, $strTempFilePath);
+    				//$this->File = $strTempFilePath;
 
-  				// Cleanup and Save Filename
-  				//$this->strFileName = preg_replace('/[^A-Z^a-z^0-9_\-]/', '', $strBaseFilename) . '.' . $strExtension;
-  			}
-  			if (!$blnError) {
-  			  $this->FileCsvData = new File_CSV_DataSource();
-  			  $this->FileCsvData->settings($this->GetCsvSettings());
-  			  $file = fopen($this->File, "r");
-          // Counter of fles
-          $i=1;
-          // Counter of rows
-          $j=1;
-          $this->strFilePathArray = array();
-          // The uploaded file splits up in order to avoid out of memory
-          while ($row = fgets($file, 1000)) {
-            if ($j == 1) {
-              $strFilePath = sprintf('%s/%s_%s.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $i);
-              $this->strFilePathArray[] = $strFilePath;
-              $file_part = fopen($strFilePath, "w+");
+    				// Cleanup and Save Filename
+    				//$this->strFileName = preg_replace('/[^A-Z^a-z^0-9_\-]/', '', $strBaseFilename) . '.' . $strExtension;
+    			}
+    			if (!$blnError) {
+    			  $this->FileCsvData = new File_CSV_DataSource();
+    			  $this->FileCsvData->settings($this->GetCsvSettings());
+    			  $file = fopen($this->flcFileCsv->File, "r");
+            // Counter of fles
+            $i=1;
+            // Counter of rows
+            $j=1;
+            $this->strFilePathArray = array();
+            // The uploaded file splits up in order to avoid out of memory
+            while ($row = fgets($file, 1000)) {
+              if ($j == 1) {
+                $strFilePath = sprintf('%s/%s_%s.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $i);
+                $this->strFilePathArray[] = $strFilePath;
+                $file_part = fopen($strFilePath, "w+");
+              }
+
+              /*while ($row != $row_new = str_replace($this->FileCsvData->settings['escape'].$this->FileCsvData->settings['escape'], $this->FileCsvData->settings['escape'].$this->FileCsvData->settings['delimiter'].$this->FileCsvData->settings['delimiter'].$this->FileCsvData->settings['escape'], $row)) {
+                $row = $row_new;
+              }*/
+
+              fwrite($file_part, $row);
+              $j++;
+              if ($j > 1000) {
+                $j = 1;
+                $i++;
+                fclose($file_part);
+              }
             }
-
-            /*while ($row != $row_new = str_replace($this->FileCsvData->settings['escape'].$this->FileCsvData->settings['escape'], $this->FileCsvData->settings['escape'].$this->FileCsvData->settings['delimiter'].$this->FileCsvData->settings['delimiter'].$this->FileCsvData->settings['escape'], $row)) {
-              $row = $row_new;
-            }*/
-
-            fwrite($file_part, $row);
-            $j++;
-            if ($j > 1000) {
-              $j = 1;
-              $i++;
-              fclose($file_part);
-            }
-          }
-          // Load first file
-          $this->FileCsvData->load($this->strFilePathArray[0]);
-          $blnHeader = false;
-          // Get Headers
-          if ($this->chkHeaderRow->Checked) {
-            $this->arrCsvHeader = $this->FileCsvData->getHeaders();
-            $blnHeader = true;
-          }
-          else {
-            $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
-          }
-          $strFirstRowArray = $this->FileCsvData->getRow(0);
-          for ($i=0; $i<count($strFirstRowArray); $i++) {
-            $this->lstMapHeader_Create($this->pnlStepTwo, $i);
+            $this->arrMapFields = array();
+            // Load first file
+            $this->FileCsvData->load($this->strFilePathArray[0]);
+            $blnHeader = false;
+            // Get Headers
             if ($this->chkHeaderRow->Checked) {
-              $lblHeaderRow = new QLabel($this->pnlStepTwo);
-              $lblHeaderRow->Text = "  " . $this->arrCsvHeader[$i];
+              $this->arrCsvHeader = $this->FileCsvData->getHeaders();
+              $blnHeader = true;
             }
-            $txtDefaultValue = new QTextBox($this->pnlStepTwo);
-            $txtDefaultValue->Width = 100;
-            $lblRow1 = new QLabel($this->pnlStepTwo);
-            $lblRow1->Text = "  " . $strFirstRowArray[$i] . "<br/>";
-            $lblRow1->HtmlEntities = false;
-          }
-  			}
+            else {
+              $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
+            }
+            $strFirstRowArray = $this->FileCsvData->getRow(0);
+            for ($i=0; $i<count($strFirstRowArray); $i++) {
+              $this->arrMapFields[$i] = array();
+              if ($blnHeader) {
+                $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
+                //$lblHeader = new QLabel($this->pnlStepTwo);
+                //$lblHeader->Text = "  " . $this->arrCsvHeader[$i];
+                $this->arrMapFields[$i]['header'] = $this->arrCsvHeader[$i];
+              }
+              else {
+                $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i);
+              }
+              if ($this->arrCsvHeader[$i]) {
+                $txtDefaultValue = new QTextBox($this);
+                $txtDefaultValue->Width = 100;
+                $this->txtMapDefaultValueArray[] = $txtDefaultValue;
+              }
+              //$lblRow1 = new QLabel($this->pnlStepTwo);
+              //$lblRow1->Text = "  " . $strFirstRowArray[$i] . "<br/>";
+              //$lblRow1->HtmlEntities = false;
+              $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
+            }
+    			}
+		    }
 		  }
 		  elseif ($this->intStep == 2) {
 		    // Step 2 complete
@@ -271,29 +303,34 @@
 		  }
 	  }
 
-	  protected function lstMapHeader_Create($objParentObject, $intId) {
+	  protected function lstMapHeader_Create($objParentObject, $intId, $strName = null) {
+	    if ($this->chkHeaderRow->Checked && !$strName) {
+	      return false;
+	    }
 	    $lstMapHeader = new QListBox($objParentObject);
 	    $lstMapHeader->Name = "lst".$intId;
 	    $strAssetGroup = "Asset";
 	    $strAssetModelGroup = "Asset Model";
 	    $lstMapHeader->AddItem("- Not Mapped -", null);
-	    $lstMapHeader->AddItem("Asset Code", "Asset Code", null, $strAssetGroup);
+	    $lstMapHeader->AddItem("Asset Code", "Asset Code", (strtolower($strName) == 'asset code') ? true : false, $strAssetGroup);
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
-	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId, null, $strAssetGroup);
+	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId,  (strtolower($strName) == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
 	    }
-	    $lstMapHeader->AddItem("Location", "Location", null, $strAssetGroup);
-	    $lstMapHeader->AddItem("Created By", "Created By", null, $strAssetGroup);
-	    $lstMapHeader->AddItem("Created Date", "Created Date", null, $strAssetGroup);
-	    $lstMapHeader->AddItem("Modified By", "Modified By", null, $strAssetGroup);
-	    $lstMapHeader->AddItem("Modified Date", "Modified Date", null, $strAssetGroup);
-	    $lstMapHeader->AddItem("Asset Model Code", "Asset Model Code", null, $strAssetModelGroup);
-	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", null, $strAssetModelGroup);
-	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", null, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Location", "Location", (strtolower($strName) == 'location') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Created By", "Created By", (strtolower($strName) == 'created by') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Created Date", "Created Date", (strtolower($strName) == 'created date') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Modified By", "Modified By", (strtolower($strName) == 'modified by') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Modified Date", "Modified Date", (strtolower($strName) == 'modified date') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Asset Model Code", "Asset Model Code", (strtolower($strName) == 'asset model code') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", (strtolower($strName) == 'asset model short description') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", (strtolower($strName) == 'asset model long description') ? true : false, $strAssetModelGroup);
 	    foreach ($this->arrAssetModelCustomField as $objCustomField) {
-	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId, null, $strAssetModelGroup);
+	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId, (strtolower($strName) == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetModelGroup);
 	    }
-	    $lstMapHeader->AddItem("Category", "Category", null, $strAssetModelGroup);
-	    $lstMapHeader->AddItem("Manufacturer", "Manufacturer", null, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Category", "Category", (strtolower($strName) == 'category') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Manufacturer", "Manufacturer", (strtolower($strName) == 'manufacturer') ? true : false, $strAssetModelGroup);
+	    $this->lstMapHeaderArray[] = $lstMapHeader;
+	    return true;
 	  }
 
 	  protected function GetCsvSettings() {
@@ -305,7 +342,7 @@
 	        $strSeparator = "\t";
 	        break;
 	      default:
-	        $strSeparator = $this->txtFieldSeparator;
+	        $strSeparator = $this->txtFieldSeparator->Text;
 	        break;
 	    }
 	    switch ($this->lstTextDelimiter->SelectedValue) {
@@ -319,7 +356,7 @@
 	        $strDelimiter = '"';
 	        break;
 	      default:
-	        $strDelimiter = $this->txtTextDelimiter;
+	        $strDelimiter = $this->txtTextDelimiter->Text;
 	        break;
 	    }
 	    return $settings = array(
@@ -333,20 +370,24 @@
     protected function DisplayStepForm($intStep) {
       switch ($intStep) {
        case 1:
-         $this->pnlStepOne->Display = true;
+         /*$this->pnlStepOne->Display = true;
 		     $this->pnlStepOne->Visible = true;
 		     $this->pnlStepTwo->Display = false;
 		     $this->pnlStepTwo->Visible = false;
 		     $this->pnlStepThree->Display = false;
-		     $this->pnlStepThree->Visible = false;
+		     $this->pnlStepThree->Visible = false;*/
+         $this->pnlMain->RemoveChildControls($this->pnlMain);
+		     $this->pnlStepOne_Create();
 		     break;
 		   case 2:
-		     $this->pnlStepOne->Display = false;
+		     /*$this->pnlStepOne->Display = false;
 		     $this->pnlStepOne->Visible = false;
 		     $this->pnlStepTwo->Display = true;
 		     $this->pnlStepTwo->Visible = true;
 		     $this->pnlStepThree->Display = false;
-		     $this->pnlStepThree->Visible = false;
+		     $this->pnlStepThree->Visible = false;*/
+		     $this->pnlMain->RemoveChildControls($this->pnlMain);
+		     $this->pnlStepTwo_Create();
 		     break;
 		   case 3:
 		     $this->pnlStepOne->Display = false;

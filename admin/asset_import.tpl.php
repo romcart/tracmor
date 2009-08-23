@@ -28,18 +28,8 @@
 					<table>
 						<tr>
 							<td>
-							 <?php $this->pnlStepOne->Render(); ?>
+							 <?php $this->pnlMain->Render(); ?>
 							 </td>
-						</tr>
-						<tr>
-							 <td>
-							 <?php $this->pnlStepTwo->Render(); ?>
-							 </td>
-						</tr>
-						<tr>
-							 <td>
-							 <?php $this->pnlStepThree->Render(); ?>
-	             </td>
 						</tr>
 						<tr>
 							 <td>
