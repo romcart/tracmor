@@ -52,6 +52,7 @@
 		protected $lblStepTwo;
 		protected $arrAssetCustomField;
 		protected $arrAssetModelCustomField;
+		protected $arrTracmorField;
 
 		protected function Form_Create() {
 			// Create the Header Menu
@@ -260,6 +261,7 @@
               }
             }
             $this->arrMapFields = array();
+            $this->arrTracmorField = array();
             // Load first file
             $this->FileCsvData->load($this->strFilePathArray[0]);
             // Get Headers
@@ -296,7 +298,66 @@
 		  }
 		  elseif ($this->intStep == 2) {
 		    // Step 2 complete
+		    $blnError = false;
+        $blnAssetCode = false;
+        $blnLocation = false;
+        $blnAssetModelCode = false;
+        $blnAssetModelShortDescription = false;
+        foreach ($this->lstMapHeaderArray as $lstMapHeader) {
+          $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
+          if ($strSelectedValue == "location") {
+            $blnLocation = true;
+          }
+          elseif ($strSelectedValue == "asset code") {
+            $blnAssetCode = true;
+          }
+          elseif ($strSelectedValue == "asset model short description") {
+            $blnAssetModelShortDescription = true;
+          }
+          elseif ($strSelectedValue == "asset model code") {
+            $blnAssetModelCode = true;
+          }
+        }
+        if ($blnAssetCode && $blnAssetModelCode && $blnAssetModelShortDescription && $blnLocation) {
+          $this->btnNext->Warning = "";
+          $strLocationArray = array();
+          $objLocationArray = Location::LoadAll();
+          foreach ($objLocationArray as $objLocationArray) {
+            $strLocationArray[] = $objLocationArray->ShortDescription;
+          }
+          foreach ($this->arrTracmorField as $key => $value) {
+            if ($value == 'location') {
+              $intLocationKey = $key;
+            }
+            elseif ($value == 'category') {
+              $intCategoryKey = $key;
+            }
+          }
 
+          for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
+            $strRowArray = $this->FileCsvData->getRow($i);
+            if (!$this->in_array_nocase($strRowArray[$intLocationKey], $strLocationArray)) {
+              echo "|$strRowArray[$intLocationKey]|" . " ";
+              $strLocationArray[] = $strRowArray[$intLocationKey];
+            }
+          }
+        }
+        /*elseif (!$blnAssetCode) {
+          $this->btnNext->Warning = "1";
+        }
+        elseif (!$blnAssetModelCode) {
+          $this->btnNext->Warning = "2";
+        }
+        elseif (!$blnAssetModelShortDescription) {
+          $this->btnNext->Warning = "3";
+        }
+        elseif (!$blnLocation) {
+          $this->btnNext->Warning = "4";
+        }*/
+        else {
+          $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Code, Asset Model Short Description, Location).";
+          $blnError = true;
+        }
 		  }
 		  else {
 		    // Step 3 complete
@@ -308,34 +369,67 @@
 		  }
 	  }
 
+	  // Case-insensitive in array function
+    protected function in_array_nocase($search, &$array) {
+      $search = strtolower($search);
+      foreach ($array as $item)
+        if (strtolower($item) == $search)
+          return TRUE;
+      return FALSE;
+    }
+
 	  protected function lstMapHeader_Create($objParentObject, $intId, $strName = null) {
 	    if ($this->chkHeaderRow->Checked && !$strName) {
 	      return false;
 	    }
+	    $strName = strtolower($strName);
 	    $lstMapHeader = new QListBox($objParentObject);
 	    $lstMapHeader->Name = "lst".$intId;
 	    $strAssetGroup = "Asset";
 	    $strAssetModelGroup = "Asset Model";
 	    $lstMapHeader->AddItem("- Not Mapped -", null);
-	    $lstMapHeader->AddItem("Asset Code", "Asset Code", (strtolower($strName) == 'asset code') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Asset Code", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup);
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
-	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId,  (strtolower($strName) == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
+	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
 	    }
-	    $lstMapHeader->AddItem("Location", "Location", (strtolower($strName) == 'location') ? true : false, $strAssetGroup);
-	    $lstMapHeader->AddItem("Created By", "Created By", (strtolower($strName) == 'created by') ? true : false, $strAssetGroup);
-	    $lstMapHeader->AddItem("Created Date", "Created Date", (strtolower($strName) == 'created date') ? true : false, $strAssetGroup);
-	    $lstMapHeader->AddItem("Modified By", "Modified By", (strtolower($strName) == 'modified by') ? true : false, $strAssetGroup);
-	    $lstMapHeader->AddItem("Modified Date", "Modified Date", (strtolower($strName) == 'modified date') ? true : false, $strAssetGroup);
-	    $lstMapHeader->AddItem("Asset Model Code", "Asset Model Code", (strtolower($strName) == 'asset model code') ? true : false, $strAssetModelGroup);
-	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", (strtolower($strName) == 'asset model short description') ? true : false, $strAssetModelGroup);
-	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", (strtolower($strName) == 'asset model long description') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Created By", "Created By", ($strName == 'created by') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Created Date", "Created Date", ($strName == 'created date') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Modified By", "Modified By", ($strName == 'modified by') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Modified Date", "Modified Date", ($strName == 'modified date') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Asset Model Code", "Asset Model Code", ($strName == 'asset model code') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", ($strName == 'asset model short description') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", ($strName == 'asset model long description') ? true : false, $strAssetModelGroup);
 	    foreach ($this->arrAssetModelCustomField as $objCustomField) {
-	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId, (strtolower($strName) == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetModelGroup);
+	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId, ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetModelGroup);
 	    }
-	    $lstMapHeader->AddItem("Category", "Category", (strtolower($strName) == 'category') ? true : false, $strAssetModelGroup);
-	    $lstMapHeader->AddItem("Manufacturer", "Manufacturer", (strtolower($strName) == 'manufacturer') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Category", "Category", ($strName == 'category') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Manufacturer", "Manufacturer", ($strName == 'manufacturer') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddAction(new QChangeEvent(), new QAjaxAction('lstTramorField_Change'));
 	    $this->lstMapHeaderArray[] = $lstMapHeader;
+	    if ($strName && strtolower($lstMapHeader->SelectedValue) == $strName) {
+	      $this->arrTracmorField[$intId] = $strName;
+	    }
 	    return true;
+	  }
+
+	  protected function lstTramorField_Change($strFormId, $strControlId, $strParameter) {
+      $objControl = QForm::GetControl($strControlId);
+      if ($objControl->SelectedValue != null) {
+        $search = strtolower($objControl->SelectedValue);
+        if ($this->in_array_nocase($search, $this->arrTracmorField)) {
+          $objControl->Warning = "This value has already been selected.";
+          $objControl->SelectedIndex = 0;
+          unset($this->arrTracmorField[substr($objControl->Name, 3)]);
+        }
+        else {
+          $objControl->Warning = "";
+          $this->arrTracmorField[substr($objControl->Name, 3)] = $search;
+        }
+      }
+      else {
+        unset($this->arrTracmorField[substr($objControl->Name, 3)]);
+      }
 	  }
 
 	  protected function GetCsvSettings() {

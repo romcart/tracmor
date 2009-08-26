@@ -33,7 +33,7 @@
 						</tr>
 						<tr>
 							 <td>
-							 <?php $this->btnCancel->Render(); ?>&nbsp;<?php $this->btnNext->Render(); ?>
+							 <?php $this->btnCancel->Render(); ?>&nbsp;<?php $this->btnNext->RenderWithError(); ?>
 							 </td>
 						</tr>
 					</table>
