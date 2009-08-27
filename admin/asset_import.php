@@ -303,6 +303,8 @@
         $blnLocation = false;
         $blnAssetModelCode = false;
         $blnAssetModelShortDescription = false;
+        $blnCategory = false;
+        $blnManufacturer = false;
         foreach ($this->lstMapHeaderArray as $lstMapHeader) {
           $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
           if ($strSelectedValue == "location") {
@@ -317,14 +319,15 @@
           elseif ($strSelectedValue == "asset model code") {
             $blnAssetModelCode = true;
           }
-        }
-        if ($blnAssetCode && $blnAssetModelCode && $blnAssetModelShortDescription && $blnLocation) {
-          $this->btnNext->Warning = "";
-          $strLocationArray = array();
-          $objLocationArray = Location::LoadAll();
-          foreach ($objLocationArray as $objLocationArray) {
-            $strLocationArray[] = $objLocationArray->ShortDescription;
+          elseif ($strSelectedValue == "category") {
+            $blnCategory = true;
           }
+          elseif ($strSelectedValue == "manufacturer") {
+            $blnManufacturer = true;
+          }
+        }
+        if ($blnAssetCode && $blnAssetModelCode && $blnAssetModelShortDescription && $blnLocation && $blnCategory && $blnManufacturer) {
+          $this->btnNext->Warning = "";
           foreach ($this->arrTracmorField as $key => $value) {
             if ($value == 'location') {
               $intLocationKey = $key;
@@ -332,13 +335,39 @@
             elseif ($value == 'category') {
               $intCategoryKey = $key;
             }
+            elseif ($value == 'manufacturer') {
+              $intManufacturerKey = $key;
+            }
           }
 
+          $strLocationArray = array();
+          $strNewLocationArray = array();
+          foreach (Location::LoadAll() as $objLocation) {
+            $strLocationArray[] = $objLocation->ShortDescription;
+          }
+          $strCategoryArray = array();
+          $strNewCategoryArray = array();
+          foreach (Category::LoadAll() as $objCategory) {
+            $strCategoryArray[] = $objCategory->ShortDescription;
+          }
+          $strManufacturerArray = array();
+          $strNewManufacturerArray = array();
+          foreach (Manufacturer::LoadAll() as $objManufacturer) {
+            $strManufacturerArray[] = $objManufacturer->ShortDescription;
+          }
           for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
             $strRowArray = $this->FileCsvData->getRow($i);
             if (!$this->in_array_nocase($strRowArray[$intLocationKey], $strLocationArray)) {
-              echo "|$strRowArray[$intLocationKey]|" . " ";
               $strLocationArray[] = $strRowArray[$intLocationKey];
+              $strNewLocationArray[] = $strRowArray[$intLocationKey];
+            }
+            if (!$this->in_array_nocase($strRowArray[$intCategoryKey], $strCategoryArray)) {
+              $strCategoryArray[] = $strRowArray[$intCategoryKey];
+              $strNewCategoryArray[] = $strRowArray[$intCategoryKey];
+            }
+            if (!$this->in_array_nocase($strRowArray[$intManufacturerKey], $strManufacturerArray)) {
+              $strManufacturerArray[] = $strRowArray[$intManufacturerKey];
+              $strNewManufacturerArray[] = $strRowArray[$intManufacturerKey];
             }
           }
         }
@@ -355,7 +384,7 @@
           $this->btnNext->Warning = "4";
         }*/
         else {
-          $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Code, Asset Model Short Description, Location).";
+          $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Code, Asset Model Short Description, Location, Category and Manifacturer).";
           $blnError = true;
         }
 		  }
