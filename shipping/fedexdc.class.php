@@ -274,7 +274,10 @@ class FedExDC extends FedExTags{
                  if (!fwrite($FH, $this->httpLabel)) {
                     $this->setError("Can't write to file $label_file");
                     return false;
-                 }
+                 } else {
+					// add a linefeed at the end for thermal labels
+					fwrite($FH,"\n");
+				 }
                  fclose($FH);
             } else {
                 return $this->httpLabel;
