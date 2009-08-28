@@ -4436,6 +4436,17 @@
 						1370 => ($this->lstFedexLabelPrinterType->SelectedValue === 1) ? 				//Label Media Type ; 5 = Plain Paper
 								5 : 
 								$this->lstFedexLabelFormatType->SelectedValue, 
+						2973 => 1,																		//Doc Tab Type Indicator; 1 = Zone 001
+						1607 => 'SHIPPING',
+						1608 => 'SPECIAL',
+						1609 => 'HANDLING',
+						1610 => 'DISCOUNT',
+						1611 => 'TOTAL',
+						1624 => '1416',
+						1625 => '1417',
+						1626 => '3107',
+						1627 => '1418',
+						1628 => '1419',
 						1401 => number_format(round($this->txtPackageWeight->Text, 1), 1, '.', ''),		//Total Package Weight
 						1201 => $this->txtFedexNotifySenderEmail->Text,									//Sender EMail
 						1202 => $this->txtFedexNotifyRecipientEmail->Text,								//Recipient EMail

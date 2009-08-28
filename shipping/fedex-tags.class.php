@@ -564,6 +564,7 @@ class FedExTags {
         2254 => 'recipient_fax_number',
         2382 => 'return_shipment_indicator',
         2399 => 'signature_option',
+		2973 => 'doc_tab_type_indicator',
         3000 => 'cod_type_collection',
         3001 => 'fedex_ground_purchase_order',
         3002 => 'fedex_ground_invoice',
