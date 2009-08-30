@@ -473,6 +473,7 @@
 		  }
 		  else {
 		    // Step 3 complete
+		    set_time_limit(0);
         if (!$this->blnImportEnd) {
           if ($this->intImportStep == 2) {
             $strCategoryArray = array();
@@ -489,6 +490,33 @@
               $strManufacturerArray[] = $objManufacturer->ShortDescription;
             }
             $this->btnNext->Warning = "Manufacturers have been imported. Please wait...";
+          }
+          elseif ($this->intImportStep == 4) {
+            $intCategoryArray = array();
+            foreach (Category::LoadAllWithFlags(true, false) as $objCategory) {
+              $intCategoryArray["'" . strtolower($objCategory->ShortDescription) . "'"] = $objCategory->CategoryId;
+            }
+            $intManufacturerArray = array();
+            foreach (Manufacturer::LoadAll() as $objManufacturer) {
+              $intManufacturerArray["'" . strtolower($objManufacturer->ShortDescription) . "'"] = $objManufacturer->ManufacturerId;
+            }
+
+            foreach ($this->arrTracmorField as $key => $value) {
+              if ($value == 'asset model short description') {
+                $intModelShortDescriptionKey = $key;
+              }
+              elseif ($value == 'asset model long description') {
+                $intModelLongDescriptionKey = $key;
+              }
+              elseif ($value == 'asset model code') {
+                $intModelCodeKey = $key;
+              }
+            }
+            $strAssetModelArray = array();
+            foreach (AssetModel::LoadAll() as $objAssetModel) {
+              $strAddedAssetModelArray[] = strtolower($objAssetModel->ShortDescription);
+            }
+            $this->btnNext->Warning = "Asset Models have been imported. Please wait...";
           }
 
           $j=1;
@@ -525,18 +553,38 @@
                 }
               }
             }
+            elseif ($this->intImportStep == 4) {
+              for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
+                $strRowArray = $this->FileCsvData->getRow($i);
+                if (trim($strRowArray[$intModelShortDescriptionKey]) && !$this->in_array_nocase(trim($strRowArray[$intModelShortDescriptionKey]), $strAddedAssetModelArray)) {
+                  $strAddedAssetModelArray[] = strtolower(trim($strRowArray[$intModelShortDescriptionKey]));
+                  $objNewAssetModel = new AssetModel();
+                  $objNewAssetModel->ShortDescription = trim($strRowArray[$intModelShortDescriptionKey]);
+                  $objNewAssetModel->AssetModelCode = trim($strRowArray[$intModelCodeKey]);
+                  $objNewAssetModel->CategoryId = $intCategoryArray["'".strtolower(trim($strRowArray[$this->intCategoryKey]))."'"];
+                  $objNewAssetModel->ManufacturerId = $intManufacturerArray["'".strtolower(trim($strRowArray[$this->intManufacturerKey]))."'"];
+                  if (isset($intModelLongDescriptionKey)) {
+                    $objNewAssetModel->LongDescription = trim($strRowArray[$intModelLongDescriptionKey]);
+                  }
+                  $objNewAssetModel->Save();
+                  //$this->objNewAssetModelArray[] = $objNewAssetModel;
+                }
+              }
+            }
             $j++;
           }
-          // Enable Next button
-          $this->btnNext->Enabled = true;
-          $this->intImportStep++;
-          if ($this->intImportStep == 4) {
+          if ($this->intImportStep == 5) {
             $this->blnImportEnd = true;
             $this->btnNext->Warning = "";
             $this->dtgLocation->DataSource = $this->objNewLocationArray;
             $this->dtgCategory->DataSource = $this->objNewCategoryArray;
             $this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
             $this->intImportStep = -1;
+          }
+          // Enable Next button
+          $this->btnNext->Enabled = true;
+          if (!$this->blnImportEnd) {
+            $this->intImportStep++;
           }
         }
 		  }
