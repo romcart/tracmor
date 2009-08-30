@@ -53,6 +53,19 @@
 		protected $arrAssetCustomField;
 		protected $arrAssetModelCustomField;
 		protected $arrTracmorField;
+		protected $dtgCategory;
+		protected $objNewCategoryArray;
+		protected $dtgManufacturer;
+		protected $objNewManufacturerArray;
+		protected $dtgLocation;
+		protected $objNewLocationArray;
+		protected $blnImportEnd;
+		protected $intImportStep;
+		protected $intLocationKey;
+    protected $intCategoryKey;
+    protected $intManufacturerKey;
+    protected $intCreatedBy;
+    protected $intCreatedDate;
 
 		protected function Form_Create() {
 			// Create the Header Menu
@@ -63,6 +76,7 @@
 			//$this->pnlStepThree_Create();
 			$this->Buttons_Create();
 			$this->intStep = 1;
+			$this->blnImportEnd = true;
 			$this->arrAssetCustomField = CustomField::LoadArrayByActiveFlagEntity(1, 1);
 			if (!$this->arrAssetCustomField) {
 			  $this->arrAssetCustomField = array();
@@ -135,9 +149,9 @@
 
     protected function pnlStepThree_Create() {
 			$this->pnlStepThree = new QPanel($this->pnlMain);
-      $this->pnlStepThree->Display = false;
-      $this->pnlStepThree->AutoRenderChildren = true;
-
+      //$this->pnlStepThree->Display = false;
+      //$this->pnlStepThree->AutoRenderChildren = true;
+      $this->pnlStepThree->Template = "asset_import_pnl_step3.tpl.php";
       // Step 3
 
     }
@@ -330,46 +344,115 @@
           $this->btnNext->Warning = "";
           foreach ($this->arrTracmorField as $key => $value) {
             if ($value == 'location') {
-              $intLocationKey = $key;
+              $this->intLocationKey = $key;
             }
             elseif ($value == 'category') {
-              $intCategoryKey = $key;
+              $this->intCategoryKey = $key;
             }
             elseif ($value == 'manufacturer') {
-              $intManufacturerKey = $key;
+              $this->intManufacturerKey = $key;
+            }
+            elseif ($value == 'created by') {
+              $this->intCreatedBy = $key;
+            }
+            elseif ($value == 'created date') {
+              $this->intCreatedDate = $key;
             }
           }
 
           $strLocationArray = array();
-          $strNewLocationArray = array();
           foreach (Location::LoadAll() as $objLocation) {
             $strLocationArray[] = $objLocation->ShortDescription;
           }
-          $strCategoryArray = array();
-          $strNewCategoryArray = array();
-          foreach (Category::LoadAll() as $objCategory) {
-            $strCategoryArray[] = $objCategory->ShortDescription;
-          }
-          $strManufacturerArray = array();
-          $strNewManufacturerArray = array();
-          foreach (Manufacturer::LoadAll() as $objManufacturer) {
-            $strManufacturerArray[] = $objManufacturer->ShortDescription;
-          }
-          for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
-            $strRowArray = $this->FileCsvData->getRow($i);
-            if (!$this->in_array_nocase($strRowArray[$intLocationKey], $strLocationArray)) {
-              $strLocationArray[] = $strRowArray[$intLocationKey];
-              $strNewLocationArray[] = $strRowArray[$intLocationKey];
+          $this->objNewLocationArray = array();
+          $this->objNewCategoryArray = array();
+          $this->objNewManufacturerArray = array();
+          $this->blnImportEnd = false;
+          $j=1;
+          foreach ($this->strFilePathArray as $strFilePath) {
+            if ($j != 1) {
+              $this->FileCsvData->load($strFilePath);
+              $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
-            if (!$this->in_array_nocase($strRowArray[$intCategoryKey], $strCategoryArray)) {
-              $strCategoryArray[] = $strRowArray[$intCategoryKey];
-              $strNewCategoryArray[] = $strRowArray[$intCategoryKey];
+            // Location Import
+            for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
+              $strRowArray = $this->FileCsvData->getRow($i);
+              if (trim($strRowArray[$this->intLocationKey]) && !$this->in_array_nocase(trim($strRowArray[$this->intLocationKey]), $strLocationArray)) {
+                $strLocationArray[] = trim($strRowArray[$this->intLocationKey]);
+                $objNewLocation = new Location();
+                $objNewLocation->ShortDescription = trim($strRowArray[$this->intLocationKey]);
+                $objNewLocation->Save();
+                $this->objNewLocationArray[] = $objNewLocation;
+              }
             }
-            if (!$this->in_array_nocase($strRowArray[$intManufacturerKey], $strManufacturerArray)) {
-              $strManufacturerArray[] = $strRowArray[$intManufacturerKey];
-              $strNewManufacturerArray[] = $strRowArray[$intManufacturerKey];
-            }
+            $j++;
           }
+          $this->btnNext->RemoveAllActions('onclick');
+          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
+    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
+    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
+    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+          $this->btnNext->Warning = "Locations have been imported. Please wait...";
+          $this->intImportStep = 2;
+
+          $this->dtgLocation = new QDataGrid($this);
+          $this->dtgLocation->Name = 'location_list';
+      		$this->dtgLocation->CellPadding = 5;
+      		$this->dtgLocation->CellSpacing = 0;
+      		$this->dtgLocation->CssClass = "datagrid";
+          $this->dtgLocation->UseAjax = true;
+          $this->dtgLocation->ShowColumnToggle = false;
+          $this->dtgLocation->ShowExportCsv = false;
+          $this->dtgLocation->ShowHeader = false;
+
+          // Enable Pagination, and set to 20 items per page
+          //$objPaginator = new QPaginator($this->dtgLocation);
+          //$this->dtgLocation->Paginator = $objPaginator;
+          //$this->dtgLocation->ItemsPerPage = 20;
+
+          $this->dtgLocation->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          //$this->dtgLocation->DataSource = $this->objNewLocationArray;
+          //$this->dtgLocation->TotalItemCount = count($this->objNewLocationArray);
+
+          $this->dtgCategory = new QDataGrid($this);
+          $this->dtgCategory->Name = 'category_list';
+      		$this->dtgCategory->CellPadding = 5;
+      		$this->dtgCategory->CellSpacing = 0;
+      		$this->dtgCategory->CssClass = "datagrid";
+          $this->dtgCategory->UseAjax = true;
+          $this->dtgCategory->ShowColumnToggle = false;
+          $this->dtgCategory->ShowExportCsv = false;
+          $this->dtgCategory->ShowHeader = false;
+
+          // Enable Pagination, and set to 20 items per page
+          //$objPaginator = new QPaginator($this->dtgCategory);
+          //$this->dtgCategory->Paginator = $objPaginator;
+          //$this->dtgCategory->ItemsPerPage = 20;
+
+          $this->dtgCategory->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          //$this->dtgCategory->DataSource = $this->objNewCategoryArray;
+          //$this->dtgCategory->TotalItemCount = count($this->objNewCategoryArray);
+
+          $this->dtgManufacturer = new QDataGrid($this);
+          $this->dtgManufacturer->Name = 'manufacturer_list';
+      		$this->dtgManufacturer->CellPadding = 5;
+      		$this->dtgManufacturer->CellSpacing = 0;
+      		$this->dtgManufacturer->CssClass = "datagrid";
+          $this->dtgManufacturer->UseAjax = true;
+          $this->dtgManufacturer->ShowColumnToggle = false;
+          $this->dtgManufacturer->ShowExportCsv = false;
+          $this->dtgManufacturer->ShowHeader = false;
+
+          // Enable Pagination, and set to 20 items per page
+          //$objPaginator = new QPaginator($this->dtgManufacturer);
+          //$this->dtgManufacturer->Paginator = $objPaginator;
+          //$this->dtgManufacturer->ItemsPerPage = 20;
+
+          $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          //$this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
+          //$this->dtgManufacturer->TotalItemCount = count($this->objNewManufacturerArray);
+          //QApplication::ExecuteJavaScript("document.getElementById('".$this->btnNext->ControlId."').click();");
         }
         /*elseif (!$blnAssetCode) {
           $this->btnNext->Warning = "1";
@@ -390,11 +473,81 @@
 		  }
 		  else {
 		    // Step 3 complete
+        if (!$this->blnImportEnd) {
+          if ($this->intImportStep == 2) {
+            $strCategoryArray = array();
+            $this->objNewCategoryArray = array();
+            foreach (Category::LoadAll() as $objCategory) {
+              $strCategoryArray[] = $objCategory->ShortDescription;
+            }
+            $this->btnNext->Warning = "Categories have been imported. Please wait...";
+          }
+          elseif ($this->intImportStep == 3) {
+            $strManufacturerArray = array();
+            $this->objNewManufacturerArray = array();
+            foreach (Manufacturer::LoadAll() as $objManufacturer) {
+              $strManufacturerArray[] = $objManufacturer->ShortDescription;
+            }
+            $this->btnNext->Warning = "Manufacturers have been imported. Please wait...";
+          }
 
+          $j=1;
+          foreach ($this->strFilePathArray as $strFilePath) {
+            if ($j != 1) {
+              $this->FileCsvData->load($strFilePath);
+              $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
+            }
+            // Category Import
+            if ($this->intImportStep == 2) {
+              for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
+                $strRowArray = $this->FileCsvData->getRow($i);
+                if (trim($strRowArray[$this->intCategoryKey]) && !$this->in_array_nocase(trim($strRowArray[$this->intCategoryKey]), $strCategoryArray)) {
+                  $strCategoryArray[] = trim($strRowArray[$this->intCategoryKey]);
+                  $objNewCategory = new Category();
+                  $objNewCategory->ShortDescription = trim($strRowArray[$this->intCategoryKey]);
+                  $objNewCategory->AssetFlag = true;
+                  $objNewCategory->InventoryFlag = false;
+                  $objNewCategory->Save();
+                  $this->objNewCategoryArray[] = $objNewCategory;
+                }
+              }
+            }
+            // Manufacturer Import
+            elseif ($this->intImportStep == 3) {
+              for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
+                $strRowArray = $this->FileCsvData->getRow($i);
+                if (trim($strRowArray[$this->intManufacturerKey]) && !$this->in_array_nocase(trim($strRowArray[$this->intManufacturerKey]), $strManufacturerArray)) {
+                  $strManufacturerArray[] = trim($strRowArray[$this->intManufacturerKey]);
+                  $objNewManufacturer = new Manufacturer();
+                  $objNewManufacturer->ShortDescription = trim($strRowArray[$this->intManufacturerKey]);
+                  $objNewManufacturer->Save();
+                  $this->objNewManufacturerArray[] = $objNewManufacturer;
+                }
+              }
+            }
+            $j++;
+          }
+          // Enable Next button
+          $this->btnNext->Enabled = true;
+          $this->intImportStep++;
+          if ($this->intImportStep == 4) {
+            $this->blnImportEnd = true;
+            $this->btnNext->Warning = "";
+            $this->dtgLocation->DataSource = $this->objNewLocationArray;
+            $this->dtgCategory->DataSource = $this->objNewCategoryArray;
+            $this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
+            $this->intImportStep = -1;
+          }
+        }
 		  }
 		  if (!$blnError) {
-		    $this->intStep++;
-  		  $this->DisplayStepForm($this->intStep);
+		    if (($this->blnImportEnd || $this->intImportStep == 2) && $this->intImportStep != -1) {
+  		    $this->intStep++;
+    		  $this->DisplayStepForm($this->intStep);
+		    }
+    		if (!$this->blnImportEnd) {
+  		    QApplication::ExecuteJavaScript("document.getElementById('".$this->btnNext->ControlId."').click();");
+  		  }
 		  }
 	  }
 
@@ -419,7 +572,7 @@
 	    $lstMapHeader->AddItem("- Not Mapped -", null);
 	    $lstMapHeader->AddItem("Asset Code", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup);
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
-	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
+	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "Asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
 	    }
 	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Created By", "Created By", ($strName == 'created by') ? true : false, $strAssetGroup);
@@ -430,7 +583,7 @@
 	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", ($strName == 'asset model short description') ? true : false, $strAssetModelGroup);
 	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", ($strName == 'asset model long description') ? true : false, $strAssetModelGroup);
 	    foreach ($this->arrAssetModelCustomField as $objCustomField) {
-	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "CustomField_".$objCustomField->CustomFieldId, ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetModelGroup);
+	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "AssetModel_".$objCustomField->CustomFieldId, ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetModelGroup);
 	    }
 	    $lstMapHeader->AddItem("Category", "Category", ($strName == 'category') ? true : false, $strAssetModelGroup);
 	    $lstMapHeader->AddItem("Manufacturer", "Manufacturer", ($strName == 'manufacturer') ? true : false, $strAssetModelGroup);
@@ -518,12 +671,14 @@
 		     $this->pnlStepTwo_Create();
 		     break;
 		   case 3:
-		     $this->pnlStepOne->Display = false;
+		     /*$this->pnlStepOne->Display = false;
 		     $this->pnlStepOne->Visible = false;
 		     $this->pnlStepTwo->Display = false;
 		     $this->pnlStepTwo->Visible = false;
 		     $this->pnlStepThree->Display = true;
-		     $this->pnlStepThree->Visible = true;
+		     $this->pnlStepThree->Visible = true;*/
+		     $this->pnlMain->RemoveChildControls($this->pnlMain);
+		     $this->pnlStepThree_Create();
 		     break;
 		   case 4:
 		     $this->DisplayStepForm(1);
