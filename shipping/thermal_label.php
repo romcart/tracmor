@@ -71,7 +71,7 @@
 
 			$this->lblImage->Text = '<applet code="com.tracmor.applet.ThermalLabelPrint.class" archive="../includes/java/jars/ThermalLabelPrint.jar" style="width:1px;height:1px;float:left;">';
 			$this->lblImage->Text.= '<param name="type" value="nio">';
-			$this->lblImage->Text.= '<param name="url" value="'.$strSrc . QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension.'">';
+			$this->lblImage->Text.= '<param name="url" value="'.$strSrc . QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension.'?nocache='.time().'">';
 			$this->lblImage->Text.= '<param name="printer" value="'.$this->objFedexShipment->ThermalPrinterPort.'"></applet>';
 		}
 	}
