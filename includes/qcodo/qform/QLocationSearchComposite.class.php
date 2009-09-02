@@ -176,13 +176,13 @@ class QLocationSearchComposite extends QControl {
   	
     $this->strLocation = $this->txtLocation->Text;
 		if ($this->strLocation) {
-			$this->dtgLocation->TotalItemCount = Location::QueryCount(QQ::AndCondition(QQ::Like(QQN::Location()->ShortDescription, '%' . $this->strLocation . '%'), QQ::GreaterThan(QQN::Location()->LocationId, 5)), $objClauses);
+			$this->dtgLocation->TotalItemCount = Location::QueryCount(QQ::AndCondition(QQ::Like(QQN::Location()->ShortDescription, '%' . $this->strLocation . '%'), QQ::GreaterThan(QQN::Location()->LocationId, 6)), $objClauses);
 		  if ($this->dtgLocation->TotalItemCount > 0) {
 		    $this->dtgLocation->ShowHeader = true;
 		    // Add the LimitClause information, as well
 				if ($objClause = $this->dtgLocation->LimitClause)
 					array_push($objClauses, $objClause);
-		    $this->dtgLocation->DataSource = Location::QueryArray(QQ::AndCondition(QQ::Like(QQN::Location()->ShortDescription, '%' . $this->strLocation . '%'), QQ::GreaterThan(QQN::Location()->LocationId, 5)), $objClauses);
+		    $this->dtgLocation->DataSource = Location::QueryArray(QQ::AndCondition(QQ::Like(QQN::Location()->ShortDescription, '%' . $this->strLocation . '%'), QQ::GreaterThan(QQN::Location()->LocationId, 6)), $objClauses);
 		  }
 		  else {
 		    $this->dtgLocation->ShowHeader = false;
@@ -191,7 +191,7 @@ class QLocationSearchComposite extends QControl {
 		else {
 		  $objExpansionMap[Location::ExpandCreatedByObject] = true;
   		// Get Total Count b/c of Pagination
-  		$this->dtgLocation->TotalItemCount = Location::QueryCount(QQ::GreaterThan(QQN::Location()->LocationId, 5), $objClauses);
+  		$this->dtgLocation->TotalItemCount = Location::QueryCount(QQ::GreaterThan(QQN::Location()->LocationId, 6), $objClauses);
   		if ($this->dtgLocation->TotalItemCount == 0) {
   			$this->dtgLocation->ShowHeader = false;
   		}
@@ -200,7 +200,7 @@ class QLocationSearchComposite extends QControl {
 				if ($objClause = $this->dtgLocation->LimitClause)
 					array_push($objClauses, $objClause);
   			
-		    $this->dtgLocation->DataSource = Location::QueryArray(QQ::GreaterThan(QQN::Location()->LocationId, 5), $objClauses);
+		    $this->dtgLocation->DataSource = Location::QueryArray(QQ::GreaterThan(QQN::Location()->LocationId, 6), $objClauses);
   			$this->dtgLocation->ShowHeader = true;
 		  }
 		}
