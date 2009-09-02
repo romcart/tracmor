@@ -15,7 +15,7 @@
 	     <tr>
 	       <td style="font-size:11px;font-family:verdana;color:#464646"><?php if (isset($this->lstMapHeaderArray[$i])) $this->lstMapHeaderArray[$i]->RenderWithError(); ?></td>
 	       <?php if ($this->blnHeaderRow) { ?><td nowrap style="font-size:11px;font-family:verdana;color:#464646"><?php echo $this->arrMapFields[$i]['header']; ?></td><?php } ?>
-	       <td style="font-size:11px;font-family:verdana;color:#464646"><?php if (isset($this->txtMapDefaultValueArray[$i])) $this->txtMapDefaultValueArray[$i]->Render(); ?></td>
+	       <td style="font-size:11px;font-family:verdana;color:#464646"><?php if (isset($this->txtMapDefaultValueArray[$i])) $this->txtMapDefaultValueArray[$i]->RenderWithError() . "&nbsp;" . $this->lstMapDefaultValueArray[$i]->RenderWithError(); ?></td>
 	       <td nowrap style="font-size:11px;font-family:verdana;color:#464646"><?php echo $this->arrMapFields[$i]['row1']; ?></td>
 	     </tr>
 	     <?php } ?>

@@ -43,6 +43,7 @@
 		protected $strFilePathArray;
 		protected $lstMapHeaderArray;
 		protected $txtMapDefaultValueArray;
+		protected $lstMapDefaultValueArray;
 		protected $strAcceptibleMimeArray;
 		protected $chkHeaderRow;
 		protected $blnHeaderRow;
@@ -74,8 +75,6 @@
 			$this->ctlHeaderMenu_Create();
 			$this->pnlMain_Create();
 			$this->pnlStepOne_Create();
-			//$this->pnlStepTwo_Create();
-			//$this->pnlStepThree_Create();
 			$this->Buttons_Create();
 			$this->intStep = 1;
 			$this->blnImportEnd = true;
@@ -137,25 +136,12 @@
 
     protected function pnlStepTwo_Create() {
 			$this->pnlStepTwo = new QPanel($this->pnlMain);
-			//$this->pnlStepTwo->AutoRenderChildren = true;
-			//$this->pnlStepTwo->Display = false;
       $this->pnlStepTwo->Template = "asset_import_pnl_step2.tpl.php";
-
-      // Step 2
-      /*$this->lblStepTwo = new QLabel($this->pnlStepTwo);
-      $this->lblStepTwo->Text = "Step 2: Map Fields and Import<br/>";
-      $this->lblStepTwo->CssClass = "title";
-      $this->lblStepTwo->HtmlEntities = false;*/
-
     }
 
     protected function pnlStepThree_Create() {
 			$this->pnlStepThree = new QPanel($this->pnlMain);
-      //$this->pnlStepThree->Display = false;
-      //$this->pnlStepThree->AutoRenderChildren = true;
       $this->pnlStepThree->Template = "asset_import_pnl_step3.tpl.php";
-      // Step 3
-
     }
 
     protected function Buttons_Create() {
@@ -301,8 +287,13 @@
               }
               if ($this->blnHeaderRow && $this->arrCsvHeader[$i] || !$this->blnHeaderRow) {
                 $txtDefaultValue = new QTextBox($this);
-                $txtDefaultValue->Width = 100;
+                $txtDefaultValue->Width = 150;
                 $this->txtMapDefaultValueArray[] = $txtDefaultValue;
+
+                $lstDefaultValue = new QListBox($this);
+                $lstDefaultValue->Width = 150;
+                $lstDefaultValue->Display = false;
+                $this->lstMapDefaultValueArray[] = $lstDefaultValue;
               }
               //$lblRow1 = new QLabel($this->pnlStepTwo);
               //$lblRow1->Text = "  " . $strFirstRowArray[$i] . "<br/>";
@@ -342,7 +333,31 @@
             $blnManufacturer = true;
           }
         }
-        if ($blnAssetCode && $blnAssetModelCode && $blnAssetModelShortDescription && $blnLocation && $blnCategory && $blnManufacturer) {
+        if ($this->lstMapDefaultValueArray) {
+          foreach ($this->lstMapDefaultValueArray as $lstDefault) {
+            if ($lstDefault->Display && $lstDefault->Required && !$lstDefault->SelectedValue) {
+              $lstDefault->Warning = "You must select one default value.";
+              $blnError = true;
+              break;
+            }
+            else {
+              $blnError = false;
+              $lstDefault->Warning = "";
+            }
+          }
+        }
+        if ($this->txtMapDefaultValueArray) {
+          foreach ($this->txtMapDefaultValueArray as $txtDefault) {
+            if ($txtDefault->Display && $txtDefault->Required && !$txtDefault->Text) {
+              $txtDefault->Warning = "You must enter default value.";
+              break;
+            }
+            else {
+              $txtDefault->Warning = "";
+            }
+          }
+        }
+        if (!$blnError && $blnAssetCode && $blnAssetModelCode && $blnAssetModelShortDescription && $blnLocation && $blnCategory && $blnManufacturer) {
           $this->btnNext->Warning = "";
           foreach ($this->arrTracmorField as $key => $value) {
             if ($value == 'location') {
@@ -595,7 +610,7 @@
                   }
                   $objNewAssetModel->Save();
                   foreach ($arrAssetModelCustomField as $objCustomField) {
-                    //if (isset($intModelCustomFieldKeyArray[$objCustomField->CustomFieldId])) {
+                    if ($objCustomField->CustomFieldQtypeId != 2) {
                       $objCustomField->CustomFieldSelection = new CustomFieldSelection;
           						$objCustomField->CustomFieldSelection->newCustomFieldValue = new CustomFieldValue;
           						$objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldId = $objCustomField->CustomFieldId;
@@ -610,7 +625,25 @@
           						$objCustomField->CustomFieldSelection->EntityQtypeId = 4;
           						$objCustomField->CustomFieldSelection->CustomFieldValueId = $objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldValueId;
           						$objCustomField->CustomFieldSelection->Save();
-                    //}
+                    }
+                    else {
+                      $data = trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+                      $blnInList = false;
+                      $objCustomField->CustomFieldSelection = new CustomFieldSelection;
+                			$objCustomField->CustomFieldSelection->EntityId = $objNewAssetModel->AssetModelId;
+                			$objCustomField->CustomFieldSelection->EntityQtypeId = 4;
+                			foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
+            					  if (strtolower($objCustomFieldValue->ShortDescription) == $data) {
+                 					$objCustomField->CustomFieldSelection->CustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
+                					$blnInList = true;
+                					break;
+            					  }
+            					}
+            					if (!$blnInList && $this->lstMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+             					  $objCustomField->CustomFieldSelection->CustomFieldValueId = $this->lstMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
+            					}
+             					$objCustomField->CustomFieldSelection->Save();
+                    }
                   }
                   $this->objNewAssetModelArray[] = $objNewAssetModel;
                 }
@@ -700,7 +733,50 @@
         }
         else {
           $objControl->Warning = "";
+          $txtDefault = $this->txtMapDefaultValueArray[substr($objControl->Name, 3)];
+          $lstDefault = $this->lstMapDefaultValueArray[substr($objControl->Name, 3)];
           $this->arrTracmorField[substr($objControl->Name, 3)] = $search;
+          if (substr($objControl->SelectedValue, 0, 6) == "model_" || substr($objControl->SelectedValue, 0, 6) == "asset_") {
+            $objCustomField = CustomField::LoadByCustomFieldId(substr($objControl->SelectedValue, 6));
+            // type = Text or TextBox
+            if ($objCustomField->CustomFieldQtypeId != 2) {
+              $txtDefault->Required = $objCustomField->RequiredFlag;
+              // If it is a required text field, then assign the default text for a new entity only
+  	 					if ($objCustomField->RequiredFlag && $objCustomField->DefaultCustomFieldValueId) {
+  	 						$txtDefault->Text = $objCustomField->DefaultCustomFieldValue->ShortDescription;
+  	 					}
+  	 					else {
+  	 					  $txtDefault->Text = "";
+  	 					}
+              $txtDefault->Display = true;
+              $lstDefault->Display = false;
+            }
+            // type = Select
+            else {
+              $lstDefault->RemoveAllItems();
+  						$lstDefault->AddItem('- Select One -', null);
+  						$lstDefault->Required = $objCustomField->RequiredFlag;
+
+  						$objCustomFieldValueArray = CustomFieldValue::LoadArrayByCustomFieldId(substr($objControl->SelectedValue, 6), QQ::Clause(QQ::OrderBy(QQN::CustomFieldValue()->ShortDescription)));
+  						if ($objCustomFieldValueArray) {
+                foreach ($objCustomFieldValueArray as $objCustomFieldValue) {
+  								$objListItem = new QListItem($objCustomFieldValue->__toString(), $objCustomFieldValue->CustomFieldValueId);
+  								// If it is a required field, then select the value on new entities by default
+  								if ($objCustomField->RequiredFlag && $objCustomField->DefaultCustomFieldValueId && $objCustomField->DefaultCustomFieldValueId == $objCustomFieldValue->CustomFieldValueId) {
+  									$objListItem->Selected = true;
+  								}
+								  $lstDefault->AddItem($objListItem);
+  							}
+  						}
+
+  						$txtDefault->Display = false;
+              $lstDefault->Display = true;
+            }
+          }
+          else {
+            $txtDefault->Display = true;
+            $lstDefault->Display = false;
+          }
         }
       }
       else {
