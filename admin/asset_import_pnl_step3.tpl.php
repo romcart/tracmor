@@ -3,6 +3,12 @@
 	  <td class="title">Import Results</td>
 	</tr>
 	<tr>
+	  <td class="title">Last Imported Assets</td>
+	</tr>
+	<tr>
+	  <td><?php $this->dtgAsset->Render(); ?></td>
+	</tr>
+	<tr>
 	  <td class="title">Last Imported Asset Models</td>
 	</tr>
 	<tr>

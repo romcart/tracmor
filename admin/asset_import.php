@@ -62,6 +62,8 @@
 		protected $objNewLocationArray;
 		protected $dtgAssetModel;
 		protected $objNewAssetModelArray;
+		protected $dtgAsset;
+		protected $objNewAssetArray;
 		protected $blnImportEnd;
 		protected $intImportStep;
 		protected $intLocationKey;
@@ -78,9 +80,9 @@
 			$this->Buttons_Create();
 			$this->intStep = 1;
 			$this->blnImportEnd = true;
-			$this->arrAssetCustomField = CustomField::LoadArrayByActiveFlagEntity(1, 1);
-			if (!$this->arrAssetCustomField) {
-			  $this->arrAssetCustomField = array();
+			$this->arrAssetCustomField = array();
+			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 1) as $objCustomField) {
+			  $this->arrAssetCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
 			$this->arrAssetModelCustomField = array();
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 4) as $objCustomField) {
@@ -487,8 +489,27 @@
           //$this->dtgAssetModel->ItemsPerPage = 20;
 
           $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-          //$this->dtgAssetModel->DataSource = $this->objNewManufacturerArray;
-          //$this->dtgAssetModel->TotalItemCount = count($this->objNewManufacturerArray);
+          //$this->dtgAssetModel->DataSource = $this->objNewAssetModelArray;
+          //$this->dtgAssetModel->TotalItemCount = count($this->objNewAssetModelArray);
+
+          $this->dtgAsset = new QDataGrid($this);
+          $this->dtgAsset->Name = 'asset_list';
+      		$this->dtgAsset->CellPadding = 5;
+      		$this->dtgAsset->CellSpacing = 0;
+      		$this->dtgAsset->CssClass = "datagrid";
+          $this->dtgAsset->UseAjax = true;
+          $this->dtgAsset->ShowColumnToggle = false;
+          $this->dtgAsset->ShowExportCsv = false;
+          $this->dtgAsset->ShowHeader = false;
+
+          // Enable Pagination, and set to 20 items per page
+          //$objPaginator = new QPaginator($this->dtgAsset);
+          //$this->dtgAsset->Paginator = $objPaginator;
+          //$this->dtgAsset->ItemsPerPage = 20;
+
+          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          //$this->dtgAsset->DataSource = $this->objNewAssetArray;
+          //$this->dtgAsset->TotalItemCount = count($this->objNewAssetArray);
         }
         /*elseif (!$blnAssetCode) {
           $this->btnNext->Warning = "1";
@@ -549,16 +570,49 @@
               elseif ($value == 'asset model code') {
                 $intModelCodeKey = $key;
               }
+              elseif ($value == 'asset code') {
+                $intAssetCode = $key;
+              }
               elseif (substr($value, 0, 6) == 'model_') {
                 $intModelCustomFieldKeyArray[substr($value, 6)] = $key;
-                $arrAssetModelCustomField[substr($value, 6)] = $this->arrAssetModelCustomField[substr($value, 6)];
+                $arrAssetModelCustomField[substr($value, 6)] = $this->arrAssetCustomField[substr($value, 6)];
               }
             }
             $strAssetModelArray = array();
             foreach (AssetModel::LoadAll() as $objAssetModel) {
               $strAssetModelArray[] = strtolower($objAssetModel->ShortDescription);
             }
-            $this->btnNext->Warning = "Asset Models have been imported. Please wait...";
+          }
+          elseif ($this->intImportStep == 5) {
+            $intAssetModelArray = array();
+            foreach (AssetModel::LoadAll() as $objAssetModel) {
+              $intAssetModelArray["'" . strtolower($objAssetModel->ShortDescription) . "'"] = $objAssetModel->AssetModelId;
+            }
+            $intAssetCustomFieldKeyArray = array();
+            $arrAssetCustomField = array();
+            foreach ($this->arrTracmorField as $key => $value) {
+              if ($value == 'asset model short description') {
+                $intModelShortDescriptionKey = $key;
+              }
+              elseif ($value == 'asset code') {
+                $intAssetCode = $key;
+              }
+              elseif (substr($value, 0, 6) == 'asset_') {
+                $intAssetCustomFieldKeyArray[substr($value, 6)] = $key;
+                $arrAssetCustomField[substr($value, 6)] = $this->arrAssetCustomField[substr($value, 6)];
+              }
+            }
+            $intLocationArray = array();
+            foreach (Location::LoadAll() as $objLocation) {
+              //$intLocationArray["'" . strtolower($objLocation->ShortDescription) . "'"] = $objLocation->LocationId;
+              $intLocationArray[$objLocation->LocationId] = strtolower($objLocation->ShortDescription);
+            }
+
+            $strAssetArray = array();
+            foreach (Asset::LoadAll() as $objAsset) {
+              $strAssetArray[] = strtolower($objAsset->AssetCode);
+            }
+            $this->btnNext->Warning = "Assets have been imported. Please wait...";
           }
 
           $j=1;
@@ -641,23 +695,88 @@
             					}
             					if (!$blnInList && $this->lstMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
              					  $objCustomField->CustomFieldSelection->CustomFieldValueId = $this->lstMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
+             					  $objCustomField->CustomFieldSelection->Save();
             					}
-             					$objCustomField->CustomFieldSelection->Save();
+            					elseif ($data) {
+            					  $objCustomField->CustomFieldSelection->Save();
+            					}
                     }
                   }
                   $this->objNewAssetModelArray[] = $objNewAssetModel;
                 }
               }
             }
+            elseif ($this->intImportStep == 5) {
+              for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
+                $strRowArray = $this->FileCsvData->getRow($i);
+                if (trim($strRowArray[$intAssetCode]) && !$this->in_array_nocase(trim($strRowArray[$intAssetCode]), $strAssetArray)) {
+                  if (array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey]))) && array_keys($intAssetModelArray, strtolower(trim($strRowArray[$intModelShortDescriptionKey])))) {
+                    $strAssetArray[] = strtolower(trim($strRowArray[$intAssetCode]));
+                    $objNewAsset = new Asset();
+                    $objNewAsset->AssetCode = trim($strRowArray[$intAssetCode]);
+                    $location_id = array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey])));
+                    $objNewAsset->LocationId = $location_id[0];
+                    $objNewAsset->AssetModelId = $intAssetModelArray["'" . strtolower(trim($strRowArray[$intModelShortDescriptionKey])) . "'"];
+                    $objNewAsset->Save();
+
+                    foreach ($arrAssetCustomField as $objCustomField) {
+                      if ($objCustomField->CustomFieldQtypeId != 2) {
+                        $objCustomField->CustomFieldSelection = new CustomFieldSelection;
+            						$objCustomField->CustomFieldSelection->newCustomFieldValue = new CustomFieldValue;
+            						$objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldId = $objCustomField->CustomFieldId;
+            						if (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) {
+            						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+            						}
+            						else {
+            						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = $this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text;
+            						}
+            						$objCustomField->CustomFieldSelection->newCustomFieldValue->Save();
+            						$objCustomField->CustomFieldSelection->EntityId = $objNewAsset->AssetId;
+            						$objCustomField->CustomFieldSelection->EntityQtypeId = 1;
+            						$objCustomField->CustomFieldSelection->CustomFieldValueId = $objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldValueId;
+            						$objCustomField->CustomFieldSelection->Save();
+                      }
+                      else {
+                        $data = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+                        $blnInList = false;
+                        $objCustomField->CustomFieldSelection = new CustomFieldSelection;
+                  			$objCustomField->CustomFieldSelection->EntityId = $objNewAsset->AssetId;
+                  			$objCustomField->CustomFieldSelection->EntityQtypeId = 1;
+                  			foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
+              					  if (strtolower($objCustomFieldValue->ShortDescription) == $data) {
+                   					$objCustomField->CustomFieldSelection->CustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
+                  					$blnInList = true;
+                  					break;
+              					  }
+              					}
+              					if (!$blnInList && $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+               					  $objCustomField->CustomFieldSelection->CustomFieldValueId = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
+               					  $objCustomField->CustomFieldSelection->Save();
+              					}
+              					elseif ($data) {
+              					  $objCustomField->CustomFieldSelection->Save();
+              					}
+                      }
+                    }
+                    $this->objNewAssetArray[] = $objNewAsset;
+                  }
+                  // Add records skipped due to errors
+                  //else {
+                   // $this->btnNext->Warning = trim($strRowArray[$intAssetCode]). "bla bla bla..." . trim($strRowArray[$intModelShortDescriptionKey]);
+                  //}
+                }
+              }
+            }
             $j++;
           }
-          if ($this->intImportStep == 5) {
+          if ($this->intImportStep == 6) {
             $this->blnImportEnd = true;
-            $this->btnNext->Warning = "";
+            //$this->btnNext->Warning = "";
             $this->dtgLocation->DataSource = $this->objNewLocationArray;
             $this->dtgCategory->DataSource = $this->objNewCategoryArray;
             $this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
             $this->dtgAssetModel->DataSource = $this->objNewAssetModelArray;
+            $this->dtgAsset->DataSource = $this->objNewAssetArray;
             $this->intImportStep = -1;
           }
           // Enable Next button
