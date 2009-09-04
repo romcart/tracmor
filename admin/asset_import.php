@@ -402,7 +402,7 @@
                 $objNewLocation = new Location();
                 $objNewLocation->ShortDescription = trim($strRowArray[$this->intLocationKey]);
                 $objNewLocation->Save();
-                $this->objNewLocationArray[] = $objNewLocation;
+                $this->objNewLocationArray[] = $objNewLocation->ShortDescription;
               }
             }
             $j++;
@@ -431,7 +431,7 @@
           //$this->dtgLocation->Paginator = $objPaginator;
           //$this->dtgLocation->ItemsPerPage = 20;
 
-          $this->dtgLocation->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgLocation->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
           //$this->dtgLocation->DataSource = $this->objNewLocationArray;
           //$this->dtgLocation->TotalItemCount = count($this->objNewLocationArray);
 
@@ -450,7 +450,7 @@
           //$this->dtgCategory->Paginator = $objPaginator;
           //$this->dtgCategory->ItemsPerPage = 20;
 
-          $this->dtgCategory->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgCategory->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
           //$this->dtgCategory->DataSource = $this->objNewCategoryArray;
           //$this->dtgCategory->TotalItemCount = count($this->objNewCategoryArray);
 
@@ -469,7 +469,7 @@
           //$this->dtgManufacturer->Paginator = $objPaginator;
           //$this->dtgManufacturer->ItemsPerPage = 20;
 
-          $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
           //$this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
           //$this->dtgManufacturer->TotalItemCount = count($this->objNewManufacturerArray);
 
@@ -488,7 +488,7 @@
           //$this->dtgAssetModel->Paginator = $objPaginator;
           //$this->dtgAssetModel->ItemsPerPage = 20;
 
-          $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
           //$this->dtgAssetModel->DataSource = $this->objNewAssetModelArray;
           //$this->dtgAssetModel->TotalItemCount = count($this->objNewAssetModelArray);
 
@@ -507,7 +507,7 @@
           //$this->dtgAsset->Paginator = $objPaginator;
           //$this->dtgAsset->ItemsPerPage = 20;
 
-          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset', '<?= $_ITEM->ShortDescription ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
           //$this->dtgAsset->DataSource = $this->objNewAssetArray;
           //$this->dtgAsset->TotalItemCount = count($this->objNewAssetArray);
         }
@@ -582,6 +582,7 @@
             foreach (AssetModel::LoadAll() as $objAssetModel) {
               $strAssetModelArray[] = strtolower($objAssetModel->ShortDescription);
             }
+            $this->btnNext->Warning = "Asset Models have been imported. Please wait...";
           }
           elseif ($this->intImportStep == 5) {
             $intAssetModelArray = array();
@@ -632,7 +633,7 @@
                   $objNewCategory->AssetFlag = true;
                   $objNewCategory->InventoryFlag = false;
                   $objNewCategory->Save();
-                  $this->objNewCategoryArray[] = $objNewCategory;
+                  $this->objNewCategoryArray[] = $objNewCategory->ShortDescription;
                 }
               }
             }
@@ -645,7 +646,7 @@
                   $objNewManufacturer = new Manufacturer();
                   $objNewManufacturer->ShortDescription = trim($strRowArray[$this->intManufacturerKey]);
                   $objNewManufacturer->Save();
-                  $this->objNewManufacturerArray[] = $objNewManufacturer;
+                  $this->objNewManufacturerArray[] = $objNewManufacturer->ShortDescription;
                 }
               }
             }
@@ -702,7 +703,7 @@
             					}
                     }
                   }
-                  $this->objNewAssetModelArray[] = $objNewAssetModel;
+                  $this->objNewAssetModelArray[] = $objNewAssetModel->ShortDescription;
                 }
               }
             }
@@ -758,7 +759,7 @@
               					}
                       }
                     }
-                    $this->objNewAssetArray[] = $objNewAsset;
+                    $this->objNewAssetArray[] = $objNewAsset->AssetCode;
                   }
                   // Add records skipped due to errors
                   //else {
@@ -771,7 +772,7 @@
           }
           if ($this->intImportStep == 6) {
             $this->blnImportEnd = true;
-            //$this->btnNext->Warning = "";
+            $this->btnNext->Warning = "";
             $this->dtgLocation->DataSource = $this->objNewLocationArray;
             $this->dtgCategory->DataSource = $this->objNewCategoryArray;
             $this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
