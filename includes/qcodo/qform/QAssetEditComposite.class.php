@@ -707,6 +707,8 @@ class QAssetEditComposite extends QControl {
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->Transaction->CreatedByObject->__toString() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->Transaction->ToStringStatusStyled() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Tracking', '<?= $_ITEM->Transaction->ToStringTrackingNumber() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Creation Date', '<?= $_ITEM->Transaction->CreationDate ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Ship/Receive Date', '<?= $_CONTROL->objParentControl->getShipReceiveDate($_ITEM) ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 
 		//$this->dtgShipmentReceipt->SortColumnIndex = 4;
     //$this->dtgShipmentReceipt->SortDirection = 1;
@@ -861,7 +863,7 @@ class QAssetEditComposite extends QControl {
 			}
 
 			if ($this->blnEditMode) {
-				
+
 				// Check to see if the asset code already exists (and is not the asset code of the asset that the user is currently editing
 				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
 				if ($AssetDuplicate && $AssetDuplicate->AssetId != $this->objAsset->AssetId) {
@@ -1378,6 +1380,15 @@ class QAssetEditComposite extends QControl {
 		else{
 			$this->lblNewAssetModel->Visible=false;
 		}
+	}
+
+	public function getShipReceiveDate($objItem) {
+	  if ($objItem->Transaction->TransactionTypeId == 6) {
+	    return $objItem->Transaction->Shipment->ShipDate;
+	  }
+	  else {
+	    return $objItem->Transaction->Receipt->ReceiptDate;
+	  }
 	}
 
 	public function lblIconParentAssetCode_Click() {
