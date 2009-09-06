@@ -36,7 +36,8 @@ class QAdvancedSearchComposite extends QControl {
 	protected $dtpDueDate;
 	protected $dtpReceiptDate;
 	protected $chkAttachment;
-	protected $chkArchived;
+	protected $chkIncludeTBR;
+	protected $chkIncludeShipped;
 	protected $lstDateModified;
 	protected $dtpDateModifiedFirst;
 	protected $dtpDateModifiedLast;
@@ -66,7 +67,7 @@ class QAdvancedSearchComposite extends QControl {
 	    	$this->txtAssetModelCode_Create();
 	    	$this->lstReservedBy_Create();
 	    	$this->lstCheckedOutBy_Create();
-	    	$this->chkArchived_Create();
+	    	$this->chkInclude_Create();
 	    }
 
 	    if ($objParentObject instanceof ShipmentListForm) {
@@ -178,11 +179,16 @@ class QAdvancedSearchComposite extends QControl {
   	}
   }
 
-  protected function chkArchived_Create() {
-  	$this->chkArchived = new QCheckBox($this);
-  	$this->chkArchived->Name = 'Include Archived';
-  	$this->chkArchived->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
-  	$this->chkArchived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+  protected function chkInclude_Create() {
+  	$this->chkIncludeTBR = new QCheckBox($this);
+  	$this->chkIncludeTBR->Name = 'Include To Be Received';
+  	$this->chkIncludeTBR->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+  	$this->chkIncludeTBR->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+
+  	$this->chkIncludeShipped = new QCheckBox($this);
+  	$this->chkIncludeShipped->Name = 'Include Shipped';
+  	$this->chkIncludeShipped->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+  	$this->chkIncludeShipped->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
 
   protected function txtFromCompany_Create() {
@@ -382,7 +388,9 @@ class QAdvancedSearchComposite extends QControl {
 				break;
 			case "Attachment": return $this->chkAttachment->Checked;
 				break;
-			case "Archived": return $this->chkArchived->Checked;
+			case "TBR": return $this->chkIncludeTBR->Checked;
+				break;
+			case "Shipped": return $this->chkIncludeShipped->Checked;
 				break;
 			case "CustomFieldArray": return $this->arrCustomFields;
 				break;

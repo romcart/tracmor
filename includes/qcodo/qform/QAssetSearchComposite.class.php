@@ -61,7 +61,8 @@ class QAssetSearchComposite extends QControl {
 	protected $strDateModifiedFirst;
 	protected $strDateModifiedLast;
 	protected $blnAttachment;
-	protected $blnArchived;
+	protected $blnIncludeTBR;
+	protected $blnIncludeShipped;
 
 	// Use Ajax
 	protected $blnUseAjax;
@@ -261,7 +262,8 @@ class QAssetSearchComposite extends QControl {
 		$strDateModifiedLast = $this->strDateModifiedLast;
 		$strDateModified = $this->strDateModified;
 		$blnAttachment = $this->blnAttachment;
-		$blnArchived = $this->blnArchived;
+		$blnIncludeTBR = $this->blnIncludeTBR;
+		$blnIncludeShipped = $this->blnIncludeShipped;
 		$arrCustomFields = $this->arrCustomFields;
 
 		// Enable Profiling
@@ -275,12 +277,12 @@ class QAssetSearchComposite extends QControl {
     $objExpansionMap[Asset::ExpandLocation] = true;
 		//if ($this->blnSearch || !$this->blnUseAjax) {
 		if ((!$this->objParentControl && $this->Display == true) || $this->objParentControl->Display == true) {
-			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnArchived);
+			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped);
 			if ($this->dtgAsset->TotalItemCount == 0) {
 				$this->dtgAsset->ShowHeader = false;
 			}
 			else {
-				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnArchived);
+				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped);
 				$this->dtgAsset->ShowHeader = true;
 			}
 		}
@@ -454,7 +456,8 @@ class QAssetSearchComposite extends QControl {
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
 	  	$this->blnAttachment = false;
-	  	$this->blnArchived = false;
+	  	$this->blnIncludeTBR = false;
+	  	$this->blnIncludeShipped = false;
 	  	if ($this->arrCustomFields) {
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
@@ -499,12 +502,18 @@ class QAssetSearchComposite extends QControl {
 		$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 		$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
 		$this->blnAttachment = $this->ctlAdvanced->Attachment;
-		// Searching the "Archived" location overrides the "Include Archived" checkbox
-		if ($this->intLocationId != 6) {
-		  $this->blnArchived = $this->ctlAdvanced->Archived;
+		// Searching the "Shipped" location overrides the "Include Shipped" checkbox
+		if ($this->intLocationId != 2) {
+		  $this->blnIncludeShipped = $this->ctlAdvanced->Shipped;
 		}
 		else {
-		  $this->blnArchived = true;
+		  $this->blnIncludeShipped = true;
+		}
+		if ($this->intLocationId != 5) {
+		  $this->blnIncludeTBR = $this->ctlAdvanced->TBR;
+		}
+		else {
+		  $this->blnIncludeTBR = true;
 		}
 
 		$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
