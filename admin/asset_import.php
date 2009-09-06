@@ -51,7 +51,6 @@
 		protected $btnNext;
 		protected $btnCancel;
 		protected $intStep;
-		protected $lblStepTwo;
 		protected $arrAssetCustomField;
 		protected $arrAssetModelCustomField;
 		protected $arrTracmorField;
@@ -77,6 +76,7 @@
     protected $intUserArray;
     protected $lblImportSuccess;
     protected $intSkippedRecordCount;
+    protected $strFilePath;
     protected $btnUndoLastImport;
     protected $btnImportMore;
     protected $btnReturnToAssets;
@@ -289,12 +289,14 @@
             else {
               $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
+            $file_skipped = fopen($this->strFilePath = sprintf('%s/%s_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "a");
             $strFirstRowArray = $this->FileCsvData->getRow(0);
             for ($i=0; $i<count($strFirstRowArray); $i++) {
               $this->arrMapFields[$i] = array();
               if ($this->blnHeaderRow) {
                 $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
                 $this->arrMapFields[$i]['header'] = $this->arrCsvHeader[$i];
+                $this->PutSkippedRecordInFile($file_skipped, $strFirstRowArray);
               }
               else {
                 $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i);
@@ -318,6 +320,7 @@
               $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
             }
             $this->btnNext->Text = "Import Now";
+            fclose($file_skipped);
     			}
 		    }
 		  }
@@ -586,6 +589,7 @@
 		  else {
 		    // Step 3 complete
 		    set_time_limit(0);
+		    $file_skipped = fopen($strFilePath = sprintf('%s/%s_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "a");
 		    if (!$this->blnImportEnd) {
           if ($this->intImportStep == 2) {
             $strCategoryArray = array();
@@ -740,6 +744,7 @@
                   }
                   else {
                     $this->intSkippedRecordCount++;
+                    $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                     break;
                   }
                   if ($intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey]))) || $intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text)))) {
@@ -747,6 +752,7 @@
                   }
                   else {
                     $this->intSkippedRecordCount++;
+                    $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                     break;
                   }
                   if (isset($intModelLongDescriptionKey)) {
@@ -865,6 +871,7 @@
                   else {
                    // $this->btnNext->Warning = trim($strRowArray[$intAssetCode]). "bla bla bla..." . trim($strRowArray[$intModelShortDescriptionKey]);
                     $this->intSkippedRecordCount++;
+                    $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                   }
                 }
               }
@@ -888,6 +895,10 @@
             $this->lblImportSuccess->Text = "Success:<br/>" .
                                              "<b>" . count($this->objNewAssetArray) . "</b> Records imported successfully<br/>" .
                                              "<b>" . $this->intSkippedRecordCount . "</b> Records skipped due to error<br/>";
+            if ($this->intSkippedRecordCount) {
+               $this->lblImportSuccess->Text .= sprintf("<a href='http://%s%s/%s_skipped.csv'>Click here to download records that could not be imported</a><br/>", $_SERVER['SERVER_NAME'] . __SUBDIRECTORY__, __TRACMOR_TMP__, $_SESSION['intUserAccountId']);
+            }
+
             $this->intImportStep = -1;
           }
           // Enable Next button
@@ -896,6 +907,7 @@
             $this->intImportStep++;
           }
         }
+        fclose($file_skipped);
 		  }
 		  if (!$blnError) {
 		    if (($this->blnImportEnd || $this->intImportStep == 2) && $this->intImportStep != -1) {
@@ -1125,6 +1137,10 @@
         $strQuery = sprintf("DELETE FROM `location` WHERE `location_id` IN (%s)", implode(", ", array_keys($this->objNewLocationArray)));
         $objDatabase->NonQuery($strQuery);
 		  }
+    }
+
+    protected function PutSkippedRecordInFile ($file, $strRowArray) {
+      fputcsv($file, $strRowArray, $this->FileCsvData->settings['delimiter'], $this->FileCsvData->settings['eol']);
     }
 
 	}
