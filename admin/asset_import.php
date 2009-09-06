@@ -44,6 +44,7 @@
 		protected $lstMapHeaderArray;
 		protected $txtMapDefaultValueArray;
 		protected $lstMapDefaultValueArray;
+		protected $dtpDateArray;
 		protected $strAcceptibleMimeArray;
 		protected $chkHeaderRow;
 		protected $blnHeaderRow;
@@ -69,8 +70,16 @@
 		protected $intLocationKey;
     protected $intCategoryKey;
     protected $intManufacturerKey;
-    protected $intCreatedBy;
-    protected $intCreatedDate;
+    protected $intCreatedByKey;
+    protected $intCreatedDateKey;
+    protected $intModifiedByKey;
+    protected $intModifiedDateKey;
+    protected $intUserArray;
+    protected $lblImportSuccess;
+    protected $intSkippedRecordCount;
+    protected $btnUndoLastImport;
+    protected $btnImportMore;
+    protected $btnReturnToAssets;
 
 		protected function Form_Create() {
 			// Create the Header Menu
@@ -79,6 +88,7 @@
 			$this->pnlStepOne_Create();
 			$this->Buttons_Create();
 			$this->intStep = 1;
+			$this->intSkippedRecordCount = 0;
 			$this->blnImportEnd = true;
 			$this->arrAssetCustomField = array();
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 1) as $objCustomField) {
@@ -87,6 +97,10 @@
 			$this->arrAssetModelCustomField = array();
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 4) as $objCustomField) {
 			  $this->arrAssetModelCustomField[$objCustomField->CustomFieldId] = $objCustomField;
+			}
+			$this->intUserArray = array();
+			foreach (UserAccount::LoadAll() as $objUser) {
+			  $this->intUserArray[strtolower($objUser->Username)] = $objUser->UserAccountId;
 			}
 			$this->strAcceptibleMimeArray = array(
 						'text/plain' => 'txt',
@@ -280,8 +294,6 @@
               $this->arrMapFields[$i] = array();
               if ($this->blnHeaderRow) {
                 $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
-                //$lblHeader = new QLabel($this->pnlStepTwo);
-                //$lblHeader->Text = "  " . $this->arrCsvHeader[$i];
                 $this->arrMapFields[$i]['header'] = $this->arrCsvHeader[$i];
               }
               else {
@@ -289,19 +301,23 @@
               }
               if ($this->blnHeaderRow && $this->arrCsvHeader[$i] || !$this->blnHeaderRow) {
                 $txtDefaultValue = new QTextBox($this);
-                $txtDefaultValue->Width = 150;
+                $txtDefaultValue->Width = 200;
                 $this->txtMapDefaultValueArray[] = $txtDefaultValue;
 
                 $lstDefaultValue = new QListBox($this);
-                $lstDefaultValue->Width = 150;
+                $lstDefaultValue->Width = 200;
                 $lstDefaultValue->Display = false;
                 $this->lstMapDefaultValueArray[] = $lstDefaultValue;
+
+                $dtpDate = new QDateTimePicker($this);
+              	$dtpDate->DateTimePickerType = QDateTimePickerType::Date;
+              	$dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+              	$dtpDate->Display = false;
+              	$this->dtpDateArray[] = $dtpDate;
               }
-              //$lblRow1 = new QLabel($this->pnlStepTwo);
-              //$lblRow1->Text = "  " . $strFirstRowArray[$i] . "<br/>";
-              //$lblRow1->HtmlEntities = false;
               $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
             }
+            $this->btnNext->Text = "Import Now";
     			}
 		    }
 		  }
@@ -372,16 +388,30 @@
               $this->intManufacturerKey = $key;
             }
             elseif ($value == 'created by') {
-              $this->intCreatedBy = $key;
+              $this->intCreatedByKey = $key;
             }
             elseif ($value == 'created date') {
-              $this->intCreatedDate = $key;
+              $this->intCreatedDateKey = $key;
+            }
+            elseif ($value == 'modified by') {
+              $this->intModifiedByKey = $key;
+            }
+            elseif ($value == 'modified date') {
+              $this->intModifiedDateKey = $key;
             }
           }
 
           $strLocationArray = array();
           foreach (Location::LoadAll() as $objLocation) {
             $strLocationArray[] = $objLocation->ShortDescription;
+          }
+          $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intLocationKey]->Text);
+          if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strLocationArray)) {
+            $strLocationArray[] = $txtDefaultValue;
+            $objNewLocation = new Location();
+            $objNewLocation->ShortDescription = $txtDefaultValue;
+            $objNewLocation->Save();
+            $this->objNewLocationArray[$objNewLocation->LocationId] = $objNewLocation->ShortDescription;
           }
           $this->objNewLocationArray = array();
           $this->objNewCategoryArray = array();
@@ -402,7 +432,7 @@
                 $objNewLocation = new Location();
                 $objNewLocation->ShortDescription = trim($strRowArray[$this->intLocationKey]);
                 $objNewLocation->Save();
-                $this->objNewLocationArray[] = $objNewLocation->ShortDescription;
+                $this->objNewLocationArray[$objNewLocation->LocationId] = $objNewLocation->ShortDescription;
               }
             }
             $j++;
@@ -510,6 +540,31 @@
           $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
           //$this->dtgAsset->DataSource = $this->objNewAssetArray;
           //$this->dtgAsset->TotalItemCount = count($this->objNewAssetArray);
+
+          $this->lblImportSuccess = new QLabel($this);
+        	$this->lblImportSuccess->HtmlEntities = false;
+        	$this->lblImportSuccess->Display = false;
+
+        	$this->btnUndoLastImport = new QButton($this);
+        	$this->btnUndoLastImport->Text = "Undo Last Import";
+        	$this->btnUndoLastImport->Display = false;
+        	$this->btnUndoLastImport->AddAction(new QClickEvent(), new QServerAction('btnCancel_Click'));
+    			$this->btnUndoLastImport->AddAction(new QEnterKeyEvent(), new QServerAction('btnCancel_Click'));
+    			$this->btnUndoLastImport->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+
+    			$this->btnImportMore = new QButton($this);
+        	$this->btnImportMore->Text = "Import More";
+        	$this->btnImportMore->Display = false;
+        	$this->btnImportMore->AddAction(new QClickEvent(), new QServerAction('btnImportMore_Click'));
+    			$this->btnImportMore->AddAction(new QEnterKeyEvent(), new QServerAction('btnImportMore_Click'));
+    			$this->btnImportMore->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+
+    			$this->btnReturnToAssets = new QButton($this);
+        	$this->btnReturnToAssets->Text = "Return to Assets";
+        	$this->btnReturnToAssets->Display = false;
+        	$this->btnReturnToAssets->AddAction(new QClickEvent(), new QServerAction('btnReturnToAssets_Click'));
+    			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QServerAction('btnReturnToAssets_Click'));
+    			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QTerminateAction());
         }
         /*elseif (!$blnAssetCode) {
           $this->btnNext->Warning = "1";
@@ -531,12 +586,22 @@
 		  else {
 		    // Step 3 complete
 		    set_time_limit(0);
-        if (!$this->blnImportEnd) {
+		    if (!$this->blnImportEnd) {
           if ($this->intImportStep == 2) {
             $strCategoryArray = array();
             $this->objNewCategoryArray = array();
             foreach (Category::LoadAll() as $objCategory) {
               $strCategoryArray[] = $objCategory->ShortDescription;
+            }
+            $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text);
+            if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strCategoryArray)) {
+              $strCategoryArray[] = $txtDefaultValue;
+              $objNewCategory = new Category();
+              $objNewCategory->ShortDescription = $txtDefaultValue;
+              $objNewCategory->AssetFlag = true;
+              $objNewCategory->InventoryFlag = false;
+              $objNewCategory->Save();
+              $this->objNewCategoryArray[$objNewCategory->CategoryId] = $objNewCategory->ShortDescription;
             }
             $this->btnNext->Warning = "Categories have been imported. Please wait...";
           }
@@ -546,16 +611,26 @@
             foreach (Manufacturer::LoadAll() as $objManufacturer) {
               $strManufacturerArray[] = $objManufacturer->ShortDescription;
             }
+            $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text);
+            if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strManufacturerArray)) {
+              $strManufacturerArray[] = $txtDefaultValue;
+              $objNewManufacturer = new Manufacturer();
+              $objNewManufacturer->ShortDescription = $txtDefaultValue;
+              $objNewManufacturer->Save();
+              $this->objNewManufacturerArray[$objNewManufacturer->ManufacturerId] = $objNewManufacturer->ShortDescription;
+            }
             $this->btnNext->Warning = "Manufacturers have been imported. Please wait...";
           }
           elseif ($this->intImportStep == 4) {
             $intCategoryArray = array();
             foreach (Category::LoadAllWithFlags(true, false) as $objCategory) {
-              $intCategoryArray["'" . strtolower($objCategory->ShortDescription) . "'"] = $objCategory->CategoryId;
+              //$intCategoryArray["'" . strtolower($objCategory->ShortDescription) . "'"] = $objCategory->CategoryId;
+              $intCategoryArray[$objCategory->CategoryId] = strtolower($objCategory->ShortDescription);
             }
             $intManufacturerArray = array();
             foreach (Manufacturer::LoadAll() as $objManufacturer) {
-              $intManufacturerArray["'" . strtolower($objManufacturer->ShortDescription) . "'"] = $objManufacturer->ManufacturerId;
+              //$intManufacturerArray["'" . strtolower($objManufacturer->ShortDescription) . "'"] = $objManufacturer->ManufacturerId;
+              $intManufacturerArray[$objManufacturer->ManufacturerId] = strtolower($objManufacturer->ShortDescription);
             }
 
             $intModelCustomFieldKeyArray = array();
@@ -587,7 +662,8 @@
           elseif ($this->intImportStep == 5) {
             $intAssetModelArray = array();
             foreach (AssetModel::LoadAll() as $objAssetModel) {
-              $intAssetModelArray["'" . strtolower($objAssetModel->ShortDescription) . "'"] = $objAssetModel->AssetModelId;
+              //$intAssetModelArray["'" . strtolower($objAssetModel->ShortDescription) . "'"] = $objAssetModel->AssetModelId;
+              $intAssetModelArray[$objAssetModel->AssetModelId] = strtolower($objAssetModel->ShortDescription);
             }
             $intAssetCustomFieldKeyArray = array();
             $arrAssetCustomField = array();
@@ -633,7 +709,7 @@
                   $objNewCategory->AssetFlag = true;
                   $objNewCategory->InventoryFlag = false;
                   $objNewCategory->Save();
-                  $this->objNewCategoryArray[] = $objNewCategory->ShortDescription;
+                  $this->objNewCategoryArray[$objNewCategory->CategoryId] = $objNewCategory->ShortDescription;
                 }
               }
             }
@@ -646,10 +722,11 @@
                   $objNewManufacturer = new Manufacturer();
                   $objNewManufacturer->ShortDescription = trim($strRowArray[$this->intManufacturerKey]);
                   $objNewManufacturer->Save();
-                  $this->objNewManufacturerArray[] = $objNewManufacturer->ShortDescription;
+                  $this->objNewManufacturerArray[$objNewManufacturer->ManufacturerId] = $objNewManufacturer->ShortDescription;
                 }
               }
             }
+            // Asset Model import
             elseif ($this->intImportStep == 4) {
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
@@ -658,12 +735,25 @@
                   $objNewAssetModel = new AssetModel();
                   $objNewAssetModel->ShortDescription = trim($strRowArray[$intModelShortDescriptionKey]);
                   $objNewAssetModel->AssetModelCode = trim($strRowArray[$intModelCodeKey]);
-                  $objNewAssetModel->CategoryId = $intCategoryArray["'".strtolower(trim($strRowArray[$this->intCategoryKey]))."'"];
-                  $objNewAssetModel->ManufacturerId = $intManufacturerArray["'".strtolower(trim($strRowArray[$this->intManufacturerKey]))."'"];
+                  if ($intCategoryId = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey]))) || $intCategoryId = array_keys($intCategoryArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text)))) {
+                    $objNewAssetModel->CategoryId = $intCategoryId[0];
+                  }
+                  else {
+                    $this->intSkippedRecordCount++;
+                    break;
+                  }
+                  if ($intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey]))) || $intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text)))) {
+                    $objNewAssetModel->ManufacturerId = $intManufacturerId[0];
+                  }
+                  else {
+                    $this->intSkippedRecordCount++;
+                    break;
+                  }
                   if (isset($intModelLongDescriptionKey)) {
                     $objNewAssetModel->LongDescription = trim($strRowArray[$intModelLongDescriptionKey]);
                   }
                   $objNewAssetModel->Save();
+                  // Asset Model Custom Field import
                   foreach ($arrAssetModelCustomField as $objCustomField) {
                     if ($objCustomField->CustomFieldQtypeId != 2) {
                       $objCustomField->CustomFieldSelection = new CustomFieldSelection;
@@ -703,10 +793,11 @@
             					}
                     }
                   }
-                  $this->objNewAssetModelArray[] = $objNewAssetModel->ShortDescription;
+                  $this->objNewAssetModelArray[$objNewAssetModel->AssetModelId] = $objNewAssetModel->ShortDescription;
                 }
               }
             }
+            // Asset import
             elseif ($this->intImportStep == 5) {
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
@@ -717,9 +808,18 @@
                     $objNewAsset->AssetCode = trim($strRowArray[$intAssetCode]);
                     $location_id = array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey])));
                     $objNewAsset->LocationId = $location_id[0];
-                    $objNewAsset->AssetModelId = $intAssetModelArray["'" . strtolower(trim($strRowArray[$intModelShortDescriptionKey])) . "'"];
+                    $asset_model_id = array_keys($intAssetModelArray, strtolower(trim($strRowArray[$intModelShortDescriptionKey])));
+                    $objNewAsset->AssetModelId = $asset_model_id[0];
+                    if (isset($this->intCreatedByKey)) {
+                      if (isset($this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))])) {
+                        $objNewAsset->CreatedBy = $this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))];
+                      }
+                      else {
+                        $objNewAsset->CreatedBy = $this->lstMapDefaultValueArray[$this->intCreatedByKey]->SelectedValue;
+                      }
+                    }
                     $objNewAsset->Save();
-
+                    // Asset Custom Field import
                     foreach ($arrAssetCustomField as $objCustomField) {
                       if ($objCustomField->CustomFieldQtypeId != 2) {
                         $objCustomField->CustomFieldSelection = new CustomFieldSelection;
@@ -759,12 +859,13 @@
               					}
                       }
                     }
-                    $this->objNewAssetArray[] = $objNewAsset->AssetCode;
+                    $this->objNewAssetArray[$objNewAsset->AssetId] = $objNewAsset->AssetCode;
                   }
                   // Add records skipped due to errors
-                  //else {
+                  else {
                    // $this->btnNext->Warning = trim($strRowArray[$intAssetCode]). "bla bla bla..." . trim($strRowArray[$intModelShortDescriptionKey]);
-                  //}
+                    $this->intSkippedRecordCount++;
+                  }
                 }
               }
             }
@@ -778,6 +879,15 @@
             $this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
             $this->dtgAssetModel->DataSource = $this->objNewAssetModelArray;
             $this->dtgAsset->DataSource = $this->objNewAssetArray;
+            $this->btnNext->Display = false;
+            $this->btnCancel->Display = false;
+            $this->btnUndoLastImport->Display = true;
+            $this->btnImportMore->Display = true;
+            $this->btnReturnToAssets->Display = true;
+            $this->lblImportSuccess->Display = true;
+            $this->lblImportSuccess->Text = "Success:<br/>" .
+                                             "<b>" . count($this->objNewAssetArray) . "</b> Records imported successfully<br/>" .
+                                             "<b>" . $this->intSkippedRecordCount . "</b> Records skipped due to error<br/>";
             $this->intImportStep = -1;
           }
           // Enable Next button
@@ -855,6 +965,7 @@
           $objControl->Warning = "";
           $txtDefault = $this->txtMapDefaultValueArray[substr($objControl->Name, 3)];
           $lstDefault = $this->lstMapDefaultValueArray[substr($objControl->Name, 3)];
+          $dtpDefault = $this->dtpDateArray[substr($objControl->Name, 3)];
           $this->arrTracmorField[substr($objControl->Name, 3)] = $search;
           if (substr($objControl->SelectedValue, 0, 6) == "model_" || substr($objControl->SelectedValue, 0, 6) == "asset_") {
             $objCustomField = CustomField::LoadByCustomFieldId(substr($objControl->SelectedValue, 6));
@@ -870,6 +981,7 @@
   	 					}
               $txtDefault->Display = true;
               $lstDefault->Display = false;
+              $dtpDefault->Display = false;
             }
             // type = Select
             else {
@@ -891,11 +1003,28 @@
 
   						$txtDefault->Display = false;
               $lstDefault->Display = true;
+              $dtpDefault->Display = false;
             }
+          }
+          elseif ($objControl->SelectedValue == "Created By" || $objControl->SelectedValue == "Modified By") {
+            $lstDefault->RemoveAllItems();
+            foreach ($this->intUserArray as $strUsername => $intUserId) {
+              $objListItem = new QListItem($strUsername, $intUserId, ($intUserId != $_SESSION['intUserAccountId']) ? false : true);
+              $lstDefault->AddItem($objListItem);
+            }
+            $txtDefault->Display = false;
+            $lstDefault->Display = true;
+            $dtpDefault->Display = false;
+          }
+          elseif ($objControl->SelectedValue == "Created Date" || $objControl->SelectedValue == "Modified Date") {
+            $txtDefault->Display = false;
+            $lstDefault->Display = false;
+            $dtpDefault->Display = true;
           }
           else {
             $txtDefault->Display = true;
             $lstDefault->Display = false;
+            $dtpDefault->Display = false;
           }
         }
       }
@@ -941,32 +1070,14 @@
     protected function DisplayStepForm($intStep) {
       switch ($intStep) {
        case 1:
-         /*$this->pnlStepOne->Display = true;
-		     $this->pnlStepOne->Visible = true;
-		     $this->pnlStepTwo->Display = false;
-		     $this->pnlStepTwo->Visible = false;
-		     $this->pnlStepThree->Display = false;
-		     $this->pnlStepThree->Visible = false;*/
          $this->pnlMain->RemoveChildControls($this->pnlMain);
 		     $this->pnlStepOne_Create();
 		     break;
 		   case 2:
-		     /*$this->pnlStepOne->Display = false;
-		     $this->pnlStepOne->Visible = false;
-		     $this->pnlStepTwo->Display = true;
-		     $this->pnlStepTwo->Visible = true;
-		     $this->pnlStepThree->Display = false;
-		     $this->pnlStepThree->Visible = false;*/
 		     $this->pnlMain->RemoveChildControls($this->pnlMain);
 		     $this->pnlStepTwo_Create();
 		     break;
 		   case 3:
-		     /*$this->pnlStepOne->Display = false;
-		     $this->pnlStepOne->Visible = false;
-		     $this->pnlStepTwo->Display = false;
-		     $this->pnlStepTwo->Visible = false;
-		     $this->pnlStepThree->Display = true;
-		     $this->pnlStepThree->Visible = true;*/
 		     $this->pnlMain->RemoveChildControls($this->pnlMain);
 		     $this->pnlStepThree_Create();
 		     break;
@@ -979,7 +1090,41 @@
 
 		// Cancel button click action
 		protected function btnCancel_Click() {
+		  $this->UndoImport();
       QApplication::Redirect("./asset_import.php");
+    }
+
+    protected function btnImportMore_Click() {
+      QApplication::Redirect("./asset_import.php");
+    }
+
+    protected function btnReturnToAssets_Click() {
+      QApplication::Redirect("../assets/asset_list.php");
+    }
+
+    // Delete All imported Assets, Asset Models, Manufacturers, Categories and Locations
+    protected function UndoImport() {
+      $objDatabase = Asset::GetDatabase();
+		  if (count($this->objNewAssetArray)) {
+        $strQuery = sprintf("DELETE FROM `asset` WHERE `asset_id` IN (%s)", implode(", ", array_keys($this->objNewAssetArray)));
+        $objDatabase->NonQuery($strQuery);
+		  }
+		  if (count($this->objNewAssetModelArray)) {
+        $strQuery = sprintf("DELETE FROM `asset_model` WHERE `asset_model_id` IN (%s)", implode(", ", array_keys($this->objNewAssetModelArray)));
+        $objDatabase->NonQuery($strQuery);
+		  }
+		  if (count($this->objNewManufacturerArray)) {
+        $strQuery = sprintf("DELETE FROM `manufacturer` WHERE `manufacturer_id` IN (%s)", implode(", ", array_keys($this->objNewManufacturerArray)));
+        $objDatabase->NonQuery($strQuery);
+		  }
+		  if (count($this->objNewCategoryArray)) {
+        $strQuery = sprintf("DELETE FROM `category` WHERE `category_id` IN (%s)", implode(", ", array_keys($this->objNewCategoryArray)));
+        $objDatabase->NonQuery($strQuery);
+		  }
+		  if (count($this->objNewLocationArray)) {
+        $strQuery = sprintf("DELETE FROM `location` WHERE `location_id` IN (%s)", implode(", ", array_keys($this->objNewLocationArray)));
+        $objDatabase->NonQuery($strQuery);
+		  }
     }
 
 	}

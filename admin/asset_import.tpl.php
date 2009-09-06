@@ -22,10 +22,10 @@
 	include('../includes/header.inc.php');
 	$this->RenderBegin();
 ?>
-		<table cellpadding="5" cellspacing="0">
+		<table cellpadding="5" cellspacing="0" width="100%">
 			<tr>
 				<td>
-					<table>
+					<table width="100%">
 						<tr>
 							<td>
 							 <?php $this->pnlMain->Render(); ?>

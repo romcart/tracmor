@@ -1,7 +1,13 @@
 <table width="100%">
 	<tr>
-	  <td class="title">Import Results</td>
+	  <td class="title" height="30px">Import Results</td>
 	</tr>
+	<tr>
+	  <td><?php $this->lblImportSuccess->Render(); ?></td>
+	</tr>
+	<tr>
+	  <td><?php $this->btnUndoLastImport->Render(); ?>&nbsp;<?php $this->btnImportMore->Render(); ?>&nbsp;<?php $this->btnReturnToAssets->Render(); ?></td>
+	</tr
 	<tr>
 	  <td class="title">Last Imported Assets</td>
 	</tr>
