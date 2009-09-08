@@ -104,6 +104,7 @@
 			}
 			$this->strAcceptibleMimeArray = array(
 						'text/plain' => 'txt',
+						'text/comma-separated-values' => 'csv',
   				  'application/vnd.ms-excel' => 'csv');
 		}
 
