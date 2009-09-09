@@ -80,6 +80,7 @@
     protected $btnUndoLastImport;
     protected $btnImportMore;
     protected $btnReturnToAssets;
+    protected $btnRemoveArray;
 
 		protected function Form_Create() {
 			// Create the Header Menu
@@ -90,6 +91,7 @@
 			$this->intStep = 1;
 			$this->intSkippedRecordCount = 0;
 			$this->blnImportEnd = true;
+			$this->btnRemoveArray = array();
 			$this->arrAssetCustomField = array();
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 1) as $objCustomField) {
 			  $this->arrAssetCustomField[$objCustomField->CustomFieldId] = $objCustomField;
@@ -320,6 +322,29 @@
               }
               $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
             }
+            $btnAddField = new QButton($this);
+            $btnAddField->Text = "Add Field";
+            $btnAddField->AddAction(new QClickEvent(), new QServerAction('btnAddField_Click'));
+            $btnAddField->AddAction(new QEnterKeyEvent(), new QServerAction('btnAddField_Click'));
+            $btnAddField->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+            $this->lstMapHeaderArray[] = $btnAddField;
+
+            /*$txtDefaultValue = new QTextBox($this);
+            $txtDefaultValue->Width = 200;
+            $txtDefaultValue->Display = false;
+            $this->txtMapDefaultValueArray[] = $txtDefaultValue;
+
+            $lstDefaultValue = new QListBox($this);
+            $lstDefaultValue->Width = 200;
+            $lstDefaultValue->Display = false;
+            $this->lstMapDefaultValueArray[] = $lstDefaultValue;
+
+            $dtpDate = new QDateTimePicker($this);
+            $dtpDate->DateTimePickerType = QDateTimePickerType::Date;
+            $dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+            $dtpDate->Display = false;
+            $this->dtpDateArray[] = $dtpDate;*/
+
             $this->btnNext->Text = "Import Now";
             fclose($file_skipped);
     			}
@@ -583,7 +608,7 @@
           $this->btnNext->Warning = "4";
         }*/
         else {
-          $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Code, Asset Model Short Description, Location, Category and Manifacturer).";
+          $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Code, Asset Model Short Description, Location, Category and Manufacturer).";
           $blnError = true;
         }
 		  }
@@ -1000,7 +1025,7 @@
             else {
               $lstDefault->RemoveAllItems();
   						$lstDefault->AddItem('- Select One -', null);
-  						$lstDefault->Required = $objCustomField->RequiredFlag;
+  						$lstDefault->Required = true;
 
   						$objCustomFieldValueArray = CustomFieldValue::LoadArrayByCustomFieldId(substr($objControl->SelectedValue, 6), QQ::Clause(QQ::OrderBy(QQN::CustomFieldValue()->ShortDescription)));
   						if ($objCustomFieldValueArray) {
@@ -1142,6 +1167,76 @@
 
     protected function PutSkippedRecordInFile ($file, $strRowArray) {
       fputcsv($file, $strRowArray, $this->FileCsvData->settings['delimiter'], $this->FileCsvData->settings['eol']);
+    }
+
+    protected function btnAddField_Click() {
+      $intTotalCount = count($this->lstMapHeaderArray);
+      $this->lstMapHeader_Create($this, $intTotalCount-1, ($this->chkHeaderRow->Checked) ? "addfield" : null);
+      $objTemp = $this->lstMapHeaderArray[$intTotalCount];
+      $this->lstMapHeaderArray[$intTotalCount] = $this->lstMapHeaderArray[$intTotalCount-1];
+      $this->lstMapHeaderArray[$intTotalCount-1] = $objTemp;
+
+      $txtDefaultValue = new QTextBox($this);
+      $txtDefaultValue->Width = 200;
+      $this->txtMapDefaultValueArray[] = $txtDefaultValue;
+
+      $lstDefaultValue = new QListBox($this);
+      $lstDefaultValue->Width = 200;
+      $lstDefaultValue->Display = false;
+      $this->lstMapDefaultValueArray[] = $lstDefaultValue;
+
+      $dtpDate = new QDateTimePicker($this);
+      $dtpDate->DateTimePickerType = QDateTimePickerType::Date;
+      $dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+      $dtpDate->Display = false;
+      $this->dtpDateArray[] = $dtpDate;
+
+      $btnRemove = new QButton($this);
+      $btnRemove->Text = "Remove";
+      $btnRemove->ActionParameter = $intTotalCount-1;
+      $btnRemove->AddAction(new QClickEvent(), new QServerAction('btnRemove_Click'));
+      $btnRemove->AddAction(new QEnterKeyEvent(), new QServerAction('btnRemove_Click'));
+      $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+      if (isset($this->arrMapFields[$intTotalCount-1])) {
+        unset($this->arrMapFields[$intTotalCount-1]);
+      }
+      $this->btnRemoveArray[$intTotalCount-1] = $btnRemove;
+    }
+
+    protected function btnRemove_Click($strFormId, $strControlId, $strParameter) {
+      $intId = (int)$strParameter;
+      $intTotalCount = count($this->lstMapHeaderArray)-1;
+      if ($intId < count($this->lstMapHeaderArray)-2) {
+        for ($i=$intId; $i<count($this->lstMapHeaderArray)-1; $i++) {
+          $this->lstMapHeaderArray[$i] = $this->lstMapHeaderArray[$i+1];
+          if (isset($this->txtMapDefaultValueArray[$i+1])) {
+            $this->txtMapDefaultValueArray[$i] = $this->txtMapDefaultValueArray[$i+1];
+            $this->lstMapDefaultValueArray[$i] = $this->lstMapDefaultValueArray[$i+1];
+            $this->dtpDateArray[$i] = $this->dtpDateArray[$i+1];
+            $this->btnRemoveArray[$i] = $this->btnRemoveArray[$i+1];
+          }
+          else {
+            unset($this->txtMapDefaultValueArray[$i]);
+            unset($this->lstMapDefaultValueArray[$i]);
+            unset($this->dtpDateArray[$i]);
+            unset($this->btnRemoveArray[$i]);
+          }
+        }
+        unset($this->lstMapHeaderArray[$intTotalCount]);
+      }
+      else {
+        $this->lstMapHeaderArray[$intId] = $this->lstMapHeaderArray[$intId+1];
+        unset($this->lstMapHeaderArray[$intId+1]);
+        unset($this->txtMapDefaultValueArray[$intId]);
+        unset($this->lstMapDefaultValueArray[$intId]);
+        unset($this->dtpDateArray[$intId]);
+        unset($this->btnRemoveArray[$intId]);
+
+      }
+      unset($this->txtMapDefaultValueArray[$intTotalCount]);
+      unset($this->lstMapDefaultValueArray[$intTotalCount]);
+      unset($this->dtpDateArray[$intTotalCount]);
+      unset($this->btnRemoveArray[$intTotalCount]);
     }
 
 	}
