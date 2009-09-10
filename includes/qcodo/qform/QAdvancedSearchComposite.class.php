@@ -36,6 +36,7 @@ class QAdvancedSearchComposite extends QControl {
 	protected $dtpDueDate;
 	protected $dtpReceiptDate;
 	protected $chkAttachment;
+	protected $chkArchived;
 	protected $chkIncludeTBR;
 	protected $chkIncludeShipped;
 	protected $lstDateModified;
@@ -180,6 +181,11 @@ class QAdvancedSearchComposite extends QControl {
   }
 
   protected function chkInclude_Create() {
+    $this->chkArchived = new QCheckBox($this);
+  	$this->chkArchived->Name = 'Include Archived';
+  	$this->chkArchived->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+  	$this->chkArchived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+
   	$this->chkIncludeTBR = new QCheckBox($this);
   	$this->chkIncludeTBR->Name = 'Include To Be Received';
   	$this->chkIncludeTBR->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
@@ -388,6 +394,8 @@ class QAdvancedSearchComposite extends QControl {
 				break;
 			case "Attachment": return $this->chkAttachment->Checked;
 				break;
+			case "Archived": return $this->chkArchived->Checked;
+			  break;
 			case "TBR": return $this->chkIncludeTBR->Checked;
 				break;
 			case "Shipped": return $this->chkIncludeShipped->Checked;

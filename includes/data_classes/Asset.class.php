@@ -634,9 +634,9 @@
   		  $intManufacturerId = QApplication::$Database[1]->SqlVariable($intManufacturerId, true);
 				$arrSearchSql['strManufacturerSql'] = sprintf("AND `asset__asset_model_id__manufacturer_id`.`manufacturer_id`%s", $intManufacturerId);
 			}
-			if (!$blnOffsite && !$intLocationId && !$blnIncludeShipped && !$blnIncludeTBR) {
+			/*if (!$blnOffsite && !$intLocationId && !$blnIncludeShipped && !$blnIncludeTBR) {
 				$arrSearchSql['strOffsiteSql'] = "AND `asset` . `location_id` != 2 AND `asset` . `location_id` != 5";
-			}
+			}*/
 			if ($strShortDescription) {
 				$strShortDescription = QApplication::$Database[1]->SqlVariable("%" . $strShortDescription . "%", false);
 				$arrSearchSql['strShortDescriptionSql'] = "AND `asset__asset_model_id`.`short_description` LIKE $strShortDescription";
@@ -699,11 +699,11 @@
 				$arrSearchSql['strAttachmentSql'] = sprintf("AND attachment.attachment_id IS NOT NULL");
 			}
 
-			if (!$blnOffsite && !$blnIncludeTBR) {
+			if (!$blnIncludeTBR) {
 				$arrSearchSql['strIncludeTBRSql'] = sprintf("AND `asset`.`location_id`!='5'");
 			}
 
-			if (!$blnOffsite && !$blnIncludeShipped) {
+			if (!$blnIncludeShipped) {
 				$arrSearchSql['strIncludeShippedSql'] = sprintf("AND `asset`.`location_id`!='2'");
 			}
 
