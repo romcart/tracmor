@@ -294,7 +294,11 @@ function NextLocation() {
 }
 function AssetsAuditDone() {
   var strResult = document.main_form.result.value;
-  if (strResult != '') {
+  if (i>0) {
+    document.getElementById("btn_next").click();
+    return false;
+  }
+  else if (strResult != '') {
     return true;
   }
   else {

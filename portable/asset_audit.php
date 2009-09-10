@@ -232,7 +232,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 	<input type="hidden" name="main_result" value="<?php echo $strCheckedLocationAsset; ?>">
 	<input type="hidden" name="location" value="">
 	<tr>
-		<td colspan="2" align="center"><input type="submit" value="Next Location" style="width:216px;height:56px;font-size:24;"></td>
+		<td colspan="2" align="center"><input type="submit" id="btn_next" value="Next Location" style="width:216px;height:56px;font-size:24;"></td>
 	</tr>
 	</form>
 	<form method="post" name="main_form" onsubmit="javascript:return AssetsAuditDone();">
