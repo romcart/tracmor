@@ -80,6 +80,7 @@
     protected $btnUndoLastImport;
     protected $btnImportMore;
     protected $btnReturnToAssets;
+    protected $objDatabase;
     protected $btnRemoveArray;
 
 		protected function Form_Create() {
@@ -93,6 +94,7 @@
 			$this->blnImportEnd = true;
 			$this->btnRemoveArray = array();
 			$this->arrAssetCustomField = array();
+			$this->objDatabase = Asset::GetDatabase();
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 1) as $objCustomField) {
 			  $this->arrAssetCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
@@ -322,31 +324,15 @@
               }
               $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
             }
+            $this->btnNext->Text = "Import Now";
+            fclose($file_skipped);
+
             $btnAddField = new QButton($this);
             $btnAddField->Text = "Add Field";
             $btnAddField->AddAction(new QClickEvent(), new QServerAction('btnAddField_Click'));
             $btnAddField->AddAction(new QEnterKeyEvent(), new QServerAction('btnAddField_Click'));
             $btnAddField->AddAction(new QEnterKeyEvent(), new QTerminateAction());
             $this->lstMapHeaderArray[] = $btnAddField;
-
-            /*$txtDefaultValue = new QTextBox($this);
-            $txtDefaultValue->Width = 200;
-            $txtDefaultValue->Display = false;
-            $this->txtMapDefaultValueArray[] = $txtDefaultValue;
-
-            $lstDefaultValue = new QListBox($this);
-            $lstDefaultValue->Width = 200;
-            $lstDefaultValue->Display = false;
-            $this->lstMapDefaultValueArray[] = $lstDefaultValue;
-
-            $dtpDate = new QDateTimePicker($this);
-            $dtpDate->DateTimePickerType = QDateTimePickerType::Date;
-            $dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-            $dtpDate->Display = false;
-            $this->dtpDateArray[] = $dtpDate;*/
-
-            $this->btnNext->Text = "Import Now";
-            fclose($file_skipped);
     			}
 		    }
 		  }
@@ -432,13 +418,13 @@
 
           $strLocationArray = array();
           foreach (Location::LoadAll() as $objLocation) {
-            $strLocationArray[] = $objLocation->ShortDescription;
+            $strLocationArray[] = stripslashes($objLocation->ShortDescription);
           }
           $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intLocationKey]->Text);
           if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strLocationArray)) {
             $strLocationArray[] = $txtDefaultValue;
             $objNewLocation = new Location();
-            $objNewLocation->ShortDescription = $txtDefaultValue;
+            $objNewLocation->ShortDescription = addslashes($txtDefaultValue);
             $objNewLocation->Save();
             $this->objNewLocationArray[$objNewLocation->LocationId] = $objNewLocation->ShortDescription;
           }
@@ -459,7 +445,7 @@
               if (trim($strRowArray[$this->intLocationKey]) && !$this->in_array_nocase(trim($strRowArray[$this->intLocationKey]), $strLocationArray)) {
                 $strLocationArray[] = trim($strRowArray[$this->intLocationKey]);
                 $objNewLocation = new Location();
-                $objNewLocation->ShortDescription = trim($strRowArray[$this->intLocationKey]);
+                $objNewLocation->ShortDescription = addslashes(trim($strRowArray[$this->intLocationKey]));
                 $objNewLocation->Save();
                 $this->objNewLocationArray[$objNewLocation->LocationId] = $objNewLocation->ShortDescription;
               }
@@ -621,13 +607,13 @@
             $strCategoryArray = array();
             $this->objNewCategoryArray = array();
             foreach (Category::LoadAll() as $objCategory) {
-              $strCategoryArray[] = $objCategory->ShortDescription;
+              $strCategoryArray[] = stripslashes($objCategory->ShortDescription);
             }
             $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text);
             if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strCategoryArray)) {
               $strCategoryArray[] = $txtDefaultValue;
               $objNewCategory = new Category();
-              $objNewCategory->ShortDescription = $txtDefaultValue;
+              $objNewCategory->ShortDescription = addslashes($txtDefaultValue);
               $objNewCategory->AssetFlag = true;
               $objNewCategory->InventoryFlag = false;
               $objNewCategory->Save();
@@ -639,13 +625,13 @@
             $strManufacturerArray = array();
             $this->objNewManufacturerArray = array();
             foreach (Manufacturer::LoadAll() as $objManufacturer) {
-              $strManufacturerArray[] = $objManufacturer->ShortDescription;
+              $strManufacturerArray[] = stripslashes($objManufacturer->ShortDescription);
             }
             $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text);
             if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strManufacturerArray)) {
               $strManufacturerArray[] = $txtDefaultValue;
               $objNewManufacturer = new Manufacturer();
-              $objNewManufacturer->ShortDescription = $txtDefaultValue;
+              $objNewManufacturer->ShortDescription = addslashes($txtDefaultValue);
               $objNewManufacturer->Save();
               $this->objNewManufacturerArray[$objNewManufacturer->ManufacturerId] = $objNewManufacturer->ShortDescription;
             }
@@ -655,12 +641,12 @@
             $intCategoryArray = array();
             foreach (Category::LoadAllWithFlags(true, false) as $objCategory) {
               //$intCategoryArray["'" . strtolower($objCategory->ShortDescription) . "'"] = $objCategory->CategoryId;
-              $intCategoryArray[$objCategory->CategoryId] = strtolower($objCategory->ShortDescription);
+              $intCategoryArray[$objCategory->CategoryId] = stripslashes(strtolower($objCategory->ShortDescription));
             }
             $intManufacturerArray = array();
             foreach (Manufacturer::LoadAll() as $objManufacturer) {
               //$intManufacturerArray["'" . strtolower($objManufacturer->ShortDescription) . "'"] = $objManufacturer->ManufacturerId;
-              $intManufacturerArray[$objManufacturer->ManufacturerId] = strtolower($objManufacturer->ShortDescription);
+              $intManufacturerArray[$objManufacturer->ManufacturerId] = stripslashes(strtolower($objManufacturer->ShortDescription));
             }
 
             $intModelCustomFieldKeyArray = array();
@@ -693,7 +679,7 @@
             $intAssetModelArray = array();
             foreach (AssetModel::LoadAll() as $objAssetModel) {
               //$intAssetModelArray["'" . strtolower($objAssetModel->ShortDescription) . "'"] = $objAssetModel->AssetModelId;
-              $intAssetModelArray[$objAssetModel->AssetModelId] = strtolower($objAssetModel->ShortDescription);
+              $intAssetModelArray[$objAssetModel->AssetModelId] = stripslashes(strtolower($objAssetModel->ShortDescription));
             }
             $intAssetCustomFieldKeyArray = array();
             $arrAssetCustomField = array();
@@ -712,12 +698,12 @@
             $intLocationArray = array();
             foreach (Location::LoadAll() as $objLocation) {
               //$intLocationArray["'" . strtolower($objLocation->ShortDescription) . "'"] = $objLocation->LocationId;
-              $intLocationArray[$objLocation->LocationId] = strtolower($objLocation->ShortDescription);
+              $intLocationArray[$objLocation->LocationId] = stripslashes(strtolower($objLocation->ShortDescription));
             }
 
             $strAssetArray = array();
             foreach (Asset::LoadAll() as $objAsset) {
-              $strAssetArray[] = strtolower($objAsset->AssetCode);
+              $strAssetArray[] = stripslashes(strtolower($objAsset->AssetCode));
             }
             $this->btnNext->Warning = "Assets have been imported. Please wait...";
           }
@@ -735,7 +721,7 @@
                 if (trim($strRowArray[$this->intCategoryKey]) && !$this->in_array_nocase(trim($strRowArray[$this->intCategoryKey]), $strCategoryArray)) {
                   $strCategoryArray[] = trim($strRowArray[$this->intCategoryKey]);
                   $objNewCategory = new Category();
-                  $objNewCategory->ShortDescription = trim($strRowArray[$this->intCategoryKey]);
+                  $objNewCategory->ShortDescription = addslashes(trim($strRowArray[$this->intCategoryKey]));
                   $objNewCategory->AssetFlag = true;
                   $objNewCategory->InventoryFlag = false;
                   $objNewCategory->Save();
@@ -750,7 +736,7 @@
                 if (trim($strRowArray[$this->intManufacturerKey]) && !$this->in_array_nocase(trim($strRowArray[$this->intManufacturerKey]), $strManufacturerArray)) {
                   $strManufacturerArray[] = trim($strRowArray[$this->intManufacturerKey]);
                   $objNewManufacturer = new Manufacturer();
-                  $objNewManufacturer->ShortDescription = trim($strRowArray[$this->intManufacturerKey]);
+                  $objNewManufacturer->ShortDescription = addslashes(trim($strRowArray[$this->intManufacturerKey]));
                   $objNewManufacturer->Save();
                   $this->objNewManufacturerArray[$objNewManufacturer->ManufacturerId] = $objNewManufacturer->ShortDescription;
                 }
@@ -763,18 +749,18 @@
                 if (trim($strRowArray[$intModelShortDescriptionKey]) && !$this->in_array_nocase(trim($strRowArray[$intModelShortDescriptionKey]), $strAssetModelArray)) {
                   $strAssetModelArray[] = strtolower(trim($strRowArray[$intModelShortDescriptionKey]));
                   $objNewAssetModel = new AssetModel();
-                  $objNewAssetModel->ShortDescription = trim($strRowArray[$intModelShortDescriptionKey]);
-                  $objNewAssetModel->AssetModelCode = trim($strRowArray[$intModelCodeKey]);
-                  if ($intCategoryId = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey]))) || $intCategoryId = array_keys($intCategoryArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text)))) {
-                    $objNewAssetModel->CategoryId = $intCategoryId[0];
+                  $objNewAssetModel->ShortDescription = addslashes(trim($strRowArray[$intModelShortDescriptionKey]));
+                  $objNewAssetModel->AssetModelCode = addslashes(trim($strRowArray[$intModelCodeKey]));
+                  if ($intCategoryId = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])))/* || $intCategoryId = array_keys($intCategoryArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text)))*/) {
+                    $objNewAssetModel->CategoryId = $this->objDatabase->SqlVariable($intCategoryId[0]);
                   }
                   else {
                     $this->intSkippedRecordCount++;
                     $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                     break;
                   }
-                  if ($intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey]))) || $intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text)))) {
-                    $objNewAssetModel->ManufacturerId = $intManufacturerId[0];
+                  if ($intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey])))/* || $intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text)))*/) {
+                    $objNewAssetModel->ManufacturerId = $this->objDatabase->SqlVariable($intManufacturerId[0]);
                   }
                   else {
                     $this->intSkippedRecordCount++;
@@ -782,7 +768,7 @@
                     break;
                   }
                   if (isset($intModelLongDescriptionKey)) {
-                    $objNewAssetModel->LongDescription = trim($strRowArray[$intModelLongDescriptionKey]);
+                    $objNewAssetModel->LongDescription = addslashes(trim($strRowArray[$intModelLongDescriptionKey]));
                   }
                   $objNewAssetModel->Save();
                   // Asset Model Custom Field import
@@ -792,10 +778,10 @@
           						$objCustomField->CustomFieldSelection->newCustomFieldValue = new CustomFieldValue;
           						$objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldId = $objCustomField->CustomFieldId;
           						if (trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]])) {
-          						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+          						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = addslashes(trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
           						}
           						else {
-          						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = $this->txtMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text;
+          						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = addslashes($this->txtMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
           						}
           						$objCustomField->CustomFieldSelection->newCustomFieldValue->Save();
           						$objCustomField->CustomFieldSelection->EntityId = $objNewAssetModel->AssetModelId;
@@ -837,11 +823,11 @@
                   if (array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey]))) && array_keys($intAssetModelArray, strtolower(trim($strRowArray[$intModelShortDescriptionKey])))) {
                     $strAssetArray[] = strtolower(trim($strRowArray[$intAssetCode]));
                     $objNewAsset = new Asset();
-                    $objNewAsset->AssetCode = trim($strRowArray[$intAssetCode]);
+                    $objNewAsset->AssetCode = addslashes(trim($strRowArray[$intAssetCode]));
                     $location_id = array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey])));
-                    $objNewAsset->LocationId = $location_id[0];
+                    $objNewAsset->LocationId = $this->objDatabase->SqlVariable($location_id[0]);
                     $asset_model_id = array_keys($intAssetModelArray, strtolower(trim($strRowArray[$intModelShortDescriptionKey])));
-                    $objNewAsset->AssetModelId = $asset_model_id[0];
+                    $objNewAsset->AssetModelId = $this->objDatabase->SqlVariable($asset_model_id[0]);
                     if (isset($this->intCreatedByKey)) {
                       if (isset($this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))])) {
                         $objNewAsset->CreatedBy = $this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))];
@@ -858,10 +844,10 @@
             						$objCustomField->CustomFieldSelection->newCustomFieldValue = new CustomFieldValue;
             						$objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldId = $objCustomField->CustomFieldId;
             						if (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) {
-            						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+            						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
             						}
             						else {
-            						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = $this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text;
+            						  $objCustomField->CustomFieldSelection->newCustomFieldValue->ShortDescription = addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
             						}
             						$objCustomField->CustomFieldSelection->newCustomFieldValue->Save();
             						$objCustomField->CustomFieldSelection->EntityId = $objNewAsset->AssetId;
@@ -1170,74 +1156,70 @@
     }
 
     protected function btnAddField_Click() {
-      $intTotalCount = count($this->lstMapHeaderArray);
-      $this->lstMapHeader_Create($this, $intTotalCount-1, ($this->chkHeaderRow->Checked) ? "addfield" : null);
-      $objTemp = $this->lstMapHeaderArray[$intTotalCount];
-      $this->lstMapHeaderArray[$intTotalCount] = $this->lstMapHeaderArray[$intTotalCount-1];
-      $this->lstMapHeaderArray[$intTotalCount-1] = $objTemp;
+ 	      $intTotalCount = count($this->lstMapHeaderArray);
+ 	      $this->lstMapHeader_Create($this, $intTotalCount-1, ($this->chkHeaderRow->Checked) ? "addfield" : null);
+ 	      $objTemp = $this->lstMapHeaderArray[$intTotalCount];
+ 	      $this->lstMapHeaderArray[$intTotalCount] = $this->lstMapHeaderArray[$intTotalCount-1];
+ 	      $this->lstMapHeaderArray[$intTotalCount-1] = $objTemp;
+ 	      $txtDefaultValue = new QTextBox($this);
+ 	      $txtDefaultValue->Width = 200;
+ 	      $this->txtMapDefaultValueArray[] = $txtDefaultValue;
+ 	      $lstDefaultValue = new QListBox($this);
+ 	      $lstDefaultValue->Width = 200;
+ 	      $lstDefaultValue->Display = false;
+ 	      $this->lstMapDefaultValueArray[] = $lstDefaultValue;
+ 	      $dtpDate = new QDateTimePicker($this);
+ 	      $dtpDate->DateTimePickerType = QDateTimePickerType::Date;
+ 	      $dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+ 	      $dtpDate->Display = false;
+ 	      $this->dtpDateArray[] = $dtpDate;
 
-      $txtDefaultValue = new QTextBox($this);
-      $txtDefaultValue->Width = 200;
-      $this->txtMapDefaultValueArray[] = $txtDefaultValue;
+ 	      $btnRemove = new QButton($this);
+ 	      $btnRemove->Text = "Remove";
+ 	      $btnRemove->ActionParameter = $intTotalCount-1;
+ 	      $btnRemove->AddAction(new QClickEvent(), new QServerAction('btnRemove_Click'));
+ 	      $btnRemove->AddAction(new QEnterKeyEvent(), new QServerAction('btnRemove_Click'));
+ 	      $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
-      $lstDefaultValue = new QListBox($this);
-      $lstDefaultValue->Width = 200;
-      $lstDefaultValue->Display = false;
-      $this->lstMapDefaultValueArray[] = $lstDefaultValue;
+ 	      if (isset($this->arrMapFields[$intTotalCount-1])) {
+ 	        unset($this->arrMapFields[$intTotalCount-1]);
+ 	      }
 
-      $dtpDate = new QDateTimePicker($this);
-      $dtpDate->DateTimePickerType = QDateTimePickerType::Date;
-      $dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-      $dtpDate->Display = false;
-      $this->dtpDateArray[] = $dtpDate;
+ 	      $this->btnRemoveArray[$intTotalCount-1] = $btnRemove;
+ 	    }
 
-      $btnRemove = new QButton($this);
-      $btnRemove->Text = "Remove";
-      $btnRemove->ActionParameter = $intTotalCount-1;
-      $btnRemove->AddAction(new QClickEvent(), new QServerAction('btnRemove_Click'));
-      $btnRemove->AddAction(new QEnterKeyEvent(), new QServerAction('btnRemove_Click'));
-      $btnRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-      if (isset($this->arrMapFields[$intTotalCount-1])) {
-        unset($this->arrMapFields[$intTotalCount-1]);
-      }
-      $this->btnRemoveArray[$intTotalCount-1] = $btnRemove;
-    }
+ 	    protected function btnRemove_Click($strFormId, $strControlId, $strParameter) {
+ 	      $intId = (int)$strParameter;
+ 	      $intTotalCount = count($this->lstMapHeaderArray)-1;
 
-    protected function btnRemove_Click($strFormId, $strControlId, $strParameter) {
-      $intId = (int)$strParameter;
-      $intTotalCount = count($this->lstMapHeaderArray)-1;
-      if ($intId < count($this->lstMapHeaderArray)-2) {
-        for ($i=$intId; $i<count($this->lstMapHeaderArray)-1; $i++) {
-          $this->lstMapHeaderArray[$i] = $this->lstMapHeaderArray[$i+1];
-          if (isset($this->txtMapDefaultValueArray[$i+1])) {
-            $this->txtMapDefaultValueArray[$i] = $this->txtMapDefaultValueArray[$i+1];
-            $this->lstMapDefaultValueArray[$i] = $this->lstMapDefaultValueArray[$i+1];
-            $this->dtpDateArray[$i] = $this->dtpDateArray[$i+1];
-            $this->btnRemoveArray[$i] = $this->btnRemoveArray[$i+1];
-          }
-          else {
-            unset($this->txtMapDefaultValueArray[$i]);
-            unset($this->lstMapDefaultValueArray[$i]);
-            unset($this->dtpDateArray[$i]);
-            unset($this->btnRemoveArray[$i]);
-          }
-        }
-        unset($this->lstMapHeaderArray[$intTotalCount]);
-      }
-      else {
-        $this->lstMapHeaderArray[$intId] = $this->lstMapHeaderArray[$intId+1];
-        unset($this->lstMapHeaderArray[$intId+1]);
-        unset($this->txtMapDefaultValueArray[$intId]);
-        unset($this->lstMapDefaultValueArray[$intId]);
-        unset($this->dtpDateArray[$intId]);
-        unset($this->btnRemoveArray[$intId]);
-
-      }
-      unset($this->txtMapDefaultValueArray[$intTotalCount]);
-      unset($this->lstMapDefaultValueArray[$intTotalCount]);
-      unset($this->dtpDateArray[$intTotalCount]);
-      unset($this->btnRemoveArray[$intTotalCount]);
-    }
+ 	      if ($intId < count($this->lstMapHeaderArray)-2) {
+ 	        for ($i=$intId; $i<count($this->lstMapHeaderArray)-1; $i++) {
+ 	          $this->lstMapHeaderArray[$i] = $this->lstMapHeaderArray[$i+1];
+ 	          if (isset($this->txtMapDefaultValueArray[$i+1])) {
+ 	            $this->txtMapDefaultValueArray[$i] = $this->txtMapDefaultValueArray[$i+1];
+ 	            $this->lstMapDefaultValueArray[$i] = $this->lstMapDefaultValueArray[$i+1];
+ 	            $this->dtpDateArray[$i] = $this->dtpDateArray[$i+1];
+ 	            $this->btnRemoveArray[$i] = $this->btnRemoveArray[$i+1];
+ 	            $this->btnRemoveArray[$i]->ActionParameter = $i;
+ 	          }
+ 	          else {
+ 	            unset($this->txtMapDefaultValueArray[$i]);
+ 	            unset($this->lstMapDefaultValueArray[$i]);
+ 	            unset($this->dtpDateArray[$i]);
+ 	            unset($this->btnRemoveArray[$i]);
+ 	          }
+ 	        }
+ 	        unset($this->lstMapHeaderArray[$intTotalCount]);
+ 	      }
+ 	      else {
+ 	        $this->lstMapHeaderArray[$intId] = $this->lstMapHeaderArray[$intId+1];
+ 	        unset($this->lstMapHeaderArray[$intId+1]);
+ 	        unset($this->txtMapDefaultValueArray[$intId]);
+ 	        unset($this->lstMapDefaultValueArray[$intId]);
+ 	        unset($this->dtpDateArray[$intId]);
+ 	        unset($this->btnRemoveArray[$intId]);
+ 	      }
+ 	    }
 
 	}
 	// Go ahead and run this form object to generate the page
