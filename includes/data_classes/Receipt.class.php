@@ -679,7 +679,7 @@
 			}
 
 			// Generate Authorization SQL based on the QApplication::$objRoleModule
-			$arrSearchSql['strAuthorizationSql'] = QApplication::AuthorizationSql(6);
+			$arrSearchSql['strAuthorizationSql'] = QApplication::AuthorizationSql(EntityQtype::ToStringTable(EntityQtype::Receipt));
 
 			return $arrSearchSql;
 	  }
