@@ -95,14 +95,17 @@
 			$this->btnRemoveArray = array();
 			$this->arrAssetCustomField = array();
 			$this->objDatabase = Asset::GetDatabase();
+			// Load Asset Custom Field
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 1) as $objCustomField) {
 			  $this->arrAssetCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
 			$this->arrAssetModelCustomField = array();
+			// Load Asset Model Custom Field
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 4) as $objCustomField) {
 			  $this->arrAssetModelCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
 			$this->intUserArray = array();
+			// Load Users
 			foreach (UserAccount::LoadAll() as $objUser) {
 			  $this->intUserArray[strtolower($objUser->Username)] = $objUser->UserAccountId;
 			}
@@ -117,11 +120,13 @@
 			$this->ctlHeaderMenu = new QHeaderMenu($this);
 		}
 
+		// Main Panel
 		protected function pnlMain_Create() {
 		  $this->pnlMain = new QPanel($this);
 		  $this->pnlMain->AutoRenderChildren = true;
 		}
 
+		// Step 1 Panel
 		protected function pnlStepOne_Create() {
 			$this->pnlStepOne = new QPanel($this->pnlMain);
       $this->pnlStepOne->Template = "asset_import_pnl_step1.tpl.php";
@@ -155,11 +160,14 @@
 			$this->chkHeaderRow->Name = "Header Row: ";
     }
 
+
+    // Step 2 Panel
     protected function pnlStepTwo_Create() {
 			$this->pnlStepTwo = new QPanel($this->pnlMain);
       $this->pnlStepTwo->Template = "asset_import_pnl_step2.tpl.php";
     }
 
+    // Step 3 Panel
     protected function pnlStepThree_Create() {
 			$this->pnlStepThree = new QPanel($this->pnlMain);
       $this->pnlStepThree->Template = "asset_import_pnl_step3.tpl.php";
@@ -233,29 +241,10 @@
     				// Setup Filename, Base Filename and Extension
     				$strFilename = $this->flcFileCsv->FileName;
     				$intPosition = strrpos($strFilename, '.');
-
-    				/*if (is_array($this->strAcceptibleMimeArray) && array_key_exists($this->flcFileCsv->Type, $this->strAcceptibleMimeArray))
-    					$strExtension = $this->strAcceptibleMimeArray[$this->flcFileCsv->Type];
-    				else {
-    					if ($intPosition)
-    						$strExtension = substr($strFilename, $intPosition + 1);
-    					else
-    						$strExtension = null;
-    				}*/
-
-    				//$strBaseFilename = substr($strFilename, 0, $intPosition);
-    				//$strExtension = strtolower($strExtension);
-
-    				// Save the File in a slightly more permanent temporary location
-    				//$strTempFilePath = __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__ . '/'.$_SESSION['intUserAccountId'] .'.' . 'csv';
-    				//copy($this->flcFileCsv->File, $strTempFilePath);
-    				//$this->File = $strTempFilePath;
-
-    				// Cleanup and Save Filename
-    				//$this->strFileName = preg_replace('/[^A-Z^a-z^0-9_\-]/', '', $strBaseFilename) . '.' . $strExtension;
     			}
     			if (!$blnError) {
     			  $this->FileCsvData = new File_CSV_DataSource();
+    			  // Setup the settings which have got on step 1
     			  $this->FileCsvData->settings($this->GetCsvSettings());
     			  $file = fopen($this->flcFileCsv->File, "r");
             // Counter of fles
@@ -270,10 +259,6 @@
                 $this->strFilePathArray[] = $strFilePath;
                 $file_part = fopen($strFilePath, "w+");
               }
-
-              /*while ($row != $row_new = str_replace($this->FileCsvData->settings['escape'].$this->FileCsvData->settings['escape'], $this->FileCsvData->settings['escape'].$this->FileCsvData->settings['delimiter'].$this->FileCsvData->settings['delimiter'].$this->FileCsvData->settings['escape'], $row)) {
-                $row = $row_new;
-              }*/
 
               fwrite($file_part, $row);
               $j++;
@@ -292,20 +277,23 @@
               $this->arrCsvHeader = $this->FileCsvData->getHeaders();
             }
             else {
+              // If it is not first file
               $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
-            $file_skipped = fopen($this->strFilePath = sprintf('%s/%s_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "a");
+            $file_skipped = fopen($this->strFilePath = sprintf('%s/%s_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "w+");
             $strFirstRowArray = $this->FileCsvData->getRow(0);
             for ($i=0; $i<count($strFirstRowArray); $i++) {
               $this->arrMapFields[$i] = array();
               if ($this->blnHeaderRow) {
-                $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
+                $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
                 $this->arrMapFields[$i]['header'] = $this->arrCsvHeader[$i];
+                // Create the header row in the skipped error file
                 $this->PutSkippedRecordInFile($file_skipped, $strFirstRowArray);
               }
               else {
-                $this->arrMapFields[$i]['select_list'] = $this->lstMapHeader_Create($this, $i);
+                $this->lstMapHeader_Create($this, $i);
               }
+              // Create Default Value TextBox, ListBox and DateTimePicker
               if ($this->blnHeaderRow && $this->arrCsvHeader[$i] || !$this->blnHeaderRow) {
                 $txtDefaultValue = new QTextBox($this);
                 $txtDefaultValue->Width = 200;
@@ -326,7 +314,7 @@
             }
             $this->btnNext->Text = "Import Now";
             fclose($file_skipped);
-
+            // Create Add Fiekd button
             $btnAddField = new QButton($this);
             $btnAddField->Text = "Add Field";
             $btnAddField->AddAction(new QClickEvent(), new QServerAction('btnAddField_Click'));
@@ -345,7 +333,9 @@
         $blnAssetModelShortDescription = false;
         $blnCategory = false;
         $blnManufacturer = false;
-        foreach ($this->lstMapHeaderArray as $lstMapHeader) {
+        // Checking errors (Location, Asset Code, Model Short Description, Model Code, Category and Manufacturer must be selected)
+        for ($i=0; $i < count($this->lstMapHeaderArray)-1; $i++) {
+          $lstMapHeader = $this->lstMapHeaderArray[$i];
           $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
           if ($strSelectedValue == "location") {
             $blnLocation = true;
@@ -367,6 +357,7 @@
           }
         }
         if ($this->lstMapDefaultValueArray) {
+          // Checking errors for required Default Value text fields
           foreach ($this->lstMapDefaultValueArray as $lstDefault) {
             if ($lstDefault->Display && $lstDefault->Required && !$lstDefault->SelectedValue) {
               $lstDefault->Warning = "You must select one default value.";
@@ -380,18 +371,22 @@
           }
         }
         if ($this->txtMapDefaultValueArray) {
+          // Checking errors for required Default Value lst fields
           foreach ($this->txtMapDefaultValueArray as $txtDefault) {
             if ($txtDefault->Display && $txtDefault->Required && !$txtDefault->Text) {
               $txtDefault->Warning = "You must enter default value.";
               break;
             }
             else {
+              $blnError = false;
               $txtDefault->Warning = "";
             }
           }
         }
+        // If all required fields have no errors
         if (!$blnError && $blnAssetCode && $blnAssetModelCode && $blnAssetModelShortDescription && $blnLocation && $blnCategory && $blnManufacturer) {
           $this->btnNext->Warning = "";
+          // Setup keys for main required fields
           foreach ($this->arrTracmorField as $key => $value) {
             if ($value == 'location') {
               $this->intLocationKey = $key;
@@ -417,10 +412,12 @@
           }
 
           $strLocationArray = array();
+          // Load all locations
           foreach (Location::LoadAll() as $objLocation) {
             $strLocationArray[] = stripslashes($objLocation->ShortDescription);
           }
           $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intLocationKey]->Text);
+          // Add default value in database if it is not exist
           if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strLocationArray)) {
             $strLocationArray[] = $txtDefaultValue;
             $objNewLocation = new Location();
@@ -434,6 +431,7 @@
           $this->objNewAssetModelArray = array();
           $this->blnImportEnd = false;
           $j=1;
+          // Add all unique locations in database
           foreach ($this->strFilePathArray as $strFilePath) {
             if ($j != 1) {
               $this->FileCsvData->load($strFilePath);
@@ -453,6 +451,7 @@
             $j++;
           }
           $this->btnNext->RemoveAllActions('onclick');
+          // Add new ajax actions for button
           $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
@@ -461,6 +460,7 @@
           $this->btnNext->Warning = "Locations have been imported. Please wait...";
           $this->intImportStep = 2;
 
+          // New locations
           $this->dtgLocation = new QDataGrid($this);
           $this->dtgLocation->Name = 'location_list';
       		$this->dtgLocation->CellPadding = 5;
@@ -470,16 +470,9 @@
           $this->dtgLocation->ShowColumnToggle = false;
           $this->dtgLocation->ShowExportCsv = false;
           $this->dtgLocation->ShowHeader = false;
-
-          // Enable Pagination, and set to 20 items per page
-          //$objPaginator = new QPaginator($this->dtgLocation);
-          //$this->dtgLocation->Paginator = $objPaginator;
-          //$this->dtgLocation->ItemsPerPage = 20;
-
           $this->dtgLocation->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-          //$this->dtgLocation->DataSource = $this->objNewLocationArray;
-          //$this->dtgLocation->TotalItemCount = count($this->objNewLocationArray);
 
+          // New categories
           $this->dtgCategory = new QDataGrid($this);
           $this->dtgCategory->Name = 'category_list';
       		$this->dtgCategory->CellPadding = 5;
@@ -489,16 +482,9 @@
           $this->dtgCategory->ShowColumnToggle = false;
           $this->dtgCategory->ShowExportCsv = false;
           $this->dtgCategory->ShowHeader = false;
-
-          // Enable Pagination, and set to 20 items per page
-          //$objPaginator = new QPaginator($this->dtgCategory);
-          //$this->dtgCategory->Paginator = $objPaginator;
-          //$this->dtgCategory->ItemsPerPage = 20;
-
           $this->dtgCategory->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-          //$this->dtgCategory->DataSource = $this->objNewCategoryArray;
-          //$this->dtgCategory->TotalItemCount = count($this->objNewCategoryArray);
 
+          // New manufacturers
           $this->dtgManufacturer = new QDataGrid($this);
           $this->dtgManufacturer->Name = 'manufacturer_list';
       		$this->dtgManufacturer->CellPadding = 5;
@@ -508,16 +494,9 @@
           $this->dtgManufacturer->ShowColumnToggle = false;
           $this->dtgManufacturer->ShowExportCsv = false;
           $this->dtgManufacturer->ShowHeader = false;
-
-          // Enable Pagination, and set to 20 items per page
-          //$objPaginator = new QPaginator($this->dtgManufacturer);
-          //$this->dtgManufacturer->Paginator = $objPaginator;
-          //$this->dtgManufacturer->ItemsPerPage = 20;
-
           $this->dtgManufacturer->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-          //$this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
-          //$this->dtgManufacturer->TotalItemCount = count($this->objNewManufacturerArray);
 
+          // New asset models
           $this->dtgAssetModel = new QDataGrid($this);
           $this->dtgAssetModel->Name = 'asset_model_list';
       		$this->dtgAssetModel->CellPadding = 5;
@@ -527,16 +506,9 @@
           $this->dtgAssetModel->ShowColumnToggle = false;
           $this->dtgAssetModel->ShowExportCsv = false;
           $this->dtgAssetModel->ShowHeader = false;
-
-          // Enable Pagination, and set to 20 items per page
-          //$objPaginator = new QPaginator($this->dtgAssetModel);
-          //$this->dtgAssetModel->Paginator = $objPaginator;
-          //$this->dtgAssetModel->ItemsPerPage = 20;
-
           $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-          //$this->dtgAssetModel->DataSource = $this->objNewAssetModelArray;
-          //$this->dtgAssetModel->TotalItemCount = count($this->objNewAssetModelArray);
 
+          // New assets
           $this->dtgAsset = new QDataGrid($this);
           $this->dtgAsset->Name = 'asset_list';
       		$this->dtgAsset->CellPadding = 5;
@@ -546,20 +518,14 @@
           $this->dtgAsset->ShowColumnToggle = false;
           $this->dtgAsset->ShowExportCsv = false;
           $this->dtgAsset->ShowHeader = false;
-
-          // Enable Pagination, and set to 20 items per page
-          //$objPaginator = new QPaginator($this->dtgAsset);
-          //$this->dtgAsset->Paginator = $objPaginator;
-          //$this->dtgAsset->ItemsPerPage = 20;
-
           $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-          //$this->dtgAsset->DataSource = $this->objNewAssetArray;
-          //$this->dtgAsset->TotalItemCount = count($this->objNewAssetArray);
 
+          // Create the label for successful import
           $this->lblImportSuccess = new QLabel($this);
         	$this->lblImportSuccess->HtmlEntities = false;
         	$this->lblImportSuccess->Display = false;
 
+        	// Undo Last Import button
         	$this->btnUndoLastImport = new QButton($this);
         	$this->btnUndoLastImport->Text = "Undo Last Import";
         	$this->btnUndoLastImport->Display = false;
@@ -567,6 +533,7 @@
     			$this->btnUndoLastImport->AddAction(new QEnterKeyEvent(), new QServerAction('btnCancel_Click'));
     			$this->btnUndoLastImport->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
+    			// Import More button
     			$this->btnImportMore = new QButton($this);
         	$this->btnImportMore->Text = "Import More";
         	$this->btnImportMore->Display = false;
@@ -574,6 +541,7 @@
     			$this->btnImportMore->AddAction(new QEnterKeyEvent(), new QServerAction('btnImportMore_Click'));
     			$this->btnImportMore->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
+    			// Return to Assets button
     			$this->btnReturnToAssets = new QButton($this);
         	$this->btnReturnToAssets->Text = "Return to Assets";
         	$this->btnReturnToAssets->Display = false;
@@ -581,18 +549,6 @@
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QServerAction('btnReturnToAssets_Click'));
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QTerminateAction());
         }
-        /*elseif (!$blnAssetCode) {
-          $this->btnNext->Warning = "1";
-        }
-        elseif (!$blnAssetModelCode) {
-          $this->btnNext->Warning = "2";
-        }
-        elseif (!$blnAssetModelShortDescription) {
-          $this->btnNext->Warning = "3";
-        }
-        elseif (!$blnLocation) {
-          $this->btnNext->Warning = "4";
-        }*/
         else {
           $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Code, Asset Model Short Description, Location, Category and Manufacturer).";
           $blnError = true;
@@ -603,12 +559,15 @@
 		    set_time_limit(0);
 		    $file_skipped = fopen($strFilePath = sprintf('%s/%s_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "a");
 		    if (!$this->blnImportEnd) {
+		      // Category
           if ($this->intImportStep == 2) {
             $strCategoryArray = array();
             $this->objNewCategoryArray = array();
+            // Load all categories
             foreach (Category::LoadAll() as $objCategory) {
               $strCategoryArray[] = stripslashes($objCategory->ShortDescription);
             }
+            // Add Default value
             $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text);
             if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strCategoryArray)) {
               $strCategoryArray[] = $txtDefaultValue;
@@ -621,13 +580,16 @@
             }
             $this->btnNext->Warning = "Categories have been imported. Please wait...";
           }
+          // Manufacturer
           elseif ($this->intImportStep == 3) {
             $strManufacturerArray = array();
             $this->objNewManufacturerArray = array();
+            // Load all manufacturers
             foreach (Manufacturer::LoadAll() as $objManufacturer) {
               $strManufacturerArray[] = stripslashes($objManufacturer->ShortDescription);
             }
             $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text);
+            // Add Default Value
             if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strManufacturerArray)) {
               $strManufacturerArray[] = $txtDefaultValue;
               $objNewManufacturer = new Manufacturer();
@@ -637,13 +599,16 @@
             }
             $this->btnNext->Warning = "Manufacturers have been imported. Please wait...";
           }
+          // Asset Model
           elseif ($this->intImportStep == 4) {
             $intCategoryArray = array();
+            // Load all categories with keys=category_id
             foreach (Category::LoadAllWithFlags(true, false) as $objCategory) {
               //$intCategoryArray["'" . strtolower($objCategory->ShortDescription) . "'"] = $objCategory->CategoryId;
               $intCategoryArray[$objCategory->CategoryId] = stripslashes(strtolower($objCategory->ShortDescription));
             }
             $intManufacturerArray = array();
+            // Load all manufacturers with keys=manufacturer_id
             foreach (Manufacturer::LoadAll() as $objManufacturer) {
               //$intManufacturerArray["'" . strtolower($objManufacturer->ShortDescription) . "'"] = $objManufacturer->ManufacturerId;
               $intManufacturerArray[$objManufacturer->ManufacturerId] = stripslashes(strtolower($objManufacturer->ShortDescription));
@@ -651,6 +616,7 @@
 
             $intModelCustomFieldKeyArray = array();
             $arrAssetModelCustomField = array();
+            // Setup keys
             foreach ($this->arrTracmorField as $key => $value) {
               if ($value == 'asset model short description') {
                 $intModelShortDescriptionKey = $key;
@@ -670,19 +636,23 @@
               }
             }
             $strAssetModelArray = array();
+            // Load all asset models
             foreach (AssetModel::LoadAll() as $objAssetModel) {
-              $strAssetModelArray[] = strtolower($objAssetModel->ShortDescription);
+              $strAssetModelArray[] = strtolower(sprintf("%s_%s_%s_%s", $objAssetModel->AssetModelCode, stripslashes($objAssetModel->ShortDescription), $objAssetModel->CategoryId, $objAssetModel->ManufacturerId));
             }
             $this->btnNext->Warning = "Asset Models have been imported. Please wait...";
           }
+          // Asset
           elseif ($this->intImportStep == 5) {
             $intAssetModelArray = array();
+            // Load all asset models with keys=asset_model_id
             foreach (AssetModel::LoadAll() as $objAssetModel) {
               //$intAssetModelArray["'" . strtolower($objAssetModel->ShortDescription) . "'"] = $objAssetModel->AssetModelId;
-              $intAssetModelArray[$objAssetModel->AssetModelId] = stripslashes(strtolower($objAssetModel->ShortDescription));
+              $intAssetModelArray[$objAssetModel->AssetModelId] = strtolower(sprintf("%s_%s_%s_%s", $objAssetModel->AssetModelCode, stripslashes($objAssetModel->ShortDescription), $objAssetModel->CategoryId, $objAssetModel->ManufacturerId));
             }
             $intAssetCustomFieldKeyArray = array();
             $arrAssetCustomField = array();
+            // Setup keys
             foreach ($this->arrTracmorField as $key => $value) {
               if ($value == 'asset model short description') {
                 $intModelShortDescriptionKey = $key;
@@ -696,12 +666,14 @@
               }
             }
             $intLocationArray = array();
+            // Load all locations with keys=location_id
             foreach (Location::LoadAll() as $objLocation) {
               //$intLocationArray["'" . strtolower($objLocation->ShortDescription) . "'"] = $objLocation->LocationId;
               $intLocationArray[$objLocation->LocationId] = stripslashes(strtolower($objLocation->ShortDescription));
             }
 
             $strAssetArray = array();
+            // Load all assets
             foreach (Asset::LoadAll() as $objAsset) {
               $strAssetArray[] = stripslashes(strtolower($objAsset->AssetCode));
             }
@@ -746,27 +718,59 @@
             elseif ($this->intImportStep == 4) {
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
-                if (trim($strRowArray[$intModelShortDescriptionKey]) && !$this->in_array_nocase(trim($strRowArray[$intModelShortDescriptionKey]), $strAssetModelArray)) {
-                  $strAssetModelArray[] = strtolower(trim($strRowArray[$intModelShortDescriptionKey]));
+                $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
+                $strAssetModelCode = addslashes(trim($strRowArray[$intModelCodeKey]));
+                if ($strKeyArray = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey]) && isset($strKeyArray[0])))) {
+                  $intCategoryId = $strKeyArray[0];
+                }
+                elseif ($strKeyArray = array_keys($intCategoryArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text) && isset($strKeyArray[0])))) {
+                  $intCategoryId = $strKeyArray[0];
+                }
+                else {
+                  $intCategoryId = false;
+                }
+                if ($strKeyArray = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey]) && isset($strKeyArray[0])))) {
+                  $intManufacturerId = $strKeyArray[0];
+                }
+                elseif ($strKeyArray = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text) && isset($strKeyArray[0])))) {
+                  $intManufacturerId = $strKeyArray[0];
+                }
+                else {
+                  $intManufacturerId = false;
+                }
+                if (!$strShortDescription && $intCategoryId === false && $intManufacturerId === false) {
+                  $blnError = true;
+                  $this->intSkippedRecordCount++;
+                  $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                  break;
+                }
+                else {
+                  $blnError = false;
+                  $strAssetModel = strtolower(sprintf("%s_%s_%s_%s", $strAssetModelCode, $strShortDescription, $intCategoryId, $intManufacturerId));
+                }
+                if (!$blnError && !$this->in_array_nocase($strAssetModel, $strAssetModelArray)) {
+                  $strAssetModelArray[] = $strAssetModel;
                   $objNewAssetModel = new AssetModel();
-                  $objNewAssetModel->ShortDescription = addslashes(trim($strRowArray[$intModelShortDescriptionKey]));
-                  $objNewAssetModel->AssetModelCode = addslashes(trim($strRowArray[$intModelCodeKey]));
-                  if ($intCategoryId = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])))/* || $intCategoryId = array_keys($intCategoryArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text)))*/) {
-                    $objNewAssetModel->CategoryId = $this->objDatabase->SqlVariable($intCategoryId[0]);
+                  $objNewAssetModel->ShortDescription = $strShortDescription;
+                  $objNewAssetModel->AssetModelCode = $strAssetModelCode;
+                  $objNewAssetModel->CategoryId = $intCategoryId;
+                  $objNewAssetModel->ManufacturerId = $intManufacturerId;
+                  /*if ($intCategoryId = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])))/* || $intCategoryId = array_keys($intCategoryArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text)))) {*/
+                  /*  $objNewAssetModel->CategoryId = $this->objDatabase->SqlVariable($intCategoryId[0]);
                   }
                   else {
                     $this->intSkippedRecordCount++;
                     $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                     break;
                   }
-                  if ($intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey])))/* || $intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text)))*/) {
-                    $objNewAssetModel->ManufacturerId = $this->objDatabase->SqlVariable($intManufacturerId[0]);
+                  if ($intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey])))/* || $intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text)))) {*/
+                  /*  $objNewAssetModel->ManufacturerId = $this->objDatabase->SqlVariable($intManufacturerId[0]);
                   }
                   else {
                     $this->intSkippedRecordCount++;
                     $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                     break;
-                  }
+                  }*/
                   if (isset($intModelLongDescriptionKey)) {
                     $objNewAssetModel->LongDescription = addslashes(trim($strRowArray[$intModelLongDescriptionKey]));
                   }
@@ -819,14 +823,44 @@
             elseif ($this->intImportStep == 5) {
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
-                if (trim($strRowArray[$intAssetCode]) && !$this->in_array_nocase(trim($strRowArray[$intAssetCode]), $strAssetArray)) {
+                $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
+                $strAssetModelCode = addslashes(trim($strRowArray[$intModelCodeKey]));
+                if ($strKeyArray = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey]) && isset($strKeyArray[0])))) {
+                  $intCategoryId = $strKeyArray[0];
+                }
+                elseif ($strKeyArray = array_keys($intCategoryArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text) && isset($strKeyArray[0])))) {
+                  $intCategoryId = $strKeyArray[0];
+                }
+                else {
+                  $intCategoryId = false;
+                }
+                if ($strKeyArray = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey]) && isset($strKeyArray[0])))) {
+                  $intManufacturerId = $strKeyArray[0];
+                }
+                elseif ($strKeyArray = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text) && isset($strKeyArray[0])))) {
+                  $intManufacturerId = $strKeyArray[0];
+                }
+                else {
+                  $intManufacturerId = false;
+                }
+                if (!$strShortDescription && $intCategoryId === false && $intManufacturerId === false) {
+                  $blnError = true;
+                  $this->intSkippedRecordCount++;
+                  $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                  break;
+                }
+                else {
+                  $blnError = false;
+                  $strAssetModel = strtolower(sprintf("%s_%s_%s_%s", $strAssetModelCode, $strShortDescription, $intCategoryId, $intManufacturerId));
+                }
+                if (!$blnError && trim($strRowArray[$intAssetCode]) && !$this->in_array_nocase(trim($strRowArray[$intAssetCode]), $strAssetArray)) {
                   if (array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey]))) && array_keys($intAssetModelArray, strtolower(trim($strRowArray[$intModelShortDescriptionKey])))) {
                     $strAssetArray[] = strtolower(trim($strRowArray[$intAssetCode]));
                     $objNewAsset = new Asset();
                     $objNewAsset->AssetCode = addslashes(trim($strRowArray[$intAssetCode]));
                     $location_id = array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey])));
                     $objNewAsset->LocationId = $this->objDatabase->SqlVariable($location_id[0]);
-                    $asset_model_id = array_keys($intAssetModelArray, strtolower(trim($strRowArray[$intModelShortDescriptionKey])));
+                    $asset_model_id = array_keys($intAssetModelArray, $strAssetModel);
                     $objNewAsset->AssetModelId = $this->objDatabase->SqlVariable($asset_model_id[0]);
                     if (isset($this->intCreatedByKey)) {
                       if (isset($this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))])) {
