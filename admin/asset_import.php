@@ -452,9 +452,9 @@
           }
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
-          $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
-    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QServerAction('btnNext_Click'));
+    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QTerminateAction());
           $this->btnNext->Warning = "Locations have been imported. Please wait...";
@@ -734,7 +734,7 @@
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
                 $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
-                $strAssetModelCode = addslashes(trim($strRowArray[$intModelCodeKey]));
+                $strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? addslashes(trim($strRowArray[$intModelCodeKey])) : addslashes(trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text));
                 $strKeyArray = array_keys($intCategoryArray, addslashes(strtolower(trim($strRowArray[$this->intCategoryKey]))));
                 if (count($strKeyArray)) {
                   $intCategoryId = $strKeyArray[0];
@@ -779,22 +779,7 @@
                   $objNewAssetModel->AssetModelCode = $strAssetModelCode;
                   $objNewAssetModel->CategoryId = $intCategoryId;
                   $objNewAssetModel->ManufacturerId = $intManufacturerId;
-                  /*if ($intCategoryId = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])))/* || $intCategoryId = array_keys($intCategoryArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intCategoryKey]->Text)))) {*/
-                  /*  $objNewAssetModel->CategoryId = $this->objDatabase->SqlVariable($intCategoryId[0]);
-                  }
-                  else {
-                    $this->intSkippedRecordCount++;
-                    $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
-                    break;
-                  }
-                  if ($intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey])))/* || $intManufacturerId = array_keys($intManufacturerArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intManufacturerKey]->Text)))) {*/
-                  /*  $objNewAssetModel->ManufacturerId = $this->objDatabase->SqlVariable($intManufacturerId[0]);
-                  }
-                  else {
-                    $this->intSkippedRecordCount++;
-                    $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
-                    break;
-                  }*/
+
                   if (isset($intModelLongDescriptionKey)) {
                     $objNewAssetModel->LongDescription = addslashes(trim($strRowArray[$intModelLongDescriptionKey]));
                   }
@@ -848,7 +833,7 @@
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
                 $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
-                $strAssetModelCode = addslashes(trim($strRowArray[$intModelCodeKey]));
+                $strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? addslashes(trim($strRowArray[$intModelCodeKey])) : addslashes(trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text));
                 $strKeyArray = array_keys($intCategoryArray, addslashes(strtolower(trim($strRowArray[$this->intCategoryKey]))));
                 if (count($strKeyArray)) {
                   $intCategoryId = $strKeyArray[0];
@@ -892,27 +877,45 @@
                   if ($strAssetCode && !$this->in_array_nocase($strAssetCode, $strAssetArray)) {
                     $intLocationKeyArray = array_keys($intLocationArray, addslashes(strtolower(trim($strRowArray[$this->intLocationKey]))));
                     $intModelKeyArray = array_keys($intAssetModelArray, $strAssetModel);
-                    if (true || count($intLocationKeyArray) && count($intModelKeyArray)) {
+                    if (count($intLocationKeyArray) && count($intModelKeyArray)) {
                       $strAssetArray[] = strtolower($strAssetCode);
                       $objNewAsset = new Asset();
                       $objNewAsset->AssetCode = $strAssetCode;
-                      $location_id = array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey])));
-                      $objNewAsset->LocationId = $this->objDatabase->SqlVariable($location_id[0]);
-                      $asset_model_id = array_keys($intAssetModelArray, $strAssetModel);
-                      $objNewAsset->AssetModelId = $this->objDatabase->SqlVariable($asset_model_id[0]);
-                      if (isset($this->intCreatedByKey)) {
+                      //$location_id = array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey])));
+                      //$objNewAsset->LocationId = $this->objDatabase->SqlVariable($location_id[0]);
+                      $objNewAsset->LocationId = $intLocationKeyArray[0];
+                      //$asset_model_id = array_keys($intAssetModelArray, $strAssetModel);
+                      //$objNewAsset->AssetModelId = $this->objDatabase->SqlVariable($asset_model_id[0]);
+                      $objNewAsset->AssetModelId = $intModelKeyArray[0];
+                      /*if (isset($this->intCreatedByKey)) {
                         if (isset($this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))])) {
                           $objNewAsset->CreatedBy = $this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))];
                         }
                         else {
                           $objNewAsset->CreatedBy = $this->lstMapDefaultValueArray[$this->intCreatedByKey]->SelectedValue;
                         }
-                      }
+                      }*/
                       $objNewAsset->Save();
+                      $strCFVArray = array();
+                      $objDatabase = CustomField::GetDatabase();
                       // Asset Custom Field import
                       foreach ($arrAssetCustomField as $objCustomField) {
                         if ($objCustomField->CustomFieldQtypeId != 2) {
-                          $objCustomField->CustomFieldSelection = new CustomFieldSelection;
+                          $strShortDescription = (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?
+                                      addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
+                                      addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
+                          $strQuery = sprintf("INSERT INTO `custom_field_value` " .
+                                              "(`custom_field_id`,`short_description`, `created_by`, `creation_date`) " .
+                                              "VALUES ('%s', '%s', '%s', 'NOW()');",
+                                              $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
+                          $objDatabase->NonQuery($strQuery);
+                          $strQuery = sprintf("INSERT INTO `custom_field_selection` " .
+                                              "(`entity_id`,`entity_qtype_id`, `custom_field_value_id`) " .
+                                              "VALUES ('%s', '%s', '%s');",
+                                              $objNewAsset->AssetId, 1, $objDatabase->InsertId(), $_SESSION['intUserAccountId']);
+                          $objDatabase->NonQuery($strQuery);
+                          $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strShortDescription);
+                          /*$objCustomField->CustomFieldSelection = new CustomFieldSelection;
               						$objCustomField->CustomFieldSelection->newCustomFieldValue = new CustomFieldValue;
               						$objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldId = $objCustomField->CustomFieldId;
               						if (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) {
@@ -925,7 +928,7 @@
               						$objCustomField->CustomFieldSelection->EntityId = $objNewAsset->AssetId;
               						$objCustomField->CustomFieldSelection->EntityQtypeId = 1;
               						$objCustomField->CustomFieldSelection->CustomFieldValueId = $objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldValueId;
-              						$objCustomField->CustomFieldSelection->Save();
+              						$objCustomField->CustomFieldSelection->Save();*/
                         }
                         else {
                           $data = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
@@ -950,6 +953,12 @@
                         }
                       }
                       $this->objNewAssetArray[$objNewAsset->AssetId] = $objNewAsset->AssetCode;
+                      if (count($strCFVArray)) {
+                        $strQuery = sprintf("UPDATE `asset_custom_field_helper` " .
+                                            "SET %s " .
+                                            "WHERE `asset_id`='%s';", implode(", ", $strCFVArray), $objNewAsset->AssetId);
+                        $objDatabase->NonQuery($strQuery);
+                      }
                     }
                     // Add records skipped due to errors
                     else {
