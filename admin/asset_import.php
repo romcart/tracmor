@@ -876,16 +876,15 @@
                   $strAssetCode = addslashes(trim($strRowArray[$intAssetCode]));
                   if ($strAssetCode && !$this->in_array_nocase($strAssetCode, $strAssetArray)) {
                     $intLocationKeyArray = array_keys($intLocationArray, addslashes(strtolower(trim($strRowArray[$this->intLocationKey]))));
+                    if (!count($intLocationKeyArray)) {
+                      $intLocationKeyArray = array_keys($intLocationArray, addslashes(strtolower(trim($this->txtMapDefaultValueArray[$this->intLocationKey]->Text))));
+                    }
                     $intModelKeyArray = array_keys($intAssetModelArray, $strAssetModel);
                     if (count($intLocationKeyArray) && count($intModelKeyArray)) {
                       $strAssetArray[] = strtolower($strAssetCode);
                       $objNewAsset = new Asset();
                       $objNewAsset->AssetCode = $strAssetCode;
-                      //$location_id = array_keys($intLocationArray, strtolower(trim($strRowArray[$this->intLocationKey])));
-                      //$objNewAsset->LocationId = $this->objDatabase->SqlVariable($location_id[0]);
                       $objNewAsset->LocationId = $intLocationKeyArray[0];
-                      //$asset_model_id = array_keys($intAssetModelArray, $strAssetModel);
-                      //$objNewAsset->AssetModelId = $this->objDatabase->SqlVariable($asset_model_id[0]);
                       $objNewAsset->AssetModelId = $intModelKeyArray[0];
                       /*if (isset($this->intCreatedByKey)) {
                         if (isset($this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))])) {
