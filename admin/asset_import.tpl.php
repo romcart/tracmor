@@ -22,6 +22,21 @@
 	include('../includes/header.inc.php');
 	$this->RenderBegin();
 ?>
+<!-- Begin Header Menu -->
+<?php
+	$this->ctlHeaderMenu->Render();
+?>
+<!-- End Header Menu -->
+<!-- Begin Shortcut Menu -->
+<?php
+	include('shortcut_menu.inc.php');
+?>
+<!-- End Shortcut Menu -->
+</td>
+		<td>
+			<img src="../images/empty.gif" width="10">
+		</td>
+		<td width="100%" valign="top">
 		<table cellpadding="5" cellspacing="0" width="100%">
 			<tr>
 				<td>
@@ -40,5 +55,7 @@
 				</td>
 			</tr>
    </table>
+<br class="item_divider" />
 
 <?php $this->RenderEnd() ?>
+<?php require_once('../includes/footer.inc.php'); ?>
