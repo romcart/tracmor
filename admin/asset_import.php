@@ -82,6 +82,8 @@
     protected $btnReturnToAssets;
     protected $objDatabase;
     protected $btnRemoveArray;
+    protected $intTotalCount;
+    protected $intCurrentFile;
 
 		protected function Form_Create() {
 			// Create the Header Menu
@@ -247,7 +249,7 @@
     			  // Setup the settings which have got on step 1
     			  $this->FileCsvData->settings($this->GetCsvSettings());
     			  $file = fopen($this->flcFileCsv->File, "r");
-            // Counter of fles
+            // Counter of files
             $i=1;
             // Counter of rows
             $j=1;
@@ -262,65 +264,72 @@
 
               fwrite($file_part, $row);
               $j++;
-              if ($j > 1000) {
+              if ($j > 200) {
                 $j = 1;
                 $i++;
                 fclose($file_part);
               }
             }
-            $this->arrMapFields = array();
-            $this->arrTracmorField = array();
-            // Load first file
-            $this->FileCsvData->load($this->strFilePathArray[0]);
-            // Get Headers
-            if ($this->blnHeaderRow) {
-              $this->arrCsvHeader = $this->FileCsvData->getHeaders();
+            $this->intTotalCount = $i*200 + $j-1;
+            if (QApplication::$TracmorSettings->AssetLimit != null && QApplication::$TracmorSettings->AssetLimit < ($this->intTotalCount + Asset::CountAll())) {
+              $blnError = true;
+              $this->btnNext->Warning = "You can not import too many assets. You have the asset limit = " . ($this->intTotalCount + Asset::CountAll());
             }
             else {
-              // If it is not first file
-              $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
-            }
-            $file_skipped = fopen($this->strFilePath = sprintf('%s/%s_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "w+");
-            $strFirstRowArray = $this->FileCsvData->getRow(0);
-            for ($i=0; $i<count($strFirstRowArray); $i++) {
-              $this->arrMapFields[$i] = array();
+              $this->arrMapFields = array();
+              $this->arrTracmorField = array();
+              // Load first file
+              $this->FileCsvData->load($this->strFilePathArray[0]);
+              // Get Headers
               if ($this->blnHeaderRow) {
-                $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
-                $this->arrMapFields[$i]['header'] = $this->arrCsvHeader[$i];
-                // Create the header row in the skipped error file
-                $this->PutSkippedRecordInFile($file_skipped, $strFirstRowArray);
+                $this->arrCsvHeader = $this->FileCsvData->getHeaders();
               }
               else {
-                $this->lstMapHeader_Create($this, $i);
+                // If it is not first file
+                $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
               }
-              // Create Default Value TextBox, ListBox and DateTimePicker
-              if ($this->blnHeaderRow && $this->arrCsvHeader[$i] || !$this->blnHeaderRow) {
-                $txtDefaultValue = new QTextBox($this);
-                $txtDefaultValue->Width = 200;
-                $this->txtMapDefaultValueArray[] = $txtDefaultValue;
+              $file_skipped = fopen($this->strFilePath = sprintf('%s/%s_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "w+");
+              $strFirstRowArray = $this->FileCsvData->getRow(0);
+              for ($i=0; $i<count($strFirstRowArray); $i++) {
+                $this->arrMapFields[$i] = array();
+                if ($this->blnHeaderRow) {
+                  $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
+                  $this->arrMapFields[$i]['header'] = $this->arrCsvHeader[$i];
+                  // Create the header row in the skipped error file
+                  $this->PutSkippedRecordInFile($file_skipped, $strFirstRowArray);
+                }
+                else {
+                  $this->lstMapHeader_Create($this, $i);
+                }
+                // Create Default Value TextBox, ListBox and DateTimePicker
+                if ($this->blnHeaderRow && $this->arrCsvHeader[$i] || !$this->blnHeaderRow) {
+                  $txtDefaultValue = new QTextBox($this);
+                  $txtDefaultValue->Width = 200;
+                  $this->txtMapDefaultValueArray[] = $txtDefaultValue;
 
-                $lstDefaultValue = new QListBox($this);
-                $lstDefaultValue->Width = 200;
-                $lstDefaultValue->Display = false;
-                $this->lstMapDefaultValueArray[] = $lstDefaultValue;
+                  $lstDefaultValue = new QListBox($this);
+                  $lstDefaultValue->Width = 200;
+                  $lstDefaultValue->Display = false;
+                  $this->lstMapDefaultValueArray[] = $lstDefaultValue;
 
-                $dtpDate = new QDateTimePicker($this);
-              	$dtpDate->DateTimePickerType = QDateTimePickerType::Date;
-              	$dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-              	$dtpDate->Display = false;
-              	$this->dtpDateArray[] = $dtpDate;
+                  $dtpDate = new QDateTimePicker($this);
+                	$dtpDate->DateTimePickerType = QDateTimePickerType::Date;
+                	$dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+                	$dtpDate->Display = false;
+                	$this->dtpDateArray[] = $dtpDate;
+                }
+                $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
               }
-              $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
+              $this->btnNext->Text = "Import Now";
+              fclose($file_skipped);
+              // Create Add Fiekd button
+              $btnAddField = new QButton($this);
+              $btnAddField->Text = "Add Field";
+              $btnAddField->AddAction(new QClickEvent(), new QServerAction('btnAddField_Click'));
+              $btnAddField->AddAction(new QEnterKeyEvent(), new QServerAction('btnAddField_Click'));
+              $btnAddField->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+              $this->lstMapHeaderArray[] = $btnAddField;
             }
-            $this->btnNext->Text = "Import Now";
-            fclose($file_skipped);
-            // Create Add Fiekd button
-            $btnAddField = new QButton($this);
-            $btnAddField->Text = "Add Field";
-            $btnAddField->AddAction(new QClickEvent(), new QServerAction('btnAddField_Click'));
-            $btnAddField->AddAction(new QEnterKeyEvent(), new QServerAction('btnAddField_Click'));
-            $btnAddField->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-            $this->lstMapHeaderArray[] = $btnAddField;
     			}
 		    }
 		  }
@@ -433,8 +442,8 @@
           $j=1;
           // Add all unique locations in database
           foreach ($this->strFilePathArray as $strFilePath) {
+            $this->FileCsvData->load($strFilePath);
             if ($j != 1) {
-              $this->FileCsvData->load($strFilePath);
               $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
             // Location Import
@@ -459,6 +468,7 @@
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QTerminateAction());
           $this->btnNext->Warning = "Locations have been imported. Please wait...";
           $this->intImportStep = 2;
+          $this->intCurrentFile = 0;
 
           // New locations
           $this->dtgLocation = new QDataGrid($this);
@@ -638,9 +648,9 @@
             $strAssetModelArray = array();
             // Load all asset models
             foreach (AssetModel::LoadAll() as $objAssetModel) {
-              $strAssetModelArray[] = strtolower(sprintf("%s_%s_%s_%s", $objAssetModel->AssetModelCode, $objAssetModel->ShortDescription, $objAssetModel->CategoryId, $objAssetModel->ManufacturerId));
+              $strAssetModelArray[] = strtolower(sprintf("%s_%s_%s", $objAssetModel->ShortDescription, $objAssetModel->CategoryId, $objAssetModel->ManufacturerId));
             }
-            $this->btnNext->Warning = "Asset Models have been imported. Please wait...";
+            $this->btnNext->Warning = sprintf("Please wait... Asset Model import complete: %s%s", ceil($this->intCurrentFile*200/$this->intTotalCount*100), "%");
           }
           // Asset
           elseif ($this->intImportStep == 5) {
@@ -692,13 +702,12 @@
             foreach (Asset::LoadAll() as $objAsset) {
               $strAssetArray[] = strtolower($objAsset->AssetCode);
             }
-            $this->btnNext->Warning = "Assets have been imported. Please wait...";
+            $this->btnNext->Warning = sprintf("Please wait... Asset import complete: %s%s", ceil($this->intCurrentFile*200/$this->intTotalCount*100), "%");
           }
 
-          $j=1;
-          foreach ($this->strFilePathArray as $strFilePath) {
-            if ($j != 1) {
-              $this->FileCsvData->load($strFilePath);
+          for ($j=$this->intCurrentFile; $j<count($this->strFilePathArray); $j++) {
+            $this->FileCsvData->load($this->strFilePathArray[$j]);
+            if (!$j) {
               $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
             // Category Import
@@ -770,7 +779,7 @@
                 }
                 else {
                   //$blnError = false;
-                  $strAssetModel = strtolower(sprintf("%s_%s_%s_%s", $strAssetModelCode, $strShortDescription, $intCategoryId, $intManufacturerId));
+                  $strAssetModel = strtolower(sprintf("%s_%s_%s", $strShortDescription, $intCategoryId, $intManufacturerId));
                 }
                 if ($strAssetModel && !$this->in_array_nocase($strAssetModel, $strAssetModelArray)) {
                   $strAssetModelArray[] = $strAssetModel;
@@ -826,6 +835,8 @@
                   }
                   $this->objNewAssetModelArray[$objNewAssetModel->AssetModelId] = $objNewAssetModel->ShortDescription;
                 }
+                $this->intCurrentFile++;
+                break;
               }
             }
             // Asset import
@@ -862,12 +873,8 @@
                 }
                 if (!$strShortDescription || $intCategoryId === false || $intManufacturerId === false) {
                   //$blnError = true;
-                  //$this->intSkippedRecordCount++;
-                  //$this->PutSkippedRecordInFile($file_skipped, $strRowArray);
-                  //echo $strShortDescription . $intCategoryId . $intManufacturerId . "<br/>";
-                  //if (!$intCategoryId) echo "CAT";
-                  //if (!$intManufacturerId) echo "MAN";
-                  //exit();
+                  $this->intSkippedRecordCount++;
+                  $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                   //break;
                 }
                 else {
@@ -967,6 +974,8 @@
                   }
                 }
               }
+              $this->intCurrentFile++;
+              break;
             }
             $j++;
           }
@@ -995,10 +1004,10 @@
           }
           // Enable Next button
           $this->btnNext->Enabled = true;
-          if (!$this->blnImportEnd) {
+          if (!$this->blnImportEnd && !$this->intCurrentFile) {
             $this->intImportStep++;
           }
-        }
+        } 
         fclose($file_skipped);
 		  }
 		  if (!$blnError) {
@@ -1009,6 +1018,10 @@
     		if (!$this->blnImportEnd) {
   		    QApplication::ExecuteJavaScript("document.getElementById('".$this->btnNext->ControlId."').click();");
   		  }
+        if (!($this->intCurrentFile < count($this->strFilePathArray))) {
+          $this->intCurrentFile = 0;
+          $this->intImportStep++;
+        }
 		  }
 	  }
 
