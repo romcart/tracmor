@@ -84,6 +84,7 @@
     protected $btnRemoveArray;
     protected $intTotalCount;
     protected $intCurrentFile;
+    protected $strSelectedValueArray;
 
 		protected function Form_Create() {
 			// Create the Header Menu
@@ -184,8 +185,8 @@
 			$this->btnNext->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->btnCancel = new QButton($this);
 			$this->btnCancel->Text = "Cancel";
-			$this->btnCancel->AddAction(new QClickEvent(), new QAjaxAction('btnCancel_Click'));
-			$this->btnCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCancel_Click'));
+			$this->btnCancel->AddAction(new QClickEvent(), new QServerAction('btnCancel_Click'));
+			$this->btnCancel->AddAction(new QEnterKeyEvent(), new QServerAction('btnCancel_Click'));
 			$this->btnCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
     }
 
@@ -469,6 +470,7 @@
           $this->btnNext->Warning = "Locations have been imported. Please wait...";
           $this->intImportStep = 2;
           $this->intCurrentFile = 0;
+          $this->strSelectedValueArray = array();
 
           // New locations
           $this->dtgLocation = new QDataGrid($this);
@@ -650,7 +652,7 @@
             foreach (AssetModel::LoadAll() as $objAssetModel) {
               $strAssetModelArray[] = strtolower(sprintf("%s_%s_%s", $objAssetModel->ShortDescription, $objAssetModel->CategoryId, $objAssetModel->ManufacturerId));
             }
-            $this->btnNext->Warning = sprintf("Please wait... Asset Model import complete: %s%s", ceil($this->intCurrentFile*200/$this->intTotalCount*100), "%");
+            $this->btnNext->Warning = sprintf("Please wait... Asset Model import complete: %s%s", ceil(($this->intCurrentFile+1)*200/$this->intTotalCount*100), "%");
           }
           // Asset
           elseif ($this->intImportStep == 5) {
@@ -702,7 +704,7 @@
             foreach (Asset::LoadAll() as $objAsset) {
               $strAssetArray[] = strtolower($objAsset->AssetCode);
             }
-            $this->btnNext->Warning = sprintf("Please wait... Asset import complete: %s%s", ceil($this->intCurrentFile*200/$this->intTotalCount*100), "%");
+            $this->btnNext->Warning = sprintf("Please wait... Asset import complete: %s%s", ceil(($this->intCurrentFile+1)*200/$this->intTotalCount*100), "%");
           }
 
           for ($j=$this->intCurrentFile; $j<count($this->strFilePathArray); $j++) {
@@ -915,11 +917,7 @@
                                               "VALUES ('%s', '%s', '%s', 'NOW()');",
                                               $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
                           $objDatabase->NonQuery($strQuery);
-                          $strQuery = sprintf("INSERT INTO `custom_field_selection` " .
-                                              "(`entity_id`,`entity_qtype_id`, `custom_field_value_id`) " .
-                                              "VALUES ('%s', '%s', '%s');",
-                                              $objNewAsset->AssetId, 1, $objDatabase->InsertId(), $_SESSION['intUserAccountId']);
-                          $objDatabase->NonQuery($strQuery);
+                          $this->strSelectedValueArray[] = sprintf("('%s', '%s', '%s')", $objNewAsset->AssetId, 1, $objDatabase->InsertId());
                           $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strShortDescription);
                           /*$objCustomField->CustomFieldSelection = new CustomFieldSelection;
               						$objCustomField->CustomFieldSelection->newCustomFieldValue = new CustomFieldValue;
@@ -937,25 +935,23 @@
               						$objCustomField->CustomFieldSelection->Save();*/
                         }
                         else {
-                          $data = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+                          $strShortDescription = addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
                           $blnInList = false;
-                          $objCustomField->CustomFieldSelection = new CustomFieldSelection;
-                    			$objCustomField->CustomFieldSelection->EntityId = $objNewAsset->AssetId;
-                    			$objCustomField->CustomFieldSelection->EntityQtypeId = 1;
-                    			foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
-                					  if (strtolower($objCustomFieldValue->ShortDescription) == $data) {
-                     					$objCustomField->CustomFieldSelection->CustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
+                          foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
+                					  if (strtolower($objCustomFieldValue->ShortDescription) == $strShortDescription) {
+                     					$intCustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
                     					$blnInList = true;
                     					break;
                 					  }
                 					}
                 					if (!$blnInList && $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
-                 					  $objCustomField->CustomFieldSelection->CustomFieldValueId = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
-                 					  $objCustomField->CustomFieldSelection->Save();
-                					}
-                					elseif ($data) {
-                					  $objCustomField->CustomFieldSelection->Save();
-                					}
+                 					  $intCustomFieldValueId = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
+                            $strShortDescription = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
+                 					}
+                          if ($strShortDescription && $intCustomFieldValueId) {
+                            $this->strSelectedValueArray[] = sprintf("('%s', '%s', '%s')", $objNewAsset->AssetId, 1, $intCustomFieldValueId);
+                            $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strShortDescription);
+                          }
                         }
                       }
                       $this->objNewAssetArray[$objNewAsset->AssetId] = $objNewAsset->AssetCode;
@@ -980,6 +976,13 @@
             $j++;
           }
           if ($this->intImportStep == 6) {
+            if (count($this->strSelectedValueArray)) {
+              $objDatabase = CustomField::GetDatabase();
+              $strQuery = sprintf("INSERT INTO `custom_field_selection` " .
+                                  "(`entity_id`,`entity_qtype_id`, `custom_field_value_id`) " .
+                                  "VALUES %s;", implode(", ", $this->strSelectedValueArray));
+              $objDatabase->NonQuery($strQuery);
+            }
             $this->blnImportEnd = true;
             $this->btnNext->Warning = "";
             $this->dtgLocation->DataSource = $this->objNewLocationArray;
