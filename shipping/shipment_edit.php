@@ -3330,7 +3330,13 @@
 										// Transaction is a receipt
 										$objTransaction->TransactionTypeId = 7;
 										// Set a note showing how this receipt was created
-										$objTransaction->Note = sprintf('This receipt was automatically created when creating Shipment Number %s.', $this->objShipment->ShipmentNumber);
+										if (!$objAssetTransaction->NewAssetId) {
+											$strTransactionType = 'return';
+										}
+										else {
+											$strTransactionType = 'exchange';
+										}
+										$objTransaction->Note = sprintf('This %s receipt was automatically created when creating Shipment Number %s.', $strTransactionType, $this->objShipment->ShipmentNumber);
 										// Save the transaction
 										$objTransaction->Save();
 										// Create a new receipt
