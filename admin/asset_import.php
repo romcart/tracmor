@@ -1014,6 +1014,7 @@
                           }
                         }
                       }
+                      $this->objNewAssetArray[] = $objNewAsset->AssetCode;
                       /*$this->objNewAssetArray[$objNewAsset->AssetId] = $objNewAsset->AssetCode;
                       if (count($strCFVArray)) {
                         $strQuery = sprintf("UPDATE `asset_custom_field_helper` " .
@@ -1038,6 +1039,7 @@
               }
               $intAssetCount = count($strAssetValuesArray);
               if ($intAssetCount) {
+                $strAssetCodeArray = array_merge($this->objNewAssetArray, array());
                 $objDatabase = Asset::GetDatabase();
                 $strQuery = sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `created_by`, `creation_date`) " .
                                     "VALUES %s;", implode(", ", $strAssetValuesArray));
@@ -1048,6 +1050,9 @@
                 }
                 $strQuery = sprintf("INSERT INTO `asset_custom_field_helper` VALUES %s", implode(", ", $strAssetCFVArray));
                 $objDatabase->NonQuery($strQuery);
+                for ($i=0; $i<$intAssetCount; $i++) {
+                    $this->objNewAssetArray[$intStartId+$i] = $strAssetCodeArray[$i];
+                  }
               }
               $this->intCurrentFile++;
               break;
