@@ -833,7 +833,7 @@
                     $objNewAssetModel->LongDescription = addslashes(trim($strRowArray[$intModelLongDescriptionKey]));
                   }
                   $objNewAssetModel->Save();
-                  
+
                   // Asset Model Custom Field import
                   foreach ($arrAssetModelCustomField as $objCustomField) {
                     if ($objCustomField->CustomFieldQtypeId != 2) {
@@ -895,6 +895,8 @@
             }
             // Asset import
             elseif ($this->intImportStep == 5) {
+              $strAssetValuesArray = array();
+              $strAssetCFVArray = array();
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
                 $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
@@ -943,19 +945,20 @@
                     $intModelKeyArray = array_keys($intAssetModelArray, $strAssetModel);
                     if (count($intLocationKeyArray) && count($intModelKeyArray)) {
                       $strAssetArray[] = strtolower($strAssetCode);
-                      $objNewAsset = new Asset();
+                      $strAssetValuesArray = sprintf("('%s', '%s', '%s', '%s', NOW())", $strAssetCode, $intLocationKeyArray[0], $intModelKeyArray[0], $_SESSION['intUserAccountId']);
+                      /*$objNewAsset = new Asset();
                       $objNewAsset->AssetCode = $strAssetCode;
                       $objNewAsset->LocationId = $intLocationKeyArray[0];
                       $objNewAsset->AssetModelId = $intModelKeyArray[0];
-                      /*if (isset($this->intCreatedByKey)) {
+                      if (isset($this->intCreatedByKey)) {
                         if (isset($this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))])) {
                           $objNewAsset->CreatedBy = $this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))];
                         }
                         else {
                           $objNewAsset->CreatedBy = $this->lstMapDefaultValueArray[$this->intCreatedByKey]->SelectedValue;
                         }
-                      }*/
-                      $objNewAsset->Save();
+                      }
+                      $objNewAsset->Save();*/
                       $strCFVArray = array();
                       $objDatabase = CustomField::GetDatabase();
                       // Asset Custom Field import
@@ -964,14 +967,15 @@
                           $strShortDescription = (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?
                                       addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
                                       addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
-                          $strQuery = sprintf("INSERT INTO `custom_field_value` " .
+                          $strCFVArray[$objCustomField->CustomFieldId] = ($strShortDescription) ? sprintf("'%s'", $strShortDescription) : "''";
+                          /*$strQuery = sprintf("INSERT INTO `custom_field_value` " .
                                               "(`custom_field_id`,`short_description`, `created_by`, `creation_date`) " .
                                               "VALUES ('%s', '%s', '%s', 'NOW()');",
                                               $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
                           $objDatabase->NonQuery($strQuery);
                           $this->strSelectedValueArray[] = sprintf("('%s', '%s', '%s')", $objNewAsset->AssetId, 1, $objDatabase->InsertId());
                           $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strShortDescription);
-                          /*$objCustomField->CustomFieldSelection = new CustomFieldSelection;
+                          $objCustomField->CustomFieldSelection = new CustomFieldSelection;
               						$objCustomField->CustomFieldSelection->newCustomFieldValue = new CustomFieldValue;
               						$objCustomField->CustomFieldSelection->newCustomFieldValue->CustomFieldId = $objCustomField->CustomFieldId;
               						if (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) {
@@ -991,27 +995,37 @@
                           $blnInList = false;
                           foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
                 					  if (strtolower($objCustomFieldValue->ShortDescription) == $strShortDescription) {
-                     					$intCustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
+                     					//$intCustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
                     					$blnInList = true;
                     					break;
                 					  }
                 					}
                 					if (!$blnInList && $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
-                 					  $intCustomFieldValueId = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
+                 					  //$intCustomFieldValueId = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
                             $strShortDescription = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                  					}
                           if ($strShortDescription && $intCustomFieldValueId) {
-                            $this->strSelectedValueArray[] = sprintf("('%s', '%s', '%s')", $objNewAsset->AssetId, 1, $intCustomFieldValueId);
-                            $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strShortDescription);
+                            //$this->strSelectedValueArray[] = sprintf("('%s', '%s', '%s')", $objNewAsset->AssetId, 1, $intCustomFieldValueId);
+                            //$strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strShortDescription);
+                            $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
+                          }
+                          else {
+                            $strCFVArray[$objCustomField->CustomFieldId] = "''";
                           }
                         }
                       }
-                      $this->objNewAssetArray[$objNewAsset->AssetId] = $objNewAsset->AssetCode;
+                      /*$this->objNewAssetArray[$objNewAsset->AssetId] = $objNewAsset->AssetCode;
                       if (count($strCFVArray)) {
                         $strQuery = sprintf("UPDATE `asset_custom_field_helper` " .
                                             "SET %s " .
                                             "WHERE `asset_id`='%s';", implode(", ", $strCFVArray), $objNewAsset->AssetId);
                         $objDatabase->NonQuery($strQuery);
+                      }*/
+                      if (count($strCFVArray)) {
+                        $strAssetCFVArray[] = implode(' ,', $strCFVArray);
+                      }
+                      else {
+                        $strAssetCFVArray[] = "";
                       }
                     }
                     // Add records skipped due to errors
@@ -1021,6 +1035,19 @@
                     }
                   }
                 }
+              }
+              $intAssetCount = count($strAssetValuesArray);
+              if ($intAssetCount) {
+                $objDatabase = Asset::GetDatabase();
+                $strQuery = sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `created_by`, `creation_date`) " .
+                                    "VALUES %s;", implode(", ", $strAssetValuesArray));
+                $objDatabase->NonQuery($strQuery);
+                $intInsertId = $objDatabase->InsertId();
+                for ($i=0; $i<$intAssetCount; $i++) {
+                  $strAssetCFVArray[$i] = sprintf("('%s', %s)", $intInsertId+$i, $strAssetCFVArray[$i]);
+                }
+                $strQuery = sprintf("INSERT INTO `asset_custom_field_helper` VALUES %s", implode(", ", $strAssetCFVArray));
+                $objDatabase->NonQuery($strQuery);
               }
               $this->intCurrentFile++;
               break;
@@ -1062,7 +1089,7 @@
           if (!$this->blnImportEnd && !$this->intCurrentFile) {
             $this->intImportStep++;
           }
-        } 
+        }
         fclose($file_skipped);
 		  }
 		  if (!$blnError) {
