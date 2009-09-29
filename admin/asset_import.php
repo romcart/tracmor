@@ -476,7 +476,7 @@
           }
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
-          $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
@@ -945,7 +945,7 @@
                     $intModelKeyArray = array_keys($intAssetModelArray, $strAssetModel);
                     if (count($intLocationKeyArray) && count($intModelKeyArray)) {
                       $strAssetArray[] = strtolower($strAssetCode);
-                      $strAssetValuesArray = sprintf("('%s', '%s', '%s', '%s', NOW())", $strAssetCode, $intLocationKeyArray[0], $intModelKeyArray[0], $_SESSION['intUserAccountId']);
+                      $strAssetValuesArray[] = sprintf("('%s', '%s', '%s', '%s', NOW())", $strAssetCode, $intLocationKeyArray[0], $intModelKeyArray[0], $_SESSION['intUserAccountId']);
                       /*$objNewAsset = new Asset();
                       $objNewAsset->AssetCode = $strAssetCode;
                       $objNewAsset->LocationId = $intLocationKeyArray[0];
@@ -967,7 +967,7 @@
                           $strShortDescription = (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?
                                       addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
                                       addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
-                          $strCFVArray[$objCustomField->CustomFieldId] = ($strShortDescription) ? sprintf("'%s'", $strShortDescription) : "''";
+                          $strCFVArray[$objCustomField->CustomFieldId] = ($strShortDescription) ? sprintf("'%s'", $strShortDescription) : "NULL";
                           /*$strQuery = sprintf("INSERT INTO `custom_field_value` " .
                                               "(`custom_field_id`,`short_description`, `created_by`, `creation_date`) " .
                                               "VALUES ('%s', '%s', '%s', 'NOW()');",
@@ -1004,17 +1004,17 @@
                  					  //$intCustomFieldValueId = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
                             $strShortDescription = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                  					}
-                          if ($strShortDescription && $intCustomFieldValueId) {
+                          if ($strShortDescription/* && $intCustomFieldValueId*/) {
                             //$this->strSelectedValueArray[] = sprintf("('%s', '%s', '%s')", $objNewAsset->AssetId, 1, $intCustomFieldValueId);
                             //$strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strShortDescription);
                             $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
                           }
                           else {
-                            $strCFVArray[$objCustomField->CustomFieldId] = "''";
+                            $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
                           }
                         }
                       }
-                      $this->objNewAssetArray[] = $objNewAsset->AssetCode;
+                      $this->objNewAssetArray[] = $strAssetCode;
                       /*$this->objNewAssetArray[$objNewAsset->AssetId] = $objNewAsset->AssetCode;
                       if (count($strCFVArray)) {
                         $strQuery = sprintf("UPDATE `asset_custom_field_helper` " .
@@ -1023,7 +1023,7 @@
                         $objDatabase->NonQuery($strQuery);
                       }*/
                       if (count($strCFVArray)) {
-                        $strAssetCFVArray[] = implode(' ,', $strCFVArray);
+                        $strAssetCFVArray[] = implode(', ', $strCFVArray);
                       }
                       else {
                         $strAssetCFVArray[] = "";
@@ -1041,18 +1041,26 @@
               if ($intAssetCount) {
                 $strAssetCodeArray = array_merge($this->objNewAssetArray, array());
                 $objDatabase = Asset::GetDatabase();
-                $strQuery = sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `created_by`, `creation_date`) " .
-                                    "VALUES %s;", implode(", ", $strAssetValuesArray));
+                $strQuery = sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $strAssetValuesArray));
                 $objDatabase->NonQuery($strQuery);
                 $intInsertId = $objDatabase->InsertId();
-                for ($i=0; $i<$intAssetCount; $i++) {
-                  $strAssetCFVArray[$i] = sprintf("('%s', %s)", $intInsertId+$i, $strAssetCFVArray[$i]);
-                }
-                $strQuery = sprintf("INSERT INTO `asset_custom_field_helper` VALUES %s", implode(", ", $strAssetCFVArray));
-                $objDatabase->NonQuery($strQuery);
-                for ($i=0; $i<$intAssetCount; $i++) {
-                    $this->objNewAssetArray[$intStartId+$i] = $strAssetCodeArray[$i];
+                if ($intInsertId) {
+                  for ($i=0; $i<$intAssetCount; $i++) {
+                    $strAssetCFVArray[$i] = sprintf("('%s', %s)", $intInsertId+$i, $strAssetCFVArray[$i]);
                   }
+                  $strCFVNameArray = array();
+                  foreach ($arrAssetCustomField as $objCustomField) {
+                    $strCFVNameArray[] = sprintf("`cfv_%s`", $objCustomField->CustomFieldId);
+                  }
+                  $strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", implode(", ", $strCFVNameArray), implode(", ", $strAssetCFVArray));
+                  $objDatabase->NonQuery($strQuery);
+                  for ($i=0; $i<$intAssetCount; $i++) {
+                    $this->objNewAssetArray[$intInsertId+$i] = $strAssetCodeArray[$i];
+                  }
+                }
+                else {
+                  //echo $strQuery . "<br/>";
+                }
               }
               $this->intCurrentFile++;
               break;
@@ -1060,13 +1068,13 @@
             $j++;
           }
           if ($this->intImportStep == 6) {
-            if (count($this->strSelectedValueArray)) {
+            /*if (count($this->strSelectedValueArray)) {
               $objDatabase = CustomField::GetDatabase();
               $strQuery = sprintf("INSERT INTO `custom_field_selection` " .
                                   "(`entity_id`,`entity_qtype_id`, `custom_field_value_id`) " .
                                   "VALUES %s;", implode(", ", $this->strSelectedValueArray));
               $objDatabase->NonQuery($strQuery);
-            }
+            }*/
             $this->blnImportEnd = true;
             $this->btnNext->Warning = "";
             $this->dtgLocation->DataSource = $this->objNewLocationArray;
