@@ -262,6 +262,12 @@
                 $strFilePath = sprintf('%s/%s_%s.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $i);
                 $this->strFilePathArray[] = $strFilePath;
                 $file_part = fopen($strFilePath, "w+");
+                if ($i == 1) {
+                  $strHeaderRow = $row;
+                }
+                else {
+                  fwrite($file_part, $strHeaderRow);
+                }
               }
 
               fwrite($file_part, $row);
@@ -289,10 +295,10 @@
                 // Create the header row in the skipped error file
                 $this->PutSkippedRecordInFile($file_skipped, $this->arrCsvHeader);
               }
-              else {
+              /*else {
                 // If it is not first file
                 $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
-              }
+              }*/
               $strFirstRowArray = $this->FileCsvData->getRow(0);
               for ($i=0; $i<count($strFirstRowArray); $i++) {
                 $this->arrMapFields[$i] = array();
@@ -449,7 +455,7 @@
           foreach ($this->strFilePathArray as $strFilePath) {
             $this->FileCsvData->load($strFilePath);
             if ($j != 1) {
-              $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
+              //$this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
             // Location Import
             for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
@@ -724,7 +730,7 @@
           for ($j=$this->intCurrentFile; $j<count($this->strFilePathArray); $j++) {
             $this->FileCsvData->load($this->strFilePathArray[$j]);
             if (!$j) {
-              $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
+              //$this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
             // Category Import
             if ($this->intImportStep == 2) {
