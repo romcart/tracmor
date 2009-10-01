@@ -151,7 +151,6 @@
 			$this->lstTextDelimiter = new QListBox($this->pnlStepOne);
 			$this->lstTextDelimiter->Name = "Text Delimiter: ";
 			$this->lstTextDelimiter->Width = 150;
-			$this->lstTextDelimiter->AddItem(new QListItem('None', 1));
 			$this->lstTextDelimiter->AddItem(new QListItem('Single Quote (\')', 2));
 			$this->lstTextDelimiter->AddItem(new QListItem('Double Quote (")', 3));
 			$this->lstTextDelimiter->AddItem(new QListItem('Other', 'other'));
@@ -1275,9 +1274,6 @@
 	        break;
 	    }
 	    switch ($this->lstTextDelimiter->SelectedValue) {
-	      case 1:
-          $strDelimiter = null;
-          break;
 	      case 2:
 	        $strDelimiter = "'";
 	        break;
