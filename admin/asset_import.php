@@ -89,7 +89,30 @@
     protected $intAssetModelArray;
 
 		protected function Form_Create() {
-			// Create the Header Menu
+			if (QApplication::QueryString('intDownloadCsv')) {
+        $this->RenderBegin(false);
+			
+  			session_cache_limiter('must-revalidate');    // force a "no cache" effect
+        header("Pragma: hack"); // IE chokes on "no cache", so set to something, anything, else.
+        $ExpStr = "Expires: " . gmdate("D, d M Y H:i:s", time()) . " GMT";
+        header($ExpStr);
+        header('Content-Type: text/csv');
+  			header('Content-Disposition: csv; filename=skipped_records.csv');
+        
+        $file = fopen(sprintf("%s%s/%s_skipped.csv", __DOCROOT__ . __SUBDIRECTORY__, __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "r");
+        ob_end_clean();
+        while ($row = fgets($file, 1000)) {
+          print $row;
+          @ob_flush();
+  				flush();
+        }
+        
+        QApplication::$JavaScriptArray = array();
+  			QApplication::$JavaScriptArrayHighPriority = array();
+  			$this->RenderEnd(false);
+  			exit();
+      }
+      // Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			$this->pnlMain_Create();
 			$this->pnlStepOne_Create();
@@ -1108,7 +1131,7 @@
                                              "<b>" . count($this->objNewAssetArray) . "</b> Records imported successfully<br/>" .
                                              "<b>" . $this->intSkippedRecordCount . "</b> Records skipped due to error<br/>";
             if ($this->intSkippedRecordCount) {
-               $this->lblImportSuccess->Text .= sprintf("<a href='http://%s%s/%s_skipped.csv'>Click here to download records that could not be imported</a><br/>", $_SERVER['SERVER_NAME'] . __SUBDIRECTORY__, __TRACMOR_TMP__, $_SESSION['intUserAccountId']);
+               $this->lblImportSuccess->Text .= sprintf("<a href='./asset_import.php?intDownloadCsv=1'");
             }
 
             $this->intImportStep = -1;
@@ -1421,7 +1444,7 @@
  	        unset($this->btnRemoveArray[$intId]);
  	      }
  	    }
-
+    
 	}
 	// Go ahead and run this form object to generate the page
 	AdminLabelsForm::Run('AdminLabelsForm', 'asset_import.tpl.php');
