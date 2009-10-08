@@ -87,18 +87,24 @@
     protected $strSelectedValueArray;
     protected $strModelValuesArray;
     protected $intAssetModelArray;
+    protected $lblImportResults;
+    protected $lblImportAssets;
+    protected $lblImportModels;
+    protected $lblImportCategories;
+    protected $lblImportManufacturers;
+    protected $lblImportLocations;
 
 		protected function Form_Create() {
 			if (QApplication::QueryString('intDownloadCsv')) {
         $this->RenderBegin(false);
-			
+
   			session_cache_limiter('must-revalidate');    // force a "no cache" effect
         header("Pragma: hack"); // IE chokes on "no cache", so set to something, anything, else.
         $ExpStr = "Expires: " . gmdate("D, d M Y H:i:s", time()) . " GMT";
         header($ExpStr);
         header('Content-Type: text/csv');
   			header('Content-Disposition: csv; filename=skipped_records.csv');
-        
+
         $file = fopen(sprintf("%s%s/%s_skipped.csv", __DOCROOT__ . __SUBDIRECTORY__, __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "r");
         ob_end_clean();
         while ($row = fgets($file, 1000)) {
@@ -106,7 +112,7 @@
           @ob_flush();
   				flush();
         }
-        
+
         QApplication::$JavaScriptArray = array();
   			QApplication::$JavaScriptArrayHighPriority = array();
   			$this->RenderEnd(false);
@@ -122,6 +128,7 @@
 			$this->blnImportEnd = true;
 			$this->btnRemoveArray = array();
 			$this->arrAssetCustomField = array();
+      $this->Labels_Create();
 			$this->objDatabase = Asset::GetDatabase();
 			// Load Asset Custom Field
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 1) as $objCustomField) {
@@ -142,7 +149,42 @@
 						'text/comma-separated-values' => 'csv',
   				  'application/vnd.ms-excel' => 'csv');
 		}
-
+    
+    // Create labels
+    protected function Labels_Create() {
+      $this->lblImportResults = new QLabel($this);
+      $this->lblImportResults->HtmlEntities = false;
+      $this->lblImportResults->Display = false;
+      $this->lblImportResults->CssClass = "title";
+      $this->lblImportResults->Text = "Import Results<br/><br/>";
+      
+      $this->lblImportAssets = new QLabel($this);
+      $this->lblImportAssets->HtmlEntities = false;
+      $this->lblImportAssets->Display = false;
+      $this->lblImportAssets->CssClass = "title";
+      $this->lblImportAssets->Text = "<br/><br/>Last Imported Assets";
+      
+      $this->lblImportModels = new QLabel($this);
+      $this->lblImportModels->Display = false;
+      $this->lblImportModels->CssClass = "title";
+      $this->lblImportModels->Text = "Last Imported Models";
+      
+      $this->lblImportManufacturers = new QLabel($this);
+      $this->lblImportManufacturers->Display = false;
+      $this->lblImportManufacturers->CssClass = "title";
+      $this->lblImportManufacturers->Text = "Last Imported Manufacturers";
+      
+      $this->lblImportCategories = new QLabel($this);
+      $this->lblImportCategories->Display = false;
+      $this->lblImportCategories->CssClass = "title";
+      $this->lblImportCategories->Text = "Last Imported Categories";
+      
+      $this->lblImportLocations = new QLabel($this);
+      $this->lblImportLocations->Display = false;
+      $this->lblImportLocations->CssClass = "title";
+      $this->lblImportLocations->Text = "Last Imported Locations";
+    }
+    
 		// Create and Setup the Header Composite Control
 		protected function ctlHeaderMenu_Create() {
 			$this->ctlHeaderMenu = new QHeaderMenu($this);
@@ -348,7 +390,7 @@
                 	$dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
                 	$dtpDate->Display = false;
                 	$this->dtpDateArray[] = $dtpDate;
-                  
+
                   $this->lstTramorField_Change(null, $this->lstMapHeaderArray[$i]->ControlId, null);
                 }
                 $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
@@ -917,13 +959,13 @@
                   $strNewModelArray = array_merge($this->objNewAssetModelArray, array());
                   $this->objNewAssetModelArray = array();
                   $objDatabase = AssetModel::GetDatabase();
-                  
+
                   //var_dump($this->strModelValuesArray);
                   //exit();
-                  
+
                   $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $this->strModelValuesArray)));
                   $intStartId = $objDatabase->InsertId();
-                  
+
                   for ($i=0; $i<count($strNewModelArray); $i++) {
                     //$objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", $this->strModelValuesArray[$i]));
                     //$intStartId = $objDatabase->InsertId();
@@ -1121,18 +1163,30 @@
             $this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
             $this->dtgAssetModel->DataSource = $this->objNewAssetModelArray;
             $this->dtgAsset->DataSource = $this->objNewAssetArray;
+            $this->lblImportResults->Display = true;
+            if (count($this->objNewAssetArray))
+              $this->lblImportAssets->Display = true;
+            if (count($this->objNewAssetModelArray))
+              $this->lblImportModels->Display = true;
+            if (count($this->objNewManufacturerArray))
+              $this->lblImportManufacturers->Display = true;
+            if (count($this->objNewCategoryArray))
+              $this->lblImportCategories->Display = true;
+            if (count($this->objNewLocationArray))
+              $this->lblImportLocations->Display = true;
             $this->btnNext->Display = false;
             $this->btnCancel->Display = false;
             $this->btnUndoLastImport->Display = true;
             $this->btnImportMore->Display = true;
             $this->btnReturnToAssets->Display = true;
             $this->lblImportSuccess->Display = true;
-            $this->lblImportSuccess->Text = "Success:<br/>" .
-                                             "<b>" . count($this->objNewAssetArray) . "</b> Records imported successfully<br/>" .
-                                             "<b>" . $this->intSkippedRecordCount . "</b> Records skipped due to error<br/>";
+            $this->lblImportSuccess->Text = sprintf("Success:<br/>" .
+                                             "<b>%s</b> Records imported successfully<br/>" .
+                                             "<b>%s</b> Records skipped due to error<br/>", count($this->objNewAssetArray), $this->intSkippedRecordCount);
             if ($this->intSkippedRecordCount) {
-               $this->lblImportSuccess->Text .= sprintf("<a href='./asset_import.php?intDownloadCsv=1'");
+               $this->lblImportSuccess->Text .= sprintf("<a href='./asset_import.php?intDownloadCsv=1'>Click here to download records that could not be imported</a>");
             }
+            $this->lblImportSuccess->Text .= "<br/><br/>";
 
             $this->intImportStep = -1;
           }
@@ -1444,7 +1498,7 @@
  	        unset($this->btnRemoveArray[$intId]);
  	      }
  	    }
-    
+
 	}
 	// Go ahead and run this form object to generate the page
 	AdminLabelsForm::Run('AdminLabelsForm', 'asset_import.tpl.php');
