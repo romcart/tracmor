@@ -338,13 +338,13 @@
 
               fwrite($file_part, $row);
               $j++;
-              if ($j > 1000) {
+              if ($j > 200) {
                 $j = 1;
                 $i++;
                 fclose($file_part);
               }
             }
-            $this->intTotalCount = $i*1000 + $j-1;
+            $this->intTotalCount = $i*200 + $j-1;
             if (QApplication::$TracmorSettings->AssetLimit != null && QApplication::$TracmorSettings->AssetLimit < ($this->intTotalCount + Asset::CountAll())) {
               $blnError = true;
               $this->btnNext->Warning = "You can not import too many assets. You have the asset limit = " . ($this->intTotalCount + Asset::CountAll());
