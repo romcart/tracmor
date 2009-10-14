@@ -20,6 +20,14 @@
  */
 
 	include('../includes/header.inc.php');
+?>
+<style>
+<!--
+.item_label {font-family:verdana;font-size:13px;color:#464646;}
+label {font-family:verdana;font-size:13px;color:#464646;}
+-->
+</style>
+<?php
 	$this->RenderBegin();
 ?>
 <!-- Begin Header Menu -->
