@@ -148,6 +148,7 @@
 						'text/plain' => 'txt',
 						'text/comma-separated-values' => 'csv',
 						'text/csv' => 'csv',
+						'text/x-comma-separated-values' => 'csv',
   				  'application/vnd.ms-excel' => 'csv');
 		}
     
@@ -217,6 +218,7 @@
 			$this->lstTextDelimiter = new QListBox($this->pnlStepOne);
 			$this->lstTextDelimiter->Name = "Text Delimiter: ";
 			$this->lstTextDelimiter->Width = 150;
+			$this->lstTextDelimiter->AddItem(new QListItem('None', 1));
 			$this->lstTextDelimiter->AddItem(new QListItem('Single Quote (\')', 2));
 			$this->lstTextDelimiter->AddItem(new QListItem('Double Quote (")', 3));
 			$this->lstTextDelimiter->AddItem(new QListItem('Other', 'other'));
@@ -983,9 +985,13 @@
               $strAssetValuesArray = array();
               $strAssetCFVArray = array();
               $strAssetCodeArray = array();
+              // This will add extra commas for blank values
+              $this->FileCsvData->symmetrize();
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
-                $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
+                // The addslashes was causing match-up problems
+                //$strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
+                $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? trim($strRowArray[$intModelShortDescriptionKey]) : false;
                 $strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? addslashes(trim($strRowArray[$intModelCodeKey])) : addslashes(trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text));
                 $strKeyArray = array_keys($intCategoryArray, addslashes(strtolower(trim($strRowArray[$this->intCategoryKey]))));
                 if (count($strKeyArray)) {
@@ -1050,10 +1056,12 @@
                       // Asset Custom Field import
                       foreach ($arrAssetCustomField as $objCustomField) {
                         if ($objCustomField->CustomFieldQtypeId != 2) {
-                          $strShortDescription = (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?
+                        	$strShortDescription = (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?
                                       addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
                                       addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
                           $strCFVArray[$objCustomField->CustomFieldId] = ($strShortDescription) ? sprintf("'%s'", $strShortDescription) : "NULL";
+                          
+                          
                           /*$strQuery = sprintf("INSERT INTO `custom_field_value` " .
                                               "(`custom_field_id`,`short_description`, `created_by`, `creation_date`) " .
                                               "VALUES ('%s', '%s', '%s', 'NOW()');",
@@ -1352,6 +1360,9 @@
 	        break;
 	    }
 	    switch ($this->lstTextDelimiter->SelectedValue) {
+	    	case 1:
+	    		$strDelimiter = '"';
+	    		break;
 	      case 2:
 	        $strDelimiter = "'";
 	        break;
