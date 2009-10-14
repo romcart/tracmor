@@ -206,7 +206,7 @@
 			// Step 1
 			$this->lstFieldSeparator = new QRadioButtonList($this->pnlStepOne);
 			$this->lstFieldSeparator->Name = "Field Separator: ";
-			$this->lstFieldSeparator->Width = 200;
+			$this->lstFieldSeparator->Width = 150;
 			$this->lstFieldSeparator->AddItem(new QListItem('Comma Separated', 1));
 			$this->lstFieldSeparator->AddItem(new QListItem('Tab Separated', 2));
 			$this->lstFieldSeparator->AddItem(new QListItem('Other', 'other'));
@@ -217,13 +217,14 @@
 			$this->txtFieldSeparator->Display = false;
 			$this->lstTextDelimiter = new QListBox($this->pnlStepOne);
 			$this->lstTextDelimiter->Name = "Text Delimiter: ";
-			$this->lstTextDelimiter->Width = 150;
+			$this->lstTextDelimiter->Width = 170;
 			$this->lstTextDelimiter->AddItem(new QListItem('None', 1));
 			$this->lstTextDelimiter->AddItem(new QListItem('Single Quote (\')', 2));
 			$this->lstTextDelimiter->AddItem(new QListItem('Double Quote (")', 3));
 			$this->lstTextDelimiter->AddItem(new QListItem('Other', 'other'));
 			$this->lstTextDelimiter->AddAction(new QChangeEvent(), new QAjaxAction('lstTextDelimiter_Change'));
 			$this->txtTextDelimiter = new QTextBox($this->pnlStepOne);
+			$this->txtTextDelimiter->Name = 'Other: ';
 			$this->txtTextDelimiter->Width = 100;
 			$this->txtTextDelimiter->Display = false;
 			$this->flcFileCsv = new QFileControlExt($this->pnlStepOne);
