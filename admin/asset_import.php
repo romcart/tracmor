@@ -1337,6 +1337,11 @@
             $lstDefault->Display = true;
             $dtpDefault->Display = false;
           }
+          elseif ($objControl->SelectedValue == "Asset Code") {
+          	$txtDefault->Display = false;
+          	$lstDefault->Display = false;
+          	$dtpDefault->Display = false;
+          }
           elseif ($objControl->SelectedValue == "Created Date" || $objControl->SelectedValue == "Modified Date") {
             $txtDefault->Display = false;
             $lstDefault->Display = false;
