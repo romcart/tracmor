@@ -396,7 +396,9 @@
                 	$dtpDate->Display = false;
                 	$this->dtpDateArray[] = $dtpDate;
 
-                  $this->lstTramorField_Change(null, $this->lstMapHeaderArray[$i]->ControlId, null);
+                	if (array_key_exists($i, $this->lstMapHeaderArray)) {
+                  	$this->lstTramorField_Change(null, $this->lstMapHeaderArray[$i]->ControlId, null);
+                	}
                 }
                 $this->arrMapFields[$i]['row1'] = $strFirstRowArray[$i];
               }
