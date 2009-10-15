@@ -373,6 +373,9 @@
               for ($i=0; $i<count($strFirstRowArray); $i++) {
                 $this->arrMapFields[$i] = array();
                 if ($this->blnHeaderRow) {
+                	if ($this->arrCsvHeader[$i] == '') {
+                		$this->arrCsvHeader[$i] = ' ';
+                	}
                   $this->lstMapHeader_Create($this, $i, $this->arrCsvHeader[$i]);
                   $this->arrMapFields[$i]['header'] = $this->arrCsvHeader[$i];
                 }
@@ -1237,7 +1240,7 @@
 
 	  protected function lstMapHeader_Create($objParentObject, $intId, $strName = null) {
 	    if ($this->chkHeaderRow->Checked && !$strName) {
-	      return false;
+	      $strName = 'abcdefg';
 	    }
 	    $strName = strtolower($strName);
 	    $lstMapHeader = new QListBox($objParentObject);
