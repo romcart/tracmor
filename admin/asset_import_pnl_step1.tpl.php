@@ -6,7 +6,7 @@
 	  <td class="record_field_edit">
 	    <table width="100%">
 	     	<tr>
-	       	<td><?php $this->lstFieldSeparator->Render(); ?><?php $this->txtFieldSeparator->Render(); ?></td>
+	       	<td class="record_field_name"><?php $this->lstFieldSeparator->Render(); ?><?php $this->txtFieldSeparator->Render(); ?></td>
 	     	</tr>
 	     	<!--
 	     	<tr>
@@ -26,7 +26,7 @@
 	     		<td>
 	       		<table width="380" border="0" cellpadding="0" cellspacing="0">
 	       			<tr>
-	       				<td><?php $this->lstTextDelimiter->RenderWithName(); ?></td><td><?php $this->txtTextDelimiter->Render(); ?></td>
+	       				<td class="record_field_name"><?php $this->lstTextDelimiter->RenderWithName(); ?></td><td><?php $this->txtTextDelimiter->Render(); ?></td>
 	       			</tr>
 	       		</table>
 	       	</td>
