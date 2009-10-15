@@ -214,6 +214,7 @@
 			$this->lstFieldSeparator->AddAction(new QChangeEvent(), new QAjaxAction('lstFieldSeparator_Change'));
 			$this->txtFieldSeparator = new QTextBox($this->pnlStepOne);
 			$this->txtFieldSeparator->Width = 100;
+			$this->txtFieldSeparator->SetCustomStyle('margin-left', '26px');
 			$this->txtFieldSeparator->Display = false;
 			$this->lstTextDelimiter = new QListBox($this->pnlStepOne);
 			$this->lstTextDelimiter->Name = "Text Delimiter: ";
