@@ -150,6 +150,10 @@
 					$strPrimaryKey = 'contact_id';
 					$strHelperTable = '`contact_custom_field_helper`';
 					break;
+				case 9: 
+					$strPrimaryKey = 'address_id';
+					$strHelperTable = '`address_custom_field_helper`';
+					break;
 				case 10: 
 					$strPrimaryKey = 'shipment_id';
 					$strHelperTable = '`shipment_custom_field_helper`';
@@ -322,6 +326,11 @@
 					$strId = 'contact`.`contact_id';
 					$strHelperTable = '`contact_custom_field_helper`';
 					break;
+				case 9: 
+					$strPrimaryKey = 'address_id';
+					$strId = 'address`.`address_id';
+					$strHelperTable = '`address_custom_field_helper`';
+					break;
 				case 10: 
 					$strPrimaryKey = 'shipment_id';
 					$strId = 'shipment`.`shipment_id';
@@ -408,6 +417,9 @@
 					break;
 				case 8: 
 					$strHelperTable = 'contact_custom_field_helper';
+					break;
+				case 9: 
+					$strHelperTable = 'address_custom_field_helper';
 					break;
 				case 10: 
 					$strHelperTable = 'shipment_custom_field_helper';

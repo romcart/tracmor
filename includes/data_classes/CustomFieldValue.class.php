@@ -153,6 +153,10 @@
     			$strTableName = "contact";
     			$strHelperTable = '`contact_custom_field_helper`';
     			break;
+    		case 9: 
+    			$strTableName = "address";
+    			$strHelperTable = '`address_custom_field_helper`';
+    			break;
     		case 10: 
     			$strTableName = "shipment";
     			$strHelperTable = '`shipment_custom_field_helper`';

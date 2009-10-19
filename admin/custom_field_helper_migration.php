@@ -2,7 +2,8 @@
 
 require_once('../includes/prepend.inc.php');
 
-$arrEntityQtypeId = array(1,2,4,5,6,7,8,10,11);
+$arrEntityQtypeId = array(1,2,4,5,6,7,8,9,10,11);
+//$arrEntityQtypeId = array(9);
 
 foreach ($arrEntityQtypeId as $intEntityQtypeId) {
 
@@ -48,6 +49,12 @@ foreach ($arrEntityQtypeId as $intEntityQtypeId) {
 						$strObjectId = "ContactId";
 						$strId = 'contact`.`contact_id';
 						$strHelperTable = '`contact_custom_field_helper`';
+						break;
+					case 9: 
+						$strTableName = "address";
+						$strObjectId = "AddressId";
+						$strId = 'address`.`address_id';
+						$strHelperTable = '`address_custom_field_helper`';
 						break;
 					case 10: 
 						$strTableName = "shipment";
@@ -131,6 +138,9 @@ foreach ($arrEntityQtypeId as $intEntityQtypeId) {
 		break;
 	  case 8:
 		$objArray = Contact::InstantiateDbResult($objDbResult);
+		break;
+		case 9:
+		$objArray = Address::InstantiateDbResult($objDbResult);
 		break;
 	  case 10:
 		$objArray = Shipment::InstantiateDbResult($objDbResult);
