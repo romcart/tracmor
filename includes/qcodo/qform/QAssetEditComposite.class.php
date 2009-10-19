@@ -1009,7 +1009,7 @@ class QAssetEditComposite extends QControl {
 			$this->objAsset->Delete();
 			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 			// The values do not get deleted for select values
-			CustomField::DeleteTextValues($objCustomFieldArray);
+			// CustomField::DeleteTextValues($objCustomFieldArray);
 			// ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
 			Asset::ResetParentAssetIdToNullByAssetId($this->objAsset->AssetId);
 			QApplication::Redirect('asset_list.php');

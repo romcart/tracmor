@@ -160,7 +160,7 @@
 				$this->objManufacturer->Delete();
 				// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 				// The values should not get deleted for select values
-				CustomField::DeleteTextValues($objCustomFieldArray);
+				// CustomField::DeleteTextValues($objCustomFieldArray);
 				$this->RedirectToListPage();
 			}
 			catch (QDatabaseExceptionBase $objExc) {

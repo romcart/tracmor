@@ -3363,7 +3363,7 @@
 			// Just delete the transaction and MySQL CASCADE down to shipment, asset_transaction, and inventory_transaction
 			$this->objTransaction = Transaction::Load($this->objShipment->TransactionId);
 			$this->objTransaction->Delete();
-			CustomField::DeleteTextValues($objCustomFieldArray);
+			// CustomField::DeleteTextValues($objCustomFieldArray);
 
 			QApplication::Redirect('../shipping/shipment_list.php');
 		}

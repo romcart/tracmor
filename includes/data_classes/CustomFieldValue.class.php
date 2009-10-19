@@ -48,6 +48,19 @@
 		public function __toString() {
 			return $this->ShortDescription;
 		}
+		
+		public function LoadByCustomFieldShortDescription($intCustomFieldId, $strShortDescription) {
+			
+			// Call CustomFieldValue::QueryArray to perform the LoadByCustFieldShortDescription query
+			try {
+				return CustomFieldValue::QuerySingle(
+					QQ::AndCondition(QQ::Equal(QQN::CustomFieldValue()->CustomFieldId, $intCustomFieldId), QQ::Equal(QQN::CustomFieldValue()->ShortDescription, $strShortDescription)));
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+			
+		}
 
 		// This adds the created by and creation date before saving a new asset
 		// And also updates the data into helper tables if short_description has been modified
@@ -90,7 +103,7 @@
 			$objClauses = QQ::Clause(QQ::Expand(QQN::CustomFieldSelection()->CustomFieldValue));
 			// Select all CustomFieldSelections (and expanded CustomFieldValues) by CustomFieldValueId
 			$objCustomFieldSelectionArray = CustomFieldSelection::QueryArray($objCondition, $objClauses);
-			parent::Delete();
+			//parent::Delete();
 			$intRowsToDeleteArray = array();
 			// Create an array switched by helper tables (to minimize number of queries)
 			foreach ($objCustomFieldSelectionArray as $objCustomFieldSelection) {
@@ -152,6 +165,34 @@
        	  return false;
       }
 		  return array($strHelperTable, $strTableName);
+		}
+		
+		public function __set($strName, $mixValue) {
+			switch ($strName) {
+				///////////////////
+				// Member Variables
+				///////////////////
+				case 'CustomFieldValueId':
+					/**
+					 * Sets the value for intCustomFieldId (Not Null)
+					 * @param integer $mixValue
+					 * @return integer
+					 */
+					try {
+						return ($this->intCustomFieldValueId = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+					
+					default:
+					try {
+						return parent::__set($strName, $mixValue);
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+			}
 		}
 	}
 ?>

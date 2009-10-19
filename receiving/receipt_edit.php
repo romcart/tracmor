@@ -2365,7 +2365,7 @@
 				// Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
 				$this->objTransaction->Delete();
 
-				CustomField::DeleteTextValues($objCustomFieldArray);
+				// CustomField::DeleteTextValues($objCustomFieldArray);
 
 				$this->RedirectToListPage();
 
