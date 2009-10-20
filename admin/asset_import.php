@@ -149,7 +149,8 @@
 						'text/comma-separated-values' => 'csv',
 						'text/csv' => 'csv',
 						'text/x-comma-separated-values' => 'csv',
-  				  'application/vnd.ms-excel' => 'csv');
+  				  'application/vnd.ms-excel' => 'csv',
+  				  'application/csv');
 		}
     
     // Create labels
