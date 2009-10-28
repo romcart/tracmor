@@ -1280,6 +1280,14 @@
 
 			if ($this->rblAssetType->SelectedValue == 'new') {
 				$blnError = false;
+
+				// Do not allow creation of an asset if asset limit will be exceeded
+				$intAssetLimit = (is_numeric(QApplication::$TracmorSettings->AssetLimit)) ? QApplication::$TracmorSettings->AssetLimit : false;			
+				if ($intAssetLimit && Asset::CountActive() >= $intAssetLimit) {
+					$blnError = true;
+					$this->txtNewAssetCode->Warning = "Your asset limit has been reached.";
+				}			
+
 				// Assign an empty string to the asset code for now (NULL won't work to render properly in the datagrid
 				if ($this->chkAutoGenerateAssetCode->Checked == true) {
 					$strAssetCode = '';
@@ -2357,7 +2365,7 @@
 				// Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
 				$this->objTransaction->Delete();
 
-				CustomField::DeleteTextValues($objCustomFieldArray);
+				// CustomField::DeleteTextValues($objCustomFieldArray);
 
 				$this->RedirectToListPage();
 

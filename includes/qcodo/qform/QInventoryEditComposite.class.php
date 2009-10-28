@@ -711,7 +711,7 @@ class QInventoryEditComposite extends QControl {
 			$this->objInventoryModel->Delete();
 			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 			// The values do not get deleted for select values
-			CustomField::DeleteTextValues($objCustomFieldArray);
+			// CustomField::DeleteTextValues($objCustomFieldArray);
 			QApplication::Redirect('inventory_model_list.php');
 		}
 		catch (QDatabaseExceptionBase $objExc) {

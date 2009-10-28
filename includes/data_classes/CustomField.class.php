@@ -115,6 +115,60 @@
 		}
 		
 		/**
+		 * This method returns the name of the helper table based on their entity_qtype_id
+		 * @param integer $intEntityQtypeId
+		 * @return string $strHelperTable
+		 */
+		public static function ToStringHelperTable($intEntityQtypeId) {
+			
+			switch ($intEntityQtypeId) {
+				case 1: 
+					$strPrimaryKey = 'asset_id';
+					$strHelperTable = '`asset_custom_field_helper`';
+					break;
+				case 2:
+					$strPrimaryKey = 'inventory_model_id';
+					$strHelperTable = '`inventory_model_custom_field_helper`';
+					break;
+				case 4: 
+					$strPrimaryKey = 'asset_model_id';
+					$strHelperTable = '`asset_model_custom_field_helper`';
+					break;
+				case 5: 
+					$strPrimaryKey = 'manufacturer_id';
+					$strHelperTable = '`manufacturer_custom_field_helper`';
+					break;
+				case 6: 
+					$strPrimaryKey = 'category_id';
+					$strHelperTable = '`category_custom_field_helper`';
+					break;
+				case 7: 
+					$strPrimaryKey = 'company_id';
+					$strHelperTable = '`company_custom_field_helper`';
+					break;
+				case 8: 
+					$strPrimaryKey = 'contact_id';
+					$strHelperTable = '`contact_custom_field_helper`';
+					break;
+				case 9: 
+					$strPrimaryKey = 'address_id';
+					$strHelperTable = '`address_custom_field_helper`';
+					break;
+				case 10: 
+					$strPrimaryKey = 'shipment_id';
+					$strHelperTable = '`shipment_custom_field_helper`';
+					break;
+				case 11:
+					$strPrimaryKey = 'receipt_id';
+					$strHelperTable = '`receipt_custom_field_helper`';
+					break;
+			}
+			
+			$arrHelperTable = array('strPrimaryKey' => $strPrimaryKey, 'strHelperTable' => $strHelperTable);
+			return $arrHelperTable;
+		}
+		
+		/**
 		 * This method will update the CustomFieldSelections for one Required Custom Field
 		 *
 		 */
@@ -126,15 +180,20 @@
 				foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
 					
 					$strEntity = EntityQtype::ToStringPrimaryKeySql($objEntityQtypeCustomField->EntityQtypeId);
-					$strEntityTable = EntityQtype::ToStringTable($objEntityQtypeCustomField->EntityQtypeId);
+					$arrHelperTable = CustomField::ToStringHelperTable($objEntityQtypeCustomField->EntityQtypeId);
 					
 					// This query returns entities which do not have a custom_field_selection for this specific Custom Field/Entity QType combination
-					$strQuery = sprintf("
+					/*$strQuery = sprintf("
 					SELECT %s AS entity_id
 					FROM %s
 					LEFT JOIN (custom_field_selection JOIN custom_field_value ON custom_field_selection.custom_field_value_id = custom_field_value.custom_field_value_id AND custom_field_value.custom_field_id = %s) ON %s = custom_field_selection.entity_id AND custom_field_selection.entity_qtype_id = %s
 					WHERE custom_field_selection.custom_field_selection_id IS NULL"
-					, $strEntity, $strEntityTable, $this->CustomFieldId, $strEntity, $objEntityQtypeCustomField->EntityQtypeId);
+					, $strEntity, $strEntityTable, $this->CustomFieldId, $strEntity, $objEntityQtypeCustomField->EntityQtypeId);*/
+					
+					$strQuery = sprintf("
+					SELECT %s AS entity_id
+					FROM %s
+					WHERE cfv_%s IS NULL OR cfv_%s = ''", $arrHelperTable['strPrimaryKey'], $arrHelperTable['strHelperTable'], $this->CustomFieldId, $this->CustomFieldId);
 					
 					$objDatabase = QApplication::$Database[1];
 					$objDbResult = $objDatabase->Query($strQuery);
@@ -267,6 +326,11 @@
 					$strId = 'contact`.`contact_id';
 					$strHelperTable = '`contact_custom_field_helper`';
 					break;
+				case 9: 
+					$strPrimaryKey = 'address_id';
+					$strId = 'address`.`address_id';
+					$strHelperTable = '`address_custom_field_helper`';
+					break;
 				case 10: 
 					$strPrimaryKey = 'shipment_id';
 					$strId = 'shipment`.`shipment_id';
@@ -353,6 +417,9 @@
 					break;
 				case 8: 
 					$strHelperTable = 'contact_custom_field_helper';
+					break;
+				case 9: 
+					$strHelperTable = 'address_custom_field_helper';
 					break;
 				case 10: 
 					$strHelperTable = 'shipment_custom_field_helper';
@@ -499,10 +566,10 @@
 						$arrCustomFields[$i]['lbl'] = new QLabel($objForm);
 					}
 	 				$arrCustomFields[$i]['lbl']->Name = $objCustomFieldArray[$i]->ShortDescription;
-	 				if ($blnEditMode && $objCustomFieldArray[$i]->CustomFieldSelection) {
+	 				if ($blnEditMode && $objCustomFieldArray[$i]->CustomFieldSelection && $objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription) {
 	 					$arrCustomFields[$i]['lbl']->Text = nl2br($objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription);
 	 				}
-	 				elseif ($blnEditMode && !$objCustomFieldArray[$i]->CustomFieldSelection) {
+	 				elseif ($blnEditMode && (!$objCustomFieldArray[$i]->CustomFieldSelection || (empty($objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription) && $objCustomFieldArray[$i]->CustomFieldQtypeId == 2))) {
 	 					$arrCustomFields[$i]['lbl']->Text = 'None';
 	 				}
 				}
@@ -634,15 +701,18 @@
 						$objCustomFieldArray[$i]->CustomFieldSelection->newCustomFieldValue = new CustomFieldValue;
 						$objCustomFieldArray[$i]->CustomFieldSelection->newCustomFieldValue->CustomFieldId = $arrCustomFields[$i]['CustomFieldId'];
 						$objCustomFieldArray[$i]->CustomFieldSelection->newCustomFieldValue->ShortDescription = $arrCustomFields[$i]['input']->Text;
-						$objCustomFieldArray[$i]->CustomFieldSelection->newCustomFieldValue->Save();
+						$objCustomFieldArray[$i]->CustomFieldSelection->newCustomFieldValue->CustomFieldValueId = 0;
+						//$objCustomFieldArray[$i]->CustomFieldSelection->newCustomFieldValue->Save();
 						$objCustomFieldArray[$i]->CustomFieldSelection->EntityId = $intEntityId;
 						$objCustomFieldArray[$i]->CustomFieldSelection->EntityQtypeId = $intEntityQtypeId;
-						$objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValueId = $objCustomFieldArray[$i]->CustomFieldSelection->newCustomFieldValue->CustomFieldValueId;
-						$objCustomFieldArray[$i]->CustomFieldSelection->Save();							
+						//$objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValueId = $objCustomFieldArray[$i]->CustomFieldSelection->newCustomFieldValue->CustomFieldValueId;
+						$objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValueId = 0;
+						$objCustomFieldArray[$i]->CustomFieldSelection->Save();
 					}
 					else {
 						$objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription = $arrCustomFields[$i]['input']->Text;
-						$objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->Save();
+						//$objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->Save();
+						$objCustomFieldArray[$i]->CustomFieldSelection->Save();
 					}
 				}
 				// List Boxes
@@ -654,6 +724,7 @@
 					$objCustomFieldArray[$i]->CustomFieldSelection->EntityId = $intEntityId;
 					$objCustomFieldArray[$i]->CustomFieldSelection->EntityQtypeId = $intEntityQtypeId;
  					$objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValueId = $arrCustomFields[$i]['input']->SelectedValue;
+ 					//$objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription = $arrCustomFields[$i]['input']->SelectedName;
 					$objCustomFieldArray[$i]->CustomFieldSelection->Save();						
 				}
 				// If the selected value is null, delete the CustomAssetFieldSelection
@@ -767,7 +838,7 @@
 			}
 		}
 		
-		public static function DeleteTextValues($objCustomFieldArray) {
+		/*public static function DeleteTextValues($objCustomFieldArray) {
 			// Manually delete the CustomFieldValues for Text fields because the MySQL ON DELETE functionality will not handle it
 			if ($objCustomFieldArray) {
 				foreach ($objCustomFieldArray as $objCustomField) {
@@ -781,6 +852,6 @@
 					}
 				}
 			}
-		}
+		}*/
 	}
 ?>

@@ -53,7 +53,9 @@
 	$arrAdvancedSearchFields[] = array('name' => 'Attachment(s)', 'value' => $this->chkAttachment->RenderWithError(false));
 
 	if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
-	  $arrAdvancedSearchFields[] = array('name' => 'Include Archived:', 'value' => $this->chkArchived->RenderWithError(false));
+	   $arrAdvancedSearchFields[] = array('name' => 'Include Archived:', 'value' => $this->chkArchived->RenderWithError(false));
+	  $arrAdvancedSearchFields[] = array('name' => 'Include To Be Received:', 'value' => $this->chkIncludeTBR->RenderWithError(false));
+	  $arrAdvancedSearchFields[] = array('name' => 'Include Shipped:', 'value' => $this->chkIncludeShipped->RenderWithError(false));
 	}
 
 	// Custom Fields

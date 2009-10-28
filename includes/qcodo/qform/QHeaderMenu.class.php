@@ -67,6 +67,9 @@ class QHeaderMenu extends QControl {
 		
 		// Store the Output Buffer locally
 		$strAlreadyRendered = ob_get_contents();
+    $JavaScriptArray = QApplication::$JavaScriptArray;
+    $AlertMessageArray = QApplication::$AlertMessageArray;
+    $JavaScriptArrayHighPriority = QApplication::$JavaScriptArrayHighPriority;
 		ob_clean();
 
 		// Evaluate the template
@@ -82,8 +85,12 @@ class QHeaderMenu extends QControl {
 		$strStyle,
 		$strAttributes,
 		$strTemplateEvaluated);
-		
-		return $strToReturn;
+    
+    QApplication::$JavaScriptArray = $JavaScriptArray;
+    QApplication::$AlertMessageArray = $AlertMessageArray;
+    QApplication::$JavaScriptArrayHighPriority = $JavaScriptArrayHighPriority;
+    
+    return $strToReturn;
 	}
 	
 	protected function lblSignOut_Create() {

@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2009, Tracmor, LLC 
+ * Copyright (c)  2009, Tracmor, LLC
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -66,11 +66,15 @@
 							<tr>
 								<td width="30" align="center"><img src="../images/icons/user_role.png" name="shortcut7"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="role_list.php" class="graylink">User Roles</a></td>
-							</tr>								
+							</tr>
 							<tr>
 								<td width="30" align="center"><img src="../images/icons/user.png" name="shortcut6"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="user_account_list.php" class="graylink">Users</a></td>
-							</tr>									
+							</tr>
+							<tr>
+								<td width="30" align="center"><img src="../images/icons/asset_import.png" name="shortcut9"></td>
+								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="asset_import.php" class="graylink">Asset Import</a></td>
+							</tr>
 						</table>
 					</td>
 				</tr>

@@ -707,6 +707,8 @@ class QAssetEditComposite extends QControl {
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Scheduled By', '<?= $_ITEM->Transaction->CreatedByObject->__toString() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->Transaction->ToStringStatusStyled() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Tracking', '<?= $_ITEM->Transaction->ToStringTrackingNumber() ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Creation Date', '<?= $_ITEM->Transaction->CreationDate ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
+		$this->dtgShipmentReceipt->AddColumn(new QDataGridColumn('Ship/Receive Date', '<?= $_CONTROL->objParentControl->getShipReceiveDate($_ITEM) ?>', array('CssClass' => 'dtg_column', 'HtmlEntities' => false)));
 
 		//$this->dtgShipmentReceipt->SortColumnIndex = 4;
     //$this->dtgShipmentReceipt->SortDirection = 1;
@@ -797,6 +799,16 @@ class QAssetEditComposite extends QControl {
 			$blnError = false;
 			// If a new asset is being created
 			if (!$this->blnEditMode) {
+
+				// Do not allow creation of an asset if asset limit will be exceeded
+				$intAssetLimit = (is_numeric(QApplication::$TracmorSettings->AssetLimit)) ? QApplication::$TracmorSettings->AssetLimit : false;
+
+				if (!$this->blnEditMode) {
+					if ($intAssetLimit && Asset::CountActive() >= $intAssetLimit) {
+						$blnError = true;
+						$this->txtAssetCode->Warning = "Your asset limit has been reached.";
+					}
+				}
 
 				// Check to see if the asset code already exists
 				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
@@ -997,7 +1009,7 @@ class QAssetEditComposite extends QControl {
 			$this->objAsset->Delete();
 			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 			// The values do not get deleted for select values
-			CustomField::DeleteTextValues($objCustomFieldArray);
+			// CustomField::DeleteTextValues($objCustomFieldArray);
 			// ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
 			Asset::ResetParentAssetIdToNullByAssetId($this->objAsset->AssetId);
 			QApplication::Redirect('asset_list.php');
@@ -1368,6 +1380,15 @@ class QAssetEditComposite extends QControl {
 		else{
 			$this->lblNewAssetModel->Visible=false;
 		}
+	}
+
+	public function getShipReceiveDate($objItem) {
+	  if ($objItem->Transaction->TransactionTypeId == 6) {
+	    return $objItem->Transaction->Shipment->ShipDate;
+	  }
+	  else {
+	    return $objItem->Transaction->Receipt->ReceiptDate;
+	  }
 	}
 
 	public function lblIconParentAssetCode_Click() {

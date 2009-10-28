@@ -21,7 +21,7 @@
 				<td style="vertical-align:top;" noWrap>
 					<?php $this->lstManufacturer->RenderWithNameLeft("Width=150") ?>
 				</td>
-				<td><?php $this->chkOffsite->Render(); ?></td>
+				<td><?php //$this->chkOffsite->Render(); ?></td>
 				<td>
 					<?php $this->lblAdvanced->Render(); ?>
 				</td>

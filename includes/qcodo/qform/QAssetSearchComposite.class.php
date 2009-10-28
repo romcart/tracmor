@@ -30,7 +30,6 @@ class QAssetSearchComposite extends QControl {
 	protected $lstLocation;
 	protected $txtShortDescription;
 	protected $txtAssetCode;
-	protected $chkOffsite;
 	protected $lblAssetModelId;
 	protected $arrCustomFields;
 
@@ -53,7 +52,6 @@ class QAssetSearchComposite extends QControl {
 	protected $strAssetCode;
 	protected $intCategoryId;
 	protected $intManufacturerId;
-	protected $blnOffsite;
 	protected $strAssetModelCode;
 	protected $intReservedBy;
 	protected $intCheckedOutBy;
@@ -62,6 +60,8 @@ class QAssetSearchComposite extends QControl {
 	protected $strDateModifiedLast;
 	protected $blnAttachment;
 	protected $blnArchived;
+	protected $blnIncludeTBR;
+	protected $blnIncludeShipped;
 
 	// Use Ajax
 	protected $blnUseAjax;
@@ -176,7 +176,6 @@ class QAssetSearchComposite extends QControl {
     $this->lstLocation_Create();
     $this->txtShortDescription_Create();
     $this->txtAssetCode_Create();
-    $this->chkOffsite_Create();
     $this->lblAssetModelId_Create();
     $this->btnSearch_Create();
     $this->btnClear_Create();
@@ -252,7 +251,6 @@ class QAssetSearchComposite extends QControl {
 		$intAssetModelId = $this->intAssetModelId;
 		$intCategoryId = $this->intCategoryId;
 		$intManufacturerId = $this->intManufacturerId;
-		$blnOffsite = $this->blnOffsite;
 		$strAssetModelCode = $this->strAssetModelCode;
 		$intReservedBy = $this->intReservedBy;
 		$intCheckedOutBy = $this->intCheckedOutBy;
@@ -262,6 +260,8 @@ class QAssetSearchComposite extends QControl {
 		$strDateModified = $this->strDateModified;
 		$blnAttachment = $this->blnAttachment;
 		$blnArchived = $this->blnArchived;
+		$blnIncludeTBR = $this->blnIncludeTBR;
+		$blnIncludeShipped = $this->blnIncludeShipped;
 		$arrCustomFields = $this->arrCustomFields;
 
 		// Enable Profiling
@@ -275,12 +275,12 @@ class QAssetSearchComposite extends QControl {
     $objExpansionMap[Asset::ExpandLocation] = true;
 		//if ($this->blnSearch || !$this->blnUseAjax) {
 		if ((!$this->objParentControl && $this->Display == true) || $this->objParentControl->Display == true) {
-			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnArchived);
+			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
 			if ($this->dtgAsset->TotalItemCount == 0) {
 				$this->dtgAsset->ShowHeader = false;
 			}
 			else {
-				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnArchived);
+				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
 				$this->dtgAsset->ShowHeader = true;
 			}
 		}
@@ -365,11 +365,6 @@ class QAssetSearchComposite extends QControl {
   	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
 
-  protected function chkOffsite_Create() {
-  	$this->chkOffsite = new QCheckBox($this);
-  	$this->chkOffsite->Text = 'Show Offsite Assets';
-  }
-
   protected function lblAssetModelId_Create() {
   	$this->lblAssetModelId = new QLabel($this);
   	$this->lblAssetModelId->Text = '';
@@ -435,7 +430,6 @@ class QAssetSearchComposite extends QControl {
 	  	$this->lstManufacturer->SelectedIndex = 0;
 	  	$this->txtShortDescription->Text = '';
 	  	$this->txtAssetCode->Text = '';
-	  	$this->chkOffsite->Checked = false;
 	  	$this->lstLocation->SelectedIndex = 0;
 	  	$this->ctlAdvanced->ClearControls();
 
@@ -446,7 +440,6 @@ class QAssetSearchComposite extends QControl {
 	  	$this->intAssetModelId = null;
 	  	$this->strShortDescription = null;
 	  	$this->strAssetCode = null;
-	  	$this->blnOffsite = false;
 	  	$this->strAssetModelCode = null;
 	  	$this->intReservedBy = null;
 	  	$this->intCheckedOutBy = null;
@@ -455,6 +448,8 @@ class QAssetSearchComposite extends QControl {
 	  	$this->strDateModifiedLast = null;
 	  	$this->blnAttachment = false;
 	  	$this->blnArchived = false;
+	  	$this->blnIncludeTBR = false;
+	  	$this->blnIncludeShipped = false;
 	  	if ($this->arrCustomFields) {
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
@@ -489,7 +484,6 @@ class QAssetSearchComposite extends QControl {
 		$this->intManufacturerId = $this->lstManufacturer->SelectedValue;
 		$this->strShortDescription = $this->txtShortDescription->Text;
 		$this->strAssetCode = $this->txtAssetCode->Text;
-		$this->blnOffsite = $this->chkOffsite->Checked;
 		$this->intLocationId = $this->lstLocation->SelectedValue;
 		$this->intAssetModelId = $this->lblAssetModelId->Text;
 		$this->strAssetModelCode = $this->ctlAdvanced->AssetModelCode;
@@ -505,6 +499,19 @@ class QAssetSearchComposite extends QControl {
 		}
 		else {
 		  $this->blnArchived = true;
+		}
+		// Searching the "Shipped" location overrides the "Include Shipped" checkbox
+		if ($this->intLocationId != 2) {
+		  $this->blnIncludeShipped = $this->ctlAdvanced->Shipped;
+		}
+		else {
+		  $this->blnIncludeShipped = true;
+		}
+		if ($this->intLocationId != 5) {
+		  $this->blnIncludeTBR = $this->ctlAdvanced->TBR;
+		}
+		else {
+		  $this->blnIncludeTBR = true;
 		}
 
 		$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
