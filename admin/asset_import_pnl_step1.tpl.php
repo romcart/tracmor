@@ -4,21 +4,10 @@
 	</tr>
 	<tr>
 	  <td class="record_field_edit">
-	    <table width="100%">
+	    <table width="100%" align="left" cellpadding="0" cellspacing="0">
 	     	<tr>
-	       	<td class="record_field_name"><?php $this->lstFieldSeparator->Render(); ?><?php $this->txtFieldSeparator->Render(); ?></td>
+	       	<td class="record_field_name" style="text-align: left"><?php $this->lstFieldSeparator->Render(); ?><?php $this->txtFieldSeparator->Render(); ?></td>
 	     	</tr>
-	     	<!--
-	     	<tr>
-	     		<td>
-	     			<table width="250" border="0" cellpadding="0" cellspacing="0">
-	     				<tr>
-	     					<td><?php //$this->lstFieldSeparator->Render(); ?></td><td valign="bottom"><?php //$this->txtFieldSeparator->Render(); ?></td>
-	     				</tr>
-	     			</table>
-	     		</td>
-	     	</tr>
-	     	-->
 	     	<tr>
 	     		<td>&nbsp;</td>
 	     	</tr>
