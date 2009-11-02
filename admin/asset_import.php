@@ -150,7 +150,8 @@
 						'text/csv' => 'csv',
 						'text/x-comma-separated-values' => 'csv',
   				  'application/vnd.ms-excel' => 'csv',
-  				  'application/csv' => 'csv');
+  				  'application/csv' => 'csv',
+  				  'text/x-csv' => 'csv');
 		}
     
     // Create labels
@@ -995,6 +996,7 @@
               $strAssetValuesArray = array();
               $strAssetCFVArray = array();
               $strAssetCodeArray = array();
+              $strAddedCFVArray = array();
               // This will add extra commas for blank values
               $this->FileCsvData->symmetrize();
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
@@ -1095,6 +1097,7 @@
               						$objCustomField->CustomFieldSelection->Save();*/
                         }
                         else {
+                        	$objDatabase = Asset::GetDatabase();
                           $strShortDescription = addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
                           $blnInList = false;
                           foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
@@ -1104,7 +1107,13 @@
                     					break;
                 					  }
                 					}
-                					if (!$blnInList && $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                					// Add the CustomFieldValue
+                					if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
+                						$strQuery = sprintf("INSERT INTO custom_field_value (custom_field_id, short_description, created_by, creation_date) VALUES (%s, '%s', %s, NOW());", $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
+                						$objDatabase->NonQuery($strQuery);
+                						$strAddedCFVArray[] = $strShortDescription;
+                					}
+                					elseif (!$blnInList && $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
                  					  //$intCustomFieldValueId = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
                             $strShortDescription = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                  					}
