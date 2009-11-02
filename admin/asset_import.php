@@ -305,7 +305,9 @@
   		    // Step 1 complete
           // File Not Uploaded
     			if (!file_exists($this->flcFileCsv->File) || !$this->flcFileCsv->Size) {
-    				throw new QCallerException('FileAssetType must be a valid QFileAssetType constant value');
+    				//throw new QCallerException('FileAssetType must be a valid QFileAssetType constant value');
+    				$this->flcFileCsv->Warning = 'The file could not be uploaded. Please provide a valid file.';
+    				$blnError = true;
     			// File Has Incorrect MIME Type (only if an acceptiblemimearray is setup)
     			} elseif (is_array($this->strAcceptibleMimeArray) && (!array_key_exists($this->flcFileCsv->Type, $this->strAcceptibleMimeArray))) {
     				$this->flcFileCsv->Warning = "Extension must be 'csv' or 'txt'";

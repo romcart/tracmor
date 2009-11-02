@@ -24,7 +24,7 @@
 	     		<td>&nbsp;</td>
 	     	</tr>
 	     	<tr>
-	       	<td class="record_field_name" style="text-align:left;">Select File:<br /><?php $this->flcFileCsv->Render(); ?></td>
+	       	<td class="record_field_name" style="text-align:left;">Select File:<br /><?php $this->flcFileCsv->RenderWithError(); ?></td>
 	     	</tr>
 	     	<tr>
 	       	<td class="record_field_name" style="text-align: left;"><?php $this->chkHeaderRow->Render(); ?>&nbsp;Header Row</td>
