@@ -245,8 +245,9 @@
 			$this->lstFieldSeparator->SelectedIndex = 0;
 			$this->lstFieldSeparator->AddAction(new QChangeEvent(), new QAjaxAction('lstFieldSeparator_Change'));
 			$this->txtFieldSeparator = new QTextBox($this->pnlStepOne);
-			$this->txtFieldSeparator->Width = 100;
+			$this->txtFieldSeparator->Width = 50;
 			$this->txtFieldSeparator->SetCustomStyle('margin-left', '26px');
+			$this->txtFieldSeparator->MaxLength = 1;
 			$this->txtFieldSeparator->Display = false;
 			$this->lstTextDelimiter = new QListBox($this->pnlStepOne);
 			$this->lstTextDelimiter->Name = "Text Delimiter: ";
@@ -258,7 +259,8 @@
 			$this->lstTextDelimiter->AddAction(new QChangeEvent(), new QAjaxAction('lstTextDelimiter_Change'));
 			$this->txtTextDelimiter = new QTextBox($this->pnlStepOne);
 			$this->txtTextDelimiter->Name = 'Other: ';
-			$this->txtTextDelimiter->Width = 100;
+			$this->txtTextDelimiter->Width = 50;
+			$this->txtTextDelimiter->MaxLength = 1;
 			$this->txtTextDelimiter->Display = false;
 			$this->flcFileCsv = new QFileControlExt($this->pnlStepOne);
 			$this->flcFileCsv->Name = "Select File: ";
