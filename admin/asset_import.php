@@ -153,6 +153,36 @@
   				  'application/csv' => 'csv',
   				  'text/x-csv' => 'csv');
 		}
+		
+		protected function Form_PreRender() {
+			
+			if ($this->dtgLocation && count($this->objNewLocationArray) > 0 && $this->dtgLocation->Paginator) {
+				$this->dtgLocation->TotalItemCount = count($this->objNewLocationArray);
+      	$this->dtgLocation->DataSource = $this->return_array_chunk($this->dtgLocation, $this->objNewLocationArray);
+			}
+			
+			if ($this->dtgCategory && count($this->objNewCategoryArray) > 0 && $this->dtgCategory->Paginator) {
+				$this->dtgCategory->TotalItemCount = count($this->objNewCategoryArray);
+      	$this->dtgCategory->DataSource = $this->return_array_chunk($this->dtgCategory, $this->objNewCategoryArray);
+			}
+			
+			if ($this->dtgManufacturer && count($this->objNewManufacturerArray) > 0 && $this->dtgManufacturer->Paginator) {
+				$this->dtgManufacturer->TotalItemCount = count($this->objNewManufacturerArray);
+      	$this->dtgManufacturer->DataSource = $this->return_array_chunk($this->dtgManufacturer, $this->objNewManufacturerArray);
+			}
+			
+			if ($this->dtgAssetModel && count($this->objNewAssetModelArray) > 0 && $this->dtgAssetModel->Paginator) {
+				$this->dtgAssetModel->TotalItemCount = count($this->objNewAssetModelArray);
+      	$this->dtgAssetModel->DataSource = $this->return_array_chunk($this->dtgAssetModel, $this->objNewAssetModelArray);
+			}
+			
+			if ($this->dtgAsset && count($this->objNewAssetArray) > 0 && $this->dtgAsset->Paginator) {
+				$this->dtgAsset->TotalItemCount = count($this->objNewAssetArray);
+      	$this->dtgAsset->DataSource = $this->return_array_chunk($this->dtgAsset, $this->objNewAssetArray);
+			}
+			
+			
+		}
     
     // Create labels
     protected function Labels_Create() {
@@ -631,7 +661,7 @@
           $this->dtgAsset->ShowColumnToggle = false;
           $this->dtgAsset->ShowExportCsv = false;
           $this->dtgAsset->ShowHeader = false;
-          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Create the label for successful import
           $this->lblImportSuccess = new QLabel($this);
@@ -1186,22 +1216,35 @@
             }*/
             $this->blnImportEnd = true;
             $this->btnNext->Warning = "";
-            $this->dtgLocation->DataSource = $this->objNewLocationArray;
-            $this->dtgCategory->DataSource = $this->objNewCategoryArray;
-            $this->dtgManufacturer->DataSource = $this->objNewManufacturerArray;
-            $this->dtgAssetModel->DataSource = $this->objNewAssetModelArray;
-            $this->dtgAsset->DataSource = $this->objNewAssetArray;
+            
+            
             $this->lblImportResults->Display = true;
-            if (count($this->objNewAssetArray))
+            if (count($this->objNewAssetArray)) {
               $this->lblImportAssets->Display = true;
-            if (count($this->objNewAssetModelArray))
+              $this->dtgAsset->Paginator = new QPaginator($this->dtgAsset);
+              $this->dtgAsset->ItemsPerPage = 20;
+              
+            }
+            if (count($this->objNewAssetModelArray)) {
               $this->lblImportModels->Display = true;
-            if (count($this->objNewManufacturerArray))
+              $this->dtgAssetModel->Paginator = new QPaginator($this->dtgAssetModel);
+              $this->dtgAssetModel->ItemsPerPage = 20;
+            }
+            if (count($this->objNewManufacturerArray)) {
               $this->lblImportManufacturers->Display = true;
-            if (count($this->objNewCategoryArray))
+              $this->dtgManufacturer->Paginator = new QPaginator($this->dtgManufacturer);
+              $this->dtgManufacturer->ItemsPerPage = 20;
+            }
+            if (count($this->objNewCategoryArray)) {
               $this->lblImportCategories->Display = true;
-            if (count($this->objNewLocationArray))
+              $this->dtgCategory->Paginator = new QPaginator($this->dtgCategory);
+              $this->dtgCategory->ItemsPerPage = 20;
+            }
+            if (count($this->objNewLocationArray)) {
               $this->lblImportLocations->Display = true;
+              $this->dtgLocation->Paginator = new QPaginator($this->dtgLocation);
+              $this->dtgLocation->ItemsPerPage = 20;
+            }
             $this->btnNext->Display = false;
             $this->btnCancel->Display = false;
             $this->btnUndoLastImport->Display = true;
@@ -1240,7 +1283,18 @@
         }
 		  }
 	  }
-
+	  
+	  public function return_array_chunk($dtgDatagrid, $strArray) {
+	  	if (count($strArray) > 0) {
+		  	$intPageNumber = $dtgDatagrid->Paginator->PageNumber;
+		  	$arrChunks = array_chunk($strArray, 20);
+		  	$intKey = $intPageNumber-1;
+		  	return $arrChunks[$intKey];
+	  	} else {
+	  		return false;
+	  	}
+	  }
+	  
 	  // Case-insensitive in array function
     protected function in_array_nocase($search, &$array) {
       $search = strtolower($search);
