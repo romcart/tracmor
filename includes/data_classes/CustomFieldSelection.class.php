@@ -588,7 +588,9 @@
     		  $strTableName = $strHelperTableArray[1];
 				  
     		  $objDatabase = CustomField::GetDatabase();
-				  $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' where `%s_id`='%s';", $strHelperTable, $intCustomFieldId, $objCustomFieldValue->ShortDescription, $strTableName, $this->EntityId);
+    		  $strShortDescription = $objDatabase->SqlVariable($objCustomFieldValue->ShortDescription);
+    		  $intEntityId = $objDatabase->SqlVariable($this->EntityId);
+				  $strQuery = sprintf("UPDATE %s SET `cfv_%s`=%s where `%s_id`=%s;", $strHelperTable, $intCustomFieldId, $strShortDescription, $strTableName, $intEntityId);
   			  $objDatabase->NonQuery($strQuery);
 				}
 			}
