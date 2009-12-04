@@ -381,7 +381,7 @@
         `asset_transaction__transaction_id__creation_date` %s,
 			", $strSortByDate, $strSortByDate);
 
-			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Asset);
+			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
 			$strQuery = sprintf('
         SELECT
         	`asset_transaction`.`asset_transaction_id` AS `asset_transaction_id`,
@@ -425,7 +425,7 @@
         $objQueryExpansion->GetFromSql("", "\n					"), str_replace("`asset`.`asset_id`", " `asset_transaction__asset_id`.`asset_id`", $arrCustomFieldSql['strFrom']),
         $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql'],
         $strSortByDate);
-
+        
       if ($blnReturnStrQuery) {
 			  return $strQuery;
 			}
@@ -522,7 +522,7 @@
 			}
 
 			$arrCustomFieldSql = CustomField::GenerateSql(EntityQtype::Asset);
-			$strQuery = sprintf('
+/*			$strQuery = sprintf('
         SELECT
         	COUNT(DISTINCT `asset_transaction`.`transaction_id`) AS row_count
         FROM
@@ -544,7 +544,32 @@
           OR `asset_transaction__asset_id`.`archived_flag` is TRUE
       ', $objQueryExpansion->GetFromSql("", "\n					"), str_replace("`asset`.`asset_id`", " `asset_transaction__asset_id`.`asset_id`", $arrCustomFieldSql['strFrom']),
         $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql']
+       );*/
+
+			$strQuery = sprintf('
+        SELECT
+        	COUNT(DISTINCT `asset_transaction`.`transaction_id`) AS row_count
+        FROM
+        	`asset_transaction` AS `asset_transaction`
+        	%s
+        WHERE
+          1=1
+          %s
+          %s
+          %s
+          %s
+          %s
+          %s
+          %s
+          %s
+          %s
+          %s
+          OR `asset_transaction__asset_id`.`archived_flag` is TRUE
+      ', $objQueryExpansion->GetFromSql("", "\n					"),
+        $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql']
        );
+       
+       //echo($strQuery); exit;
 
      $objDatabase = AssetTransaction::GetDatabase();
      $objDbResult = $objDatabase->Query($strQuery);
