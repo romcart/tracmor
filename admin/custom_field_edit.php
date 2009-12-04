@@ -664,7 +664,7 @@
 					}
 					// If the EntityQtype needs to be deleted, you must delete the CustomFieldValues for text and textarea, and CustomFieldSelections for all types
 					if (!$blnKeep) {
-						$objAndCondition = QQ::AndCondition(QQ::Equal(QQN::CustomFieldSelection()->EntityQtypeId, $objEntityQtypeCustomField->EntityQtypeId), QQ::Equal(QQN::CustomFieldSelection()->CustomFieldValue->CustomFieldId, $this->objCustomField->CustomFieldId));
+						/*$objAndCondition = QQ::AndCondition(QQ::Equal(QQN::CustomFieldSelection()->EntityQtypeId, $objEntityQtypeCustomField->EntityQtypeId), QQ::Equal(QQN::CustomFieldSelection()->CustomFieldValue->CustomFieldId, $this->objCustomField->CustomFieldId));
 						$objClauses = QQ::Clause(QQ::Expand(QQN::CustomFieldSelection()->CustomFieldValue));
 						// Select all CustomFieldSelections (and expanded CustomFieldValues) by EntityQtypeId and CustomFieldId
 						$objCustomFieldSelectionArray = CustomFieldSelection::QueryArray($objAndCondition, $objClauses);
@@ -679,7 +679,8 @@
 									$objCustomFieldSelection->Delete();
 								}
 							}
-						}
+						}*/
+						
 						// If the EntityQtype needs to be deleted, you must delete EntityQtypeId for all roles in RoleEntityQTypeCustomFieldAuthorization
 						$objRoleEntityCustomAuthArray=RoleEntityQtypeCustomFieldAuthorization::LoadArrayByEntityQtypeCustomFieldId($objEntityQtypeCustomField->EntityQtypeCustomFieldId);
 						if($objRoleEntityCustomAuthArray)foreach($objRoleEntityCustomAuthArray as $objRoleEntityCustomAuth){

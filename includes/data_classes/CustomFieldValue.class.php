@@ -99,7 +99,20 @@
 		
 		// This also deletes the data from helper tables
 		public function Delete() {
-		  $objCondition = QQ::Equal(QQN::CustomFieldSelection()->CustomFieldValueId, $this->CustomFieldValueId);
+			
+			$arrEntityQtype = EntityQtypeCustomField::LoadArrayByCustomFieldId($this->CustomFieldId);
+			parent::Delete();
+			
+			foreach ($arrEntityQtype as $objEntityQtype) {
+				$strHelperTableArray = $this->GetHelperTableByEntityQtypeId($objEntityQtype->EntityQtypeId);
+				$strHelperTable = $strHelperTableArray[0];
+	  		$strTableName = $strHelperTableArray[1];
+				$strQuery = sprintf("UPDATE %s SET `cfv_%s` = NULL WHERE `cfv_%s` = '%s'", $strHelperTable, $this->CustomFieldId, $this->CustomFieldId, $this->ShortDescription);
+				$objDatabase = CustomFieldValue::GetDatabase();
+				$objDatabase->NonQuery($strQuery);
+			}
+			
+/*		  $objCondition = QQ::Equal(QQN::CustomFieldSelection()->CustomFieldValueId, $this->CustomFieldValueId);
 			$objClauses = QQ::Clause(QQ::Expand(QQN::CustomFieldSelection()->CustomFieldValue));
 			// Select all CustomFieldSelections (and expanded CustomFieldValues) by CustomFieldValueId
 			$objCustomFieldSelectionArray = CustomFieldSelection::QueryArray($objCondition, $objClauses);
@@ -120,7 +133,7 @@
 				
 				$strQuery = sprintf("UPDATE %s SET `cfv_%s`='' WHERE `%s_id` IN (%s);", $strHelperTable, $objCustomFieldSelection->CustomFieldValue->CustomFieldId, $strTableName, implode(', ', $intRowsToDeleteArray[$intEntityQtypeId]));
         $objDatabase->NonQuery($strQuery);
-			}
+			}*/
 		}
 		
 		public function GetHelperTableByEntityQtypeId($intEntityQtypeId) {
