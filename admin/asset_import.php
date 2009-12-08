@@ -1196,7 +1196,11 @@
                   foreach ($arrAssetCustomField as $objCustomField) {
                     $strCFVNameArray[] = sprintf("`cfv_%s`", $objCustomField->CustomFieldId);
                   }
-                  $strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", implode(", ", $strCFVNameArray), implode(", ", $strAssetCFVArray));
+                  if (count($strAssetCFVArray) > 0 && count($strCFVNameArray) > 0)  {
+                  	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", implode(", ", $strCFVNameArray), implode(", ", $strAssetCFVArray));
+                  } else {
+                  	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES ('%s')", $intInsertId);
+                  }
                   $objDatabase->NonQuery($strQuery);
                   for ($i=0; $i<$intAssetCount; $i++) {
                     $this->objNewAssetArray[$intInsertId+$i] = $strAssetCodeArray[$i];
