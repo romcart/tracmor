@@ -777,7 +777,9 @@
               }
               elseif (substr($value, 0, 6) == 'model_') {
                 $intModelCustomFieldKeyArray[substr($value, 6)] = $key;
-                $arrAssetModelCustomField[substr($value, 6)] = $this->arrAssetCustomField[substr($value, 6)];
+                if (array_key_exists(substr($value, 6), $this->arrAssetCustomField)) {
+                	$arrAssetModelCustomField[substr($value, 6)] = $this->arrAssetCustomField[substr($value, 6)];
+                }
               }
             }
             $strAssetModelArray = array();
@@ -824,7 +826,9 @@
               }
               elseif (substr($value, 0, 6) == 'asset_') {
                 $intAssetCustomFieldKeyArray[substr($value, 6)] = $key;
-                $arrAssetCustomField[substr($value, 6)] = $this->arrAssetCustomField[substr($value, 6)];
+                if (array_key_exists(substr($value, 6), $this->arrAssetCustomField)) {
+                	$arrAssetCustomField[substr($value, 6)] = $this->arrAssetCustomField[substr($value, 6)];
+                }
               }
             }
             $intLocationArray = array();
