@@ -80,7 +80,35 @@
 			
 			$this->strOverflow = QOverflow::Auto;
 		}
+
+		// Create and Setup lstCategory with alphabetic ordering
+		protected function lstCategory_Create() {
+			$this->lstCategory = new QListBox($this);
+			$this->lstCategory->Name = QApplication::Translate('Category');
+			$this->lstCategory->AddItem(QApplication::Translate('- Select One -'), null);
+			$objCategoryArray = Category::LoadAllWithFlags(true, false, 'short_description ASC');
+			if ($objCategoryArray) foreach ($objCategoryArray as $objCategory) {
+				$objListItem = new QListItem($objCategory->__toString(), $objCategory->CategoryId);
+				if (($this->objAssetModel->Category) && ($this->objAssetModel->Category->CategoryId == $objCategory->CategoryId))
+					$objListItem->Selected = true;
+				$this->lstCategory->AddItem($objListItem);
+			}
+		}
 		
+		// Create and Setup lstManufacturer with alphabetic ordering
+		protected function lstManufacturer_Create() {
+			$this->lstManufacturer = new QListBox($this);
+			$this->lstManufacturer->Name = QApplication::Translate('Manufacturer');
+			$this->lstManufacturer->AddItem(QApplication::Translate('- Select One -'), null);
+			$objManufacturerArray = Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription)));
+			if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
+				$objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
+				if (($this->objAssetModel->Manufacturer) && ($this->objAssetModel->Manufacturer->ManufacturerId == $objManufacturer->ManufacturerId))
+					$objListItem->Selected = true;
+				$this->lstManufacturer->AddItem($objListItem);
+			}
+		}
+
 		// Create the Image File Control
 		protected function ifcImage_Create() {
 			$this->ifcImage = new QImageFileControl($this);
