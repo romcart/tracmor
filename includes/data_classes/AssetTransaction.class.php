@@ -373,7 +373,7 @@
 					// When only a date is given, conversion to a timestamp assumes 12:00am
 					$strDateModifiedLast = QApplication::$Database[1]->SqlVariable($strDateModifiedLast->Timestamp, false) + 86399;
 					$arrSearchSql['strDateModifiedSql'] = sprintf("AND (UNIX_TIMESTAMP(`asset_transaction`.`modified_date`) > %s AND UNIX_TIMESTAMP(`asset_transaction`.`modified_date`) < %s", $strDateModifiedFirst, $strDateModifiedLast);
-					$arrSearchSql['strDateModifiedSql'] .= sprintf(" OR UNIX_TIMESTAMP(`asset_transaction`.`creation_date`) > %s AND UNIX_TIMESTAMP(`asset_transaction`.`creation_date`))\n", $strDateModifiedFirst, $strDateModifiedLast);
+					$arrSearchSql['strDateModifiedSql'] .= sprintf(" OR UNIX_TIMESTAMP(`asset_transaction`.`creation_date`) > %s AND UNIX_TIMESTAMP(`asset_transaction`.`creation_date`) < %s)\n", $strDateModifiedFirst, $strDateModifiedLast);
 				}
 			}
 			$strSortByDate = sprintf("
