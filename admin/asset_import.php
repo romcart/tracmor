@@ -408,7 +408,7 @@
               $strFirstRowArray = $this->FileCsvData->getRow(0);
               for ($i=0; $i<count($strFirstRowArray); $i++) {
                 $this->arrMapFields[$i] = array();
-                if ($this->blnHeaderRow) {
+                if ($this->blnHeaderRow && array_key_exists($i, $this->arrCsvHeader)) {
                 	if ($this->arrCsvHeader[$i] == '') {
                 		$this->arrCsvHeader[$i] = ' ';
                 	}
@@ -419,7 +419,7 @@
                   $this->lstMapHeader_Create($this, $i);
                 }
                 // Create Default Value TextBox, ListBox and DateTimePicker
-                if ($this->blnHeaderRow && $this->arrCsvHeader[$i] || !$this->blnHeaderRow) {
+                if ($this->blnHeaderRow && array_key_exists($i, $this->arrCsvHeader) && $this->arrCsvHeader[$i] || !$this->blnHeaderRow) {
                   $txtDefaultValue = new QTextBox($this);
                   $txtDefaultValue->Width = 200;
                   $this->txtMapDefaultValueArray[] = $txtDefaultValue;
