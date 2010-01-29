@@ -1137,7 +1137,7 @@
                           $strShortDescription = addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
                           $blnInList = false;
                           foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
-                					  if (strtolower($objCustomFieldValue->ShortDescription) == $strShortDescription) {
+                					  if (strtolower($objCustomFieldValue->ShortDescription) == strtolower($strShortDescription)) {
                      					//$intCustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
                     					$blnInList = true;
                     					break;
