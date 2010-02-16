@@ -220,7 +220,7 @@
 				$lblAssetImage->HoverTip = $objHoverTip;
 
 				// Load the AssetTransaction Array on the form so that it can be used by the hovertip panel
-				$objClauses = array();
+				/*$objClauses = array();
 				if ($objClause = QQ::LimitInfo(11, 0))
 					array_push($objClauses, $objClause);
 				if ($objClause = QQ::Expand(QQN::AssetTransaction()->Asset->AssetModel))
@@ -228,7 +228,31 @@
 				if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation));
 					array_push($objClauses, $objClause);
 				$objControl->Form->objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($this->TransactionId, $objClauses);
-				$objClauses = null;
+				$objClauses = null;*/
+				
+				$strQuery = sprintf("
+					SELECT
+					`asset_transaction__asset_id`.`asset_code` AS `asset_transaction__asset_id__asset_code`,
+					`asset_transaction__asset_id__asset_model_id`.`short_description` AS `asset_transaction__asset_id__asset_model_id__short_description`,
+					`asset_transaction__source_location_id`.`short_description` AS `asset_transaction__source_location_id__short_description`
+					FROM
+						`asset_transaction` AS `asset_transaction`
+						LEFT JOIN `asset` AS `asset_transaction__asset_id` ON `asset_transaction`.`asset_id` = `asset_transaction__asset_id`.`asset_id`
+						LEFT JOIN `asset_model` AS `asset_transaction__asset_id__asset_model_id` ON `asset_transaction__asset_id`.`asset_model_id` = `asset_transaction__asset_id__asset_model_id`.`asset_model_id`
+						LEFT JOIN `location` AS `asset_transaction__source_location_id` ON `asset_transaction`.`source_location_id` = `asset_transaction__source_location_id`.`location_id`
+					WHERE
+						`asset_transaction`.`transaction_id` = %s
+					LIMIT 11
+				", $this->TransactionId);
+				
+				$objDatabase = QApplication::$Database[1];
+
+		    // Perform the Query
+		    $objDbResult = $objDatabase->Query($strQuery);
+		    
+		    while ($mixRow = $objDbResult->FetchArray()) {
+		    	$objControl->Form->objAssetTransactionArray[] = $mixRow;
+		    }
 			}
 
 			// Create the Inventory Image label with corresponding inventory hovertip
@@ -243,13 +267,39 @@
 				$lblInventoryImage->HoverTip = $objHoverTip;
 
 				// Load the InventoryTransaction Array on the form so that it can be used by the hovertip panel
-				$objClauses = array();
+				/*$objClauses = array();
 				if ($objClause = QQ::LimitInfo(11, 0))
 					array_push($objClauses, $objClause);
 				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->InventoryLocation->InventoryModel));
 					array_push($objClauses, $objClause);
 				$objControl->Form->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->TransactionId, $objClauses);
-				$objClauses = null;
+				$objClauses = null;*/
+				
+				$strQuery = sprintf("
+				SELECT 
+					`inventory_transaction`.`quantity` AS `quantity`,
+					`inventory_transaction__inventory_location_id__location_id`.`short_description` AS `inventory_transaction__inventory_location_id__location_id__short_description`,
+					`inventory_transaction__inventory_location_id__inventory_model_id`.`inventory_model_code` AS `inventory_transaction__inventory_location_id__inventory_model_id__inventory_model_code`,
+					`inventory_transaction__inventory_location_id__inventory_model_id`.`short_description` AS `inventory_transaction__inventory_location_id__inventory_model_id__short_description`
+				FROM
+					`inventory_transaction` AS `inventory_transaction`
+					LEFT JOIN `inventory_location` AS `inventory_transaction__inventory_location_id` ON `inventory_transaction`.`inventory_location_id` = `inventory_transaction__inventory_location_id`.`inventory_location_id`
+					LEFT JOIN `location` AS `inventory_transaction__inventory_location_id__location_id` ON `inventory_transaction`.`source_location_id` = `inventory_transaction__inventory_location_id__location_id`.`location_id`
+					LEFT JOIN `inventory_model` AS `inventory_transaction__inventory_location_id__inventory_model_id` ON `inventory_transaction__inventory_location_id`.`inventory_model_id` = `inventory_transaction__inventory_location_id__inventory_model_id`.`inventory_model_id`
+				WHERE
+					`inventory_transaction`.`transaction_id` = %s
+				LIMIT 11
+				", $this->TransactionId);
+				
+				$objDatabase = QApplication::$Database[1];
+
+		    // Perform the Query
+		    $objDbResult = $objDatabase->Query($strQuery);
+		    
+		    while ($mixRow = $objDbResult->FetchArray()) {
+		    	$objControl->Form->objInventoryTransactionArray[] = $mixRow;
+		    }
+				
 			}
 
 			// Display the appropriate images

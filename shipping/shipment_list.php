@@ -93,6 +93,8 @@
 
 		protected function Form_Create() {
 			
+			//QApplication::$Database[1]->EnableProfiling();
+			
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
@@ -109,6 +111,10 @@
 			$this->lblAdvanced_Create();
 			$this->dtgShipment_Create();
 		}
+		
+		//protected function Form_Exit() {
+			//QApplication::$Database[1]->OutputProfiling();
+		//}
 		
 		protected function dtgShipment_Bind() {
 			
