@@ -38,6 +38,7 @@ if ($this->objInventoryTransactionArray) {
 			echo '<tr><td colspan="4">More ...</td></tr>';
 		}
 	}
+	$this->objInventoryTransactionArray = null;
 }
 ?>
 	</tbody>

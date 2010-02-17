@@ -37,6 +37,7 @@ if ($this->objAssetTransactionArray) {
 			echo '<tr><td colspan="3">More ...</td></tr>';
 		}
 	}
+	$this->objAssetTransactionArray = null;
 }
 
 	
