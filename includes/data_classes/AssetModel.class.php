@@ -106,7 +106,7 @@
 					`modified_date`
 				FROM
 					`asset_model`
-					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5
+					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5 AND `asset`.`location_id` != 6
 				WHERE
 					`asset_model_id` = %s
 				GROUP BY `asset_model_id`', $intAssetModelId);
@@ -182,7 +182,7 @@
 					%s
 				FROM
 					`asset_model` AS `asset_model`
-					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id`=`asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5
+					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id`=`asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5 AND `asset`.`location_id` != 6
 					%s
 				GROUP BY `asset_model_id`
 				%s
@@ -207,7 +207,8 @@
 				WHERE
 					`asset` . `asset_model_id` %s AND
 					`asset`.`location_id` != 2 AND
-					`asset`.`location_id` != 5
+					`asset`.`location_id` != 5 AND
+					`asset`.`location_id` != 6
 			', $intAssetModelId);
 
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -349,7 +350,7 @@
 					%s
 				FROM
 					`asset_model` AS `asset_model`
-					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5
+					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5 AND `asset`.`location_id` != 6
 					%s
 					%s
 					%s
@@ -416,7 +417,7 @@
 					%s
 				FROM
 					`asset_model` AS `asset_model`
-					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5
+					LEFT JOIN `asset` AS `asset` ON `asset_model`.`asset_model_id` = `asset`.`asset_model_id` AND `asset`.`location_id` != 2 AND `asset`.`location_id` != 5 AND `asset`.`location_id` != 6
 					%s
 					%s
 					%s
