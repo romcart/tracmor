@@ -1193,8 +1193,10 @@
                 $objDatabase->NonQuery($strQuery);
                 $intInsertId = $objDatabase->InsertId();
                 if ($intInsertId) {
+                	$strAssetIdArray = array();
                   for ($i=0; $i<$intAssetCount; $i++) {
                     $strAssetCFVArray[$i] = sprintf("('%s', %s)", $intInsertId+$i, $strAssetCFVArray[$i]);
+                    $strAssetIdArray[$i] = sprintf("(%s)", $intInsertId+$i);
                   }
                   $strCFVNameArray = array();
                   foreach ($arrAssetCustomField as $objCustomField) {
@@ -1203,7 +1205,7 @@
                   if (count($strAssetCFVArray) > 0 && count($strCFVNameArray) > 0)  {
                   	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", implode(", ", $strCFVNameArray), implode(", ", $strAssetCFVArray));
                   } else {
-                  	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES ('%s')", $intInsertId);
+                  	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES %s", implode(", ", $strAssetIdArray));
                   }
                   $objDatabase->NonQuery($strQuery);
                   for ($i=0; $i<$intAssetCount; $i++) {
