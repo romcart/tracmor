@@ -707,14 +707,22 @@ class QInventoryEditComposite extends QControl {
 	public function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
 		try {
+			// Get an instance of the database
+			$objDatabase = QApplication::$Database[1];
+			// Begin a MySQL Transaction to be either committed or rolled back
+			$objDatabase->TransactionBegin();
 			$objCustomFieldArray = $this->objInventoryModel->objCustomFieldArray;
 			$this->objInventoryModel->Delete();
 			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 			// The values do not get deleted for select values
 			// CustomField::DeleteTextValues($objCustomFieldArray);
+			// Commit the transaction to the database
+			$objDatabase->TransactionCommit();
 			QApplication::Redirect('inventory_model_list.php');
 		}
 		catch (QDatabaseExceptionBase $objExc) {
+			// Roll back the transaction from the database
+			$objDatabase->TransactionRollback();
 			if ($objExc->ErrorNumber == 1451) {
 				$this->btnDelete->Warning = 'This inventory model cannot be deleted because it is associated with one or more transactions.';
 			}
