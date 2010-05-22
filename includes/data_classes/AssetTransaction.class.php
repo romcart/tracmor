@@ -416,7 +416,6 @@
           %s
           %s
           %s
-          OR `asset_transaction__asset_id`.`archived_flag` is TRUE
         ORDER BY
           %s
           `transaction_id`,
