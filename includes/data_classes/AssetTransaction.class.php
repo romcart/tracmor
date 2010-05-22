@@ -563,7 +563,6 @@
           %s
           %s
           %s
-          OR `asset_transaction__asset_id`.`archived_flag` is TRUE
       ', $objQueryExpansion->GetFromSql("", "\n					"),
         $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql']
        );
