@@ -869,7 +869,7 @@ ALTER TABLE inventory_location
   ADD CONSTRAINT FOREIGN KEY( inventory_model_id) references inventory_model (
     inventory_model_id
   )
-ON Delete NO ACTION ON Update NO ACTION;
+ON Delete CASCADE ON Update NO ACTION;
 
 ALTER TABLE user_account
   ADD CONSTRAINT FOREIGN KEY( created_by) references user_account (
@@ -1091,7 +1091,7 @@ ALTER TABLE inventory_transaction
   ADD CONSTRAINT FOREIGN KEY( inventory_location_id) references inventory_location (
     inventory_location_id
   )
-ON Delete NO ACTION ON Update NO ACTION;
+ON Delete CASCADE ON Update NO ACTION;
 
 ALTER TABLE transaction
   ADD CONSTRAINT FOREIGN KEY( entity_qtype_id) references entity_qtype (
