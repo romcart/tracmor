@@ -384,10 +384,10 @@
                 fclose($file_part);
               }
             }
-            $this->intTotalCount = $i*200 + $j-1;
+            $this->intTotalCount = ($i-1)*200 + $j-1;
             if (QApplication::$TracmorSettings->AssetLimit != null && QApplication::$TracmorSettings->AssetLimit < ($this->intTotalCount + Asset::CountAll())) {
               $blnError = true;
-              $this->btnNext->Warning = "Sorry that is too many assets. Your asset limit is = " . QApplication::$TracmorSettings->AssetLimit . ", this import has " . ($this->intTotalCount) . " assets, and you already have " . Asset::CountAll() . " assets in the database.";
+              $this->btnNext->Warning = $i . " " . $j . "Sorry that is too many assets. Your asset limit is = " . QApplication::$TracmorSettings->AssetLimit . ", this import has " . ($this->intTotalCount) . " assets, and you already have " . Asset::CountAll() . " assets in the database.";
             }
             else {
               $this->arrMapFields = array();
