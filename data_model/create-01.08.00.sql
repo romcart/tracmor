@@ -693,6 +693,7 @@ CREATE TABLE attachment (
   creation_date   DATETIME   NOT NULL,
     PRIMARY KEY ( attachment_id ),
     INDEX attachment_fkindex1 ( entity_qtype_id ),
+    INDEX ( entity_id ),
     INDEX attachment_fkindex2 ( created_by ))
 TYPE = INNODB;
 
