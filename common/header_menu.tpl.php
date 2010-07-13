@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c)  2009, Tracmor, LLC 
+ * Copyright (c)  2006, Universal Diagnostic Solutions, Inc. 
  *
  * This file is part of Tracmor.  
  *
@@ -25,20 +25,20 @@
 	<table width="100%" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
-				<table cellpadding="0" cellspacing="0" width="100%" style="background:url(../images/main_header_bg.png)">
+				<table cellpadding="0" cellspacing="0" width="100%" style="background:url(../images/main_header_bg.png); background-repeat: repeat-x;">
 					<tr style="height:64px">
 						<td>
-							<table cellpadding="0" cellspacing="0">
+							<table cellpadding="0" cellspacing="0" style="width:100%;">
 								<tr>
 									<td style="padding-left:15px;padding-top:6px;"><?php $this->lblLogo->Render(); ?></td>
-									<td style="padding-right:10px;text-align:right;" align="right" width="100%" valign="top"><a href="<?php print '../preferences/'; ?>" style="color:#555555;font-family:arial;font-size:12px;text-decoration:none;font-weight:bold;">Preferences</a>&nbsp;&nbsp;|&nbsp;&nbsp;<?php $this->lblSignOut->Render(); ?></td>
+									<td style="padding-right:10px;text-align:right;" align="right" width="100%" valign="top"><a href="http://www.tracmor.com/whatsnew.html" target="_blank" style="color:#214478;font-family:arial;font-size:12px;text-decoration:none;font-weight:bold;">New Features</a>&nbsp;&nbsp;|&nbsp;&nbsp;<?php $this->lblSignOut->Render(); ?></td>
 								</tr>
 							</table>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<table cellpadding="0" cellspacing="0">
+							<table cellpadding="0" cellspacing="0" style="width:100%;">
 								<tr style="height:24px">
 									<td style="width:15px;background-image: url(../images/emptyTabSpace.gif); background-repeat:repeat-x;"><img src="../images/empty.gif" width="15" height="1"></td>
 									<?php

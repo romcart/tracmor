@@ -23,7 +23,7 @@
 	$this->RenderBegin();
 ?>
 
-<table cellpadding="0" cellspacing="0" width="100%" style="background:url(../images/main_header_bg.png)">
+<table cellpadding="0" cellspacing="0" width="100%" style="background:url(../images/main_header_bg.png); background-repeat: repeat-x;">
 	<tr style="height:40px">
 		<td>
 			<table cellpadding="0" cellspacing="0">
@@ -36,7 +36,7 @@
 	</tr>
 	<tr>
 		<td>
-			<table cellpadding="0" cellspacing="0">
+			<table cellpadding="0" cellspacing="0" style="width:100%;">
 				<tr style="height:24px">
 					<td style="width:15px;background-image: url(../images/emptyTabSpace.gif); background-repeat:repeat-x;"><img src="../images/empty.gif" width="15" height="1"></td>
 						<!--echo(sprintf('<td class="%sleft"><img src="../images/empty.gif" width="12" height="1"></td>', $strTabClass));
@@ -124,5 +124,6 @@
 	</tr>
 </table>
 
+<table align='center' cellpadding='5'><tr><td bgcolor='#CCCCCC'><strong>PHP Version:</strong></td><td bgcolor='#EEEEEE'><?php _p(phpversion()) ?></td></tr><tr><td bgcolor='#CCCCCC'><strong>MySql Version:</strong></td><td bgcolor='#EEEEEE'><?php _p(mysqli_get_client_info()); ?></td></tr><tr><td bgcolor='#CCCCCC'><strong>Qcodo Version:</strong></td><td bgcolor='#EEEEEE'><?php _p(QCODO_VERSION); ?></td></tr><tr><td bgcolor='#CCCCCC'><strong>Build Date:</strong></td><td bgcolor='#EEEEEE'>Tue Jul 13 12:25:14 PDT 2010</td></tr></table>
 <?php $this->RenderEnd(); ?>
 <?php require_once(__INCLUDES__ . '/footer.inc.php'); ?>
