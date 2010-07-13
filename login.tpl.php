@@ -1,6 +1,6 @@
 <?php
 /*
-	 * Copyright (c)  2009, Tracmor, LLC 
+	 * Copyright (c)  2010, Tracmor, LLC 
 	 *
 	 * This file is part of Tracmor.  
 	 *
@@ -124,6 +124,5 @@
 	</tr>
 </table>
 
-<table align='center' cellpadding='5'><tr><td bgcolor='#CCCCCC'><strong>PHP Version:</strong></td><td bgcolor='#EEEEEE'><?php _p(phpversion()) ?></td></tr><tr><td bgcolor='#CCCCCC'><strong>MySql Version:</strong></td><td bgcolor='#EEEEEE'><?php _p(mysqli_get_client_info()); ?></td></tr><tr><td bgcolor='#CCCCCC'><strong>Qcodo Version:</strong></td><td bgcolor='#EEEEEE'><?php _p(QCODO_VERSION); ?></td></tr><tr><td bgcolor='#CCCCCC'><strong>Build Date:</strong></td><td bgcolor='#EEEEEE'>Tue Jul 13 12:25:14 PDT 2010</td></tr></table>
 <?php $this->RenderEnd(); ?>
 <?php require_once(__INCLUDES__ . '/footer.inc.php'); ?>
