@@ -71,7 +71,10 @@
 			} else {
 				$strToReturn .= sprintf('%s %s', $this->strCity, $this->PostalCode);	
 			}
-			
+
+			// include country as well
+			$strToReturn .= sprintf('<br/>%s', $this->Country->ShortDescription);
+
 			return $strToReturn;
 		}
 		
