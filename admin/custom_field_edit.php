@@ -498,24 +498,32 @@
 				}
 			}
 		}		
-		
+
 		// Create a new CustomFieldValue when the Add button is clicked
 		protected function btnAdd_Click($strFormId, $strControlId, $strParameter) {
-			
-			$objCustomFieldValue = new CustomFieldValue();
-			$objCustomFieldValue->CustomFieldId = $this->objCustomField->CustomFieldId;
-			$objCustomFieldValue->ShortDescription = $this->txtValue->Text;
-			$objCustomFieldValue->Save();
-			
-			$this->lstDefaultValue->AddItem(new QListItem($objCustomFieldValue->ShortDescription, $objCustomFieldValue->CustomFieldValueId));
-			$this->txtValue->Text = '';
-			
-			if ($this->lstDefaultValue->ItemCount > 0 && $this->chkRequiredFlag->Enabled == false) {
-				$this->chkActiveFlag->Enabled = true;
-				$this->chkRequiredFlag->Enabled = true;
+
+			$blnError = false;
+			if (strlen(trim($this->txtValue->Text)) == 0) {
+				$blnError = true;
+				$this->txtValue->Warning = QApplication::Translate('You can not enter blank selection option.');
+			}
+
+			if (!$blnError) {
+				$objCustomFieldValue = new CustomFieldValue();
+				$objCustomFieldValue->CustomFieldId = $this->objCustomField->CustomFieldId;
+				$objCustomFieldValue->ShortDescription = $this->txtValue->Text;
+				$objCustomFieldValue->Save();
+				
+				$this->lstDefaultValue->AddItem(new QListItem($objCustomFieldValue->ShortDescription, $objCustomFieldValue->CustomFieldValueId));
+				$this->txtValue->Text = '';
+				
+				if ($this->lstDefaultValue->ItemCount > 0 && $this->chkRequiredFlag->Enabled == false) {
+					$this->chkActiveFlag->Enabled = true;
+					$this->chkRequiredFlag->Enabled = true;
+				}
 			}
 		}
-		
+
 		// Control AjaxActions
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 			

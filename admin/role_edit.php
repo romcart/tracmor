@@ -726,40 +726,63 @@ protected function pnlAssets_Create($intModule){
 
 	// Control ServerActions
 	protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
-		try {
+		
+		$blnError = false;
 
-			// Get an instance of the database
-			$objDatabase = QApplication::$Database[1];
-			// Begin a MySQL Transaction to be either committed or rolled back
-			$objDatabase->TransactionBegin();
-
-			// Update the role fields
-			$this->UpdateRoleFields();
-
-			// Save the role
-			$this->objRole->Save();
-
-			// Update the authorizations for this role
-			// This must be done after saving the Role. If it is new, we need a RoleId first.
-			$this->UpdateAuthorizations();
-
-			// Update the Role Field Authorization for this role
-			$this->UpdateFieldLevelAuthorizations();
-
-			// Update the Role Transaction Level Authorization for this role
-			$this->UpdateTransactionLevelAuthorizations();
-
-			// Commit the transaction to the database
-			$objDatabase->TransactionCommit();
-
-			QApplication::Redirect('role_list.php');
+		// Do not allow empty/whitespace for role name
+		if (!trim($this->txtShortDescription->Text)) {
+			$blnError = true;
+			$this->txtShortDescription->Warning = QApplication::Translate('You must enter a Role Name.');
 		}
-		catch (QExtendedOptimisticLockingException $objExc) {
-
-			// Roll back the transaction from the database
-			$objDatabase->TransactionRollback();
-
-			$this->btnCancel->Warning = sprintf('This role has been updated by another user. You must <a href="role_edit.php?intRoleId=%s">Refresh</a> to edit this role.', $this->objRole->RoleId);
+		
+		// Role Duplicate checks
+		if ($this->blnEditMode) {
+			$objRoleDuplicate = Role::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::Role()->ShortDescription, trim($this->txtShortDescription->Text)), QQ::NotEqual(QQN::Role()->RoleId, $this->objRole->RoleId)));
+		} else {
+			$objRoleDuplicate = Role::QuerySingle(QQ::Equal(QQN::Role()->ShortDescription, trim($this->txtShortDescription->Text)));
+		}
+		
+		if ($objRoleDuplicate) {
+			$blnError = true;
+			$this->txtShortDescription->Warning = QApplication::Translate('That Role Name is already in use.');
+		}				
+		
+		if (!$blnError) {
+			try {
+	
+				// Get an instance of the database
+				$objDatabase = QApplication::$Database[1];
+				// Begin a MySQL Transaction to be either committed or rolled back
+				$objDatabase->TransactionBegin();
+	
+				// Update the role fields
+				$this->UpdateRoleFields();
+	
+				// Save the role
+				$this->objRole->Save();
+	
+				// Update the authorizations for this role
+				// This must be done after saving the Role. If it is new, we need a RoleId first.
+				$this->UpdateAuthorizations();
+	
+				// Update the Role Field Authorization for this role
+				$this->UpdateFieldLevelAuthorizations();
+	
+				// Update the Role Transaction Level Authorization for this role
+				$this->UpdateTransactionLevelAuthorizations();
+	
+				// Commit the transaction to the database
+				$objDatabase->TransactionCommit();
+	
+				QApplication::Redirect('role_list.php');
+			}
+			catch (QExtendedOptimisticLockingException $objExc) {
+	
+				// Roll back the transaction from the database
+				$objDatabase->TransactionRollback();
+	
+				$this->btnCancel->Warning = sprintf('This role has been updated by another user. You must <a href="role_edit.php?intRoleId=%s">Refresh</a> to edit this role.', $this->objRole->RoleId);
+			}
 		}
 	}
 	protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
