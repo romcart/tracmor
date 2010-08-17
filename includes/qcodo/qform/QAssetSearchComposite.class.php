@@ -56,6 +56,7 @@ class QAssetSearchComposite extends QControl {
 	protected $intReservedBy;
 	protected $intCheckedOutBy;
 	protected $strDateModified;
+	protected $strModifiedCreated;
 	protected $strDateModifiedFirst;
 	protected $strDateModifiedLast;
 	protected $blnAttachment;
@@ -255,6 +256,7 @@ class QAssetSearchComposite extends QControl {
 		$intReservedBy = $this->intReservedBy;
 		$intCheckedOutBy = $this->intCheckedOutBy;
 		$strShortDescription = $this->strShortDescription;
+		$strModifiedCreated = $this->strModifiedCreated;
 		$strDateModifiedFirst = $this->strDateModifiedFirst;
 		$strDateModifiedLast = $this->strDateModifiedLast;
 		$strDateModified = $this->strDateModified;
@@ -275,12 +277,12 @@ class QAssetSearchComposite extends QControl {
     $objExpansionMap[Asset::ExpandLocation] = true;
 		//if ($this->blnSearch || !$this->blnUseAjax) {
 		if ((!$this->objParentControl && $this->Display == true) || $this->objParentControl->Display == true) {
-			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
+			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
 			if ($this->dtgAsset->TotalItemCount == 0) {
 				$this->dtgAsset->ShowHeader = false;
 			}
 			else {
-				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
+				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
 				$this->dtgAsset->ShowHeader = true;
 			}
 		}
@@ -444,6 +446,7 @@ class QAssetSearchComposite extends QControl {
 	  	$this->intReservedBy = null;
 	  	$this->intCheckedOutBy = null;
 	  	$this->strDateModified = null;
+	  	$this->strModifiedCreated = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
 	  	$this->blnAttachment = false;
@@ -489,6 +492,7 @@ class QAssetSearchComposite extends QControl {
 		$this->strAssetModelCode = $this->ctlAdvanced->AssetModelCode;
 		$this->intReservedBy = $this->ctlAdvanced->ReservedBy;
 		$this->intCheckedOutBy = $this->ctlAdvanced->CheckedOutBy;
+		$this->strModifiedCreated = $this->ctlAdvanced->ModifiedCreated;
 		$this->strDateModified = $this->ctlAdvanced->DateModified;
 		$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 		$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;

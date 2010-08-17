@@ -47,7 +47,14 @@
 		$arrAdvancedSearchFields[] = array('name' => 'Date Received:', 'value' => $this->dtpReceiptDate->RenderWithError(false));
 	}
 
-	$arrAdvancedSearchFields[] = array('name' => 'Date Modified:',   'value' => $this->lstDateModified->RenderWithError(false));
+	
+	
+	if (get_class($this->objParentObject) == 'AssetListForm') {
+		$arrAdvancedSearchFields[] = array('name' => 'Date:',   'value' => $this->lstDateModified->RenderWithError(false));
+		$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->lstModifiedCreated->RenderWithError(false));
+	} else {
+		$arrAdvancedSearchFields[] = array('name' => 'Date Modified:',   'value' => $this->lstDateModified->RenderWithError(false));
+	}
 	$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->dtpDateModifiedFirst->RenderWithError(false));
 	$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->dtpDateModifiedLast->RenderWithError(false));
 	$arrAdvancedSearchFields[] = array('name' => 'Attachment(s)', 'value' => $this->chkAttachment->RenderWithError(false));
