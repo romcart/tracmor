@@ -48,8 +48,7 @@
 	}
 
 	
-	
-	if (get_class($this->objParentObject) == 'AssetListForm') {
+	if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
 		$arrAdvancedSearchFields[] = array('name' => 'Date:',   'value' => $this->lstDateModified->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->lstModifiedCreated->RenderWithError(false));
 	} else {
