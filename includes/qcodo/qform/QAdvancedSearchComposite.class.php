@@ -289,7 +289,7 @@ class QAdvancedSearchComposite extends QControl {
 		
 		$this->lstModifiedCreated = new QRadioButtonList($this);
 		$this->lstModifiedCreated->Name = '';
-		$this->lstModifiedCreated->AddItem(new QListItem('Created', 'creation_date'));
+		$this->lstModifiedCreated->AddItem(new QListItem('Created', 'creation_date', true));
 		$this->lstModifiedCreated->AddItem(new QListItem('Last Modified', 'modified_date'));
 		$this->lstModifiedCreated->Enabled = false;
   }
