@@ -291,7 +291,6 @@ class QAdvancedSearchComposite extends QControl {
 		$this->lstModifiedCreated->Name = '';
 		$this->lstModifiedCreated->AddItem(new QListItem('Created', 'creation_date', true));
 		$this->lstModifiedCreated->AddItem(new QListItem('Last Modified', 'modified_date'));
-		$this->lstModifiedCreated->Enabled = false;
   }
 
 	protected function dtpShipmentDate_Create() {
@@ -326,22 +325,18 @@ class QAdvancedSearchComposite extends QControl {
 	public function lstDateModified_Select($strFormId, $strControlId, $strParameter) {
 		$value = $this->lstDateModified->SelectedValue;
 		if ($value == null) {
-			$this->lstModifiedCreated->Enabled = false;
 			$this->dtpDateModifiedFirst->Enabled = false;
 			$this->dtpDateModifiedLast->Enabled = false;
 		}
 		elseif ($value == 'before') {
-			$this->lstModifiedCreated->Enabled = true;
 			$this->dtpDateModifiedFirst->Enabled = true;
 			$this->dtpDateModifiedLast->Enabled = false;
 		}
 		elseif ($value == 'after') {
-			$this->lstModifiedCreated->Enabled = true;
 			$this->dtpDateModifiedFirst->Enabled = true;
 			$this->dtpDateModifiedLast->Enabled = false;
 		}
 		elseif ($value == 'between') {
-			$this->lstModifiedCreated->Enabled = true;
 			$this->dtpDateModifiedFirst->Enabled = true;
 			$this->dtpDateModifiedLast->Enabled = true;
 		}
@@ -353,7 +348,6 @@ class QAdvancedSearchComposite extends QControl {
 			$this->lstCheckedOutBy->SelectedIndex = 0;
 			$this->lstReservedBy->SelectedIndex = 0;
 			$this->lstModifiedCreated->SelectedIndex = 0;
-			$this->lstModifiedCreated->Enabled = false;
 		}
 		if ($this->objParentObject instanceof ShipmentListForm) {
 			$this->txtTrackingNumber->Text = '';
