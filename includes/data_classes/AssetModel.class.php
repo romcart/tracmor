@@ -50,7 +50,7 @@
 		 * @return string a nicely formatted string representation of this object
 		 */
 		public function __toString() {
-      return sprintf($this->strShortDescription);
+			return $this->strShortDescription;
 		}
 		public function __toStringWithLink($cssClass=null) {
 			return sprintf('<a href="../assets/asset_model_edit.php?intAssetModelId=%s" class="%s">%s</a>',

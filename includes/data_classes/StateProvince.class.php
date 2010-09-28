@@ -46,7 +46,7 @@
 		 * @return string a nicely formatted string representation of this object
 		 */
 		public function __toString() {
-			return sprintf($this->ShortDescription);
+			return $this->ShortDescription;
 		}
 	}
 ?>

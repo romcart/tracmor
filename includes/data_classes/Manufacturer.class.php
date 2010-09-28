@@ -49,7 +49,7 @@
 		 * @return string a nicely formatted string representation of this object
 		 */
 		public function __toString() {
-			return sprintf($this->strShortDescription);
+			return $this->strShortDescription;
 		}
 
 		public function __toStringWithLink() {

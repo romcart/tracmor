@@ -50,7 +50,7 @@
 		 * @return string a nicely formatted string representation of this object
 		 */
 		public function __toString() {
-			return sprintf($this->strInventoryModelCode);
+			return $this->strInventoryModelCode;
 		}
 
 		public function __toStringQuantity() {

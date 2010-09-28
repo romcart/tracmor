@@ -46,7 +46,7 @@
 		 * @return string a nicely formatted string representation of this object
 		 */
 		public function __toString() {
-			return sprintf($this->strShortDescription);
+			return $this->strShortDescription;
 		}
 
 		// This adds the created by and creation date before saving a new location
