@@ -1,5 +1,8 @@
 <?php
 	class QDataGrid extends QDataGridBase  {
+		protected $intCellSpacing = 0;
+		protected $intCellPadding = 0;
+
 		///////////////////////////
 		// DataGrid Preferences
 		///////////////////////////
@@ -303,7 +306,7 @@
 					}
 
 					// Restore the original error handler
-					set_error_handler("QcodoHandleError");
+					set_error_handler("__qcodo_handle_error");
 					$__exc_dtg_errstr = null;
 					unset($__exc_dtg_errstr);
 				} else {

@@ -36,7 +36,7 @@
 
 		// For multiple-select based listboxes, you can define the way a "Reset" button should look
 		protected function GetResetButtonHtml() {
-			$strToReturn = sprintf(' <a href="javascript:__resetListBox(%s, %s)" style="font-family: verdana, arial, helvetica; font-size: 8pt; text-decoration: none;">%s</a>',
+			$strToReturn = sprintf(' <a href="#" onclick="__resetListBox(%s, %s); return false;" class="listboxReset">%s</a>',
 				"'" . $this->Form->FormId . "'",
 				"'" . $this->strControlId . "'",
 				QApplication::Translate('Reset'));
