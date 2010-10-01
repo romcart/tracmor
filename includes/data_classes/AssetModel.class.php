@@ -507,15 +507,10 @@
 		 * @param string $strAliasPrefix
 		 * @return AssetModel
 		*/
-
-		public static function InstantiateDbRow($objDbRow, $strAliasPrefix = null, $strExpandAsArrayNodes = null, $objPreviousItem = null) {
-
-			$objToReturn = parent::InstantiateDbRow($objDbRow, $strAliasPrefix, $strExpandAsArrayNodes, $objPreviousItem);
+		public static function InstantiateDbRow($objDbRow, $strAliasPrefix = null, $strExpandAsArrayNodes = null, $objPreviousItem = null, $strColumnAliasArray = array()) {
+			$objToReturn = parent::InstantiateDbRow($objDbRow, $strAliasPrefix, $strExpandAsArrayNodes, $objPreviousItem, $strColumnAliasArray);
 			$objToReturn->intAssetCount = $objDbRow->GetColumn($strAliasPrefix . 'asset_count', 'Integer');
-
 			return $objToReturn;
-
 		}
-
 	}
 ?>

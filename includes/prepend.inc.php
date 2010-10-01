@@ -62,5 +62,6 @@
 		 * be placed in the includes/auto_includes directory.  Files in there will be loaded/run in alphabetical
 		 * order during QApplication::Initialize()
 		 */
+		require(dirname(__FILE__) . '/configuration_tracmor.inc.php');
 	}
 ?>
