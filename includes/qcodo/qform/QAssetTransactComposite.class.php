@@ -197,7 +197,7 @@ class QAssetTransactComposite extends QControl {
     // Enable Pagination, and set to 20 items per page
     $objPaginator = new QPaginator($this->dtgAssetTransact);
     $this->dtgAssetTransact->Paginator = $objPaginator;
-    $this->dtgAssetTransact->ItemsPerPage = 2;
+    $this->dtgAssetTransact->ItemsPerPage = 20;
 
     $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
     $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => 200, 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
