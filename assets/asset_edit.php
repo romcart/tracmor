@@ -138,9 +138,13 @@
 				// Specify the local databind method this datagrid will use
 				$this->ctlAssetEdit->dtgShipmentReceipt->SetDataBinder('dtgShipmentReceipt_Bind');
 			}
+			
+			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
+				$this->ctlAssetTransact->dtgAssetTransact->SetDataBinder('dtgAssetTransact_Bind');
+			}
 
 			// If assets are in the array, finish setting up the datagrid of assets prepared for a transaction
-			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
+/*			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
 				if ($this->ctlAssetTransact->objAssetArray) {
 					$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = count($this->ctlAssetTransact->objAssetArray);
 					$this->ctlAssetTransact->dtgAssetTransact->DataSource = $this->ctlAssetTransact->objAssetArray;
@@ -150,7 +154,7 @@
 					$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = 0;
 					$this->ctlAssetTransact->dtgAssetTransact->ShowHeader = false;
 				}
-			}
+			}*/
 
 			if (!$this->intTransactionTypeId && $this->ctlAssetEdit->Display) {
         $this->dtgChildAssets->SetDataBinder('dtgChildAssets_Bind');
@@ -296,6 +300,28 @@
 				$objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6), QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 7)));
 
 				$this->ctlAssetEdit->dtgShipmentReceipt->DataSource = AssetTransaction::QueryArray($objCondition, $objClauses);
+			}
+		}
+		
+		protected function dtgAssetTransact_Bind() {
+			
+			// If assets are in the array, finish setting up the datagrid of assets prepared for a transaction
+			if ($this->ctlAssetTransact->objAssetArray) {
+				// ItemOffset only exists in QCodo4 and beyond. When merging with Q4 we can use this to calculate intItemOffset instead of the line two lines below it.
+				//$intItemOffset = $this->ctlAssetTransact->dtgAssetTransact->ItemOffset;
+				$intItemsPerPage = $this->ctlAssetTransact->dtgAssetTransact->ItemsPerPage;
+				$intItemOffset = ($this->ctlAssetTransact->dtgAssetTransact->PageNumber - 1) * $intItemsPerPage;
+				
+				$arrDataSource = array_slice($this->ctlAssetTransact->objAssetArray, $intItemOffset, $intItemsPerPage);
+				
+				$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = count($this->ctlAssetTransact->objAssetArray);
+				// $this->ctlAssetTransact->dtgAssetTransact->DataSource = $this->ctlAssetTransact->objAssetArray;
+				$this->ctlAssetTransact->dtgAssetTransact->DataSource = $arrDataSource;
+				$this->ctlAssetTransact->dtgAssetTransact->ShowHeader = true;
+			}
+			else {
+				$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = 0;
+				$this->ctlAssetTransact->dtgAssetTransact->ShowHeader = false;
 			}
 		}
 

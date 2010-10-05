@@ -197,11 +197,11 @@ class QAssetTransactComposite extends QControl {
     // Enable Pagination, and set to 20 items per page
     $objPaginator = new QPaginator($this->dtgAssetTransact);
     $this->dtgAssetTransact->Paginator = $objPaginator;
-    $this->dtgAssetTransact->ItemsPerPage = 20;
+    $this->dtgAssetTransact->ItemsPerPage = 2;
 
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetModel->ShortDescription, false), 'Width' => 200, 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Current Location', '<?= $_ITEM->Location->__toString() ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->Location->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => 200, 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Current Location', '<?= $_ITEM->Location->__toString() ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
     $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 
 /*    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false"'));
@@ -406,6 +406,7 @@ class QAssetTransactComposite extends QControl {
 					  }
 					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 					}
+					$this->dtgAssetTransact->Refresh();
 				}
 			}
 		}
