@@ -464,10 +464,17 @@
 
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
 		protected function Form_PreRender() {
-
+			
+			$this->dtgAssetTransact->SetDataBinder('dtgAssetTransact_Bind');
+			
+			$this->dtgInventoryTransact->SetDataBinder('dtgInventoryTransact_Bind');
+			
+		}
+		
+		protected function dtgAssetTransact_Bind() {
 			// Load the data for the AssetTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyAssets || $this->blnEditMode) {
-				$this->blnModifyAssets = false;
+				//$this->blnModifyAssets = false;
 				$this->dtgAssetTransact->TotalItemCount = count($this->objAssetTransactionArray);
 				if ($this->dtgAssetTransact->TotalItemCount > 0) {
 				  // Create new array without child assets
@@ -479,20 +486,31 @@
 				  }
 				  $this->dtgAssetTransact->TotalItemCount = count($objAssetTransactionArray);
 					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;*/
-					$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
+				  $intItemsPerPage = $this->dtgAssetTransact->ItemsPerPage;
+					$intItemOffset = ($this->dtgAssetTransact->PageNumber - 1) * $intItemsPerPage;
+					$arrDataSource = array_slice($this->objAssetTransactionArray, $intItemOffset, $intItemsPerPage);
+					//$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
+					$this->dtgAssetTransact->DataSource = $arrDataSource;
 					$this->dtgAssetTransact->ShowHeader = true;
 				}
 				else {
 					$this->dtgAssetTransact->ShowHeader = false;
 				}
 			}
-
+		}
+		
+		protected function dtgInventoryTransact_Bind() {
 			// Load the data for the InventoryTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyInventory || $this->blnEditMode) {
-				$this->blnModifyInventory = false;
+				//$this->blnModifyInventory = false;
+				$intItemsPerPage = $this->dtgInventoryTransact->ItemsPerPage;
+				$intItemOffset = ($this->dtgInventoryTransact->PageNumber - 1) * $intItemsPerPage;
+				$arrDataSource = array_slice($this->objInventoryTransactionArray, $intItemOffset, $intItemsPerPage);
+				
 				$this->dtgInventoryTransact->TotalItemCount = count($this->objInventoryTransactionArray);
 				if ($this->dtgInventoryTransact->TotalItemCount > 0) {
-					$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
+					//$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
+					$this->dtgInventoryTransact->DataSource = $arrDataSource;
 					$this->dtgInventoryTransact->ShowHeader = true;
 				}
 				else {
@@ -2886,7 +2904,9 @@
   						$objLinkedAssetTransaction->SourceLocationId = $objCheckedLinkedAsset->LocationId;
   						$this->objAssetTransactionArray[] = $objLinkedAssetTransaction;
 						}
+						
 					}
+					$this->dtgAssetTransact->Refresh();
 				}
 			}
 			else {
@@ -3157,6 +3177,7 @@
 							}
 						}
 					}
+					$this->dtgInventoryTransact->Refresh();
 				}
 			}
 			else {
