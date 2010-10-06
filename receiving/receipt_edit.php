@@ -261,10 +261,52 @@
 
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
 		protected function Form_PreRender() {
+			
+			$this->dtgAssetTransact->SetDataBinder('dtgAssetTransact_Bind');
+			
+			$this->dtgInventoryTransact->SetDataBinder('dtgInventoryTransact_Bind');
 
 			// Load the data for the AssetTransact datagrid
+//			if ($this->blnModifyAssets || $this->blnEditMode) {
+//				$this->blnModifyAssets = false;
+//				$this->dtgAssetTransact->TotalItemCount = count($this->objAssetTransactionArray);
+//				if ($this->dtgAssetTransact->TotalItemCount > 0) {
+//				  // Create new array without child assets
+////				  $objAssetTransactionArray = array();
+////				  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+////				    if (!$objAssetTransaction->Asset->LinkedFlag) {
+////				      $objAssetTransactionArray[] = $objAssetTransaction;
+////				    }
+////				  }
+////				  $this->dtgAssetTransact->TotalItemCount = count($objAssetTransactionArray);
+////					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;
+//					$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
+//					$this->dtgAssetTransact->ShowHeader = true;
+//				}
+//				else {
+//					$this->dtgAssetTransact->ShowHeader = false;
+//				}
+//			}
+//
+//			// Load the data for the InventoryTransact datagrid
+//			if ($this->blnModifyInventory || $this->blnEditMode) {
+//				$this->blnModifyInventory = false;
+//				$this->dtgInventoryTransact->TotalItemCount = count($this->objInventoryTransactionArray);
+//				if ($this->dtgInventoryTransact->TotalItemCount > 0) {
+//					$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
+//					$this->dtgInventoryTransact->ShowHeader = true;
+//				}
+//				// Do not show the header if there are no items in the datagrid
+//				else {
+//					$this->dtgInventoryTransact->ShowHeader = false;
+//				}
+//			}
+		}
+		
+		protected function dtgAssetTransact_Bind() {
+			// Load the data for the AssetTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyAssets || $this->blnEditMode) {
-				$this->blnModifyAssets = false;
+				//$this->blnModifyAssets = false;
 				$this->dtgAssetTransact->TotalItemCount = count($this->objAssetTransactionArray);
 				if ($this->dtgAssetTransact->TotalItemCount > 0) {
 				  // Create new array without child assets
@@ -276,23 +318,33 @@
 				  }
 				  $this->dtgAssetTransact->TotalItemCount = count($objAssetTransactionArray);
 					$this->dtgAssetTransact->DataSource = $objAssetTransactionArray;*/
-					$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
+				  $intItemsPerPage = $this->dtgAssetTransact->ItemsPerPage;
+					$intItemOffset = ($this->dtgAssetTransact->PageNumber - 1) * $intItemsPerPage;
+					$arrDataSource = array_slice($this->objAssetTransactionArray, $intItemOffset, $intItemsPerPage);
+					//$this->dtgAssetTransact->DataSource = $this->objAssetTransactionArray;
+					$this->dtgAssetTransact->DataSource = $arrDataSource;
 					$this->dtgAssetTransact->ShowHeader = true;
 				}
 				else {
 					$this->dtgAssetTransact->ShowHeader = false;
 				}
 			}
-
-			// Load the data for the InventoryTransact datagrid
+		}
+		
+		protected function dtgInventoryTransact_Bind() {
+			// Load the data for the InventoryTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyInventory || $this->blnEditMode) {
-				$this->blnModifyInventory = false;
+				//$this->blnModifyInventory = false;
+				$intItemsPerPage = $this->dtgInventoryTransact->ItemsPerPage;
+				$intItemOffset = ($this->dtgInventoryTransact->PageNumber - 1) * $intItemsPerPage;
+				$arrDataSource = array_slice($this->objInventoryTransactionArray, $intItemOffset, $intItemsPerPage);
+				
 				$this->dtgInventoryTransact->TotalItemCount = count($this->objInventoryTransactionArray);
 				if ($this->dtgInventoryTransact->TotalItemCount > 0) {
-					$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
+					//$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
+					$this->dtgInventoryTransact->DataSource = $arrDataSource;
 					$this->dtgInventoryTransact->ShowHeader = true;
 				}
-				// Do not show the header if there are no items in the datagrid
 				else {
 					$this->dtgInventoryTransact->ShowHeader = false;
 				}
@@ -810,7 +862,7 @@
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgAssetTransact);
 	    $this->dtgAssetTransact->Paginator = $objPaginator;
-	    $this->dtgAssetTransact->ItemsPerPage = 20;
+	    $this->dtgAssetTransact->ItemsPerPage = 2;
 
     	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => "200", 'OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetModel->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
@@ -975,7 +1027,7 @@
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgInventoryTransact);
 	    $this->dtgInventoryTransact->Paginator = $objPaginator;
-	    $this->dtgInventoryTransact->ItemsPerPage = 20;
+	    $this->dtgInventoryTransact->ItemsPerPage = 2;
 
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Inventory Code', '<?= $_ITEM->InventoryLocation->InventoryModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Inventory Model', '<?= $_ITEM->InventoryLocation->InventoryModel->ShortDescription ?>', array('Width' => "200", 'CssClass' => "dtg_column")));
@@ -1459,6 +1511,7 @@
 					}
 				}
 			}
+			$this->dtgAssetTransact->Refresh();
 		}
 
 		public function btnAddInventory_Click($strFormId, $strControlId, $strParameter) {
@@ -1524,6 +1577,7 @@
 				$blnError = true;
 				$this->txtNewInventoryModelCode->Warning = "Please enter an inventory code.";
 			}
+			$this->dtgInventoryTransact->Refresh();
 		}
 
 		// Remove button click action for each asset in the datagrid
