@@ -164,7 +164,9 @@
 		protected function lblLogo_Create() {
 			$this->lblLogo = new QLabel($this);
 			$this->lblLogo->HtmlEntities=false;
-			$this->lblLogo->Text = sprintf('<img src="../images/%s" style="padding:4px;">', QApplication::$TracmorSettings->PackingListLogo);
+			$strProtocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
+			$strImagePath = (AWS_S3) ? sprintf('%ss3.amazonaws.com/%s/images', $strProtocol, AWS_BUCKET) : '../images';
+			$this->lblLogo->Text = sprintf('<img src="%s/%s" style="padding:4px;">', $strImagePath, QApplication::$TracmorSettings->PackingListLogo);
 		}
 		
 		// Create and Setup lblTerms
