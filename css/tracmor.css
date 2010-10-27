@@ -37,10 +37,16 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 .redtext { color:red; }
 .spinner { vertical-align: middle; position:absolute; }
 
-.paginator_inactive_step { font-weight: bold; color: #aaaaaa; }
-.paginator_active_step { font-weight: bold; color: #000000; text-decoration: none; }
-.paginator_page { text-decoration: none; color: #000000; padding: 0px 3px 0px 3px; }
-.paginator_selected_page { font-weight: bold; background-color: #ffba00; padding: 0px 3px 0px 3px; border: 1px; border-style: solid; }
+/* QPaginator */
+	span.paginator { margin: 0; padding: 0; }
+		span.paginator span { list-style-type:none; display: inline; padding: 0; margin: 0; }
+			span.paginator span.page a { text-decoration: none; color: #000000; padding: 0 3px 0 3px; margin: 0 2px 0 2px;}
+			span.paginator span.page a:hover { background-color: #ccf; }
+			span.paginator span.arrow { font-weight: bold; color: #ccc; margin: 0; padding: 0 3px 0 3px; }
+			span.paginator span.arrow a { font-weight: bold; color: #000; text-decoration: none; }
+			span.paginator span.selected { font-weight: bold; background-color: #ffba00; padding: 0 3px 0 3px; margin: 0 2px 0 2px; border: 1px; border-style: solid; }
+			span.paginator span.break { color: #666; margin: 0 5px 0 5px; }
+			span.paginator span.ellipsis { color: #666; }
 			
 .dtg_column { border-bottom: 1px solid #CCCCCC; }
 
