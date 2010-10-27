@@ -94,7 +94,7 @@
 */
 
 		static public function AuditScanExt() {
-			return new QQNodeAuditScanExt('audit_scan', null);
+			return new QQNodeAuditScanExt('audit_scan', null, null);
 		}
 
 		// Override or Create New Properties and Variables
