@@ -1012,14 +1012,15 @@ class QAssetEditComposite extends QControl {
 			// CustomField::DeleteTextValues($objCustomFieldArray);
 			// ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
 			Asset::ResetParentAssetIdToNullByAssetId($this->objAsset->AssetId);
+			Asset::DeleteAuditScanByAssetId($this->objAsset->AssetId);
 			QApplication::Redirect('asset_list.php');
 		}
-		catch (QDatabaseExceptionBase $objExc) {
+		catch (QDatabaseException $objExc) {
 			if ($objExc->ErrorNumber == 1451) {
 				$this->btnDelete->Warning = 'This asset cannot be deleted because it is associated with one or more transactions.';
 			}
 			else {
-				throw new QDatabaseExceptionBase();
+				throw new QDatabaseException();
 			}
 		}
 	}
