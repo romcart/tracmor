@@ -495,7 +495,7 @@ INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
 	(1,'company_id',NULL),
 	(2,'image_upload_prefix',NULL),
 	(3,'fedex_gateway_URI',NULL),
-	(4,'company_logo','empty.gif'),
+	(4,'company_logo',NULL),
 	(5,'packing_list_terms',NULL),
 	(6,'packing_list_logo',NULL),
 	(7,'min_asset_code',NULL),

@@ -1,6 +1,6 @@
 <?php
 	class QFileAsset extends QFileAssetBase {
-		protected $strTemporaryUploadPath = '/tmp';
+		protected $strTemporaryUploadPath = __TRACMOR_TMP__;
 		
 		public function __construct($objParentObject, $strControlId = null) {
 			parent::__construct($objParentObject, $strControlId);

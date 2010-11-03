@@ -28,8 +28,8 @@
 		protected $ctlHeaderMenu;
 		
 		// Inputs
+		protected $flaCompanyLogo;
 		protected $txtMinAssetCode;
-		protected $txtImageUploadPrefix;
 		protected $chkCustomShipmentNumbers;
 		protected $chkCustomReceiptNumbers;
 		protected $chkPortablePinRequired;
@@ -43,8 +43,8 @@
 			$this->ctlHeaderMenu_Create();
 			
 			// Create Inputs
+			$this->flaCompanyLogo_Create();
 			$this->txtMinAssetCode_Create();
-			$this->txtImageUploadPrefix_Create();
 			$this->chkCustomShipmentNumbers_Create();
 			$this->chkCustomReceiptNumbers_Create();
 			$this->chkPortablePinRequired_Create();
@@ -61,18 +61,30 @@
 			$this->ctlHeaderMenu = new QHeaderMenu($this);
 		}
 		
+		// Create and Setup the CompanyLogo QFileAsset control
+		protected function flaCompanyLogo_Create() {
+			$this->flaCompanyLogo = new QFileAsset($this);
+			$this->flaCompanyLogo->TemporaryUploadPath = __TRACMOR_TMP__;
+			$this->flaCompanyLogo->FileAssetType = QFileAssetType::Image;
+			$this->flaCompanyLogo->CssClass = 'file_asset';
+            $this->flaCompanyLogo->imgFileIcon->CssClass = 'file_asset_icon';
+			
+			if (!QApplication::$TracmorSettings->CompanyLogo) {
+				$this->flaCompanyLogo->imgFileIcon->ImagePath = '../images/empty.gif';
+			} else {
+				if (AWS_S3) {
+					$this->flaCompanyLogo->imgFileIcon->ImagePath = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/images/' . QApplication::$TracmorSettings->CompanyLogo;
+				} else {
+					$this->flaCompanyLogo->imgFileIcon->ImagePath = '../images/' . QApplication::$TracmorSettings->CompanyLogo;
+				}
+			}
+		}
+		
 		// Create and Setup the MinAssetCode Text Field
 		protected function txtMinAssetCode_Create() {
 			$this->txtMinAssetCode = new QTextBox($this);
 			$this->txtMinAssetCode->Name = 'Minimum Asset Code';
 			$this->txtMinAssetCode->Text = QApplication::$TracmorSettings->MinAssetCode;
-		}
-		
-		// Create and Setup the MinAssetCode Text Field
-		protected function txtImageUploadPrefix_Create() {
-			$this->txtImageUploadPrefix = new QTextBox($this);
-			$this->txtImageUploadPrefix->Name = 'Image Upload Prefix';
-			$this->txtImageUploadPrefix->Text = QApplication::$TracmorSettings->ImageUploadPrefix;
 		}
 		
 		// Create and Setup the CustomShipmentNumbers Checkbox
@@ -131,7 +143,21 @@
 		// Setting a TracmorSetting saves it to the database automagically because the __set() method has been altered
 		protected function btnSave_Click() {
 			QApplication::$TracmorSettings->MinAssetCode = $this->txtMinAssetCode->Text;
-			QApplication::$TracmorSettings->ImageUploadPrefix = $this->txtImageUploadPrefix->Text;
+			
+			// If a customer logo was uploaded, save it to the appropriate location
+			if ($this->flaCompanyLogo->File) {
+				rename($this->flaCompanyLogo->File, '../images/' . $this->flaCompanyLogo->FileName);
+				
+				if (AWS_S3) {
+					$arrImageInfo = getimagesize('../images/' . $this->flaCompanyLogo->FileName);
+					$strMimeType = image_type_to_mime_type($arrImageInfo[2]);
+					QApplication::MoveToS3(__DOCROOT__ . __IMAGE_ASSETS__, $this->flaCompanyLogo->FileName, $strMimeType, '/images');
+				}
+				
+				// Save the setting to the database
+				QApplication::$TracmorSettings->CompanyLogo = $this->flaCompanyLogo->FileName;
+			}
+			
 			// We have to cast these to string because the admin_settings value column is TEXT, and checkboxes give boolean values
 			QApplication::$TracmorSettings->CustomShipmentNumbers = (string) $this->chkCustomShipmentNumbers->Checked;
 			QApplication::$TracmorSettings->CustomReceiptNumbers = (string) $this->chkCustomReceiptNumbers->Checked;

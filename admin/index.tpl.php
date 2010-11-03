@@ -53,12 +53,12 @@
 				<td>
 					<table>
 						<tr>
-							<td class="record_field_name">Minimum Asset Code: </td>
-							<td class="record_field_edit"><?php $this->txtMinAssetCode->RenderWithError(); ?></td>
+							<td class="record_field_name">Company Logo: </td>
+							<td class="record_field_edit"><?php $this->flaCompanyLogo->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Image Upload Prefix: </td>
-							<td class="record_field_edit"><?php $this->txtImageUploadPrefix->RenderWithError(); ?></td>
+							<td class="record_field_name">Minimum Asset Code: </td>
+							<td class="record_field_edit"><?php $this->txtMinAssetCode->RenderWithError(); ?></td>
 						</tr>
 						<tr>
 							<td class="record_field_name">Custom Shipment Numbers: </td>
