@@ -91,15 +91,15 @@
 
 								
 								<tr>
-									<td class="record_field_name">Company:&nbsp;</td>
+									<td class="record_field_name">Company:</td>
 									<td class="record_field_value"><?php $this->lstFromCompany->RenderWithError();$this->lblFromCompany->Render(); $this->lblNewFromCompany->RenderWithError(); ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Contact:&nbsp;</td>
+									<td class="record_field_name">Contact:</td>
 									<td class="record_field_value"><?php $this->lstFromContact->RenderWithError();$this->lblFromContact->Render(); $this->lblNewFromContact->RenderWithError();  ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Address:&nbsp;</td>
+									<td class="record_field_name">Address:</td>
 									<td class="record_field_value"><?php $this->lstFromAddress->RenderWithError();$this->lblFromAddress->Render();  $this->lblNewFromAddress->RenderWithError(); ?><br><?php $this->lblFromAddressFull->Render(); ?></td>
 								</tr>
 							</table>
@@ -109,15 +109,15 @@
 									<td colspan="2" class="record_subheader">Recipient Information</td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Company:&nbsp;</td>
+									<td class="record_field_name">Company:</td>
 									<td class="record_field_value"><?php $this->lstToCompany->RenderWithError();$this->lblToCompany->Render(); $this->lblNewToCompany->RenderWithError(); ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Contact:&nbsp;</td>
+									<td class="record_field_name">Contact:</td>
 									<td class="record_field_value"><?php $this->lstToContact->RenderWithError();$this->lblToContact->Render();  $this->lblNewToContact->RenderWithError(); ?></td>
 								</tr>
 								<tr>
-									<td class="record_field_name">Address:&nbsp;</td>
+									<td class="record_field_name">Address:</td>
 									<td class="record_field_value"><?php $this->lstToAddress->RenderWithError();$this->lblToAddress->Render(); $this->lblNewToAddress->RenderWithError(); ?><br><?php $this->lblToAddressFull->Render(); ?></td>
 								</tr>						
 							</table>
@@ -131,7 +131,7 @@
 								<?php if (QApplication::$TracmorSettings->CustomShipmentNumbers) { ?>
 								<?php 	if(!$this->blnEditMode || $this->blnViewBuiltInFields){ ?>
 								<tr>
-									<td class="record_field_name">Shipment Number&nbsp;</td>
+									<td class="record_field_name">Shipment Number:</td>
 									<td class="record_field_value"><?php $this->txtShipmentNumber->RenderWithError();$this->lblShipmentNumber->Render(); ?>&nbsp;</td>
 								</tr>
 								<?php
@@ -140,21 +140,21 @@
 								?>
 
 								<tr>
-									<td class="record_field_name">Shipping Courier:&nbsp;</td>
-									<td class="record_field_value"><?php $this->lstCourier->RenderWithError();$this->lblCourier->Render(); ?>&nbsp;</td>
+									<td class="record_field_name">Shipping Courier:</td>
+									<td class="record_field_value"><?php $this->lstCourier->RenderWithError();$this->lblCourier->Render(); ?></td>
 								</tr>
 								<?php $tnDisplay = ($this->blnEditMode && $this->objShipment->CourierId===1 && !$this->objShipment->ShippedFlag) ? "display:none;" : ""; ?>
 								<tr id="trackingNumber" style="<?php echo($tnDisplay); ?>">
-									<td class="record_field_name">Tracking Number:&nbsp;</td>
+									<td class="record_field_name">Tracking Number:</td>
 									<td class="record_field_value"><?php $this->txtTrackingNumber->RenderWithError();$this->lblTrackingNumber->Render(); ?>&nbsp;</td>
 								</tr>								
 								<tr>
-									<td class="record_field_name">Note:&nbsp;</td>
-									<td class="record_field_value"><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?>&nbsp;</td>
+									<td class="record_field_name">Note:</td>
+									<td class="record_field_value"><?php $this->txtNote->RenderWithError();$this->pnlNote->Render(); ?></td>
 								</tr>									
 								<tr>
-									<td class="record_field_name">Ship Date:&nbsp;</td>
-									<td class="record_field_value"><?php $this->calShipDate->RenderWithError();$this->lblShipDate->Render(); ?>&nbsp;</td>
+									<td class="record_field_name">Ship Date:</td>
+									<td class="record_field_value"><?php $this->calShipDate->RenderWithError();$this->lblShipDate->Render(); ?></td>
 								</tr>
 								<?php if (!empty($arrShipmentFields)) {
 									foreach ($arrShipmentFields as $field) {
