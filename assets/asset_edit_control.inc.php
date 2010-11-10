@@ -36,9 +36,9 @@
 
 		$arrAssetFields[] = array('name' => 'Asset Code:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
 
-		$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false) . '&nbsp;');
-		$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . '&nbsp;');
-		$arrAssetFields[] = array('name' => 'Asset Model Code:',  'value' => $this->lblAssetModelCode->Render(false) . '&nbsp;');
+		$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false));
+		$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false));
+		$arrAssetFields[] = array('name' => 'Asset Model Code:',  'value' => $this->lblAssetModelCode->Render(false));
 		if (!$this->blnEditMode) {
 			$arrAssetFields[] = array('name' => 'Location:',     'value' => $this->lstLocation->RenderWithError(false));
 		}
@@ -59,7 +59,7 @@
 		}
 	}
 
-	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . '&nbsp;' . $this->lblIconParentAssetCode->Render(false));
+	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . $this->lblIconParentAssetCode->Render(false));
 
 	// Display Metadata fields in Edit mode only
 	if ($this->blnEditMode) {
@@ -96,8 +96,8 @@
 							if(isset($arrAssetFields)){
 								for ($i=0;$i<ceil(count($arrAssetFields)/2);$i++) {
 									echo('<tr>');
-									echo('<td class="record_field_name">'. $arrAssetFields[$i]['name'] .'&nbsp;</td>');
-									echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'&nbsp;</td>');
+									echo('<td class="record_field_name">'. $arrAssetFields[$i]['name'] .'</td>');
+									echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'</td>');
 									echo('</tr>');
 								}
 							}
@@ -110,8 +110,8 @@
 							if($arrAssetFields){
 								for ($i=ceil(count($arrAssetFields)/2);$i<count($arrAssetFields);$i++) {
 									echo('<tr>');
-									echo('<td class="record_field_name">'. $arrAssetFields[$i]['name'] .'&nbsp;</td>');
-									echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'&nbsp;</td>');
+									echo('<td class="record_field_name">'. $arrAssetFields[$i]['name'] .'</td>');
+									echo('<td class="record_field_value">'. $arrAssetFields[$i]['value'] .'</td>');
 									echo('</tr>');
 								}
 							}
