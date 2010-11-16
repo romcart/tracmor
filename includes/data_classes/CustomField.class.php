@@ -581,6 +581,7 @@
 	 					$arrCustomFields[$i]['input'] = new QTextBox($objForm);
 	 					$arrCustomFields[$i]['input']->Name = $objCustomFieldArray[$i]->ShortDescription;
 	 					$arrCustomFields[$i]['input']->Required = false;
+	 					$arrCustomFields[$i]['input']->CausesValidation = true;
 	 					if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'textarea' && !$blnSearch) {
 	 						$arrCustomFields[$i]['input']->TextMode = QTextMode::MultiLine;
 	 					}
