@@ -89,7 +89,10 @@
 			if ($mixValue instanceof QDateTime) {
 				if ($objTimeZone)
 					throw new QCallerException('QDateTime cloning cannot take in a DateTimeZone parameter');
-				parent::__construct($mixValue->format(DateTime::ISO8601));
+				if ($mixValue->GetTimeZone()->GetName() == date_default_timezone_get())
+					parent::__construct($mixValue->format('Y-m-d H:i:s'));
+				else
+					parent::__construct($mixValue->format(DateTime::ISO8601));
 				$this->blnDateNull = $mixValue->IsDateNull();
 				$this->blnTimeNull = $mixValue->IsTimeNull();
 
@@ -213,8 +216,9 @@
 		 *	zz - "PM" or "AM"
 		 *	zzz - "p.m." or "a.m."
 		 *	zzzz - "P.M." or "A.M."
-		 * 
-		 *  ttt - Timezone as a three-letter code (e.g. GMT)
+		 *
+		 *  ttt - Timezone Abbreviation as a three-letter code (e.g. PDT, GMT)
+		 *  tttt - Timezone Identifier (e.g. America/Los_Angeles)
 		 *
 		 * @param string $strFormat the format of the date
 		 * @return string the formatted date as a string
@@ -227,24 +231,11 @@
 				$strFormat = $strArgumentArray[0];
 			else
 				$strFormat = null;
-			
+
 			$this->ReinforceNullProperties();
 			if (is_null($strFormat))
 				$strFormat = QDateTime::$DefaultFormat;
 
-			/*
-				(?(?=D)([D]+)|
-					(?(?=M)([M]+)|
-						(?(?=Y)([Y]+)|
-							(?(?=h)([h]+)|
-								(?(?=m)([m]+)|
-									(?(?=s)([s]+)|
-										(?(?=z)([z]+)|
-											(?(?=t)([t]+)|
-				))))))))
-			*/
-
-//			$strArray = preg_split('/([^D^M^Y^h^m^s^z^t])+/', $strFormat);
 			preg_match_all('/(?(?=D)([D]+)|(?(?=M)([M]+)|(?(?=Y)([Y]+)|(?(?=h)([h]+)|(?(?=m)([m]+)|(?(?=s)([s]+)|(?(?=z)([z]+)|(?(?=t)([t]+)|))))))))/', $strFormat, $strArray);
 			$strArray = $strArray[0];
 			$strToReturn = '';
@@ -328,6 +319,9 @@
 						case 'ttt':
 							$strToReturn .= parent::format('T');
 							break;
+						case 'tttt':
+							$strToReturn .= parent::format('e');
+							break;
 
 						default:
 							$strToReturn .= $strArray[$intIndex];
@@ -349,6 +343,14 @@
 		public function setTime($intHour, $intMinute, $intSecond = null) {
 			// For compatibility with PHP 5.3
 			if (is_null($intSecond)) $intSecond = 0;
+
+			// If HOUR or MINUTE is NULL...
+			if (is_null($intHour) || is_null($intMinute)) {
+				parent::setTime($intHour, $intMinute, $intSecond);
+				$this->blnTimeNull = true;
+				return $this;
+			}
+
 			$intHour = QType::Cast($intHour, QType::Integer);
 			$intMinute = QType::Cast($intMinute, QType::Integer);
 			$intSecond = QType::Cast($intSecond, QType::Integer);
@@ -371,6 +373,27 @@
 				parent::setDate(2000, 1, 1);
 			if ($this->blnTimeNull)
 				parent::setTime(0, 0, 0);
+		}
+		
+		/**
+		 * Converts the current QDateTime object to a different TimeZone.
+		 * 
+		 * TimeZone should be passed in as a string-based identifier.
+		 * 
+		 * Note that this is different than the built-in DateTime::SetTimezone() method which expicitly
+		 * takes in a DateTimeZone object.  QDateTime::ConvertToTimezone allows you to specify any
+		 * string-based Timezone identifier.  If none is specified and/or if the specified timezone
+		 * is not a valid identifier, it will simply remain unchanged as opposed to throwing an exeception
+		 * or error.
+		 * 
+		 * @param string $strTimezoneIdentifier a string-based parameter specifying a timezone identifier (e.g. America/Los_Angeles)
+		 * @return void
+		 */
+		public function ConvertToTimezone($strTimezoneIdentifier) {
+			try {
+				$dtzNewTimezone = new DateTimeZone($strTimezoneIdentifier);
+				$this->SetTimezone($dtzNewTimezone);
+			} catch (Exception $objExc) {}
 		}
 
 		public function IsEqualTo(QDateTime $dttCompare) {
@@ -483,13 +506,14 @@
 			return new QDateTimeSpan($intDifference);
 		}
 
-		public function Add(QDateTimeSpan $dtsSpan){
-			// Get this DateTime timestamp
-			$intTimestamp = $this->Timestamp;
-
-			// And add the Span Second count to it
-			$this->Timestamp = $this->Timestamp + $dtsSpan->Seconds;
-			return $this;
+		public function Add($dtsSpan){
+			if ($dtsSpan instanceof QDateTimeSpan) {
+				// And add the Span Second count to it
+				$this->Timestamp = $this->Timestamp + $dtsSpan->Seconds;
+				return $this;
+			} else if ($dtsSpan instanceof DateInterval) {
+				return parent::add($dtsSpan);
+			}
 		}
 
 		public function AddSeconds($intSeconds){

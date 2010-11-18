@@ -24,7 +24,7 @@ if ($this->objAssetTransactionArray) {
 		else {
 			echo '<tr><td colspan="3">More ...</td></tr>';
 		}*/
-		if ($intIndex < 10) {
+		if ($intIndex < 10 && !($objAssetTransaction instanceof AssetTransaction)) {
 			printf("
 			<tr>
 				<td>%s</td>

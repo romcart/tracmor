@@ -166,7 +166,11 @@
 			$this->lblLogo->HtmlEntities=false;
 			$strProtocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
 			$strImagePath = (AWS_S3) ? sprintf('%ss3.amazonaws.com/%s/images', $strProtocol, AWS_BUCKET) : '../images';
-			$this->lblLogo->Text = sprintf('<img src="%s/%s" style="padding:4px;">', $strImagePath, QApplication::$TracmorSettings->PackingListLogo);
+			if (!QApplication::$TracmorSettings->PackingListLogo) {
+				$this->lblLogo->Text = '<img src="../images/empty.gif">';
+			} else {
+				$this->lblLogo->Text = sprintf('<img src="%s/%s" style="padding:4px;">', $strImagePath, QApplication::$TracmorSettings->PackingListLogo);
+			}
 		}
 		
 		// Create and Setup lblTerms

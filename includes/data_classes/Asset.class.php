@@ -788,6 +788,25 @@
 		  $objDatabase = QApplication::$Database[1];
 		  $objDatabase->NonQuery($strQuery);
 		}
+		
+		/**
+		 * Delete all audit_scan records for this AssetId
+		 *
+		 * @param string $intAssetId
+		 */
+		public function DeleteAuditScanByAssetId($intAssetId) {
+		  $strQuery = sprintf("
+				DELETE 
+				  `audit_scan`.*
+				FROM 
+				  `audit_scan`, `audit` 
+				WHERE
+				  `audit_scan`.`entity_id` = '%s' AND `audit_scan`.`audit_id` = `audit`.`audit_id` AND `audit`.`entity_qtype_id` = 1", 
+		  $intAssetId);
+
+		  $objDatabase = QApplication::$Database[1];
+		  $objDatabase->NonQuery($strQuery);
+		}
 
 		/**
 		 * Override method to perform a property "Set"

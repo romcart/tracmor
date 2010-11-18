@@ -86,10 +86,10 @@
 				}
 			}
 			if (AWS_S3) {
-				MoveToS3($this->strUploadPath, $this->strFileName, $this->strType, '/images/asset_models');
+				QApplication::MoveToS3($this->strUploadPath, $this->strFileName, $this->strType, '/images/asset_models');
 				if ($this->boolBuildThumbs) {
 					if (file_exists($this->strThumbUploadPath.$this->strFileName)) {
-						MoveToS3($this->strThumbUploadPath, $this->strFileName, $this->strType, '/images/asset_models/thumbs');
+						QApplication::MoveToS3($this->strThumbUploadPath, $this->strFileName, $this->strType, '/images/asset_models/thumbs');
 					}
 				}
 			}

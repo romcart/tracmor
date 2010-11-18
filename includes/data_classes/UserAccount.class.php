@@ -72,13 +72,13 @@
 		// Returns an <img> tag based on the boolean value (either a check or an X)
 		public function __toStringActiveFlag() {
 			
-			return BooleanImage($this->ActiveFlag);
+			return QApplication::BooleanImage($this->ActiveFlag);
 		}
 		
 		// Returns an <img> tag based on the boolean value (either a check or an X)
 		public function __toStringAdminFlag() {
 			
-			return BooleanImage($this->AdminFlag);
+			return QApplication::BooleanImage($this->AdminFlag);
 		}
 		
 		/**

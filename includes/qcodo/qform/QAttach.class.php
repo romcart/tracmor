@@ -29,7 +29,6 @@
 			// Setup Default Properties
 			$this->TemporaryUploadPath = __DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments';
 			$this->strTemplate = __DOCROOT__ . __SUBDIRECTORY__ . '/common/QAttach.tpl.php';
-			$this->DialogBoxCssClass = 'file_asset_dbox';
 			$this->UploadText = QApplication::Translate('Upload');
 			$this->CancelText = QApplication::Translate('Cancel');
 			$this->btnUpload->Text = '<input type="button" class="button" value="Attach">';
@@ -128,7 +127,7 @@
 				$objAttachment->Save();
 
 				if (AWS_S3) {
-					MoveToS3(__DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments', $objAttachment->TmpFilename, $objAttachment->FileType, '/attachments');
+					QApplication::MoveToS3(__DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments', $objAttachment->TmpFilename, $objAttachment->FileType, '/attachments');
 
 					$objAttachment->Path = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/attachments/' . $objAttachment->TmpFilename;
 					$objAttachment->Save();

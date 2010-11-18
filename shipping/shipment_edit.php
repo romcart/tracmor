@@ -4544,7 +4544,7 @@
 				$strLabelMimeType = ($this->objFedexShipment->LabelPrinterType == '2' || $this->objFedexShipment->LabelPrinterType == '5') ? 'text/plain' : 'image/png';
 				$fed->label('../images/shipping_labels/fedex/' . QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension);
 				if (AWS_S3) {
-					MoveToS3(__DOCROOT__ . __IMAGE_ASSETS__ . '/shipping_labels/fedex', QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension, $strLabelMimeType, '/images/shipping_labels/fedex');
+					QApplication::MoveToS3(__DOCROOT__ . __IMAGE_ASSETS__ . '/shipping_labels/fedex', QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension, $strLabelMimeType, '/images/shipping_labels/fedex');
 				}
 				return true;
 			}

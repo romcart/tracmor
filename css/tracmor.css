@@ -37,10 +37,16 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 .redtext { color:red; }
 .spinner { vertical-align: middle; position:absolute; }
 
-.paginator_inactive_step { font-weight: bold; color: #aaaaaa; }
-.paginator_active_step { font-weight: bold; color: #000000; text-decoration: none; }
-.paginator_page { text-decoration: none; color: #000000; padding: 0px 3px 0px 3px; }
-.paginator_selected_page { font-weight: bold; background-color: #ffba00; padding: 0px 3px 0px 3px; border: 1px; border-style: solid; }
+/* QPaginator */
+	span.paginator { margin: 0; padding: 0; }
+		span.paginator span { list-style-type:none; display: inline; padding: 0; margin: 0; }
+			span.paginator span.page a { text-decoration: none; color: #000000; padding: 0 3px 0 3px; margin: 0 2px 0 2px;}
+			span.paginator span.page a:hover { background-color: #ccf; }
+			span.paginator span.arrow { font-weight: bold; color: #ccc; margin: 0; padding: 0 3px 0 3px; }
+			span.paginator span.arrow a { font-weight: bold; color: #000; text-decoration: none; }
+			span.paginator span.selected { font-weight: bold; background-color: #ffba00; padding: 0 3px 0 3px; margin: 0 2px 0 2px; border: 1px; border-style: solid; }
+			span.paginator span.break { color: #666; margin: 0 5px 0 5px; }
+			span.paginator span.ellipsis { color: #666; }
 			
 .dtg_column { border-bottom: 1px solid #CCCCCC; }
 
@@ -68,8 +74,8 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 	border-top:1px solid #AAAAAA;
 	padding-bottom:4px;
 }
-.record_field_value { font-size:12px;border:1px solid #000000;background-color:#EEEEEE;width:280px;padding:3px;empty-cells:show;vertical-align:top;white-space:nowrap; }
-.record_field_name { color:#615c5c;font-size:12px;width:120px;text-align:right;padding-right:5px;vertical-align:top;white-space:nowrap; }
+.record_field_value { font-size:12px;border:1px solid #000000;background-color:#EEEEEE;width:280px;padding:3px;empty-cells:show;vertical-align:top;white-space:nowrap;height:16px; }
+.record_field_name { color:#615c5c;font-size:12px;width:120px;text-align:right;padding-right:5px;vertical-align:top;white-space:nowrap;height:16px; }
 .record_field_edit { font-size:12px;width:280px;padding:3px;vertical-align:top; }
 .record_field_spacer { width: 75px;}
 
@@ -120,10 +126,20 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 	border: 2px inset #333333;
 }
 
-.file_asset_dbox { border: 1px solid #1c4a8c; background-color: #fff; padding: 20px; width: 400px; overflow: auto; }
-.file_asset_dbox h1 { margin: 0; }
-.file_asset_dbox input { padding: 3px; margin-right: 5px; }
+/* QFileAsset */
+	div.fileassetDbox { border: 4px solid #333; background-color: #fff; padding: 20px; width: 400px; overflow: auto; }
+	div.fileassetDbox h1 { margin: 0; }
+	div.fileassetDbox input { padding: 3px; margin-right: 5px; }
 
+	.file_asset a {color: black; text-decoration:none; }
+    .file_asset_icon {border-width: 1px; border-style: solid; border-color: #147;}
+
+	/* QDialogBox */
+	div.dialogbox { border: 4px solid #333; background-color: #fff; padding: 20px; width: 400px; overflow: auto; }
+
+/* QDialogBox */
+	div.dialogbox { border: 4px solid #333; background-color: #fff; padding: 20px; width: 400px; overflow: auto; }
+	
 .report_section_heading {
 	padding-top:18px;
 	font-size:14px;

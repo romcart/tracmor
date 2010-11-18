@@ -44,17 +44,27 @@
 		 *
 		 * @var string FormStateHandler the classname of the FormState handler to use
 		 */
-		public static $FormStateHandler = 'QFormStateHandler';
+		public static $FormStateHandler = 'QFileFormStateHandler';
 		
 		/**
 		 * These are the list of core QForm JavaScript files, or JavaScript files needed by
 		 * a QControl, which QForm should IGNORE trying to load during a RenderBegin() or RenderAjax() call.
 		 * 
-		 * In production or as a performance tweak, you may want to use the compressed "_qc_packed.js"
+		 * Feel free to add the filename of any JS files, relative to __JS_ASSETS__, that you want Qcodo
+		 * to ignore because you have already explicilty placed them on the page using HTML <script>
+		 * tags.  So for example, if you are using FooControl, where FooControl requires "foo.js" via its
+		 * $strJavaScripts property, Qcodo will automagically load "foo.js" at run-time if and when it is
+		 * needed.  But if you plan on explicitly placing
+		 * 		<script type="text/javascript" src="/assets/js/foo.js"></script>
+		 * on the HTML page, then you need to add "foo.js" to this IgnoreJavaScriptFileArray so that Qcodo
+		 * doesn't try and also load "foo.js" for you. 
+		 * 
+		 * NOTE: In production or as a performance tweak, you may want to use the compressed "_qc_packed.js"
 		 * library (which is a compressed, single file version of ALL the qcodo .js files that is in _core).
 		 * 
-		 * If you want to do this, MAKE SURE you FIRST MANUALLY do a <script> inclusion of "/assets/js/_core/_qc_packed.js" in
-		 * your HTML.  Then, you can specify that QForm "ignore" all the other qcodo _core javascripts.
+		 * If you want to do this, MAKE SURE you FIRST MANUALLY do a <script> inclusion of
+		 * "/assets/js/_core/_qc_packed.js" in your HTML.  Then, you can specify that QForm "ignore" all the
+		 * other qcodo _core javascripts by adding just "_core" to the array.
 		 *
 		 * @var array
 		 */
@@ -76,6 +86,20 @@
 			'_core/qcodo.js',
 			'_core/treenav.js',
 			'datagrid_column_toggle.js'); */
+
+		/**
+		 * This should be very rarely used.
+		 * 
+		 * This mechanism acts similarly to the strIgnoreJavascriptFileArray, except it applies to StyleSheets.
+		 * However, any QControl that specifies a StyleSheet file to include is MEANT to have that property be modified / customized.
+		 * 
+		 * Therefore, there should be little to no need for this attribute.  However, it is here anyway, just in case.
+		 *
+		 * @var array
+		 */
+		protected $strIgnoreStyleSheetFileArray = array();
+		// protected $strIgnoreStyleSheetFileArray = array('datagrid.css', 'calendar.css', 'textbox.css', 'listbox.css');
+
 		
 		// Declare DefaultWaitIcon public (instead of protected in QFormBase.inc) so that it can be set from a custom control
 		// This can be removed once HeaderMenu is moved from a custom control to a QPanel.

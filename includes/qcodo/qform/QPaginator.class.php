@@ -3,13 +3,10 @@
 		// APPEARANCE
 		protected $intIndexCount = 10;
 
-		protected $strInactiveStepCssClass = 'paginator_inactive_step';
-		protected $strActiveStepCssClass = 'paginator_active_step';
-		protected $strPageCssClass = 'paginator_page';
-		protected $strSelectedPageCssClass = 'paginator_selected_page';
-		
 		protected $strLabelForPrevious;
 		protected $strLabelForNext;
+
+		protected $strCssClass = 'paginator';
 
 		//////////
 		// Methods
@@ -28,40 +25,35 @@
 			if ($strStyle)
 				$strStyle = sprintf(' style="%s"', $strStyle);
 
-			$strToReturn = sprintf('<div id="%s"%s%s>', $this->strControlId, $strStyle, $this->GetAttributes(true, false));
-
-			$strInactiveStepCssClass = ($this->strInactiveStepCssClass) ? sprintf(' class="%s"', $this->strInactiveStepCssClass) : '';
-			$strActiveStepCssClass = ($this->strActiveStepCssClass) ? sprintf(' class="%s"', $this->strActiveStepCssClass) : '';
-			$strPageCssClass = ($this->strPageCssClass) ? sprintf(' class="%s"', $this->strPageCssClass) : '';
-			$strSelectedPageCssClass = ($this->strSelectedPageCssClass) ? sprintf(' class="%s"', $this->strSelectedPageCssClass) : '';
+			$strToReturn = sprintf('<span id="%s" %s%s>', $this->strControlId, $strStyle, $this->GetAttributes(true, false));
 
 			if ($this->intPageNumber <= 1)
-				$strToReturn .= sprintf('<span%s>%s</span>', $strInactiveStepCssClass, $this->strLabelForPrevious);
+				$strToReturn .= sprintf('<span class="arrow">%s</span>', $this->strLabelForPrevious);
 			else {
 				$this->strActionParameter = $this->intPageNumber - 1;
-				$strToReturn .= sprintf('<a href="" %s%s>%s</a>',
-					$this->GetActionAttributes(), $strActiveStepCssClass, $this->strLabelForPrevious);
+				$strToReturn .= sprintf('<span class="arrow"><a href="" %s>%s</a></span>',
+					$this->GetActionAttributes(), $this->strLabelForPrevious);
 			}
 
-			$strToReturn .= '&nbsp;&nbsp;|&nbsp;&nbsp;';
+			$strToReturn .= '<span class="break">|</span>';
 			
 			if ($this->PageCount <= $this->intIndexCount) {
 				// We have less pages than total indexcount -- so let's go ahead
 				// and just display all page indexes
 				for ($intIndex = 1; $intIndex <= $this->PageCount; $intIndex++) {
 					if ($this->intPageNumber == $intIndex) {
-						$strToReturn .= sprintf('&nbsp;<span%s>%s</span>&nbsp;', $strSelectedPageCssClass, $intIndex);
+						$strToReturn .= sprintf('<span class="selected">%s</span>', $intIndex);
 					} else {
 						$this->strActionParameter = $intIndex;
-						$strToReturn .= sprintf('&nbsp;<a href="" %s%s>%s</a>&nbsp;',
-							$this->GetActionAttributes(), $strPageCssClass, $intIndex);
+						$strToReturn .= sprintf('<span class="page"><a href="" %s>%s</a></span>',
+							$this->GetActionAttributes(), $intIndex);
 					}
 				}
 			} else {
 				// Figure Out Constants
 				
 				/**
-				 * "Bunch" is defined as the collection of numbers that lies in between the pair of elipses ("...")
+				 * "Bunch" is defined as the collection of numbers that lies in between the pair of Ellipsis ("...")
 				 * 
 				 * LAYOUT
 				 * 
@@ -120,53 +112,53 @@
 				
 				if ($this->intPageNumber < $intLeftBunchTrigger) {
 					$intPageStart = 1;
-					$strStartElipse = "";
+					$strStartEllipsis = "";
 				} else {
 					$intPageStart = min($intMaximumStartOfBunch, $this->intPageNumber - $intLeftOfBunchCount);
 
 					$this->strActionParameter = 1;
-					$strStartElipse = sprintf('&nbsp;<a href="" %s%s>%s</a>&nbsp;',
-						$this->GetActionAttributes(), $strPageCssClass, 1);
-					$strStartElipse .= '&nbsp;<b>...</b>&nbsp;';
+					$strStartEllipsis = sprintf('<span class="page"><a href="" %s>%s</a></span>',
+						$this->GetActionAttributes(), 1);
+					$strStartEllipsis .= '<span class="ellipsis">...</span>';
 				}
 				
 				if ($this->intPageNumber > $intRightBunchTrigger) {
 					$intPageEnd = $this->PageCount;
-					$strEndElipse = "";
+					$strEndEllipsis = "";
 				} else {
 					$intPageEnd = max($intMinimumEndOfBunch, $this->intPageNumber + $intRightOfBunchCount);
-					$strEndElipse = '&nbsp;<b>...</b>&nbsp;';
+					$strEndEllipsis = '<span class="ellipsis">...</span>';
 
 					$this->strActionParameter = $this->PageCount;
-					$strEndElipse .= sprintf('&nbsp;<a href="" %s%s>%s</a>&nbsp;',
-						$this->GetActionAttributes(), $strPageCssClass, $this->PageCount);
+					$strEndEllipsis .= sprintf('<span class="page"><a href="" %s>%s</a></span>',
+						$this->GetActionAttributes(), $this->PageCount);
 				}
 
-				$strToReturn .= $strStartElipse;
+				$strToReturn .= $strStartEllipsis;
 				for ($intIndex = $intPageStart; $intIndex <= $intPageEnd; $intIndex++) {
 					if ($this->intPageNumber == $intIndex) {
-						$strToReturn .= sprintf('&nbsp;<span%s>%s</span>&nbsp;', $strSelectedPageCssClass, $intIndex);
+						$strToReturn .= sprintf('<span class="selected">%s</span>', $intIndex);
 					} else {
 						$this->strActionParameter = $intIndex;
-						$strToReturn .= sprintf('&nbsp;<a href="" %s%s>%s</a>&nbsp;',
-							$this->GetActionAttributes(), $strPageCssClass, $intIndex);
+						$strToReturn .= sprintf('<span class="page"><a href="" %s>%s</a></span>',
+							$this->GetActionAttributes(), $intIndex);
 					}
 				}
-				$strToReturn .= $strEndElipse;
+				$strToReturn .= $strEndEllipsis;
 			}
 				
 	
-			$strToReturn .= '&nbsp;&nbsp;|&nbsp;&nbsp;';
+			$strToReturn .= '<span class="break">|</span>';
 	
 			if ($this->intPageNumber >= $this->PageCount)
-				$strToReturn .= sprintf('<span%s>%s</span>', $strInactiveStepCssClass, $this->strLabelForNext);
+				$strToReturn .= sprintf('<span class="arrow">%s</span>', $this->strLabelForNext);
 			else {
 				$this->strActionParameter = $this->intPageNumber + 1;
-				$strToReturn .= sprintf('<a href="" %s%s>%s</a>',
-					$this->GetActionAttributes(), $strActiveStepCssClass, $this->strLabelForNext);
+				$strToReturn .= sprintf('<span class="arrow"><a href="" %s>%s</a></span>',
+					$this->GetActionAttributes(), $this->strLabelForNext);
 			}
 
-			$strToReturn .= '</div>';
+			$strToReturn .= '</span>';
 
 			return $strToReturn;
 		}
@@ -178,14 +170,6 @@
 			switch ($strName) {
 				case 'IndexCount':
 					return $this->intIndexCount;
-				case 'InactiveStepCssClass':
-					return $this->strInactiveStepCssClass;
-				case 'ActiveStepCssClass':
-					return $this->strActiveStepCssClass;
-				case 'PageCssClass':
-					return $this->strPageNumberCssClass;
-				case 'SelectedPageCssClass':
-					return $this->strSelectedPageCssClass;
 
 				case 'LabelForNext':
 					return $this->strLabelForNext;
@@ -210,41 +194,9 @@
 			switch ($strName) {
 				case 'IndexCount':
 					$this->intIndexCount = QType::Cast($mixValue, QType::Integer);
-					if ($this->intIndexCount < 10)
-						throw new QCallerException('Paginator must have an IndexCount > 10');
+					if ($this->intIndexCount < 7)
+						throw new QCallerException('Paginator must have an IndexCount >= 7');
 					return $this->intIndexCount;
-
-				case 'InactiveStepCssClass':
-					try {
-						return ($this->strInactiveStepCssClass = QType::Cast($mixValue, QType::String));
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-
-				case 'ActiveStepCssClass':
-					try {
-						return ($this->strActiveStepCssClass = QType::Cast($mixValue, QType::String));
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-
-				case 'PageCssClass':
-					try {
-						return ($this->strPageCssClass = QType::Cast($mixValue, QType::String));
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
-
-				case 'SelectedPageCssClass':
-					try {
-						return ($this->strSelectedPageCssClass = QType::Cast($mixValue, QType::String));
-					} catch (QCallerException $objExc) {
-						$objExc->IncrementOffset();
-						throw $objExc;
-					}
 
 				case 'LabelForNext':
 					try {

@@ -39,11 +39,10 @@
 		// 
 		// This one method can define how ALL controls should be rendered when "Rendered with Name" throughout the entire site.
 		// For example:
-		//			<Name>
-		//			<HTML Before><Control><HTML After>
-		//			<Instructions>
-		//			<Error>
-		//			<warning>
+		//			<Name>				<HTML Before><Control><HTML After>
+		//			<Instructions>		<Error> or <warning>
+		//
+		// REMEMBER: THIS IS JUST AN EXAMPLE!!!  Feel free to modify.
 		public function RenderWithName($blnDisplayOutput = true) {
 			////////////////////
 			// Call RenderHelper

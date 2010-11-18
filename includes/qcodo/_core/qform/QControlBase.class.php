@@ -186,6 +186,53 @@
 			}
 		}
 
+		public static function CreatePersistent($strClassName, $objParentObject, $strControlId) {
+			if ($objParentObject instanceof QForm) {
+				$objForm = $objParentObject;
+				$objParentControl = null;
+			} else if ($objParentObject instanceof QControl) {
+				$objForm = $objParentObject->Form;
+				$objParentControl = $objParentObject;
+			} else
+				throw new QCallerException('Parent Object must be a QForm or QControl');
+
+			if (array_key_exists($objForm->FormId . '_' . $strControlId, $_SESSION) && $_SESSION[$objForm->FormId . '_' . $strControlId]) {
+				$objToReturn = unserialize($_SESSION[$objForm->FormId . '_' . $strControlId]);
+				$objToReturn->objParentControl = $objParentControl;
+				$objToReturn->objForm = $objForm;
+				try {
+					$objToReturn->objForm->AddControl($objToReturn);
+					if ($objToReturn->objParentControl)
+						$objToReturn->objParentControl->AddChildControl($objToReturn);
+				} catch (QCallerException $objExc) {
+					$objExc->IncrementOffset();
+					throw $objExc;
+				}
+			} else {
+				$objToReturn = new $strClassName($objParentObject, $strControlId);
+			}
+
+			$objForm->PersistControl($objToReturn);
+			return $objToReturn;
+		}
+
+		protected function PersistPrepare() {
+			$this->objForm = null;
+			$this->objParentControl = null;
+			$this->objActionArray = array();
+			$this->objChildControlArray = array();
+			$this->blnRendered = null;
+			$this->blnRendering = null;
+			$this->blnOnPage = null;
+			$this->blnModified = null;
+			$this->mixCausesValidation = null;
+		}
+		public function Persist() {
+			$objControl = clone($this);
+			$objControl->PersistPrepare();
+			$_SESSION[$this->objForm->FormId . '_' . $this->strControlId] = serialize($objControl);
+		}
+
 		public function AddChildControl(QControl $objControl) {
 			$this->blnModified = true;
 			$this->objChildControlArray[$objControl->ControlId] = $objControl;
@@ -261,11 +308,17 @@
 			}
 		}
 
-		public function RemoveAllActions($strEvent) {
+		/**
+		 * Removes all events for a given event name.
+		 * Be sure and use a QFooEvent::EventName constant here.
+		 *
+		 * @param string $strEventName
+		 */
+		public function RemoveAllActions($strEventName) {
 			// Modified
 			$this->blnModified = true;
 
-			$this->objActionArray[$strEvent] = array();
+			$this->objActionArray[$strEventName] = array();
 		}
 
 		public function GetAllActions($strEventType, $strActionType = null) {
@@ -361,6 +414,44 @@
 				throw new QCallerException(sprintf("Custom Style does not exist in Control '%s': %s", $this->strControlId, $strName));
 		}
 
+		/**
+		 * This will add a CssClass name to the CssClass property (if it does not yet exist),
+		 * updating the CssClass property accordingly.
+		 * @param string $strCssClassName
+		 */
+		public function AddCssClass($strCssClassName) {
+			$blnAdded = false;
+			$strNewCssClass = '';
+			$strCssClassName = trim($strCssClassName);
+
+			foreach (explode(' ', $this->strCssClass) as $strCssClass)
+				if ($strCssClass = trim($strCssClass)) {
+					if ($strCssClass == $strCssClassName)
+						$blnAdded = true;
+					$strNewCssClass .= $strCssClass . ' ';
+				}
+			if (!$blnAdded)
+				$this->CssClass = $strNewCssClass . $strCssClassName;
+			else
+				$this->CssClass = trim($strNewCssClass);
+		}
+
+		/**
+		 * This will remove a CssClass name from the CssClass property (if it exists),
+		 * updating the CssClass property accordingly.
+		 * @param string $strCssClassName
+		 */
+		public function RemoveCssClass($strCssClassName) {
+			$strNewCssClass = '';
+			$strCssClassName = trim($strCssClassName);
+			foreach (explode(' ', $this->strCssClass) as $strCssClass)
+				if ($strCssClass = trim($strCssClass)) {
+					if ($strCssClass != $strCssClassName)
+						$strNewCssClass .= $strCssClass . ' ';
+				}
+			$this->CssClass = trim($strNewCssClass);
+		}
+
 		// This abstract method must be implemented by all controls.
 		//
 		// When utilizing formgen, the programmer should never access form variables directly (e.g. via the $_FORM array).
@@ -385,7 +476,7 @@
 			if ($this->intTabIndex)
 				$strToReturn .= sprintf('tabindex="%s" ', $this->intTabIndex);
 			if ($this->strToolTip)
-				$strToReturn .= sprintf('title="%s" ', $this->strToolTip);
+				$strToReturn .= sprintf('title="%s" ', QApplication::HtmlEntities($this->strToolTip));
 			if ($this->strCssClass)
 				$strToReturn .= sprintf('class="%s" ', $this->strCssClass);
 			if ($this->strAccessKey)
@@ -760,8 +851,12 @@
 			$strToReturn = "";
 
 			foreach ($this->GetChildControls() as $objControl)
-				if (!$objControl->Rendered)
-					$strToReturn .= $objControl->Render($blnDisplayOutput);
+				if (!$objControl->Rendered) {
+					$strRenderMethod = 'Render';
+					if ($objControl->RenderMethod)
+						$strRenderMethod = $objControl->RenderMethod;
+					$strToReturn .= $objControl->$strRenderMethod($blnDisplayOutput);
+				}
 
 			if ($blnDisplayOutput) {
 				print($strToReturn);
@@ -824,6 +919,10 @@
 
 		public function MarkAsWrapperModified() {
 			$this->blnWrapperModified = true;
+		}
+
+		public function MarkAsRendered() {
+			$this->blnRendered = true;
 		}
 
 		public function SetForm($objForm) {
@@ -1109,6 +1208,8 @@
 				case "Enabled":
 					try {
 						$this->blnEnabled = QType::Cast($mixValue, QType::Boolean);
+						$this->strValidationError = null;
+						$this->strWarning = null;
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -1141,6 +1242,8 @@
 				case "Visible":
 					try {
 						$this->blnVisible = QType::Cast($mixValue, QType::Boolean);
+						$this->strValidationError = null;
+						$this->strWarning = null;
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -1246,6 +1349,14 @@
 				case "Name":
 					try {
 						$this->strName = QType::Cast($mixValue, QType::String);
+						break;
+					} catch (QInvalidCastException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+				case "RenderMethod":
+					try {
+						$this->strRenderMethod = QType::Cast($mixValue, QType::String);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
