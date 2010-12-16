@@ -214,8 +214,8 @@
 				$objClauses = array();
 				if ($objClause = $this->dtgAssetTransact->OrderByClause)
 					array_push($objClauses, $objClause);
-				if ($objClause = $this->dtgAssetTransact->LimitClause)
-					array_push($objClauses, $objClause);
+				/*if ($objClause = $this->dtgAssetTransact->LimitClause)
+					array_push($objClauses, $objClause);*/
 				if ($objClause = QQ::Expand(QQN::AssetTransaction()->Asset->AssetModel))
 					array_push($objClauses, $objClause);
 				$this->objAssetTransactionArray = AssetTransaction::LoadArrayByTransactionId($this->objReceipt->TransactionId, $objClauses);
@@ -224,8 +224,8 @@
 				$objClauses = array();
 				if ($objClause = $this->dtgInventoryTransact->OrderByClause)
 					array_push($objClauses, $objClause);
-				if ($objClause = $this->dtgInventoryTransact->LimitClause)
-					array_push($objClauses, $objClause);
+				/*if ($objClause = $this->dtgInventoryTransact->LimitClause)
+					array_push($objClauses, $objClause);*/
 				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->InventoryLocation->InventoryModel));
 					array_push($objClauses, $objClause);
 				$this->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->objReceipt->TransactionId, $objClauses);
@@ -862,7 +862,7 @@
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgAssetTransact);
 	    $this->dtgAssetTransact->Paginator = $objPaginator;
-	    $this->dtgAssetTransact->ItemsPerPage = 20;
+	    $this->dtgAssetTransact->ItemsPerPage = 2;
 
     	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => "200", 'OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetModel->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
