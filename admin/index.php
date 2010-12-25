@@ -147,11 +147,58 @@
 			
 			// If a customer logo was uploaded, save it to the appropriate location
 			if ($this->flaCompanyLogo->File) {
+				$arrImageInfo = getimagesize($this->flaCompanyLogo->File);
+				
+				// Resize the image if necessary
+				$strMimeType = image_type_to_mime_type($arrImageInfo[2]);
+				$intSrcWidth = $arrImageInfo[0];
+				$intSrcHeight = $arrImageInfo[1];
+				
+				if ($intSrcHeight > 50) {
+					$intDstHeight = 50;
+					$intDstWidth = round((50 / $intSrcHeight) * $intSrcWidth);
+					$imgResampled = imagecreatetruecolor($intDstWidth, $intDstHeight);
+					$strTransparentColor = imagecolorallocatealpha($imgResampled, 0, 0, 0, 127);
+					imagealphablending($imgResampled, false);
+					imagefilledrectangle($imgResampled, 0, 0, $intDstWidth, $intDstHeight, $strTransparentColor);
+					imagealphablending($imgResampled, true);
+					imagesavealpha($imgResampled, true);
+					
+					switch ($strMimeType) {
+							case 'image/gif':
+									$image = imageCreateFromGIF($this->flaCompanyLogo->File);
+									break;
+							case 'image/jpeg':
+							case 'image/pjpeg':
+						$image = imageCreateFromJPEG($this->flaCompanyLogo->File);
+						break;
+							case 'image/png':
+							case 'image/x-png':
+									$image = imageCreateFromPNG($this->flaCompanyLogo->File);
+									break;
+					}
+					
+					imagecopyresampled($imgResampled, $image, 0, 0, 0, 0, $intDstWidth, $intDstHeight, $intSrcWidth, $intSrcHeight);
+					
+					switch ($strMimeType) {
+							case 'image/gif':
+									imagegif($imgResampled, $this->flaCompanyLogo->File);
+									break;
+							case 'image/jpeg':
+							case 'image/pjpeg':
+									imagejpeg($imgResampled, $this->flaCompanyLogo->File);
+						break;
+							case 'image/png':
+							case 'image/x-png':
+									imagepng($imgResampled, $this->flaCompanyLogo->File);
+									break;
+					}
+				} 
+				
 				rename($this->flaCompanyLogo->File, '../images/' . $this->flaCompanyLogo->FileName);
 				
+				
 				if (AWS_S3) {
-					$arrImageInfo = getimagesize('../images/' . $this->flaCompanyLogo->FileName);
-					$strMimeType = image_type_to_mime_type($arrImageInfo[2]);
 					QApplication::MoveToS3(__DOCROOT__ . __IMAGE_ASSETS__, $this->flaCompanyLogo->FileName, $strMimeType, '/images');
 				}
 				
