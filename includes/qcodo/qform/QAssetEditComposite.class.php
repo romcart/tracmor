@@ -513,7 +513,7 @@ class QAssetEditComposite extends QControl {
 		$this->btnMove->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnMove_Click'));
 		$this->btnMove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnMove->CausesValidation = false;
-		//QApplication::AuthorizeControl($this->objAsset, $this->btnMove, 2);
+		QApplication::AuthorizeControl($this->objAsset, $this->btnMove, 2);
 		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnMove, 1);
 	}
 
@@ -529,7 +529,7 @@ class QAssetEditComposite extends QControl {
 		if ($this->objAsset->CheckedOutFlag) {
 			$this->btnCheckOut->Display = false;
 		}
-		//QApplication::AuthorizeControl($this->objAsset, $this->btnCheckOut, 2);
+		QApplication::AuthorizeControl($this->objAsset, $this->btnCheckOut, 2);
 		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnCheckOut, 3);
 	}
 
