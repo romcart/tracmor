@@ -641,6 +641,7 @@
 				$this->calDueDate->DateTime = new QDateTime(QDateTime::Now);
 				$this->calDueDate->MinimumYear = $this->dttNow->Year;
 			}
+			$this->calDueDate->MaximumYear = $this->dttNow->Year +2;
 			$this->calDueDate->Required = true;
 			$this->calDueDate->TabIndex=6;
 			$this->intNextTabIndex++;
