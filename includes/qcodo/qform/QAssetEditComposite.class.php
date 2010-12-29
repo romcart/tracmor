@@ -325,7 +325,8 @@ class QAssetEditComposite extends QControl {
 	// Create The Asset Model label (Asset Name)
 	protected function lblAssetModel_Create() {
 		$this->lblAssetModel = new QLabel($this);
-	  $this->lblAssetModel->Name = 'Asset Model';
+		$this->lblAssetModel->Name = 'Asset Model';
+		$this->lblAssetModel->HtmlEntities = false;
 	}
 
 	// Create the Location label
@@ -512,7 +513,7 @@ class QAssetEditComposite extends QControl {
 		$this->btnMove->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnMove_Click'));
 		$this->btnMove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnMove->CausesValidation = false;
-		QApplication::AuthorizeControl($this->objAsset, $this->btnMove, 2);
+		//QApplication::AuthorizeControl($this->objAsset, $this->btnMove, 2);
 		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnMove, 1);
 	}
 
@@ -528,7 +529,7 @@ class QAssetEditComposite extends QControl {
 		if ($this->objAsset->CheckedOutFlag) {
 			$this->btnCheckOut->Display = false;
 		}
-		QApplication::AuthorizeControl($this->objAsset, $this->btnCheckOut, 2);
+		//QApplication::AuthorizeControl($this->objAsset, $this->btnCheckOut, 2);
 		RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnCheckOut, 3);
 	}
 
@@ -1279,7 +1280,7 @@ class QAssetEditComposite extends QControl {
 	public function UpdateAssetLabels() {
 
 		if ($this->objAsset->AssetModelId) {
-			$this->lblAssetModel->Text = $this->objAsset->AssetModel->__toString();
+			$this->lblAssetModel->Text = $this->objAsset->AssetModel->__toStringWithLink();
 			$this->lblAssetModelCode->Text = $this->objAsset->AssetModel->AssetModelCode;
 			if ($this->objAsset->AssetModel->CategoryId) {
 				$this->lblCategory->Text = $this->objAsset->AssetModel->Category->__toString();

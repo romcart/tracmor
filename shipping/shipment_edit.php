@@ -666,8 +666,9 @@
 			$this->lblFromCompany = new QLabel($this);
 			$this->lblFromCompany->Name = 'From Company';
 			if ($this->blnEditMode && $this->objShipment->FromCompanyId) {
-				$this->lblFromCompany->Text = $this->objShipment->FromCompany->__toString();
+				$this->lblFromCompany->Text = $this->objShipment->FromCompany->__toStringWithLink();
 			}
+			$this->lblFromCompany->HtmlEntities = false;
 		}
 
 		// Create and Setup lblFromContact
@@ -675,8 +676,9 @@
 			$this->lblFromContact = new QLabel($this);
 			$this->lblFromContact->Name = 'From Contact';
 			if ($this->blnEditMode && $this->objShipment->FromContactId) {
-				$this->lblFromContact->Text = $this->objShipment->FromContact->__toString();
+				$this->lblFromContact->Text = $this->objShipment->FromContact->__toStringWithLink();
 			}
+			$this->lblFromContact->HtmlEntities = false;
 		}
 
 		// Create and Setup lblFrom Address
@@ -684,8 +686,9 @@
 			$this->lblFromAddress = new QLabel($this);
 			$this->lblFromAddress->Name = 'From Address';
 			if ($this->blnEditMode && $this->objShipment->FromAddressId) {
-				$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toString();
+				$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toStringWithLink();
 			}
+			$this->lblFromAddress->HtmlEntities = false;
 		}
 
 		// Create and Setup lblFromAddressFull
@@ -702,8 +705,9 @@
 			$this->lblToCompany = new QLabel($this);
 			$this->lblToCompany->Name = 'To Company';
 			if ($this->blnEditMode && $this->objShipment->ToCompanyId) {
-				$this->lblToCompany->Text = $this->objShipment->ToCompany->__toString();
+				$this->lblToCompany->Text = $this->objShipment->ToCompany->__toStringWithLink();
 			}
+			$this->lblToCompany->HtmlEntities = false;
 		}
 
 		// Create and Setup lblToContact
@@ -711,8 +715,9 @@
 			$this->lblToContact = new QLabel($this);
 			$this->lblToContact->Name = 'To Contact';
 			if ($this->blnEditMode && $this->objShipment->ToContactId) {
-				$this->lblToContact->Text = $this->objShipment->ToContact->__toString();
+				$this->lblToContact->Text = $this->objShipment->ToContact->__toStringWithLink();
 			}
+			$this->lblToContact->HtmlEntities = false;
 		}
 
 		// Create and Setp lblToAddress
@@ -720,8 +725,9 @@
 			$this->lblToAddress = new QLabel($this);
 			$this->lblToAddress->Name = 'To Address';
 			if ($this->blnEditMode && $this->objShipment->ToAddressId) {
-				$this->lblToAddress->Text = $this->objShipment->ToAddress->__toString();
+				$this->lblToAddress->Text = $this->objShipment->ToAddress->__toStringWithLink();
 			}
+			$this->lblToAddress->HtmlEntities = false;
 		}
 
 		// Create and Setup lblToAddressFull
@@ -4758,12 +4764,12 @@
 		// Update the 'Text' values for all shipment labels for an ajax reload
 		protected function UpdateShipmentLabels() {
 			$this->lblShipDate->Text = $this->objShipment->ShipDate->__toString();
-			$this->lblFromCompany->Text = $this->objShipment->FromCompany->__toString();
-			$this->lblFromContact->Text = $this->objShipment->FromContact->__toString();
-			$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toString();
-			$this->lblToCompany->Text = $this->objShipment->ToCompany->__toString();
-			$this->lblToContact->Text = $this->objShipment->ToContact->__toString();
-			$this->lblToAddress->Text = $this->objShipment->ToAddress->__toString();
+			$this->lblFromCompany->Text = $this->objShipment->FromCompany->__toStringWithLink();
+			$this->lblFromContact->Text = $this->objShipment->FromContact->__toStringWithLink();
+			$this->lblFromAddress->Text = $this->objShipment->FromAddress->__toStringWithLink();
+			$this->lblToCompany->Text = $this->objShipment->ToCompany->__toStringWithLink();
+			$this->lblToContact->Text = $this->objShipment->ToContact->__toStringWithLink();
+			$this->lblToAddress->Text = $this->objShipment->ToAddress->__toStringWithLink();
 			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
 				$this->lblShipmentNumber->Text = $this->objShipment->ShipmentNumber;
 			}

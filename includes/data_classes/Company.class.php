@@ -53,7 +53,7 @@
 		}
 
 		public function __toStringWithLink($cssClass = null) {
-			return sprintf('<a href="company_edit.php?intCompanyId=%s" class="%s">%s</a>', $this->CompanyId, $cssClass, $this->ShortDescription);
+			return sprintf('<a href="../contacts/company_edit.php?intCompanyId=%s" class="%s">%s</a>', $this->CompanyId, $cssClass, $this->ShortDescription);
 		}
 
 		// Return the City of the primary address for this company, or return an empty string

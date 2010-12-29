@@ -409,8 +409,9 @@
 			$this->lblFromCompany = new QLabel($this);
 			$this->lblFromCompany->Name = 'Receive From Company';
 			if ($this->objReceipt->FromCompanyId) {
-				$this->lblFromCompany->Text = $this->objReceipt->FromCompany->__toString();
+				$this->lblFromCompany->Text = $this->objReceipt->FromCompany->__toStringWithLink();
 			}
+			$this->lblFromCompany->HtmlEntities = false;
 		}
 
 		// Create and Setup From Contact label
@@ -418,8 +419,9 @@
 			$this->lblFromContact = new QLabel($this);
 			$this->lblFromContact->Name = 'Receive From Contact';
 			if ($this->objReceipt->FromContactId) {
-				$this->lblFromContact->Text = $this->objReceipt->FromContact->__toString();
+				$this->lblFromContact->Text = $this->objReceipt->FromContact->__toStringWithLink();
 			}
+			$this->lblFromContact->HtmlEntities = false;
 		}
 
 		// Create and Setup To Contact label
@@ -427,8 +429,9 @@
 			$this->lblToContact = new QLabel($this);
 			$this->lblToContact->Name = 'Receiver Contact';
 			if ($this->objReceipt->ToContactId) {
-				$this->lblToContact->Text = $this->objReceipt->ToContact->__toString();
+				$this->lblToContact->Text = $this->objReceipt->ToContact->__toStringWithLink();
 			}
+			$this->lblToContact->HtmlEntities = false;
 		}
 
 		// Create and Setup To Address label
@@ -436,8 +439,9 @@
 			$this->lblToAddress = new QLabel($this);
 			$this->lblToAddress->Name = 'Receiver Address';
 			if ($this->objReceipt->ToAddressId) {
-				$this->lblToAddress->Text = $this->objReceipt->ToAddress->__toString();
+				$this->lblToAddress->Text = $this->objReceipt->ToAddress->__toStringWithLink();
 			}
+			$this->lblToAddress->HtmlEntities = false;
 		}
 
 		// Create and Setup lblReceiptNumber
@@ -641,7 +645,7 @@
 				$this->calDueDate->DateTime = new QDateTime(QDateTime::Now);
 				$this->calDueDate->MinimumYear = $this->dttNow->Year;
 			}
-			$this->calDueDate->MaximumYear = $this->dttNow->Year +2;
+			$this->calDueDate->MaximumYear = $this->dttNow->Year + 2;
 			$this->calDueDate->Required = true;
 			$this->calDueDate->TabIndex=6;
 			$this->intNextTabIndex++;
@@ -2478,10 +2482,10 @@
 		}
 
 		protected function UpdateReceiptLabels() {
-			$this->lblFromCompany->Text = $this->objReceipt->FromCompany->__toString();
-			$this->lblFromContact->Text = $this->objReceipt->FromContact->__toString();
-			$this->lblToContact->Text = $this->objReceipt->ToContact->__toString();
-			$this->lblToAddress->Text = $this->objReceipt->ToAddress->__toString();
+			$this->lblFromCompany->Text = $this->objReceipt->FromCompany->__toStringWithLink();
+			$this->lblFromContact->Text = $this->objReceipt->FromContact->__toStringWithLink();
+			$this->lblToContact->Text = $this->objReceipt->ToContact->__toStringWithLink();
+			$this->lblToAddress->Text = $this->objReceipt->ToAddress->__toStringWithLink();
 			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
 				$this->lblReceiptNumber->Text = $this->objReceipt->ReceiptNumber;
 			}
