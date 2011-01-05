@@ -432,6 +432,7 @@
                   $dtpDate = new QDateTimePicker($this);
                 	$dtpDate->DateTimePickerType = QDateTimePickerType::Date;
                 	$dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+					$dtpDate->MaximumYear = QDateTime::Now()->Year;
                 	$dtpDate->Display = false;
                 	$this->dtpDateArray[] = $dtpDate;
 
@@ -1559,6 +1560,7 @@
  	      $dtpDate = new QDateTimePicker($this);
  	      $dtpDate->DateTimePickerType = QDateTimePickerType::Date;
  	      $dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+		  $dtpDate->MaximumYear = QDateTime::Now()->Year;
  	      $dtpDate->Display = false;
  	      $this->dtpDateArray[] = $dtpDate;
 

@@ -224,6 +224,7 @@
     	$this->dtpTransactionDateFirst->DateTimePickerType = QDateTimePickerType::Date;
     	$this->dtpTransactionDateFirst->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
     	$this->dtpTransactionDateFirst->Enabled = false;
+		$this->dtpTransactionDateFirst->MaximumYear = $this->dtpTransactionDateFirst->DateTime->Year;
     }
 
     protected function dtpTransactionDateLast_Create() {
@@ -233,6 +234,7 @@
     	$this->dtpTransactionDateLast->DateTimePickerType = QDateTimePickerType::Date;
     	$this->dtpTransactionDateLast->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
     	$this->dtpTransactionDateLast->Enabled = false;
+		$this->dtpTransactionDateLast->MaximumYear = $this->dtpTransactionDateLast->DateTime->Year;
     }
 
   	protected function lstTransactionDate_Create() {

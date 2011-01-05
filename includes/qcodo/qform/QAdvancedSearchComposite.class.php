@@ -264,6 +264,7 @@ class QAdvancedSearchComposite extends QControl {
   	$this->dtpDateModifiedFirst->DateTimePickerType = QDateTimePickerType::Date;
   	$this->dtpDateModifiedFirst->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
   	$this->dtpDateModifiedFirst->Enabled = false;
+	$this->dtpDateModifiedFirst->MaximumYear = $this->dtpDateModifiedFirst->DateTime->Year;
   }
 
   protected function dtpDateModifiedLast_Create() {
@@ -273,6 +274,7 @@ class QAdvancedSearchComposite extends QControl {
   	$this->dtpDateModifiedLast->DateTimePickerType = QDateTimePickerType::Date;
   	$this->dtpDateModifiedLast->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
   	$this->dtpDateModifiedLast->Enabled = false;
+	$this->dtpDateModifiedLast->MaximumYear = $this->dtpDateModifiedLast->DateTime->Year;
   }
 
 	protected function lstDateModified_Create() {
@@ -298,6 +300,7 @@ class QAdvancedSearchComposite extends QControl {
   	$this->dtpShipmentDate->Name = '';
   	$this->dtpShipmentDate->DateTimePickerType = QDateTimePickerType::Date;
   	$this->dtpShipmentDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+	$this->dtpShipmentDate->MaximumYear = QDateTime::Now()->Year;
   }
 
   protected function dtpDueDate_Create() {
@@ -305,6 +308,7 @@ class QAdvancedSearchComposite extends QControl {
   	$this->dtpDueDate->Name = '';
   	$this->dtpDueDate->DateTimePickerType = QDateTimePickerType::Date;
   	$this->dtpDueDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+	$this->dtpDueDate->MaximumYear = QDateTime::Now()->Year;
   }
 
   protected function dtpReceiptDate_Create() {
@@ -312,6 +316,7 @@ class QAdvancedSearchComposite extends QControl {
   	$this->dtpReceiptDate->Name = '';
   	$this->dtpReceiptDate->DateTimePickerType = QDateTimePickerType::Date;
   	$this->dtpReceiptDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+	$this->dtpReceiptDate->MaximumYear = QDateTime::Now()->Year;
   }
 
 	protected function customFields_Create() {
