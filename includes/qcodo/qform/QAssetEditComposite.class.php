@@ -1232,7 +1232,7 @@ class QAssetEditComposite extends QControl {
   			}
   			elseif ($this->objAsset->CheckedOutFlag && $this->objAsset->LocationId != 6) {
   				$objUserAccount = $this->objAsset->GetLastTransactionUser();
-  				if ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId) {
+  				if ((QApplication::$TracmorSettings->StrictCheckinPolicy != '1') || ($objUserAccount && $objUserAccount->UserAccountId == QApplication::$objUserAccount->UserAccountId)) {
   					$this->btnCheckIn->Enabled = true;
   					$this->btnCheckOut->Enabled = true;
   				}

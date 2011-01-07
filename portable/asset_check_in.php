@@ -63,7 +63,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			}
 			elseif ($objNewAsset->CheckedOutFlag) {
 				$objUserAccount = $objNewAsset->GetLastTransactionUser();
-				if ($objUserAccount->UserAccountId != QApplication::$objUserAccount->UserAccountId) {
+				if ((QApplication::$TracmorSettings->StrictCheckinPolicy == '1') && ($objUserAccount->UserAccountId != QApplication::$objUserAccount->UserAccountId)) {
 				  $blnError = true;
 					$strWarning .= $strAssetCode." - That asset was not checked out by the current user.<br />";
 				}

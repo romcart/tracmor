@@ -33,6 +33,7 @@
 		protected $chkCustomShipmentNumbers;
 		protected $chkCustomReceiptNumbers;
 		protected $chkPortablePinRequired;
+		protected $chkStrictCheckinPolicy;
 		protected $pnlSaveNotification;
 		
 		// Buttons
@@ -48,6 +49,7 @@
 			$this->chkCustomShipmentNumbers_Create();
 			$this->chkCustomReceiptNumbers_Create();
 			$this->chkPortablePinRequired_Create();
+			$this->chkStrictCheckinPolicy_Create();
 			
 			// Create Buttons
 			$this->btnSave_Create();
@@ -121,6 +123,16 @@
 			}
 			else {
 				$this->chkPortablePinRequired->Checked = false;
+			}
+		}
+		
+		protected function chkStrictCheckinPolicy_Create() {
+			$this->chkStrictCheckinPolicy = new QCheckBox($this);
+			$this->chkStrictCheckinPolicy->Name = 'Strict Check-In Policy';
+			if (QApplication::$TracmorSettings->StrictCheckinPolicy == '1') {
+				$this->chkStrictCheckinPolicy->Checked = true;
+			} else {
+				$this->chkStrictCheckinPolicy->Checked = false;
 			}
 		}
 		
@@ -210,6 +222,7 @@
 			QApplication::$TracmorSettings->CustomShipmentNumbers = (string) $this->chkCustomShipmentNumbers->Checked;
 			QApplication::$TracmorSettings->CustomReceiptNumbers = (string) $this->chkCustomReceiptNumbers->Checked;
 			QApplication::$TracmorSettings->PortablePinRequired = (string) $this->chkPortablePinRequired->Checked;
+			QApplication::$TracmorSettings->StrictCheckinPolicy = (string) $this->chkStrictCheckinPolicy->Checked;
 			
 			// Show saved notification
 			$this->pnlSaveNotification->Display = true;

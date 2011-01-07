@@ -72,6 +72,10 @@
 							<td class="record_field_name">Portable Pin Required: </td>
 							<td class="record_field_edit"><?php $this->chkPortablePinRequired->RenderWithError(); ?></td>
 						</tr>
+						<tr>
+							<td class="record_field_name">Strict Check-In Policy: </td>
+							<td class="record_field_edit"><?php $this->chkStrictCheckinPolicy->RenderWithError(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>
