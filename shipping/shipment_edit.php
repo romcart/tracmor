@@ -1878,6 +1878,7 @@
 			$this->dtpScheduleReceiptDueDate->Name = 'Due Date';
 			$this->dtpScheduleReceiptDueDate->DateTimePickerType = QDateTimePickerType::Date;
 			$this->dtpScheduleReceiptDueDate->MinimumYear = date('Y');
+			$this->dtpScheduleReceiptDueDate->MaximumYear = date('Y') + 2;
 		}
 
 		//******************
