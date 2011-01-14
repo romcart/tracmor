@@ -248,7 +248,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
   <input type="hidden" name="result" value="<?php echo $strCheckedLocationInventory; ?>">
   <input type="submit" value="Done">
   </form>
-  <div id="result"></div>
+  <div id="output"></div>
 
 <?php
 }

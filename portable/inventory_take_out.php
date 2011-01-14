@@ -181,7 +181,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
   <input type="hidden" name="result" value="">
   <input type="submit" value="Complete Take Out">
   </form>
-  <div id="result"></div>
+  <div id="output"></div>
 
 <?php
 }

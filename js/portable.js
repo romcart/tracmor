@@ -14,7 +14,7 @@ function AddAsset() {
     }
     document.getElementById('warning').innerHTML = "";
     arrayAssetCode[i] = strAssetCode;
-    document.getElementById('result').innerHTML += arrayAssetCode[i++] + "<br/>";
+    document.getElementById('output').innerHTML += arrayAssetCode[i++] + "<br/>";
     document.getElementById('asset_code').value = '';
   }
   else {
@@ -24,7 +24,7 @@ function AddAsset() {
 }
 function AddAssetPost(strAssetCode) {
   arrayAssetCode[i] = strAssetCode;
-  document.getElementById('result').innerHTML += arrayAssetCode[i++] + "<br/>";
+  document.getElementById('output').innerHTML += arrayAssetCode[i++] + "<br/>";
 }
 function CompleteMove() {
   var strAssetCode = "";
@@ -76,7 +76,7 @@ function AddAssetLocation() {
     }
     document.getElementById('warning').innerHTML = "";
     arrayAssetCode[i++] = strAssetCode + "|" + strLocation;
-    document.getElementById('result').innerHTML += "Asset Code: " + strAssetCode + " Location: " + strLocation + "<br/>";
+    document.getElementById('output').innerHTML += "Asset Code: " + strAssetCode + " Location: " + strLocation + "<br/>";
     document.getElementById('asset_code').value = '';
     document.getElementById('destination_location').value = '';
     document.getElementById('asset_code').focus();
@@ -95,7 +95,7 @@ function AddAssetLocation() {
 function AddAssetLocationPost(strAssetCode,strLocation) {
   if (strAssetCode != '' && strLocation != '') {
     arrayAssetCode[i++] = strAssetCode + "|" + strLocation;
-    document.getElementById('result').innerHTML += "Asset Code: " + strAssetCode + " Location: " + strLocation + "<br/>";
+    document.getElementById('output').innerHTML += "Asset Code: " + strAssetCode + " Location: " + strLocation + "<br/>";
     document.getElementById('asset_code').value = '';
     document.getElementById('destination_location').value = '';
     document.getElementById('asset_code').focus();
@@ -127,7 +127,7 @@ function AddInventory() {
     }
     document.getElementById('warning').innerHTML = "";
     arrayInventoryCode[i++] = strInventoryCode + "|" + strSourceLocation + "|" + intQuantity;
-    document.getElementById('result').innerHTML += "Inventory Code: " + strInventoryCode + " Source Location: " + strSourceLocation + " Quantity: " + intQuantity + "<br/>";
+    document.getElementById('output').innerHTML += "Inventory Code: " + strInventoryCode + " Source Location: " + strSourceLocation + " Quantity: " + intQuantity + "<br/>";
     document.getElementById('inventory_code').value = '';
     document.getElementById('source_location').value = '';
     document.getElementById('quantity').value = '';
@@ -151,7 +151,7 @@ function AddInventory() {
 function AddInventoryPost(strInventoryCode,strSourceLocation,intQuantity) {
   if (strInventoryCode != '' && strSourceLocation != '' && intQuantity != '' && !isNaN(parseInt(intQuantity))) {
     arrayInventoryCode[i++] = strInventoryCode + "|" + strSourceLocation + "|" + intQuantity;
-    document.getElementById('result').innerHTML += "Inventory Code: " + strInventoryCode + " Source Location: " + strSourceLocation + " Quantity: " + intQuantity + "<br/>";
+    document.getElementById('output').innerHTML += "Inventory Code: " + strInventoryCode + " Source Location: " + strSourceLocation + " Quantity: " + intQuantity + "<br/>";
     document.getElementById('inventory_code').focus();
   }
 }
@@ -196,7 +196,7 @@ function AddInventoryQuantity() {
     }
     document.getElementById('warning').innerHTML = "";
     arrayInventoryCode[i++] = strInventoryCode + "|" + intQuantity;
-    document.getElementById('result').innerHTML += "Inventory Code: " + strInventoryCode + " Quantity: " + intQuantity + "<br/>";
+    document.getElementById('output').innerHTML += "Inventory Code: " + strInventoryCode + " Quantity: " + intQuantity + "<br/>";
     document.getElementById('inventory_code').value = '';
     document.getElementById('quantity').value = '';
     document.getElementById('inventory_code').focus();
@@ -215,7 +215,7 @@ function AddInventoryQuantity() {
 function AddInventoryQuantityPost(strInventoryCode,intQuantity) {
   if (strInventoryCode != '' && intQuantity != '' && !isNaN(parseInt(intQuantity))) {
     arrayInventoryCode[i++] = strInventoryCode + "|" + intQuantity;
-    document.getElementById('result').innerHTML += "Inventory Code: " + strInventoryCode + " Quantity: " + intQuantity + "<br/>";
+    document.getElementById('output').innerHTML += "Inventory Code: " + strInventoryCode + " Quantity: " + intQuantity + "<br/>";
     document.getElementById('inventory_code').focus();
   }
 }
@@ -242,7 +242,7 @@ function AddAuditLocation() {
     document.getElementById('btn_add_location').disabled = true;
     document.getElementById('asset_code').disabled = false;
     document.getElementById('btn_add_asset').disabled = false;
-    document.getElementById('result').innerHTML += "Location: " + strLocation + "<br />";
+    document.getElementById('output').innerHTML += "Location: " + strLocation + "<br />";
     if (strCheckedAssetCode != '') {
       var arrCheckedAssetCode = strCheckedAssetCode.split("#");
       for (j=0; j<arrCheckedAssetCode.length; j++) {
@@ -263,7 +263,7 @@ function AddAuditAsset() {
   var strAssetCode = document.getElementById('asset_code').value;
   if (strLocation != '' && strAssetCode != '') {
     document.getElementById('warning').innerHTML = "";
-    document.getElementById('result').innerHTML += "&nbsp;&nbsp;" + strAssetCode + "<br />";
+    document.getElementById('output').innerHTML += "&nbsp;&nbsp;" + strAssetCode + "<br />";
     arrayAssetCode[i++] = strAssetCode;
     document.getElementById('asset_code').value = "";
     document.getElementById('asset_code').focus();
@@ -315,7 +315,7 @@ function AddAuditInventoryLocation() {
     document.getElementById('inventory_code').disabled = false;
     document.getElementById('quantity').disabled = false;
     document.getElementById('btn_add_inventory').disabled = false;
-    document.getElementById('result').innerHTML += "Location: " + strLocation + "<br />";
+    document.getElementById('output').innerHTML += "Location: " + strLocation + "<br />";
     if (strCheckedInventoryQuantity != '') {
       var arrCheckedInventoryQuantity = strCheckedInventoryQuantity.split("#");
       for (j=0; j<arrCheckedInventoryQuantity.length; j++) {
@@ -345,7 +345,7 @@ function AddAuditInventory() {
       return;
     }
     document.getElementById('warning').innerHTML = "";
-    document.getElementById('result').innerHTML += "&nbsp;&nbsp;" + strInventoryCode + " Quantity: " + intQuantity + "<br />";
+    document.getElementById('output').innerHTML += "&nbsp;&nbsp;" + strInventoryCode + " Quantity: " + intQuantity + "<br />";
     arrayInventoryCode[i++] = strInventoryCode + "|" + intQuantity;
     document.getElementById('inventory_code').value = "";
     document.getElementById('quantity').value = "";

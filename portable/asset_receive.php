@@ -161,7 +161,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 	</tr>
 	</form>
 </table><p>
-<div id="result" style="font-size:24;width:100%;border-top:1px solid #CCCCCC;"></div>
+<div id="output" style="font-size:24;width:100%;border-top:1px solid #CCCCCC;"></div>
 
 <?php
 }

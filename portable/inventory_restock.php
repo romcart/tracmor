@@ -174,7 +174,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
   Destination Location: <input type="text" name="destination_location" onkeypress="javascript:if(event.keyCode=='13') CompleteMoveInventory();" size="20">
   <input type="submit" value="Complete Move">
   </form>
-  <div id="result"></div>
+  <div id="output"></div>
 
 <?php
 }
