@@ -41,38 +41,51 @@
 	 * 
 	 */
 	class LocationEditForm extends LocationEditFormBase {
-		
+
 		// Header Menu
 		protected $ctlHeaderMenu;
-		
 		protected $lblHeaderLocation;
 		
 		protected function Form_Create() {
-			
+
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			
-			parent::Form_Create();
+			//parent::Form_Create();
+			
+			// Call SetupLocation to either Load/Edit Existing or Create New
+			$this->SetupLocation();
+			
+			// Create/Setup Controls for Location's Data Fields
 			$this->lblHeaderLocation_Create();
+			$this->txtShortDescription_Create();
+			$this->txtLongDescription_Create();
+			$this->lblModifiedDate_Create();
+			
+			// Create/Setup Button Action controls
+			$this->btnSave_Create();
+			$this->btnCancel_Create();
+			$this->btnDelete_Create();
 		}
-		
+
 		// Create and Setup the Header Composite Control
-  	protected function ctlHeaderMenu_Create() {
-  		$this->ctlHeaderMenu = new QHeaderMenu($this);
-  	}
-		
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+		}
+
 		protected function lblHeaderLocation_Create() {
 			$this->lblHeaderLocation = new QLabel($this);
 			$this->lblHeaderLocation->Text = ($this->objLocation->ShortDescription != '') ? $this->objLocation->ShortDescription : 'New Location';			
 		}
-		
+
 		protected function txtShortDescription_Create() {
 			parent::txtShortDescription_Create();
 			$this->txtShortDescription->CausesValidation = true;
+			$this->txtShortDescription->Focus();
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}		
-		
+
 		// Setup btnSave
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
@@ -97,6 +110,7 @@
 			if ($objLocationDuplicate) {
 				$blnError = true;
 				$this->txtShortDescription->Warning = 'This Location Name is already in use. Please try another.';
+				$this->txtShortDescription->Focus();
 			}				
 			
 			if (!$blnError) {
@@ -129,7 +143,13 @@
 					throw new QDatabaseExceptionBase();
 				}
 			}
-		}		
+		}
+		
+		// Protected Update Methods
+		protected function UpdateLocationFields() {
+			$this->objLocation->ShortDescription = $this->txtShortDescription->Text;
+			$this->objLocation->LongDescription = $this->txtLongDescription->Text;
+		}
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using

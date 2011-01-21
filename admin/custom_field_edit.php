@@ -301,6 +301,7 @@
 		protected function txtShortDescription_Create() {
 			parent::txtShortDescription_Create();
 			$this->txtShortDescription->CausesValidation = true;
+			$this->txtShortDescription->Focus();
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}			

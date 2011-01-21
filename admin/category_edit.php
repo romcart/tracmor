@@ -41,18 +41,15 @@
 	 * 
 	 */
 	class CategoryEditForm extends CategoryEditFormBase {
-		
+
 		// Header Tabs
 		protected $ctlHeaderMenu;		
-		
+
 		protected $lblHeaderCategory;
-		
+
 		// Custom Field Objects
 		public $arrCustomFields;
-		
-		// Generate tab indexes
-		protected $intNextTabIndex = 1;
-		
+
 		protected function Form_Create() {
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();			
@@ -61,15 +58,10 @@
 
 			// Create/Setup Controls for Category's Data Fields
 			$this->lblHeaderCategory_Create();
-			$this->lblCategoryId_Create();
 			$this->txtShortDescription_Create();
 			$this->txtLongDescription_Create();
-			$this->txtImagePath_Create();
 			$this->chkAssetFlag_Create();
 			$this->chkInventoryFlag_Create();
-			$this->lstCreatedByObject_Create();
-			$this->calCreationDate_Create();
-			$this->lstModifiedByObject_Create();
 			$this->lblModifiedDate_Create();
 
 			// Create all custom asset fields
@@ -79,60 +71,56 @@
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
-			
-			
-			
-			
 		}
-		
-  	// Create and Setup the Header Composite Control
-  	protected function ctlHeaderMenu_Create() {
-  		$this->ctlHeaderMenu = new QHeaderMenu($this);
-  	}		
-		
+
+		// Create and Setup the Header Composite Control
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+		}
+
 		protected function lblHeaderCategory_Create() {
 			$this->lblHeaderCategory = new QLabel($this);
 			$this->lblHeaderCategory->Text = ($this->objCategory->ShortDescription != '') ? $this->objCategory->ShortDescription : 'New Category';
 		}
-		
+
 		protected function txtShortDescription_Create() {
 			parent::txtShortDescription_Create();
 			$this->txtShortDescription->CausesValidation = true;
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtShortDescription->TabIndex=1;
-			$this->intNextTabIndex++;
+			$this->txtShortDescription->Focus();
 		}
-		
+
+		// Create and Setup txtLongDescription
+		protected function txtLongDescription_Create() {
+			$this->txtLongDescription = new QTextBox($this);
+			$this->txtLongDescription->Name = QApplication::Translate('Long Description');
+			$this->txtLongDescription->Text = $this->objCategory->LongDescription;
+			$this->txtLongDescription->TextMode = QTextMode::MultiLine;
+		}
+
 		protected function chkAssetFlag_Create() {
 			parent::chkAssetFlag_Create();
 			$this->chkAssetFlag->CausesValidation = true;
 			$this->chkAssetFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->chkAssetFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtShortDescription->TabIndex=2;
-			$this->intNextTabIndex++;
 		}
-		
+
 		protected function chkInventoryFlag_Create() {
 			parent::chkInventoryFlag_Create();
 			$this->chkInventoryFlag->CausesValidation = true;
 			$this->chkInventoryFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->chkInventoryFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtShortDescription->TabIndex=3;
-			$this->intNextTabIndex++;
 		}
-		
+
 		// Create all Custom Asset Fields
 		protected function customFields_Create() {
 			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 			$this->objCategory->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(6, $this->blnEditMode, $this->objCategory->CategoryId);
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCategory->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-			foreach ($this->arrCustomFields as $objCustomField) {
-				$objCustomField['input']->TabIndex = ++$this->intNextTabIndex;
-			}
 		}
-		
+
 		// Setup btnSave
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
@@ -140,8 +128,6 @@
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->PrimaryButton = true;
 			$this->btnSave->CausesValidation = true;
-			$this->btnSave->TabIndex = ++$this->intNextTabIndex;
-			
 		}		
 		
 		// Control AjaxActions

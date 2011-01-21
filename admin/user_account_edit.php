@@ -88,29 +88,29 @@
   	protected function txtUsername_Create() {
   		parent::txtUsername_Create();
   		$this->txtUsername->CausesValidation = true;
-			$this->txtUsername->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtUsername->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtUsername->Focus();
+		$this->txtUsername->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+		$this->txtUsername->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
   	
   	// Create and Setup the FirstName textbox
   	protected function txtFirstName_Create() {
   		parent::txtFirstName_Create();
   		$this->txtFirstName->CausesValidation = true;
-			$this->txtFirstName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtFirstName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtFirstName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+		$this->txtFirstName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
   	
   	// Create and Setup the LastName textbox
   	protected function txtLastName_Create() {
   		parent::txtLastName_Create();
   		$this->txtLastName->CausesValidation = true;
-			$this->txtLastName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtLastName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtLastName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+		$this->txtLastName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}  	
 		
 		// Create/Setup the password textbox
 		protected function txtPassword_Create() {
-			
 			$this->txtPassword = new QTextBox($this);
 			$this->txtPassword->Name = 'Password';
 			$this->txtPassword->TextMode = QTextMode::Password;
@@ -120,8 +120,7 @@
 		}
 		
 		// Create/Setup the password confirmation textbox
-		protected function txtPasswordConfirm_Create() {
-			
+		protected function txtPasswordConfirm_Create() {			
 			$this->txtPasswordConfirm = new QTextBox($this);
 			$this->txtPasswordConfirm->Name = 'Confirm Password';
 			$this->txtPasswordConfirm->TextMode = QTextMode::Password;
@@ -142,16 +141,16 @@
   	protected function chkActiveFlag_Create() {
   		parent::chkActiveFlag_Create();
   		$this->chkActiveFlag->CausesValidation = true;
-			$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+		$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}  	
   	
   	// Create and Setup the Username textbox
   	protected function chkAdminFlag_Create() {
   		parent::chkAdminFlag_Create();
   		$this->chkAdminFlag->CausesValidation = true;
-			$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+		$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
   	
   	// Setup User Portable Access Flag Checkbox

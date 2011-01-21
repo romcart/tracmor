@@ -44,15 +44,11 @@
 		
 		// Header Menu
 		protected $ctlHeaderMenu;
-		
 		protected $lblHeaderManufacturer;
-		
+
 		// Custom Field Objects
 		public $arrCustomFields;
-		
-		// Generate tab indexes
-		protected $intNextTabIndex = 1;
-		
+
 		protected function Form_Create() {
 			
 			// Create the Header Menu
@@ -63,13 +59,8 @@
 
 			// Create/Setup Controls for Manufacturer's Data Fields
 			$this->lblHeaderManufacturer_Create();
-			$this->lblManufacturerId_Create();
 			$this->txtShortDescription_Create();
 			$this->txtLongDescription_Create();
-			$this->txtImagePath_Create();
-			$this->lstCreatedByObject_Create();
-			$this->calCreationDate_Create();
-			$this->lstModifiedByObject_Create();
 			$this->lblModifiedDate_Create();
 
 			// Create all custom asset fields
@@ -80,46 +71,39 @@
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
 		}
-		
+
 		// Create and Setup the Header Composite Control
-  	protected function ctlHeaderMenu_Create() {
-  		$this->ctlHeaderMenu = new QHeaderMenu($this);
-  	}
-		
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+		}
+
 		protected function lblHeaderManufacturer_Create() {
 			$this->lblHeaderManufacturer = new QLabel($this);
 			$this->lblHeaderManufacturer->Text = ($this->objManufacturer->ShortDescription != '') ? $this->objManufacturer->ShortDescription : 'New Manufacturer';
 		}
-		
+
 		protected function txtShortDescription_Create() {
 			parent::txtShortDescription_Create();
 			$this->txtShortDescription->CausesValidation = true;
+			$this->txtShortDescription->Focus();
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtShortDescription->TabIndex=1;
-			$this->intNextTabIndex++;
 		}
-		
+
 		protected function txtLongDescription_Create() {
 			parent::txtLongDescription_Create();
-			$this->txtLongDescription->TabIndex=2;
-			$this->intNextTabIndex++;
 		}
-		
+
 		// Create all Custom Asset Fields
 		protected function customFields_Create() {
-		
+
 			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 			$this->objManufacturer->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(5, $this->blnEditMode, $this->objManufacturer->ManufacturerId);
 			
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objManufacturer->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-			
-			foreach ($this->arrCustomFields as $objCustomField) {
-				$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
-			}
 		}
-		
+
 		// Setup btnSave
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
@@ -127,9 +111,8 @@
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->PrimaryButton = true;
 			$this->btnSave->CausesValidation = true;
-			$this->btnSave->TabIndex = $this->getNextTabIndex();
 		}		
-		
+
 		// Control ServerActions
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 			
@@ -142,7 +125,7 @@
 					// Save the values from all of the custom field controls to save the asset
 					CustomField::SaveControls($this->objManufacturer->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objManufacturer->ManufacturerId, 5);
 				}
-	
+
 				$this->RedirectToListPage();
 			}
 			catch(QExtendedOptimisticLockingException $objExc) {
@@ -153,7 +136,6 @@
 		
 		// Delete Manufacturer
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
-			
 			
 			try {
 				$objCustomFieldArray = $this->objManufacturer->objCustomFieldArray;
@@ -177,10 +159,6 @@
 		protected function UpdateManufacturerFields() {
 			$this->objManufacturer->ShortDescription = $this->txtShortDescription->Text;
 			$this->objManufacturer->LongDescription = $this->txtLongDescription->Text;
-		}
-		
-		protected function getNextTabIndex() {
-			return $this->intNextTabIndex++;
 		}
 	}
 
