@@ -410,8 +410,8 @@
 				$objClauses = array();
 				if ($objClause = $this->dtgAssetTransact->OrderByClause)
 					array_push($objClauses, $objClause);
-				if ($objClause = $this->dtgAssetTransact->LimitClause)
-					array_push($objClauses, $objClause);
+				/*if ($objClause = $this->dtgAssetTransact->LimitClause)
+					array_push($objClauses, $objClause);*/
 				if ($objClause = QQ::Expand(QQN::AssetTransaction()->Asset->AssetModel))
 					array_push($objClauses, $objClause);
 				if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation));
@@ -422,8 +422,8 @@
 				$objClauses = array();
 				if ($objClause = $this->dtgInventoryTransact->OrderByClause)
 					array_push($objClauses, $objClause);
-				if ($objClause = $this->dtgInventoryTransact->LimitClause)
-					array_push($objClauses, $objClause);
+				/*if ($objClause = $this->dtgInventoryTransact->LimitClause)
+					array_push($objClauses, $objClause);*/
 				if ($objClause = QQ::Expand(QQN::InventoryTransaction()->InventoryLocation->InventoryModel));
 					array_push($objClauses, $objClause);
 				$this->objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($this->objShipment->TransactionId, $objClauses);
@@ -1894,7 +1894,7 @@
 			$this->dtgAssetTransact->CssClass = "datagrid";
 
 	    // Enable AJAX - this won't work while using the DB profiler
-	    $this->dtgAssetTransact->UseAjax = false;
+	    $this->dtgAssetTransact->UseAjax = true;
 
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgAssetTransact);
@@ -2032,7 +2032,7 @@
 			$this->dtgInventoryTransact->CssClass = "datagrid";
 
 	    // Enable AJAX - this won't work while using the DB profiler
-	    $this->dtgInventoryTransact->UseAjax = false;
+	    $this->dtgInventoryTransact->UseAjax = true;
 
 	    // Enable Pagination, and set to 20 items per page
 	    $objPaginator = new QPaginator($this->dtgInventoryTransact);
