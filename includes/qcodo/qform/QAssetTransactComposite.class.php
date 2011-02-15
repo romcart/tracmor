@@ -310,7 +310,7 @@ class QAssetTransactComposite extends QControl {
 					}
 					elseif ($objNewAsset->CheckedOutFlag) {
 						$objUserAccount = $objNewAsset->GetLastTransactionUser();
-						if ($objUserAccount->UserAccountId != QApplication::$objUserAccount->UserAccountId) {
+						if ((QApplication::$TracmorSettings->StrictCheckinPolicy == '1') && ($objUserAccount->UserAccountId != QApplication::$objUserAccount->UserAccountId)) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "That asset was not checked out by the current user.";
 						}
