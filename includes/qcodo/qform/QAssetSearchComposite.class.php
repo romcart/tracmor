@@ -117,10 +117,10 @@ class QAssetSearchComposite extends QControl {
     // Add a 'Select All' checkbox
     $this->dtgAsset->ShowCheckboxes = false;
 
-    // Enable Pagination, and set to 20 items per page
+    // Enable Pagination
     $objPaginator = new QPaginator($this->dtgAsset);
     $this->dtgAsset->Paginator = $objPaginator;
-    $this->dtgAsset->ItemsPerPage = 20;
+    $this->dtgAsset->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 
     // If the user wants the checkboxes column
     if ($blnShowCheckboxes) {

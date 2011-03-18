@@ -57,6 +57,10 @@
 							<td class="record_field_edit"><?php $this->flaCompanyLogo->RenderWithError(); ?></td>
 						</tr>
 						<tr>
+							<td class="record_field_name">Search Results Per Page: </td>
+							<td class="record_field_edit"><?php $this->txtSearchResultsPerPage->RenderWithError(); ?></td>
+						</tr>
+						<tr>
 							<td class="record_field_name">Minimum Asset Code: </td>
 							<td class="record_field_edit"><?php $this->txtMinAssetCode->RenderWithError(); ?></td>
 						</tr>

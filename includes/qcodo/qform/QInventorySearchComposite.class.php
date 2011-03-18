@@ -94,10 +94,10 @@ class QInventorySearchComposite extends QControl {
     // Allow for CSV Export
     $this->dtgInventoryModel->ShowExportCsv = true;
 
-    // Enable Pagination, and set to 20 items per page
+    // Enable Pagination
     $objPaginator = new QPaginator($this->dtgInventoryModel);
     $this->dtgInventoryModel->Paginator = $objPaginator;
-    $this->dtgInventoryModel->ItemsPerPage = 20;
+    $this->dtgInventoryModel->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 
     // If the user wants the checkboxes column
     if ($blnShowCheckboxes) {

@@ -35,6 +35,7 @@
 		protected $chkPortablePinRequired;
 		protected $chkStrictCheckinPolicy;
 		protected $pnlSaveNotification;
+		protected $txtSearchResultsPerPage;
 		
 		// Buttons
 		protected $btnSave;
@@ -50,6 +51,7 @@
 			$this->chkCustomReceiptNumbers_Create();
 			$this->chkPortablePinRequired_Create();
 			$this->chkStrictCheckinPolicy_Create();
+			$this->txtSearchResultsPerPage_Create();
 			
 			// Create Buttons
 			$this->btnSave_Create();
@@ -88,6 +90,7 @@
 			$this->txtMinAssetCode = new QTextBox($this);
 			$this->txtMinAssetCode->Name = 'Minimum Asset Code';
 			$this->txtMinAssetCode->Text = QApplication::$TracmorSettings->MinAssetCode;
+			$this->txtMinAssetCode->Width = 64;
 		}
 		
 		// Create and Setup the CustomShipmentNumbers Checkbox
@@ -136,10 +139,22 @@
 			}
 		}
 		
+		// Create and Setup the SearchResultsPerPage Text Field
+		protected function txtSearchResultsPerPage_Create() {
+			$this->txtSearchResultsPerPage = new QTextBox($this);
+			$this->txtSearchResultsPerPage->Name = 'Search Results Per Page';
+			$this->txtSearchResultsPerPage->Text = QApplication::$TracmorSettings->SearchResultsPerPage;
+			$this->txtSearchResultsPerPage->Width = 64;
+			if (QApplication::$TracmorSettings->SearchResultsPerPage) {
+				$this->txtSearchResultsPerPage->Text = QApplication::$TracmorSettings->SearchResultsPerPage;
+			}
+		}
+		
 		// Create and Setup the Save Buttons
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
 			$this->btnSave->Text = 'Save';
+			$this->btnSave->CausesValidation = true;
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 		}
 		
@@ -155,7 +170,18 @@
 		// Save button click action
 		// Setting a TracmorSetting saves it to the database automagically because the __set() method has been altered
 		protected function btnSave_Click() {
+			$this->pnlSaveNotification->Display = false;
 			QApplication::$TracmorSettings->MinAssetCode = $this->txtMinAssetCode->Text;
+			
+			// Make sure a valid number is entered for Search Results Per Page setting
+			if (!is_numeric(trim($this->txtSearchResultsPerPage->Text)) || intval(trim($this->txtSearchResultsPerPage->Text)) < 1) {
+				$this->txtSearchResultsPerPage->Warning = QApplication::Translate('Please enter a valid number');
+				$this->txtSearchResultsPerPage->Blink();
+				$this->txtSearchResultsPerPage->Focus();
+				return;
+			} else {
+				QApplication::$TracmorSettings->SearchResultsPerPage = intval(trim($this->txtSearchResultsPerPage->Text));
+			}
 			
 			// If a customer logo was uploaded, save it to the appropriate location
 			if ($this->flaCompanyLogo->File) {

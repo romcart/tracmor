@@ -234,10 +234,10 @@
       // Allow for CSV Export
       $this->dtgCompany->ShowExportCsv = true;
 
-      // Enable Pagination, and set to 20 items per page
+      // Enable Pagination
       $objPaginator = new QPaginator($this->dtgCompany);
       $this->dtgCompany->Paginator = $objPaginator;
-      $this->dtgCompany->ItemsPerPage = 20;
+      $this->dtgCompany->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
           
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('Company Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
