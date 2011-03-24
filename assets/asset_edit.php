@@ -226,7 +226,8 @@
 	      $this->btnChildAssetsRemove->Enabled = true;
 	      $this->btnReassign->Enabled = true;
 	      $this->btnLinkToParent->Enabled = true;
-	      $this->btnUnlink->Enabled = true;
+	      if (!$this->btnUnlink->Enabled) 
+			$this->btnUnlink->Enabled = true;
 	    }
 	    else {
 	      $this->dtgChildAssets->ShowHeader = false;
