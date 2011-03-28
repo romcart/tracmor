@@ -32,4 +32,16 @@
 	    </table>
 	  </td>
 	</tr>
+	<tr>
+	  <td class="title">Import action</td>
+	</tr>
+	<tr>
+	  <td class="record_field_edit">
+	    <table width="100%" align="left" cellpadding="0" cellspacing="0">
+	     	<tr>
+	       	<td class="record_field_name" style="text-align: left"><?php $this->lstImportAction->Render(); ?></td>
+	     	</tr>
+	    </table>
+	  </td>
+	</tr>
 </table>

@@ -36,6 +36,7 @@
 		protected $txtFieldSeparator;
     protected $lstTextDelimiter;
 		protected $txtTextDelimiter;
+		protected $lstImportAction;
 		protected $flcFileCsv;
 		protected $FileCsvData;
 		protected $arrCsvHeader;
@@ -64,6 +65,9 @@
 		protected $objNewAssetModelArray;
 		protected $dtgAsset;
 		protected $objNewAssetArray;
+		protected $arrOldAssetArray;
+		protected $dtgUpdatedAsset;
+		protected $objUpdatedAssetArray;
 		protected $blnImportEnd;
 		protected $intImportStep;
 		protected $intLocationKey;
@@ -89,6 +93,7 @@
     protected $intAssetModelArray;
     protected $lblImportResults;
     protected $lblImportAssets;
+    protected $lblImportUpdatedAssets;
     protected $lblImportModels;
     protected $lblImportCategories;
     protected $lblImportManufacturers;
@@ -153,37 +158,41 @@
   				  'application/csv' => 'csv',
   				  'text/x-csv' => 'csv');
 		}
-		
+
 		protected function Form_PreRender() {
-			
+
 			if ($this->dtgLocation && count($this->objNewLocationArray) > 0 && $this->dtgLocation->Paginator) {
 				$this->dtgLocation->TotalItemCount = count($this->objNewLocationArray);
       	$this->dtgLocation->DataSource = $this->return_array_chunk($this->dtgLocation, $this->objNewLocationArray);
 			}
-			
+
 			if ($this->dtgCategory && count($this->objNewCategoryArray) > 0 && $this->dtgCategory->Paginator) {
 				$this->dtgCategory->TotalItemCount = count($this->objNewCategoryArray);
       	$this->dtgCategory->DataSource = $this->return_array_chunk($this->dtgCategory, $this->objNewCategoryArray);
 			}
-			
+
 			if ($this->dtgManufacturer && count($this->objNewManufacturerArray) > 0 && $this->dtgManufacturer->Paginator) {
 				$this->dtgManufacturer->TotalItemCount = count($this->objNewManufacturerArray);
       	$this->dtgManufacturer->DataSource = $this->return_array_chunk($this->dtgManufacturer, $this->objNewManufacturerArray);
 			}
-			
+
 			if ($this->dtgAssetModel && count($this->objNewAssetModelArray) > 0 && $this->dtgAssetModel->Paginator) {
 				$this->dtgAssetModel->TotalItemCount = count($this->objNewAssetModelArray);
       	$this->dtgAssetModel->DataSource = $this->return_array_chunk($this->dtgAssetModel, $this->objNewAssetModelArray);
 			}
-			
+
 			if ($this->dtgAsset && count($this->objNewAssetArray) > 0 && $this->dtgAsset->Paginator) {
 				$this->dtgAsset->TotalItemCount = count($this->objNewAssetArray);
       	$this->dtgAsset->DataSource = $this->return_array_chunk($this->dtgAsset, $this->objNewAssetArray);
 			}
-			
-			
+
+      if ($this->dtgUpdatedAsset && count($this->objUpdatedAssetArray) > 0 && $this->dtgUpdatedAsset->Paginator) {
+				$this->dtgUpdatedAsset->TotalItemCount = count($this->objUpdatedAssetArray);
+      	$this->dtgUpdatedAsset->DataSource = $this->return_array_chunk($this->dtgUpdatedAsset, $this->objUpdatedAssetArray);
+			}
+
 		}
-    
+
     // Create labels
     protected function Labels_Create() {
       $this->lblImportResults = new QLabel($this);
@@ -191,34 +200,40 @@
       $this->lblImportResults->Display = false;
       $this->lblImportResults->CssClass = "title";
       $this->lblImportResults->Text = "Import Results<br/><br/>";
-      
+
       $this->lblImportAssets = new QLabel($this);
       $this->lblImportAssets->HtmlEntities = false;
       $this->lblImportAssets->Display = false;
       $this->lblImportAssets->CssClass = "title";
       $this->lblImportAssets->Text = "<br/><br/>Last Imported Assets";
-      
+
+      $this->lblImportUpdatedAssets = new QLabel($this);
+      $this->lblImportUpdatedAssets->HtmlEntities = false;
+      $this->lblImportUpdatedAssets->Display = false;
+      $this->lblImportUpdatedAssets->CssClass = "title";
+      $this->lblImportUpdatedAssets->Text = "Last Updated Assets";
+
       $this->lblImportModels = new QLabel($this);
       $this->lblImportModels->Display = false;
       $this->lblImportModels->CssClass = "title";
       $this->lblImportModels->Text = "Last Imported Models";
-      
+
       $this->lblImportManufacturers = new QLabel($this);
       $this->lblImportManufacturers->Display = false;
       $this->lblImportManufacturers->CssClass = "title";
       $this->lblImportManufacturers->Text = "Last Imported Manufacturers";
-      
+
       $this->lblImportCategories = new QLabel($this);
       $this->lblImportCategories->Display = false;
       $this->lblImportCategories->CssClass = "title";
       $this->lblImportCategories->Text = "Last Imported Categories";
-      
+
       $this->lblImportLocations = new QLabel($this);
       $this->lblImportLocations->Display = false;
       $this->lblImportLocations->CssClass = "title";
       $this->lblImportLocations->Text = "Last Imported Locations";
     }
-    
+
 		// Create and Setup the Header Composite Control
 		protected function ctlHeaderMenu_Create() {
 			$this->ctlHeaderMenu = new QHeaderMenu($this);
@@ -266,6 +281,12 @@
 			$this->flcFileCsv->Name = "Select File: ";
 			$this->chkHeaderRow = new QCheckBox($this->pnlStepOne);
 			$this->chkHeaderRow->Name = "Header Row: ";
+			$this->lstImportAction = new QRadioButtonList($this->pnlStepOne);
+			$this->lstImportAction->Name = "Action Import: ";
+			$this->lstImportAction->Width = 150;
+			$this->lstImportAction->AddItem(new QListItem('Create Records', 1));
+			$this->lstImportAction->AddItem(new QListItem('Create and Update Records', 2));
+			$this->lstImportAction->SelectedIndex = 0;
     }
 
 
@@ -432,7 +453,6 @@
                   $dtpDate = new QDateTimePicker($this);
                 	$dtpDate->DateTimePickerType = QDateTimePickerType::Date;
                 	$dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-					$dtpDate->MaximumYear = QDateTime::Now()->Year;
                 	$dtpDate->Display = false;
                 	$this->dtpDateArray[] = $dtpDate;
 
@@ -444,7 +464,7 @@
               }
               $this->btnNext->Text = "Import Now";
               fclose($file_skipped);
-              // Create Add Fiekd button
+              // Create Add Field button
               $btnAddField = new QButton($this);
               $btnAddField->Text = "Add Field";
               $btnAddField->AddAction(new QClickEvent(), new QServerAction('btnAddField_Click'));
@@ -666,6 +686,18 @@
           $this->dtgAsset->ShowHeader = false;
           $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
+          // Updated assets
+          $this->dtgUpdatedAsset = new QDataGrid($this);
+          $this->dtgUpdatedAsset->Name = 'updated_asset_list';
+      		$this->dtgUpdatedAsset->CellPadding = 5;
+      		$this->dtgUpdatedAsset->CellSpacing = 0;
+      		$this->dtgUpdatedAsset->CssClass = "datagrid";
+          $this->dtgUpdatedAsset->UseAjax = true;
+          $this->dtgUpdatedAsset->ShowColumnToggle = false;
+          $this->dtgUpdatedAsset->ShowExportCsv = false;
+          $this->dtgUpdatedAsset->ShowHeader = false;
+          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+
           // Create the label for successful import
           $this->lblImportSuccess = new QLabel($this);
         	$this->lblImportSuccess->HtmlEntities = false;
@@ -840,6 +872,7 @@
             }
 
             $strAssetArray = array();
+            $strUpdatedAssetArray = array();
             // Load all assets
             foreach (Asset::LoadAll() as $objAsset) {
               $strAssetArray[] = strtolower($objAsset->AssetCode);
@@ -1031,7 +1064,9 @@
             // Asset import
             elseif ($this->intImportStep == 5) {
               $strAssetValuesArray = array();
+              $objAssetValuesArray = array();
               $strAssetCFVArray = array();
+              $strUpdatedAssetCFVArray = array();
               $strAssetCodeArray = array();
               $strAddedCFVArray = array();
               // This will add extra commas for blank values
@@ -1109,8 +1144,8 @@
                                       addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
                                       addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
                           $strCFVArray[$objCustomField->CustomFieldId] = ($strShortDescription) ? sprintf("'%s'", $strShortDescription) : "NULL";
-                          
-                          
+
+
                           /*$strQuery = sprintf("INSERT INTO `custom_field_value` " .
                                               "(`custom_field_id`,`short_description`, `created_by`, `creation_date`) " .
                                               "VALUES ('%s', '%s', '%s', 'NOW()');",
@@ -1185,6 +1220,94 @@
                       $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                     }
                   }
+                  // Import Action is "Create and Update Records"
+                  elseif ($strAssetCode && $this->lstImportAction->SelectedValue == 2 && $this->in_array_nocase($strAssetCode, $strAssetArray)) {
+                   $intLocationKeyArray = array_keys($intLocationArray, addslashes(strtolower(trim($strRowArray[$this->intLocationKey]))));
+                    if (!count($intLocationKeyArray)) {
+                      $intLocationKeyArray = array_keys($intLocationArray, addslashes(strtolower(trim($this->txtMapDefaultValueArray[$this->intLocationKey]->Text))));
+                    }
+                    $intModelKeyArray = array_keys($this->intAssetModelArray, $strAssetModel);
+                    if (count($intLocationKeyArray) && count($intModelKeyArray)) {
+                      $objAssetArray = Asset::LoadArrayBySearchHelper($strAssetCode, null, null, null, null, false, null, null, null, null, null, null, null, null, null, false, null, null, null, false, false, false);
+                      $objAsset = $objAssetArray[0];
+                      $strUpdatedAssetArray[] = strtolower($strAssetCode);
+                      $strCategoryKeyArray = array_keys($intCategoryArray, addslashes(strtolower(trim($strRowArray[$this->intCategoryKey]))));
+                      // Only fields that can normally be updated when editing an asset can be updated
+                      if ($objAsset->LocationId != $intLocationKeyArray[0] || $objAsset->AssetModel->CategoryId != $intCategoryId || $objAsset->AssetModel->ManufacturerId != $intManufacturerId) {
+                        $this->intSkippedRecordCount++;
+                        $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                      }
+                      else {
+                        $this->arrOldAssetArray[$objAsset->AssetId] = array();
+                        $this->arrOldAssetArray[$objAsset->AssetId]['AssetModelId'] = $objAsset->AssetModelId;
+                        $this->arrOldAssetArray[$objAsset->AssetId]['ModifiedBy'] = $objAsset->ModifiedBy;
+                        $this->arrOldAssetArray[$objAsset->AssetId]['ModifiedDate'] = $objAsset->ModifiedDate;
+                        $this->arrOldAssetArray[$objAsset->AssetId]['CFV'] = array();
+                        $objAsset->AssetModelId = $intModelKeyArray[0];
+                        $objAssetValuesArray[] = $objAsset;
+                        //$objAssetValuesArray[] = sprintf("('%s', '%s', '%s', '%s', NOW())", $strAssetCode, $intLocationKeyArray[0], $intModelKeyArray[0], $_SESSION['intUserAccountId']);
+                        $strCFVArray = array();
+                        $objDatabase = CustomField::GetDatabase();
+                        // Asset Custom Field import
+                        foreach ($arrAssetCustomField as $objCustomField) {
+                          $this->arrOldAssetArray[$objAsset->AssetId]['CFV'][$objCustomField->CustomFieldId] = $objAsset->GetVirtualAttribute($objCustomField->CustomFieldId);
+                          if ($objCustomField->CustomFieldQtypeId != 2) {
+                          	$strShortDescription = (trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?
+                                        addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
+                                        addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
+                            $strCFVArray[$objCustomField->CustomFieldId] = ($strShortDescription) ? sprintf("'%s'", $strShortDescription) : "NULL";
+                          }
+                          else {
+                          	$objDatabase = Asset::GetDatabase();
+                            $strShortDescription = addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
+                            $strCFVArray[$objCustomField->CustomFieldId] = ($strShortDescription) ? sprintf("'%s'", $strShortDescription) : "NULL";
+                            $blnInList = false;
+                            foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
+                  					  if (strtolower($objCustomFieldValue->ShortDescription) == strtolower($strShortDescription)) {
+                       					//$intCustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
+                      					$blnInList = true;
+                      					break;
+                  					  }
+                  					}
+                  					// Add the CustomFieldValue
+                  					if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
+                  						$strQuery = sprintf("INSERT INTO custom_field_value (custom_field_id, short_description, created_by, creation_date) VALUES (%s, '%s', %s, NOW());", $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
+                  						$objDatabase->NonQuery($strQuery);
+                  						$strAddedCFVArray[] = $strShortDescription;
+                  					}
+                  					elseif (!$blnInList && $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                   					  //$intCustomFieldValueId = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue;
+                              $strShortDescription = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
+                   					}
+                            if ($strShortDescription) {
+                              $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
+                            }
+                            else {
+                              $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
+                            }
+                          }
+                        }
+                        $strAssetCodeArray[] = $strAssetCode;
+                        if (count($strCFVArray)) {
+                          $strUpdatedAssetCFVArray[$objAsset->AssetId] = $strCFVArray;
+                        }
+                        else {
+                          $strUpdatedAssetCFVArray[$objAsset->AssetId] = "";
+                        }
+                      }
+                    }
+                    // Add records skipped due to errors
+                    else {
+                      $this->intSkippedRecordCount++;
+                      $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                    }
+                  }
+                  // If Import Action is "Create Records" and this Asset has already in the database
+                  elseif ($this->lstImportAction->SelectedValue == 1 && $this->in_array_nocase($strAssetCode, $strAssetArray)) {
+                    // Skipped and flagged as duplicates
+                    $this->intSkippedRecordCount++;
+                    $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                  }
                 }
               }
               $intAssetCount = count($strAssetValuesArray);
@@ -1214,6 +1337,23 @@
                   }
                 }
               }
+              $intObjAssetCount = count($objAssetValuesArray);
+              if ($intObjAssetCount) {
+                $objDatabase = Asset::GetDatabase();
+                $strCFVArray = array();
+                foreach ($objAssetValuesArray as $objAsset) {
+                  $this->objUpdatedAssetArray[$objAsset->AssetId] = $objAsset->AssetCode;
+                  if (count($strUpdatedAssetCFVArray[$objAsset->AssetId])) {
+                    foreach ($arrAssetCustomField as $objCustomField) {
+                      $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedAssetCFVArray[$objAsset->AssetId][$objCustomField->CustomFieldId]);
+                    }
+                    $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $objAsset->AssetId);
+                    $objDatabase->NonQuery($strQuery);
+                  }
+                  $objAsset->Save();
+                }
+
+              }
               $this->intCurrentFile++;
               break;
             }
@@ -1229,14 +1369,20 @@
             }*/
             $this->blnImportEnd = true;
             $this->btnNext->Warning = "";
-            
-            
+
+
             $this->lblImportResults->Display = true;
             if (count($this->objNewAssetArray)) {
               $this->lblImportAssets->Display = true;
               $this->dtgAsset->Paginator = new QPaginator($this->dtgAsset);
               $this->dtgAsset->ItemsPerPage = 20;
-              
+
+            }
+            if (count($this->objUpdatedAssetArray)) {
+              $this->lblImportUpdatedAssets->Display = true;
+              $this->dtgUpdatedAsset->Paginator = new QPaginator($this->dtgUpdatedAsset);
+              $this->dtgUpdatedAsset->ItemsPerPage = 20;
+
             }
             if (count($this->objNewAssetModelArray)) {
               $this->lblImportModels->Display = true;
@@ -1266,12 +1412,11 @@
             $this->lblImportSuccess->Display = true;
             $this->lblImportSuccess->Text = sprintf("Success:<br/>" .
                                              "<b>%s</b> Records imported successfully<br/>" .
-                                             "<b>%s</b> Records skipped due to error<br/>", count($this->objNewAssetArray), $this->intSkippedRecordCount);
+                                             "<b>%s</b> Records skipped due to error<br/>", count($this->objNewAssetArray) + count($this->objUpdatedAssetArray), $this->intSkippedRecordCount);
             if ($this->intSkippedRecordCount) {
                $this->lblImportSuccess->Text .= sprintf("<a href='./asset_import.php?intDownloadCsv=1'>Click here to download records that could not be imported</a>");
             }
             $this->lblImportSuccess->Text .= "<br/><br/>";
-
             $this->intImportStep = -1;
           }
           // Enable Next button
@@ -1296,7 +1441,7 @@
         }
 		  }
 	  }
-	  
+
 	  public function return_array_chunk($dtgDatagrid, $strArray) {
 	  	if (count($strArray) > 0) {
 		  	$intPageNumber = $dtgDatagrid->Paginator->PageNumber;
@@ -1307,7 +1452,7 @@
 	  		return false;
 	  	}
 	  }
-	  
+
 	  // Case-insensitive in array function
     protected function in_array_nocase($search, &$array) {
       $search = strtolower($search);
@@ -1512,6 +1657,24 @@
       $objDatabase = Asset::GetDatabase();
       //$strQuery = "SET FOREIGN_KEY_CHECKS=0;";
       //$objDatabase->NonQuery($strQuery);
+      if (isset($this->arrOldAssetArray) && count($this->arrOldAssetArray)) {
+        $strQuery = "SET FOREIGN_KEY_CHECKS=0;";
+        $objDatabase->NonQuery($strQuery);
+        foreach ($this->arrOldAssetArray as $intAssetId => $arrOldAsset) {
+          $strQuery = sprintf("UPDATE `asset` SET `asset_model_id`='%s', `modified_by`='%s', `modified_date`='%s' WHERE `asset_id`='%s'", $arrOldAsset['AssetModelId'], $arrOldAsset['ModifiedBy'], $arrOldAsset['ModifiedDate'], $intAssetId);
+          $objDatabase->NonQuery($strQuery);
+          if (count($arrOldAsset['CFV'])) {
+            $strCFV = array();
+            foreach ($arrOldAsset['CFV'] as $intCustomFieldId => $strCFV) {
+              $strCFVArray[] = sprintf("`cfv_%s`='%s'", $intCustomFieldId, $strCFV);
+            }
+            $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intAssetId);
+            $objDatabase->NonQuery($strQuery);
+          }
+        }
+        $strQuery = "SET FOREIGN_KEY_CHECKS=1;";
+        $objDatabase->NonQuery($strQuery);
+      }
 		  if (count($this->objNewAssetArray)) {
         $strQuery = sprintf("DELETE FROM `asset` WHERE `asset_id` IN (%s)", implode(", ", array_keys($this->objNewAssetArray)));
         $objDatabase->NonQuery($strQuery);
@@ -1560,7 +1723,6 @@
  	      $dtpDate = new QDateTimePicker($this);
  	      $dtpDate->DateTimePickerType = QDateTimePickerType::Date;
  	      $dtpDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-		  $dtpDate->MaximumYear = QDateTime::Now()->Year;
  	      $dtpDate->Display = false;
  	      $this->dtpDateArray[] = $dtpDate;
 
