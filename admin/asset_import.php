@@ -1233,7 +1233,8 @@
                       $strUpdatedAssetArray[] = strtolower($strAssetCode);
                       $strCategoryKeyArray = array_keys($intCategoryArray, addslashes(strtolower(trim($strRowArray[$this->intCategoryKey]))));
                       // Only fields that can normally be updated when editing an asset can be updated
-                      if ($objAsset->LocationId != $intLocationKeyArray[0] || $objAsset->AssetModel->CategoryId != $intCategoryId || $objAsset->AssetModel->ManufacturerId != $intManufacturerId) {
+                      //if ($objAsset->LocationId != $intLocationKeyArray[0] || $objAsset->AssetModel->CategoryId != $intCategoryId || $objAsset->AssetModel->ManufacturerId != $intManufacturerId) {
+                      if ($objAsset->LocationId != $intLocationKeyArray[0]) {
                         $this->intSkippedRecordCount++;
                         $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                       }
