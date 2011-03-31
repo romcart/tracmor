@@ -616,7 +616,7 @@
           }
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
-          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
@@ -1341,15 +1341,17 @@
               $intObjAssetCount = count($objAssetValuesArray);
               if ($intObjAssetCount) {
                 $objDatabase = Asset::GetDatabase();
-                $strCFVArray = array();
                 foreach ($objAssetValuesArray as $objAsset) {
                   $this->objUpdatedAssetArray[$objAsset->AssetId] = $objAsset->AssetCode;
                   if (count($strUpdatedAssetCFVArray[$objAsset->AssetId])) {
+                    $strCFVArray = array();
                     foreach ($arrAssetCustomField as $objCustomField) {
                       $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedAssetCFVArray[$objAsset->AssetId][$objCustomField->CustomFieldId]);
                     }
-                    $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $objAsset->AssetId);
-                    $objDatabase->NonQuery($strQuery);
+                    if (count($strCFVArray)) {
+                      $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $objAsset->AssetId);
+                      $objDatabase->NonQuery($strQuery);
+                    }
                   }
                   $objAsset->Save();
                 }
@@ -1662,7 +1664,9 @@
         $strQuery = "SET FOREIGN_KEY_CHECKS=0;";
         $objDatabase->NonQuery($strQuery);
         foreach ($this->arrOldAssetArray as $intAssetId => $arrOldAsset) {
-          $strQuery = sprintf("UPDATE `asset` SET `asset_model_id`='%s', `modified_by`='%s', `modified_date`='%s' WHERE `asset_id`='%s'", $arrOldAsset['AssetModelId'], $arrOldAsset['ModifiedBy'], $arrOldAsset['ModifiedDate'], $intAssetId);
+          $strModifiedBy = (!$arrOldAsset['ModifiedBy'] || strtolower($arrOldAsset['ModifiedBy']) == "null" || $arrOldAsset['ModifiedBy'] == '0') ? "null" : "'" . $arrOldAsset['ModifiedBy'] . "'";
+          $strModifiedDate = (!$arrOldAsset['ModifiedDate'] || strtolower($arrOldAsset['ModifiedDate']) == "null" || $arrOldAsset['ModifiedDate'] == '0000-00-00 00:00:00') ? "null" : "'" . $arrOldAsset['ModifiedDate'] . "'";
+          $strQuery = sprintf("UPDATE `asset` SET `asset_model_id`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_id`='%s'", $arrOldAsset['AssetModelId'], $strModifiedBy, $strModifiedDate, $intAssetId);
           $objDatabase->NonQuery($strQuery);
           if (count($arrOldAsset['CFV'])) {
             $strCFV = array();
