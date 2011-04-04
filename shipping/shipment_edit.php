@@ -3049,6 +3049,7 @@
 						unset ($this->objAssetTransactionArray[$key]);
 					}
 				}
+				$this->dtgAssetTransact->Refresh();
 			}
 		}
 
@@ -3066,6 +3067,7 @@
 						unset ($this->objInventoryTransactionArray[$key]);
 					}
 				}
+				$this->dtgInventoryTransact->Refresh();
 			}
 		}
 
