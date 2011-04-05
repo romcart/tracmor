@@ -261,9 +261,9 @@
 
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
 		protected function Form_PreRender() {
-			
+
 			$this->dtgAssetTransact->SetDataBinder('dtgAssetTransact_Bind');
-			
+
 			$this->dtgInventoryTransact->SetDataBinder('dtgInventoryTransact_Bind');
 
 			// Load the data for the AssetTransact datagrid
@@ -302,7 +302,7 @@
 //				}
 //			}
 		}
-		
+
 		protected function dtgAssetTransact_Bind() {
 			// Load the data for the AssetTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyAssets || $this->blnEditMode) {
@@ -330,7 +330,7 @@
 				}
 			}
 		}
-		
+
 		protected function dtgInventoryTransact_Bind() {
 			// Load the data for the InventoryTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyInventory || $this->blnEditMode) {
@@ -338,7 +338,7 @@
 				$intItemsPerPage = $this->dtgInventoryTransact->ItemsPerPage;
 				$intItemOffset = ($this->dtgInventoryTransact->PageNumber - 1) * $intItemsPerPage;
 				$arrDataSource = array_slice($this->objInventoryTransactionArray, $intItemOffset, $intItemsPerPage);
-				
+
 				$this->dtgInventoryTransact->TotalItemCount = count($this->objInventoryTransactionArray);
 				if ($this->dtgInventoryTransact->TotalItemCount > 0) {
 					//$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
@@ -1339,11 +1339,11 @@
 				$blnError = false;
 
 				// Do not allow creation of an asset if asset limit will be exceeded
-				$intAssetLimit = (is_numeric(QApplication::$TracmorSettings->AssetLimit)) ? QApplication::$TracmorSettings->AssetLimit : false;			
+				$intAssetLimit = (is_numeric(QApplication::$TracmorSettings->AssetLimit)) ? QApplication::$TracmorSettings->AssetLimit : false;
 				if ($intAssetLimit && Asset::CountActive() >= $intAssetLimit) {
 					$blnError = true;
 					$this->txtNewAssetCode->Warning = "Your asset limit has been reached.";
-				}			
+				}
 
 				// Assign an empty string to the asset code for now (NULL won't work to render properly in the datagrid
 				if ($this->chkAutoGenerateAssetCode->Checked == true) {
@@ -2671,7 +2671,7 @@
 						$objCustomField['lbl']->Display=true;
 						$objCustomField['input']->Display=false;
 						if(($objCustomField['blnRequired'])){
-							$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+							if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 						}
 					}
 				}

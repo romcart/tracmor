@@ -464,13 +464,13 @@
 
 		// Datagrids must load their datasource in this step, because the data is not stored in the FormState variable like everything else
 		protected function Form_PreRender() {
-			
+
 			$this->dtgAssetTransact->SetDataBinder('dtgAssetTransact_Bind');
-			
+
 			$this->dtgInventoryTransact->SetDataBinder('dtgInventoryTransact_Bind');
-			
+
 		}
-		
+
 		protected function dtgAssetTransact_Bind() {
 			// Load the data for the AssetTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyAssets || $this->blnEditMode) {
@@ -498,7 +498,7 @@
 				}
 			}
 		}
-		
+
 		protected function dtgInventoryTransact_Bind() {
 			// Load the data for the InventoryTransact datagrid - only if it has changed or is new
 			if ($this->blnModifyInventory || $this->blnEditMode) {
@@ -506,7 +506,7 @@
 				$intItemsPerPage = $this->dtgInventoryTransact->ItemsPerPage;
 				$intItemOffset = ($this->dtgInventoryTransact->PageNumber - 1) * $intItemsPerPage;
 				$arrDataSource = array_slice($this->objInventoryTransactionArray, $intItemOffset, $intItemsPerPage);
-				
+
 				$this->dtgInventoryTransact->TotalItemCount = count($this->objInventoryTransactionArray);
 				if ($this->dtgInventoryTransact->TotalItemCount > 0) {
 					//$this->dtgInventoryTransact->DataSource = $this->objInventoryTransactionArray;
@@ -2911,7 +2911,7 @@
   						$objLinkedAssetTransaction->SourceLocationId = $objCheckedLinkedAsset->LocationId;
   						$this->objAssetTransactionArray[] = $objLinkedAssetTransaction;
 						}
-						
+
 					}
 					$this->dtgAssetTransact->Refresh();
 				}
@@ -4470,8 +4470,8 @@
 						1368 => 2,																		//Label Type ; 2 = 2D Common
 						1369 => $this->lstFedexLabelPrinterType->SelectedValue,							//Label Printer Type ; 1 = Laser Printer
 						1370 => ($this->lstFedexLabelPrinterType->SelectedValue === 1) ? 				//Label Media Type ; 5 = Plain Paper
-								5 : 
-								$this->lstFedexLabelFormatType->SelectedValue, 
+								5 :
+								$this->lstFedexLabelFormatType->SelectedValue,
 						2973 => 1,																		//Doc Tab Type Indicator; 1 = Zone 001
 						1607 => 'SHIPPING',
 						1608 => 'SPECIAL',
@@ -5015,7 +5015,7 @@
 
 				//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
 				if (!$this->blnEditMode && !$objCustomField['blnEdit'] && $objCustomField['blnRequired']){
-					$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+					if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 					$objCustomField['lbl']->Display=true;
 					$objCustomField['input']->Display=false;
 				}

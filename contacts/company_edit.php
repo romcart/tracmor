@@ -95,18 +95,18 @@ class CompanyEditForm extends CompanyEditFormBase {
 	public $blnAddressEditBuiltInFields;
 
 	protected function Form_Create() {
-			
+
 		// Tab Index
 		$this->intTabIndex = 1;
-			
+
 		// Call SetupCompany to either Load/Edit Existing or Create New
 		$this->SetupCompany();
-			
+
 		// Create the Header Menu
 		$this->ctlHeaderMenu_Create();
 		// Create the Shortcut Menu
 		$this->ctlShortcutMenu_Create();
-			
+
 		// Create labels for Company information
 		$this->lblShortDescription_Create();
 		$this->lblHeaderCompanyName_Create();
@@ -119,7 +119,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 		$this->lblCreationDate_Create();
 		$this->lblModifiedDate_Create();
 		$this->UpdateCompanyLabels();
-			
+
 		// Create/Setup Controls for Company's Data Fields
 		$this->txtShortDescription_Create();
 		$this->txtLongDescription_Create();
@@ -127,17 +127,17 @@ class CompanyEditForm extends CompanyEditFormBase {
 		$this->txtEmail_Create();
 		$this->txtTelephone_Create();
 		$this->txtFax_Create();
-			
+
 		// Create all custom asset fields
 		$this->customFields_Create();
-			
+
 		$this->UpdateBuiltInFields();
-			
-			
-			
+
+
+
 		$this->lstAddress_Create();
 		$this->UpdateCompanyControls();
-			
+
 		if (!$this->blnEditMode) {
 			$this->txtAddressShortDescription_Create();
 			$this->txtAddress1_Create();
@@ -158,11 +158,11 @@ class CompanyEditForm extends CompanyEditFormBase {
 		$this->pnlAttachments_Create();
 		$this->btnCreateAddress_Create();
 		$this->btnCreateContact_Create();
-			
+
 		// Create/Setup Datagrids
 		$this->dtgContact_Create();
 		$this->dtgAddress_Create();
-			
+
 		// Display labels for the existing asset
 		if ($this->blnEditMode) {
 			$this->displayLabels();
@@ -171,7 +171,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 		else {
 			$this->displayInputs();
 		}
-			
+
 		//Set display logic of the Create New Address and Create New Contact
 		$this->UpdateAddressAccess();
 		$this->UpdateContactAccess();
@@ -197,7 +197,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 			$this->dtgContact->DataSource = Contact::LoadArrayByCompanyId($this->objCompany->CompanyId, $objClauses);
 			$this->dtgContact->ShowHeader = true;
 		}
-			
+
 		$this->dtgAddress->TotalItemCount = Address::CountByCompanyId($this->objCompany->CompanyId);
 		if ($this->dtgAddress->TotalItemCount == 0) {
 			$this->dtgAddress->ShowHeader = false;
@@ -305,7 +305,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 		$this->txtShortDescription->TabIndex = $this->intTabIndex++;
 		$this->txtShortDescription->Required = true;
 		QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->txtShortDescription->ControlId));
-			
+
 	}
 
 	// Create the Website Text Field
@@ -321,7 +321,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 	protected function txtLongDescription_Create() {
 		parent::txtLongDescription_Create();
 		$this->txtLongDescription->TabIndex = $this->intTabIndex++;
-			
+
 	}
 
 	// Create the Telephone Text Field
@@ -454,23 +454,23 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 		$this->objCompany->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(7, $this->blnEditMode, $this->objCompany->CompanyId);
-			
+
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		if ($this->objCompany->objCustomFieldArray) {
 			$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCompany->objCustomFieldArray, $this->blnEditMode, $this, true, true);
 		}
 		$this->UpdateCustomFields();
-			
-			
+
+
 	}
 
 	// Create all custom fields for addresses (only when creating a new company
 	protected function arrAddressCustomFields_Create() {
-			
+
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 		$this->objAddress = new Address();
 		$this->objAddress->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(9, $this->blnEditMode);
-			
+
 		if ($this->objAddress->objCustomFieldArray) {
 			$this->arrAddressCustomFields = CustomField::CustomFieldControlsCreate($this->objAddress->objCustomFieldArray, $this->blnEditMode, $this, false, true);
 			if ($this->arrAddressCustomFields) {
@@ -633,7 +633,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 	// Update state/province list when country is selected for Primary address if creating a new company
 	protected function lstCountry_Select() {
-			
+
 		// Save the currently selected StateProvince
 		$intStateProvinceId = $this->lstStateProvince->SelectedValue;
 		// Clear out the items from lstAddress
@@ -671,7 +671,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 		// Hide labels and display inputs where appropriate
 		$this->displayInputs();
-			
+
 		$this->UpdateBuiltInFields();
 		$this->UpdateCustomFields();
 		$this->UpdateAddressCustomFields();
@@ -679,13 +679,13 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 	// Control ServerActions
 	protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
-			
+
 		try {
 
 			$blnError = false;
 
 			if (!$this->blnEditMode) {
-					
+
 				if ($this->txtAddressShortDescription->Text) {
 					if (!$this->txtAddress1->Text) {
 						$this->txtAddress1->Warning = 'Address is a required field.';
@@ -719,13 +719,13 @@ class CompanyEditForm extends CompanyEditFormBase {
 			} else {
 				$objCompanyDuplicate = Company::QuerySingle(QQ::Equal(QQN::Company()->ShortDescription, $this->txtShortDescription->Text));
 			}
-			
+
 			if ($objCompanyDuplicate) {
 				$blnError = true;
 				$this->txtShortDescription->Warning = 'A company with that name already exists. Please try another';
 				return;
-			}			
-			
+			}
+
 			$this->UpdateCompanyFields();
 			$this->objCompany->Save();
 			// Assign input values to custom fields
@@ -801,7 +801,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 	// Save Primary Address for new Companies {
 	protected function SaveNewAddress() {
-			
+
 		if (!$this->blnEditMode && $this->txtAddressShortDescription->Text) {
 
 			if ($this->objAddress->objCustomFieldArray) {
@@ -840,7 +840,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 	// Update the Company Labels
 	protected function UpdateCompanyLabels() {
-			
+
 		if ($this->blnEditMode) {
 			$this->lblHeaderCompanyName->Text = $this->objCompany->__toString();
 		} else {
@@ -882,11 +882,11 @@ class CompanyEditForm extends CompanyEditFormBase {
 		$this->lstAddress->Display = false;
 		$this->txtTelephone->Display = false;
 		$this->txtFax->Display = false;
-			
+
 		// Do not display Cancel and Save buttons
 		$this->btnCancel->Display = false;
 		$this->btnSave->Display = false;
-			
+
 		// Display Labels for Viewing mode
 		$this->lblShortDescription->Display = true;
 		$this->lblWebsite->Display = true;
@@ -895,7 +895,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 		$this->lblAddress->Display = true;
 		$this->lblTelephone->Display = true;
 		$this->lblFax->Display = true;
-			
+
 		// Display custom field labels
 		if ($this->arrCustomFields) {
 			CustomField::DisplayLabels($this->arrCustomFields);
@@ -909,7 +909,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 	// Display the inputs for Company Edit mode
 	protected function DisplayInputs() {
-			
+
 		// Do not display labels
 		$this->lblShortDescription->Display = false;
 		$this->lblWebsite->Display = false;
@@ -918,12 +918,12 @@ class CompanyEditForm extends CompanyEditFormBase {
 		$this->lblAddress->Display = false;
 		$this->lblTelephone->Display = false;
 		$this->lblFax->Display = false;
-			
+
 		// Do not display the Edit or Delete button
 		$this->btnEdit->Display = false;
 		$this->btnDelete->Display = false;
 		$this->atcAttach->btnUpload->Display = false;
-			
+
 		// Display the inputs for edit mode
 		$this->txtShortDescription->Display = true;
 		$this->txtWebsite->Display = true;
@@ -932,19 +932,19 @@ class CompanyEditForm extends CompanyEditFormBase {
 		$this->lstAddress->Display = true;
 		$this->txtTelephone->Display = true;
 		$this->txtFax->Display = true;
-			
+
 		//If the user is not authorized to edit built-in fields, the fields are render as labels.
 		if(!$this->blnEditBuiltInFields){
 			$this->DisplayLabels();
 		}
-			
-			
-			
-			
+
+
+
+
 		// Display the Save and Cancel buttons
 		$this->btnSave->Display = true;
 		$this->btnCancel->Display = true;
-			
+
 		// Display custom field inputs
 		if ($this->arrCustomFields) {
 			CustomField::DisplayInputs($this->arrCustomFields);
@@ -978,7 +978,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 		else{
 			$this->blnAddressViewBuiltInFields=false;
 		}
-			
+
 		//Set Edit Display Logic of Built-In Fields	of Address
 		$objRoleEntityQtypeBuiltInAuthorizationAddress2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
 		if($objRoleEntityQtypeBuiltInAuthorizationAddress2 && $objRoleEntityQtypeBuiltInAuthorizationAddress2->AuthorizedFlag){
@@ -1002,11 +1002,11 @@ class CompanyEditForm extends CompanyEditFormBase {
 				$objCustomField['lbl']->Display=true;
 				$objCustomField['input']->Display=false;
 				if(($objCustomField['blnRequired'])){
-					$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+					if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 				}
 			}
 		}
-			
+
 	}
 	//Set display logic for the CustomFields of Address
 	protected function UpdateAddressCustomFields(){
@@ -1018,7 +1018,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 			//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
 			if (!$this->blnEditMode && !$objCustomField['blnEdit'] && $objCustomField['blnRequired']){
-				$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+				if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 				$objCustomField['lbl']->Display=true;
 				$objCustomField['input']->Display=false;
 			}
@@ -1046,7 +1046,7 @@ class CompanyEditForm extends CompanyEditFormBase {
 			$this->btnCreateAddress->Visible=false;
 		}
 	}
-	
+
 	protected function getNextTabIndex() {
 		return $this->intTabIndex++;
 	}

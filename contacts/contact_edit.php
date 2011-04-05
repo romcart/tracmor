@@ -97,21 +97,21 @@ class ContactEditForm extends ContactEditFormBase {
 
 
 	protected function Form_Create() {
-			
+
 		$this->intTabIndex = 1;
-			
+
 		// Call SetupCompany to either Load/Edit Existing or Create New
 		$this->SetupContact();
 		if (!$this->blnEditMode && QApplication::QueryString('intCompanyId')) {
 			// Load the Company from the $_GET variable passed
 			$this->objContact->CompanyId = QApplication::QueryString('intCompanyId');
 		}
-			
+
 		// Create the Header Menu
 		$this->ctlHeaderMenu_Create();
 		// Create the Shortcut Menu
 		$this->ctlShortcutMenu_Create();
-			
+
 		// Create labels for Contact information
 		$this->lblCompany_Create();
 		$this->lblHeaderContact_Create();
@@ -143,11 +143,11 @@ class ContactEditForm extends ContactEditFormBase {
 		$this->txtPhoneMobile_Create();
 		$this->txtFax_Create();
 		$this->lstAddress_Create();
-			
+
 		// New Dialog Boxes
 		$this->dlgNewCompany_Create();
 		$this->dlgNewAddress_Create();
-			
+
 		// Create all custom contact fields
 		$this->customFields_Create();
 		// Set Display logic of BuiltIn
@@ -158,10 +158,10 @@ class ContactEditForm extends ContactEditFormBase {
 		$this->UpdateAddressAccess();
 
 		$this->UpdateContactControls();
-			
+
 		// Create all custom company fields
 		//$this->arrCompanyCustomFields_Create();
-			
+
 		// Create/Setup Button Action controls
 		$this->btnEdit_Create();
 		$this->btnSave_Create();
@@ -169,7 +169,7 @@ class ContactEditForm extends ContactEditFormBase {
 		$this->btnDelete_Create();
 		$this->atcAttach_Create();
 		$this->pnlAttachments_Create();
-			
+
 		// Display labels for the existing company
 		if ($this->blnEditMode) {
 			$this->displayLabels();
@@ -314,7 +314,7 @@ class ContactEditForm extends ContactEditFormBase {
 			$this->lstCompany->AddItem('- Select One -', null);
 			//$this->lstCompany->AddItem('New Company', -1, false);
 		}
-			
+
 		$objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
 		if ($objCompanyArray) foreach ($objCompanyArray as $objCompany) {
 			$objListItem = new QListItem($objCompany->__toString(), $objCompany->CompanyId);
@@ -451,7 +451,7 @@ class ContactEditForm extends ContactEditFormBase {
 
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 		$this->objContact->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(8, $this->blnEditMode, $this->objContact->ContactId);
-			
+
 		if ($this->objContact->objCustomFieldArray) {
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objContact->objCustomFieldArray, $this->blnEditMode, $this, true, true);
@@ -519,7 +519,7 @@ class ContactEditForm extends ContactEditFormBase {
 
 	// Update address field when company is selected
 	public function lstCompany_Select() {
-			
+
 		// Clear out the items from lstAddress
 		$this->lstAddress->RemoveAllItems();
 		if ($this->lstCompany->SelectedValue) {
@@ -549,7 +549,7 @@ class ContactEditForm extends ContactEditFormBase {
 			$objListItem->Selected = true;
 			$this->lstAddress->AddItem($objListItem);
 		}
-			
+
 		/*			if ($this->lstCompany->SelectedValue && $this->lstCompany->SelectedValue == -1) {
 		 $this->pnlNewCompany->Visible = true;
 			}
@@ -585,7 +585,7 @@ class ContactEditForm extends ContactEditFormBase {
 
 		// Hide labels and display inputs where appropriate
 		$this->displayInputs();
-			
+
 		$this->UpdateBuiltInFields();
 		$this->UpdateCustomFields();
 	}
@@ -668,7 +668,7 @@ class ContactEditForm extends ContactEditFormBase {
 
 	// Protected Update Methods
 	protected function UpdateContactFields() {
-			
+
 		// Assign the new CompanyId if it was just created
 		//			if ($this->pnlNewCompany->Visible) {
 		//				$this->objContact->CompanyId = $this->objCompany->CompanyId;
@@ -691,7 +691,7 @@ class ContactEditForm extends ContactEditFormBase {
 
 		// Update Contact Controls
 		protected function UpdateContactControls() {
-				
+
 			$this->lstCompany->SelectedValue = $this->objContact->CompanyId;
 			$this->lstCompany_Select();
 			$this->txtFirstName->Text = $this->objContact->FirstName;
@@ -709,7 +709,7 @@ class ContactEditForm extends ContactEditFormBase {
 
 		// Update the Contact Labels
 		protected function UpdateContactLabels() {
-				
+
 			if ($this->blnEditMode) {
 				$this->lblHeaderContact->Text = sprintf('%s %s', $this->objContact->FirstName, $this->objContact->LastName);
 			} else {
@@ -736,7 +736,7 @@ class ContactEditForm extends ContactEditFormBase {
 			if ($this->objContact->ModifiedDate) {
 				$this->lblModifiedDate->Text = $this->objContact->ModifiedDate . ' by ' . $this->objContact->ModifiedByObject->__toStringFullName();
 			}
-				
+
 			// Update custom labels
 			if ($this->arrCustomFields) {
 				CustomField::UpdateLabels($this->arrCustomFields);
@@ -760,11 +760,11 @@ class ContactEditForm extends ContactEditFormBase {
 			$this->txtFax->Display = false;
 			$this->lblNewCompany->Display = false;
 			$this->lblNewAddress->Display = false;
-				
+
 			// Do not display Cancel and Save buttons
 			$this->btnCancel->Display = false;
 			$this->btnSave->Display = false;
-				
+
 			// Display Labels for Viewing mode
 			$this->lblCompany->Display = true;
 			$this->lblFirstName->Display = true;
@@ -777,7 +777,7 @@ class ContactEditForm extends ContactEditFormBase {
 			$this->lblPhoneMobile->Display = true;
 			$this->lblPhoneHome->Display = true;
 			$this->lblFax->Display = true;
-				
+
 			// Display custom field labels
 			if ($this->arrCustomFields) {
 				CustomField::DisplayLabels($this->arrCustomFields);
@@ -791,7 +791,7 @@ class ContactEditForm extends ContactEditFormBase {
 
 		// Display the inputs for Contact Edit mode
 		protected function DisplayInputs() {
-				
+
 			// Do Not Display Labels for Viewing mode
 			$this->lblCompany->Display = false;
 			$this->lblFirstName->Display = false;
@@ -809,7 +809,7 @@ class ContactEditForm extends ContactEditFormBase {
 			$this->btnEdit->Display = false;
 			$this->btnDelete->Display = false;
 			$this->atcAttach->btnUpload->Display = false;
-				
+
 			// Display inputs
 			$this->lstCompany->Display = true;
 			$this->txtFirstName->Display = true;
@@ -824,20 +824,20 @@ class ContactEditForm extends ContactEditFormBase {
 			$this->txtFax->Display = true;
 			$this->lblNewCompany->Display = true;
 			$this->lblNewAddress->Display = true;
-				
+
 
 			//If the user is not authorized to edit built-in fields, the fields are render as labels.
 			if(!$this->blnEditBuiltInFields){
 				$this->DisplayLabels();
 			}
-				
 
-				
+
+
 			// Display custom field inputs
 			if ($this->arrCustomFields) {
 				CustomField::DisplayInputs($this->arrCustomFields);
 			}
-				
+
 			// Display Cancel and Save buttons
 			$this->btnCancel->Display = true;
 			$this->btnSave->Display = true;
@@ -890,11 +890,11 @@ class ContactEditForm extends ContactEditFormBase {
 					$objCustomField['lbl']->Display=true;
 					$objCustomField['input']->Display=false;
 					if(($objCustomField['blnRequired'])){
-						$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+						if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 					}
 				}
 			}
-				
+
 		}
 
 		//Set display logic of the GreenPlusButton of Company
@@ -919,7 +919,7 @@ class ContactEditForm extends ContactEditFormBase {
 				$this->lblNewAddress->Visible=false;
 			}
 		}
-		
+
 		protected function getNextTabIndex() {
 			return $this->intTabIndex++;
 		}

@@ -74,7 +74,7 @@ class QInventoryEditComposite extends QControl {
 	// Array of Custom Field inputs and labels
 	protected $arrCustomFields;
 
-		
+
 	// Set true if the Built-in Fields have to be rendered
 	public $blnViewBuiltInFields;
 	public $blnEditBuiltInFields;
@@ -207,7 +207,7 @@ class QInventoryEditComposite extends QControl {
 
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objInventoryModel->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-		
+
 		/*if($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as $objCustomField) {
 			//Set NextTabIndex only if the custom field is show
@@ -216,7 +216,7 @@ class QInventoryEditComposite extends QControl {
 				}
 			}
 		}*/
-		
+
 		$this->UpdateCustomFields();
 	}
 
@@ -607,7 +607,7 @@ class QInventoryEditComposite extends QControl {
 			$this->objInventoryModel->ManufacturerId = $this->lstManufacturer->SelectedValue;
 			$this->objInventoryModel->LongDescription = $this->txtLongDescription->Text;
 			$this->objInventoryModel->InventoryModelCode = $this->txtInventoryModelCode->Text;
-				
+
 			$blnError = false;
 
 			// If a new inventory model is being created
@@ -632,7 +632,7 @@ class QInventoryEditComposite extends QControl {
 				// Save the values from all of the custom field controls to save the inventory model
 				CustomField::SaveControls($this->objInventoryModel->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objInventoryModel->InventoryModelId, 2);
 			}
-				
+
 			if ($this->blnEditMode) {
 
 
@@ -646,16 +646,16 @@ class QInventoryEditComposite extends QControl {
 				if (!$blnError) {
 					// Update the values of all fields for an Ajax reload
 					$this->UpdateInventoryFields();
-						
+
 					// If inventory model is not new, it must be saved after updating the inventoryfields
 					$this->objInventoryModel->Save();
-						
+
 					// Setup the InventoryModel again to retrieve the latest Modified information
 					$this->objParentObject->SetupInventoryModel($this);
-						
+
 					// Give the labels their appropriate values before display
 					$this->UpdateInventoryLabels();
-						
+
 					// This was necessary because it was not saving the changes of a second edit/save in a row
 					// Reload all custom fields
 					$this->objInventoryModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, $this->blnEditMode, $this->objInventoryModel->InventoryModelId);
@@ -663,7 +663,7 @@ class QInventoryEditComposite extends QControl {
 					$this->displayLabels();
 					// Enable the appropriate transaction buttons
 					$this->EnableTransactionButtons();
-						
+
 					// Commit the above transactions to the database
 					$objDatabase->TransactionCommit();
 				}
@@ -678,14 +678,14 @@ class QInventoryEditComposite extends QControl {
 				$strRedirect = "inventory_edit.php?intInventoryModelId=" . $this->objInventoryModel->InventoryModelId;
 				QApplication::Redirect($strRedirect);
 			}
-				
-				
+
+
 		}
 		catch (QOptimisticLockingException $objExc) {
-				
+
 			// Rollback the database
 			$objDatabase->TransactionRollback();
-				
+
 			// Output the error
 			$this->btnCancel->Warning = sprintf('This inventory has been updated by another user. You must <a href="inventory_edit.php?intInventoryModelId=%s">Refresh</a> to edit this Inventory.', $this->objInventoryModel->InventoryModelId);
 		}
@@ -820,8 +820,8 @@ class QInventoryEditComposite extends QControl {
 		// Display Cancel and Save butons
 		$this->btnCancel->Display = true;
 		$this->btnSave->Display = true;
-		 
-		 
+
+
 		// new: if the user is authorized to edit the built-in fields.
 		//if the user is not authorized to edit built-in fields, the fields are render as labels.
 		if(!$this->blnEditBuiltInFields){
@@ -935,7 +935,7 @@ class QInventoryEditComposite extends QControl {
 				$objCustomField['lbl']->Display=true;
 				$objCustomField['input']->Display=false;
 				if(($objCustomField['blnRequired'])){
-					$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+					if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 				}
 			}
 		}

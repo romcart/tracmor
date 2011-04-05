@@ -336,7 +336,7 @@
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
 			$this->btnSave->Text = QApplication::Translate('Save');
-			$this->btnSave->AddAction(new QClickEvent(), new QserverAction('btnSave_Click'));
+			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 			$this->btnSave->PrimaryButton = true;
 			$this->btnSave->CausesValidation = true;
 		}

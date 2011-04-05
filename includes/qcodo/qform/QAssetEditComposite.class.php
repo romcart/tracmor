@@ -1367,7 +1367,7 @@ class QAssetEditComposite extends QControl {
 					$objCustomField['lbl']->Display=true;
 					$objCustomField['input']->Display=false;
 					if(($objCustomField['blnRequired'])){
-						$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+					  if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 					}
 				}
 			}

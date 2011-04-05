@@ -68,15 +68,15 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected $intNextTabIndex = 1;
 
 	protected function Form_Create() {
-			
+
 		// Call SetupAssetModel to either Load/Edit Existing or Create New
 		$this->SetupAssetModel();
-			
+
 		// Create the Header Menu
 		$this->ctlHeaderMenu_Create();
 		// Create the Shortcut Menu
 		$this->ctlShortcutMenu_Create();
-			
+
 		// Create labels and buttons not included in generated form
 		$this->lblShortDescription_Create();
 		$this->lblAssetModelCode_Create();
@@ -93,10 +93,10 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		// Image label must be created AFTER image control
 		$this->lblImage_Create();
 		$this->pnlLongDescription_Create();
-			
+
 		// Set a variable which defines whether the built-in fields must be rendered or not.
 		$this->UpdateBuiltInFields();
-		
+
 		// Create all custom asset fields
 		$this->customFields_Create();
 
@@ -109,7 +109,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->pnlAttachments_Create();
 
 		// $this->btnClone_Create();
-			
+
 		// Display labels for the existing asset
 		if ($this->blnEditMode) {
 			$this->displayLabels();
@@ -118,7 +118,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		else {
 			$this->displayInputs();
 		}
-			
+
 		// Output the database profile - for debugging purposes only
 		// QApplication::$Database[1]->OutputProfiling();
 
@@ -291,10 +291,10 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 		$this->objAssetModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(4, $this->blnEditMode, $this->objAssetModel->AssetModelId);
-			
+
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-			
+
 		$this->UpdateCustomFields();
 	}
 
@@ -308,7 +308,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QServerAction('btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnSave->TabIndex= $this->intNextTabIndex++;
-			
+
 	}
 
 	// Setup Cancel Button
@@ -358,24 +358,24 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 
 		$this->displayInputs();
-			
+
 		$this->UpdateBuiltInFields();
 		$this->UpdateCustomFields();
 	}
 
 	// Save Button Click Actions
 	protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
-			
+
 		$this->UpdateAssetModelFields();
 		$this->objAssetModel->Save();
-			
+
 		// Assign input values to custom fields
 		if ($this->arrCustomFields) {
 
 			// Save the values from all of the custom field controls to save the asset
 			CustomField::SaveControls($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objAssetModel->AssetModelId, 4);
 		}
-			
+
 		if ($this->ifcImage->FileName) {
 			// Retrieve the extension (.jpg, .gif) from the filename
 			$explosion = explode(".", $this->ifcImage->FileName);
@@ -390,7 +390,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			$this->objAssetModel->ImagePath = $this->txtImagePath->Text;
 			$this->objAssetModel->Save(false, true);
 		}
-			
+
 		if ($this->blnEditMode) {
 			$this->UpdateLabels();
 			// This was necessary because it was not saving the changes of a second edit/save in a row
@@ -419,7 +419,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	// Delete Button Click Actions - Erase Image and erase entry
 	protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 		$this->ifcImage->Delete($this->objAssetModel->ImagePath);
-			
+
 		try {
 			// Get an instance of the database
 			$objDatabase = QApplication::$Database[1];
@@ -458,7 +458,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 	// Assign the original values to all Asset Controls
 	protected function UpdateAssetModelControls() {
-			
+
 		$this->lstCategory->SelectedValue = $this->objAssetModel->CategoryId;
 		$this->lstManufacturer->SelectedValue = $this->objAssetModel->ManufacturerId;
 		$this->txtAssetModelCode->Text = $this->objAssetModel->AssetModelCode;
@@ -470,7 +470,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 	// Display the labels and buttons for Asset Model Viewing mode
 	protected function displayLabels() {
-			
+
 		$this->lblImage->Display = true;
 		$this->ifcImage->Display = false;
 
@@ -480,11 +480,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lstCategory->Display = false;
 		$this->lstManufacturer->Display = false;
 		$this->txtLongDescription->Display = false;
-			
+
 		// Do not display Cancel and Save buttons
 		$this->btnCancel->Display = false;
 		$this->btnSave->Display = false;
-			
+
 		// Display Labels/Panels for Viewing mode
 		$this->lblShortDescription->Display = true;
 		$this->lblAssetModelCode->Display = true;
@@ -497,7 +497,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->btnDelete->Display = true;
 		$this->atcAttach->btnUpload->Display = true;
 		// $this->btnClone->Display = true;
-			
+
 		// Display custom field labels
 		if ($this->arrCustomFields) {
 			CustomField::DisplayLabels($this->arrCustomFields);
@@ -506,7 +506,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 	// Display the inputs and buttons for Edit or Create mode
 	protected function displayInputs() {
-			
+
 		// Do not display labels/panels
 		$this->lblShortDescription->Display = false;
 		$this->lblAssetModelCode->Display = false;
@@ -522,23 +522,23 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lstManufacturer->Display = true;
 		$this->txtLongDescription->Display = true;
 		$this->ifcImage->Display = true;
-			
-			
-			
+
+
+
 		// Display Asset Code and Asset Model input for edit mode
 		// new: if the user is authorized to edit the built-in fields.
 		//If the user is not authorized to edit built-in fields, the fields are render as labels.
 		if(!$this->blnEditBuiltInFields){
 			$this->displayLabels();
 		}
-			
 
-		 
+
+
 		// Do not display Edit and Delete buttons
 		$this->btnEdit->Display = false;
 		$this->btnDelete->Display = false;
 		$this->atcAttach->btnUpload->Display = false;
-			
+
 		// Display Cancel and Save butons
 		$this->btnCancel->Display = true;
 		$this->btnSave->Display = true;
@@ -551,19 +551,19 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	}
 
 	protected function UpdateLabels() {
-			
+
 		$this->lblShortDescription->Text = $this->txtShortDescription->Text;
 		$this->lblAssetModelCode->Text = $this->txtAssetModelCode->Text;
 		$this->lblCategory->Text = $this->lstCategory->SelectedName;
 		$this->lblManufacturer->Text = $this->lstManufacturer->SelectedName;
 		$this->pnlLongDescription->Text = nl2br($this->txtLongDescription->Text);
 		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath);
-			
+
 		// Update custom labels
 		if ($this->arrCustomFields) {
 			CustomField::UpdateLabels($this->arrCustomFields);
 		}
-			
+
 		// From AssetModelEditFormBase, this loads an Asset Model object or creates a new one
 		$this->SetupAssetModel();
 	}
@@ -602,7 +602,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 				$objCustomField['lbl']->Display=true;
 				$objCustomField['input']->Display=false;
 				if(($objCustomField['blnRequired'])){
-					$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+					if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 				}
 			}
 		}
