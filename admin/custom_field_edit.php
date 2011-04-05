@@ -343,37 +343,36 @@
 
 		// Create/Setup the Options/Values datagrid
 		protected function dtgValue_Create() {
-
 			$this->dtgValue = new QDataGrid($this);
-  		$this->dtgValue->CellPadding = 5;
-  		$this->dtgValue->CellSpacing = 0;
-  		$this->dtgValue->CssClass = "datagrid";
+			$this->dtgValue->CellPadding = 5;
+			$this->dtgValue->CellSpacing = 0;
+			$this->dtgValue->CssClass = "datagrid";
 
-      // Enable AJAX - this won't work while using the DB profiler
-      $this->dtgValue->UseAjax = true;
+			// Enable AJAX - this won't work while using the DB profiler
+			$this->dtgValue->UseAjax = true;
 
-      // Enable Pagination, and set to 20 items per page
-      $objPaginator = new QPaginator($this->dtgValue);
-      $this->dtgValue->Paginator = $objPaginator;
-      $this->dtgValue->ItemsPerPage = 20;
+			// Enable Pagination, and set to 20 items per page
+			$objPaginator = new QPaginator($this->dtgValue);
+			$this->dtgValue->Paginator = $objPaginator;
+			$this->dtgValue->ItemsPerPage = 20;
 
-      $this->dtgValue->AddColumn(new QDataGridColumn('Option', '<?= $_ITEM->__toString() ?>', array('OrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->ShortDescription, false), 'CssClass' => "dtg_column")));
-      $this->dtgValue->AddColumn(new QDataGridColumn('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', array('OrderByClause' => QQ::OrderBy(QQN::CustomField()->CreatedByObject->LastName, false, QQN::CustomField()->CreatedByObject->FirstName, false), 'ReverseOrderByClause' => QQ::OrderBy(QQN::CustomField()->CreatedByObject->LastName, QQN::CustomField()->CreatedByObject->FirstName), 'CssClass' => "dtg_column")));
-      $this->dtgValue->AddColumn(new QDataGridColumn('Creation Date', '<?= $_ITEM->CreationDate->__toString() ?>', array('OrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->CreationDate), 'ReverseOrderByClause' => QQ::OrderBy(QQN::CustomField()->CreationDate, false), 'CssClass' => "dtg_column")));
-      $this->dtgValue->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+			$this->dtgValue->AddColumn(new QDataGridColumn('Option', '<?= $_ITEM->__toString() ?>', array('OrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->ShortDescription, false), 'CssClass' => "dtg_column")));
+			$this->dtgValue->AddColumn(new QDataGridColumn('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', array('OrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->CreatedByObject->LastName, false, QQN::CustomFieldValue()->CreatedByObject->FirstName, false), 'ReverseOrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->CreatedByObject->LastName, QQN::CustomFieldValue()->CreatedByObject->FirstName), 'CssClass' => "dtg_column")));
+			$this->dtgValue->AddColumn(new QDataGridColumn('Creation Date', '<?= $_ITEM->CreationDate->__toString() ?>', array('OrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->CreationDate), 'ReverseOrderByClause' => QQ::OrderBy(QQN::CustomFieldValue()->CreationDate, false), 'CssClass' => "dtg_column")));
+			$this->dtgValue->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 
-      $objStyle = $this->dtgValue->RowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#FFFFFF';
-      $objStyle->FontSize = 12;
+			$objStyle = $this->dtgValue->RowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#FFFFFF';
+			$objStyle->FontSize = 12;
 
-      $objStyle = $this->dtgValue->AlternateRowStyle;
-      $objStyle->BackColor = '#EFEFEF';
+			$objStyle = $this->dtgValue->AlternateRowStyle;
+			$objStyle->BackColor = '#EFEFEF';
 
-      $objStyle = $this->dtgValue->HeaderRowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';
+			$objStyle = $this->dtgValue->HeaderRowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#EFEFEF';
+			$objStyle->CssClass = 'dtg_header';
 		}
 
 		// Render the remove button column in the datagrid
