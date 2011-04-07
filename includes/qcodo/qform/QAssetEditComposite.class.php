@@ -1006,23 +1006,29 @@ class QAssetEditComposite extends QControl {
 	public function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
 		try {
-			$objCustomFieldArray = $this->objAsset->objCustomFieldArray;
-			$this->objAsset->Delete();
-			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
-			// The values do not get deleted for select values
-			// CustomField::DeleteTextValues($objCustomFieldArray);
+			// Get an instance of the database
+			$objDatabase = QApplication::$Database[1];
+
+			// Begin a MySQL Transaction to be either committed or rolled back
+			$objDatabase->TransactionBegin();
+
 			// ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
 			Asset::ResetParentAssetIdToNullByAssetId($this->objAsset->AssetId);
+
+			// Delete any audit scans of this asset
 			Asset::DeleteAuditScanByAssetId($this->objAsset->AssetId);
+
+			// Delete the asset
+			$this->objAsset->Delete();
+
+			$objDatabase->TransactionCommit();
 			QApplication::Redirect('asset_list.php');
 		}
-		catch (QDatabaseException $objExc) {
-			if ($objExc->ErrorNumber == 1451) {
-				$this->btnDelete->Warning = 'This asset cannot be deleted because it is associated with one or more transactions.';
-			}
-			else {
-				throw new QDatabaseException();
-			}
+		catch (QMySqliDatabaseException $objExc) {
+			// Rollback the transaction
+			$objDatabase->TransactionRollback();
+			
+			throw new QDatabaseException();
 		}
 	}
 
