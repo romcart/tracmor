@@ -1222,7 +1222,18 @@
                   }
                   // Import Action is "Create and Update Records"
                   elseif ($strAssetCode && $this->lstImportAction->SelectedValue == 2 && $this->in_array_nocase($strAssetCode, $strAssetArray)) {
-                   $intLocationKeyArray = array_keys($intLocationArray, addslashes(strtolower(trim($strRowArray[$this->intLocationKey]))));
+                    $intLocationKeyArray = array_keys($intLocationArray, addslashes(strtolower(trim($strRowArray[$this->intLocationKey]))));
+                    if (isset($this->intCreatedByKey)) {
+                      if (isset($strRowArray[$this->intCreatedByKey]) && isset($this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))])) {
+                        $intCreatedBy = $this->intUserArray[strtolower(trim($strRowArray[$this->intCreatedByKey]))];
+                      }
+                      else {
+                        $intCreatedBy = $this->lstMapDefaultValueArray[$this->intCreatedByKey]->SelectedValue;
+                      }
+                    }
+                    else {
+                      $intCreatedBy = false;
+                    }
                     if (!count($intLocationKeyArray)) {
                       $intLocationKeyArray = array_keys($intLocationArray, addslashes(strtolower(trim($this->txtMapDefaultValueArray[$this->intLocationKey]->Text))));
                     }
@@ -1234,12 +1245,12 @@
                       $strCategoryKeyArray = array_keys($intCategoryArray, addslashes(strtolower(trim($strRowArray[$this->intCategoryKey]))));
                       // Only fields that can normally be updated when editing an asset can be updated
                       //if ($objAsset->LocationId != $intLocationKeyArray[0] || $objAsset->AssetModel->CategoryId != $intCategoryId || $objAsset->AssetModel->ManufacturerId != $intManufacturerId) {
-                      if ($objAsset->LocationId != $intLocationKeyArray[0]) {
+                      if ($objAsset->LocationId != $intLocationKeyArray[0] || ($objAsset->CreatedBy != false && $objAsset->CreatedBy != $intCreatedBy)) {
                         $this->intSkippedRecordCount++;
                         $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                       }
                       else {
-                        $this->arrOldAssetArray[$objAsset->AssetId] = array();
+                       $this->arrOldAssetArray[$objAsset->AssetId] = array();
                         $this->arrOldAssetArray[$objAsset->AssetId]['AssetModelId'] = $objAsset->AssetModelId;
                         $this->arrOldAssetArray[$objAsset->AssetId]['ModifiedBy'] = $objAsset->ModifiedBy;
                         $this->arrOldAssetArray[$objAsset->AssetId]['ModifiedDate'] = $objAsset->ModifiedDate;
