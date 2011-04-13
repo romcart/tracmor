@@ -935,7 +935,7 @@ protected function pnlAssets_Create($intModule){
 		}//if we set Edit Access to "Owner" or "All", we must enable and check all the checkboxs of the Edit Column
 		elseif ($objControl->SelectedValue == 2) {
 			if ($objDeleteControl->ItemCount == 3) {
-				$objDeleteControl->RemoveItem(2);
+				//$objDeleteControl->RemoveItem(2);
 			}
 			$objDeleteControl->Enabled = true;
 
@@ -970,7 +970,7 @@ protected function pnlAssets_Create($intModule){
 		}
 		elseif ($objControl->SelectedValue == 1) {
 			if ($objDeleteControl->ItemCount == 3) {
-				$objDeleteControl->RemoveItem(2);
+				//$objDeleteControl->RemoveItem(2);
 			}
 			$objDeleteControl->Enabled = true;
 
