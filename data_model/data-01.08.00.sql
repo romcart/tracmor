@@ -511,7 +511,8 @@ INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
 	(17,'fedex_thermal_printer_port','LPT1'),
 	(18,'asset_limit',NULL),
 	(19,'strict_checkin_policy','1'),
-	(20,'search_results_per_page','20');
+	(20,'search_results_per_page','20'),
+	(21,'disable_logins',NULL);
 
 INSERT INTO `fedex_service_type` (`fedex_service_type_id`, `short_description`, `value`) VALUES
 	(1,'Express Priority Overnight','01'),

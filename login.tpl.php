@@ -90,7 +90,7 @@
 								<td style="text-align:center;">
 									<table style="text-align:center;padding:8px">
 										<tr style="height:40px;">
-											<td style="vertical-align:top;color:#615c5c;" class="item_label">Please enter your username and password.</td>
+											<td style="vertical-align:top;color:#615c5c;" class="item_label"><?php $this->lblMessage->Render(); ?></td>
 										</tr>
 										<tr>
 											<td><?php $this->txtUsername->RenderDesignedNoRequired(); ?></td>

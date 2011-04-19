@@ -27,19 +27,25 @@
 		protected $txtPassword;
 		protected $btnLogin;
 		protected $lblLogo;
+		protected $lblMessage;
 		
 		protected function Form_Create() {
 			$this->txtUsername_Create();
 			$this->txtPassword_Create();
 			$this->btnLogin_Create();
 			$this->lblLogo_Create();
+			$this->lblMessage_Create();
+			
+			// Hide login controls if logins are disabled for this site
+			if (QApplication::$TracmorSettings->DisableLogins)
+			  $this->txtUsername->Display = $this->txtPassword->Display = $this->btnLogin->Display = false;
 		}
 		
 		protected function txtUsername_Create() {
 			$this->txtUsername = new QTextBox($this);
 			$this->txtUsername->Name = 'Username:';
 			$this->txtUsername->Required = true;
-			QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->txtUsername->ControlId));
+			$this->txtUsername->Focus();
 		}
 		
 		protected function txtPassword_Create() {
@@ -66,6 +72,11 @@
 			  $this->lblLogo->Text = sprintf('<img src="%s/%s">', $strImagePath, QApplication::$TracmorSettings->CompanyLogo);
 			}
 			$this->lblLogo->HtmlEntities = false;
+		}
+		
+		protected function lblMessage_Create() {
+		  $this->lblMessage = new QLabel($this);
+		  $this->lblMessage->Text = (QApplication::$TracmorSettings->DisableLogins) ? QApplication::Translate('Logins are currently disabled for this Tracmor site.') : QApplication::Translate('Please enter your username and password.');
 		}
 		
 		protected function btnLogin_Click($strFormId, $strControlId, $strParameter) {
