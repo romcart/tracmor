@@ -103,6 +103,10 @@
 		// Authenticate a certain module based on the module and the Role of the logged in user
 		public static function Authenticate($intModuleId = null) {
 			
+			// If logins have been disabled for this site, log the user out
+			if (QApplication::$TracmorSettings->DisableLogins)
+				QApplication::Logout();
+
 			if (array_key_exists('intUserAccountId', $_SESSION)) {
 				$objUserAccount = UserAccount::Load($_SESSION['intUserAccountId']);
 				if ($objUserAccount) {
