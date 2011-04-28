@@ -82,6 +82,8 @@
 				echo('&nbsp;');
 				$this->atcAttach->Render();
 				echo('&nbsp;');
+				$this->btnPrintAssetTag->Render();
+				echo('&nbsp;');
 				$this->btnDelete->RenderWithError();
 			?>
 		</td>

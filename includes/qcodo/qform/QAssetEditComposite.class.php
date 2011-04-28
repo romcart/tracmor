@@ -18,9 +18,6 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-?>
-
-<?php
 
 require(__DOCROOT__ . __SUBDIRECTORY__ . '/assets/AssetModelEditPanel.class.php');
 
@@ -64,6 +61,7 @@ class QAssetEditComposite extends QControl {
 	protected $btnCancel;
 	protected $btnClone;
 	protected $atcAttach;
+	protected $btnPrintAssetTag;
 	protected $pnlAttachments;
 	protected $btnMove;
 	protected $btnCheckOut;
@@ -149,6 +147,7 @@ class QAssetEditComposite extends QControl {
 		$this->btnCancel_Create();
 		$this->btnClone_Create();
 		$this->atcAttach_Create();
+		$this->btnPrintAssetTag_Create();
 		$this->pnlAttachments_Create();
 		// Only create transaction buttons if editing an existing asset
 		if ($this->blnEditMode) {
@@ -249,9 +248,9 @@ class QAssetEditComposite extends QControl {
 		$this->txtAssetCode->Required = true;
 		$this->txtAssetCode->CausesValidation = true;
 		$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
-  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-   	$this->txtAssetCode->TabIndex = 2;
-   	$this->intNextTabIndex++;
+		$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtAssetCode->TabIndex = 2;
+		$this->intNextTabIndex++;
 	}
 
 	// Create the Asset Code text input
@@ -268,7 +267,7 @@ class QAssetEditComposite extends QControl {
 
 	// Create the clickable label
 	protected function lblIconParentAssetCode_Create() {
-	  $this->lblIconParentAssetCode = new QLabel($this);
+		$this->lblIconParentAssetCode = new QLabel($this);
 		$this->lblIconParentAssetCode->HtmlEntities = false;
 		$this->lblIconParentAssetCode->Display = false;
 		$this->lblIconParentAssetCode->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
@@ -498,6 +497,16 @@ class QAssetEditComposite extends QControl {
 	protected function atcAttach_Create() {
 		$this->atcAttach = new QAttach($this, null, EntityQtype::Asset, $this->objAsset->AssetId);
 		QApplication::AuthorizeControl($this->objAsset, $this->atcAttach, 2);
+	}
+	
+	// Setup Print Asset Tag button
+	protected function btnPrintAssetTag_Create() {
+		$this->btnPrintAssetTag = new QButton($this);
+		$this->btnPrintAssetTag->Text = QApplication::Translate('Print Asset Tag');
+		$this->btnPrintAssetTag->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnPrintAssetTag_Click'));
+		$this->btnPrintAssetTag->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnPrintAssetTag_Click'));
+		$this->btnPrintAssetTag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->btnPrintAssetTag->CausesValidation = false;
 	}
 
 	// Setup Attachments Panel
@@ -945,7 +954,7 @@ class QAssetEditComposite extends QControl {
 				$objDatabase->TransactionCommit();
 
 				// Reload the edit asset page with the newly created asset
-				$strRedirect = "asset_edit.php?intAssetId=" . $this->objAsset->AssetId;
+				$strRedirect = sprintf('asset_edit.php?intAssetId=%s', $this->objAsset->AssetId);
 				QApplication::Redirect($strRedirect);
 			}
 		}
@@ -1000,6 +1009,13 @@ class QAssetEditComposite extends QControl {
 
 		// Show the inputs so the user can change any information and add the asset code
 		$this->displayInputs();
+	}
+
+	// Print Asset Tag button Click Action
+	public function btnPrintAssetTag_Click($strFormId, $strControlId, $strParameter) {
+		$strImagePath = sprintf('../includes/php/barcode.php?code=%s&encoding=128&scale=1', $this->objAsset->AssetCode);
+		QApplication::ExecuteJavaScript('var pwin = window.open("", "Image");');
+		QApplication::ExecuteJavaScript(sprintf('if (pwin) { pwin.document.writeln("<html><head><style type=\"text/css\">body { margin:0; padding:0; } </style></head><body><img src=\"%s\" /></body></html>");pwin.document.close();pwin.focus();pwin.print(); }', $strImagePath));		
 	}
 
 	// Delete Button Click Actions
@@ -1122,15 +1138,18 @@ class QAssetEditComposite extends QControl {
 		$this->btnDelete->Display = true;
 		$this->btnClone->Display = true;
 		$this->atcAttach->btnUpload->Display = true;
+		$this->btnPrintAssetTag->Display = true;
 		if ($this->objAsset->ArchivedFlag) {
-		  $this->btnEdit->Enabled = false;
-  		$this->btnClone->Enabled = false;
-  		$this->atcAttach->Enabled = false;
+			$this->btnEdit->Enabled = false;
+			$this->btnClone->Enabled = false;
+			$this->atcAttach->Enabled = false;
+			$this->btnPrintAssetTag->Enabled = false;
 		}
 		else {
-		  $this->btnEdit->Enabled = true;
-  		$this->btnClone->Enabled = true;
-  		$this->atcAttach->Enabled = true;
+			$this->btnEdit->Enabled = true;
+			$this->btnClone->Enabled = true;
+			$this->atcAttach->Enabled = true;
+			$this->btnPrintAssetTag->Enabled = true;
 		}
 
 		// Display custom field labels
@@ -1176,7 +1195,8 @@ class QAssetEditComposite extends QControl {
     $this->btnEdit->Display = false;
     $this->btnDelete->Display = false;
     $this->btnClone->Display = false;
-		$this->atcAttach->btnUpload->Display = false;
+	$this->atcAttach->btnUpload->Display = false;
+	$this->btnPrintAssetTag->Display = false;
 
     // Display Asset Code and Asset Model input for edit mode
     // new: if the user is authorized to edit the built-in fields.
