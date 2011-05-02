@@ -20,6 +20,9 @@
  */
 
 	include('../includes/header.inc.php');
+?>
+
+<?php
 	$this->RenderBegin();
 ?>
 <!-- Begin Header Menu -->
@@ -27,24 +30,36 @@
 	$this->ctlHeaderMenu->Render();
 ?>
 <!-- End Header Menu -->
-
 <!-- Begin Shortcut Menu -->
 <?php
 	include('shortcut_menu.inc.php');
 ?>
 <!-- End Shortcut Menu -->
-
-		</td>
+</td>
 		<td>
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
-		<div class="title"><?php _t('Manufacturers'); ?></div>
-		<br class="item_divider" />
+		<table cellpadding="5" cellspacing="0" width="100%">
+			<tr>
+				<td>
+					<table width="100%">
+						<tr>
+							<td>
+							<div class="title"><?php _t('Import Locations') ?></div>
+							 <?php $this->pnlMain->Render(); ?>
+							 </td>
+						</tr>
+						<tr>
+							 <td>
+							 <?php $this->btnCancel->Render(); ?>&nbsp;<?php $this->btnNext->RenderWithError(); ?>
+							 </td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+   </table>
+<br class="item_divider" />
 
-		<?php $this->btnNew->Render() ?>  <?php $this->btnImport->Render() ?>
-		<br class="item_divider" />
-		<?php $this->dtgManufacturer->Render() ?>
-
-	<?php $this->RenderEnd() ?>
-	<?php require_once('../includes/footer.inc.php'); ?>
+<?php $this->RenderEnd() ?>
+<?php require_once('../includes/footer.inc.php'); ?>

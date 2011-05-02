@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2009, Tracmor, LLC 
+ * Copyright (c)  2009, Tracmor, LLC
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,10 +23,10 @@
 	$this->RenderBegin();
 ?>
 <!-- Begin Header Menu -->
-<?php 
+<?php
 	$this->ctlHeaderMenu->Render();
 ?>
-<!-- End Header Menu -->  	
+<!-- End Header Menu -->
 
 <!-- Begin Shortcut Menu -->
 <?php
@@ -41,7 +41,7 @@
 		<td width="100%" valign="top">
 		<div class="title"><?php _t('Categories'); ?></div>
 		<br class="item_divider" />
-		<?php $this->btnNew->Render() ?>
+		<?php $this->btnNew->Render() ?> <?php $this->btnImport->Render() ?>
 		<br class="item_divider" />
 		<?php $this->dtgCategory->Render() ?>
 

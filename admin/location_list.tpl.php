@@ -43,7 +43,7 @@
 		<div class="title"><?php _t('Locations'); ?></div>
 		<br class="item_divider" />
 
-		<?php $this->btnNew->Render() ?>
+		<?php $this->btnNew->Render() ?> <?php $this->btnImport->Render() ?>
 		<br class="item_divider" />
 		<?php $this->dtgLocation->Render() ?>
 
