@@ -382,7 +382,6 @@
                 $this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
               }*/
               $strFirstRowArray = $this->FileCsvData->getRow(0);
-              $this->PutSkippedRecordInFile($file_skipped, $strFirstRowArray);
               for ($i=0; $i<count($strFirstRowArray); $i++) {
                 $this->arrMapFields[$i] = array();
                 if ($this->blnHeaderRow && array_key_exists($i, $this->arrCsvHeader)) {
