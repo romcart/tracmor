@@ -333,7 +333,14 @@
                 $this->strFilePathArray[] = $strFilePath;
                 $file_part = fopen($strFilePath, "w+");
                 if ($i == 1) {
-                  $strHeaderRow = $row;
+                  if ($this->blnHeaderRow) {
+                    $strHeaderRow = $row;
+                  }
+                  else {
+                    // Add empty row which would be as header row
+                    $strHeaderRow = "\n";
+                    fwrite($file_part, $strHeaderRow);
+                  }
                 }
                 else {
                   fwrite($file_part, $strHeaderRow);

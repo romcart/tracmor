@@ -129,11 +129,7 @@
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, EntityQtype::Manufacturer) as $objCustomField) {
 			  $this->arrItemCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
-			/*$this->arrAssetModelCustomField = array();
-			// Load Asset Model Custom Field
-			foreach (CustomField::LoadArrayByActiveFlagEntity(1, 4) as $objCustomField) {
-			  $this->arrAssetModelCustomField[$objCustomField->CustomFieldId] = $objCustomField;
-			}*/
+			
 			$this->intUserArray = array();
 			// Load Users
 			foreach (UserAccount::LoadAll() as $objUser) {
@@ -150,11 +146,6 @@
 		}
 
 		protected function Form_PreRender() {
-
-			/*if ($this->dtgLocation && count($this->objNewLocationArray) > 0 && $this->dtgLocation->Paginator) {
-				$this->dtgLocation->TotalItemCount = count($this->objNewLocationArray);
-      	$this->dtgLocation->DataSource = $this->return_array_chunk($this->dtgLocation, $this->objNewLocationArray);
-			}*/
 
 			if ($this->dtgManufacturer && count($this->objNewManufacturerArray) > 0 && $this->dtgManufacturer->Paginator) {
 				$this->dtgManufacturer->TotalItemCount = count($this->objNewManufacturerArray);
@@ -188,11 +179,6 @@
       $this->lblImportManufacturers->CssClass = "title";
       $this->lblImportManufacturers->Text = "<br/><br/>Last Imported Manufacturers";
 
-/*
-      $this->lblImportLocations = new QLabel($this);
-      $this->lblImportLocations->Display = false;
-      $this->lblImportLocations->CssClass = "title";
-      $this->lblImportLocations->Text = "Last Imported Locations";*/
     }
 
 		// Create and Setup the Header Composite Control
@@ -351,7 +337,14 @@
                 $this->strFilePathArray[] = $strFilePath;
                 $file_part = fopen($strFilePath, "w+");
                 if ($i == 1) {
-                  $strHeaderRow = $row;
+                  if ($this->blnHeaderRow) {
+                    $strHeaderRow = $row;
+                  }
+                  else {
+                    // Add empty row which would be as header row
+                    $strHeaderRow = "\n";
+                    fwrite($file_part, $strHeaderRow);
+                  }
                 }
                 else {
                   fwrite($file_part, $strHeaderRow);
@@ -514,37 +507,7 @@
           $this->objNewManufacturerArray = array();
           $this->blnImportEnd = false;
           $j=1;
-          /*$strLocationValuesArray = array();*/
-          // Add all unique locations in database
-          /*
-          foreach ($this->strFilePathArray as $strFilePath) {
-            $this->FileCsvData->load($strFilePath);
-            if ($j != 1) {
-              //$this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
-            }
-            // Location Import
-            for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
-              $strRowArray = $this->FileCsvData->getRow($i);
-              if (trim($strRowArray[$this->intLocationKey]) && !$this->in_array_nocase(trim($strRowArray[$this->intLocationKey]), $strLocationArray)) {
-                $strLocationArray[] = trim($strRowArray[$this->intLocationKey]);
-                /*$objNewLocation = new Location();
-                $objNewLocation->ShortDescription = addslashes(trim($strRowArray[$this->intLocationKey]));
-                $objNewLocation->Save();*/
-                /*$strLocationValuesArray[] = sprintf("('%s', '%s', NOW())", addslashes(trim($strRowArray[$this->intLocationKey])), $_SESSION['intUserAccountId']);
-                $strNewLocation[] = addslashes(trim($strRowArray[$this->intLocationKey]));
-                //$this->objNewLocationArray[$objNewLocation->LocationId] = $objNewLocation->ShortDescription;
-              }
-            }
-            $j++;
-          }
-          if (count($strLocationValuesArray)) {
-            $objDatabase = Location::GetDatabase();
-            $objDatabase->NonQuery(sprintf("INSERT INTO `location` (`short_description`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $strLocationValuesArray)));
-            $intStartId = $objDatabase->InsertId();
-            for ($i=0; $i<count($strNewLocation); $i++) {
-              $this->objNewLocationArray[$intStartId+$i] = $strNewLocation[$i];
-            }
-          }*/
+          
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
           $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
@@ -556,18 +519,6 @@
           $this->intImportStep = 2;
           $this->intCurrentFile = 0;
           $this->strSelectedValueArray = array();
-/*
-          // New locations
-          $this->dtgLocation = new QDataGrid($this);
-          $this->dtgLocation->Name = 'location_list';
-      		$this->dtgLocation->CellPadding = 5;
-      		$this->dtgLocation->CellSpacing = 0;
-      		$this->dtgLocation->CssClass = "datagrid";
-          $this->dtgLocation->UseAjax = true;
-          $this->dtgLocation->ShowColumnToggle = false;
-          $this->dtgLocation->ShowExportCsv = false;
-          $this->dtgLocation->ShowHeader = false;
-          $this->dtgLocation->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));*/
 
           // New manufacturers
           $this->dtgManufacturer = new QDataGrid($this);
@@ -1114,8 +1065,10 @@
             $strCFV = $objOldItem->GetVirtualAttribute($objCustomField->CustomFieldId);
             $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
           }
-          $strQuery = sprintf("UPDATE `manufacturer_custom_field_helper` SET %s WHERE `manufacturer_id`='%s'", implode(", ", $strCFVArray), $intItemId);
-          $objDatabase->NonQuery($strQuery);
+          if (count($strCFVArray)) {
+            $strQuery = sprintf("UPDATE `manufacturer_custom_field_helper` SET %s WHERE `manufacturer_id`='%s'", implode(", ", $strCFVArray), $intItemId);
+            $objDatabase->NonQuery($strQuery);
+          }
       }
 		  if (count($this->objNewManufacturerArray)) {
         $strQuery = sprintf("DELETE FROM `manufacturer` WHERE `manufacturer_id` IN (%s)", implode(", ", array_keys($this->objNewManufacturerArray)));
