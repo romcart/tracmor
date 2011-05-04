@@ -103,17 +103,18 @@
       // Enable AJAX - this won't work while using the DB profiler
       $this->dtgLocation->UseAjax = true;
 
-      //$this->dtgLocation->ShowColumnToggle = true;
+      $this->dtgLocation->ShowColumnToggle = true;
 
       // Enable Pagination, and set to 20 items per page
       $objPaginator = new QPaginator($this->dtgLocation);
       $this->dtgLocation->Paginator = $objPaginator;
       $this->dtgLocation->ItemsPerPage = 20;
+      $this->dtgLocation->ShowExportCsv = true;
 
-      $this->dtgLocation->AddColumn(new QDataGridColumn('ID', '<?= $_ITEM->LocationId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Location()->LocationId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->LocationId, false)), 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgLocation->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Location()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->ShortDescription, false)), 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgLocation->AddColumn(new QDataGridColumn('Description', '<?= $_ITEM->LongDescription ?>', 'Width=200', array('OrderByClause' => QQ::OrderBy(QQN::Location()->LongDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->LongDescription, false)), 'CssClass="dtg_column"'));
-      $this->dtgLocation->AddColumn(new QDataGridColumn('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', 'SortByCommand="location__created_by__last_name DESC, location__created_by__first_name DESC"', 'ReverseSortByCommand="location__created_by__last_name ASC, location__created_by__first_name ASC"', 'CssClass="dtg_column"'));
+      $this->dtgLocation->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->LocationId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Location()->LocationId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->LocationId, false)), 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgLocation->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Location()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->ShortDescription, false)), 'CssClass="dtg_column"', 'HtmlEntities=false'));
+      $this->dtgLocation->AddColumn(new QDataGridColumnExt('Description', '<?= $_ITEM->LongDescription ?>', 'Width=200', array('OrderByClause' => QQ::OrderBy(QQN::Location()->LongDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->LongDescription, false)), 'CssClass="dtg_column"'));
+      $this->dtgLocation->AddColumn(new QDataGridColumnExt('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', 'SortByCommand="location__created_by__last_name DESC, location__created_by__first_name DESC"', 'ReverseSortByCommand="location__created_by__last_name ASC, location__created_by__first_name ASC"', 'CssClass="dtg_column"'));
 
       $this->dtgLocation->SortColumnIndex = 0;
     	$this->dtgLocation->SortDirection = 0;
@@ -151,13 +152,12 @@
 
 			QApplication::Redirect('location_edit.php');
 		}
-		
+
 		protected function btnImport_Click() {
 
 			QApplication::Redirect('location_import.php');
 		}
 	}
-
 	// Go ahead and run this form object to generate the page and event handlers, using
 	// generated/Location_edit.php.inc as the included HTML template file
 	LocationListForm::Run('LocationListForm', __DOCROOT__ . __SUBDIRECTORY__ . '/admin/location_list.tpl.php');

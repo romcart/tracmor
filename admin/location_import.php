@@ -682,7 +682,7 @@
 
                 }
                 // Update action
-                elseif (trim($strRowArray[$this->intLocationKey]) && $this->lstImportAction->SelectedValue == 2  && !$this->in_array_nocase(trim($strRowArray[$this->intLocationKey]), $this->objUpdatedItemArray) && $objLocation && !in_array($intItemId, array(1, 2, 3, 4, 5, 6))) {
+                elseif (trim($strRowArray[$this->intLocationKey]) && $this->lstImportAction->SelectedValue == 2  && !$this->in_array_nocase(trim($strRowArray[$this->intLocationKey]), $strLocationArray) && !$this->in_array_nocase(trim($strRowArray[$this->intLocationKey]), $this->objUpdatedItemArray) && $objLocation && !in_array($intItemId, array(1, 2, 3, 4, 5, 6))) {
                   if (!$blnError) {
                     $strLocationDescription = "";
                     if (isset($this->intLocationDescriptionKey))
