@@ -1366,7 +1366,7 @@
 					$this->txtNewAssetCode->Warning = 'You must select one asset model.';
 				}
 				if (!$blnError) {
-				  $objNewAsset = new Asset();
+					$objNewAsset = new Asset();
 					$objNewAsset->AssetModelId = $this->lstAssetModel->SelectedValue;
 					$objNewAsset->LocationId = 5; // To Be Received
 					$objNewAsset->AssetCode = $strAssetCode;
@@ -1418,11 +1418,11 @@
 						  $this->txtNewAssetCode->Warning = "That asset is locked to a parent asset.";
 						}
 						// Cannot receive any archived assets
-  					elseif ($objNewAsset->ArchivedFlag) {
-  					  $blnError = true;
-  						$this->txtNewAssetCode->Warning = "That asset is archived.";
-  					}
-  					elseif ($objNewAsset->CheckedOutFlag) {
+						elseif ($objNewAsset->ArchivedFlag) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = "That asset is archived.";
+						}
+						elseif ($objNewAsset->CheckedOutFlag) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = "That asset is checked out.";
 						}
@@ -1440,63 +1440,56 @@
 							$this->txtNewAssetCode->Warning = "You do not have authorization to perform a transaction on this asset.";
 						}
 						elseif ($objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objNewAsset->AssetId)) {
-              $strAssetCodeArray = array();
-						  $objCheckedLinkedAssetArray = array();
-						  foreach ($objLinkedAssetArray as $objLinkedAsset) {
-                if (!QApplication::AuthorizeEntityBoolean($objLinkedAsset, 2)) {
-                  $blnError = true;
-							    $this->txtNewAssetCode->Warning = sprintf("You do not have authorization to perform a transaction on locked asset %s.", $objLinkedAsset->AssetCode);
-							    break;
-                }
-                else {
-                  $objCheckedLinkedAssetArray[] = $objLinkedAsset;
-                  $strAssetCodeArray[] = $objLinkedAsset->AssetCode;
-                }
+							$strAssetCodeArray = array();
+							$objCheckedLinkedAssetArray = array();
+							
+							foreach ($objLinkedAssetArray as $objLinkedAsset) {
+								if (!QApplication::AuthorizeEntityBoolean($objLinkedAsset, 2)) {
+									$blnError = true;
+								    $this->txtNewAssetCode->Warning = sprintf("You do not have authorization to perform a transaction on locked asset %s.", $objLinkedAsset->AssetCode);
+								    break;
+								} else {
+									$objCheckedLinkedAssetArray[] = $objLinkedAsset;
+									$strAssetCodeArray[] = $objLinkedAsset->AssetCode;
+								}
 
-      					if (!$blnError) {
-      					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
-      					}
-              }
-              if (!$blnError) {
-                foreach ($objCheckedLinkedAssetArray as $objCheckedLinkedAsset) {
-                  $objNewAssetTransaction = new AssetTransaction();
-    							// We can assign the AssetId for existing assets because they have already been saved to the db
-    							$objNewAssetTransaction->AssetId = $objCheckedLinkedAsset->AssetId;
-    							// The source location can either be 'Shipped'(2) or 'To Be Received'(5)
-    							$objNewAssetTransaction->SourceLocationId = $objCheckedLinkedAsset->LocationId;
-    							$this->objAssetTransactionArray[] = $objNewAssetTransaction;
-                }
-              }
-						}
-						// Check that the asset isn't already in another pending receipt
-						if (!$blnError && !$objNewAsset && $objPendingReceipt = AssetTransaction::PendingReceipt($objNewAsset->AssetId)) {
-							if (($this->blnEditMode && $objPendingReceipt->TransactionId != $this->objReceipt->TransactionId) || !$this->blnEditMode) {
-								$blnError = true;
-								$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
+								if (!$blnError) {
+									$this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
+								}
 							}
-							// If an asset was removed, and then added again in the same 'Edit', without saving in between, it needs to be removed from the ToDelete array
-							// This seems totally absurd, but it is indeed the best way I could come up with to avoid a bug that wouldn't allow you to add an asset that was just removed.
-							// This is also in shipment_edit.php - if you change one, change the other.
-							else {
-								if ($this->arrAssetTransactionToDelete) {
-									foreach ($this->arrAssetTransactionToDelete as $key => $value) {
-										if ($value) {
-											$objOffendingAssetTransaction = AssetTransaction::Load($value);
-											if ($objOffendingAssetTransaction->AssetId == $objNewAsset->AssetId) {
-												$objOffendingAssetTransaction->Delete();
-												unset($this->arrAssetTransactionToDelete[$key]);
-											}
-										}
-									}
+
+				            if (!$blnError) {
+								foreach ($objCheckedLinkedAssetArray as $objCheckedLinkedAsset) {
+									$objNewAssetTransaction = new AssetTransaction();
+									// We can assign the AssetId for existing assets because they have already been saved to the db
+									$objNewAssetTransaction->AssetId = $objCheckedLinkedAsset->AssetId;
+									// The source location can either be 'Shipped'(2) or 'To Be Received'(5)
+									$objNewAssetTransaction->SourceLocationId = $objCheckedLinkedAsset->LocationId;
+									$this->objAssetTransactionArray[] = $objNewAssetTransaction;
 								}
 							}
 						}
+						
+						// Check that the asset isn't already in another pending receipt
+						$arrPendingReceipts = AssetTransaction::QueryArray(
+							QQ::AndCondition(
+								QQ::Equal(QQN::AssetTransaction()->AssetId, $objNewAsset->AssetId),
+								QQ::In(QQN::AssetTransaction()->SourceLocationId, array(5, 2)),
+								QQ::IsNull(QQN::AssetTransaction()->DestinationLocationId),
+								QQ::NotEqual(QQN::AssetTransaction()->TransactionId, $this->objReceipt->TransactionId)
+							)
+						);
+						
+						if (!$blnError && count($arrPendingReceipts) != 0) {
+							$blnError = true;
+							$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
+						}
+						
 						// Check that the asset isn't in a pending shipment. This should be impossible, as you can not add items to a shipment that are TBR (to be received) or shipped.
 						// This means that they will be caught be the error checker above where LocationId must be 5 or 2
 						elseif (!$blnError && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
 							$blnError = true;
 							$this->txtNewAssetCode->Warning = 'That asset is in a pending shipment.';
-
 						}
 						// Create a new, but incomplete AssetTransaction
 						if (!$blnError) {
