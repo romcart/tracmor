@@ -129,7 +129,7 @@
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, EntityQtype::Manufacturer) as $objCustomField) {
 			  $this->arrItemCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
-			
+
 			$this->intUserArray = array();
 			// Load Users
 			foreach (UserAccount::LoadAll() as $objUser) {
@@ -507,7 +507,7 @@
           $this->objNewManufacturerArray = array();
           $this->blnImportEnd = false;
           $j=1;
-          
+
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
           $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
@@ -805,6 +805,7 @@
                   }
                 }
               }
+              $this->intImportStep = 6; // The import have been completed
             }
           }
           if ($this->intImportStep == 6) {

@@ -174,7 +174,7 @@
       $this->lblImportUpdatedItems->Display = false;
       $this->lblImportUpdatedItems->CssClass = "title";
       $this->lblImportUpdatedItems->Text = "Last Updated Categories";
-     
+
       $this->lblImportCategories = new QLabel($this);
       $this->lblImportCategories->HtmlEntities = false;
       $this->lblImportCategories->Display = false;
@@ -491,7 +491,7 @@
           $this->objNewCategoryArray = array();
           $this->blnImportEnd = false;
           $j=1;
-          
+
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
           $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
@@ -588,7 +588,7 @@
             }
             $this->btnNext->Warning = "Categories have been imported. Please wait...";
           }
-          
+
           for ($j=$this->intCurrentFile; $j<count($this->strFilePathArray); $j++) {
             $this->FileCsvData->load($this->strFilePathArray[$j]);
             if (!$j) {
@@ -795,6 +795,7 @@
                   }
                 }
               }
+              $this->intImportStep = 6; // The import have been completed
             }
           }
           if ($this->intImportStep == 6) {
@@ -892,7 +893,7 @@
 	    foreach ($this->arrItemCustomField as $objCustomField) {
 	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "category_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strCategoryGroup);
 	    }
-	    
+
 	    return true;
 	  }
 

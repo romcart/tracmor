@@ -787,6 +787,7 @@
                   }
                 }*/
               }
+              $this->intImportStep = 6; // The import have been completed
             }
           }
           if ($this->intImportStep == 6) {
