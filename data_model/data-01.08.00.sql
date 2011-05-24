@@ -512,7 +512,9 @@ INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
 	(18,'asset_limit',NULL),
 	(19,'strict_checkin_policy','1'),
 	(20,'search_results_per_page','20'),
-	(21,'disable_logins',NULL);
+	(21,'disable_logins',NULL),
+	(22,'asset_tag_scale','1'),
+	(23,'asset_tag_height','0');
 
 INSERT INTO `fedex_service_type` (`fedex_service_type_id`, `short_description`, `value`) VALUES
 	(1,'Express Priority Overnight','01'),

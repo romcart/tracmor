@@ -32,6 +32,6 @@ function getvar($name){
     else return false;
 }
 
-barcode_print(getvar('code'),getvar('encoding'),getvar('scale'),getvar('mode'));
+barcode_print(getvar('code'),getvar('encoding'),getvar('scale'),getvar('mode'),getvar('total_y'));
 
 ?>

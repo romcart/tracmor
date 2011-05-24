@@ -110,8 +110,7 @@ require("encode_bars.php"); /* build-in encoders */
  */
 
 
-function barcode_outimage($text, $bars, $scale = 1, $mode = "png",
-	    $total_y = 0, $space = ''){
+function barcode_outimage($text, $bars, $scale = 1, $mode = "png", $total_y = 0, $space = '') {
     global $bar_color, $bg_color, $text_color;
     global $font_loc;
     /* set defaults */
@@ -427,13 +426,14 @@ function barcode_encode($code,$encoding){
  */
 
 
-function barcode_print($code, $encoding="ANY", $scale = 2 ,$mode = "png" ){
+function barcode_print($code, $encoding="ANY", $scale = 2 , $mode = "png", $total_y = 0 ) {
     $bars=barcode_encode($code,$encoding);
     if (!$bars) return;
     if (!$mode) $mode="png";
+    if ($total_y == 0) $total_y = $scale * 60;
     if (eregi($mode,"^(text|txt|plain)$")) print barcode_outtext($bars['text'],$bars['bars']);
     elseif (eregi($mode,"^(html|htm)$")) print barcode_outhtml($bars['text'],$bars['bars'], $scale,0, 0);
-    else barcode_outimage($bars['text'],$bars['bars'],$scale, $mode);
+    else barcode_outimage($bars['text'],$bars['bars'],$scale, $mode, $total_y);
     return $bars;
 }
 

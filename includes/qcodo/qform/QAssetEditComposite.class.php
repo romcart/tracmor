@@ -1013,7 +1013,7 @@ class QAssetEditComposite extends QControl {
 
 	// Print Asset Tag button Click Action
 	public function btnPrintAssetTag_Click($strFormId, $strControlId, $strParameter) {
-		$strImagePath = sprintf('../includes/php/barcode.php?code=%s&encoding=128&scale=1', $this->objAsset->AssetCode);
+		$strImagePath = sprintf('../includes/php/barcode.php?code=%s&encoding=128&scale=%s&total_y=%s', $this->objAsset->AssetCode, QApplication::$TracmorSettings->AssetTagScale, QApplication::$TracmorSettings->AssetTagHeight);
 		QApplication::ExecuteJavaScript('var pwin = window.open("", "Image");');
 		QApplication::ExecuteJavaScript(sprintf('if (pwin) { pwin.document.writeln("<html><head><style type=\"text/css\">body { margin:0; padding:0; } </style></head><body><img src=\"%s\" /></body></html>");pwin.document.close();pwin.focus();pwin.print(); }', $strImagePath));		
 	}
