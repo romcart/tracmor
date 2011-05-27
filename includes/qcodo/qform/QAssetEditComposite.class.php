@@ -44,12 +44,14 @@ class QAssetEditComposite extends QControl {
 	protected $lblParentAssetCode;
 	protected $lblIconParentAssetCode;
 	public $lblShipmentReceipt;
+	public $lblLockedToParent;
 
 
 	// Inputs
 	public $lstAssetModel;
 	protected $txtAssetCode;
 	public $txtParentAssetCode;
+	public $chkLockToParent;
 	protected $lstLocation;
 	protected $lstCreatedByObject;
 	protected $lstModifiedByObject;
@@ -119,6 +121,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblParentAssetCode_Create();
 		$this->lblIconParentAssetCode_Create();
 		$this->lblAssetModel_Create();
+		$this->lblLockedToParent_Create();
 		$this->UpdateAssetLabels();
 
 		// Create Inputs
@@ -139,6 +142,7 @@ class QAssetEditComposite extends QControl {
 
 		// Create parent asset code field
 		$this->txtParentAssetCode_Create();
+		$this->chkLockToParent_Create();
 
 		// Create Buttons
 		$this->btnSave_Create();
@@ -261,8 +265,31 @@ class QAssetEditComposite extends QControl {
 		$this->txtParentAssetCode->Required = false;
 		$this->txtParentAssetCode->CausesValidation = true;
 		$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
-  	$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-   	$this->txtParentAssetCode->TabIndex = $this->GetNextTabIndex();
+		$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtParentAssetCode->TabIndex = $this->GetNextTabIndex();
+	}
+	
+	// Created the Locked to Parent label
+	protected function lblLockedToParent_Create() {
+		$this->lblLockedToParent = new QLabel($this);
+		$this->lblLockedToParent->Text = '<img src="../images/icons/locked.png" border="0" title="Locked to parent">';
+		$this->lblLockedToParent->HtmlEntities = false;
+		if ($this->blnEditMode && $this->objAsset->LinkedFlag) {
+			$this->lblLockedToParent->Visible = true;
+		} else {
+			$this->lblLockedToParent->Visible = false;
+		}
+	}
+	
+	// Create the Lock to Parent checkbox
+	protected function chkLockToParent_Create() {
+		$this->chkLockToParent = new QCheckBox($this);
+		$this->chkLockToParent->Name = 'Lock to parent';
+		$this->chkLockToParent->Text = 'Lock to parent';
+		$this->chkLockToParent->CausesValidation = true;
+		$this->chkLockToParent->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
+		$this->chkLockToParent->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->chkLockToParent->TabIndex = $this->GetNextTabIndex();
 	}
 
 	// Create the clickable label
@@ -834,8 +861,16 @@ class QAssetEditComposite extends QControl {
     				  $blnError = true;
     					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
     				}
+					else if ($this->chkLockToParent->Checked && $objParentAsset->LocationId != $this->lstLocation->SelectedValue) {
+						// If locking child to parent, make sure assets are at the same location
+						$blnError = true;
+						$this->chkLockToParent->Warning = 'Cannot lock to parent asset at another location.';
+					}
     				else {
     				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
+					  
+					  if ($this->chkLockToParent->Checked)
+						$this->objAsset->LinkedFlag = 1;
     				}
 				  }
 				  else {
@@ -898,8 +933,19 @@ class QAssetEditComposite extends QControl {
       				  $blnError = true;
       					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
       				}
+					else if ($this->chkLockToParent->Checked && $objParentAsset->LocationId != $this->objAsset->LocationId) {
+						// If locking child to parent, make sure assets are at the same location
+						$blnError = true;
+						$this->chkLockToParent->Warning = 'Cannot lock to parent asset at another location.';
+					}
       				else {
       				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
+					  
+					  if ($this->chkLockToParent->Checked) {
+						$this->objAsset->LinkedFlag = 1;
+					  } else {
+						$this->objAsset->LinkedFlag = 0;
+					  }
       				}
   				  }
   				  else {
@@ -912,6 +958,7 @@ class QAssetEditComposite extends QControl {
 				  // If txtParentAssetCode is empty
 				  $this->objAsset->LinkedFlag = false;
 				  $this->objAsset->ParentAssetId = null;
+				  $this->chkLockToParent->Checked = false;
 				}
 
 				if (!$blnError) {
@@ -1117,6 +1164,7 @@ class QAssetEditComposite extends QControl {
 		// Do not display inputs
 		$this->txtAssetCode->Display = false;
 		$this->txtParentAssetCode->Display = false;
+		$this->chkLockToParent->Display = false;
 		$this->lstAssetModel->Display = false;
 		$this->chkAutoGenerateAssetCode->Display = false;
 		$this->lblNewAssetModel->Display = false;
@@ -1132,6 +1180,11 @@ class QAssetEditComposite extends QControl {
 		$this->lblAssetCode->Display = true;
 		$this->lblAssetModel->Display = true;
 		$this->lblParentAssetCode->Display = true;
+		if ($this->objAsset->LinkedFlag) {
+			$this->lblLockedToParent->Visible = true;
+		} else {
+			$this->lblLockedToParent->Visible = false;
+		}
 
 		// Display Edit and Delete buttons
 		$this->btnEdit->Display = true;
@@ -1164,6 +1217,7 @@ class QAssetEditComposite extends QControl {
 	// Do not display labels
 
     $this->lblAssetCode->Display = false;
+	$this->lblLockedToParent->Visible = false;
 
     // Only display location list if creating a new asset
     if (!$this->blnEditMode) {
@@ -1188,6 +1242,7 @@ class QAssetEditComposite extends QControl {
     $this->lblAssetModelCode->Display = true;
 
     $this->txtParentAssetCode->Display = true;
+	$this->chkLockToParent->Display = true;
     $this->lblIconParentAssetCode->Display = true;
     $this->lblParentAssetCode->Display = false;
 
@@ -1352,9 +1407,11 @@ class QAssetEditComposite extends QControl {
 		$this->txtAssetCode->Text = $this->objAsset->AssetCode;
 		if ($this->objAsset->ParentAssetId) {
 		  $this->txtParentAssetCode->Text = $this->objAsset->ParentAsset->AssetCode;
+		  $this->chkLockToParent->Checked = $this->objAsset->LinkedFlag;
 		}
 		else {
 		  $this->txtParentAssetCode->Text = "";
+		  $this->chkLockToParent->Checked = false;
 		}
 		$this->arrCustomFields = CustomField::UpdateControls($this->objAsset->objCustomFieldArray, $this->arrCustomFields);
 	}

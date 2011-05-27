@@ -59,7 +59,7 @@
 		}
 	}
 
-	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . $this->lblIconParentAssetCode->Render(false));
+	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . $this->lblIconParentAssetCode->Render(false) . $this->chkLockToParent->RenderWithError(false) . $this->lblLockedToParent->Render(false));
 
 	// Display Metadata fields in Edit mode only
 	if ($this->blnEditMode) {
