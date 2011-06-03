@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2009, Tracmor, LLC 
+ * Copyright (c)  2009, Tracmor, LLC
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,30 +32,30 @@
 	 * here by overriding existing or implementing new methods, properties and variables.
 	 *
 	 * Additional qform control objects can also be defined and used here, as well.
-	 * 
+	 *
 	 * @package Application
 	 * @subpackage FormDraftObjects
-	 * 
+	 *
 	 */
 	class CompanyListForm extends CompanyListFormBase {
-		
+
 		// Header Tabs
 		protected $ctlHeaderMenu;
-		
+
 		// Shortcut Menu
-		protected $ctlShortcutMenu;		
-		
+		protected $ctlShortcutMenu;
+
 		// Basic Inputs
 		protected $txtShortDescription;
 		protected $txtCity;
 		protected $lstStateProvince;
 		protected $lstCountry;
-		
+
 		// Buttons
 		protected $btnSearch;
 		protected $blnSearch;
 		protected $btnClear;
-		
+
 		// Advanced Label/Link
 		protected $lblAdvanced;
 		// Boolean that toggles Advanced Search display
@@ -76,12 +76,12 @@
 		protected $blnAttachment;
 
 		protected function Form_Create() {
-			
+
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
-			$this->ctlShortcutMenu_Create();			
-			
+			$this->ctlShortcutMenu_Create();
+
 			$this->txtShortDescription_Create();
 			$this->txtCity_Create();
 			$this->lstStateProvince_Create();
@@ -92,14 +92,14 @@
 			$this->lblAdvanced_Create();
 			$this->dtgCompany_Create();
 		}
-		
+
 		protected function dtgCompany_Bind() {
-			
+
 			// Assing the search values given from the form input
 			if ($this->blnSearch) {
 				$this->assignSearchValues();
-			}			
-			
+			}
+
 			// Assign the class member values to local variables
 			$strShortDescription = $this->strShortDescription;
 			$strCity = $this->strCity;
@@ -110,11 +110,11 @@
 			$strDateModified = $this->strDateModified;
 			$blnAttachment = $this->blnAttachment;
 			$arrCustomFields = $this->arrCustomFields;
-			
+
 			// Expand to include the primary address, State/Province, and Country
 			$objExpansionMap[Company::ExpandAddress][Address::ExpandStateProvince] = true;
 			$objExpansionMap[Company::ExpandAddress][Address::ExpandCountry] = true;
-			
+
 			$this->dtgCompany->TotalItemCount = Company::CountBySearchHelper($strShortDescription, $strCity, $intStateProvinceId, $intCountryId, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgCompany->TotalItemCount == 0) {
 				$this->dtgCompany->ShowHeader = false;
@@ -125,7 +125,7 @@
 			}
 			$this->blnSearch = false;
 		}
-		
+
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {
   		$this->ctlHeaderMenu = new QHeaderMenu($this);
@@ -134,8 +134,8 @@
   	// Create and Setp the Shortcut Menu Composite Control
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
-  	}		
-		
+  	}
+
 		// Setup the Short Description (Company Name) Search Input
 	  protected function txtShortDescription_Create() {
 	    $this->txtShortDescription = new QTextBox($this);
@@ -143,7 +143,7 @@
       $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  // Setup the City Search Input
 	  protected function txtCity_Create() {
 	    $this->txtCity = new QTextBox($this);
@@ -151,7 +151,7 @@
       $this->txtCity->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->txtCity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  // Setup the State/Province Search Input
 	  protected function lstStateProvince_Create() {
       $this->lstStateProvince = new QListBox($this);
@@ -161,7 +161,7 @@
 				$this->lstStateProvince->AddItem($objStateProvince->ShortDescription, $objStateProvince->StateProvinceId);
 			}
 	  }
-	  
+
 	  // Setup the Country Search Input
 	  protected function lstCountry_Create() {
       $this->lstCountry = new QListBox($this);
@@ -173,9 +173,9 @@
 			// Add actions for when this input is changed
 			$this->lstCountry->AddAction(new QChangeEvent(), new QServerAction('lstCountry_Select'));
 			$this->lstCountry->AddAction(new QEnterKeyEvent(), new QServerAction('lstCountry_Select'));
-			$this->lstCountry->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
+			$this->lstCountry->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  /**************************
 	   *	CREATE BUTTON METHODS
 	  **************************/
@@ -188,7 +188,7 @@
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  // Create the Clear Button
 	  protected function btnClear_Create() {
 	  	$this->btnClear = new QButton($this);
@@ -196,9 +196,9 @@
 			$this->btnClear->Text = 'Clear';
 			$this->btnClear->AddAction(new QClickEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerAction('btnClear_Click'));
-			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());			
+			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  // Create the Advanced Search Label
 	  protected function lblAdvanced_Create() {
 	  	$this->lblAdvanced = new QLabel($this);
@@ -210,13 +210,13 @@
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
 	  }
-	  
+
 	  // Create the Advanced Search Composite Control
   	protected function ctlAdvanced_Create() {
   		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 7);
   		$this->ctlAdvanced->Display = false;
   	}
-	  
+
 	  // Create the Company Datagrid
   	protected function dtgCompany_Create() {
 			$this->dtgCompany = new QDataGrid($this);
@@ -224,13 +224,13 @@
   		$this->dtgCompany->CellPadding = 5;
   		$this->dtgCompany->CellSpacing = 0;
   		$this->dtgCompany->CssClass = "datagrid";
-      		
+
       // Disable AJAX for the datagrid
       $this->dtgCompany->UseAjax = false;
-      
+
       // Allow for column toggling
       $this->dtgCompany->ShowColumnToggle = true;
-      
+
       // Allow for CSV Export
       $this->dtgCompany->ShowExportCsv = true;
 
@@ -238,13 +238,14 @@
       $objPaginator = new QPaginator($this->dtgCompany);
       $this->dtgCompany->Paginator = $objPaginator;
       $this->dtgCompany->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
-          
+
+      $this->dtgCompany->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->CompanyId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('Company Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('City', '<?= $_ITEM->__toStringCity() ?>', 'Width=200', 'SortByCommand="company__address_id__city ASC"', 'ReverseSortByCommand="company__address_id__city DESC"', 'CssClass="dtg_column"'));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('State/Province', '<?= $_ITEM->__toStringStateProvince() ?>', 'SortByCommand="company__address_id__state_province_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__state_province_id__short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('Country', '<?= $_ITEM->__toStringCountry() ?>', 'SortByCommand="company__address_id__country_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__country_id__short_description DESC"', 'CssClass="dtg_column"'));
-      
+
       // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
       $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(7, false);
       if ($objCustomFieldArray) {
@@ -254,10 +255,10 @@
       			$this->dtgCompany->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
       	}
       }
-      
+
       $this->dtgCompany->SortColumnIndex = 1;
     	$this->dtgCompany->SortDirection = 0;
-      
+
       $objStyle = $this->dtgCompany->RowStyle;
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#FFFFFF';
@@ -270,10 +271,10 @@
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#EFEFEF';
       $objStyle->CssClass = 'dtg_header';
-      
+
       $this->dtgCompany->SetDataBinder('dtgCompany_Bind');
-  	}	  
-	  
+  	}
+
 	  protected function btnSearch_Click() {
 	  	$this->blnSearch = true;
 			$this->dtgCompany->PageNumber = 1;
@@ -287,7 +288,7 @@
 	  	$this->lstStateProvince->SelectedIndex = 0;
 	  	$this->lstCountry->SelectedIndex = 0;
 	  	$this->ctlAdvanced->ClearControls();
-	  	
+
 	  	// Set search variables to null
 	  	$this->strShortDescription = null;
 	  	$this->strCity = null;
@@ -304,13 +305,13 @@
 	  	}
 	  	$this->blnSearch = false;
   	}
-  	
+
   	// Display or Hide the advanced search composite control
 	  protected function lblAdvanced_Click() {
 	  	if ($this->blnAdvanced) {
 	  		$this->blnAdvanced = false;
 	  		$this->lblAdvanced->Text = 'Advanced Search';
-	  		
+
 	  		$this->ctlAdvanced->ClearControls();
 	  	}
 	  	else {
@@ -318,10 +319,10 @@
 	  		$this->lblAdvanced->Text = 'Hide Advanced';
 	  	}
 	  }
-	  
+
 		// Update state/province list when country is selected
 		protected function lstCountry_Select($strFormId, $strControlId, $strParameter) {
-			
+
 			// Save the currently selected StateProvince
 			$intStateProvinceId = $this->lstStateProvince->SelectedValue;
 			// Clear out the items from lstAddress
@@ -347,10 +348,10 @@
 			else {
 				$this->lstStateProvince->Enabled = false;
 			}
-		}	  
+		}
 
 	  protected function assignSearchValues() {
-	  	
+
 			$this->strShortDescription = $this->txtShortDescription->Text;
 			$this->strCity = $this->txtCity->Text;
 			$this->intStateProvinceId = $this->lstStateProvince->SelectedValue;
@@ -359,7 +360,7 @@
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
 			$this->blnAttachment = $this->ctlAdvanced->Attachment;
-			
+
 			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 			if ($this->arrCustomFields) {
 				foreach ($this->arrCustomFields as &$field) {
@@ -371,7 +372,7 @@
 					}
 				}
 			}
-	  }	   	
+	  }
 	}
 
 	// Go ahead and run this form object to generate the page and event handlers, using

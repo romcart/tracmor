@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2009, Tracmor, LLC 
+ * Copyright (c)  2009, Tracmor, LLC
  *
- * This file is part of Tracmor.  
+ * This file is part of Tracmor.
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. 
- *	
+ * (at your option) any later version.
+ *
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,29 +32,29 @@
 	 * here by overriding existing or implementing new methods, properties and variables.
 	 *
 	 * Additional qform control objects can also be defined and used here, as well.
-	 * 
+	 *
 	 * @package Application
 	 * @subpackage FormDraftObjects
-	 * 
+	 *
 	 */
 	class ContactListForm extends ContactListFormBase {
-		
+
 		// Header Tabs
 		protected $ctlHeaderMenu;
-		
+
 		// Shortcut Menu
-		protected $ctlShortcutMenu;		
+		protected $ctlShortcutMenu;
 
 		// Basic Inputs
 		protected $txtFirstName;
 		protected $txtLastName;
 		protected $txtCompany;
-		
+
 		// Buttons
 		protected $btnSearch;
 		protected $blnSearch;
 		protected $btnClear;
-		
+
 		// Advanced Label/Link
 		protected $lblAdvanced;
 		// Boolean that toggles Advanced Search display
@@ -62,7 +62,7 @@
 		// Advanced Search Composite control
 		protected $ctlAdvanced;
 		// Custom Fields array
-		protected $arrCustomFields;		
+		protected $arrCustomFields;
 
 		// Search Values
 		protected $strFirstName;
@@ -74,12 +74,12 @@
 		protected $blnAttachment;
 
 		protected function Form_Create() {
-			
+
 			// Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 			// Create the Shortcut Menu
-			$this->ctlShortcutMenu_Create();			
-			
+			$this->ctlShortcutMenu_Create();
+
 			$this->txtFirstName_Create();
 			$this->txtLastName_Create();
 			$this->txtCompany_Create();
@@ -89,14 +89,14 @@
 			$this->lblAdvanced_Create();
 			$this->dtgContact_Create();
 		}
-		
+
 		protected function dtgContact_Bind() {
-			
+
 			// Assing the class member values from the search form inputs
 			if ($this->blnSearch) {
 				$this->assignSearchValues();
-			}			
-			
+			}
+
 			// Assign local method variables
 			$strFirstName = $this->strFirstName;
 			$strLastName = $this->strLastName;
@@ -106,15 +106,15 @@
 			$strDateModified = $this->strDateModified;
 			$blnAttachment = $this->blnAttachment;
 			$arrCustomFields = $this->arrCustomFields;
-			
+
 			// Expand to include the primary address, State/Province, and Country
 			$objExpansionMap[Contact::ExpandCompany] = true;
-			
+
 			// Expand to include primary address
 			$objExpansionMap[Contact::ExpandAddress] = true;
-			
+
 			// QApplication::$Database[1]->EnableProfiling();
-			
+
 			$this->dtgContact->TotalItemCount = Contact::CountBySearchHelper($strFirstName, $strLastName, $strCompany, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
 			if ($this->dtgContact->TotalItemCount == 0) {
 				$this->dtgContact->ShowHeader = false;
@@ -125,11 +125,11 @@
 			}
 			$this->blnSearch = false;
 		}
-		
+
 /*		protected function Form_Exit() {
 			// QApplication::$Database[1]->OutputProfiling();
 		}*/
-		
+
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {
   		$this->ctlHeaderMenu = new QHeaderMenu($this);
@@ -138,7 +138,7 @@
   	// Create and Setp the Shortcut Menu Composite Control
   	protected function ctlShortcutMenu_Create() {
   		$this->ctlShortcutMenu = new QShortcutMenu($this);
-  	}		
+  	}
 
 		// Setup the First Name Search Input
 	  protected function txtFirstName_Create() {
@@ -147,7 +147,7 @@
       $this->txtFirstName->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->txtFirstName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  // Setup the Last Name Search Input
 	  protected function txtLastName_Create() {
 	    $this->txtLastName = new QTextBox($this);
@@ -155,7 +155,7 @@
       $this->txtLastName->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->txtLastName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  // Setup the Company Search Input
 	  protected function txtCompany_Create() {
 	    $this->txtCompany = new QTextBox($this);
@@ -163,11 +163,11 @@
       $this->txtCompany->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
       $this->txtCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  /**************************
 	   *	CREATE BUTTON METHODS
 	  **************************/
-		
+
 	  // Create the Search Button
 	  protected function btnSearch_Create() {
 			$this->btnSearch = new QButton($this);
@@ -177,7 +177,7 @@
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  // Create the Clear Button
 	  protected function btnClear_Create() {
 	  	$this->btnClear = new QButton($this);
@@ -187,7 +187,7 @@
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
-	  
+
 	  // Create the 'Advanced Search' Label
 	  protected function lblAdvanced_Create() {
 	  	$this->lblAdvanced = new QLabel($this);
@@ -198,7 +198,7 @@
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
 	  }
-	  
+
 	  // Create the Advanced Search Composite Control
   	protected function ctlAdvanced_Create() {
   		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 8);
@@ -212,13 +212,13 @@
   		$this->dtgContact->CellPadding = 5;
   		$this->dtgContact->CellSpacing = 0;
   		$this->dtgContact->CssClass = "datagrid";
-      		
+
       // Disable AJAX for the datagrid
       $this->dtgContact->UseAjax = false;
-      
+
       // Allow for column toggling
       $this->dtgContact->ShowColumnToggle = true;
-      
+
       // Allow for CSV Export
       $this->dtgContact->ShowExportCsv = true;
 
@@ -226,14 +226,15 @@
       $objPaginator = new QPaginator($this->dtgContact);
       $this->dtgContact->Paginator = $objPaginator;
       $this->dtgContact->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
-          
+
+      $this->dtgContact->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->ContactId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Contact()->ContactId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Contact()->ContactId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="last_name ASC, first_name DESC"', 'ReverseSortByCommand="last_name DESC, first_name DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Title', '<?= $_ITEM->Title ?>', 'Width=200', 'SortByCommand="title ASC"', 'ReverseSortByCommand="title DESC"', 'CssClass="dtg_column"'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Company', '<?= $_ITEM->Company->__toStringWithLink("bluelink") ?>', 'SortByCommand="contact__company_id__short_description ASC"', 'ReverseSortByCommand="contact__company_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Email', '<?= $_ITEM->Email ?>', 'SortByCommand="email ASC"', 'ReverseSortByCommand="email DESC"', 'CssClass="dtg_column"'));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('Address', '<?= ($_ITEM->Address instanceof Address) ? $_ITEM->Address->__toStringWithLink("bluelink") : "" ?>', 'SortByCommand="contact__address_id__short_description ASC"', 'ReverseSortByCommand="contact__address_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      
+
       // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
       $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(8, false);
       if ($objCustomFieldArray) {
@@ -243,11 +244,11 @@
       			$this->dtgContact->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
       		}
       	}
-      }      
-      
+      }
+
       $this->dtgContact->SortColumnIndex = 1;
     	$this->dtgContact->SortDirection = 0;
-      
+
       $objStyle = $this->dtgContact->RowStyle;
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#FFFFFF';
@@ -260,10 +261,10 @@
       $objStyle->ForeColor = '#000000';
       $objStyle->BackColor = '#EFEFEF';
       $objStyle->CssClass = 'dtg_header';
-      
+
       $this->dtgContact->SetDataBinder('dtgContact_Bind');
   	}
-  	
+
 	  protected function btnSearch_Click() {
 	  	$this->blnSearch = true;
 			$this->dtgContact->PageNumber = 1;
@@ -276,7 +277,7 @@
 	  	$this->txtLastName->Text = '';
 	  	$this->txtCompany->Text = '';
 	  	$this->ctlAdvanced->ClearControls();
-	  	
+
 	  	// Set search variables to null
 	  	$this->strFirstName = null;
 	  	$this->strLastName = null;
@@ -289,16 +290,16 @@
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
 	  		}
-	  	}	  	
+	  	}
 	  	$this->blnSearch = false;
   	}
-  	
+
   	// Display or hide the Advanced Search Composite Control
 	  protected function lblAdvanced_Click() {
 	  	if ($this->blnAdvanced) {
 	  		$this->blnAdvanced = false;
 	  		$this->lblAdvanced->Text = 'Advanced Search';
-	  		
+
 	  		$this->ctlAdvanced->ClearControls();
 	  	}
 	  	else {
@@ -309,7 +310,7 @@
 
 	  // Assign the search variables values from the form inputs
 	  protected function assignSearchValues() {
-	  	
+
 	  	$this->strFirstName = $this->txtFirstName->Text;
 	  	$this->strLastName = $this->txtLastName->Text;
 	  	$this->strCompany = $this->txtCompany->Text;
@@ -317,7 +318,7 @@
 			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
 			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
 			$this->blnAttachment = $this->ctlAdvanced->Attachment;
-			
+
 			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
 			if ($this->arrCustomFields) {
 				foreach ($this->arrCustomFields as &$field) {
@@ -328,8 +329,8 @@
 						$field['value'] = $field['input']->Text;
 					}
 				}
-			}					
-	  }	     	
+			}
+	  }
 	}
 	ContactListForm::Run('ContactListForm', __DOCROOT__ . __SUBDIRECTORY__ . '/contacts/contact_list.tpl.php');
 ?>
