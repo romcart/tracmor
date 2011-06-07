@@ -1146,7 +1146,7 @@
         //$strQuery = "SET FOREIGN_KEY_CHECKS=1;";
         //$objDatabase->NonQuery($strQuery);
       }*/
-		  if (isset($this->arrOldItemArray))
+		  if (isset($this->arrOldItemArray)) {
         $strQuery = "SET FOREIGN_KEY_CHECKS=0;";
         $objDatabase->NonQuery($strQuery);
         foreach ($this->arrOldItemArray as $intItemId => $objOldItem) {
@@ -1161,9 +1161,10 @@
             $strQuery = sprintf("UPDATE `company_custom_field_helper` SET %s WHERE `company_id`='%s'", implode(", ", $strCFVArray), $intItemId);
             $objDatabase->NonQuery($strQuery);
           }
+        }
+        $strQuery = "SET FOREIGN_KEY_CHECKS=1;";
+        $objDatabase->NonQuery($strQuery);
       }
-      $strQuery = "SET FOREIGN_KEY_CHECKS=1;";
-      $objDatabase->NonQuery($strQuery);
 		  if (count($this->objNewCompanyArray)) {
         $strQuery = sprintf("DELETE FROM `company` WHERE `company_id` IN (%s)", implode(", ", array_keys($this->objNewCompanyArray)));
         $objDatabase->NonQuery($strQuery);
