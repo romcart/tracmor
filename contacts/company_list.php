@@ -256,7 +256,7 @@
       	}
       }
 
-      $this->dtgCompany->SortColumnIndex = 1;
+      $this->dtgCompany->SortColumnIndex = 2;
     	$this->dtgCompany->SortDirection = 0;
 
       $objStyle = $this->dtgCompany->RowStyle;

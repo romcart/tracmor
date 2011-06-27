@@ -246,7 +246,7 @@
       	}
       }
 
-      $this->dtgContact->SortColumnIndex = 1;
+      $this->dtgContact->SortColumnIndex = 2;
     	$this->dtgContact->SortDirection = 0;
 
       $objStyle = $this->dtgContact->RowStyle;

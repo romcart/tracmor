@@ -490,7 +490,7 @@
           $j=1;
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
-          $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));

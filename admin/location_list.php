@@ -116,7 +116,7 @@
       $this->dtgLocation->AddColumn(new QDataGridColumnExt('Description', '<?= $_ITEM->LongDescription ?>', 'Width=200', array('OrderByClause' => QQ::OrderBy(QQN::Location()->LongDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->LongDescription, false)), 'CssClass="dtg_column"'));
       $this->dtgLocation->AddColumn(new QDataGridColumnExt('Created By', '<?= $_ITEM->CreatedByObject->__toStringFullName() ?>', 'SortByCommand="location__created_by__last_name DESC, location__created_by__first_name DESC"', 'ReverseSortByCommand="location__created_by__last_name ASC, location__created_by__first_name ASC"', 'CssClass="dtg_column"'));
 
-      $this->dtgLocation->SortColumnIndex = 0;
+      $this->dtgLocation->SortColumnIndex = 1;
     	$this->dtgLocation->SortDirection = 0;
 
       $objStyle = $this->dtgLocation->RowStyle;

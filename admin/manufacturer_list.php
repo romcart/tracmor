@@ -113,7 +113,7 @@
       	}
       }
 
-      $this->dtgManufacturer->SortColumnIndex = 0;
+      $this->dtgManufacturer->SortColumnIndex = 1;
     	$this->dtgManufacturer->SortDirection = 0;
 
       $objStyle = $this->dtgManufacturer->RowStyle;

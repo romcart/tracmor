@@ -32,8 +32,8 @@
 <!-- End Header Menu -->
 <!-- Begin Shortcut Menu -->
 <?php
-	$this->ctlShortcutMenu->Render();
-	//include('../admin/shortcut_menu.inc.php');
+	//$this->ctlShortcutMenu->Render();
+	include('./shortcut_menu.inc.php');
 ?>
 <!-- End Shortcut Menu -->
 </td>
