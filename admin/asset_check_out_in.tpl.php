@@ -38,7 +38,7 @@
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
-		<div class="title">Administration Settings</div>
+		<div class="title">Check In/Out</div>
 		<div style="padding:5px"><?php $this->pnlSaveNotification->Render(); ?></div>
 		<table class="datagrid" cellpadding="5" cellspacing="0">
 			<tr>
@@ -53,33 +53,29 @@
 				<td>
 					<table>
 						<tr>
-							<td class="record_field_name">Company Logo: </td>
-							<td class="record_field_edit"><?php $this->flaCompanyLogo->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Search Results Per Page: </td>
-							<td class="record_field_edit"><?php $this->txtSearchResultsPerPage->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Minimum Asset Code: </td>
-							<td class="record_field_edit"><?php $this->txtMinAssetCode->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Custom Shipment Numbers: </td>
-							<td class="record_field_edit"><?php $this->chkCustomShipmentNumbers->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Custom Receipt Numbers: </td>
-							<td class="record_field_edit"><?php $this->chkCustomReceiptNumbers->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Portable Pin Required: </td>
-							<td class="record_field_edit"><?php $this->chkPortablePinRequired->RenderWithError(); ?></td>
-						</tr>
-						<!--<tr>
 							<td class="record_field_name">Strict Check-In Policy: </td>
-							<td class="record_field_edit"><?php //$this->chkStrictCheckinPolicy->RenderWithError(); ?></td>
-						</tr>-->
+							<td class="record_field_edit"><?php $this->chkStrictCheckinPolicy->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Check-out to other users: </td>
+							<td class="record_field_edit"><?php $this->chkCheckOutToOtherUsers->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Check-out to contacts: </td>
+							<td class="record_field_edit"><?php $this->chkCheckOutToContacts->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Due date required: </td>
+							<td class="record_field_edit"><?php $this->chkDueDateRequired->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Reason required: </td>
+							<td class="record_field_edit"><?php $this->chkReasonRequired->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Default check-out period: </td>
+							<td class="record_field_edit"><?php $this->txtDefaultCheckOutPeriod->RenderWithError(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>

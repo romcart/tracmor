@@ -131,12 +131,42 @@
 		 */
 		public function __toStringDestinationLocation() {
 			if ($this->intDestinationLocationId) {
-				$strToReturn = $this->DestinationLocation->__toString();
+			  if ($this->intDestinationLocationId == 1) { // Checked Out
+			    $objAssetTransactionCheckout = $this->LoadAssetTransactionCheckOutByTransactionId($this->TransactionId);
+			    if ($objAssetTransactionCheckout) {
+			      if ($objAssetTransactionCheckout->ToContactId) {
+				      $strToReturn = $objAssetTransactionCheckout->ToContact->__toString();
+  				  }
+  				  else {
+  				    $strToReturn = $objAssetTransactionCheckout->ToUser->__toString();
+  				  }
+			    }
+			    else {
+			      $strToReturn = $this->DestinationLocation->__toString();
+			    }
+			  }
+			  else
+  				$strToReturn = $this->DestinationLocation->__toString();
 			}
 			else {
 				$strToReturn = null;
 			}
 			return sprintf('%s', $strToReturn);
+		}
+
+		/**
+		 * Load a single AssetTransactionCheckout object with expansion map of Contact and UserAccount,
+		 * by TransactionId
+		 * @param integer $intAssetId
+		 * @return object $objAssetTransactionCheckout
+		*/
+		public function LoadAssetTransactionCheckOutByTransactionId($intTransactionId = null) {
+		  $objClauses = array();
+  		array_push($objClauses, QQ::Expand(QQN::AssetTransactionCheckout()->ToContact));
+  		array_push($objClauses, QQ::Expand(QQN::AssetTransactionCheckout()->ToUser));
+  		$objAssetTransactionCheckout = AssetTransactionCheckout::QuerySingle(QQ::Equal(QQN::AssetTransactionCheckout()->TransactionId, $intTransactionId), $objClauses);
+
+  		return $objAssetTransactionCheckout;
 		}
 
 		/**
@@ -424,7 +454,7 @@
         $objQueryExpansion->GetFromSql("", "\n					"), str_replace("`asset`.`asset_id`", " `asset_transaction__asset_id`.`asset_id`", $arrCustomFieldSql['strFrom']),
         $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql'],
         $strSortByDate);
-        
+
       if ($blnReturnStrQuery) {
 			  return $strQuery;
 			}
@@ -566,7 +596,7 @@
       ', $objQueryExpansion->GetFromSql("", "\n					"),
         $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql']
        );
-       
+
        //echo($strQuery); exit;
 
      $objDatabase = AssetTransaction::GetDatabase();
