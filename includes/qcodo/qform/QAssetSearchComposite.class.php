@@ -63,6 +63,9 @@ class QAssetSearchComposite extends QControl {
 	protected $blnArchived;
 	protected $blnIncludeTBR;
 	protected $blnIncludeShipped;
+	protected $intCheckedOutToUser;
+	protected $intCheckedOutToContact;
+	protected $blnCheckedOutPastDue;
 
 	// Use Ajax
 	protected $blnUseAjax;
@@ -255,6 +258,9 @@ class QAssetSearchComposite extends QControl {
 		$strAssetModelCode = $this->strAssetModelCode;
 		$intReservedBy = $this->intReservedBy;
 		$intCheckedOutBy = $this->intCheckedOutBy;
+		$intCheckedOutToUser = $this->intCheckedOutToUser;
+		$intCheckedOutToContact = $this->intCheckedOutToContact;
+		$blnCheckedOutPastDue = $this->blnCheckedOutPastDue;
 		$strShortDescription = $this->strShortDescription;
 		$strModifiedCreated = $this->strModifiedCreated;
 		$strDateModifiedFirst = $this->strDateModifiedFirst;
@@ -277,12 +283,12 @@ class QAssetSearchComposite extends QControl {
     $objExpansionMap[Asset::ExpandLocation] = true;
 		//if ($this->blnSearch || !$this->blnUseAjax) {
 		if ((!$this->objParentControl && $this->Display == true) || $this->objParentControl->Display == true) {
-			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
+			$this->dtgAsset->TotalItemCount = Asset::CountBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived, $intCheckedOutToUser, $intCheckedOutToContact, $blnCheckedOutPastDue);
 			if ($this->dtgAsset->TotalItemCount == 0) {
 				$this->dtgAsset->ShowHeader = false;
 			}
 			else {
-				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
+				$this->dtgAsset->DataSource = Asset::LoadArrayBySearchHelper($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, false, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgAsset->SortInfo, $this->dtgAsset->LimitInfo, $objExpansionMap, $blnIncludeTBR, $blnIncludeShipped, $blnArchived, $intCheckedOutToUser, $intCheckedOutToContact, $blnCheckedOutPastDue);
 				$this->dtgAsset->ShowHeader = true;
 			}
 		}
@@ -445,7 +451,9 @@ class QAssetSearchComposite extends QControl {
 	  	$this->strAssetModelCode = null;
 	  	$this->intReservedBy = null;
 	  	$this->intCheckedOutBy = null;
-	  	$this->strDateModified = null;
+	  	$this->intCheckedOutToUser = null;
+  		$this->intCheckedOutToContact = null;
+  		$this->strDateModified = null;
 	  	$this->strModifiedCreated = null;
 	  	$this->strDateModifiedFirst = null;
 	  	$this->strDateModifiedLast = null;
@@ -453,7 +461,8 @@ class QAssetSearchComposite extends QControl {
 	  	$this->blnArchived = false;
 	  	$this->blnIncludeTBR = false;
 	  	$this->blnIncludeShipped = false;
-	  	if ($this->arrCustomFields) {
+	  	$this->blnCheckedOutPastDue = false;
+  		if ($this->arrCustomFields) {
 	  		foreach ($this->arrCustomFields as $field) {
 	  			$field['value'] = null;
 	  		}
@@ -492,6 +501,9 @@ class QAssetSearchComposite extends QControl {
 		$this->strAssetModelCode = $this->ctlAdvanced->AssetModelCode;
 		$this->intReservedBy = $this->ctlAdvanced->ReservedBy;
 		$this->intCheckedOutBy = $this->ctlAdvanced->CheckedOutBy;
+		$this->intCheckedOutToUser = $this->ctlAdvanced->CheckedOutToUser;
+		$this->intCheckedOutToContact = $this->ctlAdvanced->CheckedOutToContact;
+		$this->blnCheckedOutPastDue = $this->ctlAdvanced->CheckedOutPastDue;
 		$this->strModifiedCreated = $this->ctlAdvanced->ModifiedCreated;
 		$this->strDateModified = $this->ctlAdvanced->DateModified;
 		$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;

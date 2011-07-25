@@ -33,6 +33,10 @@ class QAssetTransactComposite extends QControl {
 
 	public $blnTransactionModified;
 	protected $lstLocation;
+	protected $lstUser;
+	protected $lstToCompany;
+	protected $lstToContact;
+	protected $lstCheckOutTo;
 	protected $txtNote;
 	protected $objAssetTransaction;
 	protected $btnSave;
@@ -44,6 +48,11 @@ class QAssetTransactComposite extends QControl {
 	protected $intTransactionTypeId;
 	protected $lblAddAsset;
 	protected $ctlAssetSearchTool;
+	protected $objCompanyArray;
+	protected $dttDueDate;
+	protected $lstDueDate;
+
+	protected $pnlCheckOutTo;
 
 	public function __construct($objParentObject, $strControlId = null) {
 	    // First, call the parent to do most of the basic setup
@@ -62,6 +71,19 @@ class QAssetTransactComposite extends QControl {
 
     // Create an empty Asset Array
     $this->objAssetArray = array();
+
+    if (!$this->intTransactionTypeId) {
+      $this->intTransactionTypeId = QApplication::QueryString("intTransactionTypeId");
+    }
+
+    // Check Out
+    //if ($this->intTransactionTypeId == 3) {
+    $this->CheckOutTo_Create();
+    $this->DueDate_Create();
+    $this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
+    $this->lstToCompany_Create();
+    $this->lstToContact_Create();
+    //}
 
     $this->btnCancel_Create();
     $this->lstLocation_Create();
@@ -181,6 +203,147 @@ class QAssetTransactComposite extends QControl {
 		$this->btnAdd->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnAdd_Click'));
 		$this->btnAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnAdd->CausesValidation = false;
+	}
+
+	protected function CheckOutTo_Create() {
+	  $this->lstCheckOutTo = new QRadioButtonList($this);
+    $this->lstCheckOutTo->AddItem(new QListItem('User', 1));
+		$this->lstCheckOutTo->AddItem(new QListItem('Contact', 2));
+		//$this->lstCheckOutTo->SelectedIndex = 0;
+		$this->lstCheckOutTo->AddAction(new QChangeEvent(), new QAjaxAction('lstCheckOutTo_Select'));
+
+		$this->lstUser = new QListBox($this);
+  	$this->lstUser->Name = 'User';
+  	$this->lstUser->Display = false;
+  	$this->lstUser->AddItem('- Select One -', null);
+  	//foreach (UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->LastName, QQN::UserAccount()->FirstName))) as $objUser) {
+  	foreach (UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->Username))) as $objUser) {
+  	  //$this->lstUser->AddItem(sprintf("%s %s", $objUser->LastName, $objUser->FirstName), $objUser->UserAccountId);
+  	  $this->lstUser->AddItem(sprintf("%s", $objUser->Username), $objUser->UserAccountId);
+  	}
+  }
+
+  protected function DueDate_Create() {
+	  $this->lstDueDate = new QRadioButtonList($this);
+		$this->lstDueDate->AddItem(new QListItem('No due date', 1));
+		$this->lstDueDate->AddItem(new QListItem('Due Date:', 2));
+		$this->lstDueDate->SelectedIndex = 0;
+		$this->lstDueDate->AddAction(new QChangeEvent(), new QServerAction('lstDueDate_Select'));
+
+		$this->dttDueDate = new QDateTimePickerExt($this);
+		$this->dttDueDate->DateTimePickerType = QDateTimePickerType::DateTime;
+		$this->dttDueDate->Display = false;
+		$dttNow = new QDateTime(QDateTime::Now);
+		$this->dttDueDate->MinimumYear = $dttNow->Year;
+		$this->dttDueDate->MinimumMonth = $dttNow->Month;
+		$this->dttDueDate->MinimumDay = $dttNow->Day;
+		$this->dttDueDate->__set('DateTime', QDateTime::FromTimestamp($dttNow->Timestamp + intval(QApplication::$TracmorSettings->DefaultCheckOutPeriod) * 3600));
+		$dttMaximumDate = QDateTime::FromTimestamp($dttNow->Timestamp + 864000); // 10 days
+    $this->dttDueDate->MaximumYear = $dttMaximumDate->Year;
+    $this->dttDueDate->MaximumMonth = $dttMaximumDate->Month;
+    $this->dttDueDate->MaximumDay = $dttMaximumDate->Day;
+    if (QApplication::$TracmorSettings->DueDateRequired == "1") {
+      $this->dttDueDate->Display = true;
+      $this->lstDueDate->SelectedIndex = 1;
+    }
+	}
+
+  // Create and Setup lstToCompany
+	protected function lstToCompany_Create() {
+		$this->lstToCompany = new QListBox($this);
+		$this->lstToCompany->Name = "Company: ";
+		$this->lstToCompany->Display = false;
+		$this->lstToCompany->AddItem('- Select One -', null);
+		$objToCompanyArray = $this->objCompanyArray;
+		if ($objToCompanyArray) foreach ($objToCompanyArray as $objToCompany) {
+			$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
+			$this->lstToCompany->AddItem($objListItem);
+		}
+		$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstToCompany_Select'));
+	}
+
+	// Create and Setup lstToContact
+	protected function lstToContact_Create() {
+		$this->lstToContact = new QListBox($this);
+		$this->lstToContact->Name = "Contact: ";
+		$this->lstToContact->Display = false;
+		$this->lstToContact->Enabled = false;
+		$this->lstToContact->AddItem('- Select One -', null);
+	}
+
+	// This is run every time a 'To Company' is selected
+	// It loads the values for 'To Contact' drop-downs for the selected company
+	public function lstToCompany_Select() {
+		if ($this->lstToCompany->SelectedValue) {
+			$objCompany = Company::Load($this->lstToCompany->SelectedValue);
+			if ($objCompany) {
+				// Load the values for the 'To Contact' List
+				if ($this->lstToContact) {
+					$objToContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
+					$this->lstToContact->RemoveAllItems();
+					$this->lstToContact->AddItem('- Select One -', null);
+					if ($objToContactArray) {
+						foreach ($objToContactArray as $objToContact) {
+							$objListItem = new QListItem($objToContact->__toString(), $objToContact->ContactId);
+							$this->lstToContact->AddItem($objListItem);
+						}
+						$this->lstToContact->Enabled = true;
+					}
+				}
+			}
+		}
+		else {
+		  $this->lstToContact->Enabled = false;
+		  $this->lstToContact->RemoveAllItems();
+			$this->lstToContact->AddItem('- Select One -', null);
+		}
+	}
+
+	public function lstCheckOutTo_Select() {
+	  switch ($this->lstCheckOutTo->SelectedValue) {
+	    case 1:
+	      if (QApplication::$TracmorSettings->CheckOutToOtherUsers != "1" && QApplication::$TracmorSettings->CheckOutToContacts == "1") {
+	        $this->lstUser->RemoveAllItems();
+	        $objUserAccount = QApplication::$objUserAccount;
+	        $this->lstUser->AddItem(sprintf("%s %s", $objUserAccount->LastName, $objUserAccount->FirstName), $objUserAccount->UserAccountId);
+	      }
+	      $this->lstToCompany->Display = false;
+	      $this->lstToContact->Display = false;
+	      $this->lstUser->Display = true;
+  	    break;
+  	  case 2:
+  	    if (QApplication::$TracmorSettings->CheckOutToContacts != "1") {
+  	      $this->lstCheckOutTo->SelectedIndex = 0;
+  	      $this->lstCheckOutTo->Warning = "Check-out to contacts is disabled.";
+	        $this->lstCheckOutTo_Select();
+	        return;
+  	    }
+  	    $this->lstToCompany->Display = true;
+	      $this->lstToContact->Display = true;
+	      $this->lstUser->Display = false;
+  	    break;
+  	  default:
+  	    return;
+	  }
+	}
+
+	public function lstDueDate_Select() {
+	  switch ($this->lstDueDate->SelectedValue) {
+	    case 1:
+	      if (QApplication::$TracmorSettings->DueDateRequired == "1") {
+	        $this->lstDueDate->SelectedIndex = 1;
+  	      $this->lstDueDate->Warning = "Due date is required.";
+	        $this->lstDueDate_Select();
+	        return;
+	      }
+	      $this->dttDueDate->Enabled = false;
+	      $this->dttDueDate->Display = false;
+  	    break;
+  	  case 2:
+  	    $this->dttDueDate->Enabled = true;
+	      $this->dttDueDate->Display = true;
+  	    break;
+	  }
 	}
 
 	// Setup the datagrid
@@ -465,12 +628,56 @@ class QAssetTransactComposite extends QControl {
 			}
 
 			if (!$blnError) {
-
-				if (($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2 || $this->intTransactionTypeId == 11) && is_null($this->lstLocation->SelectedValue)) {
+			  if ($this->intTransactionTypeId == 3) {
+          $this->lstCheckOutTo->Warning = '';
+          $this->lstDueDate->Warning = '';
+          $intToUser = "";
+          $intToContact = "";
+          $dttDueDate = "";
+  				if ((QApplication::$TracmorSettings->CheckOutToOtherUsers == "1" || QApplication::$TracmorSettings->CheckOutToContacts == "1") && $this->lstCheckOutTo->Display)
+    				if ($this->lstCheckOutTo->SelectedValue == "1") {
+    				  if (!$this->lstUser->SelectedValue) {
+    				    $this->lstCheckOutTo->Warning = 'Please select an user.';
+    				    $blnError = true;
+    				  }
+    				  else {
+    				    $intToUser = $this->lstUser->SelectedValue;
+    				  }
+    				}
+    				elseif ($this->lstCheckOutTo->SelectedValue == "2") {
+    				  if (!$this->lstToContact->SelectedValue) {
+    				    $this->lstCheckOutTo->Warning = 'Please select an contact.';
+    				    $blnError = true;
+    				  }
+    				  else {
+    				    $intToContact = $this->lstToContact->SelectedValue;
+    				  }
+    				}
+    				else {
+    				  $this->lstCheckOutTo->Warning = 'Please select one of the options';
+    				  $blnError = true;
+    				}
+    			else {
+    			  $intToUser = QApplication::$objUserAccount->UserAccountId;
+    			}
+    			if ($this->lstDueDate->Display)
+      			if ($this->lstDueDate->SelectedValue == 2) {
+      			  $dttDueDate = $this->dttDueDate;
+      			}
+      			elseif (QApplication::$TracmorSettings->DueDateRequired == "1") {
+      			  $this->lstDueDate->Warning = 'Due date is reuired';
+      				$blnError = true;
+      			}
+			  }
+			  if (QApplication::$TracmorSettings->ReasonRequired == "1" && !trim($this->txtNote->Text) && $this->intTransactionTypeId == 3) {
+				  $this->txtNote->Warning = 'Reason is required.';
+					$blnError = true;
+				}
+			  elseif (($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2 || $this->intTransactionTypeId == 11) && is_null($this->lstLocation->SelectedValue)) {
 					$this->lstLocation->Warning = 'Location is required.';
 					$blnError = true;
 				}
-				elseif ($this->txtNote->Text == '') {
+				elseif ($this->txtNote->Text == '' && $this->intTransactionTypeId != 3) {
 					$this->txtNote->Warning = 'Note is required.';
 					$blnError = true;
 				}
@@ -550,6 +757,18 @@ class QAssetTransactComposite extends QControl {
   							$this->objAssetTransaction->SourceLocationId = $SourceLocationId;
   							$this->objAssetTransaction->DestinationLocationId = $DestinationLocationId;
   							$this->objAssetTransaction->Save();
+
+  							// Create the new AssetTransactionCheckout object and save it
+  							if ($this->intTransactionTypeId == 3) {
+  							  $objAssetTransactionCheckout = new AssetTransactionCheckout();
+  								$objAssetTransactionCheckout->TransactionId = $this->objAssetTransaction->TransactionId;
+  								$objAssetTransactionCheckout->ToContactId = $intToContact;
+  								$objAssetTransactionCheckout->ToUserId = $intToUser;
+  								if ($dttDueDate instanceof QDateTimePicker) {
+  								  $objAssetTransactionCheckout->DueDate = $dttDueDate->DateTime;
+  								}
+  								$objAssetTransactionCheckout->Save();
+                }
 	            }
 							$asset->Save();
 
@@ -560,6 +779,18 @@ class QAssetTransactComposite extends QControl {
 							$this->objAssetTransaction->SourceLocationId = $SourceLocationId;
 							$this->objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 							$this->objAssetTransaction->Save();
+
+							// Create the new AssetTransactionCheckout object and save it for each linked asset
+              if ($this->intTransactionTypeId == 3) {
+							  $objAssetTransactionCheckout = new AssetTransactionCheckout();
+								$objAssetTransactionCheckout->TransactionId = $this->objAssetTransaction->TransactionId;
+								$objAssetTransactionCheckout->ToContactId = $intToContact;
+								$objAssetTransactionCheckout->ToUserId = $intToUser;
+								if ($dttDueDate instanceof QDateTimePicker) {
+								  $objAssetTransactionCheckout->DueDate = $dttDueDate->DateTime;
+								}
+								$objAssetTransactionCheckout->Save();
+              }
 						}
 					}
 
