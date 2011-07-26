@@ -27,9 +27,6 @@ class QAdvancedSearchComposite extends QControl {
 	protected $txtAssetModelCode;
 	protected $lstReservedBy;
 	protected $lstCheckedOutBy;
-	protected $lstCheckedOutToUser;
-	protected $lstToCompany;
-	protected $lstToContact;
 	protected $txtFromCompany;
 	protected $txtFromContact;
 	protected $txtTrackingNumber;
@@ -40,7 +37,6 @@ class QAdvancedSearchComposite extends QControl {
 	protected $dtpReceiptDate;
 	protected $chkAttachment;
 	protected $chkArchived;
-	protected $chkCheckedOutPastDue;
 	protected $chkIncludeTBR;
 	protected $chkIncludeShipped;
 	protected $lstModifiedCreated;
@@ -55,7 +51,6 @@ class QAdvancedSearchComposite extends QControl {
 	protected $arrCustomFields;
 	protected $intEntityQtypeId;
 	public $objParentObject;
-	protected $objCompanyArray;
 
 	// We want to override the constructor in order to setup the subcontrols
 	public function __construct($objParentObject, $intEntityQtypeId = null, $strControlId = null) {
@@ -71,14 +66,9 @@ class QAdvancedSearchComposite extends QControl {
 	    $this->intEntityQtypeId = $intEntityQtypeId;
 
 	    if ($objParentObject instanceof AssetListForm || $objParentObject instanceof QAssetSearchComposite) {
-	      $this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
 	    	$this->txtAssetModelCode_Create();
 	    	$this->lstReservedBy_Create();
 	    	$this->lstCheckedOutBy_Create();
-	    	$this->lstCheckedOutToUser_Create();
-	    	$this->lstToCompany_Create();
-	    	$this->lstToContact_Create();
-	    	$this->chkCheckedOutPastDue_Create();
 	    	$this->chkInclude_Create();
 	    	$this->lstModifiedCreated_Create();
 	    }
@@ -192,78 +182,6 @@ class QAdvancedSearchComposite extends QControl {
   	}
   }
 
-  protected function lstCheckedOutToUser_Create() {
-  	$this->lstCheckedOutToUser = new QListBox($this);
-  	$this->lstCheckedOutToUser->Name = 'Checked Out To';
-		$this->lstCheckedOutToUser->AddItem('- Select One -', null, true);
-  	$this->lstCheckedOutToUser->AddItem('Any', 'any');
-  	$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
-  	if ($objUserAccountArray) {
-  		foreach ($objUserAccountArray as $arrUserAccount) {
-  			$this->lstCheckedOutToUser->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
-  		}
-  	}
-  }
-
-  // Create and Setup lstToCompany
-	protected function lstToCompany_Create() {
-		$this->lstToCompany = new QListBox($this);
-		$this->lstToCompany->Name = "Company: ";
-		$this->lstToCompany->AddItem('- Select One -', null);
-		$objToCompanyArray = $this->objCompanyArray;
-		if ($objToCompanyArray) foreach ($objToCompanyArray as $objToCompany) {
-			$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
-			$this->lstToCompany->AddItem($objListItem);
-		}
-		$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstToCompany_Select'));
-	}
-
-	// Create and Setup lstToContact
-	protected function lstToContact_Create() {
-		$this->lstToContact = new QListBox($this);
-		$this->lstToContact->Name = "Contact: ";
-		//$this->lstToContact->Enabled = false;
-		$this->lstToContact->AddItem('- Select One -', null);
-		$this->lstToContact->AddItem('Any', 'any');
-	}
-
-	// This is run every time a 'To Company' is selected
-	// It loads the values for 'To Contact' drop-downs for the selected company
-	public function lstToCompany_Select() {
-		if ($this->lstToCompany->SelectedValue) {
-			$objCompany = Company::Load($this->lstToCompany->SelectedValue);
-			if ($objCompany) {
-				// Load the values for the 'To Contact' List
-				if ($this->lstToContact) {
-					$objToContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
-					$this->lstToContact->RemoveAllItems();
-					$this->lstToContact->AddItem('- Select One -', null);
-					$this->lstToContact->AddItem('Any', 'any');
-					if ($objToContactArray) {
-						foreach ($objToContactArray as $objToContact) {
-							$objListItem = new QListItem($objToContact->__toString(), $objToContact->ContactId);
-							$this->lstToContact->AddItem($objListItem);
-						}
-						//$this->lstToContact->Enabled = true;
-					}
-				}
-			}
-		}
-		else {
-		  //$this->lstToContact->Enabled = false;
-		  $this->lstToContact->RemoveAllItems();
-			$this->lstToContact->AddItem('- Select One -', null);
-			$this->lstToContact->AddItem('Any', 'any');
-		}
-	}
-
-	protected function chkCheckedOutPastDue_Create() {
-    $this->chkCheckedOutPastDue = new QCheckBox($this);
-  	$this->chkCheckedOutPastDue->Name = 'Checked Out Past Due';
-  	$this->chkCheckedOutPastDue->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
-  	$this->chkCheckedOutPastDue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	}
-
   protected function chkInclude_Create() {
     $this->chkArchived = new QCheckBox($this);
   	$this->chkArchived->Name = 'Include Archived';
@@ -336,8 +254,8 @@ class QAdvancedSearchComposite extends QControl {
   	}
   	$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   }
-
-
+  
+  
 
   protected function dtpDateModifiedFirst_Create() {
   	$this->dtpDateModifiedFirst = new QDateTimePicker($this);
@@ -368,9 +286,9 @@ class QAdvancedSearchComposite extends QControl {
 		$this->lstDateModified->AddItem('Between', 'between');
 		$this->lstDateModified->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstDateModified_Select'));
 	}
-
+	
 	protected function lstModifiedCreated_Create() {
-
+		
 		$this->lstModifiedCreated = new QRadioButtonList($this);
 		$this->lstModifiedCreated->Name = '';
 		$this->lstModifiedCreated->AddItem(new QListItem('Created', 'creation_date', true));
@@ -433,15 +351,8 @@ class QAdvancedSearchComposite extends QControl {
 		if ($this->objParentObject instanceof AssetListForm || $this->objParentObject instanceof QAssetSearchComposite) {
 			$this->txtAssetModelCode->Text = '';
 			$this->lstCheckedOutBy->SelectedIndex = 0;
-			$this->lstCheckedOutToUser->SelectedIndex = 0;
-			$this->lstToCompany->SelectedIndex = 0;
-			$this->lstToContact->RemoveAllItems();
-			//$this->lstToContact->Enabled = false;
-		  $this->lstToContact->AddItem('- Select One -', null);
-		  $this->lstToContact->AddItem('Any', 'any');
 			$this->lstReservedBy->SelectedIndex = 0;
 			$this->lstModifiedCreated->SelectedIndex = 0;
-			$this->chkCheckedOutPastDue->Checked = false;
 		}
 		if ($this->objParentObject instanceof ShipmentListForm) {
 			$this->txtTrackingNumber->Text = '';
@@ -476,12 +387,6 @@ class QAdvancedSearchComposite extends QControl {
 			case "ReservedBy": return $this->lstReservedBy->SelectedValue;
 				break;
 			case "CheckedOutBy": return $this->lstCheckedOutBy->SelectedValue;
-				break;
-			case "CheckedOutToUser": return $this->lstCheckedOutToUser->SelectedValue;
-				break;
-			case "CheckedOutToContact": return $this->lstToContact->SelectedValue;
-				break;
-			case "CheckedOutPastDue": return $this->chkCheckedOutPastDue->Checked;
 				break;
 			case "FromCompany": return $this->txtFromCompany->Text;
 				break;

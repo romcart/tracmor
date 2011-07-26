@@ -268,7 +268,7 @@ class QAssetEditComposite extends QControl {
 		$this->txtParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->txtParentAssetCode->TabIndex = $this->GetNextTabIndex();
 	}
-
+	
 	// Created the Locked to Parent label
 	protected function lblLockedToParent_Create() {
 		$this->lblLockedToParent = new QLabel($this);
@@ -280,7 +280,7 @@ class QAssetEditComposite extends QControl {
 			$this->lblLockedToParent->Visible = false;
 		}
 	}
-
+	
 	// Create the Lock to Parent checkbox
 	protected function chkLockToParent_Create() {
 		$this->chkLockToParent = new QCheckBox($this);
@@ -525,7 +525,7 @@ class QAssetEditComposite extends QControl {
 		$this->atcAttach = new QAttach($this, null, EntityQtype::Asset, $this->objAsset->AssetId);
 		QApplication::AuthorizeControl($this->objAsset, $this->atcAttach, 2);
 	}
-
+	
 	// Setup Print Asset Tag button
 	protected function btnPrintAssetTag_Create() {
 		$this->btnPrintAssetTag = new QButton($this);
@@ -868,7 +868,7 @@ class QAssetEditComposite extends QControl {
 					}
     				else {
     				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
-
+					  
 					  if ($this->chkLockToParent->Checked)
 						$this->objAsset->LinkedFlag = 1;
     				}
@@ -940,7 +940,7 @@ class QAssetEditComposite extends QControl {
 					}
       				else {
       				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
-
+					  
 					  if ($this->chkLockToParent->Checked) {
 						$this->objAsset->LinkedFlag = 1;
 					  } else {
@@ -1062,7 +1062,7 @@ class QAssetEditComposite extends QControl {
 	public function btnPrintAssetTag_Click($strFormId, $strControlId, $strParameter) {
 		$strImagePath = sprintf('../includes/php/barcode.php?code=%s&encoding=128&scale=%s&total_y=%s', $this->objAsset->AssetCode, QApplication::$TracmorSettings->AssetTagScale, QApplication::$TracmorSettings->AssetTagHeight);
 		QApplication::ExecuteJavaScript('var pwin = window.open("", "Image");');
-		QApplication::ExecuteJavaScript(sprintf('if (pwin) { pwin.document.writeln("<html><head><style type=\"text/css\">body { margin:0; padding:0; } </style></head><body><img src=\"%s\" /></body></html>");pwin.document.close();pwin.focus();pwin.print(); }', $strImagePath));
+		QApplication::ExecuteJavaScript(sprintf('if (pwin) { pwin.document.writeln("<html><head><style type=\"text/css\">body { margin:0; padding:0; } </style></head><body><img src=\"%s\" /></body></html>");pwin.document.close();pwin.focus();pwin.print(); }', $strImagePath));		
 	}
 
 	// Delete Button Click Actions
@@ -1090,7 +1090,7 @@ class QAssetEditComposite extends QControl {
 		catch (QMySqliDatabaseException $objExc) {
 			// Rollback the transaction
 			$objDatabase->TransactionRollback();
-
+			
 			throw new QDatabaseException();
 		}
 	}
