@@ -91,12 +91,6 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     	$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
     	$objAssetTransaction->Save();
 
-    	// Create new AssetTransactionCheckout by that user to the same user
-    	$objAssetTransactionCheckout = new AssetTransactionCheckout();
-			$objAssetTransactionCheckout->TransactionId = $objAssetTransaction->TransactionId;
-			$objAssetTransactionCheckout->ToUserId = QApplication::$objUserAccount->UserAccountId;
-			$objAssetTransactionCheckout->Save();
-
     	$objLinkedAssetArrayByNewAsset = Asset::LoadChildLinkedArrayByParentAssetId($objAsset->AssetId);
 			if ($objLinkedAssetArrayByNewAsset) {
   			foreach ($objLinkedAssetArrayByNewAsset as $objLinkedAsset) {
@@ -111,12 +105,6 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
     			$objAssetTransaction->SourceLocationId = $objAsset->LocationId;
     			$objAssetTransaction->DestinationLocationId = $intDestinationLocationId;
     			$objAssetTransaction->Save();
-
-    			// Create new AssetTransactionCheckout by that user to the same user for each linked asset
-    			$objAssetTransactionCheckout = new AssetTransactionCheckout();
-    			$objAssetTransactionCheckout->TransactionId = $objAssetTransaction->TransactionId;
-    			$objAssetTransactionCheckout->ToUserId = QApplication::$objUserAccount->UserAccountId;
-    			$objAssetTransactionCheckout->Save();
   	    }
 			}
 

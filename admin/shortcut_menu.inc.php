@@ -40,43 +40,39 @@
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="index.php" class="graylink">Settings</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/checkin_out.png" name="shortcut1"></td>
-								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="asset_check_out_in.php" class="graylink">Check In/Out</a></td>
-							</tr>
-							<tr>
-								<td width="30" align="center"><img src="../images/icons/category.png" name="shortcut2"></td>
+								<td width="30" align="center"><img src="../images/icons/category.png" name="shortcut1"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="category_list.php" class="graylink">Categories</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/manufacturers.png" name="shortcut3"></td>
+								<td width="30" align="center"><img src="../images/icons/manufacturers.png" name="shortcut2"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="manufacturer_list.php" class="graylink">Manufacturers</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/locations.png" name="shortcut4"></td>
+								<td width="30" align="center"><img src="../images/icons/locations.png" name="shortcut3"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="location_list.php" class="graylink">Locations</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/shipping_and_receiving.png" name="shortcut5"></td>
+								<td width="30" align="center"><img src="../images/icons/shipping_and_receiving.png" name="shortcut4"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="shipping_account_list.php" class="graylink">Shipping/Receiving</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/custom_fields.png" name="shortcut6"></td>
+								<td width="30" align="center"><img src="../images/icons/custom_fields.png" name="shortcut5"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="custom_field_list.php" class="graylink">Custom Fields</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/labels.png" name="shortcut7"></td>
+								<td width="30" align="center"><img src="../images/icons/labels.png" name="shortcut8"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="labels.php" class="graylink">Labels</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/user_role.png" name="shortcut8"></td>
+								<td width="30" align="center"><img src="../images/icons/user_role.png" name="shortcut7"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="role_list.php" class="graylink">User Roles</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/user.png" name="shortcut9"></td>
+								<td width="30" align="center"><img src="../images/icons/user.png" name="shortcut6"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="user_account_list.php" class="graylink">Users</a></td>
 							</tr>
 							<tr>
-								<td width="30" align="center"><img src="../images/icons/asset_import.png" name="shortcut10"></td>
+								<td width="30" align="center"><img src="../images/icons/asset_import.png" name="shortcut9"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="asset_import.php" class="graylink">Asset Import</a></td>
 							</tr>
 						</table>

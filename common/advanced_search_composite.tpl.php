@@ -29,9 +29,6 @@
 		$arrAdvancedSearchFields[] = array('name' => 'Asset Model Code:',  'value' => $this->txtAssetModelCode->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Reserved By:', 'value' => $this->lstReservedBy->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Checked Out By:', 'value' => $this->lstCheckedOutBy->RenderWithError(false));
-		$arrAdvancedSearchFields[] = array('name' => 'Checked Out To User:', 'value' => $this->lstCheckedOutToUser->RenderWithError(false));
-		$arrAdvancedSearchFields[] = array('name' => 'Checked Out To Contact:', 'value' => $this->lstToCompany->RenderWithError(false) . "&nbsp;" . $this->lstToContact->RenderWithError(false));
-		$arrAdvancedSearchFields[] = array('name' => 'Checked Out Past Due:', 'value' => $this->chkCheckedOutPastDue->RenderWithError(false));
 	}
 
 	// Show Tracking Number for Shipment Search
@@ -50,7 +47,7 @@
 		$arrAdvancedSearchFields[] = array('name' => 'Date Received:', 'value' => $this->dtpReceiptDate->RenderWithError(false));
 	}
 
-
+	
 	if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
 		//$arrAdvancedSearchFields[] = array('name' => 'Date:',   'value' => $this->lstDateModified->RenderWithError(false));
 		//$arrAdvancedSearchFields[] = array('name' => '&nbsp;', 'value' => $this->lstModifiedCreated->RenderWithError(false));

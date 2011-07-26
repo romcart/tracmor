@@ -138,7 +138,7 @@
 				// Specify the local databind method this datagrid will use
 				$this->ctlAssetEdit->dtgShipmentReceipt->SetDataBinder('dtgShipmentReceipt_Bind');
 			}
-
+			
 			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
 				$this->ctlAssetTransact->dtgAssetTransact->SetDataBinder('dtgAssetTransact_Bind');
 			}
@@ -226,7 +226,7 @@
 	      $this->btnChildAssetsRemove->Enabled = true;
 	      $this->btnReassign->Enabled = true;
 	      $this->btnLinkToParent->Enabled = true;
-	      if (!$this->btnUnlink->Enabled)
+	      if (!$this->btnUnlink->Enabled) 
 			$this->btnUnlink->Enabled = true;
 	    }
 	    else {
@@ -303,18 +303,18 @@
 				$this->ctlAssetEdit->dtgShipmentReceipt->DataSource = AssetTransaction::QueryArray($objCondition, $objClauses);
 			}
 		}
-
+		
 		protected function dtgAssetTransact_Bind() {
-
+			
 			// If assets are in the array, finish setting up the datagrid of assets prepared for a transaction
 			if ($this->ctlAssetTransact->objAssetArray) {
 				// ItemOffset only exists in QCodo4 and beyond. When merging with Q4 we can use this to calculate intItemOffset instead of the line two lines below it.
 				//$intItemOffset = $this->ctlAssetTransact->dtgAssetTransact->ItemOffset;
 				$intItemsPerPage = $this->ctlAssetTransact->dtgAssetTransact->ItemsPerPage;
 				$intItemOffset = ($this->ctlAssetTransact->dtgAssetTransact->PageNumber - 1) * $intItemsPerPage;
-
+				
 				$arrDataSource = array_slice($this->ctlAssetTransact->objAssetArray, $intItemOffset, $intItemsPerPage);
-
+				
 				$this->ctlAssetTransact->dtgAssetTransact->TotalItemCount = count($this->ctlAssetTransact->objAssetArray);
 				// $this->ctlAssetTransact->dtgAssetTransact->DataSource = $this->ctlAssetTransact->objAssetArray;
 				$this->ctlAssetTransact->dtgAssetTransact->DataSource = $arrDataSource;
@@ -877,27 +877,6 @@ CREATE FIELD METHODS
       $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
 		  $this->intDlgStatus = 3; // Adding the Parent Asset Code
 		}
-
-		// This is run every time a 'To Company' is selected in CheckOut Transaction
-  	public function lstToCompany_Select() {
-  		if ($this->ctlAssetTransact) {
-  		  $this->ctlAssetTransact->lstToCompany_Select();
-  		}
-  	}
-
-  	// This is run every time a 'Check out to' is selected in CheckOut Transaction
-  	public function lstCheckOutTo_Select() {
-  	  if ($this->ctlAssetTransact) {
-  		  $this->ctlAssetTransact->lstCheckOutTo_Select();
-  		}
-  	}
-
-  	// This is run every time a 'Set Due Date' is selected in CheckOut Transaction
-  	public function lstDueDate_Select() {
-  	  if ($this->ctlAssetTransact) {
-  		  $this->ctlAssetTransact->lstDueDate_Select();
-  		}
-  	}
 	}
 
 	// Run the form using the template asset_edit.php.inc to render the html
