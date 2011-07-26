@@ -82,7 +82,29 @@
 				$lblCheckedOutImage->Text = sprintf('<img src="%s/icons/checked_out_datagrid.png" style="vertical-align:middle;">', __IMAGE_ASSETS__);
 
 				$objHoverTip = new QHoverTip($lblCheckedOutImage);
-				$objHoverTip->Text = 'Checked Out by ' . $this->GetLastTransactionUser()->__toString();
+				//$objHoverTip->Text = 'Checked Out by ' . $this->GetLastTransactionUser()->__toString();
+				$arrObjects = $this->GetLastTransactionCheckoutObjectArray();
+				$objAccount = $arrObjects['objAccount'];
+				$objAssetTransactionCheckout = $arrObjects['objAssetTransactionCheckout'];
+				$strReason = $arrObjects['strNote'];
+				if (!$objAssetTransactionCheckout)
+				  $objHoverTip->Text = 'Checked Out by ' . $objAccount->__toString();
+				else {
+				  $objHoverTip->Text = 'Checked Out to ';
+				  if ($objAssetTransactionCheckout->ToContactId) {
+				    $objHoverTip->Text .= $objAssetTransactionCheckout->ToContact->__toString();
+				  }
+				  else {
+				    $objHoverTip->Text .= $objAssetTransactionCheckout->ToUser->__toString();
+				  }
+				  $objHoverTip->Text .= ' by ' . $objAccount->__toString();
+				  if (QApplication::$TracmorSettings->ReasonRequired == "1" || $strReason) {
+            $objHoverTip->Text .= "<br />Reason: " . $strReason;
+				  }
+				  if (QApplication::$TracmorSettings->DueDateRequired == "1" || $objAssetTransactionCheckout->DueDate) {
+            $objHoverTip->Text .= sprintf("<br />Due Date: %s", ($objAssetTransactionCheckout->DueDate) ? $objAssetTransactionCheckout->DueDate->format('m/d/Y g:i A') : "");
+				  }
+				}
 				$lblCheckedOutImage->HoverTip = $objHoverTip;
 				$strToReturn = $lblCheckedOutImage->Render(false);
 			}
@@ -217,6 +239,34 @@
 		}
 
 		/**
+		 * Returns an array of objects that created the most recent transaction for this asset
+		 *
+		 * @return array of Object Account, Object AssetTransactionCheckout, string Note
+		 */
+		public function GetLastTransactionCheckoutObjectArray() {
+
+			$objClauses = array();
+			$objExpansionClause = QQ::Expand(QQN::AssetTransaction()->Transaction->CreatedByObject);
+			$objOrderByClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false);
+			$objLimitClause = QQ::LimitInfo(1, 0);
+			array_push($objClauses, $objExpansionClause);
+			array_push($objClauses, $objOrderByClause);
+			array_push($objClauses, $objLimitClause);
+
+			$AssetTransactionArray = AssetTransaction::LoadArrayByAssetId($this->AssetId, $objClauses);
+			$intLastTransactionId = $AssetTransactionArray[0]->Transaction->TransactionId;
+  		//$objAssetTransactionCheckout = AssetTransactionCheckout::LoadByTransactionId($intLastTransactionId);
+  		$objClauses = array();
+  		array_push($objClauses, QQ::Expand(QQN::AssetTransactionCheckout()->ToContact));
+  		array_push($objClauses, QQ::Expand(QQN::AssetTransactionCheckout()->ToUser));
+  		$objAssetTransactionCheckout = AssetTransactionCheckout::QuerySingle(QQ::Equal(QQN::AssetTransactionCheckout()->TransactionId, $intLastTransactionId), $objClauses);
+			$objAccount = $AssetTransactionArray[0]->Transaction->CreatedByObject;
+			$strReason = $AssetTransactionArray[0]->Transaction->Note;
+
+			return array("objAssetTransactionCheckout" => $objAssetTransactionCheckout, "objAccount" => $objAccount, "strNote" => $strReason);
+		}
+
+		/**
 		 * Returns a Location object from the most recent shipment transaction for this asset
 		 *
 		 * @return Object Location
@@ -331,7 +381,7 @@
      * @param array $objExpansionMap
      * @return integer Count
      */
-		public static function CountBySearchHelper($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strModifiedCreated = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null, $blnIncludeTBR = false, $blnIncludeShipped = false, $blnArchived = false) {
+		public static function CountBySearchHelper($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strModifiedCreated = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $objExpansionMap = null, $blnIncludeTBR = false, $blnIncludeShipped = false, $blnArchived = false, $intCheckedOutToUser = null, $intCheckedOutToContact = null, $blnChekcedOutPastDue = false) {
 
 			// Call to QueryHelper to Get the Database Object
 			Asset::QueryHelper($objDatabase);
@@ -347,7 +397,7 @@
 				}
 			}
 
-			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
+			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $blnIncludeTBR, $blnIncludeShipped, $blnArchived, $intCheckedOutToUser, $intCheckedOutToContact, $blnChekcedOutPastDue);
 			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
 			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Asset);
 
@@ -378,8 +428,11 @@
 				  %s
 				  %s
 				  %s
+				  %s
+				  %s
+				  %s
 			', $objQueryExpansion->GetFromSql("", "\n					"), $arrAttachmentSql['strFrom'], $arrCustomFieldSql['strFrom'],
-			$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strArchivedSql'], $arrSearchSql['strIncludeTBRSql'], $arrSearchSql['strIncludeShippedSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+			$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strCheckedOutToUserSql'], $arrSearchSql['strCheckedOutToContactSql'], $arrSearchSql['strCheckedOutPastDueSql'], $arrSearchSql['strArchivedSql'], $arrSearchSql['strIncludeTBRSql'], $arrSearchSql['strIncludeShippedSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 			$arrSearchSql['strAuthorizationSql']);
 
 			$objDbResult = $objDatabase->Query($strQuery);
@@ -512,7 +565,7 @@
      * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
      * @return Asset[]
      */
-		public static function LoadArrayBySearchHelper($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strModifiedCreated, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnIncludeTBR = false, $blnIncludeShipped = false, $blnArchived = false) {
+		public static function LoadArrayBySearchHelper($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strModifiedCreated, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnIncludeTBR = false, $blnIncludeShipped = false, $blnArchived = false, $intCheckedOutToUser = null, $intCheckedOutToContact = null, $blnChekcedOutPastDue = false) {
 
 			Asset::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
@@ -527,7 +580,7 @@
 				}
 			}
 
-			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $blnIncludeTBR, $blnIncludeShipped, $blnArchived);
+			$arrSearchSql = Asset::GenerateSearchSql($strAssetCode, $intLocationId, $intAssetModelId, $intCategoryId, $intManufacturerId, $blnOffsite, $strAssetModelCode, $intReservedBy, $intCheckedOutBy, $strShortDescription, $arrCustomFields, $strDateModified, $strModifiedCreated, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $blnIncludeTBR, $blnIncludeShipped, $blnArchived, $intCheckedOutToUser, $intCheckedOutToContact, $blnChekcedOutPastDue);
 			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
 			$arrAttachmentSql = Attachment::GenerateSql(EntityQtype::Asset);
 
@@ -577,10 +630,13 @@
 				%s
 				%s
 				%s
+				%s
+				%s
+				%s
 			', $strLimitPrefix,
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'],
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
-				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strArchivedSql'], $arrSearchSql['strIncludeTBRSql'], $arrSearchSql['strIncludeShippedSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
+				$arrSearchSql['strAssetCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strAssetModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strOffsiteSql'], $arrSearchSql['strAssetModelCodeSql'], $arrSearchSql['strReservedBySql'], $arrSearchSql['strCheckedOutBySql'], $arrSearchSql['strCheckedOutToUserSql'], $arrSearchSql['strCheckedOutToContactSql'], $arrSearchSql['strCheckedOutPastDueSql'], $arrSearchSql['strArchivedSql'], $arrSearchSql['strIncludeTBRSql'], $arrSearchSql['strIncludeShippedSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],
 				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],
 				$strOrderBy, $strLimitSuffix);
 
@@ -608,10 +664,10 @@
 		 * @param string $strShortDescription
 		 * @return array with seven keys, strAssetCodeSql, strLocationSql, strAssetModelSql, strCategorySql, strManufacturerSql, strAssetModelCodeSql, strShortDescriptionSql
 		 */
-	  protected static function GenerateSearchSql ($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strModifiedCreated, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $blnIncludeTBR = null, $blnIncludeShipped = null, $blnIncludeArchived = null) {
+	  protected static function GenerateSearchSql ($strAssetCode = null, $intLocationId = null, $intAssetModelId = null, $intCategoryId = null, $intManufacturerId = null, $blnOffsite = false, $strAssetModelCode = null, $intReservedBy = null, $intCheckedOutBy = null, $strShortDescription = null, $arrCustomFields = null, $strDateModified = null, $strModifiedCreated, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $blnIncludeTBR = null, $blnIncludeShipped = null, $blnIncludeArchived = null, $intCheckedOutToUser = null, $intCheckedOutToContact = null, $blnChekcedOutPastDue = false) {
 
 	  	// Define all indexes for the array to be returned
-			$arrSearchSql = array("strAssetCodeSql" => "", "strLocationSql" => "", "strAssetModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strOffsiteSql" => "", "strAssetModelCodeSql" => "", "strReservedBySql" => "", "strCheckedOutBySql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "", "strAttachmentSql" => "", "strArchivedSql" => "", "strIncludeTBRSql" => "", "strIncludeShippedSql" => "");
+			$arrSearchSql = array("strAssetCodeSql" => "", "strLocationSql" => "", "strAssetModelSql" => "", "strCategorySql" => "", "strManufacturerSql" => "", "strOffsiteSql" => "", "strAssetModelCodeSql" => "", "strReservedBySql" => "", "strCheckedOutBySql" => "", "strShortDescriptionSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAuthorizationSql" => "", "strAttachmentSql" => "", "strArchivedSql" => "", "strIncludeTBRSql" => "", "strIncludeShippedSql" => "", "strCheckedOutToUserSql" => "", "strCheckedOutToContactSql" => "", "strCheckedOutPastDueSql" => "");
 
 			if ($strAssetCode) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()
@@ -677,8 +733,51 @@
 					$arrSearchSql['strCheckedOutBySql'] .= sprintf("\nAND (SELECT `created_by` FROM `asset_transaction` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutBy);
 				}
 			}
+
+			if ($intCheckedOutToUser) {
+			  // Excepts duplicates
+				//if (!$intCheckedOutBy)
+				  $arrSearchSql['strCheckedOutToUserSql'] = sprintf("AND `asset` . `checked_out_flag` = true");
+				/*else
+				  $arrSearchSql['strCheckedOutToUserSql'] = "";*/
+				if ($intCheckedOutToUser != 'any') {
+					$intCheckedOutToUser = QApplication::$Database[1]->SqlVariable($intCheckedOutToUser, true);
+					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
+					$arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_user_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutToUser);
+				}
+				else {
+				  $arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_user_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)IS NOT NULL");
+				}
+			}
+
+			if ($intCheckedOutToContact) {
+			  // Excepts duplicates
+				if (!$intCheckedOutBy && !$intCheckedOutToUser)
+				  $arrSearchSql['strCheckedOutToContactSql'] = sprintf("AND `asset` . `checked_out_flag` = true");
+				else
+				  $arrSearchSql['strCheckedOutToContactSql'] = "";
+				if ($intCheckedOutToContact != 'any') {
+					$intCheckedOutToContact = QApplication::$Database[1]->SqlVariable($intCheckedOutToContact, true);
+					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
+					$arrSearchSql['strCheckedOutToContactSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutToContact);
+				}
+				else {
+				  $arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)IS NOT NULL");
+				}
+			}
+
+			if ($blnChekcedOutPastDue) {
+			  if (!$intCheckedOutBy && !$intCheckedOutToUser && !$intCheckedOutToContact)
+				  $arrSearchSql['strCheckedOutPastDueSql'] = sprintf("AND `asset` . `checked_out_flag` = true");
+				else
+				  $arrSearchSql['strCheckedOutPastDueSql'] = "";
+				$dttNow = new QDateTime(QDateTime::Now);
+					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
+					$arrSearchSql['strCheckedOutPastDueSql'] .= sprintf("\nAND (SELECT `asset_transaction_checkout`.`due_date` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)<'%s'", $dttNow->format('Y-m-d h:i:s'));
+			}
+
 			if ($strDateModified) {
-				
+
 				if ($strDateModified == "before" && $strDateModifiedFirst instanceof QDateTime) {
 					$strDateModifiedFirst = QApplication::$Database[1]->SqlVariable($strDateModifiedFirst->Timestamp, false);
 					$arrSearchSql['strDateModifiedSql'] = sprintf("AND UNIX_TIMESTAMP(`asset`.`%s`) < %s", $strModifiedCreated, $strDateModifiedFirst);
@@ -788,7 +887,7 @@
 		  $objDatabase = QApplication::$Database[1];
 		  $objDatabase->NonQuery($strQuery);
 		}
-		
+
 		/**
 		 * Delete all audit_scan records for this AssetId
 		 *
@@ -796,12 +895,12 @@
 		 */
 		public function DeleteAuditScanByAssetId($intAssetId) {
 		  $strQuery = sprintf("
-				DELETE 
+				DELETE
 				  `audit_scan`.*
-				FROM 
-				  `audit_scan`, `audit` 
+				FROM
+				  `audit_scan`, `audit`
 				WHERE
-				  `audit_scan`.`entity_id` = '%s' AND `audit_scan`.`audit_id` = `audit`.`audit_id` AND `audit`.`entity_qtype_id` = 1", 
+				  `audit_scan`.`entity_id` = '%s' AND `audit_scan`.`audit_id` = `audit`.`audit_id` AND `audit`.`entity_qtype_id` = 1",
 		  $intAssetId);
 
 		  $objDatabase = QApplication::$Database[1];
