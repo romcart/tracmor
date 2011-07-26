@@ -179,7 +179,7 @@ class QAssetTransactComposite extends QControl {
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
 		$this->btnSave->Text = 'Save';
-		$this->btnSave->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
+		$this->btnSave->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnSave->CausesValidation = false;
@@ -761,7 +761,7 @@ class QAssetTransactComposite extends QControl {
   							// Create the new AssetTransactionCheckout object and save it
   							if ($this->intTransactionTypeId == 3) {
   							  $objAssetTransactionCheckout = new AssetTransactionCheckout();
-  								$objAssetTransactionCheckout->TransactionId = $this->objAssetTransaction->TransactionId;
+  								$objAssetTransactionCheckout->AssetTransactionId = $this->objAssetTransaction->AssetTransactionId;
   								$objAssetTransactionCheckout->ToContactId = $intToContact;
   								$objAssetTransactionCheckout->ToUserId = $intToUser;
   								if ($dttDueDate instanceof QDateTimePicker) {
@@ -783,8 +783,8 @@ class QAssetTransactComposite extends QControl {
 							// Create the new AssetTransactionCheckout object and save it for each linked asset
               if ($this->intTransactionTypeId == 3) {
 							  $objAssetTransactionCheckout = new AssetTransactionCheckout();
-								$objAssetTransactionCheckout->TransactionId = $this->objAssetTransaction->TransactionId;
-								$objAssetTransactionCheckout->ToContactId = $intToContact;
+								$objAssetTransactionCheckout->AssetTransactionId = $this->objAssetTransaction->AssetTransactionId;
+  							$objAssetTransactionCheckout->ToContactId = $intToContact;
 								$objAssetTransactionCheckout->ToUserId = $intToUser;
 								if ($dttDueDate instanceof QDateTimePicker) {
 								  $objAssetTransactionCheckout->DueDate = $dttDueDate->DateTime;

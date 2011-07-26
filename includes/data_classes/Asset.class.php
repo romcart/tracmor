@@ -250,16 +250,17 @@
 			$objOrderByClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false);
 			$objLimitClause = QQ::LimitInfo(1, 0);
 			array_push($objClauses, $objExpansionClause);
+			array_push($objClauses, QQ::Expand(QQN::AssetTransaction()->AssetTransactionCheckout->AssetTransactionCheckoutId));
 			array_push($objClauses, $objOrderByClause);
 			array_push($objClauses, $objLimitClause);
 
 			$AssetTransactionArray = AssetTransaction::LoadArrayByAssetId($this->AssetId, $objClauses);
-			$intLastTransactionId = $AssetTransactionArray[0]->Transaction->TransactionId;
-  		//$objAssetTransactionCheckout = AssetTransactionCheckout::LoadByTransactionId($intLastTransactionId);
+			/*$intLastAssetTransactionId = $AssetTransactionArray[0]->AssetTransactionId;
   		$objClauses = array();
   		array_push($objClauses, QQ::Expand(QQN::AssetTransactionCheckout()->ToContact));
   		array_push($objClauses, QQ::Expand(QQN::AssetTransactionCheckout()->ToUser));
-  		$objAssetTransactionCheckout = AssetTransactionCheckout::QuerySingle(QQ::Equal(QQN::AssetTransactionCheckout()->TransactionId, $intLastTransactionId), $objClauses);
+  		$objAssetTransactionCheckout = AssetTransactionCheckout::QuerySingle(QQ::Equal(QQN::AssetTransactionCheckout()->AssetTransactionId, $intLastAssetTransactionId), $objClauses);*/
+  		$objAssetTransactionCheckout = $AssetTransactionArray[0]->AssetTransactionCheckout;
 			$objAccount = $AssetTransactionArray[0]->Transaction->CreatedByObject;
 			$strReason = $AssetTransactionArray[0]->Transaction->Note;
 
@@ -743,10 +744,10 @@
 				if ($intCheckedOutToUser != 'any') {
 					$intCheckedOutToUser = QApplication::$Database[1]->SqlVariable($intCheckedOutToUser, true);
 					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
-					$arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_user_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutToUser);
+					$arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_user_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`asset_transaction_id` = `asset_transaction_checkout`.`asset_transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutToUser);
 				}
 				else {
-				  $arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_user_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)IS NOT NULL");
+				  $arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_user_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`asset_transaction_id` = `asset_transaction_checkout`.`asset_transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)IS NOT NULL");
 				}
 			}
 
@@ -759,10 +760,10 @@
 				if ($intCheckedOutToContact != 'any') {
 					$intCheckedOutToContact = QApplication::$Database[1]->SqlVariable($intCheckedOutToContact, true);
 					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
-					$arrSearchSql['strCheckedOutToContactSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutToContact);
+					$arrSearchSql['strCheckedOutToContactSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`asset_transaction_id` = `asset_transaction_checkout`.`asset_transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutToContact);
 				}
 				else {
-				  $arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)IS NOT NULL");
+				  $arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`asset_transaction_id` = `asset_transaction_checkout`.`asset_transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)IS NOT NULL");
 				}
 			}
 
@@ -773,7 +774,7 @@
 				  $arrSearchSql['strCheckedOutPastDueSql'] = "";
 				$dttNow = new QDateTime(QDateTime::Now);
 					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
-					$arrSearchSql['strCheckedOutPastDueSql'] .= sprintf("\nAND (SELECT `asset_transaction_checkout`.`due_date` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`transaction_id` = `asset_transaction_checkout`.`transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)<'%s'", $dttNow->format('Y-m-d h:i:s'));
+					$arrSearchSql['strCheckedOutPastDueSql'] .= sprintf("\nAND (SELECT `asset_transaction_checkout`.`due_date` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`asset_transaction_id` = `asset_transaction_checkout`.`asset_transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)<'%s'", $dttNow->format('Y-m-d h:i:s'));
 			}
 
 			if ($strDateModified) {

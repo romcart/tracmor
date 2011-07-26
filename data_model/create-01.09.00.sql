@@ -762,7 +762,7 @@ ENGINE = INNODB;
 
 CREATE TABLE asset_transaction_checkout (
   asset_transaction_checkout_id      INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
-  transaction_id  INTEGER UNSIGNED   NOT NULL,
+  asset_transaction_id  INTEGER UNSIGNED   NOT NULL,
   to_contact_id   INTEGER UNSIGNED   NULL,
   to_user_id   INTEGER UNSIGNED   NULL,
   due_date        DATETIME   NULL,
@@ -775,8 +775,8 @@ CREATE TABLE asset_transaction_checkout (
     INDEX asset_transaction_checkout_fkindex2 ( to_user_id ),
     INDEX asset_transaction_checkout_fkindex3 ( created_by ),
     INDEX asset_transaction_checkout_fkindex4 ( modified_by ),
-    INDEX asset_transaction_checkout_fkindex5 ( transaction_id ),
-    UNIQUE (transaction_id ))
+    INDEX asset_transaction_checkout_fkindex5 ( asset_transaction_id ),
+    UNIQUE (asset_transaction_id ))
 ENGINE = INNODB;
 
 CREATE TABLE address_custom_field_helper (
@@ -1282,8 +1282,8 @@ ALTER TABLE asset_transaction_checkout
 ON Delete NO ACTION ON Update NO ACTION;
 
 ALTER TABLE asset_transaction_checkout
-  ADD CONSTRAINT FOREIGN KEY( transaction_id) references transaction (
-    transaction_id
+  ADD CONSTRAINT FOREIGN KEY( asset_transaction_id) references asset_transaction (
+    asset_transaction_id
   )
 ON Delete CASCADE ON Update NO ACTION;
 

@@ -132,13 +132,12 @@
 		public function __toStringDestinationLocation() {
 			if ($this->intDestinationLocationId) {
 			  if ($this->intDestinationLocationId == 1) { // Checked Out
-			    $objAssetTransactionCheckout = $this->LoadAssetTransactionCheckOutByTransactionId($this->TransactionId);
-			    if ($objAssetTransactionCheckout) {
-			      if ($objAssetTransactionCheckout->ToContactId) {
-				      $strToReturn = $objAssetTransactionCheckout->ToContact->__toString();
+			    if ($this->AssetTransactionCheckout) {
+			      if ($this->AssetTransactionCheckout->ToContactId) {
+				      $strToReturn = $this->AssetTransactionCheckout->ToContact->__toString();
   				  }
   				  else {
-  				    $strToReturn = $objAssetTransactionCheckout->ToUser->__toString();
+  				    $strToReturn = $this->AssetTransactionCheckout->ToUser->__toString();
   				  }
 			    }
 			    else {
@@ -152,21 +151,6 @@
 				$strToReturn = null;
 			}
 			return sprintf('%s', $strToReturn);
-		}
-
-		/**
-		 * Load a single AssetTransactionCheckout object with expansion map of Contact and UserAccount,
-		 * by TransactionId
-		 * @param integer $intAssetId
-		 * @return object $objAssetTransactionCheckout
-		*/
-		public function LoadAssetTransactionCheckOutByTransactionId($intTransactionId = null) {
-		  $objClauses = array();
-  		array_push($objClauses, QQ::Expand(QQN::AssetTransactionCheckout()->ToContact));
-  		array_push($objClauses, QQ::Expand(QQN::AssetTransactionCheckout()->ToUser));
-  		$objAssetTransactionCheckout = AssetTransactionCheckout::QuerySingle(QQ::Equal(QQN::AssetTransactionCheckout()->TransactionId, $intTransactionId), $objClauses);
-
-  		return $objAssetTransactionCheckout;
 		}
 
 		/**

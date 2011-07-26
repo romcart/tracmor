@@ -255,6 +255,8 @@
 				array_push($objClauses, $objClause);
 			if ($objClause = QQ::Expand(QQN::AssetTransaction()->Transaction->TransactionType))
 				array_push($objClauses, $objClause);
+			if ($objClause = QQ::Expand(QQN::AssetTransaction()->AssetTransactionCheckout->AssetTransactionCheckoutId))
+				array_push($objClauses, $objClause);
 			if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation))
 				array_push($objClauses, $objClause);
 			if ($objClause = QQ::Expand(QQN::AssetTransaction()->DestinationLocation))
