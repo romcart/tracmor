@@ -131,7 +131,21 @@
 		 */
 		public function __toStringDestinationLocation() {
 			if ($this->intDestinationLocationId) {
-				$strToReturn = $this->DestinationLocation->__toString();
+			  if ($this->intDestinationLocationId == 1) { // Checked Out
+			    if ($this->AssetTransactionCheckout) {
+			      if ($this->AssetTransactionCheckout->ToContactId) {
+				      $strToReturn = $this->AssetTransactionCheckout->ToContact->__toString();
+  				  }
+  				  else {
+  				    $strToReturn = $this->AssetTransactionCheckout->ToUser->__toString();
+  				  }
+			    }
+			    else {
+			      $strToReturn = $this->DestinationLocation->__toString();
+			    }
+			  }
+			  else
+  				$strToReturn = $this->DestinationLocation->__toString();
 			}
 			else {
 				$strToReturn = null;
@@ -424,7 +438,7 @@
         $objQueryExpansion->GetFromSql("", "\n					"), str_replace("`asset`.`asset_id`", " `asset_transaction__asset_id`.`asset_id`", $arrCustomFieldSql['strFrom']),
         $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql'],
         $strSortByDate);
-        
+
       if ($blnReturnStrQuery) {
 			  return $strQuery;
 			}
@@ -566,7 +580,7 @@
       ', $objQueryExpansion->GetFromSql("", "\n					"),
         $strTransactionTypes, $strAssetModel, $strAssetCode, $strAssetModelCode, $strUser, $strCheckedOutBy, $strReservedBy, $strCategory, $strManufacturer, $arrSearchSql['strDateModifiedSql']
        );
-       
+
        //echo($strQuery); exit;
 
      $objDatabase = AssetTransaction::GetDatabase();

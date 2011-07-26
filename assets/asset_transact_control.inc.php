@@ -52,21 +52,66 @@ switch ($this->intTransactionTypeId) {
 echo($strTransactionHeader);
 ?>
 <br class="item_divider" />
-<?php
-$this->btnSave->RenderWithError();
-echo('&nbsp;');
-$this->btnCancel->RenderWithError();
-?>
+<table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
+	<tr>
+		<td class="record_header">
+		<?php
+    $this->btnSave->RenderWithError();
+    echo('&nbsp;');
+    $this->btnCancel->RenderWithError();
+    ?>
+    </td>
+  </tr>
+  <table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
+	<tr>
+		<td style="vertical-align:top; width: 100%;">
+			<table cellpadding="5" cellspacing="0" style="width: 100%;">
+    <?php
+      // Check Out
+      if ($this->intTransactionTypeId == 3) {
+        if (!(QApplication::$TracmorSettings->CheckOutToOtherUsers != "1" && QApplication::$TracmorSettings->CheckOutToContacts != "1")) {
+    ?>
+      <tr>
+        <td colspan="2" class="record_subheader"><div class="title"><?php _t('Check out to:') ?></div></td>
+      </tr>
+      <tr>
+    		<td class="record_field_name"><?php $this->lstCheckOutTo->RenderWithError(); ?></td>
+    		<td><?php $this->lstUser->RenderWithError(); ?><?php $this->lstToCompany->RenderWithName(); ?><?php $this->lstToContact->RenderWithName(); ?></td>
+    	</tr>
+    	<?php
+        }
+    	?>
+    	<tr>
+        <td colspan="2" class="record_subheader"><div class="title"><?php _t('Set due date:') ?></div></td>
+      </tr>
+      <tr>
+    		<td class="record_field_name"><?php $this->lstDueDate->RenderWithError(); ?></td>
+    		<td><?php $this->dttDueDate->Render(); ?></td>
+    	</tr>
+    	<tr>
+        <td colspan="2" class="record_subheader"></td>
+      </tr>
+    <?php
+      }
+    ?>
+    	<tr>
+    		<td class="record_field_name"><?php echo($strLocationName); ?></td>
+    		<td><?php $this->lstLocation->RenderWithError(); ?></td>
+    	</tr>
+    	<tr>
+    		<td class="record_field_name"><?php if ($this->intTransactionTypeId == 3) _t("Reason: "); else _t("Note: "); ?></td>
+    		<td><?php $this->txtNote->RenderWithError(); ?></td>
+    	</tr>
+    </table>
+    </td>
+	</tr>
+</table>
+<br class="item_divider" />
 <table>
-	<tr>
-		<td class="record_field_name"><?php echo($strLocationName); ?></td>
-		<td><?php $this->lstLocation->RenderWithError(); ?></td>
+  <tr>
+	   <td colspan="2"><div class="title"><?php if ($this->intTransactionTypeId == 3) _t("Assets to check out"); ?></div></td>
 	</tr>
-	<tr>
-		<td class="record_field_name">Note: </td>
-		<td><?php $this->txtNote->RenderWithError(); ?></td>
-	</tr>
-	<tr>
+  <tr>
 		<td class="record_field_name">Asset Code:</td>
 		<td>
 		  <table>
