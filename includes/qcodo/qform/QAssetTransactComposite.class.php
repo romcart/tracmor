@@ -179,7 +179,7 @@ class QAssetTransactComposite extends QControl {
 	protected function btnSave_Create() {
 		$this->btnSave = new QButton($this);
 		$this->btnSave->Text = 'Save';
-		$this->btnSave->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
+		$this->btnSave->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
 		$this->btnSave->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->btnSave->CausesValidation = false;
@@ -209,18 +209,19 @@ class QAssetTransactComposite extends QControl {
 	  $this->lstCheckOutTo = new QRadioButtonList($this);
     $this->lstCheckOutTo->AddItem(new QListItem('User', 1));
 		$this->lstCheckOutTo->AddItem(new QListItem('Contact', 2));
-		//$this->lstCheckOutTo->SelectedIndex = 0;
+		$this->lstCheckOutTo->SelectedIndex = 0;
 		$this->lstCheckOutTo->AddAction(new QChangeEvent(), new QAjaxAction('lstCheckOutTo_Select'));
 
 		$this->lstUser = new QListBox($this);
   	$this->lstUser->Name = 'User';
-  	$this->lstUser->Display = false;
+  	//$this->lstUser->Display = false;
   	$this->lstUser->AddItem('- Select One -', null);
   	//foreach (UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->LastName, QQN::UserAccount()->FirstName))) as $objUser) {
   	foreach (UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->Username))) as $objUser) {
   	  //$this->lstUser->AddItem(sprintf("%s %s", $objUser->LastName, $objUser->FirstName), $objUser->UserAccountId);
   	  $this->lstUser->AddItem(sprintf("%s", $objUser->Username), $objUser->UserAccountId);
   	}
+  	$this->lstCheckOutTo_Select();
   }
 
   protected function DueDate_Create() {
@@ -228,7 +229,7 @@ class QAssetTransactComposite extends QControl {
 		$this->lstDueDate->AddItem(new QListItem('No due date', 1));
 		$this->lstDueDate->AddItem(new QListItem('Due Date:', 2));
 		$this->lstDueDate->SelectedIndex = 0;
-		$this->lstDueDate->AddAction(new QChangeEvent(), new QServerAction('lstDueDate_Select'));
+		$this->lstDueDate->AddAction(new QChangeEvent(), new QAjaxAction('lstDueDate_Select'));
 
 		$this->dttDueDate = new QDateTimePickerExt($this);
 		$this->dttDueDate->DateTimePickerType = QDateTimePickerType::DateTime;
@@ -305,7 +306,7 @@ class QAssetTransactComposite extends QControl {
 	      if (QApplication::$TracmorSettings->CheckOutToOtherUsers != "1" && QApplication::$TracmorSettings->CheckOutToContacts == "1") {
 	        $this->lstUser->RemoveAllItems();
 	        $objUserAccount = QApplication::$objUserAccount;
-	        $this->lstUser->AddItem(sprintf("%s %s", $objUserAccount->LastName, $objUserAccount->FirstName), $objUserAccount->UserAccountId);
+	        $this->lstUser->AddItem(sprintf("%s", $objUserAccount->__toString()), $objUserAccount->UserAccountId);
 	      }
 	      $this->lstToCompany->Display = false;
 	      $this->lstToContact->Display = false;
@@ -602,6 +603,7 @@ class QAssetTransactComposite extends QControl {
 
 	// Save Button Click
 	public function btnSave_Click($strFormId, $strControlId, $strParameter) {
+	  $this->btnCancel->Warning = "";
 		if ($this->objAssetArray) {
 			$blnError = false;
 
@@ -637,7 +639,7 @@ class QAssetTransactComposite extends QControl {
   				if ((QApplication::$TracmorSettings->CheckOutToOtherUsers == "1" || QApplication::$TracmorSettings->CheckOutToContacts == "1") && $this->lstCheckOutTo->Display)
     				if ($this->lstCheckOutTo->SelectedValue == "1") {
     				  if (!$this->lstUser->SelectedValue) {
-    				    $this->lstCheckOutTo->Warning = 'Please select an user.';
+    				    $this->lstCheckOutTo->Warning = 'Please select a user.';
     				    $blnError = true;
     				  }
     				  else {
@@ -810,6 +812,9 @@ class QAssetTransactComposite extends QControl {
           $this->btnCancel->Warning = sprintf('The Asset %s has been altered by another user and removed from the transaction. You may add the asset again or save the transaction without it.', $objAsset->AssetCode);
 				}
 			}
+		}
+		else {
+		  $this->btnCancel->Warning = sprintf('Please provide at least one asset.');
 		}
 	}
 
