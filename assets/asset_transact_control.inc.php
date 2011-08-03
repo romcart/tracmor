@@ -83,8 +83,10 @@ echo($strTransactionHeader);
         <td colspan="2" class="record_subheader"><div class="title"><?php _t('Check out to:') ?></div></td>
       </tr>
       <tr>
-    		<td class="record_field_name"><?php $this->lstCheckOutTo->RenderWithError(); ?></td>
-    		<td><?php $this->lstUser->RenderWithError(); ?><?php $this->lstToCompany->RenderWithName(); ?><?php $this->lstToContact->RenderWithName(); ?></td>
+    		<td style="vertical-align:top;" class="record_field_name"><?php $this->lstCheckOutTo->RenderWithError(); ?></td>
+    		<td style="vertical-align:top;">
+				<table><tr><td style="text-align:right;"><?php $this->lstUser->RenderWithError(); ?><?php $this->lstToCompany->RenderWithName(); ?><?php $this->lstToContact->RenderWithName(); ?></td></tr></table>
+			</td>
     	</tr>
     	<?php
         }
@@ -94,18 +96,19 @@ echo($strTransactionHeader);
       </tr>
       <tr>
     		<td class="record_field_name"><?php $this->lstDueDate->RenderWithError(); ?></td>
-    		<td><?php $this->dttDueDate->Render(); ?></td>
+    		<td style="vertical-align:bottom;"><?php $this->dttDueDate->Render(); ?></td>
     	</tr>
     	<tr>
         <td colspan="2" class="record_subheader"></td>
       </tr>
     <?php
-      }
+      } else {
     ?>
     	<tr>
     		<td class="record_field_name"><?php echo($strLocationName); ?></td>
     		<td><?php $this->lstLocation->RenderWithError(); ?></td>
     	</tr>
+	<?php } ?>
     	<tr>
     		<td class="record_field_name"><?php if ($this->intTransactionTypeId == 3) _t("Reason: "); else _t("Note: "); ?></td>
     		<td><?php $this->txtNote->RenderWithError(); ?></td>

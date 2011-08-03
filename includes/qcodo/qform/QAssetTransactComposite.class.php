@@ -206,30 +206,28 @@ class QAssetTransactComposite extends QControl {
 	}
 
 	protected function CheckOutTo_Create() {
-	  $this->lstCheckOutTo = new QRadioButtonList($this);
-    $this->lstCheckOutTo->AddItem(new QListItem('User', 1));
-		$this->lstCheckOutTo->AddItem(new QListItem('Contact', 2));
+		$this->lstCheckOutTo = new QRadioButtonList($this);
+		$this->lstCheckOutTo->AddItem(new QListItem('User', 1, false, null, 'FontSize=12px'));
+		$this->lstCheckOutTo->AddItem(new QListItem('Contact', 2, false, null, 'FontSize=12px'));
 		$this->lstCheckOutTo->SelectedIndex = 0;
 		$this->lstCheckOutTo->AddAction(new QChangeEvent(), new QAjaxAction('lstCheckOutTo_Select'));
-
 		$this->lstUser = new QListBox($this);
-  	$this->lstUser->Name = 'User';
-  	//$this->lstUser->Display = false;
-  	$this->lstUser->AddItem('- Select One -', null);
-  	//foreach (UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->LastName, QQN::UserAccount()->FirstName))) as $objUser) {
-  	foreach (UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->Username))) as $objUser) {
-  	  //$this->lstUser->AddItem(sprintf("%s %s", $objUser->LastName, $objUser->FirstName), $objUser->UserAccountId);
-  	  $this->lstUser->AddItem(sprintf("%s", $objUser->Username), $objUser->UserAccountId);
-  	}
-  	$this->lstCheckOutTo_Select();
-  }
+		$this->lstUser->Name = 'User';
+		$this->lstUser->AddItem('- Select One -', null);
 
-  protected function DueDate_Create() {
-	  $this->lstDueDate = new QRadioButtonList($this);
-		$this->lstDueDate->AddItem(new QListItem('No due date', 1));
-		$this->lstDueDate->AddItem(new QListItem('Due Date:', 2));
+		foreach (UserAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::UserAccount()->Username))) as $objUser) {
+			$this->lstUser->AddItem(sprintf("%s", $objUser->Username), $objUser->UserAccountId);
+		}
+
+		$this->lstCheckOutTo_Select();
+	}
+
+	protected function DueDate_Create() {
+		$this->lstDueDate = new QRadioButtonList($this);
+		$this->lstDueDate->AddItem(new QListItem('No due date', 1, false, null, 'FontSize=12px'));
+		$this->lstDueDate->AddItem(new QListItem('Due Date:', 2, false, null, 'FontSize=12px'));
 		$this->lstDueDate->SelectedIndex = 0;
-		$this->lstDueDate->AddAction(new QChangeEvent(), new QAjaxAction('lstDueDate_Select'));
+		$this->lstDueDate->AddAction(new QChangeEvent(), new QAjaxAction('lstDueDate_Select'));	
 
 		$this->dttDueDate = new QDateTimePickerExt($this);
 		$this->dttDueDate->DateTimePickerType = QDateTimePickerType::DateTime;
@@ -240,13 +238,14 @@ class QAssetTransactComposite extends QControl {
 		$this->dttDueDate->MinimumDay = $dttNow->Day;
 		$this->dttDueDate->__set('DateTime', QDateTime::FromTimestamp($dttNow->Timestamp + intval(QApplication::$TracmorSettings->DefaultCheckOutPeriod) * 3600));
 		$dttMaximumDate = QDateTime::FromTimestamp($dttNow->Timestamp + 864000); // 10 days
-    $this->dttDueDate->MaximumYear = $dttMaximumDate->Year;
-    $this->dttDueDate->MaximumMonth = $dttMaximumDate->Month;
-    $this->dttDueDate->MaximumDay = $dttMaximumDate->Day;
-    if (QApplication::$TracmorSettings->DueDateRequired == "1") {
-      $this->dttDueDate->Display = true;
-      $this->lstDueDate->SelectedIndex = 1;
-    }
+		$this->dttDueDate->MaximumYear = $dttMaximumDate->Year;
+		$this->dttDueDate->MaximumMonth = $dttMaximumDate->Month;
+		$this->dttDueDate->MaximumDay = $dttMaximumDate->Day;
+
+		if (QApplication::$TracmorSettings->DueDateRequired == "1") {
+			$this->dttDueDate->Display = true;
+			$this->lstDueDate->SelectedIndex = 1;
+		}
 	}
 
   // Create and Setup lstToCompany
@@ -648,7 +647,7 @@ class QAssetTransactComposite extends QControl {
     				}
     				elseif ($this->lstCheckOutTo->SelectedValue == "2") {
     				  if (!$this->lstToContact->SelectedValue) {
-    				    $this->lstCheckOutTo->Warning = 'Please select an contact.';
+    				    $this->lstCheckOutTo->Warning = 'Please select a contact.';
     				    $blnError = true;
     				  }
     				  else {
