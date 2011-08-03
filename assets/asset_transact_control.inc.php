@@ -21,31 +21,39 @@
 
 $strTransactionHeader = null;
 $strLocationName = null;
+$strLabelAssetsTo = null;
 
 switch ($this->intTransactionTypeId) {
 	case 1:  // Move
 		$strTransactionHeader = '<div class="title">Move Assets</div>';
 		$strLocationName = 'Move To:';
+		$strLabelAssetsTo = 'Assets to move';
 		break;
 	case 2:  // Check In
 		$strTransactionHeader = '<div class="title">Check In Assets</div>';
 		$strLocationName = 'Check In To:';
+		$strLabelAssetsTo = 'Assets to check in';
 		break;
 	case 3:  // Check Out
 		$strTransactionHeader = '<div class="title">Check Out Assets</div>';
+		$strLabelAssetsTo = 'Assets to check out';
 		break;
 	case 8:  // Reserve
 		$strTransactionHeader = '<div class="title">Reserve Assets</div>';
+		$strLabelAssetsTo = 'Assets to reserve';
 		break;
 	case 9:  // Unreserve
 		$strTransactionHeader = '<div class="title">Unreserve Assets</div>';
+		$strLabelAssetsTo = 'Assets to unreserve';
 		break;
 	case 10:  // Archive
 		$strTransactionHeader = '<div class="title">Archive Assets</div>';
+		$strLabelAssetsTo = 'Assets to archive';
 		break;
 	case 11:  // Unarchive
 		$strTransactionHeader = '<div class="title">Unarchive Assets</div>';
 		$strLocationName = 'Unarchive To:';
+		$strLabelAssetsTo = 'Assets to unarchive';
 		break;
 }
 
@@ -109,7 +117,7 @@ echo($strTransactionHeader);
 <br class="item_divider" />
 <table>
   <tr>
-	   <td colspan="2"><div class="title"><?php if ($this->intTransactionTypeId == 3) _t("Assets to check out"); ?></div></td>
+	   <td colspan="2"><div class="title"><?php _t($strLabelAssetsTo); //if ($this->intTransactionTypeId == 3) _t("Assets to check out"); ?></div></td>
 	</tr>
   <tr>
 		<td class="record_field_name">Asset Code:</td>
