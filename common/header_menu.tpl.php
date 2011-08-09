@@ -31,7 +31,7 @@
 							<table cellpadding="0" cellspacing="0" style="width:100%;">
 								<tr>
 									<td style="padding-left:15px;padding-top:6px;"><?php $this->lblLogo->Render(); ?></td>
-									<td style="padding-right:10px;text-align:right;" align="right" width="100%" valign="top"><a href="http://www.tracmor.com/whatsnew.html" target="_blank" style="color:#214478;font-family:arial;font-size:12px;text-decoration:none;font-weight:bold;">New Features</a>&nbsp;&nbsp;|&nbsp;&nbsp;<?php $this->lblSignOut->Render(); ?></td>
+									<td style="padding-right:10px;text-align:right;" align="right" width="100%" valign="top"><?php $this->lblSignOut->Render(); ?></td>
 								</tr>
 							</table>
 						</td>
