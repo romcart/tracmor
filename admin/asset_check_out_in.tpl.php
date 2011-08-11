@@ -73,8 +73,8 @@
 							<td class="record_field_edit"><?php $this->chkReasonRequired->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Default check-out period: </td>
-							<td class="record_field_edit"><?php $this->txtDefaultCheckOutPeriod->RenderWithError(); ?></td>
+							<td class="record_field_name" style="vertical-align:middle;">Default check-out period: </td>
+							<td class="record_field_edit" style="vertical-align:middle;"><?php $this->txtDefaultCheckOutPeriod->RenderWithError(); ?> hours</td>
 						</tr>
 					</table>
 				</td>

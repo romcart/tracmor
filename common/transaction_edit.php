@@ -132,7 +132,7 @@
 		    $this->dtgEntity->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 		    $this->dtgEntity->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink($_ITEM->Asset->AssetModel,"bluelink") ?>', 'Width=200', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 		    $this->dtgEntity->AddColumn(new QDataGridColumn('Source', '<?= $_ITEM->SourceLocation->__toString() ?>', 'CssClass="dtg_column"'));
-		    $this->dtgEntity->AddColumn(new QDataGridColumn('Destination', '<?= $_ITEM->DestinationLocation->__toString() ?>', 'CssClass="dtg_column"'));
+		    $this->dtgEntity->AddColumn(new QDataGridColumn('Destination', '<?= $_ITEM->__toStringDestinationLocation() ?>', 'CssClass="dtg_column"'));
 	    }
 	    elseif ($this->objTransaction->EntityQtypeId == EntityQtype::Inventory) {
 	    	$this->dtgEntity->AddColumn(new QDataGridColumn('Inventory Code', '<?= $_ITEM->InventoryLocation->InventoryModel->__toStringWithLink("bluelink") ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));	    	
