@@ -93,7 +93,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 
     	// Create new AssetTransactionCheckout by that user to the same user
     	$objAssetTransactionCheckout = new AssetTransactionCheckout();
-			$objAssetTransactionCheckout->TransactionId = $objAssetTransaction->TransactionId;
+			$objAssetTransactionCheckout->AssetTransactionId = $objAssetTransaction->AssetTransactionId;
 			$objAssetTransactionCheckout->ToUserId = QApplication::$objUserAccount->UserAccountId;
 			$objAssetTransactionCheckout->Save();
 
@@ -114,7 +114,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 
     			// Create new AssetTransactionCheckout by that user to the same user for each linked asset
     			$objAssetTransactionCheckout = new AssetTransactionCheckout();
-    			$objAssetTransactionCheckout->TransactionId = $objAssetTransaction->TransactionId;
+    			$objAssetTransactionCheckout->AssetTransactionId = $objAssetTransaction->AssetTransactionId;
     			$objAssetTransactionCheckout->ToUserId = QApplication::$objUserAccount->UserAccountId;
     			$objAssetTransactionCheckout->Save();
   	    }

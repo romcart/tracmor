@@ -616,7 +616,7 @@
           }
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
-          $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
@@ -939,6 +939,7 @@
             }
             // Asset Model import
             elseif ($this->intImportStep == 4) {
+              $objNewAssetModelArray = array();
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
                 $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
@@ -1035,13 +1036,13 @@
                     }
                   }*/
                   $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', NOW())", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId, $_SESSION['intUserAccountId']);
-                  $this->objNewAssetModelArray[] = $strShortDescription;
+                  $objNewAssetModelArray[] = $strShortDescription;
                 }
               }
               //if ($this->intCurrentFile == count($this->strFilePathArray)) {
                 if (count($this->strModelValuesArray)) {
-                  $strNewModelArray = array_merge($this->objNewAssetModelArray, array());
-                  $this->objNewAssetModelArray = array();
+                  //$strNewModelArray = array_merge($this->objNewAssetModelArray, array());
+                  //$this->objNewAssetModelArray = array();
                   $objDatabase = AssetModel::GetDatabase();
 
                   //var_dump($this->strModelValuesArray);
@@ -1050,10 +1051,10 @@
                   $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $this->strModelValuesArray)));
                   $intStartId = $objDatabase->InsertId();
 
-                  for ($i=0; $i<count($strNewModelArray); $i++) {
+                  for ($i=0; $i<count($objNewAssetModelArray); $i++) {
                     //$objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", $this->strModelValuesArray[$i]));
                     //$intStartId = $objDatabase->InsertId();
-                    $this->objNewAssetModelArray[$intStartId+$i] = $strNewModelArray[$i];
+                    $this->objNewAssetModelArray[$intStartId+$i] = $objNewAssetModelArray[$i];
                   }
                   $this->strModelValuesArray = array();
                 }
@@ -1381,6 +1382,19 @@
                                   "VALUES %s;", implode(", ", $this->strSelectedValueArray));
               $objDatabase->NonQuery($strQuery);
             }*/
+
+            // Insert Values into helper tables
+            $objDatabase = Asset::GetDatabase();
+            $objDatabase->NonQuery("SET FOREIGN_KEY_CHECKS=0;");
+            // Insert into asset_model_custom_field_helper
+            $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model_custom_field_helper` (`asset_model_id`) (SELECT `asset_model_id` FROM `asset_model` WHERE `asset_model_id` NOT IN (SELECT `asset_model_id` FROM `asset_model_custom_field_helper`));"));
+            // Insert into category_custom_field_helper
+            $objDatabase->NonQuery(sprintf("INSERT INTO `category_custom_field_helper` (`category_id`) (SELECT `category_id` FROM `category` WHERE `category_id` NOT IN (SELECT `category_id` FROM `category_custom_field_helper`));"));
+            // Insert into manufacturer_custom_field_helper
+            $objDatabase->NonQuery(sprintf("INSERT INTO `manufacturer_custom_field_helper` (`manufacturer_id`) (SELECT `manufacturer_id` FROM `manufacturer` WHERE `manufacturer_id` NOT IN (SELECT `manufacturer_id` FROM `manufacturer_custom_field_helper`));"));
+            // Inserts end
+            $objDatabase->NonQuery("SET FOREIGN_KEY_CHECKS=1;");
+
             $this->blnImportEnd = true;
             $this->btnNext->Warning = "";
 
@@ -1691,17 +1705,21 @@
         $strQuery = "SET FOREIGN_KEY_CHECKS=1;";
         $objDatabase->NonQuery($strQuery);
       }
+      //$strQuery = "SET FOREIGN_KEY_CHECKS=0;";
+      //$objDatabase->NonQuery($strQuery);
 		  if (count($this->objNewAssetArray)) {
         $strQuery = sprintf("DELETE FROM `asset` WHERE `asset_id` IN (%s)", implode(", ", array_keys($this->objNewAssetArray)));
         $objDatabase->NonQuery($strQuery);
-        $strQuery = sprintf("DELETE FROM `asset_custom_field_helper` WHERE `asset_id` IN (%s)", implode(", ", array_keys($this->objNewAssetArray)));
-        $objDatabase->NonQuery($strQuery);
+        // Do not need to delete it manually (automatically CASCADE deletion)
+        //$strQuery = sprintf("DELETE FROM `asset_custom_field_helper` WHERE `asset_id` IN (%s)", implode(", ", array_keys($this->objNewAssetArray)));
+        //$objDatabase->NonQuery($strQuery);
 		  }
 		  if (count($this->objNewAssetModelArray)) {
         $strQuery = sprintf("DELETE FROM `asset_model` WHERE `asset_model_id` IN (%s)", implode(", ", array_keys($this->objNewAssetModelArray)));
         $objDatabase->NonQuery($strQuery);
-        $strQuery = sprintf("DELETE FROM `asset_model_custom_field_helper` WHERE `asset_model_id` IN (%s)", implode(", ", array_keys($this->objNewAssetModelArray)));
-        $objDatabase->NonQuery($strQuery);
+        // Do not need to delete it manually (automatically CASCADE deletion)
+        //$strQuery = sprintf("DELETE FROM `asset_model_custom_field_helper` WHERE `asset_model_id` IN (%s)", implode(", ", array_keys($this->objNewAssetModelArray)));
+        //$objDatabase->NonQuery($strQuery);
 		  }
 		  if (count($this->objNewManufacturerArray)) {
         $strQuery = sprintf("DELETE FROM `manufacturer` WHERE `manufacturer_id` IN (%s)" , implode(", ", array_keys($this->objNewManufacturerArray)));

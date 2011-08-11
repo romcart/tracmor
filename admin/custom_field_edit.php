@@ -740,6 +740,13 @@
 						  $objDatabase = CustomField::GetDatabase();
 						  $strQuery = sprintf("ALTER TABLE %s ADD `cfv_%s` TEXT DEFAULT NULL;", $strHelperTable,  $this->objCustomField->CustomFieldId);
 						  $objDatabase->NonQuery($strQuery);
+						  // If the helper table exists and have no values (empty).
+						  // It happens when the QtypeItem does not yet have the custom fields.
+						  // Uses SQL-hack to fix this issue.
+						  $strParentTableName = $strHelperTableArray[1];
+						  $strHelperTableItemId = sprintf("%s_id", $strParentTableName);
+						  $strQuery = sprintf("INSERT INTO %s (`%s`) (SELECT `%s` FROM `%s` WHERE `%s` NOT IN (SELECT `%s` FROM %s));", $strHelperTable,  $strHelperTableItemId,  $strHelperTableItemId, $strParentTableName, $strHelperTableItemId,  $strHelperTableItemId, $strHelperTable);
+						  $objDatabase->NonQuery($strQuery);
 						}
 
 						// Insert the new EntityQtypeCustomField to the RoleEntityQTypeCustomFieldAuthorization table, to all the roles, with authorized_flag set to true, one for View Auth and another for Edit Auth
