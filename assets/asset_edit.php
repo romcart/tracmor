@@ -446,7 +446,16 @@ CREATE FIELD METHODS
 
 			if (($intAssetId)) {
 
-				$objCaller->objAsset = Asset::Load($intAssetId);
+				//$objCaller->objAsset = Asset::Load($intAssetId);
+				// To minimize the count of queries
+				$objClauses = array();
+        array_push($objClauses, QQ::Expand(QQN::Asset()->AssetModel));
+        array_push($objClauses, QQ::Expand(QQN::Asset()->AssetModel->Category));
+        array_push($objClauses, QQ::Expand(QQN::Asset()->AssetModel->Manufacturer));
+        array_push($objClauses, QQ::Expand(QQN::Asset()->ParentAsset));
+        array_push($objClauses, QQ::Expand(QQN::Asset()->Location));
+        array_push($objClauses, QQ::Expand(QQN::Asset()->CreatedByObject));
+        $objCaller->objAsset = Asset::QuerySingle(QQ::Equal(QQN::Asset()->AssetId, $intAssetId), $objClauses);
 
 				if (!$objCaller->objAsset)
 					throw new Exception('Could not find a Asset object with PK arguments: ' . $intAssetId);

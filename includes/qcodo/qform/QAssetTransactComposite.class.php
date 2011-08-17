@@ -80,7 +80,8 @@ class QAssetTransactComposite extends QControl {
     //if ($this->intTransactionTypeId == 3) {
     $this->CheckOutTo_Create();
     $this->DueDate_Create();
-    $this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
+    // Removed it from constructor and added where it used
+    //$this->objCompanyArray = Company::LoadAllIntoArray();
     $this->lstToCompany_Create();
     $this->lstToContact_Create();
     //}
@@ -227,7 +228,7 @@ class QAssetTransactComposite extends QControl {
 		$this->lstDueDate->AddItem(new QListItem('No due date', 1, false, null, 'FontSize=12px'));
 		$this->lstDueDate->AddItem(new QListItem('Due Date:', 2, false, null, 'FontSize=12px'));
 		$this->lstDueDate->SelectedIndex = 0;
-		$this->lstDueDate->AddAction(new QChangeEvent(), new QAjaxAction('lstDueDate_Select'));	
+		$this->lstDueDate->AddAction(new QChangeEvent(), new QAjaxAction('lstDueDate_Select'));
 
 		$this->dttDueDate = new QDateTimePickerExt($this);
 		$this->dttDueDate->DateTimePickerType = QDateTimePickerType::DateTime;
@@ -254,11 +255,6 @@ class QAssetTransactComposite extends QControl {
 		$this->lstToCompany->Name = "Company: ";
 		$this->lstToCompany->Display = false;
 		$this->lstToCompany->AddItem('- Select One -', null);
-		$objToCompanyArray = $this->objCompanyArray;
-		if ($objToCompanyArray) foreach ($objToCompanyArray as $objToCompany) {
-			$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
-			$this->lstToCompany->AddItem($objListItem);
-		}
 		$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstToCompany_Select'));
 	}
 
@@ -317,6 +313,14 @@ class QAssetTransactComposite extends QControl {
   	      $this->lstCheckOutTo->Warning = "Check-out to contacts is disabled.";
 	        $this->lstCheckOutTo_Select();
 	        return;
+  	    }
+  	    if (!count($this->objCompanyArray)) {
+  	      $this->objCompanyArray = Company::LoadAllIntoArray();
+      		$objToCompanyArray = $this->objCompanyArray;
+      		if ($objToCompanyArray) foreach ($objToCompanyArray as $arrToCompany) {
+            $objListItem = new QListItem($arrToCompany['short_description'], $arrToCompany['company_id']);
+      			$this->lstToCompany->AddItem($objListItem);
+      		}
   	    }
   	    $this->lstToCompany->Display = true;
 	      $this->lstToContact->Display = true;

@@ -112,6 +112,42 @@
 			}
 		}
 
+		/**
+		 * Load all Companies
+		 * @param string $strOrderBy
+		 * @param string $strLimit
+		 * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
+		 * @return Company[]
+		*/
+		public static function LoadAllIntoArray($strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
+			Company::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
+
+			// Setup the SQL Query
+			$strQuery = sprintf('
+				SELECT
+					`company`.`company_id` AS `company_id`,
+					`company`.`short_description` AS `short_description`
+				FROM
+					`company`
+				ORDER BY `company`.`short_description`');
+
+			// Perform the Query and Instantiate the Result
+			$objDbResult = $objDatabase->Query($strQuery);
+
+			$objToReturn = array();
+			// If blank resultset, then return empty array
+			if (!$objDbResult)
+				return $objToReturn;
+			$item = Array();
+			while ($objDbRow = $objDbResult->GetNextRow()) {
+				$item['company_id'] = $objDbRow->GetColumn('company_id', 'Integer');
+				$item['short_description'] = $objDbRow->GetColumn('short_description');
+				array_push($objToReturn,$item);
+			}
+			return $objToReturn;
+		}
+
     /**
      * Count the total companies based on the submitted search criteria
      *
