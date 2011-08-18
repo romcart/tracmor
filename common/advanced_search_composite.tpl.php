@@ -30,7 +30,9 @@
 		$arrAdvancedSearchFields[] = array('name' => 'Reserved By:', 'value' => $this->lstReservedBy->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Checked Out By:', 'value' => $this->lstCheckedOutBy->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Checked Out To User:', 'value' => $this->lstCheckedOutToUser->RenderWithError(false));
-		$arrAdvancedSearchFields[] = array('name' => 'Checked Out To Contact:', 'value' => $this->lstToCompany->RenderWithError(false) . "&nbsp;" . $this->lstToContact->RenderWithError(false));
+		if (QApplication::$TracmorSettings->CheckOutToContacts == "1") {
+		  $arrAdvancedSearchFields[] = array('name' => 'Checked Out To Contact:', 'value' => $this->lstToCompany->RenderWithError(false) . "&nbsp;" . $this->lstToContact->RenderWithError(false));
+		}
 		$arrAdvancedSearchFields[] = array('name' => 'Checked Out Past Due:', 'value' => $this->chkCheckedOutPastDue->RenderWithError(false));
 	}
 

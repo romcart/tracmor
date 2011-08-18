@@ -145,6 +145,7 @@ class QAssetSearchComposite extends QControl {
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?= $_ITEM->AssetModel->AssetModelCode ?>', 'SortByCommand="asset__asset_model_id__asset_model_code"', 'ReverseSortByCommand="asset__asset_model_id__asset_model_code DESC"', 'CssClass="dtg_column"', 'Display="false"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Code', '<?= $_CONTROL->objParentControl->ParentAsset__toString($_ITEM) ?>', 'SortByCommand="asset__parent_asset_id__asset_code ASC"', 'ReverseSortByCommand="asset__parent_asset_id__asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"', 'HtmlEntities="false"'));
+    $this->dtgAsset->AddColumn(new QDataGridColumnExt('Check In Due', '<?= $_ITEM->CheckoutDueDate() ?>', 'CssClass="dtg_column"', 'Display="false"', 'HtmlEntities="false"'));
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
     $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);

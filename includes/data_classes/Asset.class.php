@@ -297,6 +297,25 @@
 			return $Location;
 		}
 
+		/**
+		 * Returns due date of the asset that have been checked out
+		 * else nothing
+		 *
+		 * @return string DueDate
+		 */
+		public function CheckoutDueDate() {
+		  if ($this->blnCheckedOutFlag) {
+		    $arrObjects = $this->GetLastTransactionCheckoutObjectArray();
+				$objAssetTransactionCheckout = $arrObjects['objAssetTransactionCheckout'];
+				if ($objAssetTransactionCheckout) {
+				  if ($objAssetTransactionCheckout->DueDate) {
+            return sprintf("%s", ($objAssetTransactionCheckout->DueDate) ? $objAssetTransactionCheckout->DueDate->format('m/d/Y g:i A') : "&nbsp;");
+				  }
+				}
+		  }
+		  return "&nbsp;";
+		}
+
     /**
      * Count the total assets by category_id, which is a column in the asset_model table
      *

@@ -71,13 +71,15 @@ class QAdvancedSearchComposite extends QControl {
 	    $this->intEntityQtypeId = $intEntityQtypeId;
 
 	    if ($objParentObject instanceof AssetListForm || $objParentObject instanceof QAssetSearchComposite) {
-	      $this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
 	    	$this->txtAssetModelCode_Create();
 	    	$this->lstReservedBy_Create();
 	    	$this->lstCheckedOutBy_Create();
 	    	$this->lstCheckedOutToUser_Create();
-	    	$this->lstToCompany_Create();
-	    	$this->lstToContact_Create();
+        if (QApplication::$TracmorSettings->CheckOutToContacts == "1") {
+	    	  $this->objCompanyArray = Company::LoadAllIntoArray();
+  	      $this->lstToCompany_Create();
+  	    	$this->lstToContact_Create();
+        }
 	    	$this->chkCheckedOutPastDue_Create();
 	    	$this->chkInclude_Create();
 	    	$this->lstModifiedCreated_Create();
@@ -211,10 +213,10 @@ class QAdvancedSearchComposite extends QControl {
 		$this->lstToCompany->Name = "Company: ";
 		$this->lstToCompany->AddItem('- Select One -', null);
 		$objToCompanyArray = $this->objCompanyArray;
-		if ($objToCompanyArray) foreach ($objToCompanyArray as $objToCompany) {
-			$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
-			$this->lstToCompany->AddItem($objListItem);
-		}
+    if ($objToCompanyArray) foreach ($objToCompanyArray as $arrToCompany) {
+      $objListItem = new QListItem($arrToCompany['short_description'], $arrToCompany['company_id']);
+      $this->lstToCompany->AddItem($objListItem);
+    }
 		$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstToCompany_Select'));
 	}
 
