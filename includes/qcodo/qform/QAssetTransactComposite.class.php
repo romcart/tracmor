@@ -21,6 +21,8 @@
 ?>
 
 <?php
+require('../contacts/CompanyEditPanel.class.php');
+require('../contacts/ContactEditPanel.class.php');
 
 class QAssetTransactComposite extends QControl {
 
@@ -51,6 +53,9 @@ class QAssetTransactComposite extends QControl {
 	protected $objCompanyArray;
 	protected $dttDueDate;
 	protected $lstDueDate;
+	protected $lblNewToCompany;
+	protected $lblNewToContact;
+	protected $dlgNew;
 
 	protected $pnlCheckOutTo;
 
@@ -84,6 +89,9 @@ class QAssetTransactComposite extends QControl {
     //$this->objCompanyArray = Company::LoadAllIntoArray();
     $this->lstToCompany_Create();
     $this->lstToContact_Create();
+    $this->lblNewToCompany_Create();
+    $this->lblNewToContact_Create();
+    $this->dlgNew_Create();
     //}
 
     $this->btnCancel_Create();
@@ -249,6 +257,19 @@ class QAssetTransactComposite extends QControl {
 		}
 	}
 
+	// New Entity (Company, Contact Dialog Box)
+	protected function dlgNew_Create() {
+		$this->dlgNew = new QDialogBox($this);
+		$this->dlgNew->AutoRenderChildren = true;
+		$this->dlgNew->Width = '440px';
+		$this->dlgNew->Overflow = QOverflow::Auto;
+		$this->dlgNew->Padding = '10px';
+		$this->dlgNew->Display = false;
+		$this->dlgNew->BackColor = '#FFFFFF';
+		$this->dlgNew->MatteClickable = false;
+		$this->dlgNew->CssClass = "modal_dialog";
+	}
+
   // Create and Setup lstToCompany
 	protected function lstToCompany_Create() {
 		$this->lstToCompany = new QListBox($this);
@@ -258,6 +279,17 @@ class QAssetTransactComposite extends QControl {
 		$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxAction('lstToCompany_Select'));
 	}
 
+	protected function lblNewToCompany_Create() {
+		$this->lblNewToCompany = new QLabel($this);
+		$this->lblNewToCompany->HtmlEntities = false;
+		$this->lblNewToCompany->Text = '<img src="../images/add.png">';
+		$this->lblNewToCompany->ToolTip = "New Company";
+		$this->lblNewToCompany->CssClass = "add_icon";
+		$this->lblNewToCompany->Display = false;
+		$this->lblNewToCompany->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblNewToCompany_Click'));
+		$this->lblNewToCompany->ActionParameter = $this->lstToCompany->ControlId;
+	}
+
 	// Create and Setup lstToContact
 	protected function lstToContact_Create() {
 		$this->lstToContact = new QListBox($this);
@@ -265,6 +297,17 @@ class QAssetTransactComposite extends QControl {
 		$this->lstToContact->Display = false;
 		$this->lstToContact->Enabled = false;
 		$this->lstToContact->AddItem('- Select One -', null);
+	}
+
+	protected function lblNewToContact_Create() {
+	  $this->lblNewToContact = new QLabel($this);
+		$this->lblNewToContact->HtmlEntities = false;
+		$this->lblNewToContact->Text = '<img src="../images/add.png">';
+		$this->lblNewToContact->ToolTip = "New Contact";
+		$this->lblNewToContact->CssClass = "add_icon";
+		$this->lblNewToContact->Display = false;
+		$this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
+		$this->lblNewToContact->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblNewToContact_Click'));
 	}
 
 	// This is run every time a 'To Company' is selected
@@ -295,6 +338,50 @@ class QAssetTransactComposite extends QControl {
 		}
 	}
 
+	// This is called when the 'new' label is clicked
+	public function lblNewToCompany_Click($strFormId, $strControlId, $strParameter) {
+		if (!$this->dlgNew->Display) {
+			// Create the panel, assigning it to the Dialog Box
+			$pnlEdit = new CompanyEditPanel($this->dlgNew, 'CloseNewToCompanyPanel');
+			$pnlEdit->ActionParameter = $strParameter;
+			// Show the dialog box
+			$this->dlgNew->ShowDialogBox();
+			$pnlEdit->txtShortDescription->Focus();
+		}
+	}
+
+	// This is called when the 'new' label is clicked
+	public function lblNewToContact_Click($strFormId, $strControlId, $strParameter) {
+		if (!$this->dlgNew->Display) {
+			if ($this->lstToCompany->SelectedValue) {
+				// Create the panel, assigning it to the Dialog Box
+				$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewToContactPanel', null, null, $this->lstToCompany->SelectedValue);
+				$pnlEdit->ActionParameter = $strParameter;
+				// Show the dialog box
+				$this->dlgNew->ShowDialogBox();
+				$pnlEdit->lstCompany->Focus();
+			}
+			else {
+				$this->lblNewToContact->Warning = 'You must select a company first.';
+			}
+		}
+	}
+
+	// This method is run when company or contact edit dialog box is closed
+	public function CloseNewPanel($blnUpdates) {
+		$this->dlgNew->HideDialogBox();
+	}
+
+	public function CloseNewToCompanyPanel($blnUpdates) {
+		$this->lstToCompany_Select();
+		$this->CloseNewPanel($blnUpdates);
+	}
+
+	public function CloseNewToContactPanel($blnUpdates) {
+		$this->lstToContact->Enabled = true;
+		$this->CloseNewPanel($blnUpdates);
+	}
+
 	public function lstCheckOutTo_Select() {
 	  switch ($this->lstCheckOutTo->SelectedValue) {
 	    case 1:
@@ -304,7 +391,9 @@ class QAssetTransactComposite extends QControl {
 	        $this->lstUser->AddItem(sprintf("%s", $objUserAccount->__toString()), $objUserAccount->UserAccountId);
 	      }
 	      $this->lstToCompany->Display = false;
+	      $this->lblNewToCompany->Display = false;
 	      $this->lstToContact->Display = false;
+	      $this->lblNewToContact->Display = false;
 	      $this->lstUser->Display = true;
   	    break;
   	  case 2:
@@ -323,7 +412,9 @@ class QAssetTransactComposite extends QControl {
       		}
   	    }
   	    $this->lstToCompany->Display = true;
+  	    $this->lblNewToCompany->Display = true;
 	      $this->lstToContact->Display = true;
+	      $this->lblNewToContact->Display = true;
 	      $this->lstUser->Display = false;
   	    break;
   	  default:

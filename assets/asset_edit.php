@@ -909,6 +909,25 @@ CREATE FIELD METHODS
   		  $this->ctlAssetTransact->lstDueDate_Select();
   		}
   	}
+
+  	// This method is run when company or contact edit dialog box is closed
+  	public function CloseNewPanel($blnUpdates) {
+  	  if ($this->ctlAssetTransact) {
+  	    $this->ctlAssetTransact->CloseNewPanel($blnUpdates);
+  	  }
+  	}
+    // This method is run when the company edit dialog box is closed
+  	public function CloseNewToCompanyPanel($blnUpdates) {
+  		if ($this->ctlAssetTransact) {
+  	    $this->ctlAssetTransact->CloseNewToCompanyPanel($blnUpdates);
+  	  }
+  	}
+    // This method is run when the contact edit dialog box is closed
+  	public function CloseNewToContactPanel($blnUpdates) {
+  		if ($this->ctlAssetTransact) {
+  	    $this->ctlAssetTransact->CloseNewToContactPanel($blnUpdates);
+  	  }
+  	}
 	}
 
 	// Run the form using the template asset_edit.php.inc to render the html

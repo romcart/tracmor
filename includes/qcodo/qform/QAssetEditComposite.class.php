@@ -36,6 +36,7 @@ class QAssetEditComposite extends QControl {
 	protected $lblManufacturer;
 	protected $lblCategory;
 	protected $lblReservedBy;
+	protected $lblCheckedOutTo;
 	protected $lblAssetCode;
 	protected $lblCreationDate;
 	protected $lblModifiedDate;
@@ -114,6 +115,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblManufacturer_Create();
 		$this->lblCategory_Create();
 		$this->lblReservedBy_Create();
+		$this->lblCheckedOutTo_Create();
 		$this->lblAssetCode_Create();
 		$this->lblCreationDate_Create();
 		$this->lblModifiedDate_Create();
@@ -391,6 +393,35 @@ class QAssetEditComposite extends QControl {
 		}
 		else {
 			$this->lblReservedBy->Visible = false;
+		}
+	}
+
+	// Create the Checked Out To Label
+	protected function lblCheckedOutTo_Create() {
+		$this->lblCheckedOutTo = new QLabel($this);
+		$this->lblCheckedOutTo->Name = 'Checked Out To';
+		if ($this->objAsset->CheckedOutFlag) {
+			$arrObjects = $this->objAsset->GetLastTransactionCheckoutObjectArray();
+			$objAccount = $arrObjects['objAccount'];
+			$objAssetTransactionCheckout = $arrObjects['objAssetTransactionCheckout'];
+			if ($objAssetTransactionCheckout) {
+			  if ($objAssetTransactionCheckout->ToContactId) {
+			    $this->lblCheckedOutTo->Text = $objAssetTransactionCheckout->ToContact->__toString();
+			  }
+			  else {
+			    $this->lblCheckedOutTo->Text = $objAssetTransactionCheckout->ToUser->__toString();
+			  }
+			  if ($objAssetTransactionCheckout->DueDate) {
+          $this->lblCheckedOutTo->Text .= sprintf(", due %s", ($objAssetTransactionCheckout->DueDate) ? $objAssetTransactionCheckout->DueDate->format('m/d/Y g:i A') : "");
+			  }
+			}
+			else {
+			  $this->lblCheckedOutTo->Text = $objAccount->__toString();
+			}
+			$this->lblCheckedOutTo->Visible = true;
+		}
+		else {
+			$this->lblCheckedOutTo->Visible = false;
 		}
 	}
 

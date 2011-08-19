@@ -51,6 +51,11 @@
 			$arrAssetFields[] = array('name' => 'Reserved By:', 'value' => $this->lblReservedBy->Render(false));
 		}
 
+	  // Only display 'Checked Out To' if the asset is checked out
+		if ($this->lblCheckedOutTo->Visible) {
+			$arrAssetFields[] = array('name' => 'Checked Out To:', 'value' => $this->lblCheckedOutTo->Render(false));
+		}
+
 	// Custom Fields
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {

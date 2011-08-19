@@ -85,7 +85,8 @@ echo($strTransactionHeader);
       <tr>
     		<td style="vertical-align:top;" class="record_field_name"><?php $this->lstCheckOutTo->RenderWithError(); ?></td>
     		<td style="vertical-align:top;">
-				<table><tr><td style="text-align:right;"><?php $this->lstUser->RenderWithError(); ?><?php $this->lstToCompany->RenderWithName(); ?><?php $this->lstToContact->RenderWithName(); ?></td></tr></table>
+				<table><tr><td style="text-align:right;"><?php $this->lstUser->RenderWithError(); $this->lstToCompany->RenderWithName();?></td><td><?php $this->lblNewToCompany->RenderWithError();?></td></tr>
+				  <tr><td style="text-align:right;"><?php $this->lstToContact->RenderWithName(); ?></td><td><?php $this->lblNewToContact->RenderWithError(); ?></td></tr></table>
 			</td>
     	</tr>
     	<?php
@@ -136,4 +137,5 @@ echo($strTransactionHeader);
 	</tr>
 </table>
 <?php $this->dtgAssetTransact->RenderWithError(); ?>
+<?php $this->dlgNew->Render(); ?>
 <?php $this->ctlAssetSearchTool->Render(); ?>
