@@ -24,6 +24,11 @@
 				$objExc->IncrementOffset();
 				throw $objExc;
 			}
+			
+			$this->objRowStyle = new QDataGridRowStyleExt();
+			$this->objAlternateRowStyle = new QDataGridRowStyleExt();
+			$this->objHeaderRowStyle = new QDataGridRowStyleExt();
+			$this->objHeaderLinkStyle = new QDataGridRowStyleExt();
 
 			// For example... Let's ensure that any LINKED header is still Black
 			$this->objHeaderLinkStyle->ForeColor = "black";
