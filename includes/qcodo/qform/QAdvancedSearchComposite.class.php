@@ -437,10 +437,12 @@ class QAdvancedSearchComposite extends QControl {
 			$this->lstCheckedOutBy->SelectedIndex = 0;
 			$this->lstCheckedOutToUser->SelectedIndex = 0;
 			$this->lstToCompany->SelectedIndex = 0;
-			$this->lstToContact->RemoveAllItems();
+			if ($this->lstToContact instanceof QListBox) {
+				$this->lstToContact->RemoveAllItems();
 			//$this->lstToContact->Enabled = false;
-		  $this->lstToContact->AddItem('- Select One -', null);
-		  $this->lstToContact->AddItem('Any', 'any');
+			  $this->lstToContact->AddItem('- Select One -', null);
+			  $this->lstToContact->AddItem('Any', 'any');
+			}
 			$this->lstReservedBy->SelectedIndex = 0;
 			$this->lstModifiedCreated->SelectedIndex = 0;
 			$this->chkCheckedOutPastDue->Checked = false;
