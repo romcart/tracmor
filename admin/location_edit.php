@@ -45,6 +45,7 @@
 		// Header Menu
 		protected $ctlHeaderMenu;
 		protected $lblHeaderLocation;
+		protected $chkEnabled;
 		
 		protected function Form_Create() {
 
@@ -61,6 +62,7 @@
 			$this->txtShortDescription_Create();
 			$this->txtLongDescription_Create();
 			$this->lblModifiedDate_Create();
+			$this->chkEnabled_Create();
 			
 			// Create/Setup Button Action controls
 			$this->btnSave_Create();
@@ -84,7 +86,17 @@
 			$this->txtShortDescription->Focus();
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		}		
+		}
+		
+		protected function chkEnabled_Create() {
+			$this->chkEnabled = new QCheckBox($this);
+			
+			if ($this->blnEditMode) {
+				$this->chkEnabled->Checked = $this->objLocation->EnabledFlag;
+			} else {
+				$this->chkEnabled->Checked = true;
+			}
+		}
 
 		// Setup btnSave
 		protected function btnSave_Create() {
@@ -149,6 +161,7 @@
 		protected function UpdateLocationFields() {
 			$this->objLocation->ShortDescription = $this->txtShortDescription->Text;
 			$this->objLocation->LongDescription = $this->txtLongDescription->Text;
+			$this->objLocation->EnabledFlag = $this->chkEnabled->Checked;
 		}
 	}
 

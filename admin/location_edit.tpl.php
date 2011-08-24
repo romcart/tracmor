@@ -63,6 +63,10 @@
 							<td class="record_field_name">Description: </td>
 							<td class="record_field_edit"><?php $this->txtLongDescription->RenderWithError("Rows=10"); ?></td>
 						</tr>
+						<tr>
+							<td class="record_field_name">Enabled: </td>
+							<td class="record_field_edit"><?php $this->chkEnabled->Render(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>

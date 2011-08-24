@@ -576,6 +576,7 @@
               $strLocationArray[] = $txtDefaultValue;
               $objNewLocation = new Location();
               $objNewLocation->ShortDescription = addslashes($txtDefaultValue);
+			  $objNewLocation->EnabledFlag = 1;
               $objNewLocation->Save();
               $this->objNewLocationArray[$objNewLocation->LocationId] = $objNewLocation->ShortDescription;
             }
