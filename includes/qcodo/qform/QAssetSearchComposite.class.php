@@ -503,7 +503,8 @@ class QAssetSearchComposite extends QControl {
 		$this->intReservedBy = $this->ctlAdvanced->ReservedBy;
 		$this->intCheckedOutBy = $this->ctlAdvanced->CheckedOutBy;
 		$this->intCheckedOutToUser = $this->ctlAdvanced->CheckedOutToUser;
-		$this->intCheckedOutToContact = $this->ctlAdvanced->CheckedOutToContact;
+		if (QApplication::$TracmorSettings->CheckOutToContacts)
+			$this->intCheckedOutToContact = $this->ctlAdvanced->CheckedOutToContact;
 		$this->blnCheckedOutPastDue = $this->ctlAdvanced->CheckedOutPastDue;
 		$this->strModifiedCreated = $this->ctlAdvanced->ModifiedCreated;
 		$this->strDateModified = $this->ctlAdvanced->DateModified;
