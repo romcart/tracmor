@@ -65,7 +65,7 @@
 						</tr>
 						<tr>
 							<td class="record_field_name">Enabled: </td>
-							<td class="record_field_edit"><?php $this->chkEnabled->Render(); ?></td>
+							<td class="record_field_edit"><?php $this->chkEnabled->RenderWithError(); ?></td>
 						</tr>
 					</table>
 				</td>

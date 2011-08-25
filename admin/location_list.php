@@ -143,7 +143,7 @@
 				$this->dtgLocation->ShowHeader = false;
 			}
 			else {
-				$this->dtgLocation->DataSource = Location::LoadAllLocations(false, false, $this->dtgLocation->SortInfo, $this->dtgLocation->LimitInfo, $objExpansionMap);
+				$this->dtgLocation->DataSource = Location::LoadAllLocations(false, false, $this->dtgLocation->SortInfo, $this->dtgLocation->LimitInfo, $objExpansionMap, false, true);
 				$this->dtgLocation->ShowHeader = true;
 			}
 		}

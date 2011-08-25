@@ -108,7 +108,7 @@
 		 * @param bool $blnShowArchived boolean value to decide whether to show the 'Archived' location
 		 * @return Location[]
 		*/
-		public static function LoadAllLocations($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnShowArchived = false) {
+		public static function LoadAllLocations($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnShowArchived = false, $blnShowDisabled = false) {
 			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
 			Location::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
@@ -134,6 +134,14 @@
 			}
 			else {
 				$ArchivedQuery = "";
+			}
+			
+			// Show Disabled
+			if (!$blnShowDisabled) {
+				$DisabledQuery = "AND `enabled_flag` != '0'";
+			}
+			else {
+				$DisabledQuery = "";
 			}
 
 			// Setup the SQL Query
@@ -158,8 +166,9 @@
 					%s
 					%s
 					%s
+					%s
 				%s
-				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery, $ArchivedQuery,
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery, $ArchivedQuery, $DisabledQuery,
 				$strOrderBy, $strLimitSuffix);
 
 			// Perform the Query and Instantiate the Result
@@ -167,7 +176,7 @@
 			return Location::InstantiateDbResult($objDbResult);
 		}
 
-		public static function LoadAllLocationsAsCustomArray($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnShowArchived = false) {
+		public static function LoadAllLocationsAsCustomArray($blnShowTBR = false, $blnShowShipped = false, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnShowArchived = false, $blnShowDisabled = false) {
 			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
 			Location::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
@@ -194,6 +203,14 @@
 			else {
 				$ArchivedQuery = "";
 			}
+			
+			// Show Disabled
+			if (!$blnShowDisabled) {
+				$DisabledQuery = "AND `enabled_flag` != '0'";
+			}
+			else {
+				$DisabledQuery = "";
+			}
 
 			// Setup the SQL Query
 			$strQuery = sprintf('
@@ -212,8 +229,9 @@
 					%s
 					%s
 					%s
+					%s
 				%s
-				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery, $ArchivedQuery,
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $TBRQuery, $ShippedQuery, $ArchivedQuery, $DisabledQuery,
 				$strOrderBy, $strLimitSuffix);
 
 			// Perform the Query and Instantiate the Result

@@ -123,7 +123,24 @@
 				$blnError = true;
 				$this->txtShortDescription->Warning = 'This Location Name is already in use. Please try another.';
 				$this->txtShortDescription->Focus();
-			}				
+			}
+			
+			// Check if there is any inventory at this location
+			$objInventoryLocation = InventoryLocation::QuerySingle(
+				QQ::Equal(QQN::InventoryLocation()->LocationId, $this->objLocation->LocationId),
+				QQ::Clause(
+					QQ::Sum(QQN::InventoryLocation()->Quantity, 'QuantityTotal')
+				)
+			);
+			
+			$intInventoryAtLocation = $objInventoryLocation->GetVirtualAttribute('QuantityTotal');
+			
+			// Don't allow disabling of locations with assets or inventory quantities
+			if ($this->blnEditMode && $this->objLocation->EnabledFlag && !$this->chkEnabled->Checked && (Asset::CountByLocationId($this->objLocation->LocationId) > 0 || $intInventoryAtLocation > 0)) {
+				$blnError = true;
+				$this->chkEnabled->Warning = 'Location must be empty before disabling.';
+				$this->chkEnabled->Focus();
+			}
 			
 			if (!$blnError) {
 			
