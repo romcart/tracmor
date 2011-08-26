@@ -64,6 +64,10 @@
 		public function __toStringWithLink() {
 			return sprintf('<a href="location_edit.php?intLocationId=%s">%s</a>', $this->intLocationId, $this->__toString());
 		}
+		
+		public function ToStringEnabledFlag() {
+			return QApplication::BooleanImage($this->EnabledFlag);
+		}
 
 		// Counts locations, unless $blnShowTBR is false, in which case it hides the 'To Be Received' location
 		public static function CountAllLocations($blnShowTBR = false) {
@@ -151,6 +155,7 @@
 					`location`.`location_id` AS `location_id`,
 					`location`.`short_description` AS `short_description`,
 					`location`.`long_description` AS `long_description`,
+					`location`.`enabled_flag` AS `enabled_flag`,
 					`location`.`created_by` AS `created_by`,
 					`location`.`creation_date` AS `creation_date`,
 					`location`.`modified_by` AS `modified_by`,
@@ -217,7 +222,8 @@
 				SELECT
 				%s
 					`location`.`location_id` AS `location_id`,
-					`location`.`short_description` AS `short_description`
+					`location`.`short_description` AS `short_description`,
+					`location`.`enabled_flag` AS `enabled_flag`
 					%s
 				FROM
 					`location` AS `location`
