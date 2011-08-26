@@ -47,6 +47,8 @@
 
 		protected $btnNew;
 		protected $btnImport;
+		protected $txtQuickAdd;
+		protected $btnQuickAdd;
 
 		protected function Form_Create() {
 
@@ -55,6 +57,8 @@
 
 			$this->btnNew_Create();
 			$this->btnImport_Create();
+			$this->txtQuickAdd_Create();
+			$this->btnQuickAdd_Create();
 			$this->dtgLocation_Create();
 		}
 
@@ -110,7 +114,7 @@
       $this->dtgLocation->Paginator = $objPaginator;
       $this->dtgLocation->ItemsPerPage = 20;
       $this->dtgLocation->ShowExportCsv = true;
-
+	  
       $this->dtgLocation->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->LocationId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Location()->LocationId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->LocationId, false)), 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgLocation->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::Location()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->ShortDescription, false)), 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgLocation->AddColumn(new QDataGridColumnExt('Description', '<?= $_ITEM->LongDescription ?>', 'Width=200', array('OrderByClause' => QQ::OrderBy(QQN::Location()->LongDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Location()->LongDescription, false)), 'CssClass="dtg_column"'));
@@ -158,6 +162,56 @@
 
 			QApplication::Redirect('location_import.php');
 		}
+		
+		protected function txtQuickAdd_Create() {
+			$this->txtQuickAdd = new QTextBox($this);
+			$this->txtQuickAdd->Focus();
+			$this->txtQuickAdd->Width = '160';
+			$this->txtQuickAdd->CssClass = 'textbox';
+			$this->txtQuickAdd->SetCustomStyle('vertical-align', 'baseline');
+			$this->txtQuickAdd->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnQuickAdd_Click'));
+			$this->txtQuickAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		protected function btnQuickAdd_Create() {
+			$this->btnQuickAdd = new QButton($this);
+			$this->btnQuickAdd->Text = 'Quick Add';
+			$this->btnQuickAdd->SetCustomStyle('vertical-align', 'baseline');
+			$this->btnQuickAdd->AddAction(new QClickEvent(), new QAjaxAction('btnQuickAdd_Click'));
+		}
+		
+		protected function btnQuickAdd_Click($strFormId, $strControlId, $strParameter) {
+			$blnError = false;
+			$this->btnQuickAdd->Warning = '';
+			
+			if (strlen(trim($this->txtQuickAdd->Text)) == 0) {
+				$blnError = true;
+				$this->btnQuickAdd->Warning = 'You must enter a Location name';
+			}
+			
+			// Check for dupes
+			$objLocationDuplicate = Location::QuerySingle(QQ::Equal(QQN::Location()->ShortDescription, $this->txtQuickAdd->Text));
+			
+			if ($objLocationDuplicate) {
+				$blnError = true;
+				$this->btnQuickAdd->Warning = 'This Location Name is already in use. Please try another.';
+			}
+			
+			if (!$blnError) {
+				$objLocation = new Location();
+				$objLocation->ShortDescription = $this->txtQuickAdd->Text;
+				$objLocation->EnabledFlag = '1';
+				$objLocation->CreatedBy = QApplication::$objUserAccount->UserAccountId;
+				$objLocation->CreationDate = QDateTime::Now();
+				$objLocation->Save();
+				$this->dtgLocation->Refresh();
+				$this->txtQuickAdd->Text = '';
+			}
+			
+			$this->txtQuickAdd->Focus();
+			$this->txtQuickAdd->Select();
+		}
+		
 	}
 	// Go ahead and run this form object to generate the page and event handlers, using
 	// generated/Location_edit.php.inc as the included HTML template file
