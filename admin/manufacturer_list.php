@@ -47,6 +47,8 @@
 
 		protected $btnNew;
 		protected $btnImport;
+		protected $txtQuickAdd;
+		protected $btnQuickAdd;
 
 		protected function Form_Create() {
 
@@ -55,6 +57,8 @@
 
 			$this->btnNew_Create();
 			$this->btnImport_Create();
+			$this->txtQuickAdd_Create();
+			$this->btnQuickAdd_Create();
 			$this->dtgManufacturer_Create();
 		}
 
@@ -75,6 +79,54 @@
 			$this->btnImport = new QButton($this);
 			$this->btnImport->Text = 'Import Manufacturers';
 			$this->btnImport->AddAction(new QClickEvent(), new QServerAction('btnImport_Click'));
+		}
+
+		protected function txtQuickAdd_Create() {
+			$this->txtQuickAdd = new QTextBox($this);
+			$this->txtQuickAdd->Focus();
+			$this->txtQuickAdd->Width = '160';
+			$this->txtQuickAdd->CssClass = 'textbox';
+			$this->txtQuickAdd->SetCustomStyle('vertical-align', 'baseline');
+			$this->txtQuickAdd->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnQuickAdd_Click'));
+			$this->txtQuickAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		protected function btnQuickAdd_Create() {
+			$this->btnQuickAdd = new QButton($this);
+			$this->btnQuickAdd->Text = 'Quick Add';
+			$this->btnQuickAdd->SetCustomStyle('vertical-align', 'baseline');
+			$this->btnQuickAdd->AddAction(new QClickEvent(), new QAjaxAction('btnQuickAdd_Click'));
+		}
+		
+		protected function btnQuickAdd_Click($strFormId, $strControlId, $strParameter) {
+			$blnError = false;
+			$this->btnQuickAdd->Warning = '';
+			
+			if (strlen(trim($this->txtQuickAdd->Text)) == 0) {
+				$blnError = true;
+				$this->btnQuickAdd->Warning = 'You must enter a Manufacturer name';
+			}
+			
+			// Check for dupes
+			$objManufacturerDuplicate = Manufacturer::QuerySingle(QQ::Equal(QQN::Manufacturer()->ShortDescription, $this->txtQuickAdd->Text));
+			
+			if ($objManufacturerDuplicate) {
+				$blnError = true;
+				$this->btnQuickAdd->Warning = 'This Manufacturer Name is already in use. Please try another.';
+			}
+			
+			if (!$blnError) {
+				$objManufacturer = new Manufacturer();
+				$objManufacturer->ShortDescription = $this->txtQuickAdd->Text;
+				$objManufacturer->CreatedBy = QApplication::$objUserAccount->UserAccountId;
+				$objManufacturer->CreationDate = QDateTime::Now();
+				$objManufacturer->Save();
+				$this->dtgManufacturer->Refresh();
+				$this->txtQuickAdd->Text = '';
+			}
+			
+			$this->txtQuickAdd->Focus();
+			$this->txtQuickAdd->Select();
 		}
 
 		// Create/Setup the Manufacturer datagrid

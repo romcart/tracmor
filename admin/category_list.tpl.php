@@ -41,7 +41,7 @@
 		<td width="100%" valign="top">
 		<div class="title"><?php _t('Categories'); ?></div>
 		<br class="item_divider" />
-		<?php $this->btnNew->Render() ?> <?php $this->btnImport->Render() ?>
+		<?php $this->btnNew->Render() ?> <?php $this->btnImport->Render() ?><br/><br/><?php $this->txtQuickAdd->Render(); ?> <?php $this->btnQuickAdd->RenderWithError(); ?>
 		<br class="item_divider" />
 		<?php $this->dtgCategory->Render() ?>
 

@@ -48,6 +48,8 @@
 		protected $btnNew;
 		protected $btnImport;
 		protected $lblTest;
+		protected $txtQuickAdd;
+		protected $btnQuickAdd;
 
 		protected function Form_Create() {
 
@@ -57,6 +59,8 @@
 
 			$this->btnNew_Create();
 			$this->btnImport_Create();
+			$this->txtQuickAdd_Create();
+			$this->btnQuickAdd_Create();
 			$this->dtgCategory_Create();
 
 		}
@@ -83,6 +87,56 @@
 			$this->btnImport = new QButton($this);
 			$this->btnImport->Text = 'Import Categories';
 			$this->btnImport->AddAction(new QClickEvent(), new QServerAction('btnImport_Click'));
+		}
+		
+		protected function txtQuickAdd_Create() {
+			$this->txtQuickAdd = new QTextBox($this);
+			$this->txtQuickAdd->Focus();
+			$this->txtQuickAdd->Width = '160';
+			$this->txtQuickAdd->CssClass = 'textbox';
+			$this->txtQuickAdd->SetCustomStyle('vertical-align', 'baseline');
+			$this->txtQuickAdd->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnQuickAdd_Click'));
+			$this->txtQuickAdd->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		protected function btnQuickAdd_Create() {
+			$this->btnQuickAdd = new QButton($this);
+			$this->btnQuickAdd->Text = 'Quick Add';
+			$this->btnQuickAdd->SetCustomStyle('vertical-align', 'baseline');
+			$this->btnQuickAdd->AddAction(new QClickEvent(), new QAjaxAction('btnQuickAdd_Click'));
+		}
+		
+		protected function btnQuickAdd_Click($strFormId, $strControlId, $strParameter) {
+			$blnError = false;
+			$this->btnQuickAdd->Warning = '';
+			
+			if (strlen(trim($this->txtQuickAdd->Text)) == 0) {
+				$blnError = true;
+				$this->btnQuickAdd->Warning = 'You must enter a Category name';
+			}
+			
+			// Check for dupes
+			$objCategoryDuplicate = Category::QuerySingle(QQ::Equal(QQN::Category()->ShortDescription, $this->txtQuickAdd->Text));
+			
+			if ($objCategoryDuplicate) {
+				$blnError = true;
+				$this->btnQuickAdd->Warning = 'This Category Name is already in use. Please try another.';
+			}
+			
+			if (!$blnError) {
+				$objCategory = new Category();
+				$objCategory->ShortDescription = $this->txtQuickAdd->Text;
+				$objCategory->AssetFlag = '1';
+				$objCategory->InventoryFlag = '1';
+				$objCategory->CreatedBy = QApplication::$objUserAccount->UserAccountId;
+				$objCategory->CreationDate = QDateTime::Now();
+				$objCategory->Save();
+				$this->dtgCategory->Refresh();
+				$this->txtQuickAdd->Text = '';
+			}
+			
+			$this->txtQuickAdd->Focus();
+			$this->txtQuickAdd->Select();
 		}
 
 		// Create/Setup the category datagrid
