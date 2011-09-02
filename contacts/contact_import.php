@@ -743,7 +743,7 @@
                     else
                       $strTitle = (isset($this->txtMapDefaultValueArray[$this->intTitleKey])) ? trim($this->txtMapDefaultValueArray[$this->intTitleKey]->Text) : '';
 
-                  $strContactValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW())", $intCompanyId, addslashes(trim($strRowArray[$this->intFirstNameKey])), addslashes(trim($strRowArray[$this->intLastNameKey])), addslashes(trim($strRowArray[$this->intTitleKey])), addslashes($strEmail), addslashes($strDescription),  addslashes($strOfficePhone), addslashes($strHomePhone), addslashes($strMobilePhone), addslashes($strFax), $_SESSION['intUserAccountId']);
+                  $strContactValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW())", $intCompanyId, addslashes($strFirstName), addslashes($strLastName), addslashes($strTitle), addslashes($strEmail), addslashes($strDescription),  addslashes($strOfficePhone), addslashes($strHomePhone), addslashes($strMobilePhone), addslashes($strFax), $_SESSION['intUserAccountId']);
                   $strNewContactArray[] = addslashes(sprintf("%s %s", trim($strRowArray[$this->intFirstNameKey]), trim($strRowArray[$this->intLastNameKey])));
 
                   $strCFVArray = array();
