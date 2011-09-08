@@ -2920,6 +2920,10 @@
 				$this->txtNewAssetCode->Warning = 'Please enter an asset code.';
 				$blnError = true;
 			}
+			
+			$this->txtNewAssetCode->Focus();
+			$this->txtNewAssetCode->Select();
+			
 		}
 
 		// Advanced listbox change action for each AssetTransaction in the datagrid

@@ -1470,27 +1470,30 @@
 							}
 						}
 						
-						// Check that the asset isn't already in another pending receipt
-						$arrPendingReceipts = AssetTransaction::QueryArray(
-							QQ::AndCondition(
-								QQ::Equal(QQN::AssetTransaction()->AssetId, $objNewAsset->AssetId),
-								QQ::In(QQN::AssetTransaction()->SourceLocationId, array(5, 2)),
-								QQ::IsNull(QQN::AssetTransaction()->DestinationLocationId),
-								QQ::NotEqual(QQN::AssetTransaction()->TransactionId, $this->objReceipt->TransactionId)
-							)
-						);
-						
-						if (!$blnError && count($arrPendingReceipts) != 0) {
-							$blnError = true;
-							$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
+						if (!$blnError) {
+							// Check that the asset isn't already in another pending receipt
+							$arrPendingReceipts = AssetTransaction::QueryArray(
+								QQ::AndCondition(
+									QQ::Equal(QQN::AssetTransaction()->AssetId, $objNewAsset->AssetId),
+									QQ::In(QQN::AssetTransaction()->SourceLocationId, array(5, 2)),
+									QQ::IsNull(QQN::AssetTransaction()->DestinationLocationId),
+									QQ::NotEqual(QQN::AssetTransaction()->TransactionId, $this->objReceipt->TransactionId)
+								)
+							);
+							
+							if (!$blnError && count($arrPendingReceipts) != 0) {
+								$blnError = true;
+								$this->txtNewAssetCode->Warning = 'That asset is already pending receipt.';
+							}
+							
+							// Check that the asset isn't in a pending shipment. This should be impossible, as you can not add items to a shipment that are TBR (to be received) or shipped.
+							// This means that they will be caught be the error checker above where LocationId must be 5 or 2
+							elseif (!$blnError && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
+								$blnError = true;
+								$this->txtNewAssetCode->Warning = 'That asset is in a pending shipment.';
+							}
 						}
 						
-						// Check that the asset isn't in a pending shipment. This should be impossible, as you can not add items to a shipment that are TBR (to be received) or shipped.
-						// This means that they will be caught be the error checker above where LocationId must be 5 or 2
-						elseif (!$blnError && $objPendingShipment = AssetTransaction::PendingShipment($objNewAsset->AssetId)) {
-							$blnError = true;
-							$this->txtNewAssetCode->Warning = 'That asset is in a pending shipment.';
-						}
 						// Create a new, but incomplete AssetTransaction
 						if (!$blnError) {
 							$this->txtNewAssetCode->Text = null;
@@ -1509,7 +1512,9 @@
 					}
 				}
 			}
+			
 			$this->dtgAssetTransact->Refresh();
+			$this->txtNewAssetCode->Focus();
 		}
 
 		public function btnAddInventory_Click($strFormId, $strControlId, $strParameter) {

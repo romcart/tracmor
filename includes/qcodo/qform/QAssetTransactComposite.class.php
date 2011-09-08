@@ -671,6 +671,9 @@ class QAssetTransactComposite extends QControl {
 		else {
 			$this->txtNewAssetCode->Warning = "Please enter an asset code.";
 		}
+		
+		$this->txtNewAssetCode->Focus();
+		$this->txtNewAssetCode->Select();
 	}
 
 	public function btnAssetSearchToolAdd_Click() {
