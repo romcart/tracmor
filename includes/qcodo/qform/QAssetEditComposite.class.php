@@ -896,6 +896,9 @@ class QAssetEditComposite extends QControl {
 						// If locking child to parent, make sure assets are at the same location
 						$blnError = true;
 						$this->chkLockToParent->Warning = 'Cannot lock to parent asset at another location.';
+					} else if ($this->chkLockToParent->Checked && ($objParentAsset->CheckedOutFlag || $objParentAsset->ReservedFlag || $objParentAsset->ArchivedFlag || $objParentAsset->LocationId == 2 || $objParentAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objParentAsset->AssetId))) {
+						$blnError = true;
+						$this->chkLockToParent->Warning = "Parent asset code (" . $objParentAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
 					}
     				else {
     				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
@@ -968,6 +971,12 @@ class QAssetEditComposite extends QControl {
 						// If locking child to parent, make sure assets are at the same location
 						$blnError = true;
 						$this->chkLockToParent->Warning = 'Cannot lock to parent asset at another location.';
+					} else if ($this->chkLockToParent->Checked && ($objParentAsset->CheckedOutFlag || $objParentAsset->ReservedFlag || $objParentAsset->ArchivedFlag || $objParentAsset->LocationId == 2 || $objParentAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objParentAsset->AssetId))) {
+						$blnError = true;
+						$this->chkLockToParent->Warning = "Parent asset code (" . $objParentAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
+					} else if ($this->chkLockToParent->Checked && ($this->objAsset->CheckedOutFlag || $this->objAsset->ReservedFlag || $this->objAsset->ArchivedFlag || $this->objAsset->LocationId == 2 || $this->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($this->objAsset->AssetId))) {
+						$blnError = true;
+						$this->chkLockToParent->Warning .= "Child asset must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
 					}
       				else {
       				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
