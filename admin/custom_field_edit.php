@@ -46,7 +46,7 @@
 		protected $ctlHeaderMenu;
 
 		protected $lblCustomFieldQtype;
-		protected $lstEntityQtype;
+		protected $chkEntityQtype;
 		protected $txtValue;
 		protected $txtDefaultValue;
 		protected $lstDefaultValue;
@@ -67,7 +67,7 @@
 			$this->lstCustomFieldQtype_Create();
 			$this->lblCustomFieldQtype_Create();
 			$this->txtShortDescription_Create();
-			$this->lstEntityQtype_Create();
+			$this->chkEntityQtype_Create();
 			$this->txtDefaultValue_Create();
 			$this->lstDefaultValue_Create();
 			$this->chkActiveFlag_Create();
@@ -144,12 +144,22 @@
 		}
 
 		// Create/Setup the list of EntityQtypes (either Assets or Inventory)
-		protected function lstEntityQtype_Create() {
+		protected function chkEntityQtype_Create() {
 
-			$this->lstEntityQtype = new QListBox($this);
-			$this->lstEntityQtype->Name = 'Active For';
-			$this->lstEntityQtype->SelectionMode = QSelectionMode::Multiple;
-			$this->lstEntityQtype->Rows = 5;
+			$this->chkEntityQtype = new QCheckBoxList($this);
+			$this->chkEntityQtype->Name = 'Active For';
+			/*
+			$this->chkEntityQtype->AddItem('Assets', 1);
+			$this->chkEntityQtype->AddItem('Inventory', 2);
+			$this->chkEntityQtype->AddItem('Asset Model', 4);
+			$this->chkEntityQtype->AddItem('Manufacturer', 5);
+			$this->chkEntityQtype->AddItem('Category', 6);
+			$this->chkEntityQtype->AddItem('Company', 7);
+			$this->chkEntityQtype->AddItem('Contact', 8);
+			$this->chkEntityQtype->AddItem('Address', 9);
+			$this->chkEntityQtype->AddItem('Shipment', 10);
+			$this->chkEntityQtype->AddItem('Receipt', 11);
+			*/
 			$objEntityQtypeCustomFieldArray = EntityQtypeCustomField::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
 			$objAssetListItem = new QListItem('Assets', 1);
 			$objInventoryListItem = new QListItem('Inventory', 2);
@@ -195,16 +205,16 @@
 					}
 				}
 			}
-			$this->lstEntityQtype->AddItem($objAssetListItem);
-			$this->lstEntityQtype->AddItem($objInventoryListItem);
-			$this->lstEntityQtype->AddItem($objAssetModelListItem);
-			$this->lstEntityQtype->AddItem($objManufacturerListItem);
-			$this->lstEntityQtype->AddItem($objCategoryListItem);
-			$this->lstEntityQtype->AddItem($objCompanyListItem);
-			$this->lstEntityQtype->AddItem($objContactListItem);
-			$this->lstEntityQtype->AddItem($objAddressListItem);
-			$this->lstEntityQtype->AddItem($objShipmentListItem);
-			$this->lstEntityQtype->AddItem($objReceiptListItem);
+			$this->chkEntityQtype->AddItem($objAssetListItem);
+			$this->chkEntityQtype->AddItem($objInventoryListItem);
+			$this->chkEntityQtype->AddItem($objAssetModelListItem);
+			$this->chkEntityQtype->AddItem($objManufacturerListItem);
+			$this->chkEntityQtype->AddItem($objCategoryListItem);
+			$this->chkEntityQtype->AddItem($objCompanyListItem);
+			$this->chkEntityQtype->AddItem($objContactListItem);
+			$this->chkEntityQtype->AddItem($objAddressListItem);
+			$this->chkEntityQtype->AddItem($objShipmentListItem);
+			$this->chkEntityQtype->AddItem($objReceiptListItem);
 		}
 
 		// Create/Setup the Value textbox
@@ -542,7 +552,7 @@
 						$this->btnCancel->Warning = 'A custom field must have a default value if it is required.';
 					}
 				}*/
-				if (count($this->lstEntityQtype->SelectedItems) == 0) {
+				if (count($this->chkEntityQtype->SelectedItems) == 0) {
 					$blnError = true;
 					$this->btnCancel->Warning = 'You must select at least one field in the Apply To list box.';
 				}
@@ -678,8 +688,8 @@
 				foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
 					// Determines whether or not a entityqtypecustomfield can stay or gets deleted
 					$blnKeep = false;
-					if ($this->lstEntityQtype->SelectedItems) {
-						foreach ($this->lstEntityQtype->SelectedItems as $objEntityQtypeItem) {
+					if ($this->chkEntityQtype->SelectedItems) {
+						foreach ($this->chkEntityQtype->SelectedItems as $objEntityQtypeItem) {
 							if ($objEntityQtypeCustomField->EntityQtypeId == $objEntityQtypeItem->Value) {
 								$blnKeep = true;
 							}
@@ -726,7 +736,7 @@
 			// Insert the new EntityQtypeCustomFields
 			if ($this->lstCustomFieldQtype->SelectedItems) {
 
-			  foreach ($this->lstEntityQtype->SelectedItems as $objEntityQtypeItem) {
+			  foreach ($this->chkEntityQtype->SelectedItems as $objEntityQtypeItem) {
 					// If the field doesn't already exist, then it needs to be created
 					if (!($objEntityQtypeCustomField = EntityQtypeCustomField::LoadByEntityQtypeIdCustomFieldId($objEntityQtypeItem->Value, $this->objCustomField->CustomFieldId))) {
 						$objEntityQtypeCustomField = new EntityQtypeCustomField();

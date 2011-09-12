@@ -65,7 +65,7 @@
 						</tr>
 						<tr>
 							<td class="record_field_name">Apply To: </td>
-							<td class="record_field_edit"><?php $this->lstEntityQtype->RenderWithError(); ?></td>
+							<td class="record_field_edit"><?php $this->chkEntityQtype->RenderWithError(); ?></td>
 						</tr>
 						<tr>
 							<td class="record_field_name">Enabled: </td>

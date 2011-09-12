@@ -50,7 +50,7 @@ class QAssetEditComposite extends QControl {
 
 	// Inputs
 	public $lstAssetModel;
-	protected $txtAssetCode;
+	public $txtAssetCode;
 	public $txtParentAssetCode;
 	public $chkLockToParent;
 	protected $lstLocation;

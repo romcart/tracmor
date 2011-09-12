@@ -684,6 +684,11 @@ class CompanyEditForm extends CompanyEditFormBase {
 
 			$blnError = false;
 
+			if (trim($this->txtShortDescription->Text) == "") {
+				$this->txtShortDescription->Warning = 'Short description is required';
+				$blnError = true;
+			}
+
 			if (!$this->blnEditMode) {
 
 				if ($this->txtAddressShortDescription->Text) {
@@ -703,14 +708,15 @@ class CompanyEditForm extends CompanyEditFormBase {
 						$this->lstCountry->Warning = 'Country is a required field.';
 						$blnError = true;
 					}
-					if ($blnError) {
-						return;
-					}
 				}
 				elseif ($this->txtAddress1->Text || $this->txtAddress2->Text || $this->txtCity->Text || $this->lstStateProvince->SelectedValue || $this->txtPostalCode->Text || $this->lstCountry->SelectedValue) {
 					$this->txtAddressShortDescription->Warning = 'Address Name is a required field.';
 					return;
 				}
+			}
+
+			if ($blnError) {
+				return;
 			}
 
 			// Do not allow duplicate Company names

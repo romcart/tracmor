@@ -365,6 +365,22 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 	// Save Button Click Actions
 	protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
+		
+		$blnError = false;
+			
+		if (trim($this->txtShortDescription->Text) == "") {
+			$this->txtShortDescription->Warning = 'Short description is required';
+			$blnError = true;
+		}
+
+		if (trim($this->txtAssetModelCode->Text) == "") {
+			$this->txtAssetModelCode->Warning = 'Asset model code is required';
+			$blnError = true;
+		}
+
+		if ($blnError) {
+			return;
+		}
 
 		$this->UpdateAssetModelFields();
 		$this->objAssetModel->Save();
