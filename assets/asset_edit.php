@@ -514,6 +514,7 @@ CREATE FIELD METHODS
 					}
 			  }
 			}
+			$this->ctlAssetTransact->dtgAssetTransact->Refresh();
 		}
 
 		protected function btnAddChild_Click() {
