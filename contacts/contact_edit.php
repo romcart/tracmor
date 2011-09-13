@@ -593,6 +593,22 @@ class ContactEditForm extends ContactEditFormBase {
 	// Control ServerActions
 	protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 		try {
+			
+			$blnError = false;
+				
+			if (trim($this->txtFirstName->Text) == "") {
+				$this->txtFirstName->Warning = 'First Name is required';
+				$blnError = true;
+			}
+
+			if (trim($this->txtLastName->Text) == "") {
+				$this->txtLastName->Warning = 'Last Name is required';
+				$blnError = true;
+			}
+			
+			if ($blnError) {
+				return;
+			}
 
 			/*				if ($this->pnlNewCompany->Visible) {
 			 if (!$this->txtCompanyShortDescription->Text) {
