@@ -776,10 +776,15 @@
 				  $arrSearchSql['strCheckedOutToContactSql'] = sprintf("AND `asset` . `checked_out_flag` = true");
 				else
 				  $arrSearchSql['strCheckedOutToContactSql'] = "";
-				if ($intCheckedOutToContact != 'any') {
+				if (strpos($intCheckedOutToContact, 'any') === false) {
 					$intCheckedOutToContact = QApplication::$Database[1]->SqlVariable($intCheckedOutToContact, true);
 					// This uses a subquery, and as such cannot be converted to QQuery without hacking as of 2/22/07
 					$arrSearchSql['strCheckedOutToContactSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`asset_transaction_id` = `asset_transaction_checkout`.`asset_transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)%s", $intCheckedOutToContact);
+				}
+				elseif ($intCheckedOutToContact != 'any') {
+				  // Gets company id
+				  $intCompanyId = intval(substr($intCheckedOutToContact, 4));
+				  $arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`asset_transaction_id` = `asset_transaction_checkout`.`asset_transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1) IN (SELECT `contact_id` FROM `contact` WHERE `company_id`='%s')", $intCompanyId);
 				}
 				else {
 				  $arrSearchSql['strCheckedOutToUserSql'] .= sprintf("\nAND (SELECT `to_contact_id` FROM `asset_transaction` LEFT JOIN `asset_transaction_checkout` ON `asset_transaction`.`asset_transaction_id` = `asset_transaction_checkout`.`asset_transaction_id` WHERE `asset_transaction`.`asset_id` = `asset`.`asset_id` ORDER BY `asset_transaction`.`creation_date` DESC LIMIT 0,1)IS NOT NULL");

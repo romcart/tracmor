@@ -216,7 +216,7 @@ class ContactEditForm extends ContactEditFormBase {
 	// Setup the Last Name Label
 	protected function lblLastName_Create() {
 		$this->lblLastName = new Qlabel($this);
-		$this->lblLastName->Name = 'Last Name';
+		$this->lblLastName->Name = 'First Name';
 	}
 
 	// Setup the Title Label
@@ -593,22 +593,6 @@ class ContactEditForm extends ContactEditFormBase {
 	// Control ServerActions
 	protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 		try {
-			
-				$blnError = false;
-				
-				if (trim($this->txtFirstName->Text) == "") {
-					$this->txtFirstName->Warning = 'First Name is required';
-					$blnError = true;
-				}
-
-				if (trim($this->txtLastName->Text) == "") {
-					$this->txtLastName->Warning = 'Last Name is required';
-					$blnError = true;
-				}
-				
-				if ($blnError) {
-					return;
-				}
 
 			/*				if ($this->pnlNewCompany->Visible) {
 			 if (!$this->txtCompanyShortDescription->Text) {
@@ -674,7 +658,7 @@ class ContactEditForm extends ContactEditFormBase {
 		}
 		catch (QDatabaseExceptionBase $objExc) {
 			if ($objExc->ErrorNumber == 1451) {
-				$this->btnDelete->Warning = 'This contact cannot be deleted because it is associated with one or more shipments or receipts.';
+				$this->btnDelete->Warning = 'This contact cannot be deleted because it is associated with one or more transactions (check-in/check-out) or shipments or receipts.';
 			}
 			else {
 				throw new QDatabaseExceptionBase();

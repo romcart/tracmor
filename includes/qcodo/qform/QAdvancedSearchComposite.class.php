@@ -239,8 +239,7 @@ class QAdvancedSearchComposite extends QControl {
 				if ($this->lstToContact) {
 					$objToContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
 					$this->lstToContact->RemoveAllItems();
-					$this->lstToContact->AddItem('- Select One -', null);
-					$this->lstToContact->AddItem('Any', 'any');
+					$this->lstToContact->AddItem('Any', 'any_' . $objCompany->CompanyId);
 					if ($objToContactArray) {
 						foreach ($objToContactArray as $objToContact) {
 							$objListItem = new QListItem($objToContact->__toString(), $objToContact->ContactId);
@@ -248,6 +247,12 @@ class QAdvancedSearchComposite extends QControl {
 						}
 						//$this->lstToContact->Enabled = true;
 					}
+					// For companies that have no contacts
+					// Removed because SQL-query causes no errors
+					/*else {
+					  $this->lstToContact->RemoveAllItems();
+					  $this->lstToContact->AddItem('- Select One -', null);
+					}*/
 				}
 			}
 		}
