@@ -668,7 +668,7 @@
 			}
 			// If changing the short_description, we need to change all of the values in the DatagridColumnPreference table
 			if ($this->blnEditMode && ($this->objCustomField->ShortDescription != $this->txtShortDescription->Text)) {
-				$strQuery = sprintf("UPDATE datagrid_column_preference SET column_name = '%s' WHERE column_name = '%s'", $this->txtShortDescription->Text, $this->objCustomField->ShortDescription);
+				$strQuery = sprintf("UPDATE datagrid_column_preference SET column_name = '%s' WHERE column_name = '%s'", addslashes($this->txtShortDescription->Text), addslashes($this->objCustomField->ShortDescription));
 				$objDatabase = QApplication::$Database[1];
 				$objDatabase->NonQuery($strQuery);
 			}

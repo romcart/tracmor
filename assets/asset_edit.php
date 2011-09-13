@@ -930,16 +930,6 @@ CREATE FIELD METHODS
   	  }
   	}
   	
-  	// custom validation on some fields
-  	protected function Form_Validate() {
-		if (trim($this->ctlAssetEdit->txtAssetCode->Text) == "") {
-			$this->ctlAssetEdit->txtAssetCode->Warning = 'Asset code is required';
-			return false;
-		}
-				
-  		return true;
-  	}
-  	
 	}
 
 	// Run the form using the template asset_edit.php.inc to render the html

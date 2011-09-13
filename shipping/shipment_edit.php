@@ -1103,9 +1103,9 @@
 			$this->calShipDate->Required = true;
 
 			$this->dttNow = new QDateTime(QDateTime::Now);
-			$this->calShipDate->MinimumYear = $this->dttNow->Year;
-			$this->calShipDate->MinimumMonth = $this->dttNow->Month;
-			$this->calShipDate->MinimumDay = $this->dttNow->Day;
+			// $this->calShipDate->MinimumYear = $this->dttNow->Year;
+			// $this->calShipDate->MinimumMonth = $this->dttNow->Month;
+			// $this->calShipDate->MinimumDay = $this->dttNow->Day;
       		// 5 Days: 432000
       		// 6 Days: 518400
       		// 7 Days: 604800
