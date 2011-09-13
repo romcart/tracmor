@@ -216,7 +216,7 @@ class ContactEditForm extends ContactEditFormBase {
 	// Setup the Last Name Label
 	protected function lblLastName_Create() {
 		$this->lblLastName = new Qlabel($this);
-		$this->lblLastName->Name = 'First Name';
+		$this->lblLastName->Name = 'Last Name';
 	}
 
 	// Setup the Title Label
