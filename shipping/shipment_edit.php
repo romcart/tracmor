@@ -1129,10 +1129,9 @@
       		$this->calShipDate->MaximumMonth = $this->dttFiveDaysFromNow->Month;
       		$this->calShipDate->MaximumDay = $this->dttFiveDaysFromNow->Day;
 
-     		 $this->calShipDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
- 			if (!$this->blnEditMode) {
- 				QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->calShipDate->ControlId));
- 			}
+     		$this->calShipDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
+ 			QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->calShipDate->ControlId));
+
  			$this->calShipDate->TabIndex=10;
 		}
 
@@ -4214,8 +4213,7 @@
 			$this->objShipment->ToContactId = $this->lstToContact->SelectedValue;
 			$this->objShipment->FromCompanyId = $this->lstFromCompany->SelectedValue;
 			$this->objShipment->FromContactId = $this->lstFromContact->SelectedValue;
-			if (!$this->objShipment->ShippedFlag)
-				$this->objShipment->ShipDate = $this->calShipDate->DateTime;
+			$this->objShipment->ShipDate = $this->calShipDate->DateTime;
 			$this->objShipment->FromAddressId = $this->lstFromAddress->SelectedValue;
 			$this->objShipment->ToCompanyId = $this->lstToCompany->SelectedValue;
 			$this->objShipment->ToAddressId = $this->lstToAddress->SelectedValue;
@@ -4953,8 +4951,12 @@
 			if(!$this->blnEditBuiltInFields || $this->objShipment->ShippedFlag)
 				$this->DisplayLabels();
 
+			$this->calShipDate->Display = true;
+			$this->lblShipDate->Display = false;
+			
 			$this->pnlNote->Display = false;
 			$this->txtNote->Display = true;
+			
 			$this->btnEdit->Display = false;
 			$this->atcAttach->btnUpload->Display = false;
 			$this->btnSave->Display = true;
