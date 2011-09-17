@@ -151,6 +151,46 @@
 			}						
 			return $objToReturn;
 		}
+		
+		/**
+		 * Load all AssetModels
+		 * @param string $strOrderBy
+		 * @param string $strLimit
+		 * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
+		 * @return AssetModel[]
+		*/
+		public static function LoadAllIntoExtendedArray($strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
+			AssetModel::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
+
+			// Setup the SQL Query
+			$strQuery = sprintf('
+				SELECT
+					`asset_model`.`asset_model_code` AS `asset_model_code`,					
+					`asset_model`.`short_description` AS `short_description`,
+					`asset_model`.`category_id` AS `category_id`,					
+					`asset_model`.`manufacturer_id` AS `manufacturer_id`
+				FROM
+					`asset_model`					
+				ORDER BY `asset_model`.`short_description`');
+
+			// Perform the Query and Instantiate the Result
+			$objDbResult = $objDatabase->Query($strQuery);
+			
+			$objToReturn = array();
+			// If blank resultset, then return empty array
+			if (!$objDbResult)
+				return $objToReturn;			
+			$item = Array();
+			while ($objDbRow = $objDbResult->GetNextRow()) {				
+				$item['model_code'] = $objDbRow->GetColumn('asset_model_code');
+				$item['short_description'] = $objDbRow->GetColumn('short_description');
+				$item['category_id'] = $objDbRow->GetColumn('category_id', 'Integer');
+				$item['manufacturer_id'] = $objDbRow->GetColumn('manufacturer_id', 'Integer');
+				array_push($objToReturn,$item);
+			}						
+			return $objToReturn;
+		}
 
 		/**
 		 * Load all AssetModels

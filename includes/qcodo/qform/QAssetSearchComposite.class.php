@@ -130,6 +130,7 @@ class QAssetSearchComposite extends QControl {
     	// This will render all of the necessary controls and actions. chkSelected_Render expects a unique ID for each row of the database.
     	$this->dtgAsset->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
     }
+    $this->dtgAsset->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->AssetId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Asset()->AssetId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Asset()->AssetId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
     // Removing any links in the column data
     if ($this->blnRemoveAllLinks) {
