@@ -124,15 +124,34 @@
 				$objAttachment->FileType = $this->dlgFileAsset->flcFileAsset->Type;
 				$objAttachment->Path = $this->File;
 				$objAttachment->Size = filesize($this->File);
-				$objAttachment->Save();
-
-				if (AWS_S3) {
-					QApplication::MoveToS3(__DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments', $objAttachment->TmpFilename, $objAttachment->FileType, '/attachments');
-
-					$objAttachment->Path = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/attachments/' . $objAttachment->TmpFilename;
-					$objAttachment->Save();
+				
+				// do not upload same file by the same user
+				$duplicate_file = false;
+				$existing_attachments = Attachment::LoadArrayByEntityQtypeIdEntityId($this->intEntityQtypeId, $this->intEntityId);
+				if (count($existing_attachments)) {
+					foreach ($existing_attachments as $existing_attachment) {
+						if ($existing_attachment->EntityQtypeId == $this->intEntityQtypeId &&
+								$existing_attachment->EntityId == $this->intEntityId &&
+								$existing_attachment->Filename == $this->FileName &&
+								$existing_attachment->FileType == $this->dlgFileAsset->flcFileAsset->Type &&
+								$existing_attachment->Size == filesize($this->File) &&
+								$existing_attachment->CreatedBy == QApplication::$objUserAccount->UserAccountId)
+							$duplicate_file = true;
+					}
 				}
+				
+				if (!$duplicate_file) {
+					$objAttachment->Save();
 
+					if (AWS_S3) {
+						QApplication::MoveToS3(__DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments', $objAttachment->TmpFilename, $objAttachment->FileType, '/attachments');
+	
+						$objAttachment->Path = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/attachments/' . $objAttachment->TmpFilename;
+						$objAttachment->Save();
+					}
+	
+				}
+				
 				if ($this->objParentControl) {
 					$this->objParentControl->pnlAttachments_Create();
 				}
