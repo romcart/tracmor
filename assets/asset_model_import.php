@@ -23,7 +23,6 @@
 	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
 	QApplication::Authenticate(2);
 	require(__DOCROOT__ . __PHP_ASSETS__ . '/csv/DataSource.php');
-	QApplication::Authenticate();
 
 	class AssetModelImportForm extends QForm {
 		// Header Menu
@@ -101,6 +100,7 @@
     protected $lblImportLocations;
     protected $arrOldItemArray;
     protected $objUpdatedItemArray;
+    protected $blnError;
 
 		protected function Form_Create() {
 			if (QApplication::QueryString('intDownloadCsv')) {
@@ -128,35 +128,66 @@
       }
       // Create the Header Menu
 			$this->ctlHeaderMenu_Create();
-			$this->pnlMain_Create();
-			$this->pnlStepOne_Create();
-			$this->Buttons_Create();
-			$this->intStep = 1;
-			$this->intSkippedRecordCount = 0;
-			$this->blnImportEnd = true;
-			$this->btnRemoveArray = array();
-      $this->Labels_Create();
-			$this->objDatabase = AssetModel::GetDatabase();
-			$this->intItemIdKey = null;
-			$this->objUpdatedItemArray = array();
-			$this->arrModelCustomField = array();
-			// Load Asset Model Custom Field
-			foreach (CustomField::LoadArrayByActiveFlagEntity(1,  EntityQtype::AssetModel) as $objCustomField) {
-			  $this->arrModelCustomField[$objCustomField->CustomFieldId] = $objCustomField;
+			$intRoleId = QApplication::$objUserAccount->RoleId;
+			$this->blnError = true;
+			$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId($intRoleId, EntityQtype::AssetModel, 2);
+			// Check the user have edit permissions
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
+			  $this->blnError = false;
 			}
-			$this->intUserArray = array();
-			// Load Users
-			foreach (UserAccount::LoadAll() as $objUser) {
-			  $this->intUserArray[strtolower($objUser->Username)] = $objUser->UserAccountId;
+			if (!$this->blnError){
+  			$this->pnlMain_Create();
+  			$this->pnlStepOne_Create();
+  			$this->Buttons_Create();
+  			$this->intStep = 1;
+  			$this->intSkippedRecordCount = 0;
+  			$this->blnImportEnd = true;
+  			$this->btnRemoveArray = array();
+        $this->Labels_Create();
+  			$this->objDatabase = AssetModel::GetDatabase();
+  			$this->intItemIdKey = null;
+  			$this->objUpdatedItemArray = array();
+			 
+  			$this->arrModelCustomField = array();
+  			$intCustomFieldIdArray = array();
+  			// Load Asset Model Custom Field
+  			foreach (CustomField::LoadArrayByActiveFlagEntity(1,  EntityQtype::AssetModel) as $objCustomField) {
+  			  $this->arrModelCustomField[$objCustomField->CustomFieldId] = $objCustomField;
+  			  $intCustomFieldIdArray[] = $objCustomField->CustomFieldId;
+  			}
+  			if (count($intCustomFieldIdArray)) {
+  			  //QApplication::$Database[1]->EnableProfiling();
+  			  // Load restrict permisions for Asset Model Cutom Fields
+  			  $objConditions = QQ::AndCondition(
+  			                     QQ::Equal(QQN::RoleEntityQtypeCustomFieldAuthorization()->RoleId, (string) $intRoleId),
+  			                     QQ::In(QQN::RoleEntityQtypeCustomFieldAuthorization()->EntityQtypeCustomField->CustomFieldId, $intCustomFieldIdArray),
+  			                     QQ::Equal(QQN::RoleEntityQtypeCustomFieldAuthorization()->AuthorizedFlag, false)
+  			                   );
+  			  $objClauses = array();
+  			  array_push($objClauses, QQ::Expand(QQN::RoleEntityQtypeCustomFieldAuthorization()->EntityQtypeCustomField->EntityQtypeCustomFieldId));
+  			  array_push($objClauses, QQ::OrderBy(QQN::RoleEntityQtypeCustomFieldAuthorization()->EntityQtypeCustomFieldId));
+  			  $arrRoleEntityQtypeCustomFieldAuthorization = RoleEntityQtypeCustomFieldAuthorization::QueryArray($objConditions, $objClauses);
+  			  if ($arrRoleEntityQtypeCustomFieldAuthorization) foreach ($arrRoleEntityQtypeCustomFieldAuthorization as $objRoleAuth) {
+  			    if (array_key_exists($objRoleAuth->EntityQtypeCustomField->CustomFieldId, $this->arrModelCustomField)) {
+  			      unset($this->arrModelCustomField[$objRoleAuth->EntityQtypeCustomField->CustomFieldId]);
+  			    }
+  			  }
+  			  //QApplication::$Database[1]->OutputProfiling();
+  			}
+  			$this->intUserArray = array();
+  			// Load Users
+  			foreach (UserAccount::LoadAll() as $objUser) {
+  			  $this->intUserArray[strtolower($objUser->Username)] = $objUser->UserAccountId;
+  			}
+  			$this->strAcceptibleMimeArray = array(
+  						'text/plain' => 'txt',
+  						'text/comma-separated-values' => 'csv',
+  						'text/csv' => 'csv',
+  						'text/x-comma-separated-values' => 'csv',
+    				  'application/vnd.ms-excel' => 'csv',
+    				  'application/csv' => 'csv',
+    				  'text/x-csv' => 'csv');
 			}
-			$this->strAcceptibleMimeArray = array(
-						'text/plain' => 'txt',
-						'text/comma-separated-values' => 'csv',
-						'text/csv' => 'csv',
-						'text/x-comma-separated-values' => 'csv',
-  				  'application/vnd.ms-excel' => 'csv',
-  				  'application/csv' => 'csv',
-  				  'text/x-csv' => 'csv');
 		}
 
 		protected function Form_PreRender() {
