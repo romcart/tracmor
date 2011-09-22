@@ -24,7 +24,7 @@
 	QApplication::Authenticate(2);
 	require(__DOCROOT__ . __PHP_ASSETS__ . '/csv/DataSource.php');
 
-	class AssetModelImportForm extends QForm {
+	class AssetImportForm extends QForm {
 		// Header Menu
 		protected $ctlHeaderMenu;
 
@@ -52,20 +52,11 @@
 		protected $btnNext;
 		protected $btnCancel;
 		protected $intStep;
-		protected $arrModelCustomField;
+		protected $arrAssetCustomField;
 		protected $intItemIdKey;
 		protected $arrTracmorField;
-		protected $dtgCategory;
-		protected $objNewCategoryArray;
-		protected $dtgManufacturer;
-		protected $objNewManufacturerArray;
-		protected $dtgLocation;
-		protected $objNewLocationArray;
-		protected $dtgAssetModel;
-		protected $objNewAssetModelArray;
 		protected $dtgAsset;
 		protected $objNewAssetArray;
-		protected $arrOldAssetModelArray;
 		protected $dtgUpdatedAsset;
 		protected $objUpdatedAssetArray;
 		protected $blnImportEnd;
@@ -89,15 +80,12 @@
     protected $intTotalCount;
     protected $intCurrentFile;
     protected $strSelectedValueArray;
-    protected $strModelValuesArray;
+    protected $strAssetValuesArray;
     protected $intAssetModelArray;
     protected $lblImportResults;
     protected $lblImportAssets;
     protected $lblImportUpdatedAssets;
-    protected $lblImportModels;
-    protected $lblImportCategories;
-    protected $lblImportManufacturers;
-    protected $lblImportLocations;
+    protected $lblImportAsset;
     protected $arrOldItemArray;
     protected $objUpdatedItemArray;
     protected $blnError;
@@ -130,7 +118,7 @@
 			$this->ctlHeaderMenu_Create();
 			$intRoleId = QApplication::$objUserAccount->RoleId;
 			$this->blnError = true;
-			$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId($intRoleId, EntityQtype::AssetModel, 2);
+			$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId($intRoleId, EntityQtype::Asset, 2);
 			// Check the user have edit permissions
 			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 			  $this->blnError = false;
@@ -144,20 +132,20 @@
   			$this->blnImportEnd = true;
   			$this->btnRemoveArray = array();
         $this->Labels_Create();
-  			$this->objDatabase = AssetModel::GetDatabase();
+  			$this->objDatabase = Asset::GetDatabase();
   			$this->intItemIdKey = null;
   			$this->objUpdatedItemArray = array();
 			 
-  			$this->arrModelCustomField = array();
+  			$this->arrAssetCustomField = array();
   			$intCustomFieldIdArray = array();
   			// Load Asset Model Custom Field
-  			foreach (CustomField::LoadArrayByActiveFlagEntity(1,  EntityQtype::AssetModel) as $objCustomField) {
-  			  $this->arrModelCustomField[$objCustomField->CustomFieldId] = $objCustomField;
+  			foreach (CustomField::LoadArrayByActiveFlagEntity(1,  EntityQtype::Asset) as $objCustomField) {
+  			  $this->arrAssetCustomField[$objCustomField->CustomFieldId] = $objCustomField;
   			  $intCustomFieldIdArray[] = $objCustomField->CustomFieldId;
   			}
   			if (count($intCustomFieldIdArray)) {
   			  //QApplication::$Database[1]->EnableProfiling();
-  			  // Load restrict permisions for Asset Model Cutom Fields
+  			  // Load restrict permisions for Asset Cutom Fields
   			  $objConditions = QQ::AndCondition(
   			                     QQ::Equal(QQN::RoleEntityQtypeCustomFieldAuthorization()->RoleId, (string) $intRoleId),
   			                     QQ::In(QQN::RoleEntityQtypeCustomFieldAuthorization()->EntityQtypeCustomField->CustomFieldId, $intCustomFieldIdArray),
@@ -168,17 +156,17 @@
   			  array_push($objClauses, QQ::OrderBy(QQN::RoleEntityQtypeCustomFieldAuthorization()->EntityQtypeCustomFieldId));
   			  $arrRoleEntityQtypeCustomFieldAuthorization = RoleEntityQtypeCustomFieldAuthorization::QueryArray($objConditions, $objClauses);
   			  if ($arrRoleEntityQtypeCustomFieldAuthorization) foreach ($arrRoleEntityQtypeCustomFieldAuthorization as $objRoleAuth) {
-  			    if (array_key_exists($objRoleAuth->EntityQtypeCustomField->CustomFieldId, $this->arrModelCustomField)) {
-  			      unset($this->arrModelCustomField[$objRoleAuth->EntityQtypeCustomField->CustomFieldId]);
+  			    if (array_key_exists($objRoleAuth->EntityQtypeCustomField->CustomFieldId, $this->arrAssetCustomField)) {
+  			      unset($this->arrAssetCustomField[$objRoleAuth->EntityQtypeCustomField->CustomFieldId]);
   			    }
   			  }
   			  //QApplication::$Database[1]->OutputProfiling();
   			}
   			$this->intUserArray = array();
   			// Load Users
-  			foreach (UserAccount::LoadAll() as $objUser) {
+  			/*foreach (UserAccount::LoadAll() as $objUser) {
   			  $this->intUserArray[strtolower($objUser->Username)] = $objUser->UserAccountId;
-  			}
+  			}*/
   			$this->strAcceptibleMimeArray = array(
   						'text/plain' => 'txt',
   						'text/comma-separated-values' => 'csv',
@@ -192,9 +180,9 @@
 
 		protected function Form_PreRender() {
 
-			if ($this->dtgAssetModel && count($this->objNewAssetModelArray) > 0 && $this->dtgAssetModel->Paginator) {
-				$this->dtgAssetModel->TotalItemCount = count($this->objNewAssetModelArray);
-      	$this->dtgAssetModel->DataSource = $this->return_array_chunk($this->dtgAssetModel, $this->objNewAssetModelArray);
+			if ($this->dtgAsset && count($this->objNewAssetArray) > 0 && $this->dtgAsset->Paginator) {
+				$this->dtgAsset->TotalItemCount = count($this->objNewAssetArray);
+      	$this->dtgAsset->DataSource = $this->return_array_chunk($this->dtgAsset, $this->objNewAssetArray);
 			}
 
 			if ($this->dtgUpdatedAsset && count($this->objUpdatedAssetArray) > 0 && $this->dtgUpdatedAsset->Paginator) {
@@ -216,12 +204,13 @@
       $this->lblImportUpdatedAssets->HtmlEntities = false;
       $this->lblImportUpdatedAssets->Display = false;
       $this->lblImportUpdatedAssets->CssClass = "title";
-      $this->lblImportUpdatedAssets->Text = "Last Updated Assets";
+      $this->lblImportUpdatedAssets->Text = "<br/>Last Updated Assets";
 
-      $this->lblImportModels = new QLabel($this);
-      $this->lblImportModels->Display = false;
-      $this->lblImportModels->CssClass = "title";
-      $this->lblImportModels->Text = "Last Imported Models";
+      $this->lblImportAsset = new QLabel($this);
+      $this->lblImportAsset->HtmlEntities = false;
+      $this->lblImportAsset->Display = false;
+      $this->lblImportAsset->CssClass = "title";
+      $this->lblImportAsset->Text = "<br/>Last Imported Assets";
     }
 
 		// Create and Setup the Header Composite Control
@@ -238,7 +227,7 @@
 		// Step 1 Panel
 		protected function pnlStepOne_Create() {
 			$this->pnlStepOne = new QPanel($this->pnlMain);
-      $this->pnlStepOne->Template = "asset_model_import_pnl_step1.tpl.php";
+      $this->pnlStepOne->Template = "asset_import_pnl_step1.tpl.php";
 
 			// Step 1
 			$this->lstFieldSeparator = new QRadioButtonList($this->pnlStepOne);
@@ -283,13 +272,13 @@
     // Step 2 Panel
     protected function pnlStepTwo_Create() {
 			$this->pnlStepTwo = new QPanel($this->pnlMain);
-      $this->pnlStepTwo->Template = "asset_model_import_pnl_step2.tpl.php";
+      $this->pnlStepTwo->Template = "asset_import_pnl_step2.tpl.php";
     }
 
     // Step 3 Panel
     protected function pnlStepThree_Create() {
 			$this->pnlStepThree = new QPanel($this->pnlMain);
-      $this->pnlStepThree->Template = "asset_model_import_pnl_step3.tpl.php";
+      $this->pnlStepThree->Template = "asset_import_pnl_step3.tpl.php";
     }
 
     protected function Buttons_Create() {
@@ -376,7 +365,7 @@
             // The uploaded file splits up in order to avoid out of memory
             while ($row = fgets($file, 1000)) {
               if ($j == 1) {
-                $strFilePath = sprintf('%s/%s_mod_%s.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $i);
+                $strFilePath = sprintf('%s/%s_%s.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $i);
                 $this->strFilePathArray[] = $strFilePath;
                 $file_part = fopen($strFilePath, "w+");
                 if ($i == 1) {
@@ -396,7 +385,7 @@
               }
             }
             $this->intTotalCount = ($i-1)*200 + $j-1;
-            if (false) {
+            if (QApplication::$TracmorSettings->AssetLimit != null && QApplication::$TracmorSettings->AssetLimit < ($this->intTotalCount + Asset::CountAll())) {
               $blnError = true;
               $this->btnNext->Warning = $i . " " . $j . "Sorry that is too many assets. Your asset limit is = " . QApplication::$TracmorSettings->AssetLimit . ", this import has " . ($this->intTotalCount) . " assets, and you already have " . Asset::CountAll() . " assets in the database.";
             }
@@ -468,29 +457,25 @@
 		  elseif ($this->intStep == 2) {
 		    // Step 2 complete
 		    $blnError = false;
-        $blnAssetModelCode = false;
+        $blnAssetCode = false;
         $blnAssetModelShortDescription = false;
-        $blnCategory = false;
-        $blnManufacturer = false;
-        $blnModelId = false;
+        $blnLocation = false;
+        $blnAssetId = false;
         // Checking errors (Model Short Description, Model Code, Category and Manufacturer must be selected)
         for ($i=0; $i < count($this->lstMapHeaderArray)-1; $i++) {
           $lstMapHeader = $this->lstMapHeaderArray[$i];
           $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
-          if ($strSelectedValue == "asset model short description") {
+          if ($strSelectedValue == "asset model") {
             $blnAssetModelShortDescription = true;
           }
-          elseif ($strSelectedValue == "asset model code") {
-            $blnAssetModelCode = true;
+          elseif ($strSelectedValue == "asset code") {
+            $blnAssetCode = true;
           }
-          elseif ($strSelectedValue == "category") {
-            $blnCategory = true;
-          }
-          elseif ($strSelectedValue == "manufacturer") {
-            $blnManufacturer = true;
+          elseif ($strSelectedValue == "location") {
+            $blnLocation = true;
           }
           elseif ($strSelectedValue == "id") {
-            $blnModelId = true;
+            $blnAssetId = true;
           }
         }
         if ($this->lstMapDefaultValueArray) {
@@ -521,17 +506,17 @@
           }
         }
         // If all required fields have no errors
-        if (!$blnError && $blnAssetModelCode && $blnAssetModelShortDescription && $blnCategory && $blnManufacturer && ($this->lstImportAction->SelectedValue != 2 || $blnModelId)) {
+        if (!$blnError && $blnAssetCode && $blnAssetModelShortDescription && $blnLocation && ($this->lstImportAction->SelectedValue != 2 || $blnAssetId)) {
           $this->btnNext->Warning = "";
           // Setup keys for main required fields
           foreach ($this->arrTracmorField as $key => $value) {
-            if ($value == 'category') {
+            /*if ($value == 'category') {
               $this->intCategoryKey = $key;
             }
             elseif ($value == 'manufacturer') {
               $this->intManufacturerKey = $key;
             }
-            elseif ($this->lstImportAction->SelectedValue == 2 && $value == 'id') {
+            else*/if ($this->lstImportAction->SelectedValue == 2 && $value == 'id') {
               $this->intItemIdKey = $key;
             }
             /*elseif ($value == 'created by') {
@@ -548,14 +533,14 @@
             }*/
           }
 
-          $this->objNewAssetModelArray = array();
-          $this->strModelValuesArray = array();
+          $this->objNewAssetArray = array();
+          $this->strAssetValuesArray = array();
           $this->blnImportEnd = false;
           $j=1;
           
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
-          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
@@ -566,16 +551,16 @@
           $this->strSelectedValueArray = array();
 
           // New asset models
-          $this->dtgAssetModel = new QDataGrid($this);
-          $this->dtgAssetModel->Name = 'asset_model_list';
-      		$this->dtgAssetModel->CellPadding = 5;
-      		$this->dtgAssetModel->CellSpacing = 0;
-      		$this->dtgAssetModel->CssClass = "datagrid";
-          $this->dtgAssetModel->UseAjax = true;
-          $this->dtgAssetModel->ShowColumnToggle = false;
-          $this->dtgAssetModel->ShowExportCsv = false;
-          $this->dtgAssetModel->ShowHeader = false;
-          $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgAsset = new QDataGrid($this);
+          $this->dtgAsset->Name = 'asset_list';
+      		$this->dtgAsset->CellPadding = 5;
+      		$this->dtgAsset->CellSpacing = 0;
+      		$this->dtgAsset->CssClass = "datagrid";
+          $this->dtgAsset->UseAjax = true;
+          $this->dtgAsset->ShowColumnToggle = false;
+          $this->dtgAsset->ShowExportCsv = false;
+          $this->dtgAsset->ShowHeader = false;
+          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Updated assets
           $this->dtgUpdatedAsset = new QDataGrid($this);
@@ -612,14 +597,14 @@
 
     			// Return to Assets button
     			$this->btnReturnToAssets = new QButton($this);
-        	$this->btnReturnToAssets->Text = "Return to Models";
+        	$this->btnReturnToAssets->Text = "Return to Assets";
         	$this->btnReturnToAssets->Display = false;
         	$this->btnReturnToAssets->AddAction(new QClickEvent(), new QServerAction('btnReturnToAssets_Click'));
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QServerAction('btnReturnToAssets_Click'));
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QTerminateAction());
         }
         else {
-          $this->btnNext->Warning = "You must select all required fields (Asset Model Code, Asset Model Short Description, Category and Manufacturer).";
+          $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Short Description and Location).";
           $blnError = true;
         }
 		  }
@@ -628,86 +613,37 @@
 		    set_time_limit(0);
 		    $file_skipped = fopen($strFilePath = sprintf('%s/%s_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "a");
 		    if (!$this->blnImportEnd) {
-		      // Asset Model
+		      // Asset
           if ($this->intImportStep == 2) {
             $intCategoryArray = array();
             // Load all categories with key=category_id
-            foreach (Category::LoadAllWithFlags(true, false) as $objCategory) {
+            /*foreach (Category::LoadAllWithFlags(true, false) as $objCategory) {
               $intCategoryArray[$objCategory->CategoryId] = strtolower($objCategory->ShortDescription);
             }
             $intManufacturerArray = array();
             // Load all manufacturers with key=manufacturer_id
             foreach (Manufacturer::LoadAll() as $objManufacturer) {
               $intManufacturerArray[$objManufacturer->ManufacturerId] = strtolower($objManufacturer->ShortDescription);
-            }
+            }*/
 
-            $intModelCustomFieldKeyArray = array();
-            $arrModelCustomField = array();
-            // Setup keys
-            foreach ($this->arrTracmorField as $key => $value) {
-              if ($value == 'asset model short description') {
-                $intModelShortDescriptionKey = $key;
-              }
-              elseif ($value == 'asset model long description') {
-                $intModelLongDescriptionKey = $key;
-              }
-              elseif ($value == 'asset model code') {
-                $intModelCodeKey = $key;
-              }
-              elseif (substr($value, 0, 6) == 'model_') {
-                $intModelCustomFieldKeyArray[substr($value, 6)] = $key;
-                if (array_key_exists(substr($value, 6), $this->arrModelCustomField)) {
-                	$arrModelCustomField[substr($value, 6)] = $this->arrModelCustomField[substr($value, 6)];
-                }
-              }
-            }
-            $strAssetModelArray = array();
-            $strItemCFVArray = array();
-            $strUpdatedItemCFVArray = array();
-            $strUpdatedValuesArray = array();
-            $this->arrOldItemArray = array();
-            $this->objUpdatedItemArray = array();
-              
-            // Load all asset models
-            foreach (AssetModel::LoadAllIntoExtendedArray() as $arrAssetModel) {
-              $strAssetModelArray[] = strtolower(sprintf("%s_%s_%s_%s", addslashes($arrAssetModel['model_code']),  addslashes($arrAssetModel['short_description']),  $arrAssetModel['category_id'], $arrAssetModel['manufacturer_id']));
-            }
-            $this->btnNext->Warning = sprintf("Please wait... Asset Model import complete: %s%s", ceil(($this->intCurrentFile+1)*200/$this->intTotalCount*100), "%");
-          }
-          // Asset
-          /*elseif ($this->intImportStep == 5) {
-            $intCategoryArray = array();
-            // Load all categories with keys=category_id
-            foreach (Category::LoadAllWithFlags(true, false) as $objCategory) {
-              //$intCategoryArray["'" . strtolower($objCategory->ShortDescription) . "'"] = $objCategory->CategoryId;
-              $intCategoryArray[$objCategory->CategoryId] = strtolower($objCategory->ShortDescription);
-            }
-            $intManufacturerArray = array();
-            // Load all manufacturers with keys=manufacturer_id
-            foreach (Manufacturer::LoadAll() as $objManufacturer) {
-              //$intManufacturerArray["'" . strtolower($objManufacturer->ShortDescription) . "'"] = $objManufacturer->ManufacturerId;
-              $intManufacturerArray[$objManufacturer->ManufacturerId] = strtolower($objManufacturer->ShortDescription);
-            }
-            if ($this->intCurrentFile == 0) {
-              $this->intAssetModelArray = array();
-              // Load all asset models with keys=asset_model_id
-              foreach (AssetModel::LoadAll() as $objAssetModel) {
-                //$intAssetModelArray["'" . strtolower($objAssetModel->ShortDescription) . "'"] = $objAssetModel->AssetModelId;
-                $this->intAssetModelArray[$objAssetModel->AssetModelId] = strtolower(sprintf("%s_%s_%s_%s", $objAssetModel->AssetModelCode, $objAssetModel->ShortDescription, $objAssetModel->CategoryId, $objAssetModel->ManufacturerId));
-              }
-            }
             $intAssetCustomFieldKeyArray = array();
             $arrAssetCustomField = array();
             // Setup keys
             foreach ($this->arrTracmorField as $key => $value) {
-              if ($value == 'asset model short description') {
-                $intModelShortDescriptionKey = $key;
+              if ($value == 'asset code') {
+                $intAssetCodeKey = $key;
               }
-              elseif ($value == 'asset model code') {
-                $intModelCodeKey = $key;
+              elseif ($value == 'asset model') {
+                $intAssetModelDescriptionKey = $key;
               }
-              elseif ($value == 'asset code') {
-                $intAssetCode = $key;
+              elseif ($value == 'location') {
+                $intLocationKey = $key;
+              }
+              elseif ($value == 'parent asset') {
+                $intParentAssetKey = $key;
+              }
+              elseif ($value == 'locked to parent') {
+                $intLinkedKey = $key;
               }
               elseif (substr($value, 0, 6) == 'asset_') {
                 $intAssetCustomFieldKeyArray[substr($value, 6)] = $key;
@@ -716,28 +652,34 @@
                 }
               }
             }
+            $intAssetModelArray = array();
+            $strItemCFVArray = array();
+            $strUpdatedItemCFVArray = array();
+            $strUpdatedValuesArray = array();
+            $this->arrOldItemArray = array();
+            $this->objUpdatedItemArray = array();
+              
+            // Load all asset models
+            foreach (AssetModel::LoadAllIntoArray() as $arrAssetModel) {
+              //$strAssetModelArray[] = strtolower(sprintf("%s_%s_%s_%s", addslashes($arrAssetModel['model_code']),  addslashes($arrAssetModel['short_description']),  $arrAssetModel['category_id'], $arrAssetModel['manufacturer_id']));
+              $intAssetModelArray[$arrAssetModel['asset_model_id']] = strtolower($arrAssetModel['short_description']);
+            }
             $intLocationArray = array();
             // Load all locations with keys=location_id
             foreach (Location::LoadAll() as $objLocation) {
-              //$intLocationArray["'" . strtolower($objLocation->ShortDescription) . "'"] = $objLocation->LocationId;
               $intLocationArray[$objLocation->LocationId] = strtolower($objLocation->ShortDescription);
             }
 
             $strAssetArray = array();
-            $strUpdatedAssetArray = array();
             // Load all assets
-            foreach (Asset::LoadAll() as $objAsset) {
-              $strAssetArray[] = strtolower($objAsset->AssetCode);
-            }
-            $this->btnNext->Warning = sprintf("Please wait... Asset import complete: %s%s", ceil(($this->intCurrentFile+1)*200/$this->intTotalCount*100), "%");
-          }*/
-          // Loads array of AssetModelId
-          $arrAssetModelArray = AssetModel::LoadAllIntoArray();
-          $arrAssetModelId = array();
-          if (count($arrAssetModel)) {
-            foreach ($arrAssetModelArray as $arrAssetModel) {
-              $arrAssetModelId[$arrAssetModel['asset_model_id']] = true;
-            }
+            // Loads array of AssetModelId
+            $arrAssetArray = Asset::LoadAllIntoArray();
+            $arrAssetId = array();
+            if (count($arrAssetArray))
+              foreach ($arrAssetArray as $arrAsset) {
+                $arrAssetId[$arrAsset['asset_id']] = addslashes(strtolower($arrAsset['asset_code']));
+                $strAssetArray[] = addslashes(strtolower($arrAsset['asset_code']));
+              }
           }
           
           for ($j=$this->intCurrentFile; $j<count($this->strFilePathArray); $j++) {
@@ -746,14 +688,64 @@
               //$this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
             if ($this->intImportStep == 2) {
-              $objNewAssetModelArray = array();
+              $objNewAssetArray = array();
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
-                $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
-                //$strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? trim($strRowArray[$intModelShortDescriptionKey]) : false;
-                $strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? addslashes(trim($strRowArray[$intModelCodeKey])) : addslashes(trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text));
-                //$strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? trim($strRowArray[$intModelCodeKey]) : trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text);
-                $strKeyArray = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])));
+                $strAssetCode = (trim($strRowArray[$intAssetCodeKey])) ? addslashes(trim($strRowArray[$intAssetCodeKey])) : false;
+                //$strAssetCode = (trim($strRowArray[$intAssetCodeKey])) ? trim($strRowArray[$intAssetCodeKey]) : false;
+                $strKeyArray = array_keys($intLocationArray, strtolower(trim($strRowArray[$intLocationKey])));
+                if (count($strKeyArray)) {
+                  $intLocationId = $strKeyArray[0];
+                }
+                else {
+                  $strKeyArray = array_keys($intLocationArray, strtolower(trim($txtMapDefaultValueArray[$intLocationKey]->Text)));
+                  if (count($strKeyArray)) {
+                    $intLocationId = $strKeyArray[0];
+                  }
+                  else {
+                    $intLocationId = false;
+                  }
+                }
+                $strKeyArray = array_keys($intAssetModelArray, strtolower(trim($strRowArray[$intAssetModelDescriptionKey])));
+                if (count($strKeyArray)) {
+                  $intAssetModelId = $strKeyArray[0];
+                }
+                else {
+                  $strKeyArray = array_keys($intAssetModelArray, strtolower(trim($txtMapDefaultValueArray[$intAssetModelDescriptionKey]->Text)));
+                  if (count($strKeyArray)) {
+                    $intAssetModelId = $strKeyArray[0];
+                  }
+                  else {
+                    $intAssetModelId = false;
+                  }
+                }
+                $blnError = false;
+                if (isset($strRowArray[$intParentAssetKey])) {
+                  $strKeyArray = array_keys($arrAssetId, strtolower(trim($strRowArray[$intParentAssetKey])));
+                  if (count($strKeyArray)) {
+                    $intParentAssetId = $strKeyArray[0];
+                  }
+                  else {
+                    $strKeyArray = array_keys($arrAssetId, strtolower(trim($txtMapDefaultValueArray[$intParentAssetKey]->Text)));
+                    if (count($strKeyArray)) {
+                      $intParentAssetId = $strKeyArray[0];
+                    }
+                    else {
+                      $intParentAssetId = null;
+                      $blnError = true;
+                    }
+                  }
+                  if (!$intParentAssetId || $strRowArray[$intParentAssetKey] == $strAssetCode) {
+                    $blnError = true;
+                  }
+                  $blnLinked = ($intParentAssetId && isset($intLinkedKey) && strlen(trim($strRowArray[$intLinkedKey])) > 0) ? 1 : 0;
+                }
+                else {
+                  $intParentAssetId = null;
+                  $blnLinked = 0;
+                }
+                
+                /*$strKeyArray = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])));
                 if (count($strKeyArray)) {
                   $intCategoryId = $strKeyArray[0];
                 }
@@ -778,49 +770,54 @@
                   else {
                     $intManufacturerId = false;
                   }
-                }
-                $objAssetModel = false;
-                if (!$strShortDescription || $intCategoryId === false || $intManufacturerId === false) {
+                }*/
+                $objAsset = false;
+                if (!$strAssetCode || $blnError || $intAssetModelId === false || $intLocationId === false/* || $intCategoryId === false || $intManufacturerId === false*/) {
                   //$blnError = true;
-                  //echo sprintf("Desc: %s AssetCode: %s Cat: %s Man: %s<br/>", $strShortDescription, $strAssetModelCode, $intCategoryId, $intManufacturerId);
+                  //echo sprintf("Desc: %s AssetCode: %s Cat: %s Man: %s<br/>", $strAssetCode, $strLocation, $intCategoryId, $intManufacturerId);
                   //break;
-                  $strAssetModel =  null;
+                  $strAssetCode =  null;
                   $this->intSkippedRecordCount++;
                   $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                 }
                 else {
                   //$blnError = false;
-                  $strAssetModel = strtolower(sprintf("%s_%s_%s_%s", $strAssetModelCode, $strShortDescription, $intCategoryId, $intManufacturerId));
                   if ($this->lstImportAction->SelectedValue == 2) {
-                    $intItemId = intval(trim($strRowArray[$this->intItemIdKey]));
-                    if ($intItemId > 0 && array_key_exists($intItemId, $arrAssetModelId)) {
-                      $objAssetModelArray = AssetModel::LoadArrayBySearchHelper(null, null, null, null, null, null, null, null, null, null, null, null, $intItemId);
-                      if ($objAssetModelArray)
-                        $objAssetModel = $objAssetModelArray[0];
+                    echo $intItemId = intval(trim($strRowArray[$this->intItemIdKey]));
+                    if ($intItemId > 0 && array_key_exists($intItemId, $arrAssetId)) {
+                      //echo "!1!";
+                      //QApplication::$Database[1]->EnableProfiling();
+                      $objAssetArray = Asset::LoadArrayBySearchHelper(null, null, null, null, null, false, null, null, null, null, null, null, null, null, null, false, null, null, null, false, false, false, null, null, false, $intItemId);
+                      //QApplication::$Database[1]->OutputProfiling();
+                      if ($objAssetArray)
+                        $objAsset = $objAssetArray[0];
+                      //var_dump($objAssetArray);
+                      
                     }
+                    //exit();
                   }
                   else {
                     $intItemId = 0;
                   }
                 }
                 
-                if ($strAssetModel && !$intItemId && !$this->in_array_nocase($strAssetModel, $strAssetModelArray)) {
+                if ($strAssetCode && !$intItemId && !$this->in_array_nocase($strAssetCode, $strAssetArray)) {
                       // Custom Fields Section
                       $strCFVArray = array();
                       $objDatabase = CustomField::GetDatabase();
                       $blnCheckCFVError = false;
                       // Asset Model Custom Field import
-                      foreach ($arrModelCustomField as $objCustomField) {
+                      foreach ($arrAssetCustomField as $objCustomField) {
                         if ($objCustomField->CustomFieldQtypeId != 2) {
-                        	$strCSDescription = trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+                        	$strCSDescription = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
                           $strCSDescription = (strlen($strCSDescription) > 0) ?
                                       addslashes($strCSDescription) :
-                                      addslashes($this->txtMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
+                                      addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
                           $strCFVArray[$objCustomField->CustomFieldId] = (strlen($strCSDescription) > 0) ? sprintf("'%s'", $strCSDescription) : "NULL";
                         }
                         else {
-                        	$objDatabase = AssetModel::GetDatabase();
-                          $strCSDescription = addslashes(trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
+                        	$objDatabase = Asset::GetDatabase();
+                          $strCSDescription = addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
                           $blnInList = false;
                           foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
                 					  if (strtolower($objCustomFieldValue->ShortDescription) == strtolower($strCSDescription)) {
@@ -837,8 +834,8 @@
                 						$strAddedCFVArray[] = $strCSDescription;
                 					}
                 					else*/
-                					if (!$blnInList && $this->lstMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
-                            $strCSDescription = $this->lstMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
+                					if (!$blnInList && $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                            $strCSDescription = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                  					}
                  					elseif (!$blnInList) {
                  					  $blnCheckCFVError = true;
@@ -855,48 +852,39 @@
                       }
                       
                       if (!$blnCheckCFVError) {
-                        $strAssetModelArray[] = $strAssetModel;
-                        $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', NOW())", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId, $_SESSION['intUserAccountId']);
-                        $objNewAssetModelArray[] = $strShortDescription;
+                        $strAssetArray[] = $strAssetCode;
+                        $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW())", $strAssetCode, $intLocationId, $intAssetModelId, ($intParentAssetId) ? $intParentAssetId : "NULL", ($blnLinked) ? "1" : "0", $_SESSION['intUserAccountId']);
+                        $objNewAssetArray[] = $strAssetCode;
                         if (count($strCFVArray)) {
-                          $strModelCFVArray[] = implode(', ', $strCFVArray);
+                          $strAssetCFVArray[] = implode(', ', $strCFVArray);
                         }
                         else {
-                          $strModelCFVArray[] = "";
+                          $strAssetCFVArray[] = "";
                         }
                       }
                       else {
                         $this->intSkippedRecordCount++;
                         $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
-                        $strAssetModel = null;
+                        $strAssetCode = null;
                       }
                   }
                   
                   // Import Action is "Create and Update Records"
-                  elseif ($strAssetModel && $this->lstImportAction->SelectedValue == 2 && $objAssetModel) {
+                  elseif ($strAssetCode && $this->lstImportAction->SelectedValue == 2 && $objAsset) {
                     $strUpdateFieldArray = array();
-                    $strUpdateFieldArray[] = sprintf("`manufacturer_id`='%s'", $intManufacturerId);
-                    $strUpdateFieldArray[] = sprintf("`category_id`='%s'", $intCategoryId);
-                    $strUpdateFieldArray[] = sprintf("`short_description`='%s'", $strShortDescription);
-                    $strUpdateFieldArray[] = sprintf("`asset_model_code`='%s'", $strAssetModelCode);
-                    $strModelLongDescription = "";
-                    if (isset($intModelLongDescription)) {
-                      if (trim($strRowArray[$intModelLongDescriptionKey]))
-                        $strModelLongDescription = trim($strRowArray[$intModelLongDescriptionKey]);
-                      else
-                        $strModelLongDescription = (isset($txtMapDefaultValueArray[$intModelLongDescriptionKey])) ? trim($txtMapDefaultValueArray[$intModelLongDescriptionKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`asset_model_long_description`='%s'", $strModelLongDescription);
-                    }
-                    $strUpdateFieldArray[] = sprintf("modified_by='%s'", $_SESSION['intUserAccountId']);
-                    
+                    $strUpdateFieldArray[] = sprintf("`asset_code`='%s'", $strAssetCode);
+                    $strUpdateFieldArray[] = sprintf("`asset_model_id`='%s'", $intAssetModelId);
+                    $strUpdateFieldArray[] = sprintf("`parent_asset_id`=%s", QApplication::$Database[1]->SqlVariable($intParentAssetId));
+                    $strUpdateFieldArray[] = sprintf("`linked_flag`='%s'", ($blnLinked) ? 1 : 0);
+                    $strUpdateFieldArray[] = sprintf("`modified_by`='%s'", $_SESSION['intUserAccountId']);
                     
                     $blnCheckCFVError = false;
-                    foreach ($arrModelCustomField as $objCustomField) {
+                    foreach ($arrAssetCustomField as $objCustomField) {
                       if ($objCustomField->CustomFieldQtypeId != 2) {
-                       	$strCSDescription = trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+                       	$strCSDescription = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
                         $strCSDescription = (strlen($strCSDescription) > 0) ?
                                       addslashes($strCSDescription) :
-                                      addslashes($this->txtMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
+                                      addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
                         $strCFVArray[$objCustomField->CustomFieldId] = (strlen($strCSDescription) > 0) ? sprintf("'%s'", $strCSDescription) : "NULL";
                       }
                       else {
@@ -911,8 +899,8 @@
                         		break;
                     			}
                     		}
-                    		if (!$blnInList && $this->lstMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
-                          $strCSDescription = $this->lstMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
+                    		if (!$blnInList && $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                          $strCSDescription = $this->lstMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                     		}
                  				elseif (!$blnInList) {
                  				  $blnCheckCFVError = true;
@@ -928,32 +916,32 @@
                       }
                     }
                     if (!$blnCheckCFVError) {
-                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset_model` SET %s WHERE `asset_model_id`='%s'", implode(", ", $strUpdateFieldArray), $objAssetModel->AssetModelId);
+                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", implode(", ", $strUpdateFieldArray), $objAsset->AssetId);
                       if (count($strCFVArray)) {
-                        $strUpdatedItemCFVArray[$objAssetModel->AssetModelId] = $strCFVArray;
+                        $strUpdatedItemCFVArray[$objAsset->AssetId] = $strCFVArray;
                       }
                       else {
-                        $strUpdatedItemCFVArray[$objAssetModel->AssetModelId] = "";
+                        $strUpdatedItemCFVArray[$objAsset->AssetId] = "";
                       }
-                      $this->objUpdatedItemArray[$objAssetModel->AssetModelId] = sprintf("%s", $objAssetModel->ShortDescription);
-                      //$this->arrOldItemArray[$objAssetModel->AssetModelId] = $objAssetModel;
-                      $strItemQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_model_id`='%s'", $objAssetModel->ShortDescription, $objAssetModel->LongDescription, $objAssetModel->ManufacturerId, $objAssetModel->CategoryId, $objAssetModel->AssetModelCode, (!$objAssetModel->ModifiedBy) ? "NULL" : $objAssetModel->ModifiedBy, (!$objAssetModel->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAssetModel->ModifiedDate), $objAssetModel->AssetModelId);
+                      $this->objUpdatedItemArray[$objAsset->AssetId] = sprintf("%s", $objAsset->AssetCode);
+                      //$this->arrOldItemArray[$objAsset->AssetId] = $objAsset;
+                      $strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate), $objAsset->AssetId);
                       $strCFVArray = array();
-                      foreach ($this->arrModelCustomField as $objCustomField) {
-                        $strCFV = $objAssetModel->GetVirtualAttribute($objCustomField->CustomFieldId);
+                      foreach ($this->arrAssetCustomField as $objCustomField) {
+                        $strCFV = $objAsset->GetVirtualAttribute($objCustomField->CustomFieldId);
                         $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
                       }
                       if (count($strCFVArray)) {
-                        $strCFVQuery = sprintf("UPDATE `asset_model_custom_field_helper` SET %s WHERE `asset_model_id`='%s'", implode(", ", $strCFVArray), $intItemId);
+                        $strCFVQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemId);
                       }
                       else {
                         $strCFVQuery = false;
                       }
-                      $this->arrOldItemArray[$objAssetModel->AssetModelId] = array("ItemSql" => $strItemQuery, "CFVSql" => $strCFVQuery);
+                      $this->arrOldItemArray[$objAsset->AssetId] = array("ItemSql" => $strItemQuery, "CFVSql" => $strCFVQuery);
                     }
                   }
                   // If Import Action is "Create Records" and this Asset has already in the database
-                  /*elseif ($this->lstImportAction->SelectedValue == 1 && $this->in_array_nocase($strAssetModel, $strAssetModelArray)) {
+                  /*elseif ($this->lstImportAction->SelectedValue == 1 && $this->in_array_nocase($strAssetCode, $strAssetArray)) {
                     // Skipped and flagged as duplicates
                     $this->intSkippedRecordCount++;
                     $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
@@ -966,64 +954,66 @@
                 }
               //if ($this->intCurrentFile == count($this->strFilePathArray)) {
                 // Inserts
-                if (count($this->strModelValuesArray)) {
-                  $objDatabase = AssetModel::GetDatabase();
+                if (count($this->strAssetValuesArray)) {
+                  $objDatabase = Asset::GetDatabase();
 
-                  //var_dump($this->strModelValuesArray);
+                  //var_dump($this->strAssetValuesArray);
                   //exit();
 
-                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $this->strModelValuesArray)));
+                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $this->strAssetValuesArray)));
                   $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
-                  	$strModelIdArray = array();
+                  	$strAssetIdArray = array();
                   	$strCFVArray = array();
-                  	for ($i=0; $i<count($objNewAssetModelArray); $i++) {
-                      $this->objNewAssetModelArray[$intInsertId+$i] = $objNewAssetModelArray[$i];
-                      $strCFVArray[$i] = sprintf("('%s', %s)", $intInsertId+$i, $strModelCFVArray[$i]);
-                      $strModelIdArray[$i] = sprintf("(%s)", $intInsertId+$i);
+                  	for ($i=0; $i<count($objNewAssetArray); $i++) {
+                      $this->objNewAssetArray[$intInsertId+$i] = $objNewAssetArray[$i];
+                      $strCFVArray[$i] = sprintf("('%s', %s)", $intInsertId+$i, $strAssetCFVArray[$i]);
+                      $strAssetIdArray[$i] = sprintf("(%s)", $intInsertId+$i);
                     }
                     $strCFVNameArray = array();
-                    foreach ($arrModelCustomField as $objCustomField) {
+                    foreach ($arrAssetCustomField as $objCustomField) {
                       $strCFVNameArray[] = sprintf("`cfv_%s`", $objCustomField->CustomFieldId);
                     }
-                    if (count($strModelCFVArray) > 0 && count($strCFVNameArray) > 0)  {
-                    	$strQuery = sprintf("INSERT INTO `asset_model_custom_field_helper` (`asset_model_id`, %s) VALUES %s", implode(", ", $strCFVNameArray), implode(", ", $strCFVArray));
+                    if (count($strAssetCFVArray) > 0 && count($strCFVNameArray) > 0)  {
+                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", implode(", ", $strCFVNameArray), implode(", ", $strCFVArray));
                     } else {
-                    	$strQuery = sprintf("INSERT INTO `asset_model_custom_field_helper` (`asset_model_id`) VALUES %s", implode(", ", $strModelIdArray));
+                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES %s", implode(", ", $strAssetIdArray));
                     }
                     $objDatabase->NonQuery($strQuery);
                     for ($i=0; $i<$intModelCount; $i++) {
-                      $this->objNewAssetModelArray[$intInsertId+$i] = $strModelCodeArray[$i];
+                      $this->objNewAssetArray[$intInsertId+$i] = $strModelCodeArray[$i];
                     }
                   }
 
-                  $this->strModelValuesArray = array();
+                  $this->strAssetValuesArray = array();
                 }
                 // Updates
                 if (count($strUpdatedValuesArray)) {
-                  $objDatabase = AssetModel::GetDatabase();
+                  $objDatabase = Asset::GetDatabase();
                   foreach ($strUpdatedValuesArray as $query) {
                     $objDatabase->NonQuery($query);
                   }
                   foreach ($this->objUpdatedItemArray as $intItemKey => $objUpdatedItem) {
                     if (isset($strUpdatedItemCFVArray[$intItemKey]) && count($strUpdatedItemCFVArray[$intItemKey])) {
                       $strCFVArray = array();
-                      foreach ($arrModelCustomField as $objCustomField) {
+                      foreach ($arrAssetCustomField as $objCustomField) {
                         $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                       }
                       if (count($strCFVArray)) {
-                        $strQuery = sprintf("UPDATE `asset_model_custom_field_helper` SET %s WHERE `asset_model_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
+                        $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
                         $objDatabase->NonQuery($strQuery);
                       }
                     }
                 }
               }
+                            
               //}
               //$this->intCurrentFile++;
               //break;
             }
             //$j++;
           }
+          
           if ($this->intImportStep == 3) {
             /*if (count($this->strSelectedValueArray)) {
               $objDatabase = CustomField::GetDatabase();
@@ -1036,8 +1026,8 @@
             // Insert Values into helper tables
             $objDatabase = Asset::GetDatabase();
             $objDatabase->NonQuery("SET FOREIGN_KEY_CHECKS=0;");
-            // Insert into asset_model_custom_field_helper
-            $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model_custom_field_helper` (`asset_model_id`) (SELECT `asset_model_id` FROM `asset_model` WHERE `asset_model_id` NOT IN (SELECT `asset_model_id` FROM `asset_model_custom_field_helper`));"));
+            // Insert into asset_custom_field_helper
+            $objDatabase->NonQuery(sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) (SELECT `asset_id` FROM `asset` WHERE `asset_id` NOT IN (SELECT `asset_id` FROM `asset_custom_field_helper`));"));
             // Inserts end
             $objDatabase->NonQuery("SET FOREIGN_KEY_CHECKS=1;");
 
@@ -1058,10 +1048,10 @@
               $this->dtgUpdatedAsset->ItemsPerPage = 20;
 
             }
-            if (count($this->objNewAssetModelArray)) {
-              $this->lblImportModels->Display = true;
-              $this->dtgAssetModel->Paginator = new QPaginator($this->dtgAssetModel);
-              $this->dtgAssetModel->ItemsPerPage = 20;
+            if (count($this->objNewAssetArray)) {
+              $this->lblImportAsset->Display = true;
+              $this->dtgAsset->Paginator = new QPaginator($this->dtgAsset);
+              $this->dtgAsset->ItemsPerPage = 20;
             }
             $this->btnNext->Display = false;
             $this->btnCancel->Display = false;
@@ -1071,9 +1061,9 @@
             $this->lblImportSuccess->Display = true;
             $this->lblImportSuccess->Text = sprintf("Success:<br/>" .
                                              "<b>%s</b> Records imported successfully<br/>" .
-                                             "<b>%s</b> Records skipped due to error<br/>", count($this->objNewAssetModelArray) + count($this->objUpdatedItemArray), $this->intSkippedRecordCount);
+                                             "<b>%s</b> Records skipped due to error<br/>", count($this->objNewAssetArray) + count($this->objUpdatedItemArray), $this->intSkippedRecordCount);
             if ($this->intSkippedRecordCount) {
-               $this->lblImportSuccess->Text .= sprintf("<a href='./asset_model_import.php?intDownloadCsv=1'>Click here to download records that could not be imported</a>");
+               $this->lblImportSuccess->Text .= sprintf("<a href='./asset_import.php?intDownloadCsv=1'>Click here to download records that could not be imported</a>");
             }
             $this->lblImportSuccess->Text .= "<br/><br/>";
             $this->intImportStep = -1;
@@ -1092,6 +1082,7 @@
     		  $this->DisplayStepForm($this->intStep);
 		    }
     		if (!$this->blnImportEnd) {
+    		  $this->btnNext->Warning = "Please wait...";
   		    QApplication::ExecuteJavaScript("document.getElementById('".$this->btnNext->ControlId."').click();");
   		  }
         if (!($this->intCurrentFile < count($this->strFilePathArray))) {
@@ -1128,29 +1119,25 @@
 	    $strName = strtolower($strName);
 	    $lstMapHeader = new QListBox($objParentObject);
 	    $lstMapHeader->Name = "lst".$intId;
-	    $strAssetModelGroup = "Asset Model";
+	    $strAssetGroup = "Asset";
+	    $strAssetGroup = "Asset";
 	    $lstMapHeader->AddItem("- Not Mapped -", null);
-	    /*$lstMapHeader->AddItem("Asset Code", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    // Add ID for update imports only
+	    if ($this->lstImportAction->SelectedValue == 2) {
+	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    }
+	    $lstMapHeader->AddItem("Asset Code", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Asset Model", "Asset Model", ($strName == 'asset model') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Parent Asset", "Parent Asset", ($strName == 'parent asset') ? true : false, $strAssetGroup);
+	    $lstMapHeader->AddItem("Locked To Parent", "Locked To Parent", ($strName == 'locked to parent') ? true : false, $strAssetGroup);
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
 	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
 	    }
-	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Created By", "Created By", ($strName == 'created by') ? true : false, $strAssetGroup);
+	    /*$lstMapHeader->AddItem("Created By", "Created By", ($strName == 'created by') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Created Date", "Created Date", ($strName == 'created date') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Modified By", "Modified By", ($strName == 'modified by') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Modified Date", "Modified Date", ($strName == 'modified date') ? true : false, $strAssetGroup);*/
-	    // Add ID for update imports only
-	    if ($this->lstImportAction->SelectedValue == 2) {
-	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
-	    }
-	    $lstMapHeader->AddItem("Asset Model Code", "Asset Model Code", ($strName == 'asset model code') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", ($strName == 'asset model short description') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", ($strName == 'asset model long description') ? true : false, $strAssetModelGroup);
-	    $lstMapHeader->AddItem("Category", "Category", ($strName == 'category') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Manufacturer", "Manufacturer", ($strName == 'manufacturer') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
-	    foreach ($this->arrModelCustomField as $objCustomField) {
-	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "model_".$objCustomField->CustomFieldId, ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetModelGroup);
-	    }
 	    $lstMapHeader->AddAction(new QChangeEvent(), new QAjaxAction('lstTramorField_Change'));
 	    $this->lstMapHeaderArray[] = $lstMapHeader;
 	    /*if ($strName && $lstMapHeader->SelectedValue) {
@@ -1303,15 +1290,15 @@
 		// Cancel button click action
 		protected function btnCancel_Click() {
 		  $this->UndoImport();
-      QApplication::Redirect("./asset_model_import.php");
+      QApplication::Redirect("./asset_import.php");
     }
 
     protected function btnImportMore_Click() {
-      QApplication::Redirect("./asset_model_import.php");
+      QApplication::Redirect("./asset_import.php");
     }
 
     protected function btnReturnToAssets_Click() {
-      QApplication::Redirect("../assets/asset_model_list.php");
+      QApplication::Redirect("../assets/asset_list.php");
     }
 
     // Delete All imported Assets, Asset Models, Manufacturers, Categories and Locations
@@ -1323,17 +1310,6 @@
 		    $strQuery = "SET FOREIGN_KEY_CHECKS=0;";
         $objDatabase->NonQuery($strQuery);
         foreach ($this->arrOldItemArray as /*$intItemId => */$objOldItem) {
-          /*$strQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_model_id`='%s'", $objOldItem->ShortDescription, $objOldItem->LongDescription, $objOldItem->ManufacturerId, $objOldItem->CategoryId, $objOldItem->AssetModelCode, (!$objOldItem->ModifiedBy) ? "NULL" : $objOldItem->ModifiedBy, (!$objOldItem->ModifiedBy) ? "NULL" : sprintf("'%s'", $objOldItem->ModifiedDate), $objOldItem->AssetModelId);
-          $objDatabase->NonQuery($strQuery);
-          $strCFVArray = array();
-          foreach ($this->arrModelCustomField as $objCustomField) {
-            $strCFV = $objOldItem->GetVirtualAttribute($objCustomField->CustomFieldId);
-            $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
-          }
-          if (count($strCFVArray)) {
-            $strQuery = sprintf("UPDATE `asset_model_custom_field_helper` SET %s WHERE `asset_model_id`='%s'", implode(", ", $strCFVArray), $intItemId);
-            $objDatabase->NonQuery($strQuery);
-          }*/
           $objDatabase->NonQuery($objOldItem['ItemSql']);
           if ($objOldItem['CFVSql'])
             $objDatabase->NonQuery($objOldItem['CFVSql']);
@@ -1343,11 +1319,11 @@
       }
       //$strQuery = "SET FOREIGN_KEY_CHECKS=0;";
       //$objDatabase->NonQuery($strQuery);
-		  if (count($this->objNewAssetModelArray)) {
-        $strQuery = sprintf("DELETE FROM `asset_model` WHERE `asset_model_id` IN (%s)", implode(", ", array_keys($this->objNewAssetModelArray)));
+		  if (count($this->objNewAssetArray)) {
+        $strQuery = sprintf("DELETE FROM `asset` WHERE `asset_id` IN (%s)", implode(", ", array_keys($this->objNewAssetArray)));
         $objDatabase->NonQuery($strQuery);
         // Do not need to delete it manually (automatically CASCADE deletion)
-        //$strQuery = sprintf("DELETE FROM `asset_model_custom_field_helper` WHERE `asset_model_id` IN (%s)", implode(", ", array_keys($this->objNewAssetModelArray)));
+        //$strQuery = sprintf("DELETE FROM `asset_custom_field_helper` WHERE `asset_id` IN (%s)", implode(", ", array_keys($this->objNewAssetArray)));
         //$objDatabase->NonQuery($strQuery);
 		  }
 		  //$strQuery = "SET FOREIGN_KEY_CHECKS=1;";
@@ -1426,5 +1402,5 @@
 
 	}
 	// Go ahead and run this form object to generate the page
-	AssetModelImportForm::Run('AssetModelImportForm', 'asset_model_import.tpl.php');
+	AssetImportForm::Run('AssetImportForm', 'asset_import.tpl.php');
 ?>
