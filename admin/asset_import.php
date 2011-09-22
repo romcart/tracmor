@@ -23,6 +23,7 @@
 	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
 	require(__DOCROOT__ . __PHP_ASSETS__ . '/csv/DataSource.php');
 	QApplication::Authenticate();
+	QApplication::Redirect("./");
 
 	class AdminLabelsForm extends QForm {
 		// Header Menu
