@@ -787,7 +787,7 @@ class QInventoryEditComposite extends QControl {
 		// Display Edit and Delete buttons
 		$this->btnEdit->Display = true;
 		$this->btnDelete->Display = true;
-		$this->atcAttach->btnUpload->Display = true;
+		$this->atcAttach->Display = true;
 
 		// Display custom field labels
 		if ($this->arrCustomFields) {
