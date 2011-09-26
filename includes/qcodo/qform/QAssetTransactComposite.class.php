@@ -241,15 +241,10 @@ class QAssetTransactComposite extends QControl {
 		$this->dttDueDate = new QDateTimePickerExt($this);
 		$this->dttDueDate->DateTimePickerType = QDateTimePickerType::DateTime;
 		$this->dttDueDate->Display = false;
-		$dttNow = new QDateTime(QDateTime::Now);
+		$dttNow = QDateTime::Now();
 		$this->dttDueDate->MinimumYear = $dttNow->Year;
-		$this->dttDueDate->MinimumMonth = $dttNow->Month;
-		$this->dttDueDate->MinimumDay = $dttNow->Day;
 		$this->dttDueDate->__set('DateTime', QDateTime::FromTimestamp($dttNow->Timestamp + intval(QApplication::$TracmorSettings->DefaultCheckOutPeriod) * 3600));
-		$dttMaximumDate = QDateTime::FromTimestamp($dttNow->Timestamp + 864000); // 10 days
-		$this->dttDueDate->MaximumYear = $dttMaximumDate->Year;
-		$this->dttDueDate->MaximumMonth = $dttMaximumDate->Month;
-		$this->dttDueDate->MaximumDay = $dttMaximumDate->Day;
+		$this->dttDueDate->MaximumYear = $dttNow->Year+1;
 
 		if (QApplication::$TracmorSettings->DueDateRequired == "1") {
 			$this->dttDueDate->Display = true;
