@@ -759,9 +759,13 @@ class QAssetTransactComposite extends QControl {
       			  $dttDueDate = $this->dttDueDate;
       			}
       			elseif (QApplication::$TracmorSettings->DueDateRequired == "1") {
-      			  $this->lstDueDate->Warning = 'Due date is reuired';
+      			  $this->lstDueDate->Warning = 'Due date is required';
       				$blnError = true;
       			}
+				if ($this->dttDueDate->DateTime && $this->dttDueDate->DateTime < QDateTime::Now()) {
+					$this->lstDueDate->Warning = 'Due date must be a future date';
+					$blnError = true;
+				}
 			  }
 			  if (QApplication::$TracmorSettings->ReasonRequired == "1" && !trim($this->txtNote->Text) && $this->intTransactionTypeId == 3) {
 				  $this->txtNote->Warning = 'Reason is required.';
