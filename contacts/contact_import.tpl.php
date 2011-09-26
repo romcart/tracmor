@@ -48,13 +48,15 @@
 						<tr>
 							<td>
 							<div class="title"><?php _t('Import Contacts') ?></div>
-							 <?php $this->pnlMain->Render(); ?>
-							 </td>
+							<?php if (!$this->blnError) { ?>
+					    <?php $this->pnlMain->Render(); ?>
+							</td>
 						</tr>
 						<tr>
-							 <td>
-							 <?php $this->btnCancel->Render(); ?>&nbsp;<?php $this->btnNext->RenderWithError(); ?>
-							 </td>
+							<td>
+							<?php $this->btnCancel->Render(); ?>&nbsp;<?php $this->btnNext->RenderWithError(); ?>
+							<?php } else _t('<br /><div class="record_field_name">You do not have "Edit" permissions.</div>'); ?>
+							</td>
 						</tr>
 					</table>
 				</td>

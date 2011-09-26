@@ -95,6 +95,7 @@
     protected $lblImportResults;
     protected $lblImportUpdatedItems;
     protected $lblImportCompanies;
+    protected $blnError;
 
 		protected function Form_Create() {
 			if (QApplication::QueryString('intDownloadCsv')) {
@@ -132,11 +133,36 @@
 			$this->btnRemoveArray = array();
 			$this->arrItemCustomField = array();
       $this->Labels_Create();
-			$this->objDatabase = Asset::GetDatabase();
+			$this->objDatabase = Company::GetDatabase();
 			// Load Custom Field
 			foreach (CustomField::LoadArrayByActiveFlagEntity(1, EntityQtype::Company) as $objCustomField) {
 			  $this->arrItemCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
+			$this->blnError = true;
+			$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId($intRoleId, EntityQtype::Company, 2);
+			// Check the user have edit permissions
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
+			  $this->blnError = false;
+			}
+			if (count($intCustomFieldIdArray)) {
+  		  //QApplication::$Database[1]->EnableProfiling();
+  		  // Load restrict permisions for Custom Fields
+  		  $objConditions = QQ::AndCondition(
+  			                     QQ::Equal(QQN::RoleEntityQtypeCustomFieldAuthorization()->RoleId, (string) $intRoleId),
+  			                     QQ::In(QQN::RoleEntityQtypeCustomFieldAuthorization()->EntityQtypeCustomField->CustomFieldId, $intCustomFieldIdArray),
+  			                     QQ::Equal(QQN::RoleEntityQtypeCustomFieldAuthorization()->AuthorizedFlag, false)
+  		                   );
+  		  $objClauses = array();
+  		  array_push($objClauses, QQ::Expand(QQN::RoleEntityQtypeCustomFieldAuthorization()->EntityQtypeCustomField->EntityQtypeCustomFieldId));
+  		  array_push($objClauses, QQ::OrderBy(QQN::RoleEntityQtypeCustomFieldAuthorization()->EntityQtypeCustomFieldId));
+  		  $arrRoleEntityQtypeCustomFieldAuthorization = RoleEntityQtypeCustomFieldAuthorization::QueryArray($objConditions, $objClauses);
+  		  if ($arrRoleEntityQtypeCustomFieldAuthorization) foreach ($arrRoleEntityQtypeCustomFieldAuthorization as $objRoleAuth) {
+  		    if (array_key_exists($objRoleAuth->EntityQtypeCustomField->CustomFieldId, $this->arrAssetCustomField)) {
+  		      unset($this->arrAssetCustomField[$objRoleAuth->EntityQtypeCustomField->CustomFieldId]);
+  		    }
+  		  }
+  		  //QApplication::$Database[1]->OutputProfiling();
+  		}
 			$this->intUserArray = array();
 			// Load Users
 			foreach (UserAccount::LoadAll() as $objUser) {
@@ -687,9 +713,7 @@
                     else
                       $strFax = (isset($this->txtMapDefaultValueArray[$this->intFaxKey])) ? trim($this->txtMapDefaultValueArray[$this->intFaxKey]->Text) : '';
 
-                  $strCompanyValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW())", addslashes(trim($strRowArray[$this->intCompanyKey])), addslashes($strCompanyDescription), addslashes($strWebsite), addslashes($strEmail), addslashes($strTelephone), addslashes($strFax), $_SESSION['intUserAccountId']);
-                  $strNewCompanyArray[] = addslashes(trim($strRowArray[$this->intCompanyKey]));
-
+                  $blnCheckCFVError = true;
                   $strCFVArray = array();
                   // Custom Field import
                   foreach ($arrItemCustomField as $objCustomField) {
@@ -708,29 +732,38 @@
                 					  }
                 					}
                 					// Add the CustomFieldValue
-                					if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
+                					/*if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
                 						$strQuery = sprintf("INSERT INTO custom_field_value (custom_field_id, short_description, created_by, creation_date) VALUES (%s, '%s', %s, NOW());", $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
                 						$objDatabase->NonQuery($strQuery);
                 						$strAddedCFVArray[] = $strShortDescription;
                 					}
-                					elseif (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                					else*/
+                					if (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
                             $strShortDescription = $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                  					}
-                          if ($strShortDescription/* && $intCustomFieldValueId*/) {
-                            $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
-                          }
-                          else {
-                            $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
-                          }
+                 					elseif (!$blnInList) {
+                 					  $blnCheckCFVError = true;
+                 					  break;
+                 					}
+                 					if (!$blnCheckCFVError)
+                   					if ($strShortDescription) {
+                              $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
+                            }
+                            else {
+                              $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
+                            }
                         }
-                 }
-                 if (count($strCFVArray)) {
-                   $strItemCFVArray[] = implode(', ', $strCFVArray);
-                 }
-                 else {
-                   $strItemCFVArray[] = "";
-                 }
-
+                   }
+                   if (!$blnCheckCFVError) {
+                     if (count($strCFVArray)) {
+                       $strItemCFVArray[] = implode(', ', $strCFVArray);
+                     }
+                     else {
+                       $strItemCFVArray[] = "";
+                     }
+                     $strCompanyValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW())", addslashes(trim($strRowArray[$this->intCompanyKey])), addslashes($strCompanyDescription), addslashes($strWebsite), addslashes($strEmail), addslashes($strTelephone), addslashes($strFax), $_SESSION['intUserAccountId']);
+                     $strNewCompanyArray[] = addslashes(trim($strRowArray[$this->intCompanyKey]));
+                   }
                 }
                 // Update action
                 elseif (trim($strRowArray[$this->intCompanyKey]) && $this->lstImportAction->SelectedValue == 2  && !$this->in_array_nocase(trim($strRowArray[$this->intCompanyKey]), $this->objUpdatedItemArray) && $objCompany) {
@@ -785,9 +818,7 @@
                     }
                     $strUpdateFieldArray[] = sprintf("modified_by='%s'", $_SESSION['intUserAccountId']);
                     $this->arrOldItemArray[$objCompany->CompanyId] = $objCompany;
-                    $strUpdatedCompanyValuesArray[] = sprintf("UPDATE `company` SET %s WHERE `company_id`='%s'", implode(", ", $strUpdateFieldArray), $objCompany->CompanyId);
-                    $this->objUpdatedItemArray[$objCompany->CompanyId] = $objCompany->ShortDescription;
-
+                    $blnCheckCFVError = false;
                     foreach ($arrItemCustomField as $objCustomField) {
 
                       //$objItem = $objCompanyArray[strtolower($objUpdatedItem)];
@@ -808,14 +839,26 @@
                     			}
                     		}
                     		// Add the CustomFieldValue
-                    		if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
+                    		/*if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
                     			$strQuery = sprintf("INSERT INTO custom_field_value (custom_field_id, short_description, created_by, creation_date) VALUES (%s, '%s', %s, NOW());", $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
                     			$objDatabase->NonQuery($strQuery);
                     			$strAddedCFVArray[] = $strShortDescription;
                     		}
-                    		elseif (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                    		else*/
+                    		if (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
                                 $strShortDescription = $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                					}
+               					elseif (!$blnInList) {
+                 					  $blnCheckCFVError = true;
+                 					  break;
+                 					}
+                 					if (!$blnCheckCFVError)
+                   					if ($strCSDescription/* && $intCustomFieldValueId*/) {
+                              $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strCSDescription);
+                            }
+                            else {
+                              $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
+                            }
                         if ($strShortDescription) {
                           $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
                         }
@@ -823,13 +866,23 @@
                           $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
                         }
                       }
-                      if (count($strCFVArray)) {
-                        $strUpdatedItemCFVArray[$objCompany->CompanyId] = $strCFVArray;
-                      }
-                      else {
-                        $strUpdatedItemCFVArray[$intItemKey] = "";
-                      }
                     }
+                    if (!$blnCheckCFVError) {
+                        if (count($strCFVArray)) {
+                          $strItemCFVArray[] = implode(', ', $strCFVArray);
+                        }
+                        else {
+                          $strItemCFVArray[] = "";
+                        }
+                        if (count($strCFVArray)) {
+                          $strUpdatedItemCFVArray[$objCompany->CompanyId] = $strCFVArray;
+                        }
+                        else {
+                          $strUpdatedItemCFVArray[$intItemKey] = "";
+                        }
+                        $strUpdatedCompanyValuesArray[] = sprintf("UPDATE `company` SET %s WHERE `company_id`='%s'", implode(", ", $strUpdateFieldArray), $objCompany->CompanyId);
+                        $this->objUpdatedItemArray[$objCompany->CompanyId] = $objCompany->ShortDescription;
+                      }
                   }
                   else {
                     $this->intSkippedRecordCount++;
@@ -883,10 +936,9 @@
                   }
                 }
               }
-              $this->intImportStep = 6; // The import have been completed
             }
           }
-          if ($this->intImportStep == 6) {
+          if ($this->intImportStep == 3) {
             $this->blnImportEnd = true;
             $this->btnNext->Warning = "";
 
