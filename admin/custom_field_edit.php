@@ -645,7 +645,7 @@
 		// Control AjaxActions
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
-			$strQuery = sprintf("DELETE FROM datagrid_column_preference WHERE column_name = '%s'", $this->objCustomField->ShortDescription);
+			$strQuery = sprintf("DELETE FROM datagrid_column_preference WHERE column_name = '%s'", addslashes($this->objCustomField->ShortDescription));
 			$objDatabase = QApplication::$Database[1];
 			$objDatabase->NonQuery($strQuery);
 
