@@ -73,6 +73,10 @@
 				$this->lstCompany->AddItem($objListItem);
 			}
 			
+			if ($this->lstCompany->SelectedValue) {
+				$this->lstCompany->Enabled = false;
+			}
+			
 			$this->lstCompany->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstCompany_Change'));
 		}
 		

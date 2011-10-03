@@ -1018,6 +1018,7 @@
 			$this->lblNewFromContact->CssClass = "add_icon";
 			$this->lblNewFromContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromContact_Click'));
 			$this->lblNewFromContact->ActionParameter = $this->lstFromContact->ControlId;
+			$this->lblNewFromContact->Display = false;
 		}
 
 		protected function lblNewFromAddress_Create() {
@@ -1028,6 +1029,7 @@
 			$this->lblNewFromAddress->CssClass = "add_icon";
 			$this->lblNewFromAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromAddress_Click'));
 			$this->lblNewFromAddress->ActionParameter = $this->lstFromAddress->ControlId;
+			$this->lblNewFromAddress->Display = false;
 		}
 
 		protected function lblNewToCompany_Create() {
@@ -2263,10 +2265,18 @@
 		// This is run every time a 'From Company' is selected
 		// It loads the values for the 'From Address' and 'From Contact' drop-downs for the selected company
 		protected function lstFromCompany_Select() {
+
+			$this->lblNewFromContact->Display = false;
+			$this->lblNewFromAddress->Display = false;
+
 			if ($this->lstFromCompany->SelectedValue) {
 				// this SelectedValue is incorrect - it still thinks Fictional, INC. is selected
 				$objCompany = Company::Load($this->lstFromCompany->SelectedValue);
 				if ($objCompany) {
+
+					$this->lblNewFromContact->Display = true;
+					$this->lblNewFromAddress->Display = true;
+
 					// Load the values for the 'From Contact' List
 					if ($this->lstFromContact) {
 						$objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
@@ -4910,8 +4920,8 @@
 				$this->txtValue->Display = true;
 				$this->lstCurrencyUnit->Display = true;
 				$this->lblNewFromCompany->Display = true;
-				$this->lblNewFromContact->Display = true;
-				$this->lblNewFromAddress->Display = true;
+				// $this->lblNewFromContact->Display = true;
+				// $this->lblNewFromAddress->Display = true;
 				$this->lblNewToCompany->Display = true;
 				$this->lblNewToContact->Display = true;
 				$this->lblNewToAddress->Display = true;

@@ -73,6 +73,10 @@
 				}
 				$this->lstCompany->AddItem($objListItem);
 			}
+
+			if ($this->lstCompany->SelectedValue) {
+				$this->lstCompany->Enabled = false;
+			}
 		}
 		
 		protected function lstCountry_Create() {
