@@ -1018,7 +1018,6 @@
 			$this->lblNewFromContact->CssClass = "add_icon";
 			$this->lblNewFromContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromContact_Click'));
 			$this->lblNewFromContact->ActionParameter = $this->lstFromContact->ControlId;
-			$this->lblNewFromContact->Display = false;
 		}
 
 		protected function lblNewFromAddress_Create() {
@@ -1029,7 +1028,6 @@
 			$this->lblNewFromAddress->CssClass = "add_icon";
 			$this->lblNewFromAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewFromAddress_Click'));
 			$this->lblNewFromAddress->ActionParameter = $this->lstFromAddress->ControlId;
-			$this->lblNewFromAddress->Display = false;
 		}
 
 		protected function lblNewToCompany_Create() {
@@ -2265,18 +2263,14 @@
 		// This is run every time a 'From Company' is selected
 		// It loads the values for the 'From Address' and 'From Contact' drop-downs for the selected company
 		protected function lstFromCompany_Select() {
-
-			$this->lblNewFromContact->Display = false;
-			$this->lblNewFromAddress->Display = false;
-
+			// Clear any displayed warnings
+			$this->lblNewFromContact->Warning = '';
+			$this->lblNewFromAddress->Warning = '';
+			
 			if ($this->lstFromCompany->SelectedValue) {
 				// this SelectedValue is incorrect - it still thinks Fictional, INC. is selected
 				$objCompany = Company::Load($this->lstFromCompany->SelectedValue);
 				if ($objCompany) {
-
-					$this->lblNewFromContact->Display = true;
-					$this->lblNewFromAddress->Display = true;
-
 					// Load the values for the 'From Contact' List
 					if ($this->lstFromContact) {
 						$objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName, QQN::Contact()->FirstName)));
@@ -2349,6 +2343,10 @@
 		// This is run every time a 'To Company' is selected
 		// It loads the values for the 'To Address' and 'To Contact' drop-downs for the selected company
 		protected function lstToCompany_Select() {
+			// Clear any displayed warnings
+			$this->lblNewToContact->Warning = '';
+			$this->lblNewToAddress->Warning = '';
+			
 			if ($this->lstToCompany->SelectedValue) {
 				$objCompany = Company::Load($this->lstToCompany->SelectedValue);
 				if ($objCompany) {
@@ -2671,24 +2669,40 @@
 		// This is called when the 'new' label is clicked
 		public function lblNewFromContact_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
-				// Create the panel, assigning it to the Dialog Box
-				$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
-				$pnlEdit->ActionParameter = $strParameter;
-				// Show the dialog box
-				$this->dlgNew->ShowDialogBox();
-				$pnlEdit->lstCompany->Focus();
+				if ($this->lstFromCompany->SelectedValue) {
+					// Create the panel, assigning it to the Dialog Box
+					$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
+					$pnlEdit->ActionParameter = $strParameter;
+					// Show the dialog box
+					$this->dlgNew->ShowDialogBox();
+					if ($pnlEdit->lstCompany->Enabled) {
+						$pnlEdit->lstCompany->Focus();
+					} else {
+						$pnlEdit->txtFirstName->Focus();
+					}
+				} else {
+					$this->lblNewFromContact->Warning = 'You must select a company first.';
+				}
 			}
 		}
 
 		// This is called when the 'new' label is clicked
 		public function lblNewFromAddress_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
-				// Create the panel, assigning it to the Dialog Box
-				$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
-				$pnlEdit->ActionParameter = $strParameter;
-				// Show the dialog box
-				$this->dlgNew->ShowDialogBox();
-				$pnlEdit->lstCompany->Focus();
+				if ($this->lstFromCompany->SelectedValue) {
+					// Create the panel, assigning it to the Dialog Box
+					$pnlEdit = new AddressEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
+					$pnlEdit->ActionParameter = $strParameter;
+					// Show the dialog box
+					$this->dlgNew->ShowDialogBox();
+					if ($pnlEdit->lstCompany->Enabled) {
+						$pnlEdit->lstCompany->Focus();
+					} else {
+						$pnlEdit->txtShortDescription->Focus();
+					}
+				} else {
+					$this->lblNewFromAddress->Warning = 'You must select a company first.';
+				}
 			}
 		}
 
@@ -2713,7 +2727,11 @@
 					$pnlEdit->ActionParameter = $strParameter;
 					// Show the dialog box
 					$this->dlgNew->ShowDialogBox();
-					$pnlEdit->lstCompany->Focus();
+					if ($pnlEdit->lstCompany->Enabled) {
+						$pnlEdit->lstCompany->Focus();
+					} else {
+						$pnlEdit->txtFirstName->Focus();
+					}
 				}
 				else {
 					$this->lblNewToContact->Warning = 'You must select a company first.';
@@ -2730,7 +2748,11 @@
 					$pnlEdit->ActionParameter = $strParameter;
 					// Show the dialog box
 					$this->dlgNew->ShowDialogBox();
-					$pnlEdit->lstCompany->Focus();
+					if ($pnlEdit->lstCompany->Enabled) {
+						$pnlEdit->lstCompany->Focus();
+					} else {
+						$pnlEdit->txtShortDescription->Focus();
+					}
 				}
 				else {
 					$this->lblNewToAddress->Warning = 'You must select a company first.';
@@ -4920,8 +4942,8 @@
 				$this->txtValue->Display = true;
 				$this->lstCurrencyUnit->Display = true;
 				$this->lblNewFromCompany->Display = true;
-				// $this->lblNewFromContact->Display = true;
-				// $this->lblNewFromAddress->Display = true;
+				$this->lblNewFromContact->Display = true;
+				$this->lblNewFromAddress->Display = true;
 				$this->lblNewToCompany->Display = true;
 				$this->lblNewToContact->Display = true;
 				$this->lblNewToAddress->Display = true;
