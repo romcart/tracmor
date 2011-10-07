@@ -816,6 +816,9 @@
 
 		// This method runs every time a 'From Company' is selected
 		protected function lstFromCompany_Select() {
+			// Clear any displayed warnings
+			$this->lblNewFromContact->Warning = '';
+			
 			if ($this->lstFromCompany->SelectedValue) {
 				$objCompany = Company::Load($this->lstFromCompany->SelectedValue);
 				if ($objCompany) {
@@ -1245,12 +1248,16 @@
 		// This is called when the 'new' label is clicked
 		public function lblNewFromContact_Click($strFormId, $strControlId, $strParameter) {
 			if (!$this->dlgNew->Display) {
-				// Create the panel, assigning it to the Dialog Box
-				$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
-				$pnlEdit->ActionParameter = $strParameter;
-				// Show the dialog box
-				$this->dlgNew->ShowDialogBox();
-				$pnlEdit->lstCompany->Focus();
+				if ($this->lstFromCompany->SelectedValue) {
+					// Create the panel, assigning it to the Dialog Box
+					$pnlEdit = new ContactEditPanel($this->dlgNew, 'CloseNewPanel', null, null, $this->lstFromCompany->SelectedValue);
+					$pnlEdit->ActionParameter = $strParameter;
+					// Show the dialog box
+					$this->dlgNew->ShowDialogBox();
+					$pnlEdit->lstCompany->Focus();
+				} else {
+					$this->lblNewFromContact->Warning = 'You must select a company first.';
+				}
 			}
 		}
 
