@@ -95,6 +95,7 @@
 		
 		// Destroy the user session and redirect the user to the login page
 		public static function Logout() {
+			QFileFormStateHandler::DeleteFormStateForSession();
 			unset($_SESSION['intUserAccountId']);
 			session_destroy();
 			QApplication::Redirect('../login.php');
