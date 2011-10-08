@@ -56,7 +56,7 @@
 		protected $lstFedexLabelPrinterType;
 		protected $lstFedexLabelFormatType;
 		protected $txtFedexThermalPrinterPort;
-		protected $fckPackingListTerms;
+		protected $txtPackingListTerms;
 		protected $btnNewCourier;
 		protected $dtgCourier;
 		protected $pnlSaveNotification;
@@ -81,7 +81,7 @@
 			$this->lstFedexLabelPrinterType_Create();
 			$this->lstFedexLabelFormatType_Create();
 			$this->txtFedexThermalPrinterPort_Create();
-			$this->fckPackingListTerms_Create();
+			$this->txtPackingListTerms_Create();
 			$this->btnNewCourier_Create();
 			$this->dtgCourier_Create();
 			$this->pnlSaveNotification_Create();
@@ -132,8 +132,6 @@
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
 			$this->btnSave->Text = 'Save';
-			// This javascript function call is necessary in order to save the FCKEditor contents via AJAX
-			$this->btnSave->AddAction(new QClickEvent(), new QJavaScriptAction(sprintf('FCKeditorAPI.GetInstance(\'%s\').UpdateLinkedField();',$this->fckPackingListTerms->ControlId)));
 			$this->btnSave->AddAction(new QClickEvent(), new QAjaxAction('btnSave_Click'));
 		}
 		
@@ -222,17 +220,14 @@
 			}
 		}
 		
-		// Create and Setup the MinAssetCode Text Field
-		protected function fckPackingListTerms_Create() {
-			$this->fckPackingListTerms = new QFCKeditor($this);
-			$this->fckPackingListTerms->Width = 640;
-			$this->fckPackingListTerms->ToolbarCanCollapse = true;
-			$this->fckPackingListTerms->EnterMode = 'br';
-			$this->fckPackingListTerms->ShiftEnterMode = 'p';
-			$this->fckPackingListTerms->Name = 'Packing List Terms';
-			$this->fckPackingListTerms->ToolbarSet = 'Tracmor';
-			$this->fckPackingListTerms->SkinPath = 'skins/default/';
-			$this->fckPackingListTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
+		// Create and Setup the Packing List Terms Text Field
+		protected function txtPackingListTerms_Create() {
+			$this->txtPackingListTerms = new QTextBox($this);
+			$this->txtPackingListTerms->TextMode = QTextMode::MultiLine;
+			$this->txtPackingListTerms->Width = 640;
+			$this->txtPackingListTerms->Height = 96;
+			$this->txtPackingListTerms->Name = 'Packing List Terms';
+			$this->txtPackingListTerms->Text = QApplication::$TracmorSettings->PackingListTerms;
 		}	
 		
 		// Create and Setup btnNewCourier button
@@ -367,10 +362,7 @@
 			$intAccountId = $this->lstFedexAccount->SelectedValue;
 			$objAccount = ShippingAccount::Load($intAccountId);
 			
-			if ($objCompany && !$objCompany->Telephone) {
-				$this->lstCompany->Warning = "The Shipping/Receiving company must have a valid telephone number.";
-			}
-			elseif ($objAccount && (!$objAccount->AccessId || !$objAccount->AccessCode)) {
+			if ($objAccount && (!$objAccount->AccessId || !$objAccount->AccessCode)) {
 				$this->lstFedexAccount->Warning = "The FedEx Account must have a valid account number and meter number.";
 			} else {
 				// Altered $TracmorSettings __set() method so that just setting a value will save it in the database.
@@ -380,7 +372,7 @@
 				QApplication::$TracmorSettings->FedexLabelPrinterType = $this->lstFedexLabelPrinterType->SelectedValue;
 				QApplication::$TracmorSettings->FedexLabelFormatType = $this->lstFedexLabelFormatType->SelectedValue;
 				QApplication::$TracmorSettings->FedexThermalPrinterPort = $this->txtFedexThermalPrinterPort->Text;
-				QApplication::$TracmorSettings->PackingListTerms = $this->fckPackingListTerms->Text;
+				QApplication::$TracmorSettings->PackingListTerms = $this->txtPackingListTerms->Text;
 				QApplication::$TracmorSettings->AutodetectTrackingNumbers = $this->chkAutoDetectTrackingNumbers->Checked;
 				QApplication::$TracmorSettings->ReceiveToLastLocation = $this->chkReceiveToLastLocation->Checked;
 				

@@ -86,7 +86,7 @@
 						</tr>
 						<tr>
 							<td class="record_field_name">Packing List Terms:</td>
-							<td class="record_field_edit"><?php $this->fckPackingListTerms->RenderWithError(); ?></td>
+							<td class="record_field_edit"><?php $this->txtPackingListTerms->RenderWithError(); ?></td>
 						</tr>
 					</table>	
 				</td>
