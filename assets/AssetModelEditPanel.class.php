@@ -119,8 +119,8 @@
 			// $this->ifcImage->FileName = $this->objAssetModel->ImagePath;
 			$this->ifcImage->Name = 'Upload Picture';
 			$this->ifcImage->BuildThumbs = true;
-			$this->ifcImage->ThumbWidth = 150;
-			$this->ifcImage->ThumbHeight = 250;
+			$this->ifcImage->ThumbWidth = 240;
+			$this->ifcImage->ThumbHeight = 240;
 			$this->ifcImage->Required = false;
 			// $this->ifcImage->ThumbPrefix = "thumb_";
 			$this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;

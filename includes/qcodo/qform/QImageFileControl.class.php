@@ -113,6 +113,13 @@
 			else {
 		    $height = ($width / $width_orig) * $height_orig;
 			}
+			
+			// thumbnail should not be bigger than original/actual image
+			if ($width > $width_orig || $height > $height_orig) {
+				$width = $width_orig;
+				$height = $height_orig;
+			}
+			
 			$image_p = imagecreatetruecolor($width, $height);
 			
 			switch ($this->strType) {
@@ -142,7 +149,7 @@
 		 * @param string $strImagePath
 		 * @return string $strToReturn An HTML image tag with link
 		 */
-		public function GetDisplayHtml($strImagePath) {
+		public function GetDisplayHtml($strImagePath, $targetWindow = "") {
 			if ($strImagePath) {
 				if (AWS_S3) {
 					$href = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/images/asset_models/' . $strImagePath;
@@ -152,7 +159,13 @@
 					$href = $this->strWebPath . $strImagePath;
 					$src = $this->strThumbWebPath . $this->strThumbPrefix . $strImagePath;
 				}
-				$strToReturn = sprintf('<a href="%s"><img src="%s" border="0" /></a>', $href, $src);
+				
+				if ($targetWindow == "") {
+					$strToReturn = sprintf('<a href="%s"><img src="%s" border="0" /></a>', $href, $src);
+				}
+				else {
+					$strToReturn = sprintf('<a href="%s" target="%s"><img src="%s" border="0" /></a>', $href, $targetWindow, $src);
+				}
 				
 			}
 			else {
