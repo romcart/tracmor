@@ -49,6 +49,7 @@
 		$arrInventoryFields[] = array('name' => 'Date Created:', 'value' => $this->lblCreationDate->Render(false));
 		$arrInventoryFields[] = array('name' => 'Date Modified:', 'value' => $this->lblModifiedDate->Render(false));			
 	}
+	$arrInventoryFields[] = array('name' => 'Image:', 'value' => $this->ifcImage->RenderWithError(false) . $this->lblImage->Render(false));
 	
 ?>
 
