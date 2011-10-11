@@ -1616,7 +1616,7 @@ ALTER TABLE asset_transaction
   ADD CONSTRAINT FOREIGN KEY( parent_asset_transaction_id) references asset_transaction (
     asset_transaction_id
   )
-ON Delete NO ACTION ON Update NO ACTION;
+ON Delete SET NULL ON Update NO ACTION;
 
 ALTER TABLE audit
   ADD CONSTRAINT FOREIGN KEY( entity_qtype_id) references entity_qtype (
