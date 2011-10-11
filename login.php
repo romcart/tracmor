@@ -114,8 +114,10 @@
 				$objReceivingRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 6);
 				$objReportsRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, 7);
 
+				if (array_key_exists('strReferer', $_GET)) {
+					QApplication::Redirect($_GET['strReferer']);
+				} else if ($objAssetRoleModule->AccessFlag) {
 				// If the user has access to the assets module, send them there, otherwise...
-				if ($objAssetRoleModule->AccessFlag) {
 					QApplication::Redirect('./assets/');
 				}
 				// If the user has access to the inventory module, send them there.

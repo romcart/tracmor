@@ -137,7 +137,7 @@
 				}
 			}
 			else {
-				QApplication::Redirect('../login.php');
+				QApplication::Redirect('../login.php?strReferer=' . urlencode(QApplication::$RequestUri));
 			}
 		}
 		
