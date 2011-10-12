@@ -253,7 +253,7 @@
 					$objInventoryModel = InventoryModel::Load($intInventoryModelId);
 					if ($objInventoryModel) {
 						$this->txtNewInventoryModelCode->Text = $objInventoryModel->InventoryModelCode;
-						QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->txtQuantity->ControlId));
+						$this->txtQuantity->Focus();
 					}
 				}
 			}
@@ -545,7 +545,7 @@
 			$this->lstFromCompany->AddAction(new QChangeEvent, new QAjaxAction('lstFromCompany_Select'));
 			$this->lstFromCompany->TabIndex=1;
 			$this->intNextTabIndex++;
-			QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->lstFromCompany->ControlId));
+			$this->lstFromCompany->Focus();
 		}
 
 		// Create and Setup lstFromContact
@@ -1254,7 +1254,11 @@
 					$pnlEdit->ActionParameter = $strParameter;
 					// Show the dialog box
 					$this->dlgNew->ShowDialogBox();
-					$pnlEdit->lstCompany->Focus();
+					if ($pnlEdit->lstCompany->Enabled) {
+						$pnlEdit->lstCompany->Focus();
+					} else {
+						$pnlEdit->txtFirstName->Focus();
+					}
 				} else {
 					$this->lblNewFromContact->Warning = 'You must select a company first.';
 				}
@@ -1270,7 +1274,11 @@
 				$pnlEdit->lstCompany->Enabled = false;
 				// Show the dialog box
 				$this->dlgNew->ShowDialogBox();
-				$pnlEdit->lstCompany->Focus();
+				if ($pnlEdit->lstCompany->Enabled) {
+					$pnlEdit->lstCompany->Focus();
+				} else {
+					$pnlEdit->txtFirstName->Focus();
+				}
 			}
 		}
 
@@ -1283,7 +1291,11 @@
 				$pnlEdit->lstCompany->Enabled = false;
 				// Show the dialog box
 				$this->dlgNew->ShowDialogBox();
-				$pnlEdit->lstCompany->Focus();
+				if ($pnlEdit->lstCompany->Enabled) {
+					$pnlEdit->lstCompany->Focus();
+				} else {
+					$pnlEdit->txtShortDescription->Focus();
+				}
 			}
 		}
 
