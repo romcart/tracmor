@@ -8,7 +8,6 @@
 		protected $strAcceptibleMimeArray;
 		protected $strUnacceptableMessage;
 		protected $intFileAssetType;
-		protected $strFileMimeType;
 		protected $strFile;
 		protected $strFileName;
 		protected $blnClickToView;
@@ -118,13 +117,7 @@
 				$this->strCssClass = 'FileAssetPanelItemNone';
 				$this->SetCustomStyle('background', null);
 			} */
-			if (!empty($this->strFile)) {
-				return sprintf('<div style="height: 85px; background: url(\'../tmp/' . basename($this->strFile) . '\') no-repeat;"> </div>') . str_replace('<img ', '<img style="display: none;" ', parent::GetControlHtml());
-				// return parent::GetControlHtml();
-			}
-			else {
-				return parent::GetControlHtml();
-			} 
+			return parent::GetControlHtml();
 		}
 
 		public function btnDelete_Click() {
@@ -139,7 +132,6 @@
 				case 'FileName': return $this->strFileName;
 				case 'UnacceptableMessage': return $this->strUnacceptableMessage;
 				case 'FileAssetType': return $this->intFileAssetType;
-				case 'FileMimeMimeType': return $this->strFileMimeType;
 				case 'TemporaryUploadPath': return $this->strTemporaryUploadPath;
 				case 'ClickToView': return $this->blnClickToView;
 

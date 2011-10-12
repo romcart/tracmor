@@ -16,7 +16,8 @@
 		protected $strThumbPrefix = null;
 		protected $strPrefix = null;
 		protected $strSuffix = null;
-	
+		protected $strFileMimeType;
+
 		protected $strTemporaryUploadPath = __TRACMOR_TMP__;
 		
 		//////////
@@ -208,7 +209,21 @@
 			}			
 			return $returnValue;
 		}
+
+		public function dlgFileAsset_Upload() {
+			$this->strFileMimeType = $this->dlgFileAsset->flcFileAsset->Type;
+			parent::dlgFileAsset_Upload();
+		}
 	
+		public function GetControlHtml() {
+			if (!empty($this->strFile)) {
+				return sprintf('<div style="height: 85px; background: url(\'../tmp/' . basename($this->strFile) . '\') no-repeat;"> </div>') . str_replace('<img ', '<img style="display: none;" ', parent::GetControlHtml());
+			}
+			else {
+				return parent::GetControlHtml();
+			} 
+		}
+
 		/////////////////////////
 		// Public Properties: GET
 		/////////////////////////
@@ -217,6 +232,7 @@
 				// MISC
 				case "FileName": return $this->strFileName;
 				case "Type": return $this->FileAssetType;
+				case 'FileMimeType': return $this->strFileMimeType;
 				case "Size": return $this->intSize;
 				case "File": return $this->strFile;
 				case "UploadPath": return $this->strUploadPath;
