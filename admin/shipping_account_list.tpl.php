@@ -57,26 +57,6 @@
 							<td class="record_field_edit"><?php $this->lstCompany->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Default FedEx&reg; Account:</td>
-							<td class="record_field_edit"><?php $this->lstFedexAccount->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">FedEx&reg; Gateway URI:</td>
-							<td class="record_field_edit"><?php $this->txtFedexGatewayUri->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">FedEx&reg; Label Printer Type:</td>
-							<td class="record_field_edit"><?php $this->lstFedexLabelPrinterType->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">FedEx&reg; Label Format:</td>
-							<td class="record_field_edit"><?php $this->lstFedexLabelFormatType->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">FedEx&reg; Thermal Printer Port:</td>
-							<td class="record_field_edit"><?php $this->txtFedexThermalPrinterPort->RenderWithError(); ?></td>
-						</tr>
-						<tr>
 							<td class="record_field_name">Detect Tracking Numbers:</td>
 							<td class="record_field_edit"><?php $this->chkAutoDetectTrackingNumbers->RenderWithError(); ?></td>
 						</tr>
@@ -84,6 +64,14 @@
 							<td class="record_field_name">Receive to Last Location:</td>
 							<td class="record_field_edit"><?php $this->chkReceiveToLastLocation->RenderWithError(); ?></td>
 						</tr>
+						<tr>
+							<td class="record_field_name">Custom Shipment Numbers: </td>
+							<td class="record_field_edit"><?php $this->chkCustomShipmentNumbers->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Custom Receipt Numbers: </td>
+							<td class="record_field_edit"><?php $this->chkCustomReceiptNumbers->RenderWithError(); ?></td>
+						</tr>						
 						<tr>
 							<td class="record_field_name">Packing List Terms:</td>
 							<td class="record_field_edit"><?php $this->txtPackingListTerms->RenderWithError(); ?></td>
@@ -98,12 +86,5 @@
 		<?php $this->btnNewCourier->Render(); ?>
 		<br class="item_divider" />
 		<?php $this->dtgCourier->Render(); ?>
-		<br class="item_divider" />
-		<div class="title"><?php _t('Shipping Accounts'); ?></div>	
-		<br class="item_divider" />	
-		<?php $this->btnNew->Render() ?>
-		<br class="item_divider" />
-		<?php $this->dtgShippingAccount->Render() ?>
-
 	<?php $this->RenderEnd() ?>
-	<?php require_once('../includes/footer.inc.php'); ?>	
+	<?php require_once('../includes/footer.inc.php'); ?>

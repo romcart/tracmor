@@ -50,16 +50,18 @@
 		protected $chkAutoDetectTrackingNumbers;
 		protected $chkReceiveToLastLocation;
 		protected $btnSave;
-		protected $btnNew;
-		protected $lstFedexAccount;
-		protected $txtFedexGatewayUri;
-		protected $lstFedexLabelPrinterType;
-		protected $lstFedexLabelFormatType;
-		protected $txtFedexThermalPrinterPort;
+		//protected $btnNew;
+		//protected $lstFedexAccount;
+		//protected $txtFedexGatewayUri;
+		//protected $lstFedexLabelPrinterType;
+		//protected $lstFedexLabelFormatType;
+		//protected $txtFedexThermalPrinterPort;
 		protected $txtPackingListTerms;
 		protected $btnNewCourier;
 		protected $dtgCourier;
 		protected $pnlSaveNotification;
+		protected $chkCustomShipmentNumbers;
+		protected $chkCustomReceiptNumbers;
 		
 		protected function Form_Create() {
 			
@@ -69,45 +71,29 @@
 			// Create Shipping/Receiving Company Fields
 			$this->lstCompany_Create();
 			
-			$this->btnNew_Create();
-			$this->dtgShippingAccount_Create();
+			//$this->btnNew_Create();
+			//$this->dtgShippingAccount_Create();
 			
 			// Create FedEx Shipping Account Fields
-			$this->lstFedexAccount_Create();
+			//$this->lstFedexAccount_Create();
 			
 			$this->chkAutoDetectTrackingNumbers_Create();
 			$this->chkReceiveToLastLocation_Create();
-			$this->txtFedexGatewayUri_Create();
-			$this->lstFedexLabelPrinterType_Create();
-			$this->lstFedexLabelFormatType_Create();
-			$this->txtFedexThermalPrinterPort_Create();
+			//$this->txtFedexGatewayUri_Create();
+			//$this->lstFedexLabelPrinterType_Create();
+			//$this->lstFedexLabelFormatType_Create();
+			//$this->txtFedexThermalPrinterPort_Create();
 			$this->txtPackingListTerms_Create();
 			$this->btnNewCourier_Create();
 			$this->dtgCourier_Create();
 			$this->pnlSaveNotification_Create();
+			$this->chkCustomShipmentNumbers_Create();
+			$this->chkCustomReceiptNumbers_Create();
 			
 			$this->btnSave_Create();
 		}
 		
 		protected function Form_PreRender() {
-			$objExpansionMap[ShippingAccount::ExpandCourier] = true;
-			// Get Total Count b/c of Pagination
-			$this->dtgShippingAccount->TotalItemCount = ShippingAccount::CountAll();
-			if ($this->dtgShippingAccount->TotalItemCount == 0) {
-				$this->dtgShippingAccount->ShowHeader = false;
-			}
-			else {
-				$objClauses = array();
-				if ($objClause = $this->dtgShippingAccount->OrderByClause)
-					array_push($objClauses, $objClause);
-				if ($objClause = $this->dtgShippingAccount->LimitClause)
-					array_push($objClauses, $objClause);
-				if ($objClause = QQ::Expand(QQN::ShippingAccount()->Courier))
-					array_push($objClauses, $objClause);
-				$this->dtgShippingAccount->DataSource = ShippingAccount::LoadAll($objClauses);
-				$this->dtgShippingAccount->ShowHeader = true;
-			}
-			
 			$this->dtgCourier->TotalItemCount = Courier::CountAll();
 			if ($this->dtgCourier->TotalItemCount == 0) {
 				$this->dtgCourier->ShowHeader = false;
@@ -124,9 +110,9 @@
 		}
 		
 		// Create and Setup the Header Composite Control
-  	protected function ctlHeaderMenu_Create() {
-  		$this->ctlHeaderMenu = new QHeaderMenu($this);
-  	}
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+		}
 		
 		// Create/Setup the Save button
 		protected function btnSave_Create() {
@@ -165,59 +151,6 @@
 			$this->chkReceiveToLastLocation = new QCheckBox($this);
 			$this->chkReceiveToLastLocation->Name = QApplication::Translate('Receive to Last Location');
 			$this->chkReceiveToLastLocation->Checked = QApplication::$TracmorSettings->ReceiveToLastLocation;
-		}
-		
-		// Create and Setup the txtFedexGatewayUri Text Field
-		protected function txtFedexGatewayUri_Create() {
-			$this->txtFedexGatewayUri = new QTextBox($this);
-			$this->txtFedexGatewayUri->Name = 'Fedex Gateway URI';
-			$this->txtFedexGatewayUri->Text = QApplication::$TracmorSettings->FedexGatewayUri;
-		}
-
-		// Create and Setup lstFedexLabelPrinterType
-		protected function lstFedexLabelPrinterType_Create() {
-			$this->lstFedexLabelPrinterType = new QListBox($this);
-			$this->lstFedexLabelPrinterType->Name = QApplication::Translate('Label Printer Type');
-			$objFedexLabelPrinterTypeArray = FedExDC::get_label_printer_types();
-			if ($objFedexLabelPrinterTypeArray) foreach ($objFedexLabelPrinterTypeArray as $key => $value) {
-				$objListItem = new QListItem($value, $key);
-				if ((QApplication::$TracmorSettings->FedexLabelPrinterType) && (QApplication::$TracmorSettings->FedexLabelPrinterType == $key))
-					$objListItem->Selected = true;
-
-				$this->lstFedexLabelPrinterType->AddItem($objListItem);
-			}
-		}
-
-		// Create and Setup lstFedexLabelFormatType
-		protected function lstFedexLabelFormatType_Create() {
-			$this->lstFedexLabelFormatType = new QListBox($this);
-			$this->lstFedexLabelFormatType->Name = QApplication::Translate('Label Format Type');
-			$this->lstFedexLabelFormatType->AddItem(QApplication::Translate('- Select One -'), null);
-			$objFedexLabelFormatTypeArray = FedExDC::get_label_format_types();
-			if ($objFedexLabelFormatTypeArray) foreach ($objFedexLabelFormatTypeArray as $key => $value) {
-				$objListItem = new QListItem($value, $key);
-				if ((QApplication::$TracmorSettings->FedexLabelFormatType) && (QApplication::$TracmorSettings->FedexLabelFormatType == $key))
-					$objListItem->Selected = true;
-
-				$this->lstFedexLabelFormatType->AddItem($objListItem);
-			}
-			if ($this->lstFedexLabelPrinterType->SelectedValue ===1) {
-				$this->lstFedexLabelFormatType->SelectedValue = 1;
-				$this->lstFedexLabelFormatType->Enabled = false;			
-			}
-			$this->lstFedexLabelPrinterType->AddAction(new QChangeEvent(), new QAjaxAction('lstFedexLabelPrinterType_Select'));
-		}
-
-		// Create and Setup txtFedexThermalPrinterPort
-		protected function txtFedexThermalPrinterPort_Create() {
-			$this->txtFedexThermalPrinterPort = new QTextBox($this);
-			$this->txtFedexThermalPrinterPort->Name = QApplication::Translate('Thermal Printer Port');
-			if ($this->lstFedexLabelPrinterType->SelectedValue ===1) {
-				$this->txtFedexThermalPrinterPort->Text = '';
-				$this->txtFedexThermalPrinterPort->Enabled=false;	
-			} else if (QApplication::$TracmorSettings->FedexThermalPrinterPort) {
-				$this->txtFedexThermalPrinterPort->Text = QApplication::$TracmorSettings->FedexThermalPrinterPort;
-			}
 		}
 		
 		// Create and Setup the Packing List Terms Text Field
@@ -279,78 +212,27 @@
 			
 		}
 		
-		// Create and Setup lstFedexAccount
-		protected function lstFedexAccount_Create() {
-			$this->lstFedexAccount = new QListBox($this);
-			$this->lstFedexAccount->Name = QApplication::Translate('Default FedEx&reg; Integration Account:');
-			$this->lstFedexAccount->Required = false;
-			$this->lstFedexAccount->AddItem('- Select One -', null);
-			$objAccountArray = ShippingAccount::LoadArrayByCourierId(1);
-			if ($objAccountArray) foreach ($objAccountArray as $objAccount) {
-				$objListItem = new QListItem($objAccount->__toString(), $objAccount->ShippingAccountId);
-				if ((QApplication::$TracmorSettings->FedexAccountId) && (QApplication::$TracmorSettings->FedexAccountId == $objAccount->ShippingAccountId))
-					$objListItem->Selected = true;
-				$this->lstFedexAccount->AddItem($objListItem);
+		// Create and Setup the CustomShipmentNumbers Checkbox
+		protected function chkCustomShipmentNumbers_Create() {
+			$this->chkCustomShipmentNumbers = new QCheckBox($this);
+			$this->chkCustomShipmentNumbers->Name = 'Custom Shipment Numbers';
+			if (QApplication::$TracmorSettings->CustomShipmentNumbers == '1') {
+				$this->chkCustomShipmentNumbers->Checked = true;
 			}
-			$this->lstFedexAccount->AddAction(new QChangeEvent(), new QAjaxAction('lstFedexAccount_Change'));
-			$this->lstFedexAccount->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-		}
-		
-		// Create/Setup the New button
-		protected function btnNew_Create() {
-			$this->btnNew = new QButton($this);
-			$this->btnNew->Text = 'New Account';
-			$this->btnNew->AddAction(new QClickEvent(), new QServerAction('btnNew_Click'));
+			else {
+				$this->chkCustomShipmentNumbers->Checked = false;
+			}
 		}
 
-		// Create/Setup the Shipping Account datagrid
-		protected function dtgShippingAccount_Create() {
-
-			$this->dtgShippingAccount = new QDataGrid($this);
-  		$this->dtgShippingAccount->CellPadding = 5;
-  		$this->dtgShippingAccount->CellSpacing = 0;
-  		$this->dtgShippingAccount->CssClass = "datagrid";
-  		$this->dtgShippingAccount->SortColumnIndex = 0;
-      		
-      // Enable AJAX - this won't work while using the DB profiler
-      $this->dtgShippingAccount->UseAjax = true;
-
-      // Enable Pagination, and set to 20 items per page
-      $objPaginator = new QPaginator($this->dtgShippingAccount);
-      $this->dtgShippingAccount->Paginator = $objPaginator;
-      $this->dtgShippingAccount->ItemsPerPage = 20;
-          
-      $this->dtgShippingAccount->AddColumn(new QDataGridColumn('Account', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-      $this->dtgShippingAccount->AddColumn(new QDataGridColumn('Courier', '<?= $_ITEM->Courier->__toString() ?>', array('Width' => "200", 'OrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->Courier->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->Courier->ShortDescription, false), 'CssClass' => "dtg_column")));
-      $this->dtgShippingAccount->AddColumn(new QDataGridColumn('Account Number', '<?= $_ITEM->AccessId ?>', array('OrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->AccessId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::ShippingAccount()->AccessId, false), 'CssClass' => "dtg_column")));
-      
-      $this->dtgShippingAccount->SortColumnIndex = 0;
-    	$this->dtgShippingAccount->SortDirection = 0;
-      
-      $objStyle = $this->dtgShippingAccount->RowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#FFFFFF';
-      $objStyle->FontSize = 12;
-
-      $objStyle = $this->dtgShippingAccount->AlternateRowStyle;
-      $objStyle->BackColor = '#EFEFEF';
-
-      $objStyle = $this->dtgShippingAccount->HeaderRowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';  			
-		}
-
-		protected function lstFedexLabelPrinterType_Select() {
-			$strSelectedFedexLabelPrinterType = ($this->lstFedexLabelPrinterType->SelectedValue) ? $this->lstFedexLabelPrinterType->SelectedValue : null;
-			if ($strSelectedFedexLabelPrinterType == '2' || $strSelectedFedexLabelPrinterType == '5') {
-				$this->lstFedexLabelFormatType->Enabled=true;
-				$this->txtFedexThermalPrinterPort->Enabled=true;
-			} else {
-				$this->lstFedexLabelFormatType->SelectedIndex=0;
-				$this->lstFedexLabelFormatType->Enabled=false;
-				$this->txtFedexThermalPrinterPort->Text='';
-				$this->txtFedexThermalPrinterPort->Enabled=false;
+		// Create and Setup the CustomShipmentNumbers Checkbox
+		protected function chkCustomReceiptNumbers_Create() {
+			$this->chkCustomReceiptNumbers = new QCheckBox($this);
+			$this->chkCustomReceiptNumbers->Name = 'Custom Receipt Numbers';
+			if (QApplication::$TracmorSettings->CustomReceiptNumbers == '1') {
+				$this->chkCustomReceiptNumbers->Checked = true;
+			}
+			else {
+				$this->chkCustomReceiptNumbers->Checked = false;
 			}
 		}
 		
@@ -359,26 +241,17 @@
 		protected function btnSave_Click() {
 			$intCompanyId = $this->lstCompany->SelectedValue;
 			$objCompany = Company::Load($intCompanyId);
-			$intAccountId = $this->lstFedexAccount->SelectedValue;
-			$objAccount = ShippingAccount::Load($intAccountId);
 			
-			if ($objAccount && (!$objAccount->AccessId || !$objAccount->AccessCode)) {
-				$this->lstFedexAccount->Warning = "The FedEx Account must have a valid account number and meter number.";
-			} else {
-				// Altered $TracmorSettings __set() method so that just setting a value will save it in the database.
-				QApplication::$TracmorSettings->CompanyId = $intCompanyId;
-				QApplication::$TracmorSettings->FedexAccountId = $intAccountId;
-				QApplication::$TracmorSettings->FedexGatewayUri = $this->txtFedexGatewayUri->Text;
-				QApplication::$TracmorSettings->FedexLabelPrinterType = $this->lstFedexLabelPrinterType->SelectedValue;
-				QApplication::$TracmorSettings->FedexLabelFormatType = $this->lstFedexLabelFormatType->SelectedValue;
-				QApplication::$TracmorSettings->FedexThermalPrinterPort = $this->txtFedexThermalPrinterPort->Text;
-				QApplication::$TracmorSettings->PackingListTerms = $this->txtPackingListTerms->Text;
-				QApplication::$TracmorSettings->AutodetectTrackingNumbers = $this->chkAutoDetectTrackingNumbers->Checked;
-				QApplication::$TracmorSettings->ReceiveToLastLocation = $this->chkReceiveToLastLocation->Checked;
-				
-				// Show saved notification
-				$this->pnlSaveNotification->Display = true;
-			}
+			// Altered $TracmorSettings __set() method so that just setting a value will save it in the database.
+			QApplication::$TracmorSettings->CompanyId = $intCompanyId;
+			QApplication::$TracmorSettings->PackingListTerms = $this->txtPackingListTerms->Text;
+			QApplication::$TracmorSettings->AutodetectTrackingNumbers = $this->chkAutoDetectTrackingNumbers->Checked;
+			QApplication::$TracmorSettings->ReceiveToLastLocation = $this->chkReceiveToLastLocation->Checked;
+			QApplication::$TracmorSettings->CustomShipmentNumbers = (string) $this->chkCustomShipmentNumbers->Checked;
+			QApplication::$TracmorSettings->CustomReceiptNumbers = (string) $this->chkCustomReceiptNumbers->Checked;
+		
+			// Show saved notification
+			$this->pnlSaveNotification->Display = true;
 		}
 		
 		// Erase the 'Saved' warning if a new company is selected
@@ -386,18 +259,7 @@
 			$this->lstCompany->Warning = "";
 		}
 		
-		// Erase the 'Saved' warning if a new FedEx Account is selected
-		protected function lstFedexAccount_Change() {
-			$this->lstFedexAccount->Warning = "";
-		}
-		
-		protected function btnNew_Click() {
-			
-			QApplication::Redirect('shipping_account_edit.php');
-		}
-		
 		protected function btnNewCourier_Click() {
-			
 			QApplication::Redirect('courier_edit.php');
 		}		
 		

@@ -30,8 +30,6 @@
 		// Inputs
 		protected $flaCompanyLogo;
 		protected $txtMinAssetCode;
-		protected $chkCustomShipmentNumbers;
-		protected $chkCustomReceiptNumbers;
 		protected $chkPortablePinRequired;
 		protected $chkStrictCheckinPolicy;
 		protected $pnlSaveNotification;
@@ -47,8 +45,6 @@
 			// Create Inputs
 			$this->flaCompanyLogo_Create();
 			$this->txtMinAssetCode_Create();
-			$this->chkCustomShipmentNumbers_Create();
-			$this->chkCustomReceiptNumbers_Create();
 			$this->chkPortablePinRequired_Create();
 			//$this->chkStrictCheckinPolicy_Create();
 			$this->txtSearchResultsPerPage_Create();
@@ -91,30 +87,6 @@
 			$this->txtMinAssetCode->Name = 'Minimum Asset Code';
 			$this->txtMinAssetCode->Text = QApplication::$TracmorSettings->MinAssetCode;
 			$this->txtMinAssetCode->Width = 64;
-		}
-
-		// Create and Setup the CustomShipmentNumbers Checkbox
-		protected function chkCustomShipmentNumbers_Create() {
-			$this->chkCustomShipmentNumbers = new QCheckBox($this);
-			$this->chkCustomShipmentNumbers->Name = 'Custom Shipment Numbers';
-			if (QApplication::$TracmorSettings->CustomShipmentNumbers == '1') {
-				$this->chkCustomShipmentNumbers->Checked = true;
-			}
-			else {
-				$this->chkCustomShipmentNumbers->Checked = false;
-			}
-		}
-
-		// Create and Setup the CustomShipmentNumbers Checkbox
-		protected function chkCustomReceiptNumbers_Create() {
-			$this->chkCustomReceiptNumbers = new QCheckBox($this);
-			$this->chkCustomReceiptNumbers->Name = 'Custom Receipt Numbers';
-			if (QApplication::$TracmorSettings->CustomReceiptNumbers == '1') {
-				$this->chkCustomReceiptNumbers->Checked = true;
-			}
-			else {
-				$this->chkCustomReceiptNumbers->Checked = false;
-			}
 		}
 
 		// Create and Setup the PortablePinRequired Checkbox
@@ -245,8 +217,6 @@
 			}
 
 			// We have to cast these to string because the admin_settings value column is TEXT, and checkboxes give boolean values
-			QApplication::$TracmorSettings->CustomShipmentNumbers = (string) $this->chkCustomShipmentNumbers->Checked;
-			QApplication::$TracmorSettings->CustomReceiptNumbers = (string) $this->chkCustomReceiptNumbers->Checked;
 			QApplication::$TracmorSettings->PortablePinRequired = (string) $this->chkPortablePinRequired->Checked;
 			//QApplication::$TracmorSettings->StrictCheckinPolicy = (string) $this->chkStrictCheckinPolicy->Checked;
 

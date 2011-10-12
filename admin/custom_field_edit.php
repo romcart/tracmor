@@ -535,6 +535,8 @@
 					$this->chkRequiredFlag->Enabled = true;
 				}
 			}
+			
+			$this->txtValue->Focus();
 		}
 
 		// Control AjaxActions
