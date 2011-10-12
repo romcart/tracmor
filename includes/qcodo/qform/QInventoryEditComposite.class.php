@@ -40,7 +40,7 @@ class QInventoryEditComposite extends QControl {
 	protected $lblModifiedDate;
 	public $lblShipmentReceipt;
 
-	protected $ifcImage;
+	protected $ifaImage;
 	protected $lblImage;
 
 	protected $pnlLongDescription;
@@ -114,7 +114,7 @@ class QInventoryEditComposite extends QControl {
 		$this->lstManufacturer_Create();
 		$this->txtInventoryModelCode_Create();
 		$this->txtLongDescription_Create();
-		$this->ifcImage_Create();
+		$this->ifaImage_Create();
 		// Image label must be created AFTER image control
 		$this->lblImage_Create();
 
@@ -289,28 +289,29 @@ class QInventoryEditComposite extends QControl {
 	// Output the image
 	protected function lblImage_Create() {
 		$this->lblImage = new QLabel($this);
-		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objInventoryModel->ImagePath, $this->objInventoryModel->InventoryModelId . "_inventory_image");
+		$this->lblImage->Text = $this->ifaImage->GetDisplayHtml($this->objInventoryModel->ImagePath, $this->objInventoryModel->InventoryModelId . "_inventory_image");
 		$this->lblImage->HtmlEntities = false;
 	}
 
 	// Create the Image File Control
-	protected function ifcImage_Create() {
-		$this->ifcImage = new QImageFileControl($this->objParentObject);
-		// $this->ifcImage->UploadPath = "/www/imagestorage/";
-		$this->ifcImage->UploadPath = "../images/inventory_models/";
-		$this->ifcImage->WebPath = "../images/inventory_models/";
-		$this->ifcImage->ThumbUploadPath = "../images/inventory_models/thumbs/";
-		$this->ifcImage->ThumbWebPath = "../images/inventory_models/thumbs/";
-		// $this->ifcImage->FileName = $this->objInventoryModel->ImagePath;
-		$this->ifcImage->Name = 'Upload Picture';
-		$this->ifcImage->BuildThumbs = true;
-		$this->ifcImage->ThumbWidth = 240;
-		$this->ifcImage->ThumbHeight = 240;
-		$this->ifcImage->Required = false;
-		// $this->ifcImage->ThumbPrefix = "thumb_";
-		$this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
-		$this->ifcImage->Suffix = "_inventory_model";
-		$this->ifcImage->TabIndex=6;
+	protected function ifaImage_Create() {
+		$this->ifaImage = new QImageFileAsset($this);
+		// $this->ifaImage->UploadPath = "/www/imagestorage/";
+		$this->ifaImage->FileAssetType = QFileAssetType::Image;
+		$this->ifaImage->UploadPath = "../images/inventory_models/";
+		$this->ifaImage->WebPath = "../images/inventory_models/";
+		$this->ifaImage->ThumbUploadPath = "../images/inventory_models/thumbs/";
+		$this->ifaImage->ThumbWebPath = "../images/inventory_models/thumbs/";
+		// $this->ifaImage->FileName = $this->objInventoryModel->ImagePath;
+		$this->ifaImage->Name = 'Upload Picture';
+		$this->ifaImage->BuildThumbs = true;
+		$this->ifaImage->ThumbWidth = 240;
+		$this->ifaImage->ThumbHeight = 240;
+		$this->ifaImage->Required = false;
+		// $this->ifaImage->ThumbPrefix = "thumb_";
+		$this->ifaImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
+		$this->ifaImage->Suffix = "_inventory_model";
+		$this->ifaImage->TabIndex=6;
 		$this->intNextTabIndex++;
 	}
 
@@ -665,16 +666,16 @@ class QInventoryEditComposite extends QControl {
 				CustomField::SaveControls($this->objInventoryModel->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objInventoryModel->InventoryModelId, 2);
 			}
 
-			if ($this->ifcImage->FileName) {
+			if ($this->ifaImage->FileName) {
 				// Retrieve the extension (.jpg, .gif) from the filename
-				$explosion = explode(".", $this->ifcImage->FileName);
+				$explosion = explode(".", $this->ifaImage->FileName);
 				// Set the file name to ID_inventory_model.ext
-				$this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objInventoryModel->InventoryModelId, $this->ifcImage->Suffix, $explosion[1]);
+				$this->ifaImage->FileName = sprintf('%s%s%s.%s', $this->ifaImage->Prefix, $this->objInventoryModel->InventoryModelId, $this->ifaImage->Suffix, $explosion[1]);
 				// Set the image path for saving the asset model
-				$txtImagePath = $this->ifcImage->FileName;
+				$txtImagePath = $this->ifaImage->FileName;
 				// Upload the file to the server
-				$this->ifcImage->ProcessUpload();
-	
+				$this->ifaImage->ProcessUpload();
+				
 				// Save the image path information to the InventoryModel object
 				$this->objInventoryModel->ImagePath = $txtImagePath;
 				$this->objInventoryModel->Save(false, true);
@@ -752,7 +753,7 @@ class QInventoryEditComposite extends QControl {
 
 	// Delete Button Click Actions
 	public function btnDelete_Click($strFormId, $strControlId, $strParameter) {
-		$this->ifcImage->Delete($this->objInventoryModel->ImagePath);
+		$this->ifaImage->Delete($this->objInventoryModel->ImagePath);
 
 		try {
 			// Get an instance of the database
@@ -762,7 +763,7 @@ class QInventoryEditComposite extends QControl {
 			$strImagePath = $this->objInventoryModel->ImagePath;
 			$objCustomFieldArray = $this->objInventoryModel->objCustomFieldArray;
 			$this->objInventoryModel->Delete();
-			$this->ifcImage->Delete($strImagePath);
+			$this->ifaImage->Delete($strImagePath);
 			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 			// The values do not get deleted for select values
 			// CustomField::DeleteTextValues($objCustomFieldArray);
@@ -817,7 +818,7 @@ class QInventoryEditComposite extends QControl {
 	public function displayLabels() {
 
 		$this->lblImage->Display = true;
-		$this->ifcImage->Display = false;
+		$this->ifaImage->Display = false;
 
 		// Do not display inputs
 		$this->txtShortDescription->Display = false;
@@ -852,7 +853,7 @@ class QInventoryEditComposite extends QControl {
 	public function displayInputs() {
 
 		$this->lblImage->Display = false;
-		$this->ifcImage->Display = true;
+		$this->ifaImage->Display = true;
 
 		// Do not display labels
 		$this->lblShortDescription->Display = false;
@@ -932,7 +933,7 @@ class QInventoryEditComposite extends QControl {
 			$this->lblModifiedDate->Text = $this->objInventoryModel->ModifiedDate . ' by ' . $this->objInventoryModel->ModifiedByObject->__toStringFullName();
 		}
 
-		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objInventoryModel->ImagePath, $this->objInventoryModel->InventoryModelId . "_inventory_image");
+		$this->lblImage->Text = $this->ifaImage->GetDisplayHtml($this->objInventoryModel->ImagePath, $this->objInventoryModel->InventoryModelId . "_inventory_image");
 		// Update custom labels
 		if ($this->arrCustomFields) {
 			CustomField::UpdateLabels($this->arrCustomFields);

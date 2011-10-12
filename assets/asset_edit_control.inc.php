@@ -72,7 +72,7 @@
 		$arrAssetFields[] = array('name' => 'Date Modified:', 'value' => $this->lblModifiedDate->Render(false));
 	}
 	
-	$arrAssetFields[] = array('name' => 'Image:', 'value' => $this->ifcImage->RenderWithError(false) . $this->lblImage->Render(false));
+	$arrAssetFields[] = array('name' => 'Image:', 'value' => $this->ifaImage->RenderWithError(false) . $this->lblImage->Render(false));
 
 ?>
 
