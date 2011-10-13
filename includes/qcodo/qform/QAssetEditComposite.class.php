@@ -198,7 +198,7 @@ class QAssetEditComposite extends QControl {
 	public function GetJavaScriptAction() {return "onchange";}
 
 	public function Validate() {
-		if (trim($this->txtAssetCode->Text) == "") {
+		if (!$this->chkAutoGenerateAssetCode->Checked && trim($this->txtAssetCode->Text) == "") {
 			$this->txtAssetCode->Warning = 'Asset code is required';
 			return false;
 		}
