@@ -92,6 +92,13 @@
 			}
 			
 			$image_p = imagecreatetruecolor($width, $height);
+
+			// alpha transperancy
+			$strTransparentColor = imagecolorallocatealpha($image_p, 0, 0, 0, 127);
+			imagealphablending($image_p, false);
+			imagefilledrectangle($image_p, 0, 0, $width, $height, $strTransparentColor);
+			imagealphablending($image_p, true);
+			imagesavealpha($image_p, true);
 			
 			switch ($this->strFileMimeType) {
 				case 'image/gif':
@@ -99,7 +106,7 @@
 					break;
 				case 'image/jpeg':
 				case 'image/pjpeg':
-			    $image = imageCreateFromJPEG($original);
+			    	$image = imageCreateFromJPEG($original);
 			    break;
 				case 'image/png':
 				case 'image/x-png':
@@ -217,7 +224,7 @@
 	
 		public function GetControlHtml() {
 			if (!empty($this->strFile)) {
-				return sprintf('<div style="height: 85px; background: url(\'../tmp/' . basename($this->strFile) . '\') no-repeat;"> </div>') . str_replace('<img ', '<img style="display: none;" ', parent::GetControlHtml());
+				return sprintf('<div style="height: 85px;"><img src="../tmp/' . basename($this->strFile) . '" style="height: 85px"/></div>') . str_replace('<img ', '<img style="display: none;" ', parent::GetControlHtml());
 			}
 			else {
 				return parent::GetControlHtml();
