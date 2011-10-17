@@ -75,10 +75,10 @@
 								<td width="30" align="center"><img src="../images/icons/user.png" name="shortcut9"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="user_account_list.php" class="graylink">Users</a></td>
 							</tr>
-							<!--<tr>
+							<tr>
 								<td width="30" align="center"><img src="../images/icons/asset_import.png" name="shortcut10"></td>
 								<td style="border-left:1px solid #CCCCCC;border-bottom:1px solid #CCCCCC;padding-left:5px;cursor:pointer;" width="100%" onmouseover="this.style.backgroundColor='#EEEEEE';" onmouseout="this.style.backgroundColor='#FFFFFF';"><a href="asset_import.php" class="graylink">Asset Import</a></td>
-							</tr>-->
+							</tr>
 						</table>
 					</td>
 				</tr>
