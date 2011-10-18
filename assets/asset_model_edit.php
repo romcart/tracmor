@@ -50,7 +50,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected $lblCategory;
 	protected $lblManufacturer;
 	protected $btnEdit;
-	protected $ifaImage;
+	protected $ifcImage;
 	protected $lblImage;
 	protected $pnlLongDescription;
 
@@ -89,7 +89,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->txtAssetModelCode_Create();
 		$this->lstManufacturer_Create();
 		$this->txtImagePath_Create();
-		$this->ifaImage_Create();
+		$this->ifcImage_Create();
 		// Image label must be created AFTER image control
 		$this->lblImage_Create();
 		$this->pnlLongDescription_Create();
@@ -186,7 +186,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	// Output the image
 	protected function lblImage_Create() {
 		$this->lblImage = new QLabel($this);
-		$this->lblImage->Text = $this->ifaImage->GetDisplayHtml($this->objAssetModel->ImagePath, $this->objAssetModel->AssetModelId . "_asset_model_image");
+		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath, $this->objAssetModel->AssetModelId . "_asset_model_image");
 		$this->lblImage->HtmlEntities = false;
 	}
 
@@ -200,24 +200,23 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	}
 
 	// Create the Image File Control
-	protected function ifaImage_Create() {
-		$this->ifaImage = new QImageFileAsset($this);
-		// $this->ifaImage->UploadPath = "/www/imagestorage/";
-		$this->ifaImage->FileAssetType = QFileAssetType::Image;
-		$this->ifaImage->UploadPath = "../images/asset_models/";
-		$this->ifaImage->WebPath = "../images/asset_models/";
-		$this->ifaImage->ThumbUploadPath = "../images/asset_models/thumbs/";
-		$this->ifaImage->ThumbWebPath = "../images/asset_models/thumbs/";
-		// $this->ifaImage->FileName = $this->objAssetModel->ImagePath;
-		$this->ifaImage->Name = 'Upload Picture';
-		$this->ifaImage->BuildThumbs = true;
-		$this->ifaImage->ThumbWidth = 240;
-		$this->ifaImage->ThumbHeight = 240;
-		$this->ifaImage->Required = false;
-		// $this->ifaImage->ThumbPrefix = "thumb_";
-		$this->ifaImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
-		$this->ifaImage->Suffix = "_asset_model";
-		$this->ifaImage->TabIndex=6;
+	protected function ifcImage_Create() {
+		$this->ifcImage = new QImageFileControl($this);
+		// $this->ifcImage->UploadPath = "/www/imagestorage/";
+		$this->ifcImage->UploadPath = "../images/asset_models/";
+		$this->ifcImage->WebPath = "../images/asset_models/";
+		$this->ifcImage->ThumbUploadPath = "../images/asset_models/thumbs/";
+		$this->ifcImage->ThumbWebPath = "../images/asset_models/thumbs/";
+		// $this->ifcImage->FileName = $this->objAssetModel->ImagePath;
+		$this->ifcImage->Name = 'Upload Picture';
+		$this->ifcImage->BuildThumbs = true;
+		$this->ifcImage->ThumbWidth = 240;
+		$this->ifcImage->ThumbHeight = 240;
+		$this->ifcImage->Required = false;
+		// $this->ifcImage->ThumbPrefix = "thumb_";
+		$this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
+		$this->ifcImage->Suffix = "_asset_model";
+		$this->ifcImage->TabIndex=6;
 		$this->intNextTabIndex++;
 	}
 
@@ -393,15 +392,15 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			CustomField::SaveControls($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objAssetModel->AssetModelId, 4);
 		}
 
-		if ($this->ifaImage->FileName) {
+		if ($this->ifcImage->FileName) {
 			// Retrieve the extension (.jpg, .gif) from the filename
-			$explosion = explode(".", $this->ifaImage->FileName);
+			$explosion = explode(".", $this->ifcImage->FileName);
 			// Set the file name to ID_asset_model.ext
-			$this->ifaImage->FileName = sprintf('%s%s%s.%s', $this->ifaImage->Prefix, $this->objAssetModel->AssetModelId, $this->ifaImage->Suffix, $explosion[1]);
+			$this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objAssetModel->AssetModelId, $this->ifcImage->Suffix, $explosion[1]);
 			// Set the image path for saving the asset model
-			$this->txtImagePath->Text = $this->ifaImage->FileName;
+			$this->txtImagePath->Text = $this->ifcImage->FileName;
 			// Upload the file to the server
-			$this->ifaImage->ProcessUpload();
+			$this->ifcImage->ProcessUpload();
 
 			// Save the image path information to the AssetModel object
 			$this->objAssetModel->ImagePath = $this->txtImagePath->Text;
@@ -435,7 +434,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 	// Delete Button Click Actions - Erase Image and erase entry
 	protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
-		$this->ifaImage->Delete($this->objAssetModel->ImagePath);
+		$this->ifcImage->Delete($this->objAssetModel->ImagePath);
 
 		try {
 			// Get an instance of the database
@@ -445,7 +444,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			$strImagePath = $this->objAssetModel->ImagePath;
 			$objCustomFieldArray = $this->objAssetModel->objCustomFieldArray;
 			$this->objAssetModel->Delete();
-			$this->ifaImage->Delete($strImagePath);
+			$this->ifcImage->Delete($strImagePath);
 			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 			// The values should not get deleted for select values
 			// CustomField::DeleteTextValues($objCustomFieldArray);
@@ -489,7 +488,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function displayLabels() {
 
 		$this->lblImage->Display = true;
-		$this->ifaImage->Display = false;
+		$this->ifcImage->Display = false;
 
 		// Do not display inputs
 		$this->txtShortDescription->Display = false;
@@ -538,7 +537,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lstCategory->Display = true;
 		$this->lstManufacturer->Display = true;
 		$this->txtLongDescription->Display = true;
-		$this->ifaImage->Display = true;
+		$this->ifcImage->Display = true;
 
 
 
@@ -574,7 +573,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblCategory->Text = $this->lstCategory->SelectedName;
 		$this->lblManufacturer->Text = $this->lstManufacturer->SelectedName;
 		$this->pnlLongDescription->Text = nl2br($this->txtLongDescription->Text);
-		$this->lblImage->Text = $this->ifaImage->GetDisplayHtml($this->objAssetModel->ImagePath, $this->objAssetModel->AssetModelId . "_asset_model_image");
+		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath, $this->objAssetModel->AssetModelId . "_asset_model_image");
 
 		// Update custom labels
 		if ($this->arrCustomFields) {

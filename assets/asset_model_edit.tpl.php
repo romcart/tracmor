@@ -45,7 +45,7 @@
 			$arrAssetModelFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . $this->lstManufacturer->RenderWithError(false));
 			$arrAssetModelFields[] = array('name' => 'Asset Model Code:', 'value' => $this->lblAssetModelCode->Render(false) . $this->txtAssetModelCode->RenderWithError(false));
 			$arrAssetModelFields[] = array('name' => 'Long Description:', 'value' => $this->pnlLongDescription->Render(false) . $this->txtLongDescription->RenderWithError(false));
-			$arrAssetModelFields[] = array('name' => 'Image:', 'value' => $this->ifaImage->RenderWithError(false) . $this->lblImage->Render(false));
+			$arrAssetModelFields[] = array('name' => 'Image:', 'value' => $this->ifcImage->RenderWithError(false) . $this->lblImage->Render(false));
 		// Custom Fields
 		if ($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as $field) {

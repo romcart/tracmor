@@ -57,7 +57,7 @@ class QAssetEditComposite extends QControl {
 	protected $lstCreatedByObject;
 	protected $lstModifiedByObject;
 
-	protected $ifaImage;
+	protected $ifcImage;
 	protected $lblImage;
 
 	// Buttons
@@ -135,7 +135,7 @@ class QAssetEditComposite extends QControl {
 		$this->dlgNewAssetModel_Create();
 		$this->UpdateAssetControls();
 
-		$this->ifaImage_Create();
+		$this->ifcImage_Create();
 		// Image label must be created AFTER image control
 		$this->lblImage_Create();
 
@@ -484,29 +484,28 @@ class QAssetEditComposite extends QControl {
 	// Output the image
 	protected function lblImage_Create() {
 		$this->lblImage = new QLabel($this);
-		$this->lblImage->Text = $this->ifaImage->GetDisplayHtml($this->objAsset->ImagePath, $this->objAsset->AssetId . "_asset_image");
+		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAsset->ImagePath, $this->objAsset->AssetId . "_asset_image");
 		$this->lblImage->HtmlEntities = false;
 	}
 
 	// Create the Image File Control
-	protected function ifaImage_Create() {
-		$this->ifaImage = new QImageFileAsset($this);
-		// $this->ifaImage->UploadPath = "/www/imagestorage/";
-		$this->ifaImage->FileAssetType = QFileAssetType::Image;
-		$this->ifaImage->UploadPath = "../images/assets/";
-		$this->ifaImage->WebPath = "../images/assets/";
-		$this->ifaImage->ThumbUploadPath = "../images/assets/thumbs/";
-		$this->ifaImage->ThumbWebPath = "../images/assets/thumbs/";
-		// $this->ifaImage->FileName = $this->objAsset->ImagePath;
-		$this->ifaImage->Name = 'Upload Picture';
-		$this->ifaImage->BuildThumbs = true;
-		$this->ifaImage->ThumbWidth = 240;
-		$this->ifaImage->ThumbHeight = 240;
-		$this->ifaImage->Required = false;
-		// $this->ifaImage->ThumbPrefix = "thumb_";
-		$this->ifaImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
-		$this->ifaImage->Suffix = "_asset";
-		$this->ifaImage->TabIndex=6;
+	protected function ifcImage_Create() {
+		$this->ifcImage = new QImageFileControl($this->objParentObject);
+		// $this->ifcImage->UploadPath = "/www/imagestorage/";
+		$this->ifcImage->UploadPath = "../images/assets/";
+		$this->ifcImage->WebPath = "../images/assets/";
+		$this->ifcImage->ThumbUploadPath = "../images/assets/thumbs/";
+		$this->ifcImage->ThumbWebPath = "../images/assets/thumbs/";
+		// $this->ifcImage->FileName = $this->objAsset->ImagePath;
+		$this->ifcImage->Name = 'Upload Picture';
+		$this->ifcImage->BuildThumbs = true;
+		$this->ifcImage->ThumbWidth = 240;
+		$this->ifcImage->ThumbHeight = 240;
+		$this->ifcImage->Required = false;
+		// $this->ifcImage->ThumbPrefix = "thumb_";
+		$this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
+		$this->ifcImage->Suffix = "_asset";
+		$this->ifcImage->TabIndex=6;
 		$this->intNextTabIndex++;
 	}
 	
@@ -983,15 +982,15 @@ class QAssetEditComposite extends QControl {
 				CustomField::SaveControls($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objAsset->AssetId, 1);
 			}
 
-			if ($this->ifaImage->FileName) {
+			if ($this->ifcImage->FileName) {
 				// Retrieve the extension (.jpg, .gif) from the filename
-				$explosion = explode(".", $this->ifaImage->FileName);
+				$explosion = explode(".", $this->ifcImage->FileName);
 				// Set the file name to ID_asset.ext
-				$this->ifaImage->FileName = sprintf('%s%s%s.%s', $this->ifaImage->Prefix, $this->objAsset->AssetId, $this->ifaImage->Suffix, $explosion[1]);
+				$this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objAsset->AssetId, $this->ifcImage->Suffix, $explosion[1]);
 				// Set the image path for saving the asset model
-				$txtImagePath = $this->ifaImage->FileName;
+				$txtImagePath = $this->ifcImage->FileName;
 				// Upload the file to the server
-				$this->ifaImage->ProcessUpload();
+				$this->ifcImage->ProcessUpload();
 	
 				// Save the image path information to the AssetModel object
 				$this->objAsset->ImagePath = $txtImagePath;
@@ -1259,7 +1258,7 @@ class QAssetEditComposite extends QControl {
 	public function displayLabels() {
 
 		$this->lblImage->Display = true;
-		$this->ifaImage->Display = false;
+		$this->ifcImage->Display = false;
 
 		// Do not display inputs
 		$this->txtAssetCode->Display = false;
@@ -1320,7 +1319,7 @@ class QAssetEditComposite extends QControl {
 	$this->lblLockedToParent->Visible = false;
 
 		$this->lblImage->Display = false;
-		$this->ifaImage->Display = true;
+		$this->ifcImage->Display = true;
 
     // Only display location list if creating a new asset
     if (!$this->blnEditMode) {
@@ -1488,7 +1487,7 @@ class QAssetEditComposite extends QControl {
 			$this->lblModifiedDate->Text = $this->objAsset->ModifiedDate . ' by ' . $this->objAsset->ModifiedByObject->__toStringFullName();
 		}
 
-		$this->lblImage->Text = $this->ifaImage->GetDisplayHtml($this->objAsset->ImagePath, $this->objAsset->AssetId . "_asset_image");
+		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAsset->ImagePath, $this->objAsset->AssetId . "_asset_image");
 
 		// Update custom labels
 		if ($this->arrCustomFields) {

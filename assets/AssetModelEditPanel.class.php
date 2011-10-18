@@ -43,7 +43,7 @@
 		// Specify the Location of the Template (feel free to modify) for this Panel
 		protected $strTemplate = 'AssetModelEditPanel.tpl.php';
 		// Image File Control
-		public $ifaImage;
+		public $ifcImage;
 		// An array of custom fields
 		public $arrCustomFields;
 		
@@ -57,7 +57,7 @@
 			}
 			
 			// Create the Image File Control
-			$this->ifaImage_Create();
+			$this->ifcImage_Create();
 			// Create all custom asset model fields
 			$this->customFields_Create();
 			
@@ -71,7 +71,7 @@
 			$this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
 			
 			// Add Enter Key Events to each control except the Cancel Button
-			$arrControls = array($this->txtShortDescription, $this->lstCategory, $this->lstManufacturer, $this->txtAssetModelCode, $this->txtLongDescription, $this->ifaImage);
+			$arrControls = array($this->txtShortDescription, $this->lstCategory, $this->lstManufacturer, $this->txtAssetModelCode, $this->txtLongDescription, $this->ifcImage);
 			foreach ($arrControls as $ctlControl) {
 				$ctlControl->CausesValidation = true;
 				$ctlControl->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSave_Click'));
@@ -110,24 +110,21 @@
 		}
 
 		// Create the Image File Control
-		protected function ifaImage_Create() {
-			$this->ifaImage = new QImageFileAsset($this);
-			// $this->ifaImage->UploadPath = "/www/imagestorage/";
-			$this->ifaImage->FileAssetType = QFileAssetType::Image;
-			$this->ifaImage->UploadPath = "../images/asset_models/";
-			$this->ifaImage->WebPath = "../images/asset_models/";
-			$this->ifaImage->ThumbUploadPath = "../images/asset_models/thumbs/";
-			$this->ifaImage->ThumbWebPath = "../images/asset_models/thumbs/";
-			// $this->ifaImage->FileName = $this->objAssetModel->ImagePath;
-			$this->ifaImage->Name = 'Upload Picture';
-			$this->ifaImage->BuildThumbs = true;
-			$this->ifaImage->ThumbWidth = 240;
-			$this->ifaImage->ThumbHeight = 240;
-			$this->ifaImage->Required = false;
-			// $this->ifaImage->ThumbPrefix = "thumb_";
-			$this->ifaImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
-			$this->ifaImage->Suffix = "_asset_model";
-			$this->ifaImage->TabIndex=6;
+		protected function ifcImage_Create() {
+			$this->ifcImage = new QImageFileControl($this);
+			$this->ifcImage->UploadPath = "../images/asset_models/";
+			$this->ifcImage->WebPath = "../images/asset_models/";
+			$this->ifcImage->ThumbUploadPath = "../images/asset_models/thumbs/";
+			$this->ifcImage->ThumbWebPath = "../images/asset_models/thumbs/";
+			// $this->ifcImage->FileName = $this->objAssetModel->ImagePath;
+			$this->ifcImage->Name = 'Upload Picture';
+			$this->ifcImage->BuildThumbs = true;
+			$this->ifcImage->ThumbWidth = 240;
+			$this->ifcImage->ThumbHeight = 240;
+			$this->ifcImage->Required = false;
+			// $this->ifcImage->ThumbPrefix = "thumb_";
+			$this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
+			$this->ifcImage->Suffix = "_asset_model";
 		}
 		
 		// Create all Custom Asset Fields
@@ -152,15 +149,15 @@
 				CustomField::SaveControls($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objAssetModel->AssetModelId, 4);
 			}
 
-			if ($this->ifaImage->FileName) {
+			if ($this->ifcImage->FileName) {
 				// Retrieve the extension (.jpg, .gif) from the filename
-				$explosion = explode(".", $this->ifaImage->FileName);
+				$explosion = explode(".", $this->ifcImage->FileName);
 				// Set the file name to ID_asset_model.ext
-				$this->ifaImage->FileName = sprintf('%s%s%s.%s', $this->ifaImage->Prefix, $this->objAssetModel->AssetModelId, $this->ifaImage->Suffix, $explosion[1]);
+				$this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objAssetModel->AssetModelId, $this->ifcImage->Suffix, $explosion[1]);
 				// Set the image path for saving the asset model
-				$this->txtImagePath->Text = $this->ifaImage->FileName;
+				$this->txtImagePath->Text = $this->ifcImage->FileName;
 				// Upload the file to the server
-				$this->ifaImage->ProcessUpload();
+				$this->ifcImage->ProcessUpload();
 				
 				// Save the image path information to the AssetModel object
 				$this->objAssetModel->ImagePath = $this->txtImagePath->Text;

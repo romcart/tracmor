@@ -28,7 +28,7 @@
 	$arrAssetModelFields[] = array('name' => $_CONTROL->lstManufacturer->Name.':', 'value' => $_CONTROL->lstManufacturer->RenderWithError(false));
 	$arrAssetModelFields[] = array('name' => $_CONTROL->txtAssetModelCode->Name.':', 'value' => $_CONTROL->txtAssetModelCode->RenderWithError(false));
 	$arrAssetModelFields[] = array('name' => $_CONTROL->txtLongDescription->Name.':', 'value' => $_CONTROL->txtLongDescription->RenderWithError(false));
-	$arrAssetModelFields[] = array('name' => $_CONTROL->ifaImage->Name.':', 'value' => $_CONTROL->ifaImage->RenderWithError(false));
+	$arrAssetModelFields[] = array('name' => $_CONTROL->ifcImage->Name.':', 'value' => $_CONTROL->ifcImage->RenderWithError(false));
 	
 	// Custom Fields
 	if ($_CONTROL->arrCustomFields) {
