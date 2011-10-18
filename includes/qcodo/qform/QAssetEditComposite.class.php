@@ -57,9 +57,6 @@ class QAssetEditComposite extends QControl {
 	protected $lstCreatedByObject;
 	protected $lstModifiedByObject;
 
-	protected $ifcImage;
-	protected $lblImage;
-
 	// Buttons
 	protected $btnSave;
 	protected $btnDelete;
@@ -127,6 +124,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblIconParentAssetCode_Create();
 		$this->lblAssetModel_Create();
 		$this->lblLockedToParent_Create();
+		$this->UpdateAssetLabels();
 
 		// Create Inputs
 		$this->txtAssetCode_Create();
@@ -135,12 +133,7 @@ class QAssetEditComposite extends QControl {
 		$this->dlgNewAssetModel_Create();
 		$this->UpdateAssetControls();
 
-		$this->ifcImage_Create();
-		// Image label must be created AFTER image control
-		$this->lblImage_Create();
-
 		// Set a variable which defines whether the built-in fields must be rendered or not.
-		$this->UpdateAssetLabels();
 		$this->UpdateBuiltInFields();
 
 		// Set a variable which defines whether the GreenPlusButton of the AssetModel must be rendered or not
@@ -481,34 +474,6 @@ class QAssetEditComposite extends QControl {
 		$this->lblParentAssetCode->HtmlEntities = false;
 	}
 
-	// Output the image
-	protected function lblImage_Create() {
-		$this->lblImage = new QLabel($this);
-		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAsset->ImagePath, $this->objAsset->AssetId . "_asset_image");
-		$this->lblImage->HtmlEntities = false;
-	}
-
-	// Create the Image File Control
-	protected function ifcImage_Create() {
-		$this->ifcImage = new QImageFileControl($this->objParentObject);
-		// $this->ifcImage->UploadPath = "/www/imagestorage/";
-		$this->ifcImage->UploadPath = "../images/assets/";
-		$this->ifcImage->WebPath = "../images/assets/";
-		$this->ifcImage->ThumbUploadPath = "../images/assets/thumbs/";
-		$this->ifcImage->ThumbWebPath = "../images/assets/thumbs/";
-		// $this->ifcImage->FileName = $this->objAsset->ImagePath;
-		$this->ifcImage->Name = 'Upload Picture';
-		$this->ifcImage->BuildThumbs = true;
-		$this->ifcImage->ThumbWidth = 240;
-		$this->ifcImage->ThumbHeight = 240;
-		$this->ifcImage->Required = false;
-		// $this->ifcImage->ThumbPrefix = "thumb_";
-		$this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
-		$this->ifcImage->Suffix = "_asset";
-		$this->ifcImage->TabIndex=6;
-		$this->intNextTabIndex++;
-	}
-	
 	// Create the Auto Generate Asset Code Checkbox
 	protected function chkAutoGenerateAssetCode_Create() {
 		$this->chkAutoGenerateAssetCode = new QCheckBox($this);
@@ -982,21 +947,6 @@ class QAssetEditComposite extends QControl {
 				CustomField::SaveControls($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objAsset->AssetId, 1);
 			}
 
-			if ($this->ifcImage->FileName) {
-				// Retrieve the extension (.jpg, .gif) from the filename
-				$explosion = explode(".", $this->ifcImage->FileName);
-				// Set the file name to ID_asset.ext
-				$this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objAsset->AssetId, $this->ifcImage->Suffix, $explosion[1]);
-				// Set the image path for saving the asset model
-				$txtImagePath = $this->ifcImage->FileName;
-				// Upload the file to the server
-				$this->ifcImage->ProcessUpload();
-	
-				// Save the image path information to the AssetModel object
-				$this->objAsset->ImagePath = $txtImagePath;
-				$this->objAsset->Save(false, true);
-			}
-			
 			if ($this->blnEditMode) {
 
 				// Check to see if the asset code already exists (and is not the asset code of the asset that the user is currently editing
@@ -1257,9 +1207,6 @@ class QAssetEditComposite extends QControl {
 	// Display the labels and buttons for Asset Viewing mode
 	public function displayLabels() {
 
-		$this->lblImage->Display = true;
-		$this->ifcImage->Display = false;
-
 		// Do not display inputs
 		$this->txtAssetCode->Display = false;
 		$this->txtParentAssetCode->Display = false;
@@ -1317,9 +1264,6 @@ class QAssetEditComposite extends QControl {
 
     $this->lblAssetCode->Display = false;
 	$this->lblLockedToParent->Visible = false;
-
-		$this->lblImage->Display = false;
-		$this->ifcImage->Display = true;
 
     // Only display location list if creating a new asset
     if (!$this->blnEditMode) {
@@ -1486,8 +1430,6 @@ class QAssetEditComposite extends QControl {
 		if ($this->objAsset->ModifiedDate) {
 			$this->lblModifiedDate->Text = $this->objAsset->ModifiedDate . ' by ' . $this->objAsset->ModifiedByObject->__toStringFullName();
 		}
-
-		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAsset->ImagePath, $this->objAsset->AssetId . "_asset_image");
 
 		// Update custom labels
 		if ($this->arrCustomFields) {

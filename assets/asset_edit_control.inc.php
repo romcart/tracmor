@@ -71,8 +71,6 @@
 		$arrAssetFields[] = array('name' => 'Date Created:', 'value' => $this->lblCreationDate->Render(false));
 		$arrAssetFields[] = array('name' => 'Date Modified:', 'value' => $this->lblModifiedDate->Render(false));
 	}
-	
-	$arrAssetFields[] = array('name' => 'Image:', 'value' => $this->ifcImage->RenderWithError(false) . $this->lblImage->Render(false));
 
 ?>
 

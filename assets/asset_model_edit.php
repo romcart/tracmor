@@ -186,7 +186,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	// Output the image
 	protected function lblImage_Create() {
 		$this->lblImage = new QLabel($this);
-		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath, $this->objAssetModel->AssetModelId . "_asset_model_image");
+		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath);
 		$this->lblImage->HtmlEntities = false;
 	}
 
@@ -210,8 +210,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		// $this->ifcImage->FileName = $this->objAssetModel->ImagePath;
 		$this->ifcImage->Name = 'Upload Picture';
 		$this->ifcImage->BuildThumbs = true;
-		$this->ifcImage->ThumbWidth = 240;
-		$this->ifcImage->ThumbHeight = 240;
+		$this->ifcImage->ThumbWidth = 150;
+		$this->ifcImage->ThumbHeight = 250;
 		$this->ifcImage->Required = false;
 		// $this->ifcImage->ThumbPrefix = "thumb_";
 		$this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
@@ -573,7 +573,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblCategory->Text = $this->lstCategory->SelectedName;
 		$this->lblManufacturer->Text = $this->lstManufacturer->SelectedName;
 		$this->pnlLongDescription->Text = nl2br($this->txtLongDescription->Text);
-		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath, $this->objAssetModel->AssetModelId . "_asset_model_image");
+		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath);
 
 		// Update custom labels
 		if ($this->arrCustomFields) {
