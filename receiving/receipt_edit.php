@@ -1007,7 +1007,7 @@
 							$lstLocationAssetReceived->AddItem($objLocation->__toString(), $objLocation->LocationId, $blnSelected);
 						}
 					}
-					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveAssetTransaction'));
+					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnReceiveAssetTransaction_Click'));
 					$lstLocationAssetReceived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 					if ($objAssetTransaction->Asset->LinkedFlag) {
             $lstLocationAssetReceived->Enabled = false;
