@@ -32,8 +32,7 @@
 <!-- End Header Menu -->
 <!-- Begin Shortcut Menu -->
 <?php
-	//$this->ctlShortcutMenu->Render();
-	include('./shortcut_menu.inc.php');
+	include('shortcut_menu.inc.php');
 ?>
 <!-- End Shortcut Menu -->
 </td>
@@ -44,10 +43,10 @@
 		<table cellpadding="5" cellspacing="0" width="100%">
 			<tr>
 				<td>
-					<table width="100%">
+				  <table width="100%">
 						<tr>
 							<td>
-							<div class="title"><?php _t('Import Companies') ?></div>
+							 <div class="title"><?php _t('Import Asset') ?></div>
 							 <?php if (!$this->blnError) { ?>
 					     <?php $this->pnlMain->Render(); ?>
 							 </td>

@@ -654,10 +654,9 @@
                       $strManufacturerDescription = trim($strRowArray[$this->intManufacturerDescriptionKey]);
                     else
                       $strManufacturerDescription = (isset($this->txtMapDefaultValueArray[$this->intManufacturerDescriptionKey])) ? trim($this->txtMapDefaultValueArray[$this->intManufacturerDescriptionKey]->Text) : '';
-                  $strManufacturerValuesArray[] = sprintf("('%s', '%s', '%s', NOW())", addslashes(trim($strRowArray[$this->intManufacturerKey])), addslashes($strManufacturerDescription), $_SESSION['intUserAccountId']);
-                  $strNewManufacturerArray[] = addslashes(trim($strRowArray[$this->intManufacturerKey]));
 
                   $strCFVArray = array();
+                  $blnCheckCFVError = false;
                   // Custom Field import
                   foreach ($arrItemCustomField as $objCustomField) {
                     if ($objCustomField->CustomFieldQtypeId != 2) {
@@ -675,27 +674,37 @@
                 					  }
                 					}
                 					// Add the CustomFieldValue
-                					if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
+                					/*if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
                 						$strQuery = sprintf("INSERT INTO custom_field_value (custom_field_id, short_description, created_by, creation_date) VALUES (%s, '%s', %s, NOW());", $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
                 						$objDatabase->NonQuery($strQuery);
                 						$strAddedCFVArray[] = $strShortDescription;
                 					}
-                					elseif (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                					else*/
+                					if (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
                             $strShortDescription = $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                  					}
-                          if ($strShortDescription/* && $intCustomFieldValueId*/) {
-                            $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
-                          }
-                          else {
-                            $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
-                          }
+                          elseif (!$blnInList) {
+                 				    $blnCheckCFVError = true;
+                 				    break;
+                 				  }
+                 				  if (!$blnCheckCFVError)
+                   				  if ($strShortDescription/* && $intCustomFieldValueId*/) {
+                              $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
+                            }
+                            else {
+                              $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
+                            }
                         }
                  }
-                 if (count($strCFVArray)) {
-                   $strItemCFVArray[] = implode(', ', $strCFVArray);
-                 }
-                 else {
-                   $strItemCFVArray[] = "";
+                 if (!$blnCheckCFVError) {
+                   if (count($strCFVArray)) {
+                     $strItemCFVArray[] = implode(', ', $strCFVArray);
+                   }
+                   else {
+                     $strItemCFVArray[] = "";
+                   }
+                   $strManufacturerValuesArray[] = sprintf("('%s', '%s', '%s', NOW())", addslashes(trim($strRowArray[$this->intManufacturerKey])), addslashes($strManufacturerDescription), $_SESSION['intUserAccountId']);
+                  $strNewManufacturerArray[] = addslashes(trim($strRowArray[$this->intManufacturerKey]));
                  }
 
                 }
@@ -709,9 +718,7 @@
                       else
                         $strManufacturerDescription = (isset($this->txtMapDefaultValueArray[$this->intManufacturerDescriptionKey])) ? trim($this->txtMapDefaultValueArray[$this->intManufacturerDescriptionKey]->Text) : '';
                     $this->arrOldItemArray[$objManufacturer->ManufacturerId] = $objManufacturer;
-                    $strUpdatedManufacturerValuesArray[] = sprintf("UPDATE `manufacturer` SET `short_description`='%s', `long_description`='%s' WHERE `manufacturer_id`='%s'", addslashes(trim($strRowArray[$this->intManufacturerKey])), addslashes($strManufacturerDescription), $objManufacturer->ManufacturerId);
-                    $this->objUpdatedItemArray[$objManufacturer->ManufacturerId] = $objManufacturer->ShortDescription;
-
+                    $blnCheckCFVError = false;
                     foreach ($arrItemCustomField as $objCustomField) {
                       if ($objCustomField->CustomFieldQtypeId != 2) {
                        	$strShortDescription = (trim($strRowArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ? addslashes(trim($strRowArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]])) : addslashes($this->txtMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
@@ -730,27 +737,37 @@
                     			}
                     		}
                     		// Add the CustomFieldValue
-                    		if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
+                    		/*if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
                     			$strQuery = sprintf("INSERT INTO custom_field_value (custom_field_id, short_description, created_by, creation_date) VALUES (%s, '%s', %s, NOW());", $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
                     			$objDatabase->NonQuery($strQuery);
                     			$strAddedCFVArray[] = $strShortDescription;
                     		}
-                    		elseif (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                    		else*/
+                    		if (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
                                 $strShortDescription = $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                					}
-                        if ($strShortDescription) {
-                          $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
-                        }
-                        else {
-                          $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
-                        }
+               					elseif (!$blnInList) {
+                 				  $blnCheckCFVError = true;
+                 				  break;
+                 				}
+                 				if (!$blnCheckCFVError)
+                          if ($strShortDescription) {
+                            $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
+                          }
+                          else {
+                            $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
+                          }
                       }
+                    }
+                    if (!$blnCheckCFVError) {
                       if (count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objManufacturer->ManufacturerId] = $strCFVArray;
                       }
                       else {
                         $strUpdatedItemCFVArray[$intItemId] = "";
                       }
+                      $strUpdatedManufacturerValuesArray[] = sprintf("UPDATE `manufacturer` SET `short_description`='%s', `long_description`='%s' WHERE `manufacturer_id`='%s'", addslashes(trim($strRowArray[$this->intManufacturerKey])), addslashes($strManufacturerDescription), $objManufacturer->ManufacturerId);
+                    $this->objUpdatedItemArray[$objManufacturer->ManufacturerId] = $objManufacturer->ShortDescription;
                     }
                   }
                   else {
@@ -805,10 +822,9 @@
                   }
                 }
               }
-              $this->intImportStep = 6; // The import have been completed
             }
           }
-          if ($this->intImportStep == 6) {
+          if ($this->intImportStep == 3) {
             /*if (count($this->strSelectedValueArray)) {
               $objDatabase = CustomField::GetDatabase();
               $strQuery = sprintf("INSERT INTO `custom_field_selection` " .

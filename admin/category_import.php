@@ -641,10 +641,9 @@
                       $strCategoryDescription = trim($strRowArray[$this->intCategoryDescriptionKey]);
                     else
                       $strCategoryDescription = (isset($this->txtMapDefaultValueArray[$this->intCategoryDescriptionKey])) ? trim($this->txtMapDefaultValueArray[$this->intCategoryDescriptionKey]->Text) : '';
-                  $strCategoryValuesArray[] = sprintf("('%s', '%s', '1', '1', '%s', NOW())", addslashes(trim($strRowArray[$this->intCategoryKey])), addslashes($strCategoryDescription), $_SESSION['intUserAccountId']);
-                  $strNewCategoryArray[] = addslashes(trim($strRowArray[$this->intCategoryKey]));
 
                   $strCFVArray = array();
+                  $blnCheckCFVError = false;
                   // Custom Field import
                   foreach ($arrItemCustomField as $objCustomField) {
                     if ($objCustomField->CustomFieldQtypeId != 2) {
@@ -662,29 +661,38 @@
                 					  }
                 					}
                 					// Add the CustomFieldValue
-                					if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
+                					/*if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
                 						$strQuery = sprintf("INSERT INTO custom_field_value (custom_field_id, short_description, created_by, creation_date) VALUES (%s, '%s', %s, NOW());", $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
                 						$objDatabase->NonQuery($strQuery);
                 						$strAddedCFVArray[] = $strShortDescription;
                 					}
-                					elseif (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                					else*/
+                					if (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
                             $strShortDescription = $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                  					}
-                          if ($strShortDescription/* && $intCustomFieldValueId*/) {
-                            $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
-                          }
-                          else {
-                            $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
-                          }
+                          elseif (!$blnInList) {
+                 				    $blnCheckCFVError = true;
+                 				    break;
+                 				  }
+                 				  if (!$blnCheckCFVError)
+                   				  if ($strShortDescription/* && $intCustomFieldValueId*/) {
+                              $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
+                            }
+                            else {
+                              $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
+                            }
                         }
-                 }
-                 if (count($strCFVArray)) {
-                   $strItemCFVArray[] = implode(', ', $strCFVArray);
-                 }
-                 else {
-                   $strItemCFVArray[] = "";
-                 }
-
+                   }
+                   if (!$blnCheckCFVError) {
+                     if (count($strCFVArray)) {
+                       $strItemCFVArray[] = implode(', ', $strCFVArray);
+                     }
+                     else {
+                       $strItemCFVArray[] = "";
+                     }
+                     $strCategoryValuesArray[] = sprintf("('%s', '%s', '1', '1', '%s', NOW())", addslashes(trim($strRowArray[$this->intCategoryKey])), addslashes($strCategoryDescription), $_SESSION['intUserAccountId']);
+                     $strNewCategoryArray[] = addslashes(trim($strRowArray[$this->intCategoryKey]));
+                   }
                 }
                 // Update action
                 elseif (trim($strRowArray[$this->intCategoryKey]) && $this->lstImportAction->SelectedValue == 2  && !$this->in_array_nocase(trim($strRowArray[$this->intCategoryKey]), $this->objUpdatedItemArray) && $objCategory) {
@@ -697,9 +705,7 @@
                       else
                         $strCategoryDescription = (isset($this->txtMapDefaultValueArray[$this->intCategoryDescriptionKey])) ? trim($this->txtMapDefaultValueArray[$this->intCategoryDescriptionKey]->Text) : '';
                     $this->arrOldItemArray[$objCategory->CategoryId] = $objCategory;
-                    $strUpdatedCategoryValuesArray[] = sprintf("UPDATE `category` SET `short_description`='%s', `long_description`='%s' WHERE `category_id`='%s'", addslashes(trim($strRowArray[$this->intCategoryKey])), addslashes($strCategoryDescription), $objCategory->CategoryId);
-                    $this->objUpdatedItemArray[$objCategory->CategoryId] = $objCategory->ShortDescription;
-
+                    $blnCheckCFVError = false;
                     foreach ($arrItemCustomField as $objCustomField) {
 
                       //$objItem = $objCategoryArray[strtolower($objUpdatedItem)];
@@ -720,27 +726,38 @@
                     			}
                     		}
                     		// Add the CustomFieldValue
-                    		if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
+                    		/*if (!$blnInList && !in_array($strShortDescription, $strAddedCFVArray)) {
                     			$strQuery = sprintf("INSERT INTO custom_field_value (custom_field_id, short_description, created_by, creation_date) VALUES (%s, '%s', %s, NOW());", $objCustomField->CustomFieldId, $strShortDescription, $_SESSION['intUserAccountId']);
                     			$objDatabase->NonQuery($strQuery);
                     			$strAddedCFVArray[] = $strShortDescription;
                     		}
-                    		elseif (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
+                    		else*/
+                    		if (!$blnInList && $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedValue != null) {
                                 $strShortDescription = $this->lstMapDefaultValueArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]->SelectedName;
                					}
-                        if ($strShortDescription) {
-                          $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
-                        }
-                        else {
-                          $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
-                        }
+               					elseif (!$blnInList) {
+                 				  $blnCheckCFVError = true;
+                 				  break;
+                 				}
+                 				if (!$blnCheckCFVError)
+                          if ($strShortDescription) {
+                            $strCFVArray[$objCustomField->CustomFieldId] = sprintf("'%s'", $strShortDescription);
+                          }
+                          else {
+                            $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
+                          }
                       }
+                    }
+                    if (!$blnCheckCFVError) {
                       if (count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objCategory->CategoryId] = $strCFVArray;
                       }
                       else {
                         $strUpdatedItemCFVArray[$intItemKey] = "";
                       }
+                      $strUpdatedCategoryValuesArray[] = sprintf("UPDATE `category` SET `short_description`='%s', `long_description`='%s' WHERE `category_id`='%s'", addslashes(trim($strRowArray[$this->intCategoryKey])), addslashes($strCategoryDescription), $objCategory->CategoryId);
+                    $this->objUpdatedItemArray[$objCategory->CategoryId] = $objCategory->ShortDescription;
+
                     }
                   }
                   else {
