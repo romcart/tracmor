@@ -734,7 +734,7 @@
           // Loads array of AssetModelId
           $arrAssetModelArray = AssetModel::LoadAllIntoArray();
           $arrAssetModelId = array();
-          if (count($arrAssetModel)) {
+          if (count($arrAssetModelArray)) {
             foreach ($arrAssetModelArray as $arrAssetModel) {
               $arrAssetModelId[$arrAssetModel['asset_model_id']] = true;
             }
