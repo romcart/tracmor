@@ -22,8 +22,8 @@ INSERT INTO `location` (`location_id`, `short_description`, `long_description`, 
 	(1,'Checked Out',NULL,'1',NULL,NULL,NULL,NULL),
 	(2,'Shipped',NULL,'1',NULL,NULL,NULL,NULL),
 	(3,'Taken Out',NULL,'1',NULL,NULL,NULL,NULL),
-	(4,'New Inventory','1',NULL,NULL,NULL,NULL,NULL),
-	(5,'To Be Received','1',NULL,NULL,NULL,NULL,NULL),
+	(4,'New Inventory',NULL,'1',NULL,NULL,NULL,NULL),
+	(5,'To Be Received',NULL,'1',NULL,NULL,NULL,NULL),
 	(6,'Archived',NULL,'1',NULL,NULL,NULL,NULL);
 
 INSERT INTO `transaction_type` VALUES
