@@ -992,9 +992,6 @@
                     	$strQuery = sprintf("INSERT INTO `asset_model_custom_field_helper` (`asset_model_id`) VALUES %s", implode(", ", $strModelIdArray));
                     }
                     $objDatabase->NonQuery($strQuery);
-                    for ($i=0; $i<$intModelCount; $i++) {
-                      $this->objNewAssetModelArray[$intInsertId+$i] = $strModelCodeArray[$i];
-                    }
                   }
 
                   $this->strModelValuesArray = array();
