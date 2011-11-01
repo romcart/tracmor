@@ -314,7 +314,7 @@
 
 		// Create and Setup the table per each page for Bar Code Label Generation
 		protected function CreateTableByBarCodeArray() {
-		  $strTable = "<table height=\"100%\" border=\"1\" style=\"text-align:center\">";
+		  $strTable = "<table height=\"100%\" border=\"0\" style=\"text-align:center\">";
 		  $intBarCodeArrayCount = count($this->strBarCodeArray);
 		  switch ($this->lstLabelStock->SelectedValue) {
   		  case 1:
