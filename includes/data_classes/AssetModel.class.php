@@ -489,7 +489,7 @@
 
 	  protected static function GenerateSearchSql ($intCategoryId = null, $intManufacturerId = null, $strDescription = null, $strAssetModelCode = null, $arrCustomFields = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $blnAttachment = null, $intAssetModelId = null) {
 
-			$arrSearchSql = array("strCategorySql" => "", "strManufacturerSql" => "", "strDescriptionSql" => "", "strAssetModelCodeSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAttachmentSql" => "", "strAuthorizationSql" => "", "strAssetNodelIdSql" => "");
+			$arrSearchSql = array("strCategorySql" => "", "strManufacturerSql" => "", "strDescriptionSql" => "", "strAssetModelCodeSql" => "", "strCustomFieldsSql" => "", "strDateModifiedSql" => "", "strAttachmentSql" => "", "strAuthorizationSql" => "", "strAssetModelIdSql" => "");
 
 			if ($intCategoryId) {
   			// Properly Escape All Input Parameters using Database->SqlVariable()
