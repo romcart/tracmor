@@ -693,12 +693,12 @@
                 $strRowArray = $this->FileCsvData->getRow($i);
                 $strAssetCode = (trim($strRowArray[$intAssetCodeKey])) ? addslashes(trim($strRowArray[$intAssetCodeKey])) : false;
                 //$strAssetCode = (trim($strRowArray[$intAssetCodeKey])) ? trim($strRowArray[$intAssetCodeKey]) : false;
-                $strKeyArray = array_keys($intLocationArray, strtolower(trim($strRowArray[$intLocationKey])));
+                $strKeyArray = array_keys($intLocationArray, (isset($strRowArray[$intLocationKey])) ? strtolower(trim($strRowArray[$intLocationKey])) : array());
                 if (count($strKeyArray)) {
                   $intLocationId = $strKeyArray[0];
                 }
                 else {
-                  $strKeyArray = array_keys($intLocationArray, strtolower(trim($txtMapDefaultValueArray[$intLocationKey]->Text)));
+                  $strKeyArray = array_keys($intLocationArray, strtolower(trim($this->txtMapDefaultValueArray[$intLocationKey]->Text)));
                   if (count($strKeyArray)) {
                     $intLocationId = $strKeyArray[0];
                   }
@@ -711,7 +711,7 @@
                   $intAssetModelId = $strKeyArray[0];
                 }
                 else {
-                  $strKeyArray = array_keys($intAssetModelArray, strtolower(trim($txtMapDefaultValueArray[$intAssetModelDescriptionKey]->Text)));
+                  $strKeyArray = array_keys($intAssetModelArray, strtolower(trim($this->txtMapDefaultValueArray[$intAssetModelDescriptionKey]->Text)));
                   if (count($strKeyArray)) {
                     $intAssetModelId = $strKeyArray[0];
                   }
@@ -720,13 +720,13 @@
                   }
                 }
                 $blnError = false;
-                if (isset($strRowArray[$intParentAssetKey])) {
+                if (isset($intParentAssetKey) && isset($strRowArray[$intParentAssetKey])) {
                   $strKeyArray = array_keys($arrAssetId, strtolower(trim($strRowArray[$intParentAssetKey])));
                   if (count($strKeyArray)) {
                     $intParentAssetId = $strKeyArray[0];
                   }
                   else {
-                    $strKeyArray = array_keys($arrAssetId, strtolower(trim($txtMapDefaultValueArray[$intParentAssetKey]->Text)));
+                    $strKeyArray = array_keys($arrAssetId, strtolower(trim($this->txtMapDefaultValueArray[$intParentAssetKey]->Text)));
                     if (count($strKeyArray)) {
                       $intParentAssetId = $strKeyArray[0];
                     }
@@ -977,9 +977,6 @@
                     	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES %s", implode(", ", $strAssetIdArray));
                     }
                     $objDatabase->NonQuery($strQuery);
-                    for ($i=0; $i<$intModelCount; $i++) {
-                      $this->objNewAssetArray[$intInsertId+$i] = $strModelCodeArray[$i];
-                    }
                   }
 
                   $this->strAssetValuesArray = array();
@@ -1034,7 +1031,7 @@
 
             $this->lblImportResults->Display = true;
             if (count($this->objNewAssetArray)) {
-              $this->lblImportAssets->Display = true;
+              //$this->lblImportAssets->Display = true;
               $this->dtgAsset->Paginator = new QPaginator($this->dtgAsset);
               $this->dtgAsset->ItemsPerPage = 20;
 
