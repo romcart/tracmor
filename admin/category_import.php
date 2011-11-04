@@ -684,7 +684,7 @@
                         }
                    }
                    if (!$blnCheckCFVError) {
-                     if (count($strCFVArray)) {
+                     if (isset($strCFVArray) && count($strCFVArray)) {
                        $strItemCFVArray[] = implode(', ', $strCFVArray);
                      }
                      else {
@@ -749,11 +749,11 @@
                       }
                     }
                     if (!$blnCheckCFVError) {
-                      if (count($strCFVArray)) {
+                      if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objCategory->CategoryId] = $strCFVArray;
                       }
                       else {
-                        $strUpdatedItemCFVArray[$intItemKey] = "";
+                        $strUpdatedItemCFVArray[$objCategory->CategoryId] = "";
                       }
                       $strUpdatedCategoryValuesArray[] = sprintf("UPDATE `category` SET `short_description`='%s', `long_description`='%s' WHERE `category_id`='%s'", addslashes(trim($strRowArray[$this->intCategoryKey])), addslashes($strCategoryDescription), $objCategory->CategoryId);
                     $this->objUpdatedItemArray[$objCategory->CategoryId] = $objCategory->ShortDescription;
@@ -805,7 +805,7 @@
                     foreach ($arrItemCustomField as $objCustomField) {
                       $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                     }
-                    if (count($strCFVArray)) {
+                    if (isset($strCFVArray) && count($strCFVArray)) {
                       $strQuery = sprintf("UPDATE `category_custom_field_helper` SET %s WHERE `category_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
                       $objDatabase->NonQuery($strQuery);
                     }
@@ -1085,7 +1085,7 @@
             $strCFV = $objOldItem->GetVirtualAttribute($objCustomField->CustomFieldId);
             $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
           }
-          if (count($strCFVArray)) {
+          if (isset($strCFVArray) && count($strCFVArray)) {
             $strQuery = sprintf("UPDATE `category_custom_field_helper` SET %s WHERE `category_id`='%s'", implode(", ", $strCFVArray), $intItemId);
             $objDatabase->NonQuery($strQuery);
           }

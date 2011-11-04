@@ -781,6 +781,7 @@
                 }
                 else {
                   if ($this->lstImportAction->SelectedValue == 2) {
+                    $intItemId = intval(trim($strRowArray[$this->intItemIdKey]));
                     if ($intItemId > 0 && array_key_exists($intItemId, $arrAssetId)) {
                       //QApplication::$Database[1]->EnableProfiling();
                       $objAssetArray = Asset::LoadArrayBySearchHelper(null, null, null, null, null, false, null, null, null, null, null, null, null, null, null, false, null, null, null, false, false, false, null, null, false, $intItemId);
@@ -848,7 +849,7 @@
                         $strAssetArray[] = $strAssetCode;
                         $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW())", $strAssetCode, $intLocationId, $intAssetModelId, ($intParentAssetId) ? $intParentAssetId : "NULL", ($blnLinked) ? "1" : "0", $_SESSION['intUserAccountId']);
                         $objNewAssetArray[] = $strAssetCode;
-                        if (count($strCFVArray)) {
+                        if (isset($strCFVArray) && count($strCFVArray)) {
                           $strAssetCFVArray[] = implode(', ', $strCFVArray);
                         }
                         else {
@@ -914,7 +915,7 @@
                     }
                     if (!$blnCheckCFVError) {
                       $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", implode(", ", $strUpdateFieldArray), $objAsset->AssetId);
-                      if (count($strCFVArray)) {
+                      if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objAsset->AssetId] = $strCFVArray;
                       }
                       else {
@@ -928,7 +929,7 @@
                         $strCFV = $objAsset->GetVirtualAttribute($objCustomField->CustomFieldId);
                         $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
                       }
-                      if (count($strCFVArray)) {
+                      if (isset($strCFVArray) && count($strCFVArray)) {
                         $strCFVQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemId);
                       }
                       else {
@@ -993,7 +994,7 @@
                       foreach ($arrAssetCustomField as $objCustomField) {
                         $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                       }
-                      if (count($strCFVArray)) {
+                      if (isset($strCFVArray) && count($strCFVArray)) {
                         $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
                         $objDatabase->NonQuery($strQuery);
                       }

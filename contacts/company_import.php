@@ -139,12 +139,13 @@
 			  $this->arrItemCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
 			$this->blnError = true;
+			$intRoleId = QApplication::$objUserAccount->RoleId;
 			$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId($intRoleId, EntityQtype::Company, 2);
 			// Check the user have edit permissions
 			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 			  $this->blnError = false;
 			}
-			if (count($intCustomFieldIdArray)) {
+			if (isset($intCustomFieldIdArray) && count($intCustomFieldIdArray)) {
   		  //QApplication::$Database[1]->EnableProfiling();
   		  // Load restrict permisions for Custom Fields
   		  $objConditions = QQ::AndCondition(
@@ -713,7 +714,7 @@
                     else
                       $strFax = (isset($this->txtMapDefaultValueArray[$this->intFaxKey])) ? trim($this->txtMapDefaultValueArray[$this->intFaxKey]->Text) : '';
 
-                  $blnCheckCFVError = true;
+                  $blnCheckCFVError = false;
                   $strCFVArray = array();
                   // Custom Field import
                   foreach ($arrItemCustomField as $objCustomField) {
@@ -755,7 +756,7 @@
                         }
                    }
                    if (!$blnCheckCFVError) {
-                     if (count($strCFVArray)) {
+                     if (isset($strCFVArray) && count($strCFVArray)) {
                        $strItemCFVArray[] = implode(', ', $strCFVArray);
                      }
                      else {
@@ -775,14 +776,14 @@
                         $strCompany = trim($strRowArray[$this->intCompanyKey]);
                       else
                         $strCompany = (isset($this->txtMapDefaultValueArray[$this->intCompanyKey])) ? trim($this->txtMapDefaultValueArray[$this->intCompanyKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`short_description`='%s'", $strCompany);
+                      $strUpdateFieldArray[] = sprintf("`short_description`='%s'", addslashes($strCompany));
                     }
                     if (isset($this->intCompanyDescriptionKey)) {
                       if (trim($strRowArray[$this->intCompanyDescriptionKey]))
                         $strCompanyDescription = trim($strRowArray[$this->intCompanyDescriptionKey]);
                       else
                         $strCompanyDescription = (isset($this->txtMapDefaultValueArray[$this->intCompanyDescriptionKey])) ? trim($this->txtMapDefaultValueArray[$this->intCompanyDescriptionKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`long_description`='%s'", $strCompanyDescription);
+                      $strUpdateFieldArray[] = sprintf("`long_description`='%s'", addslashes($strCompanyDescription));
                     }
                     $strWebsite = "";
                     if (isset($this->intWebsiteKey)) {
@@ -790,7 +791,7 @@
                         $strWebsite = trim($strRowArray[$this->intWebsiteKey]);
                       else
                         $strWebsite = (isset($this->txtMapDefaultValueArray[$this->intWebsiteKey])) ? trim($this->txtMapDefaultValueArray[$this->intWebsiteKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`website`='%s'", $strWebsite);
+                      $strUpdateFieldArray[] = sprintf("`website`='%s'", addslashes($strWebsite));
                     }
                     $strEmail = "";
                     if (isset($this->intEmailKey)) {
@@ -798,7 +799,7 @@
                         $strEmail = trim($strRowArray[$this->intEmailKey]);
                       else
                         $strEmail = (isset($this->txtMapDefaultValueArray[$this->intEmailKey])) ? trim($this->txtMapDefaultValueArray[$this->intEmailKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`email`='%s'", $strEmail);
+                      $strUpdateFieldArray[] = sprintf("`email`='%s'", addslashes($strEmail));
                     }
                     $strTelephone = "";
                     if (isset($this->intTelephoneKey)) {
@@ -806,7 +807,7 @@
                         $strTelephone = trim($strRowArray[$this->intTelephoneKey]);
                       else
                         $strTelephone = (isset($this->txtMapDefaultValueArray[$this->intTelephoneKey])) ? trim($this->txtMapDefaultValueArray[$this->intTelephoneKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`telephone`='%s'", $strTelephone);
+                      $strUpdateFieldArray[] = sprintf("`telephone`='%s'", addslashes($strTelephone));
                     }
                     $strFax = "";
                     if (isset($this->intFaxKey)) {
@@ -814,7 +815,7 @@
                         $strFax = trim($strRowArray[$this->intFaxKey]);
                       else
                         $strFax = (isset($this->txtMapDefaultValueArray[$this->intFaxKey])) ? trim($this->txtMapDefaultValueArray[$this->intFaxKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`fax`='%s'", $strFax);
+                      $strUpdateFieldArray[] = sprintf("`fax`='%s'", addslashes($strFax));
                     }
                     $strUpdateFieldArray[] = sprintf("modified_by='%s'", $_SESSION['intUserAccountId']);
                     $this->arrOldItemArray[$objCompany->CompanyId] = $objCompany;
@@ -868,17 +869,17 @@
                       }
                     }
                     if (!$blnCheckCFVError) {
-                        if (count($strCFVArray)) {
+                        if (isset($strCFVArray) && count($strCFVArray)) {
                           $strItemCFVArray[] = implode(', ', $strCFVArray);
                         }
                         else {
                           $strItemCFVArray[] = "";
                         }
-                        if (count($strCFVArray)) {
+                        if (isset($strCFVArray) && count($strCFVArray)) {
                           $strUpdatedItemCFVArray[$objCompany->CompanyId] = $strCFVArray;
                         }
                         else {
-                          $strUpdatedItemCFVArray[$intItemKey] = "";
+                          $strUpdatedItemCFVArray[$objCompany->CompanyId] = "";
                         }
                         $strUpdatedCompanyValuesArray[] = sprintf("UPDATE `company` SET %s WHERE `company_id`='%s'", implode(", ", $strUpdateFieldArray), $objCompany->CompanyId);
                         $this->objUpdatedItemArray[$objCompany->CompanyId] = $objCompany->ShortDescription;
@@ -929,7 +930,7 @@
                     foreach ($arrItemCustomField as $objCustomField) {
                       $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                     }
-                    if (count($strCFVArray)) {
+                    if (isset($strCFVArray) && count($strCFVArray)) {
                       $strQuery = sprintf("UPDATE `company_custom_field_helper` SET %s WHERE `company_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
                       $objDatabase->NonQuery($strQuery);
                     }
@@ -1209,7 +1210,7 @@
             $strCFV = $objOldItem->GetVirtualAttribute($objCustomField->CustomFieldId);
             $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
           }
-          if (count($strCFVArray)) {
+          if (isset($strCFVArray) && count($strCFVArray)) {
             $strQuery = sprintf("UPDATE `company_custom_field_helper` SET %s WHERE `company_id`='%s'", implode(", ", $strCFVArray), $intItemId);
             $objDatabase->NonQuery($strQuery);
           }

@@ -144,12 +144,13 @@
 			  $this->arrItemCustomField[$objCustomField->CustomFieldId] = $objCustomField;
 			}
 			$this->blnError = true;
+			$intRoleId = QApplication::$objUserAccount->RoleId;
 			$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId($intRoleId, EntityQtype::Contact, 2);
 			// Check the user have edit permissions
 			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 			  $this->blnError = false;
 			}
-			if (count($intCustomFieldIdArray)) {
+			if (isset($intCustomFieldIdArray) && count($intCustomFieldIdArray)) {
   		  //QApplication::$Database[1]->EnableProfiling();
   		  // Load restrict permisions for Custom Fields
   		  $objConditions = QQ::AndCondition(
@@ -811,14 +812,14 @@
                         }
                    }
                    if (!$blnCheckCFVError) {
-                     if (count($strCFVArray)) {
+                     if (isset($strCFVArray) && count($strCFVArray)) {
                        $strItemCFVArray[] = implode(', ', $strCFVArray);
                      }
                      else {
                        $strItemCFVArray[] = "";
                      }
                      $strContactValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW())", $intCompanyId, addslashes($strFirstName), addslashes($strLastName), addslashes($strTitle), addslashes($strEmail), addslashes($strDescription),  addslashes($strOfficePhone), addslashes($strHomePhone), addslashes($strMobilePhone), addslashes($strFax), $_SESSION['intUserAccountId']);
-                    $strNewContactArray[] = addslashes(sprintf("%s %s", trim($strRowArray[$this->intFirstNameKey]), trim($strRowArray[$this->intLastNameKey])));
+                    $strNewContactArray[] = addslashes(sprintf("%s %s", (isset($this->intFirstNameKey)) ? trim($strRowArray[$this->intFirstNameKey]) : "", trim($strRowArray[$this->intLastNameKey])));
                    }
                 }
                 // Update action
@@ -826,14 +827,14 @@
                   if (!$blnError) {
                     $strUpdateFieldArray = array();
                     //$objContact = $objContactArray[strtolower(trim($strRowArray[$this->intCompanyKey]))];
-                    $strUpdateFieldArray[] = sprintf("`company_id`='%s'", $intCompanyId);
+                    $strUpdateFieldArray[] = sprintf("`company_id`='%s'", addslashes($intCompanyId));
                     $strDescription = "";
                     if (isset($this->intDescriptionKey)) {
                       if (trim($strRowArray[$this->intDescriptionKey]))
                         $strDescription = trim($strRowArray[$this->intDescriptionKey]);
                       else
                         $strDescription = (isset($this->txtMapDefaultValueArray[$this->intDescriptionKey])) ? trim($this->txtMapDefaultValueArray[$this->intDescriptionKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`description`='%s'", $strDescription);
+                      $strUpdateFieldArray[] = sprintf("`description`='%s'", addslashes($strDescription));
                     }
                     $strLastName = "";
                     if (isset($this->intLastNameKey)) {
@@ -841,7 +842,7 @@
                         $strLastName = trim($strRowArray[$this->intLastNameKey]);
                       else
                         $strLastName = (isset($this->txtMapDefaultValueArray[$this->intLastNameKey])) ? trim($this->txtMapDefaultValueArray[$this->intLastNameKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`last_name`='%s'", $strLastName);
+                      $strUpdateFieldArray[] = sprintf("`last_name`='%s'", addslashes($strLastName));
                     }
                     $strFirstName = "";
                     if (isset($this->intFirstNameKey)) {
@@ -849,7 +850,7 @@
                         $strFirstName = trim($strRowArray[$this->intFirstNameKey]);
                       else
                         $strFirstName = (isset($this->txtMapDefaultValueArray[$this->intFirstNameKey])) ? trim($this->txtMapDefaultValueArray[$this->intFirstNameKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`first_name`='%s'", $strFirstName);
+                      $strUpdateFieldArray[] = sprintf("`first_name`='%s'", addslashes($strFirstName));
                     }
                     $strEmail = "";
                     if (isset($this->intEmailKey)) {
@@ -857,7 +858,7 @@
                         $strEmail = trim($strRowArray[$this->intEmailKey]);
                       else
                         $strEmail = (isset($this->txtMapDefaultValueArray[$this->intEmailKey])) ? trim($this->txtMapDefaultValueArray[$this->intEmailKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`email`='%s'", $strEmail);
+                      $strUpdateFieldArray[] = sprintf("`email`='%s'", addslashes($strEmail));
                     }
                     $strOfficePhone = "";
                     if (isset($this->intOfficePhoneKey)) {
@@ -865,7 +866,7 @@
                         $strOfficePhone = trim($strRowArray[$this->intOfficePhoneKey]);
                       else
                         $strOfficePhone = (isset($this->txtMapDefaultValueArray[$this->intOfficePhoneKey])) ? trim($this->txtMapDefaultValueArray[$this->intOfficePhoneKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`phone_office`='%s'", $strOfficePhone);
+                      $strUpdateFieldArray[] = sprintf("`phone_office`='%s'", addslashes($strOfficePhone));
                     }
                     $strHomePhone = "";
                     if (isset($this->intHomePhoneKey)) {
@@ -873,7 +874,7 @@
                         $strHomePhone = trim($strRowArray[$this->intHomePhoneKey]);
                       else
                         $strHomePhone = (isset($this->txtMapDefaultValueArray[$this->intHomePhoneKey])) ? trim($this->txtMapDefaultValueArray[$this->intHomePhoneKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`phone_home`='%s'", $strHomePhone);
+                      $strUpdateFieldArray[] = sprintf("`phone_home`='%s'", addslashes($strHomePhone));
                     }
                     $strMobilePhone = "";
                     if (isset($this->intMobilePhoneKey)) {
@@ -881,7 +882,7 @@
                         $strMobilePhone = trim($strRowArray[$this->intMobilePhoneKey]);
                       else
                         $strMobilePhone = (isset($this->txtMapDefaultValueArray[$this->intMobilePhoneKey])) ? trim($this->txtMapDefaultValueArray[$this->intMobilePhoneKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`phone_mobile`='%s'", $strMobilePhone);
+                      $strUpdateFieldArray[] = sprintf("`phone_mobile`='%s'", addslashes($strMobilePhone));
                     }
                     $strFax = "";
                     if (isset($this->intFaxKey)) {
@@ -889,7 +890,7 @@
                         $strFax = trim($strRowArray[$this->intFaxKey]);
                       else
                         $strFax = (isset($this->txtMapDefaultValueArray[$this->intFaxKey])) ? trim($this->txtMapDefaultValueArray[$this->intFaxKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`fax`='%s'", $strFax);
+                      $strUpdateFieldArray[] = sprintf("`fax`='%s'", addslashes($strFax));
                     }
                     $strTitle = "";
                     if (isset($this->intTitleKey)) {
@@ -897,7 +898,7 @@
                         $strTitle = trim($strRowArray[$this->intTitleKey]);
                       else
                         $strTitle = (isset($this->txtMapDefaultValueArray[$this->intTitleKey])) ? trim($this->txtMapDefaultValueArray[$this->intTitleKey]->Text) : '';
-                      $strUpdateFieldArray[] = sprintf("`title`='%s'", $strTitle);
+                      $strUpdateFieldArray[] = sprintf("`title`='%s'", addslashes($strTitle));
                     }
                     $strUpdateFieldArray[] = sprintf("modified_by='%s'", $_SESSION['intUserAccountId']);
                     $this->arrOldItemArray[$objContact->ContactId] = $objContact;
@@ -945,11 +946,11 @@
                       }
                     }
                     if (!$blnCheckCFVError) {
-                      if (count($strCFVArray)) {
+                      if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objContact->ContactId] = $strCFVArray;
                       }
                       else {
-                        $strUpdatedItemCFVArray[$intItemKey] = "";
+                        $strUpdatedItemCFVArray[$objContact->ContactId] = "";
                       }
                       $strUpdatedContactValuesArray[] = sprintf("UPDATE `contact` SET %s WHERE `contact_id`='%s'", implode(", ", $strUpdateFieldArray), $objContact->ContactId);
                       $this->objUpdatedItemArray[$objContact->ContactId] = sprintf("%s %s", $objContact->FirstName, $objContact->LastName);
@@ -1000,7 +1001,7 @@
                     foreach ($arrItemCustomField as $objCustomField) {
                       $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                     }
-                    if (count($strCFVArray)) {
+                    if (isset($strCFVArray) && count($strCFVArray)) {
                       $strQuery = sprintf("UPDATE `contact_custom_field_helper` SET %s WHERE `contact_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
                       $objDatabase->NonQuery($strQuery);
                     }
@@ -1286,7 +1287,7 @@
             $strCFV = $objOldItem->GetVirtualAttribute($objCustomField->CustomFieldId);
             $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
           }
-          if (count($strCFVArray)) {
+          if (isset($strCFVArray) && count($strCFVArray)) {
             $strQuery = sprintf("UPDATE `contact_custom_field_helper` SET %s WHERE `contact_id`='%s'", implode(", ", $strCFVArray), $intItemId);
             $objDatabase->NonQuery($strQuery);
           }

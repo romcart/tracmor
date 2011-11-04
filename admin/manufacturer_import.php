@@ -697,7 +697,7 @@
                         }
                  }
                  if (!$blnCheckCFVError) {
-                   if (count($strCFVArray)) {
+                   if (isset($strCFVArray) && count($strCFVArray)) {
                      $strItemCFVArray[] = implode(', ', $strCFVArray);
                    }
                    else {
@@ -760,7 +760,7 @@
                       }
                     }
                     if (!$blnCheckCFVError) {
-                      if (count($strCFVArray)) {
+                      if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objManufacturer->ManufacturerId] = $strCFVArray;
                       }
                       else {
@@ -815,7 +815,7 @@
                     foreach ($arrItemCustomField as $objCustomField) {
                       $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                     }
-                    if (count($strCFVArray)) {
+                    if (isset($strCFVArray) && count($strCFVArray)) {
                       $strQuery = sprintf("UPDATE `manufacturer_custom_field_helper` SET %s WHERE `manufacturer_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
                       $objDatabase->NonQuery($strQuery);
                     }
@@ -1082,7 +1082,7 @@
             $strCFV = $objOldItem->GetVirtualAttribute($objCustomField->CustomFieldId);
             $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
           }
-          if (count($strCFVArray)) {
+          if (isset($strCFVArray) && count($strCFVArray)) {
             $strQuery = sprintf("UPDATE `manufacturer_custom_field_helper` SET %s WHERE `manufacturer_id`='%s'", implode(", ", $strCFVArray), $intItemId);
             $objDatabase->NonQuery($strQuery);
           }

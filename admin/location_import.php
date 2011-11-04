@@ -674,7 +674,7 @@
                           }
                         }
                  }
-                 if (count($strCFVArray)) {
+                 if (isset($strCFVArray) && count($strCFVArray)) {
                    $strItemCFVArray[] = implode(', ', $strCFVArray);
                  }
                  else {
@@ -728,7 +728,7 @@
                           $strCFVArray[$objCustomField->CustomFieldId] = "NULL";
                         }
                       }
-                      if (count($strCFVArray)) {
+                      if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objLocation->LocationId] = $strCFVArray;
                       }
                       else {
@@ -781,17 +781,16 @@
                     foreach ($arrItemCustomField as $objCustomField) {
                       $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                     }
-                    if (count($strCFVArray)) {
+                    if (isset($strCFVArray) && count($strCFVArray)) {
                       $strQuery = sprintf("UPDATE `location_custom_field_helper` SET %s WHERE `location_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
                       $objDatabase->NonQuery($strQuery);
                     }
                   }
                 }*/
               }
-              $this->intImportStep = 6; // The import have been completed
             }
           }
-          if ($this->intImportStep == 6) {
+          if ($this->intImportStep == 3) {
             /*if (count($this->strSelectedValueArray)) {
               $objDatabase = CustomField::GetDatabase();
               $strQuery = sprintf("INSERT INTO `custom_field_selection` " .
