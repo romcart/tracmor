@@ -64,8 +64,7 @@
 
 		protected function lblLogo_Create() {
 			$this->lblLogo = new QLabel($this);
-			$strProtocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
-			$strImagePath = (AWS_S3) ? sprintf('%ss3.amazonaws.com/%s/images', $strProtocol, AWS_BUCKET) : 'images';
+			$strImagePath = (AWS_S3) ? sprintf('https://s3.amazonaws.com/%s/images', AWS_BUCKET) : 'images';
 			if (!QApplication::$TracmorSettings->CompanyLogo) {
 			  $this->lblLogo->Text = '<img src="images/empty.gif">';
 		    } else {
