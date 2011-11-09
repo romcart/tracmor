@@ -875,7 +875,9 @@
                     $blnCheckCFVError = false;
                     foreach ($arrAssetCustomField as $objCustomField) {
                       if ($objCustomField->CustomFieldQtypeId != 2) {
-                       	$strCSDescription = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+                       	$strCSDescription = (isset($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ? 
+                       	                    trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]) :
+                       	                    "";
                         $strCSDescription = (strlen($strCSDescription) > 0) ?
                                       addslashes($strCSDescription) :
                                       addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
@@ -883,7 +885,9 @@
                       }
                       else {
                        	$objDatabase = CustomField::GetDatabase();
-                        $strCSDescription = addslashes(trim($strRowArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
+                        $strCSDescription = (isset($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?     
+                                            addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
+                                            "";
                         $strCFVArray[$objCustomField->CustomFieldId] = ($strCSDescription) ? sprintf("'%s'", $strCSDescription) : "NULL";
                         $blnInList = false;
                         foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {

@@ -555,7 +555,7 @@
           
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
-          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QServerAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
@@ -893,7 +893,9 @@
                     $blnCheckCFVError = false;
                     foreach ($arrModelCustomField as $objCustomField) {
                       if ($objCustomField->CustomFieldQtypeId != 2) {
-                       	$strCSDescription = trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+                       	$strCSDescription = (isset($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ? 
+                       	                    trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]) :
+                       	                    "";
                         $strCSDescription = (strlen($strCSDescription) > 0) ?
                                       addslashes($strCSDescription) :
                                       addslashes($this->txtMapDefaultValueArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
@@ -901,7 +903,9 @@
                       }
                       else {
                        	$objDatabase = CustomField::GetDatabase();
-                        $strCSDescription = addslashes(trim($strRowArray[$intItemCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
+                        $strCSDescription = (isset($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ? 
+                                            addslashes(trim($strRowArray[$intModelCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
+                                            "";
                         $strCFVArray[$objCustomField->CustomFieldId] = ($strCSDescription) ? sprintf("'%s'", $strCSDescription) : "NULL";
                         $blnInList = false;
                         foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
