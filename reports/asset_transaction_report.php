@@ -300,6 +300,7 @@
       $objExpansionMap[AssetTransaction::ExpandTransaction][Transaction::ExpandTransactionType] = true;
       $objExpansionMap[AssetTransaction::ExpandTransaction][Transaction::ExpandCreatedByObject ] = true;
       $objExpansionMap[AssetTransaction::ExpandTransaction][Transaction::ExpandModifiedByObject] = true;
+	  
 
       $arrTransactionTypes = array();
       // Create an array of checked transaction types
@@ -352,6 +353,9 @@
               <HEADER>
                 <ROW>
                   <COL ALIGN='LEFT' TYPE='EXPRESSION' COLSPAN='".(4 + $intCustomFieldCount)."' CELLCLASS='report_section_heading'>\$this->getValue('asset_transaction__transaction_id__transaction_type_id__short_description').' by '.(\$this->getValue('asset_transaction__transaction_id__modified_by')?\$this->getValue('asset_transaction__transaction_id__modified_by__first_name').' '.\$this->getValue('asset_transaction__transaction_id__modified_by__last_name').' on '.\$this->getValue('asset_transaction__transaction_id__modified_date'):\$this->getValue('asset_transaction__transaction_id__created_by__first_name').' '.\$this->getValue('asset_transaction__transaction_id__created_by__last_name').' on '.\$this->getValue('asset_transaction__transaction_id__creation_date'))</COL>
+                </ROW>
+				<ROW>
+                  <COL ALIGN='LEFT' TYPE='EXPRESSION' COLSPAN='".(4 + $intCustomFieldCount)."' CELLCLASS='report_cell'>\$this->getValue('asset_transaction__transaction_id__note')</COL>
                 </ROW>
                 <ROW>
                   <COL CELLCLASS='report_column_header'>Asset Code:</COL>
