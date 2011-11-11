@@ -540,7 +540,7 @@
 
           $this->btnNext->RemoveAllActions('onclick');
           // Add new ajax actions for button
-          $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
+          $this->btnNext->AddAction(new QClickEvent(), new QSErverAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
     			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
@@ -803,7 +803,9 @@
                       // Asset Model Custom Field import
                       foreach ($arrAssetCustomField as $objCustomField) {
                         if ($objCustomField->CustomFieldQtypeId != 2) {
-                        	$strCSDescription = trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]);
+                        	$strCSDescription = (isset($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?
+                        	                     trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]) :
+                        	                     "";
                           $strCSDescription = (strlen($strCSDescription) > 0) ?
                                       addslashes($strCSDescription) :
                                       addslashes($this->txtMapDefaultValueArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]->Text);
@@ -811,7 +813,9 @@
                         }
                         else {
                         	$objDatabase = Asset::GetDatabase();
-                          $strCSDescription = addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]]));
+                          $strCSDescription = (isset($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) ?
+                                              addslashes(trim($strRowArray[$intAssetCustomFieldKeyArray[$objCustomField->CustomFieldId]])) :
+                                              "";
                           $blnInList = false;
                           foreach (CustomFieldValue::LoadArrayByCustomFieldId($objCustomField->CustomFieldId) as $objCustomFieldValue) {
                 					  if (strtolower($objCustomFieldValue->ShortDescription) == strtolower($strCSDescription)) {

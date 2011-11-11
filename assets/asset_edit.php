@@ -827,7 +827,7 @@ CREATE FIELD METHODS
 			  }
 			  else {
 			    $this->lblChildAssets->Visible = true;
-			    $this->dtgChildAssets->Visible = true;
+			    @$this->dtgChildAssets->Visible = true;
 			  }
   		  $this->lblAssetCode->Display = false;
   		  $this->pnlAddChildAsset->Display = false;

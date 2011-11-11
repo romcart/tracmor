@@ -522,7 +522,7 @@
 			$objCustomField = CustomField::Load($intCustomFieldId);
 			// If it is a select custom field
 			if ($objCustomField->CustomFieldQtypeId == 2 && !empty($strShortDescription)) {
-				$objCustomFieldValue = CustomFieldValue::LoadByCustomFieldShortDescription($intCustomFieldId, $strShortDescription);
+				@$objCustomFieldValue = CustomFieldValue::LoadByCustomFieldShortDescription($intCustomFieldId, $strShortDescription);
 				$objCustomFieldSelection->CustomFieldValueId = $objCustomFieldValue->CustomFieldValueId;
 			}
 			else {

@@ -385,10 +385,10 @@ class QAssetTransactComposite extends QControl {
 	        $objUserAccount = QApplication::$objUserAccount;
 	        $this->lstUser->AddItem(sprintf("%s", $objUserAccount->__toString()), $objUserAccount->UserAccountId);
 	      }
-	      $this->lstToCompany->Display = false;
-	      $this->lblNewToCompany->Display = false;
-	      $this->lstToContact->Display = false;
-	      $this->lblNewToContact->Display = false;
+	      @$this->lstToCompany->Display = false;
+	      @$this->lblNewToCompany->Display = false;
+	      @$this->lstToContact->Display = false;
+	      @$this->lblNewToContact->Display = false;
 	      $this->lstUser->Display = true;
   	    break;
   	  case 2:

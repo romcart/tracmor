@@ -1456,8 +1456,8 @@ class QAssetEditComposite extends QControl {
 		  $this->chkLockToParent->Checked = $this->objAsset->LinkedFlag;
 		}
 		else {
-		  $this->txtParentAssetCode->Text = "";
-		  $this->chkLockToParent->Checked = false;
+		  @$this->txtParentAssetCode->Text = "";
+		  @$this->chkLockToParent->Checked = false;
 		}
 		$this->arrCustomFields = CustomField::UpdateControls($this->objAsset->objCustomFieldArray, $this->arrCustomFields);
 	}
