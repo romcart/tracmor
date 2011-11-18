@@ -1288,11 +1288,6 @@ class QAssetEditComposite extends QControl {
     // Always display the label, never input, because it is associated with the AssetModelId
     $this->lblAssetModelCode->Display = true;
 
-    $this->txtParentAssetCode->Display = true;
-	$this->chkLockToParent->Display = true;
-    $this->lblIconParentAssetCode->Display = true;
-    $this->lblParentAssetCode->Display = false;
-
     // Do not display Edit and Delete buttons
     $this->btnEdit->Display = false;
     $this->btnDelete->Display = false;
@@ -1305,9 +1300,14 @@ class QAssetEditComposite extends QControl {
 		if($this->blnEditBuiltInFields){
 			$this->txtAssetCode->Display = true;
 			$this->lstAssetModel->Display = true;
+			$this->txtParentAssetCode->Display = true;
+			$this->chkLockToParent->Display = true;
+      $this->lblIconParentAssetCode->Display = true;
+      $this->lblParentAssetCode->Display = false;
 		}else{ //in edit mode, if the user is not authorized to edit built-in fields, the fields are render as labels.
 			$this->lblAssetCode->Display = true;
 			$this->lblAssetModel->Display = true;
+			$this->lblParentAssetCode->Display = true;
 		}
 
     // Display Cancel and Save butons
