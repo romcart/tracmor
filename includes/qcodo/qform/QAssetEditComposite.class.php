@@ -1085,10 +1085,11 @@ class QAssetEditComposite extends QControl {
 		$this->lstLocation_Create();
 		$this->lstLocation->SelectedValue = $this->objAsset->LocationId;
 
+		$objAssetToClone = $this->objAsset;
 		// Instantiate new Asset object
 		$this->objAsset = new Asset();
 		// Load custom fields for asset with values from original asset
-		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode);
+		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, true, $objAssetToClone->AssetId);
 		// Set the asset_code to null because they are unique
 		$this->lblHeaderAssetCode->Text = 'New Asset';
 		$this->txtAssetCode->Text = '';

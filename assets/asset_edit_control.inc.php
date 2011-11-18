@@ -59,7 +59,7 @@
 	// Custom Fields
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
-			if(!$this->blnEditMode || $field['blnView'])
+			if(/*!$this->blnEditMode || */$field['blnView'])
 				$arrAssetFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));
 		}
 	}
