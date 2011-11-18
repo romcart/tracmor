@@ -625,7 +625,9 @@
               $strCompanyArray[] = stripslashes($objCompany->ShortDescription);
             }
             // Add Default value
-            $txtDefaultValue = trim($this->txtMapDefaultValueArray[$this->intCompanyKey]->Text);
+            $txtDefaultValue = (isset($this->txtMapDefaultValueArray[$this->intCompanyKey]->Text)) ?
+                                trim($this->txtMapDefaultValueArray[$this->intCompanyKey]->Text) :
+                                "";
             if ($txtDefaultValue && !$this->in_array_nocase($txtDefaultValue, $strCompanyArray)) {
               $strCompanyArray[] = $txtDefaultValue;
               $objNewCompany = new Company();
@@ -765,6 +767,10 @@
                      $strCompanyValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW())", addslashes(trim($strRowArray[$this->intCompanyKey])), addslashes($strCompanyDescription), addslashes($strWebsite), addslashes($strEmail), addslashes($strTelephone), addslashes($strFax), $_SESSION['intUserAccountId']);
                      $strNewCompanyArray[] = addslashes(trim($strRowArray[$this->intCompanyKey]));
                    }
+                   else {
+                     $this->intSkippedRecordCount++;
+                     $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                   }
                 }
                 // Update action
                 elseif (trim($strRowArray[$this->intCompanyKey]) && $this->lstImportAction->SelectedValue == 2  && !$this->in_array_nocase(trim($strRowArray[$this->intCompanyKey]), $this->objUpdatedItemArray) && $objCompany) {
@@ -883,7 +889,11 @@
                         }
                         $strUpdatedCompanyValuesArray[] = sprintf("UPDATE `company` SET %s WHERE `company_id`='%s'", implode(", ", $strUpdateFieldArray), $objCompany->CompanyId);
                         $this->objUpdatedItemArray[$objCompany->CompanyId] = $objCompany->ShortDescription;
-                      }
+                    }
+                    else {
+                      $this->intSkippedRecordCount++;
+                      $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                    }
                   }
                   else {
                     $this->intSkippedRecordCount++;

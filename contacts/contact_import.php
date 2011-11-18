@@ -821,6 +821,10 @@
                      $strContactValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW())", $intCompanyId, addslashes($strFirstName), addslashes($strLastName), addslashes($strTitle), addslashes($strEmail), addslashes($strDescription),  addslashes($strOfficePhone), addslashes($strHomePhone), addslashes($strMobilePhone), addslashes($strFax), $_SESSION['intUserAccountId']);
                     $strNewContactArray[] = addslashes(sprintf("%s %s", (isset($this->intFirstNameKey)) ? trim($strRowArray[$this->intFirstNameKey]) : "", trim($strRowArray[$this->intLastNameKey])));
                    }
+                   else {
+                     $this->intSkippedRecordCount++;
+                     $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                   }
                 }
                 // Update action
                 elseif ($intCompanyId && trim($strRowArray[$this->intLastNameKey]) && $this->lstImportAction->SelectedValue == 2  /*&& !$this->in_array_nocase(trim($strRowArray[$this->intCompanyKey]), $this->objUpdatedItemArray) */&& $objContact) {
@@ -954,6 +958,10 @@
                       }
                       $strUpdatedContactValuesArray[] = sprintf("UPDATE `contact` SET %s WHERE `contact_id`='%s'", implode(", ", $strUpdateFieldArray), $objContact->ContactId);
                       $this->objUpdatedItemArray[$objContact->ContactId] = sprintf("%s %s", $objContact->FirstName, $objContact->LastName);
+                    }
+                    else {
+                      $this->intSkippedRecordCount++;
+                      $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
                     }
                   }
                   else {
