@@ -259,7 +259,7 @@ class QInventorySearchComposite extends QControl {
  		$this->lstLocation = new QListBox($this);
  		$this->lstLocation->Name = 'Location';
  		$this->lstLocation->AddItem('- ALL -', null);
- 		foreach (Location::LoadAllLocations(false, false, 'short_description') as $objLocation) {
+ 		foreach (Location::LoadAllLocations(false, false, 'short_description',null,null,false,false,false,true) as $objLocation) {
  			$this->lstLocation->AddItem($objLocation->ShortDescription, $objLocation->LocationId);
  		}
  		if ($this->blnUseAjax) {

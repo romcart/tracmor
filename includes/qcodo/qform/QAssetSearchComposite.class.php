@@ -311,7 +311,7 @@ class QAssetSearchComposite extends QControl {
 		$this->lstLocation = new QListBox($this);
 		$this->lstLocation->Name = 'Location';
 		$this->lstLocation->AddItem('- ALL -', null);
-		foreach (Location::LoadAllLocationsAsCustomArray(true, true, 'short_description', null, null, true) as $arrLocation) {
+		foreach (Location::LoadAllLocationsAsCustomArray(true, true, 'short_description', null, null, true, false, true, false) as $arrLocation) {
 			// Keep Shipped, To Be Received and Archived at the top of the list
 			if ($arrLocation['location_id'] == 2 || $arrLocation['location_id'] == 5 || $arrLocation['location_id'] == 6) {
 				$this->lstLocation->AddItemAt(1, new QListItem($arrLocation['short_description'], $arrLocation['location_id']));

@@ -45,6 +45,8 @@
 		// Header Menu
 		protected $ctlHeaderMenu;
 		protected $lblHeaderLocation;
+		protected $chkAssetLocation;
+		protected $chkInventoryLocation;
 		protected $chkEnabled;
 		
 		protected function Form_Create() {
@@ -62,6 +64,8 @@
 			$this->txtShortDescription_Create();
 			$this->txtLongDescription_Create();
 			$this->lblModifiedDate_Create();
+			$this->chkAssetLocation_Create();
+			$this->chkInventoryLocation_Create();
 			$this->chkEnabled_Create();
 			
 			// Create/Setup Button Action controls
@@ -86,6 +90,26 @@
 			$this->txtShortDescription->Focus();
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+		
+		protected function chkAssetLocation_Create() {
+			$this->chkAssetLocation = new QCheckBox($this);
+			
+			if ($this->blnEditMode) {
+				$this->chkAssetLocation->Checked = $this->objLocation->AssetFlag;
+			} else {
+				$this->chkAssetLocation->Checked = true;
+			}
+		}
+		
+		protected function chkInventoryLocation_Create() {
+			$this->chkInventoryLocation = new QCheckBox($this);
+			
+			if ($this->blnEditMode) {
+				$this->chkInventoryLocation->Checked = $this->objLocation->InventoryFlag;
+			} else {
+				$this->chkInventoryLocation->Checked = true;
+			}
 		}
 		
 		protected function chkEnabled_Create() {
@@ -142,6 +166,20 @@
 				$this->chkEnabled->Focus();
 			}
 			
+			// Don't allow removing as an asset location if the location contains assets
+			if ($this->blnEditMode && $this->objLocation->AssetFlag && !$this->chkAssetLocation->Checked && Asset::CountByLocationId($this->objLocation->LocationId) > 0) {
+				$blnError = true;
+				$this->chkAssetLocation->Warning = 'Location must not contain assets.';
+				$this->chkAssetLocation->Focus();
+			}
+			
+			// Don't allow removing as an inventory location if the location contains inventory
+			if ($this->blnEditMode && $this->objLocation->InventoryFlag && !$this->chkInventoryLocation->Checked && $intInventoryAtLocation > 0) {
+				$blnError = true;
+				$this->chkInventoryLocation->Warning = 'Location must not contain inventory.';
+				$this->chkInventoryLocation->Focus();
+			}
+			
 			if (!$blnError) {
 			
 				try {
@@ -179,6 +217,8 @@
 			$this->objLocation->ShortDescription = $this->txtShortDescription->Text;
 			$this->objLocation->LongDescription = $this->txtLongDescription->Text;
 			$this->objLocation->EnabledFlag = $this->chkEnabled->Checked;
+			$this->objLocation->AssetFlag = $this->chkAssetLocation->Checked;
+			$this->objLocation->InventoryFlag = $this->chkInventoryLocation->Checked;
 		}
 	}
 

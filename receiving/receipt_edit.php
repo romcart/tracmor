@@ -996,7 +996,7 @@
 					$lstLocationAssetReceived->Name = 'Location To Receive';
 					$lstLocationAssetReceived->ActionParameter = $objAssetTransaction->AssetTransactionId;
 					$lstLocationAssetReceived->AddItem('- Select One -', null);
-					$objLocationArray = Location::LoadAllLocations(false, false, 'short_description');
+					$objLocationArray = Location::LoadAllLocations(false, false, 'short_description',null,null,false,false,true,false);
 					if ($objLocationArray) {
 						// Get assets last location if the admin setting is enabled, otherwise set to null
 						$objLastLocation = (QApplication::$TracmorSettings->ReceiveToLastLocation) ? $objAssetTransaction->Asset->GetLastShippedFromLocation() : null;
@@ -1165,7 +1165,7 @@
 					$lstLocationInventoryReceived->Name = 'Location To Receive';
 					$lstLocationInventoryReceived->ActionParameter = $objInventoryTransaction->InventoryTransactionId;
 					$lstLocationInventoryReceived->AddItem('- Select One -', null);
-					$objLocationArray = Location::LoadAllLocations(false, false, 'short_description');
+					$objLocationArray = Location::LoadAllLocations(false, false, 'short_description',null,null,false,false,false,true);
 					if ($objLocationArray) {
 						foreach ($objLocationArray as $objLocation) {
 							$lstLocationInventoryReceived->AddItem($objLocation->__toString(), $objLocation->LocationId);

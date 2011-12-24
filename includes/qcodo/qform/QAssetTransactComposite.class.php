@@ -166,7 +166,7 @@ class QAssetTransactComposite extends QControl {
 		$this->lstLocation = new QListBox($this);
 		$this->lstLocation->Name = 'Location';
 		$this->lstLocation->AddItem('- Select One -', null);
-		$objLocationArray = Location::LoadAllLocations(false, false, 'short_description');
+		$objLocationArray = Location::LoadAllLocations(false, false, 'short_description',null,null,false,false,true,false);
 		if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
 			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
 			$this->lstLocation->AddItem($objListItem);

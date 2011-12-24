@@ -64,6 +64,14 @@
 							<td class="record_field_edit"><?php $this->txtLongDescription->RenderWithError("Rows=10"); ?></td>
 						</tr>
 						<tr>
+							<td class="record_field_name">Asset Location: </td>
+							<td class="record_field_edit"><?php $this->chkAssetLocation->RenderWithError(); ?></td>
+						</tr>
+						<tr>
+							<td class="record_field_name">Inventory Location: </td>
+							<td class="record_field_edit"><?php $this->chkInventoryLocation->RenderWithError(); ?></td>
+						</tr>
+						<tr>
 							<td class="record_field_name">Enabled: </td>
 							<td class="record_field_edit"><?php $this->chkEnabled->RenderWithError(); ?></td>
 						</tr>
