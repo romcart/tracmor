@@ -33,6 +33,8 @@ CREATE TABLE location (
   short_description VARCHAR(255)   NOT NULL,
   long_description  TEXT   NULL,
   enabled_flag      BIT (1)   NOT NULL   DEFAULT b'1',
+  asset_flag        BIT (1)   NOT NULL   DEFAULT b'1',
+  inventory_flag    BIT (1)   NOT NULL   DEFAULT b'1',
   created_by        INTEGER UNSIGNED   NULL,
   creation_date     DATETIME   NULL   DEFAULT NULL,
   modified_by       INTEGER UNSIGNED   NULL,

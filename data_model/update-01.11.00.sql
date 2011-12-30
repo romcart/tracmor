@@ -10,6 +10,3 @@ ALTER TABLE  `asset_transaction` DROP FOREIGN KEY  `asset_transaction_ibfk_8` ;
 ALTER TABLE  `asset_transaction` ADD FOREIGN KEY (  `parent_asset_transaction_id` ) REFERENCES  `asset_transaction` (
 `asset_transaction_id`
 ) ON DELETE SET NULL ON UPDATE NO ACTION ;
-
-ALTER TABLE  `location` ADD  `inventory_flag` BIT( 1 ) NOT NULL DEFAULT b'1' AFTER  `long_description`;
-ALTER TABLE  `location` ADD  `asset_flag`     BIT( 1 ) NOT NULL DEFAULT b'1' AFTER  `long_description`;
