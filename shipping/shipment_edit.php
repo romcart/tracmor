@@ -2263,6 +2263,7 @@
 		// This is run every time a 'From Company' is selected
 		// It loads the values for the 'From Address' and 'From Contact' drop-downs for the selected company
 		protected function lstFromCompany_Select() {
+            $this->disableAdvancedIfInternal();
 			// Clear any displayed warnings
 			$this->lblNewFromContact->Warning = '';
 			$this->lblNewFromAddress->Warning = '';
@@ -2343,6 +2344,7 @@
 		// This is run every time a 'To Company' is selected
 		// It loads the values for the 'To Address' and 'To Contact' drop-downs for the selected company
 		protected function lstToCompany_Select() {
+            $this->disableAdvancedIfInternal();
 			// Clear any displayed warnings
 			$this->lblNewToContact->Warning = '';
 			$this->lblNewToAddress->Warning = '';
@@ -3365,7 +3367,8 @@
 								$objAssetTransaction->DestinationLocationId = $DestinationLocationId;
 
 								// No any actions with linked items (LinkedFlag = 1) which have been scheduled for receipt
-								if ($objAssetTransaction->ScheduleReceiptFlag && !$objAssetTransaction->Asset->LinkedFlag) {
+								if (($objAssetTransaction->ScheduleReceiptFlag && !$objAssetTransaction->Asset->LinkedFlag)
+                                    ||(($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId) && !$objAssetTransaction->Asset->LinkedFlag)){
 
 									if ($objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset && $objAssetTransaction->NewAsset->AssetId == null) {
 										// We have to create the new asset before we can
@@ -4974,9 +4977,11 @@
 			if ($this->blnEditMode) {
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-			}
+                if($this->lstFromCompany->SelectedValue!=$this->lstToCompany->SelectedValue){
+                    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+                    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+                }
+            }
 
 			// If the user is not authorized to edit built-in fields, the fields are render as labels.
 			// Also used if editing a completed shipment
@@ -5102,6 +5107,56 @@
 		}
 
 	}
+          protected function disableAdvancedIfInternal(){
+              if(!$this->lblFromCompany->Display){
+
+                 if($this->lstToCompany->SelectedValue==$this->lstFromCompany->SelectedValue){
+
+                     // switch off advansed parameters
+                     if ($this->objAssetTransactionArray) {
+                     			  $objNewAssetTransactionArray = array();
+                     			  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+                     			    $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
+                     			  }
+                     				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+
+                     						// set advansed to 'None'
+                     							$objAssetTransaction->ScheduleReceiptFlag = false;
+                     							$objAssetTransaction->NewAssetFlag = false;
+                     							$objAssetTransaction->NewAssetId = null;
+                     							$objAssetTransaction->NewAsset = null;
+                                                $objAssetTransaction->ScheduleReceiptDueDate = null;
+
+                     							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
+                     							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+                     							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+                     							    $objLinkedAssetTransaction->ScheduleReceiptFlag = false;
+                         							$objLinkedAssetTransaction->NewAssetFlag = false;
+                         							$objLinkedAssetTransaction->NewAssetId = null;
+                         							$objLinkedAssetTransaction->NewAsset = null;
+                                                    $objLinkedAssetTransaction->ScheduleReceiptDueDate = null;
+                     							  }
+                     							}
+
+                     						// Return
+
+                     				}
+                     				$this->blnModifyAssets = true;
+                     			}
+                     //
+                     $this->dtgAssetTransact->RemoveColumnByName('Advanced');
+                     $this->dtgAssetTransact->RemoveColumnByName('Due Date');
+                 }
+                 else{
+                      if(!$this->dtgAssetTransact->GetColumnByName('Advanced')){
+                         $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+                         $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+                      }
+                 }
+
+              }
+
+          }
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using
