@@ -201,6 +201,8 @@
 				$objLocation = new Location();
 				$objLocation->ShortDescription = $this->txtQuickAdd->Text;
 				$objLocation->EnabledFlag = '1';
+				$objLocation->AssetFlag = '1';
+				$objLocation->InventoryFlag = '1';
 				$objLocation->CreatedBy = QApplication::$objUserAccount->UserAccountId;
 				$objLocation->CreationDate = QDateTime::Now();
 				$objLocation->Save();
