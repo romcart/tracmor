@@ -204,6 +204,7 @@
 		protected $dttNow;
 		protected $dttFiveDaysFromNow;
 		protected $objFedexShipment;
+        protected $receiveInternalShipmentTransaction;
 
 		// Integers
 		protected $intNewTempId = 1;
@@ -3330,6 +3331,30 @@
 						}
 					}
 
+                    //Create receive transaction for internal shipment
+                    if($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId){
+                        $this->receiveInternalShipmentTransaction = new Transaction();
+                        $this->receiveInternalShipmentTransaction->EntityQtypeId = $intEntityQtypeId;
+                        $this->receiveInternalShipmentTransaction->TransactionTypeId = 7;
+                        $note = sprintf('This receipt was automatically created when creating internal shipment Number %s. ',  $this->objShipment->ShipmentNumber);
+                        $this->receiveInternalShipmentTransaction->Note = $note . $this->txtNote->Text;
+                        $this->receiveInternalShipmentTransaction->Save();
+
+
+
+                        // Create a new receipt
+                        $objInternalReceipt = new Receipt();
+                        $objInternalReceipt->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
+                        // The receipt will be coming to the same
+                        $objInternalReceipt->FromCompanyId = $this->objShipment->FromCompanyId;
+                        $objInternalReceipt->FromContactId = $this->objShipment->FromContactId;
+                        $objInternalReceipt->ToContactId = $this->objShipment->ToContactId;
+                        $objInternalReceipt->ToAddressId = $this->objShipment->ToAddressId;
+                        $objInternalReceipt->ReceivedFlag = 0;
+                        $objInternalReceipt->ReceiptNumber = Receipt::LoadNewReceiptNumber();
+                        $objInternalReceipt->Save();
+                    }
+
 					// If courier is FedEx, initiate communication with FedEx
 					if(!$blnError && $this->objShipment->CourierId == 1) {
 						if (!$this->FedEx()) {
@@ -3343,10 +3368,10 @@
 
 						$objTransaction = '';
 						$objReceipt = '';
-            $objNewAssetTransactionArray = array();
-            foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-              $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
-            }
+                        $objNewAssetTransactionArray = array();
+                        foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+                          $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
+                        }
 						// Assign a destinationLocation to the AssetTransaction, and change the Location of the asset
 						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 							if ($objAssetTransaction->Asset instanceof Asset) {
@@ -3368,7 +3393,8 @@
 
 								// No any actions with linked items (LinkedFlag = 1) which have been scheduled for receipt
 								if (($objAssetTransaction->ScheduleReceiptFlag && !$objAssetTransaction->Asset->LinkedFlag)
-                                    ||(($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId) && !$objAssetTransaction->Asset->LinkedFlag)){
+                                   // ||(($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId) && !$objAssetTransaction->Asset->LinkedFlag)
+                                                                                                                                                      ){
 
 									if ($objAssetTransaction->NewAsset && $objAssetTransaction->NewAsset instanceof Asset && $objAssetTransaction->NewAsset->AssetId == null) {
 										// We have to create the new asset before we can
@@ -3452,10 +3478,10 @@
 									    $objLinkedReceiptAssetTransaction = new AssetTransaction();
 									    // If this is a return
 									    if (!$objAssetTransaction->NewAssetId) {
-									      $objLinkedReceiptAssetTransaction->AssetId = $objLinkedAssetTransaction->AssetId;
-									      $objLinkedReceiptAssetTransaction->TransactionId = $objTransaction->TransactionId;
-    									$objLinkedReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->DestinationLocationId;
-    									$objLinkedReceiptAssetTransaction->Save();
+									        $objLinkedReceiptAssetTransaction->AssetId = $objLinkedAssetTransaction->AssetId;
+									        $objLinkedReceiptAssetTransaction->TransactionId = $objTransaction->TransactionId;
+    									    $objLinkedReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->DestinationLocationId;
+    									    $objLinkedReceiptAssetTransaction->Save();
 									    }
 									    // If this is an exchange
 									    else {
@@ -3474,6 +3500,26 @@
 									// Set the Receipt Asset Transaction as child of the Shipment Asset Transaction
 									$objAssetTransaction->AssociateChildAssetTransaction($objReceiptAssetTransaction);
 								}
+                                if(($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId) && !$objAssetTransaction->Asset->LinkedFlag){
+                                    $objReceiptAssetTransaction = new AssetTransaction();
+									$objReceiptAssetTransaction->AssetId = $objAssetTransaction->AssetId;
+									$objReceiptAssetTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
+                                    $objReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->SourceLocationId;
+                                    $objReceiptAssetTransaction->Save();
+                                     // Load all child assets
+									if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
+									  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+									    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+									    $objLinkedReceiptAssetTransaction = new AssetTransaction();
+									    // add data to linked asset
+									    $objLinkedReceiptAssetTransaction->AssetId = $objLinkedAssetTransaction->AssetId;
+									    $objLinkedReceiptAssetTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
+    									$objLinkedReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->SourceLocationId;
+    									$objLinkedReceiptAssetTransaction->Save();
+
+									  }
+									}
+                                }
 
 
 								$objReceipt = null;
@@ -3485,13 +3531,22 @@
 					if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
 						// Assign different source and destinations depending on transaction type
 						foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
-
+                            if($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId){
+                                $objReceiptInventoryTransaction = new InventoryTransaction();
+                                $objReceiptInventoryTransaction->InventoryLocationId = $objInventoryTransaction->InventoryLocationId;
+                                $objReceiptInventoryTransaction->SourceLocationId = $objInventoryTransaction->SourceLocationId;
+                            //   $objReceiptInventoryTransaction->DescinationLocationId = $objInventoryTransaction->DescinationLocationId;
+                                $objReceiptInventoryTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
+                                $objReceiptInventoryTransaction->Quantity = $objInventoryTransaction->Quantity;
+                                $objReceiptInventoryTransaction->Save();
+                            }
 							// LocationId #2 == Shipped
 							$DestinationLocationId = 2;
 
 							if (!$this->blnEditMode) {
 								$objInventoryTransaction->TransactionId = $this->objTransaction->TransactionId;
 							}
+
 
 							// Remove the inventory quantity from the source
 							$objInventoryTransaction->InventoryLocation->Quantity = $objInventoryTransaction->InventoryLocation->Quantity - $objInventoryTransaction->Quantity;
@@ -3564,7 +3619,6 @@
 				$this->btnCancelCompleteShipment->Warning = 'There are no assets or inventory in this shipment.';
 				return;
 			}
-
 			try {
 				// Get an instance of the database
 				$objDatabase = QApplication::$Database[1];
@@ -3623,14 +3677,13 @@
 				if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
 					// Set the DestinationLocation of the InventoryTransaction to null and add the inventory quantity back to the source
 					foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
-
 						// Set the destination location to null
 						$objInventoryTransaction->DestinationLocationId = null;
 						$objInventoryTransaction->Save();
-
 						// Add the inventory back to it's source location
 						$objInventoryTransaction->InventoryLocation->Quantity += $objInventoryTransaction->Quantity;
-						$objInventoryTransaction->InventoryLocation->Save();
+                        $objInventoryTransaction->InventoryLocation->Save();
+
 					}
 				}
 
