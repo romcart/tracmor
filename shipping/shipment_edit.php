@@ -3331,7 +3331,7 @@
 						}
 					}
 
-                    //Create receive transaction for internal shipment
+                    // Create receive transaction for internal shipment
                     if($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId){
                         $this->receiveInternalShipmentTransaction = new Transaction();
                         $this->receiveInternalShipmentTransaction->EntityQtypeId = $intEntityQtypeId;
@@ -3345,7 +3345,7 @@
                         // Create a new receipt
                         $objInternalReceipt = new Receipt();
                         $objInternalReceipt->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
-                        // The receipt will be coming to the same
+                        // The receipt will be coming to the same information
                         $objInternalReceipt->FromCompanyId = $this->objShipment->FromCompanyId;
                         $objInternalReceipt->FromContactId = $this->objShipment->FromContactId;
                         $objInternalReceipt->ToContactId = $this->objShipment->ToContactId;
@@ -3549,8 +3549,11 @@
 
 
 							// Remove the inventory quantity from the source
-							$objInventoryTransaction->InventoryLocation->Quantity = $objInventoryTransaction->InventoryLocation->Quantity - $objInventoryTransaction->Quantity;
-							$objInventoryTransaction->InventoryLocation->Save();
+							// Only do this though if this is not an internal shipment, or otherwise the quantity would be double-subtracted
+							if ($this->objShipment->ToCompanyId != $this->objShipment->FromCompanyId) {
+								$objInventoryTransaction->InventoryLocation->Quantity = $objInventoryTransaction->InventoryLocation->Quantity - $objInventoryTransaction->Quantity;
+								$objInventoryTransaction->InventoryLocation->Save();
+							}
 
 							// Finish the InventoryTransaction and save it
 							$objInventoryTransaction->DestinationLocationId = $DestinationLocationId;
@@ -3682,9 +3685,15 @@
 						$objInventoryTransaction->Save();
 						// Add the inventory back to it's source location
 						$objInventoryTransaction->InventoryLocation->Quantity += $objInventoryTransaction->Quantity;
-                        $objInventoryTransaction->InventoryLocation->Save();
+            $objInventoryTransaction->InventoryLocation->Save();
 
 					}
+				}
+				
+				// If an Internal Receipt was created, then it needs to be deleted
+				if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
+					$objReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
+					$objReceipt->Transaction->Delete();
 				}
 
 				// Cancel FedEx Shipment

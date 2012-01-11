@@ -355,6 +355,36 @@
 				return 1000;
 			}
 		}
+		
+		/**
+		 * Return the objReceipt of the automatically generated receipt from the completion of the internal shipment.
+		 * 
+		 * @param int $intShipmentId
+		 * @return integer $intReceiptId
+		 */
+		public static function FindInternalReceipt($intShipmentId) {
+			
+			$objShipment = Shipment::Load($intShipmentId);
+			
+			// If this is not an internal shipment, return a null value
+			if ($objShipment->FromCompanyId != $objShipment->ToCompanyId) {
+				$return = null;
+			}
+			else {
+				// The transaction_id for the receipt should be immediately after the shipment 
+				$intReceiptTransactionId = $objShipment->TransactionId + 1;
+				$objReceipt = Receipt::QuerySingle(QQ::AndCondition(
+					QQ::Equal(QQN::Receipt()->ToContactId, $objShipment->ToContactId), 
+					QQ::Equal(QQN::Receipt()->FromCompanyId, $objShipment->FromCompanyId),
+					QQ::Equal(QQN::Receipt()->CreatedBy, $objShipment->CreatedBy), 
+					QQ::Equal(QQN::Receipt()->TransactionId, $intReceiptTransactionId)));
+					
+				$return = $objReceipt;
+			}
+			
+			return $return;
+		}
+		
 
     /**
      * Count the total shipments based on the submitted search criteria
