@@ -372,12 +372,14 @@
 			}
 			else {
 				// The transaction_id for the receipt should be immediately after the shipment 
-				$intReceiptTransactionId = $objShipment->TransactionId + 1;
+				// TO-DO this doesn't work. What if the user saves a shipment, then comes back to it later to complete it. Duh.
+				//$intReceiptTransactionId = $objShipment->TransactionId + 1;
+				// Matching the same transactions based on time they were created. That is not ideal and ultimately won't work as a permananent solution.
 				$objReceipt = Receipt::QuerySingle(QQ::AndCondition(
 					QQ::Equal(QQN::Receipt()->ToContactId, $objShipment->ToContactId), 
 					QQ::Equal(QQN::Receipt()->FromCompanyId, $objShipment->FromCompanyId),
 					QQ::Equal(QQN::Receipt()->CreatedBy, $objShipment->CreatedBy), 
-					QQ::Equal(QQN::Receipt()->TransactionId, $intReceiptTransactionId)));
+					QQ::OrCondition(QQ::Equal(QQN::Receipt()->CreationDate, $objShipment->CreationDate), QQ::Equal(QQN::Receipt()->CreationDate, $objShipment->ModifiedDate))));
 					
 				$return = $objReceipt;
 			}

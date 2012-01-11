@@ -3678,6 +3678,20 @@
 
 				// Inventory
 				if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
+					
+					if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
+						$objInternalReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
+						$objInternalReceiptInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($objInternalReceipt->TransactionId);
+						foreach ($objInternalReceiptInventoryTransactionArray as $objReceiptInventoryTransaction) {
+							if ($objReceiptInventoryTransaction->DestinationLocationId > 0) {
+								$this->btnCancelCompleteShipment->Warning = sprintf('The inventory %s has been received since this shipment was completed.', $objReceiptInventoryTransaction->InventoryLocation->InventoryModel->InventoryModelCode);
+								$objDatabase->TransactionRollback();
+								return;
+							}
+						}
+					}
+					
+					
 					// Set the DestinationLocation of the InventoryTransaction to null and add the inventory quantity back to the source
 					foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
 						// Set the destination location to null
@@ -3692,8 +3706,8 @@
 				
 				// If an Internal Receipt was created, then it needs to be deleted
 				if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
-					$objReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
-					$objReceipt->Transaction->Delete();
+					$objInternalReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
+					$objInternalReceiptasdf->Transaction->Delete();
 				}
 
 				// Cancel FedEx Shipment
