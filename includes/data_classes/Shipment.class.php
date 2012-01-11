@@ -375,16 +375,12 @@
 				// TO-DO this doesn't work. What if the user saves a shipment, then comes back to it later to complete it. Duh.
 				//$intReceiptTransactionId = $objShipment->TransactionId + 1;
 				// Matching the same transactions based on time they were created. That is not ideal and ultimately won't work as a permananent solution.
-				/*    $objReceipt = Receipt::QuerySingle(QQ::AndCondition(
+
+				    $objReceipt = Receipt::QuerySingle(QQ::AndCondition(
 				//	QQ::Equal(QQN::Receipt()->ToContactId, $objShipment->ToContactId),
 					QQ::Equal(QQN::Receipt()->FromCompanyId, $objShipment->FromCompanyId),
 					QQ::Equal(QQN::Receipt()->CreatedBy, $objShipment->CreatedBy),
-					QQ::OrCondition(QQ::Equal(QQN::Receipt()->CreationDate, $objShipment->CreationDate), QQ::Equal(QQN::Receipt()->CreationDate, $objShipment->ModifiedDate))));*/
-
-
-                    $note = sprintf('This receipt was automatically created when creating internal shipment Number %s. ',  $objShipment->ShipmentNumber);
-                    $objTransaction = Transaction::QuerySingle(QQ::Like(QQN::Transaction()->Note,$note));
-                    $objReceipt = Receipt::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::Receipt()->TransactionId, $objTransaction->TransactionId)));
+					QQ::OrCondition(QQ::Equal(QQN::Receipt()->CreationDate, $objShipment->CreationDate->PHPDate("Y-m-d H:i:s")), QQ::Equal(QQN::Receipt()->CreationDate, $objShipment->ModifiedDate))));
 
 				$return = $objReceipt;
 			}

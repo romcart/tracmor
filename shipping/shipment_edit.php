@@ -3337,7 +3337,7 @@
                         $this->receiveInternalShipmentTransaction->EntityQtypeId = $intEntityQtypeId;
                         $this->receiveInternalShipmentTransaction->TransactionTypeId = 7;
                         $note = sprintf('This receipt was automatically created when creating internal shipment Number %s. ',  $this->objShipment->ShipmentNumber);
-                        $this->receiveInternalShipmentTransaction->Note = $note /*. $this->txtNote->Text*/;
+                        $this->receiveInternalShipmentTransaction->Note = $note . $this->txtNote->Text;
                         $this->receiveInternalShipmentTransaction->Save();
 
 
@@ -3685,14 +3685,16 @@
 					if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId
                         ) {
 						$objInternalReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
-						$objInternalReceiptInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($objInternalReceipt->TransactionId);
-						foreach ($objInternalReceiptInventoryTransactionArray as $objReceiptInventoryTransaction) {
-							if ($objReceiptInventoryTransaction->DestinationLocationId > 0) {
-								$this->btnCancelCompleteShipment->Warning = sprintf('The inventory %s has been received since this shipment was completed.', $objReceiptInventoryTransaction->InventoryLocation->InventoryModel->InventoryModelCode);
-								$objDatabase->TransactionRollback();
-								return;
-							}
-						}
+                        if($objInternalReceipt instanceof Receipt){
+                            $objInternalReceiptInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($objInternalReceipt->TransactionId);
+                            foreach ($objInternalReceiptInventoryTransactionArray as $objReceiptInventoryTransaction) {
+                                if ($objReceiptInventoryTransaction->DestinationLocationId > 0) {
+                                    $this->btnCancelCompleteShipment->Warning = sprintf('The inventory %s has been received since this shipment was completed.', $objReceiptInventoryTransaction->InventoryLocation->InventoryModel->InventoryModelCode);
+                                    $objDatabase->TransactionRollback();
+                                    return;
+                                }
+                            }
+                        }
 					}
 					
 					
@@ -3711,7 +3713,9 @@
 				// If an Internal Receipt was created, then it needs to be deleted
 				if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
 					$objInternalReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
-					$objInternalReceipt->Transaction->Delete();
+                    if($objInternalReceipt instanceof Receipt){
+					    $objInternalReceipt->Transaction->Delete();
+                    }
 				}
 
 				// Cancel FedEx Shipment
