@@ -3337,7 +3337,7 @@
                         $this->receiveInternalShipmentTransaction->EntityQtypeId = $intEntityQtypeId;
                         $this->receiveInternalShipmentTransaction->TransactionTypeId = 7;
                         $note = sprintf('This receipt was automatically created when creating internal shipment Number %s. ',  $this->objShipment->ShipmentNumber);
-                        $this->receiveInternalShipmentTransaction->Note = $note . $this->txtNote->Text;
+                        $this->receiveInternalShipmentTransaction->Note = $note /*. $this->txtNote->Text*/;
                         $this->receiveInternalShipmentTransaction->Save();
 
 
@@ -3643,6 +3643,9 @@
 									$objNewerAssetTransaction->Transaction->Delete();
 								}
 							}
+                            elseif($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId && $objNewerAssetTransaction->DestinationLocationId == null){
+
+                            }
 							// Generate an error
 							else {
 								$this->btnCancelCompleteShipment->Warning = sprintf('The asset %s has been involved in a transaction since this shipment was completed.', $objAssetTransaction->Asset->AssetCode);
@@ -3679,7 +3682,8 @@
 				// Inventory
 				if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
 					
-					if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
+					if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId
+                        ) {
 						$objInternalReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
 						$objInternalReceiptInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($objInternalReceipt->TransactionId);
 						foreach ($objInternalReceiptInventoryTransactionArray as $objReceiptInventoryTransaction) {
@@ -3707,7 +3711,7 @@
 				// If an Internal Receipt was created, then it needs to be deleted
 				if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
 					$objInternalReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
-					$objInternalReceiptasdf->Transaction->Delete();
+					$objInternalReceipt->Transaction->Delete();
 				}
 
 				// Cancel FedEx Shipment
