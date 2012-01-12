@@ -221,8 +221,14 @@
 		protected function dtgChildAssets_Bind() {
 		  $this->dtgChildAssets->TotalItemCount = count($this->ctlAssetEdit->objChildAssetArray);
 	    if ($this->dtgChildAssets->TotalItemCount) {
-	      $this->dtgChildAssets->ShowHeader = true;
-	      $this->dtgChildAssets->DataSource = $this->ctlAssetEdit->objChildAssetArray;
+        $this->dtgChildAssets->ShowHeader = true;
+        // added to fix items per page
+	       $this->dtgChildAssets->DataSource = $this->ctlAssetEdit->objChildAssetArray;
+         $intItemsPerPage = $this->dtgChildAssets->ItemsPerPage;
+	       $intItemOffset = ($this->dtgChildAssets->PageNumber - 1) * $intItemsPerPage;
+	       $arrDataSource = array_slice($this->ctlAssetEdit->objChildAssetArray, $intItemOffset, $intItemsPerPage);
+	      // end of fix
+	      $this->dtgChildAssets->DataSource = $arrDataSource;
 	      $this->btnChildAssetsRemove->Enabled = true;
 	      $this->btnReassign->Enabled = true;
 	      $this->btnLinkToParent->Enabled = true;
