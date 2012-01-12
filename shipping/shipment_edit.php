@@ -204,7 +204,7 @@
 		protected $dttNow;
 		protected $dttFiveDaysFromNow;
 		protected $objFedexShipment;
-        protected $receiveInternalShipmentTransaction;
+    protected $receiveInternalShipmentTransaction;
 
 		// Integers
 		protected $intNewTempId = 1;
@@ -2264,7 +2264,7 @@
 		// This is run every time a 'From Company' is selected
 		// It loads the values for the 'From Address' and 'From Contact' drop-downs for the selected company
 		protected function lstFromCompany_Select() {
-            $this->disableAdvancedIfInternal();
+      $this->disableAdvancedIfInternal();
 			// Clear any displayed warnings
 			$this->lblNewFromContact->Warning = '';
 			$this->lblNewFromAddress->Warning = '';
@@ -2345,7 +2345,7 @@
 		// This is run every time a 'To Company' is selected
 		// It loads the values for the 'To Address' and 'To Contact' drop-downs for the selected company
 		protected function lstToCompany_Select() {
-            $this->disableAdvancedIfInternal();
+      $this->disableAdvancedIfInternal();
 			// Clear any displayed warnings
 			$this->lblNewToContact->Warning = '';
 			$this->lblNewToAddress->Warning = '';
@@ -3346,10 +3346,10 @@
 						$objReceipt = '';
             $objNewAssetTransactionArray = array();
             foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-                          $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
-               }
-            // Create receive transaction for internal shipment
-            if($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId){
+							$objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
+						}
+            // Create receipt transaction for internal shipment
+            if($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId){
               $this->receiveInternalShipmentTransaction = new Transaction();
               $this->receiveInternalShipmentTransaction->EntityQtypeId = EntityQtype::Asset;
               $this->receiveInternalShipmentTransaction->TransactionTypeId = 7;
@@ -3359,7 +3359,7 @@
               // Create a new receipt
               $objInternalReceipt = new Receipt();
               $objInternalReceipt->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
-             // The receipt will be coming to the same information
+             // The receipt will mimic the shipment information
               $objInternalReceipt->FromCompanyId = $this->objShipment->FromCompanyId;
               $objInternalReceipt->FromContactId = $this->objShipment->FromContactId;
               $objInternalReceipt->ToContactId = $this->objShipment->ToContactId;
@@ -3493,13 +3493,13 @@
 									// Set the Receipt Asset Transaction as child of the Shipment Asset Transaction
 									$objAssetTransaction->AssociateChildAssetTransaction($objReceiptAssetTransaction);
 								}
-                if(($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId) && !$objAssetTransaction->Asset->LinkedFlag){
+                if(($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) && !$objAssetTransaction->Asset->LinkedFlag){
                   $objReceiptAssetTransaction = new AssetTransaction();
 									$objReceiptAssetTransaction->AssetId = $objAssetTransaction->AssetId;
 									$objReceiptAssetTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
-                                    $objReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->SourceLocationId;
-                                    $objReceiptAssetTransaction->Save();
-                                     // Load all child assets
+                  $objReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->SourceLocationId;
+                  $objReceiptAssetTransaction->Save();
+                   // Load all child assets
 									if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
 									  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
 									    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
@@ -3524,17 +3524,7 @@
 						// Assign different source and destinations depending on transaction type
 
 						foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
-						/* excluding inventory from internal shipment
-              if($this->objShipment->ToCompanyId==$this->objShipment->FromCompanyId){
-                $objReceiptInventoryTransaction = new InventoryTransaction();
-                $objReceiptInventoryTransaction->InventoryLocationId = $objInventoryTransaction->InventoryLocationId;
-                $objReceiptInventoryTransaction->SourceLocationId = $objInventoryTransaction->SourceLocationId;
-                //$objReceiptInventoryTransaction->DescinationLocationId = $objInventoryTransaction->DescinationLocationId;
-                $objReceiptInventoryTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
-                $objReceiptInventoryTransaction->Quantity = $objInventoryTransaction->Quantity;
-                $objReceiptInventoryTransaction->Save();
-              }
-            */
+
 							// LocationId #2 == Shipped
 							$DestinationLocationId = 2;
 
@@ -3544,11 +3534,8 @@
 
 
 							// Remove the inventory quantity from the source
-							//// Only do this though if this is not an internal shipment, or otherwise the quantity would be double-subtracted
-					    ////if ($this->objShipment->ToCompanyId != $this->objShipment->FromCompanyId) {
 							$objInventoryTransaction->InventoryLocation->Quantity = $objInventoryTransaction->InventoryLocation->Quantity - $objInventoryTransaction->Quantity;
 							$objInventoryTransaction->InventoryLocation->Save();
-							////}
 
 							// Finish the InventoryTransaction and save it
 							$objInventoryTransaction->DestinationLocationId = $DestinationLocationId;
@@ -3673,21 +3660,7 @@
 
 				// Inventory
 				if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Inventory) {
-					/* excluding inventory from internal shipment
-					if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
-						$objInternalReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
-              if($objInternalReceipt instanceof Receipt){
-                $objInternalReceiptInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($objInternalReceipt->TransactionId);
-                foreach ($objInternalReceiptInventoryTransactionArray as $objReceiptInventoryTransaction) {
-                  if ($objReceiptInventoryTransaction->DestinationLocationId > 0) {
-                    $this->btnCancelCompleteShipment->Warning = sprintf('The inventory %s has been received since this shipment was completed.', $objReceiptInventoryTransaction->InventoryLocation->InventoryModel->InventoryModelCode);
-                    $objDatabase->TransactionRollback();
-                      return;
-                  }
-                }
-              }
-					}
-					*/
+
 					// Set the DestinationLocation of the InventoryTransaction to null and add the inventory quantity back to the source
 					foreach ($this->objInventoryTransactionArray as $objInventoryTransaction) {
 						// Set the destination location to null
@@ -3699,15 +3672,7 @@
 
 					}
 				}
-				/* excluding inventory from internal shipment
-				// If an Internal Receipt was created, then it needs to be deleted
-				if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
-					$objInternalReceipt = Shipment::FindInternalReceipt($this->objShipment->ShipmentId);
-                    if($objInternalReceipt instanceof Receipt){
-					    $objInternalReceipt->Transaction->Delete();
-                    }
-				}
-        */
+
 				// Cancel FedEx Shipment
 				if ($this->objShipment->CourierId == 1) {
 					if (!$this->FedExCancel()) {
@@ -5140,99 +5105,98 @@
 
 		}
 		//Set display logic of the GreenPlusButton of Address
-	protected function UpdateAddressAccess() {
-		//checks if the entity has edit authorization
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
-			$this->lblNewFromAddress->Visible=true;
-			$this->lblNewToAddress->Visible=true;
+		protected function UpdateAddressAccess() {
+			//checks if the entity has edit authorization
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
+			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+				$this->lblNewFromAddress->Visible=true;
+				$this->lblNewToAddress->Visible=true;
+			}
+			else{
+				$this->lblNewFromAddress->Visible=false;
+				$this->lblNewToAddress->Visible=false;
+			}
+	
 		}
-		else{
-			$this->lblNewFromAddress->Visible=false;
-			$this->lblNewToAddress->Visible=false;
+			//Set display logic of the GreenPlusButton of Company
+		protected function UpdateCompanyAccess() {
+			//checks if the entity  has edit authorization
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Company,2);
+			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+				$this->lblNewFromCompany->Visible=true;
+				$this->lblNewToCompany->Visible=true;
+			}
+			else{
+				$this->lblNewFromCompany->Visible=false;
+				$this->lblNewToCompany->Visible=false;
+			}
+	
 		}
-
+			//Set display logic of the GreenPlusButton of Contact
+		protected function UpdateContactAccess() {
+			//checks if the entity  has edit authorization
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Contact,2);
+			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+				$this->lblNewFromContact->Visible=true;
+				$this->lblNewToContact->Visible=true;
+			}
+			else{
+				$this->lblNewFromContact->Visible=false;
+				$this->lblNewToContact->Visible=false;
+			}
+	
+		}
+		
+	  protected function disableAdvancedIfInternal(){
+			if(!$this->lblFromCompany->Display){
+	
+				if($this->lstToCompany->SelectedValue==$this->lstFromCompany->SelectedValue){
+				
+					// switch off advansed parameters
+					if ($this->objAssetTransactionArray) {
+						$objNewAssetTransactionArray = array();
+						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+						  $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
+						}
+					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+			
+						// set advansed to 'None'
+							$objAssetTransaction->ScheduleReceiptFlag = false;
+							$objAssetTransaction->NewAssetFlag = false;
+							$objAssetTransaction->NewAssetId = null;
+							$objAssetTransaction->NewAsset = null;
+						              $objAssetTransaction->ScheduleReceiptDueDate = null;
+						
+							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
+							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+							    $objLinkedAssetTransaction->ScheduleReceiptFlag = false;
+									$objLinkedAssetTransaction->NewAssetFlag = false;
+									$objLinkedAssetTransaction->NewAssetId = null;
+									$objLinkedAssetTransaction->NewAsset = null;
+						                  $objLinkedAssetTransaction->ScheduleReceiptDueDate = null;
+							  }
+							}
+						
+						// Return
+			
+	 				}
+	 				$this->blnModifyAssets = true;
+	 			}
+				//
+				$this->dtgAssetTransact->RemoveColumnByName('Advanced');
+				$this->dtgAssetTransact->RemoveColumnByName('Due Date');
+			}	
+			else {
+			    if(!$this->dtgAssetTransact->GetColumnByName('Advanced')){
+			       $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+			       $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+				  }
+			 	}
+			}
+		}
 	}
-		//Set display logic of the GreenPlusButton of Company
-	protected function UpdateCompanyAccess() {
-		//checks if the entity  has edit authorization
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Company,2);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
-			$this->lblNewFromCompany->Visible=true;
-			$this->lblNewToCompany->Visible=true;
-		}
-		else{
-			$this->lblNewFromCompany->Visible=false;
-			$this->lblNewToCompany->Visible=false;
-		}
-
-	}
-		//Set display logic of the GreenPlusButton of Contact
-	protected function UpdateContactAccess() {
-		//checks if the entity  has edit authorization
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Contact,2);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
-			$this->lblNewFromContact->Visible=true;
-			$this->lblNewToContact->Visible=true;
-		}
-		else{
-			$this->lblNewFromContact->Visible=false;
-			$this->lblNewToContact->Visible=false;
-		}
-
-	}
-          protected function disableAdvancedIfInternal(){
-              if(!$this->lblFromCompany->Display){
-
-                 if($this->lstToCompany->SelectedValue==$this->lstFromCompany->SelectedValue){
-
-                     // switch off advansed parameters
-                     if ($this->objAssetTransactionArray) {
-                     			  $objNewAssetTransactionArray = array();
-                     			  foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-                     			    $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
-                     			  }
-                     				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
-
-                     						// set advansed to 'None'
-                     							$objAssetTransaction->ScheduleReceiptFlag = false;
-                     							$objAssetTransaction->NewAssetFlag = false;
-                     							$objAssetTransaction->NewAssetId = null;
-                     							$objAssetTransaction->NewAsset = null;
-                                                $objAssetTransaction->ScheduleReceiptDueDate = null;
-
-                     							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
-                     							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
-                     							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
-                     							    $objLinkedAssetTransaction->ScheduleReceiptFlag = false;
-                         							$objLinkedAssetTransaction->NewAssetFlag = false;
-                         							$objLinkedAssetTransaction->NewAssetId = null;
-                         							$objLinkedAssetTransaction->NewAsset = null;
-                                                    $objLinkedAssetTransaction->ScheduleReceiptDueDate = null;
-                     							  }
-                     							}
-
-                     						// Return
-
-                     				}
-                     				$this->blnModifyAssets = true;
-                     			}
-                     //
-                     $this->dtgAssetTransact->RemoveColumnByName('Advanced');
-                     $this->dtgAssetTransact->RemoveColumnByName('Due Date');
-                 }
-                 else{
-                      if(!$this->dtgAssetTransact->GetColumnByName('Advanced')){
-                         $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-                         $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-                      }
-                 }
-
-              }
-
-          }
-	}
-
+	
 	// Go ahead and run this form object to render the page and its event handlers, using
 	// generated/shipment_edit.php.inc as the included HTML template file
 	ShipmentEditForm::Run('ShipmentEditForm', __DOCROOT__ . __SUBDIRECTORY__ . '/shipping/shipment_edit.tpl.php');

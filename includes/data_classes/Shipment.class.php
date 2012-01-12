@@ -356,39 +356,6 @@
 			}
 		}
 		
-		/**
-		 * Return the objReceipt of the automatically generated receipt from the completion of the internal shipment.
-		 * 
-		 * @param int $intShipmentId
-		 * @return integer $intReceiptId
-		 */
-		public static function FindInternalReceipt($intShipmentId) {
-			
-			$objShipment = Shipment::Load($intShipmentId);
-			
-			// If this is not an internal shipment, return a null value
-			if ($objShipment->FromCompanyId != $objShipment->ToCompanyId) {
-				$return = null;
-			}
-			else {
-				// The transaction_id for the receipt should be immediately after the shipment 
-				// TO-DO this doesn't work. What if the user saves a shipment, then comes back to it later to complete it. Duh.
-				//$intReceiptTransactionId = $objShipment->TransactionId + 1;
-				// Matching the same transactions based on time they were created. That is not ideal and ultimately won't work as a permananent solution.
-
-				    $objReceipt = Receipt::QuerySingle(QQ::AndCondition(
-				//	QQ::Equal(QQN::Receipt()->ToContactId, $objShipment->ToContactId),
-					QQ::Equal(QQN::Receipt()->FromCompanyId, $objShipment->FromCompanyId),
-					QQ::Equal(QQN::Receipt()->CreatedBy, $objShipment->CreatedBy),
-					QQ::OrCondition(QQ::Equal(QQN::Receipt()->CreationDate, $objShipment->CreationDate->PHPDate("Y-m-d H:i:s")), QQ::Equal(QQN::Receipt()->CreationDate, $objShipment->ModifiedDate))));
-
-				$return = $objReceipt;
-			}
-			
-			return $return;
-		}
-		
-
     /**
      * Count the total shipments based on the submitted search criteria
      *
