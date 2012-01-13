@@ -440,7 +440,7 @@
 			$strQuery = sprintf('
 				SELECT
 					%s
-					COUNT( `asset`.`asset_id`) AS asset_count,
+					COUNT(DISTINCT `asset`.`asset_id`) AS asset_count,
 					`asset_model`.`asset_model_id` AS `asset_model_id`,
 					`asset_model`.`category_id` AS `category_id`,
 					`asset_model`.`manufacturer_id` AS `manufacturer_id`,
