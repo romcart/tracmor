@@ -1888,7 +1888,7 @@
 		}*/
 
 		// Receive Inventory Click - Holy Shit
-		public function btnReceiveInventoryTransaction_Click($strFormId, $strControlId, $strParameter) {
+	        public function btnReceiveInventoryTransaction_Click($strFormId, $strControlId, $strParameter) {
 
 			$blnError = false;
 
@@ -2011,6 +2011,7 @@
 
 					// Commit all of the transactions to the database
 					$objDatabase->TransactionCommit();
+                    $this->dtgInventoryTransact->Refresh();
 				}
 				catch (QExtendedOptimisticLockingException $objExc) {
 
