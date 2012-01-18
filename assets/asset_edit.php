@@ -524,12 +524,29 @@ CREATE FIELD METHODS
 		}
 
 		protected function btnAddChild_Click() {
+
 		  if ($this->txtAddChild->Text) {
   		  $objChildAsset = Asset::LoadByAssetCode($this->txtAddChild->Text);
   		  if ($objChildAsset) {
-  		    if ($objChildAsset->ParentAssetId) {
-  		      $this->txtAddChild->Warning = "That asset code already have the parent asset code. Please try another.";
-  		    }
+            // check if asset already within removed child assets
+            if(is_array($this->ctlAssetEdit->objRemovedChildAssetArray)){
+                $newRemovedChildAssetArray = array();
+                $blnAssetNotRemoved = true;
+                foreach($this->ctlAssetEdit->objRemovedChildAssetArray as $removedAsset){
+                  if($removedAsset->AssetId == $objChildAsset->AssetId){
+                    $blnAssetNotRemoved = false;
+                  }
+                  else {
+                    $newRemovedChildAssetArray[] = $removedAsset;
+                  }
+                }
+                if($blnAssetNotRemoved == false){
+                    $this->ctlAssetEdit->objRemovedChildAssetArray = $newRemovedChildAssetArray;
+                }
+            }
+  		    if ($objChildAsset->ParentAssetId&&$blnAssetNotRemoved){
+              $this->txtAddChild->Warning = "That asset code already have the parent asset code. Please try another.";
+            }
   		    elseif ($objChildAsset->AssetCode == $this->objAsset->AssetCode) {
   		      $this->txtAddChild->Warning = "That asset code does not exist. Please try another.";
   		    }
