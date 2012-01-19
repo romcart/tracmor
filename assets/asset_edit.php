@@ -529,9 +529,10 @@ CREATE FIELD METHODS
   		  $objChildAsset = Asset::LoadByAssetCode($this->txtAddChild->Text);
   		  if ($objChildAsset) {
             // check if asset already within removed child assets
+            $blnAssetNotRemoved = true;
             if(is_array($this->ctlAssetEdit->objRemovedChildAssetArray)){
                 $newRemovedChildAssetArray = array();
-                $blnAssetNotRemoved = true;
+
                 foreach($this->ctlAssetEdit->objRemovedChildAssetArray as $removedAsset){
                   if($removedAsset->AssetId == $objChildAsset->AssetId){
                     $blnAssetNotRemoved = false;
@@ -598,25 +599,34 @@ CREATE FIELD METHODS
 
 		protected function btnChildAssetsRemove_Click() {
 		  $arrAssetId = $this->dtgChildAssets->GetSelected("AssetId");
-		  if (count($arrAssetId)) {
+          if (count($arrAssetId)) {
 		    if (!is_array($this->ctlAssetEdit->objRemovedChildAssetArray)) {
 		      $this->ctlAssetEdit->objRemovedChildAssetArray = array();
 		    }
 		    $objNewChildAssetArray = array();
-        // Creating the associative array with AssetId as a key
+           // Creating the associative array with AssetId as a key
 		    foreach ($this->ctlAssetEdit->objChildAssetArray as $objChildAsset) {
-          $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
-        }
-        // Removing all checked child assets
-        foreach ($arrAssetId as $intAssetId) {
-          $objRemovedChildAsset = $objNewChildAssetArray[$intAssetId];
-          // Remove child asset
-          unset($objNewChildAssetArray[$intAssetId]);
-          $objRemovedChildAsset->ParentAssetId = "";
-          $objRemovedChildAsset->LinkedFlag = false;
-          // Add removing child asset to objRemovedChildAssetArray
-          array_push($this->ctlAssetEdit->objRemovedChildAssetArray, $objRemovedChildAsset);
-        }
+              $objNewChildAssetArray[$objChildAsset->AssetId] = $objChildAsset;
+            }
+            // Removing all checked child assets
+            foreach ($arrAssetId as $intAssetId) {
+              // subtract if checked already removed
+              $blnNotRemoved = true;
+              foreach($this->ctlAssetEdit->objRemovedChildAssetArray as $alreadyRemoved){
+                if ($alreadyRemoved->AssetId==$intAssetId) {
+                   $blnNotRemoved = false;
+                }
+              }
+              if ($blnNotRemoved){
+                $objRemovedChildAsset = $objNewChildAssetArray[$intAssetId];
+                // Remove child asset
+                 unset($objNewChildAssetArray[$intAssetId]);
+                 $objRemovedChildAsset->ParentAssetId = "";
+                 $objRemovedChildAsset->LinkedFlag = false;
+                 // Add removing child asset to objRemovedChildAssetArray
+                 array_push($this->ctlAssetEdit->objRemovedChildAssetArray, $objRemovedChildAsset);
+              }
+            }
         // Creating new objChildAssetArray without removing assets
         $this->ctlAssetEdit->objChildAssetArray = array();
 		    foreach ($objNewChildAssetArray as $objChildAsset) {
