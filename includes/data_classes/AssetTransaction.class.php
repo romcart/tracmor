@@ -159,7 +159,13 @@
                     return sprintf('from %s to %s', $this->__toStringSourceLocation(), $this->__toStringDestinationLocation());
                     break;
                 case 2:
-                    return sprintf('from %s to %s', $this->__toStringSourceLocation(), $this->__toStringDestinationLocation());
+                    if($this->Transaction->ModifiedByObject instanceof UserAccount){
+                        $user = $this->Transaction->ModifiedByObject->__toStringFullName();
+                    }
+                    else{
+                        $user = $this->Transaction->CreatedByObject->__toStringFullName();
+                    }
+                    return sprintf('from %s to %s', $user, $this->__toStringDestinationLocation());
                     break;
                 case 3:
                     if ($this->AssetTransactionCheckout) {
@@ -167,17 +173,26 @@
                   			    $strToReturn = $this->AssetTransactionCheckout->ToContact->__toStringWithLink();
                     		}
                     		else {
-                    			$strToReturn = $this->AssetTransactionCheckout->ToUser->__toString();
+                    			$strToReturn = $this->AssetTransactionCheckout->ToUser->__toStringFullName();
                     		}
                   		}
                     return sprintf('from %s to %s',$this->__toStringSourceLocation() , $strToReturn);
                     break;
-                case 6: return sprintf('from %s to %s',$this->__toStringSourceLocation(),$this->Transaction->ToStringCompanyWithLink());
+                case 6:
+                    $this->Transaction->Shipment = Shipment::LoadByTransactionId($this->TransactionId);
+                    return sprintf('from %s to %s',$this->__toStringSourceLocation(),$this->Transaction->ToStringCompanyWithLink());
                     break;
-                case 7: return sprintf('from %s to %s',$this->Transaction->ToStringCompanyWithLink(), $this->__toStringDestinationLocation());
+                case 7:
+                    $this->Transaction->Receipt = Receipt::LoadByTransactionId($this->TransactionId);
+                    if($this->Transaction->Receipt->ReceivedFlag){
+                        return sprintf('from %s to %s',$this->Transaction->ToStringCompanyWithLink(), $this->__toStringDestinationLocation());
+                    }
+                    else {
+                        return sprintf('from %s',$this->Transaction->ToStringCompanyWithLink());
+                    }
                     break;
                 default:
-                    return'';
+                    return '';
                     break;
             }
         }
