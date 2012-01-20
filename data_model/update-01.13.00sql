@@ -1,0 +1,14 @@
+ALTER TABLE `fedex_shipment` DROP FOREIGN KEY `fedex_shipment_ibfk_8` , DROP FOREIGN KEY `fedex_shipment_ibfk_7` , DROP FOREIGN KEY `fedex_shipment_ibfk_6` , DROP FOREIGN KEY `fedex_shipment_ibfk_5` , DROP FOREIGN KEY `fedex_shipment_ibfk_4` , DROP FOREIGN KEY `fedex_shipment_ibfk_3` , DROP FOREIGN KEY `fedex_shipment_ibfk_2` , DROP FOREIGN KEY `fedex_shipment_ibfk_1` ;
+DROP TABLE `fedex_shipment`;
+DROP TABLE `fedex_service_type`;
+DROP TABLE `weight_unit`;
+DROP TABLE `length_unit`;
+DROP TABLE `currency_unit`;
+DROP TABLE `package_type`;
+DELETE FROM `admin_setting` WHERE `short_description`='fedex_gateway_URI';
+DELETE FROM `admin_setting` WHERE `short_description`='fedex_account_id';
+DELETE FROM `admin_setting` WHERE `short_description`='fedex_label_printer_type';
+DELETE FROM `admin_setting` WHERE `short_description`='fedex_label_format_type';
+DELETE FROM `admin_setting` WHERE `short_description`='fedex_thermal_printer_port';
+DELETE FROM `courier` WHERE `courier_id`='1';
+DELETE FROM `shipping_account` WHERE `courier_id` = '1';

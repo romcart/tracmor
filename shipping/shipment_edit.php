@@ -25,7 +25,7 @@
 	require('../contacts/CompanyEditPanel.class.php');
 	require('../contacts/ContactEditPanel.class.php');
 	require('../contacts/AddressEditPanel.class.php');
-	require_once('./fedexdc.class.php');
+
 
 
 	/**
@@ -51,7 +51,7 @@
 		protected $ctlShortcutMenu;
 
 		// Qpanel
-		protected $pnlFedExShipment;
+//		protected $pnlFedExShipment;
 
 		// Booleans
 		protected $blnModifyAssets = false;
@@ -70,42 +70,6 @@
 		protected $txtReceiptAssetCode;
 		protected $chkAutoGenerateAssetCode;
 		protected $dtpScheduleReceiptDueDate;
-		protected $txtToPhone;
-		protected $lstBillTransportationTo;
-		protected $lstShippingAccount;
-		protected $txtRecipientThirdPartyAccount;
-		protected $txtReference;
-		protected $lstFxServiceType;
-		protected $lstPackageType;
-		protected $txtPackageWeight;
-		protected $lstWeightUnit;
-		protected $txtPackageLength;
-		protected $txtPackageWidth;
-		protected $txtPackageHeight;
-		protected $lstLengthUnit;
-		protected $txtValue;
-		protected $txtFedexNotifySenderEmail;
-		protected $chkFedexNotifySenderShipFlag;
-		protected $chkFedexNotifySenderExceptionFlag;
-		protected $chkFedexNotifySenderDeliveryFlag;
-		protected $txtFedexNotifyRecipientEmail;
-		protected $chkFedexNotifyRecipientShipFlag;
-		protected $chkFedexNotifyRecipientExceptionFlag;
-		protected $chkFedexNotifyRecipientDeliveryFlag;
-		protected $txtFedexNotifyOtherEmail;
-		protected $chkFedexNotifyOtherShipFlag;
-		protected $chkFedexNotifyOtherExceptionFlag;
-		protected $chkFedexNotifyOtherDeliveryFlag;
-		protected $lstCurrencyUnit;
-		protected $chkSaturdayDeliveryFlag;
-		protected $chkHoldAtLocationFlag;
-		protected $txtHoldAtLocationAddress;
-		protected $txtHoldAtLocationCity;
-		protected $lstHoldAtLocationState;
-		protected $txtHoldAtLocationPostalCode;
-		protected $lstFedexLabelPrinterType;
-		protected $lstFedexLabelFormatType;
-		protected $txtFedexThermalPrinterPort;
 		protected $dlgExchange;
 		protected $dlgDueDate;
 		public $lstFromCompany;
@@ -150,41 +114,14 @@
 		protected $lblToAddress;
 		protected $lblToAddressFull;
 		protected $lblCourier;
-		protected $lblToPhone;
-		protected $lblBillTransportationTo;
-		protected $lblReference;
 		protected $pnlNote;
 		protected $lblPackingListLink;
-		protected $lblFedexShippingLabelLink;
-		protected $lblAdvanced;
-		protected $lblSenderLabel;
-		protected $lblPayerAccount;
-		protected $lblFxServiceType;
-		protected $lblPackageType;
-		protected $lblPackageWeight;
-		protected $lblPackageLength;
-		protected $lblPackageWidth;
-		protected $lblPackageHeight;
-		protected $lblValue;
-		protected $lblWeightUnit;
-		protected $lblLengthUnit;
-		protected $lblCurrencyUnit;
-		protected $lblFedexNotifySenderEmail;
-		protected $lblFedexNotifyRecipientEmail;
-		protected $lblFedexNotifyOtherEmail;
 		protected $lblNewFromCompany;
 		protected $lblNewFromContact;
 		protected $lblNewFromAddress;
 		protected $lblNewToCompany;
 		protected $lblNewToContact;
 		protected $lblNewToAddress;
-		protected $lblHoldAtLocationAddress;
-		protected $lblHoldAtLocationCity;
-		protected $lblHoldAtLocationState;
-		protected $lblHoldAtLocationPostalCode;
-		protected $lblFedexLabelPrinterType;
-		protected $lblFedexLabelFormatType;
-		protected $lblFedexThermalPrinterPort;
 		protected $lblAddAsset;
 		protected $dlgNew;
 
@@ -244,11 +181,11 @@
 			$this->ctlShortcutMenu_Create();
 
 			// FedEx Shipment Panel
-			$this->pnlFedExShipment_Create();
+			// $this->pnlFedExShipment_Create();
 
 			// Packing List Link
 			$this->lblPackingListLink_Create();
-			$this->lblFedexShippingLabelLink_Create();
+//			$this->lblFedexShippingLabelLink_Create();
 
 			// Shipping Labels
 			$this->lblShipmentNumber_Create();
@@ -264,33 +201,8 @@
 			$this->lblToAddress_Create();
 			$this->lblToAddressFull_Create();
 			$this->lblCourier_Create();
-			$this->lblToPhone_Create();
-			$this->lblBillTransportationTo_Create();
-			$this->lblReference_Create();
-			$this->lblFedexNotifySenderEmail_Create();
-			$this->lblFedexNotifyRecipientEmail_Create();
-			$this->lblFedexNotifyOtherEmail_Create();
-			$this->lblHoldAtLocationAddress_Create();
-			$this->lblHoldAtLocationCity_Create();
-			$this->lblHoldAtLocationState_Create();
-			$this->lblHoldAtLocationPostalCode_Create();
-			$this->lblFedexLabelPrinterType_Create();
-			$this->lblFedexLabelFormatType_Create();
-			$this->lblFedexThermalPrinterPort_Create();
 			$this->pnlNote_Create();
 			$this->lblTrackingNumber_Create();
-			$this->lblSenderLabel_Create();
-			$this->lblPayerAccount_Create();
-			$this->lblFxServiceType_Create();
-			$this->lblPackageType_Create();
-			$this->lblPackageWeight_Create();
-			$this->lblPackageLength_Create();
-			$this->lblPackageWidth_Create();
-			$this->lblPackageHeight_Create();
-			$this->lblValue_Create();
-			$this->lblWeightUnit_Create();
-			$this->lblLengthUnit_Create();
-			$this->lblCurrencyUnit_Create();
 
 			// Shipping Inputs
 			$this->dlgExchange_Create();
@@ -306,42 +218,6 @@
 			$this->lblNewToCompany_Create();
 			$this->lstToContact_Create();
 			$this->lblNewToContact_Create();
-			$this->txtToPhone_Create();
-			$this->lstBillTransportationTo_Create();
-			$this->lstShippingAccount_Create();
-			$this->txtReference_Create();
-			$this->txtFedexNotifySenderEmail_Create();
-			$this->txtFedexNotifyRecipientEmail_Create();
-			$this->txtFedexNotifyOtherEmail_Create();
-			$this->chkFedexNotifySenderShipFlag_Create();
-			$this->chkFedexNotifySenderExceptionFlag_Create();
-			$this->chkFedexNotifySenderDeliveryFlag_Create();
-			$this->chkFedexNotifyRecipientShipFlag_Create();
-			$this->chkFedexNotifyRecipientExceptionFlag_Create();
-			$this->chkFedexNotifyRecipientDeliveryFlag_Create();
-			$this->chkFedexNotifyOtherShipFlag_Create();
-			$this->chkFedexNotifyOtherExceptionFlag_Create();
-			$this->chkFedexNotifyOtherDeliveryFlag_Create();
-			$this->lstFxServiceType_Create();
-			$this->txtRecipientThirdPartyAccount_Create();
-			$this->lstPackageType_Create();
-			$this->txtPackageWeight_Create();
-			$this->lstWeightUnit_Create();
-			$this->txtPackageLength_Create();
-			$this->txtPackageWidth_Create();
-			$this->txtPackageHeight_Create();
-			$this->lstLengthUnit_Create();
-			$this->txtValue_Create();
-			$this->lstCurrencyUnit_Create();
-			$this->chkSaturdayDeliveryFlag_Create();
-			$this->chkHoldAtLocationFlag_Create();
-			$this->txtHoldAtLocationAddress_Create();
-			$this->txtHoldAtLocationCity_Create();
-			$this->lstHoldAtLocationState_Create();
-			$this->txtHoldAtLocationPostalCode_Create();
-			$this->lstFedexLabelPrinterType_Create();
-			$this->lstFedexLabelFormatType_Create();
-			$this->txtFedexThermalPrinterPort_Create();
 			$this->lstToAddress_Create();
 			$this->lblNewToAddress_Create();
 			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
@@ -561,15 +437,7 @@
 		  $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
 
-  	// Create and Setup the FedEx Shipment Panel
-  	protected function pnlFedExShipment_Create() {
-  		$this->pnlFedExShipment = new QPanel($this);
-  		$this->pnlFedExShipment->AutoRenderChildren = false;
-  		$this->pnlFedExShipment->Template = 'pnl_fedex_shipment.inc.php';
-  		$this->pnlFedExShipment->Display = ($this->blnEditMode && $this->objShipment->CourierId===1) ? true : false;
-  	}
-
-  	// Create and Setup the Modal Dialog Box
+   	// Create and Setup the Modal Dialog Box
   	protected function dlgExchange_Create() {
   		$this->dlgExchange = new QDialogBox($this);
   		$this->dlgExchange->AutoRenderChildren = false;
@@ -607,19 +475,6 @@
 			$this->lblPackingListLink->HtmlEntities = false;
 			if ($this->blnEditMode) {
 				$this->lblPackingListLink->Text = $this->objShipment->__toStringPackingListLink("bluelink");
-			}
-		}
-
-		// Create and Setup lblFedexShippingLabelLink
-		protected function lblFedexShippingLabelLink_Create() {
-			$this->lblFedexShippingLabelLink = new QLabel($this);
-			$this->lblFedexShippingLabelLink->HtmlEntities = false;
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				if ($this->objFedexShipment->LabelPrinterType=='1') {
-					$this->lblFedexShippingLabelLink->Text = $this->objShipment->__toStringFedexShippingLabelLink("bluelink");
-				} else {
-					$this->lblFedexShippingLabelLink->Text = $this->objShipment->__toStringFedexThermalLabelLink("bluelink");
-				}
 			}
 		}
 
@@ -747,124 +602,6 @@
 			$this->lblCourier->Text = ($this->objShipment->CourierId) ? $this->objShipment->Courier->__toString() : 'Other';
 		}
 
-		// Create and Setup lblToPhone
-		protected function lblToPhone_Create() {
-			$this->lblToPhone = new QLabel($this->pnlFedExShipment);
-			$this->lblToPhone->Name = 'To Phone';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblToPhone->Text = $this->objFedexShipment->ToPhone;
-			}
-		}
-
-		// Create and Setup lblBillTransportationTo
-		protected function lblBillTransportationTo_Create() {
-			$this->lblBillTransportationTo = new QLabel($this->pnlFedExShipment);
-			$this->lblBillTransportationTo->Name = 'Bill Transportation To';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				// FedexServiceTypeId 6 = 'FedEx Ground'
-				$this->lblBillTransportationTo->Text = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::ground_pay_type($this->objFedexShipment->PayType) : FedExDC::express_pay_type($this->objFedexShipment->PayType);
-			}
-		}
-
-		// Create and Setup lblReference
-		protected function lblReference_Create() {
-			$this->lblReference = new QLabel($this->pnlFedExShipment);
-			$this->lblReference->Name = 'Reference';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblReference->Text = $this->objFedexShipment->Reference;
-			}
-		}
-
-		// Create and Setup lblFedexNotifySenderEmail
-		protected function lblFedexNotifySenderEmail_Create() {
-			$this->lblFedexNotifySenderEmail = new QLabel($this->pnlFedExShipment);
-			$this->lblFedexNotifySenderEmail->Name = 'Sender Email';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
-			}
-		}
-
-		// Create and Setup lblFedexNotifyRecipientEmail
-		protected function lblFedexNotifyRecipientEmail_Create() {
-			$this->lblFedexNotifyRecipientEmail = new QLabel($this->pnlFedExShipment);
-			$this->lblFedexNotifyRecipientEmail->Name = 'Recipient Email';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
-			}
-		}
-
-		// Create and Setup lblFedexNotifyOtherEmail
-		protected function lblFedexNotifyOtherEmail_Create() {
-			$this->lblFedexNotifyOtherEmail = new QLabel($this->pnlFedExShipment);
-			$this->lblFedexNotifyOtherEmail->Name = 'Other Email';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
-			}
-		}
-
-		// Create and Setup lblHoldAtLocationAddress
-		protected function lblHoldAtLocationAddress_Create() {
-			$this->lblHoldAtLocationAddress = new QLabel($this->pnlFedExShipment);
-			$this->lblHoldAtLocationAddress->Name = 'Hold at Location Address';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
-			}
-		}
-
-		// Create and Setup lblHoldAtLocationCity
-		protected function lblHoldAtLocationCity_Create() {
-			$this->lblHoldAtLocationCity = new QLabel($this->pnlFedExShipment);
-			$this->lblHoldAtLocationCity->Name = 'Hold at Location City';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
-			}
-		}
-
-		// Create and Setup lblHoldAtLocationState
-		protected function lblHoldAtLocationState_Create() {
-			$this->lblHoldAtLocationState = new QLabel($this->pnlFedExShipment);
-			$this->lblHoldAtLocationState->Name = 'Hold at Location State';
-			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->HoldAtLocationStateObject) {
-				$this->lblHoldAtLocationState->Text = $this->objFedexShipment->HoldAtLocationStateObject->__toString();
-			}
-		}
-
-		// Create and Setup lblHoldAtLocationPostalCode
-		protected function lblHoldAtLocationPostalCode_Create() {
-			$this->lblHoldAtLocationPostalCode = new QLabel($this->pnlFedExShipment);
-			$this->lblHoldAtLocationPostalCode->Name = 'Hold at Location Postal Code';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
-			}
-		}
-
-		// Create and Setup lblFedexLabelPrinterType
-		protected function lblFedexLabelPrinterType_Create() {
-			$this->lblFedexLabelPrinterType = new QLabel($this->pnlFedExShipment);
-			$this->lblFedexLabelPrinterType->Name = 'FedEx Label Printer Type';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblFedexLabelPrinterType->Text =  FedExDC::label_printer_type($this->objFedexShipment->LabelPrinterType);
-			}
-		}
-
-		// Create and Setup lblFedexLabelFormatType
-		protected function lblFedexLabelFormatType_Create() {
-			$this->lblFedexLabelFormatType = new QLabel($this->pnlFedExShipment);
-			$this->lblFedexLabelFormatType->Name = 'FedEx Label Format';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblFedexLabelFormatType->Text = FedExDC::label_format_type($this->objFedexShipment->LabelFormatType);
-			}
-		}
-
-		// Create and Setup lblFedexThermalPrinterPort
-		protected function lblFedexThermalPrinterPort_Create() {
-			$this->lblFedexThermalPrinterPort = new QLabel($this->pnlFedExShipment);
-			$this->lblFedexThermalPrinterPort->Name = 'Thermal Printer Port';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblFedexThermalPrinterPort->Text = $this->objFedexShipment->ThermalPrinterPort;
-			}
-		}
-
 		// Create and Setup lblAdvanced
 		protected function lblAdvanced_Create() {
 			$this->lblAdvanced = new QLabel($this);
@@ -895,110 +632,6 @@
 				$this->lblSenderLabel->Text = 'Sender Account';
 			}
 			$this->lblSenderLabel->HtmlEntities=false;
-		}
-
-		// Create and Setup lblPayerAccount
-		protected function lblPayerAccount_Create() {
-			$this->lblPayerAccount = new QLabel($this->pnlFedExShipment);
-			$this->lblPayerAccount->Name = 'Payer Account';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				// If Pay Type === 1 (Sender) then display the account name, otherwise display the account number input by the user
-				if ($this->objFedexShipment->PayType === 1 && $this->objFedexShipment->ShippingAccountId) {
-					$this->lblPayerAccount->Text = $this->objFedexShipment->ShippingAccount->__toString();
-				} else {
-					$this->lblPayerAccount->Text = $this->objFedexShipment->PayerAccountNumber;
-				}
-			}
-		}
-
-		// Create and Setup lblFxServiceType
-		protected function lblFxServiceType_Create() {
-			$this->lblFxServiceType = new QLabel($this->pnlFedExShipment);
-			$this->lblFxServiceType->Name = 'Service Type';
-			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->FedexServiceType) {
-				$this->lblFxServiceType->Text = $this->objFedexShipment->FedexServiceType->__toString();
-			}
-		}
-
-		// Create and Setup lblPackageType
-		protected function lblPackageType_Create() {
-			$this->lblPackageType = new QLabel($this->pnlFedExShipment);
-			$this->lblPackageType->Name = 'Package Type';
-			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->PackageType) {
-				$this->lblPackageType->Text = $this->objFedexShipment->PackageType->__toString();
-			}
-		}
-
-		// Create and Setup lblPackageWeight
-		protected function lblPackageWeight_Create() {
-			$this->lblPackageWeight = new QLabel($this->pnlFedExShipment);
-			$this->lblPackageWeight->Name = 'Package Weight';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblPackageWeight->Text = $this->objFedexShipment->PackageWeight;
-			}
-		}
-
-		// Create and Setup lblPackageLength
-		protected function lblPackageLength_Create() {
-			$this->lblPackageLength = new QLabel($this->pnlFedExShipment);
-			$this->lblPackageLength->Name = 'Package Length';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblPackageLength->Text = $this->objFedexShipment->PackageLength;
-			}
-		}
-
-		// Create and Setup lblPackageWidth
-		protected function lblPackageWidth_Create() {
-			$this->lblPackageWidth = new QLabel($this->pnlFedExShipment);
-			$this->lblPackageWidth->Name = 'Package Width';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblPackageWidth->Text = $this->objFedexShipment->PackageWidth;
-			}
-		}
-
-		// Create and Setup lblPackageHeight
-		protected function lblPackageHeight_Create() {
-			$this->lblPackageHeight = new QLabel($this->pnlFedExShipment);
-			$this->lblPackageHeight->Name = 'Package Height';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblPackageHeight->Text = $this->objFedexShipment->PackageHeight;
-			}
-		}
-
-		// Create and Setup lblValue
-		protected function lblValue_Create() {
-			$this->lblValue = new QLabel($this->pnlFedExShipment);
-			$this->lblValue->Name = 'Declared Value';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->lblValue->Text = $this->objFedexShipment->DeclaredValue;
-			}
-		}
-
-		// Create and Setup lblWeightUnit
-		protected function lblWeightUnit_Create() {
-			$this->lblWeightUnit = new QLabel ($this->pnlFedExShipment);
-			$this->lblWeightUnit->Name = 'Weight Unit';
-			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->WeightUnitId) {
-				$this->lblWeightUnit->Text = $this->objFedexShipment->WeightUnit->__toString();
-			}
-		}
-
-		// Create and Setup lblLengthUnit
-		protected function lblLengthUnit_Create() {
-			$this->lblLengthUnit = new QLabel ($this->pnlFedExShipment);
-			$this->lblLengthUnit->Name = 'Length Unit';
-			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LengthUnitId) {
-				$this->lblLengthUnit->Text = $this->objFedexShipment->LengthUnit->__toString();
-			}
-		}
-
-		// Create and Setup lblCurrencyUnit
-		protected function lblCurrencyUnit_Create() {
-			$this->lblCurrencyUnit = new QLabel ($this->pnlFedExShipment);
-			$this->lblCurrencyUnit->Name = 'Currency Unit';
-			if ($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->CurrencyUnitId) {
-				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
-			}
 		}
 
 		protected function lblNewFromCompany_Create() {
@@ -1083,10 +716,6 @@
 			$this->txtTrackingNumber->CausesValidation = true;
 			$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
 			$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			// Do not show the tracking number field if this is a FedEx shipment
-			//if ($this->objShipment->CourierId == 1) {
-				//$this->txtTrackingNumber->Enabled = false;
-			//}
 			$this->txtTrackingNumber->TabIndex = 8;
 		}
 
@@ -1313,485 +942,6 @@
 				$this->txtNote->Text = $this->objShipment->Transaction->Note;
 			}
 			$this->txtNote->TabIndex=9;
-		}
-
-		// Create and Setup txtToPhone
-		protected function txtToPhone_Create() {
-			$this->txtToPhone = new QTextBox($this->pnlFedExShipment);
-			$this->txtToPhone->Name = QApplication::Translate('To Phone');
-			if ($this->blnEditMode && $this->objShipment->CourierId === 1 && $this->objFedexShipment) {
-				$this->txtToPhone->Text = $this->objFedexShipment->ToPhone;
-			}
-			$this->txtToPhone->CausesValidation = true;
-			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtToPhone->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtToPhone->TabIndex=11;
-		}
-
-		// Create and Setup lstBillTransportationTo
-		protected function lstBillTransportationTo_Create() {
-			$this->lstBillTransportationTo = new QListBox($this->pnlFedExShipment);
-			$this->lstBillTransportationTo->Name = QApplication::Translate('Bill Transportation To');
-			$this->lstBillTransportationTo->Required = false;
-			//if (!$this->blnEditMode)
-			//	$this->lstBillTransportationTo->AddItem('- Select One -', null);
-
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				// FedexServiceTypeId 6 is FedEx Ground
-				$objPayTypeArray = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::get_ground_pay_types() : FedExDC::get_express_pay_types();
-				if ($objPayTypeArray) foreach ($objPayTypeArray as $key => $value) {
-					$objListItem = new QListItem($value, $key);
-					$this->lstBillTransportationTo->AddItem($objListItem);
-				}
-				$this->lstBillTransportationTo->SelectedValue = $this->objFedexShipment->PayType;
-			} else {
-				$objPayTypeArray = FedExDC::get_express_pay_types();
-				if ($objPayTypeArray) foreach ($objPayTypeArray as $key => $value) {
-					$objListItem = new QListItem($value, $key);
-					$this->lstBillTransportationTo->AddItem($objListItem);
-				}
-			}
-
-			$this->lstBillTransportationTo->AddAction(new QChangeEvent(), new QAjaxAction('lstBillTransportationTo_Select'));
-			$this->lstBillTransportationTo->TabIndex=12;
-		}
-
-		// Create and Setup lstShippingAccount
-		protected function lstShippingAccount_Create() {
-			$this->lstShippingAccount = new QListBox($this->pnlFedExShipment);
-			$this->lstShippingAccount->Name = QApplication::Translate('Sender Account');
-			$this->lstShippingAccount->Required = false;
-			if (!$this->blnEditMode)
-				$this->lstShippingAccount->AddItem('- Select One -', null);
-			$objShippingAccountArray = ShippingAccount::LoadAll(QQ::Clause(QQ::OrderBy(QQN::ShippingAccount()->ShortDescription)));
-			if ($objShippingAccountArray) foreach ($objShippingAccountArray as $objShippingAccount) {
-				$objListItem = new QListItem($objShippingAccount->__toString(), $objShippingAccount->ShippingAccountId);
-				$this->lstShippingAccount->AddItem($objListItem);
-				if (!$this->blnEditMode && count($objShippingAccountArray) === 1)
-					$objListItem->Selected = true;
-			}
-
-			//$this->lstShippingAccount->AddAction(new QChangeEvent(), new QAjaxAction('lstShippingAccount_Select'));
-			$this->lstShippingAccount->TabIndex=13;
-		}
-
-		// Create and Setup txtRecipientThirdPartyAccount
-		protected function txtRecipientThirdPartyAccount_Create() {
-			$this->txtRecipientThirdPartyAccount = new QTextBox($this->pnlFedExShipment);
-			$this->txtRecipientThirdPartyAccount->Name = QApplication::Translate('Recipient/third party account number:');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtRecipientThirdPartyAccount->Text = $this->objFedexShipment->PayerAccountNumber;
-			}
-			$this->txtRecipientThirdPartyAccount->Display=false;
-			$this->txtRecipientThirdPartyAccount->TabIndex = 14;
-		}
-
-		// Create and Setup txtReference
-		protected function txtReference_Create() {
-			$this->txtReference = new QTextBox($this->pnlFedExShipment);
-			$this->txtReference->Name = QApplication::Translate('Your reference');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtReference->Text = $this->objFedexShipment->Reference;
-			}
-			$this->txtReference->TabIndex = 15;
-		}
-
-		// Create and Setup txtFedexNotifySenderEmail
-		protected function txtFedexNotifySenderEmail_Create() {
-			$this->txtFedexNotifySenderEmail = new QTextBox($this->pnlFedExShipment);
-			$this->txtFedexNotifySenderEmail->Name = QApplication::Translate('Sender Email');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
-			}
-			$this->txtFedexNotifySenderEmail->TabIndex = 32;
-		}
-
-		// Create and Setup txtFedexNotifyRecipientEmail
-		protected function txtFedexNotifyRecipientEmail_Create() {
-			$this->txtFedexNotifyRecipientEmail = new QTextBox($this->pnlFedExShipment);
-			$this->txtFedexNotifyRecipientEmail->Name = QApplication::Translate('Recipient Email');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
-			}
-			$this->txtFedexNotifyRecipientEmail->TabIndex = 36;
-		}
-
-		// Create and Setup txtFedexNotifyOtherEmail
-		protected function txtFedexNotifyOtherEmail_Create() {
-			$this->txtFedexNotifyOtherEmail = new QTextBox($this->pnlFedExShipment);
-			$this->txtFedexNotifyOtherEmail->Name = QApplication::Translate('Other Email');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
-			}
-			$this->txtFedexNotifyOtherEmail->TabIndex = 40;
-		}
-
-		// Create and Setup lstFxServiceType
-		protected function lstFxServiceType_Create() {
-			$this->lstFxServiceType = new QListBox($this->pnlFedExShipment);
-			$this->lstFxServiceType->Name = QApplication::Translate('FedEx Service Type');
-			$this->lstFxServiceType->AddItem('- Select One -', null);
-
-			$objFedexServiceTypeArr = FedexServiceType::LoadAll(QQ::Clause(QQ::OrderBy(QQN::FedexServiceType()->ShortDescription)));
-			if ($objFedexServiceTypeArr) foreach ($objFedexServiceTypeArr as $objFedexServiceType) {
-				$objListItem = new QListItem($objFedexServiceType->ShortDescription, $objFedexServiceType->FedexServiceTypeId);
-				if (($this->blnEditMode && $this->objFedexShipment) && $this->objFedexShipment->FedexServiceTypeId == $objFedexServiceType->FedexServiceTypeId) {
-					$objListItem->Selected = true;
-				}
-
-				$this->lstFxServiceType->AddItem($objListItem);
-			}
-			/*if (!$this->blnEditMode) {
-				$this->lstFxServiceType->Required = false;
-				$this->lstFxServiceType->Enabled = false;
-			}
-			elseif ($this->blnEditMode && $this->objShipment->FedexServiceTypeId) {
-				$this->lstFxServiceType->Enabled = true;
-				$this->lstFxServiceType->Required = true;
-			}
-			*/
-			$this->lstFxServiceType->TabIndex=16;
-
-			$this->lstFxServiceType->AddAction(new QChangeEvent(), new QAjaxAction('lstFxServiceType_Select'));
-		}
-
-		// Create and Setup lstPackageType
-		protected function lstPackageType_Create() {
-			$this->lstPackageType = new QListBox($this->pnlFedExShipment);
-			$this->lstPackageType->Name = QApplication::Translate('Package Type');
-
-			$this->LoadPackageTypes();
-			$this->lstPackageType->TabIndex = 17;
-		}
-
-		// Create and Setup txtPackageWeight
-		protected function txtPackageWeight_Create() {
-			$this->txtPackageWeight = new QFloatTextBox($this->pnlFedExShipment);
-			$this->txtPackageWeight->Name = QApplication::Translate('Weight');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtPackageWeight->Text = $this->objFedexShipment->PackageWeight;
-			}
-			$this->txtPackageWeight->SetCustomStyle('Width','50px');
-			$this->txtPackageWeight->CausesValidation = true;
-			$this->txtPackageWeight->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageWeight->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtPackageWeight->TabIndex = 18;
-		}
-
-		// Create and Setup lstWeightUnit
-		protected function lstWeightUnit_Create() {
-			$this->lstWeightUnit = new QListBox($this->pnlFedExShipment);
-			$this->lstWeightUnit->Name = QApplication::Translate('Weight Unit');
-			//$this->lstWeightUnit->AddItem('- Select One -', null);
-			$objWeightUnitArray = WeightUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::WeightUnit()->ShortDescription)));
-			if ($objWeightUnitArray) foreach ($objWeightUnitArray as $objWeightUnit) {
-				$objListItem = new QListItem($objWeightUnit->__toString(), $objWeightUnit->WeightUnitId);
-				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->WeightUnit) && ($this->objFedexShipment->WeightUnit->WeightUnitId == $objWeightUnit->WeightUnitId)) {
-					$objListItem->Selected = true;
-				} else if (!$this->objFedexShipment && $objWeightUnit->WeightUnitId === 1) {
-					// Default to LBS (WeightUnitId 1)
-					$objListItem->Selected = true;
-				}
-				$this->lstWeightUnit->AddItem($objListItem);
-			}
-			$this->lstWeightUnit->SetCustomStyle('Width','120px');
-			$this->lstWeightUnit->TabIndex = 19;
-		}
-
-		// Create and Setup txtPackageLength
-		protected function txtPackageLength_Create() {
-			$this->txtPackageLength = new QFloatTextBox($this->pnlFedExShipment);
-			$this->txtPackageLength->Name = QApplication::Translate('L');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtPackageLength->Text = $this->objFedexShipment->PackageLength;
-			}
-			$this->txtPackageLength->CausesValidation = true;
-			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageLength->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtPackageLength->SetCustomStyle('Width','30px');
-			$this->txtPackageLength->TabIndex = 20;
-		}
-
-		// Create and Setup txtPackageWidth
-		protected function txtPackageWidth_Create() {
-			$this->txtPackageWidth = new QFloatTextBox($this->pnlFedExShipment);
-			$this->txtPackageWidth->Name = QApplication::Translate('W');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtPackageWidth->Text = $this->objFedexShipment->PackageWidth;
-			}
-			$this->txtPackageWidth->CausesValidation = true;
-			$this->txtPackageWidth->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageWidth->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtPackageWidth->SetCustomStyle('Width','30px');
-			$this->txtPackageWidth->TabIndex = 21;
-		}
-
-		// Create and Setup txtPackageHeight
-		protected function txtPackageHeight_Create() {
-			$this->txtPackageHeight = new QFloatTextBox($this->pnlFedExShipment);
-			$this->txtPackageHeight->Name = QApplication::Translate('H');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtPackageHeight->Text = $this->objFedexShipment->PackageHeight;
-			}
-			$this->txtPackageHeight->CausesValidation = true;
-			$this->txtPackageHeight->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtPackageHeight->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtPackageHeight->SetCustomStyle('Width','30px');
-			$this->txtPackageHeight->TabIndex = 22;
-		}
-
-		// Create and Setup lstLengthUnit
-		protected function lstLengthUnit_Create() {
-			$this->lstLengthUnit = new QListBox($this->pnlFedExShipment);
-			$this->lstLengthUnit->Name = QApplication::Translate('Length Unit');
-			//$this->lstLengthUnit->AddItem('- Select One -', null);
-			$objLengthUnitArray = LengthUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::LengthUnit()->ShortDescription)));
-			if ($objLengthUnitArray) foreach ($objLengthUnitArray as $objLengthUnit) {
-				$objListItem = new QListItem($objLengthUnit->__toString(), $objLengthUnit->LengthUnitId);
-				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LengthUnit) && ($this->objFedexShipment->LengthUnit->LengthUnitId == $objLengthUnit->LengthUnitId)) {
-					$objListItem->Selected = true;
-				} else if (!$this->objFedexShipment && $objLengthUnit->LengthUnitId === 1) {
-					// Default to IN (LengthUnitId 1)
-					$objListItem->Selected = true;
-				}
-				$this->lstLengthUnit->AddItem($objListItem);
-			}
-			$this->lstLengthUnit->SetCustomStyle('Width','60px');
-			$this->lstLengthUnit->TabIndex = 23;
-		}
-
-		// Create and Setup txtValue
-		protected function txtValue_Create() {
-			$this->txtValue = new QFloatTextBox($this->pnlFedExShipment);
-			$this->txtValue->Name = QApplication::Translate('Value');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtValue->Text = $this->objFedexShipment->DeclaredValue;
-			}
-			$this->txtValue->CausesValidation = true;
-			$this->txtValue->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCompleteShipment_Click'));
-			$this->txtValue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-			$this->txtValue->SetCustomStyle('Width','50px');
-			$this->txtValue->TabIndex = 24;
-		}
-
-		// Create and Setup lstCurrencyUnit
-		protected function lstCurrencyUnit_Create() {
-			$this->lstCurrencyUnit = new QListBox($this->pnlFedExShipment);
-			$this->lstCurrencyUnit->Name = QApplication::Translate('Currency Unit');
-			//$this->lstCurrencyUnit->AddItem('- Select One -', null);
-			$objCurrencyUnitArray = CurrencyUnit::LoadAll(QQ::Clause(QQ::OrderBy(QQN::CurrencyUnit()->ShortDescription)));
-			if ($objCurrencyUnitArray) foreach ($objCurrencyUnitArray as $objCurrencyUnit) {
-				$objListItem = new QListItem($objCurrencyUnit->__toString(), $objCurrencyUnit->CurrencyUnitId);
-				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->CurrencyUnit) && ($this->objFedexShipment->CurrencyUnit->CurrencyUnitId == $objCurrencyUnit->CurrencyUnitId)) {
-					$objListItem->Selected = true;
-				} else if (!$this->objFedexShipment && $objCurrencyUnit->CurrencyUnitId === 1) {
-					$objListItem->Selected = true;
-				}
-				$this->lstCurrencyUnit->AddItem($objListItem);
-			}
-			$this->lstCurrencyUnit->SetCustomStyle('Width','60px');
-			$this->lstCurrencyUnit->TabIndex = 25;
-		}
-
-		// Create and Setup chkSaturdayDeliveryFlag
-		protected function chkSaturdayDeliveryFlag_Create() {
-			$this->chkSaturdayDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkSaturdayDeliveryFlag->Name = QApplication::Translate('Saturday Delivery');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkSaturdayDeliveryFlag->Checked = $this->objFedexShipment->SaturdayDeliveryFlag;
-			}
-			$this->chkSaturdayDeliveryFlag->TabIndex = 26;
-		}
-
-		protected function chkHoldAtLocationFlag_Create() {
-			$this->chkHoldAtLocationFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkHoldAtLocationFlag->Name = QApplication::Translate('Hold at Location');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkHoldAtLocationFlag->Checked = $this->objFedexShipment->HoldAtLocationFlag;
-			}
-
-			$this->chkHoldAtLocationFlag->AddAction(new QClickEvent(), new QAjaxAction('chkHoldAtLocationFlag_Click'));
-			$this->chkHoldAtLocationFlag->TabIndex = 27;
-		}
-
-		protected function txtHoldAtLocationAddress_Create() {
-			$this->txtHoldAtLocationAddress = new QTextBox($this->pnlFedExShipment);
-			$this->txtHoldAtLocationAddress->Name = QApplication::Translate('Hold at Location Address');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
-			}
-			$this->txtHoldAtLocationAddress->TabIndex = 28;
-		}
-
-		protected function txtHoldAtLocationCity_Create() {
-			$this->txtHoldAtLocationCity = new QTextBox($this->pnlFedExShipment);
-			$this->txtHoldAtLocationCity->Name = QApplication::Translate('Hold at Location City');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
-			}
-			$this->txtHoldAtLocationCity->TabIndex = 29;
-		}
-
-		protected function lstHoldAtLocationState_Create() {
-			$this->lstHoldAtLocationState = new QListBox($this->pnlFedExShipment);
-			$this->lstHoldAtLocationState->Name = QApplication::Translate('Hold at Location State');
-			$this->lstHoldAtLocationState->AddItem(QApplication::Translate('- Select One -'), null);
-			$objStateProvinceArray = StateProvince::LoadAll();
-			if ($objStateProvinceArray) foreach ($objStateProvinceArray as $objStateProvince) {
-				$objListItem = new QListItem($objStateProvince->__toString(), $objStateProvince->StateProvinceId);
-				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->HoldAtLocationState) && ($this->objFedexShipment->HoldAtLocationState == $objStateProvince->StateProvinceId)) {
-					$objListItem->Selected = true;
-				}
-				$this->lstHoldAtLocationState->AddItem($objListItem);
-			}
-			$this->lstHoldAtLocationState->TabIndex = 30;
-		}
-
-		protected function txtHoldAtLocationPostalCode_Create() {
-			$this->txtHoldAtLocationPostalCode = new QTextBox($this->pnlFedExShipment);
-			$this->txtHoldAtLocationPostalCode->Name = QApplication::Translate('Hold at Location Postal Code');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
-			}
-			$this->txtHoldAtLocationPostalCode->TabIndex = 31;
-		}
-
-		// Create and Setup chkFedexNotifySenderShipFlag
-		protected function chkFedexNotifySenderShipFlag_Create() {
-			$this->chkFedexNotifySenderShipFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifySenderShipFlag->Name = QApplication::Translate('Ship');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifySenderShipFlag->Checked = $this->objFedexShipment->NotifySenderShipFlag;
-			}
-			$this->chkFedexNotifySenderShipFlag->TabIndex = 33;
-		}
-
-		// Create and Setup chkFedexNotifySenderExceptionFlag
-		protected function chkFedexNotifySenderExceptionFlag_Create() {
-			$this->chkFedexNotifySenderExceptionFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifySenderExceptionFlag->Name = QApplication::Translate('Exception');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifySenderExceptionFlag->Checked = $this->objFedexShipment->NotifySenderExceptionFlag;
-			}
-			$this->chkFedexNotifySenderExceptionFlag->TabIndex = 34;
-		}
-
-		// Create and Setup chkFedexNotifySenderDeliveryFlag
-		protected function chkFedexNotifySenderDeliveryFlag_Create() {
-			$this->chkFedexNotifySenderDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifySenderDeliveryFlag->Name = QApplication::Translate('Delivery');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifySenderDeliveryFlag->Checked = $this->objFedexShipment->NotifySenderDeliveryFlag;
-			}
-			$this->chkFedexNotifySenderDeliveryFlag->TabIndex = 35;
-		}
-
-		// Create and Setup chkFedexNotifyRecipientShipFlag
-		protected function chkFedexNotifyRecipientShipFlag_Create() {
-			$this->chkFedexNotifyRecipientShipFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifyRecipientShipFlag->Name = QApplication::Translate('Ship');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifyRecipientShipFlag->Checked = $this->objFedexShipment->NotifyRecipientShipFlag;
-			}
-			$this->chkFedexNotifyRecipientShipFlag->TabIndex = 37;
-		}
-
-		// Create and Setup chkFedexNotifyRecipientExceptionFlag
-		protected function chkFedexNotifyRecipientExceptionFlag_Create() {
-			$this->chkFedexNotifyRecipientExceptionFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifyRecipientExceptionFlag->Name = QApplication::Translate('Exception');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifyRecipientExceptionFlag->Checked = $this->objFedexShipment->NotifyRecipientExceptionFlag;
-			}
-			$this->chkFedexNotifyRecipientExceptionFlag->TabIndex = 38;
-		}
-
-		// Create and Setup chkFedexNotifyRecipientDeliveryFlag
-		protected function chkFedexNotifyRecipientDeliveryFlag_Create() {
-			$this->chkFedexNotifyRecipientDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifyRecipientDeliveryFlag->Name = QApplication::Translate('Delivery');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifyRecipientDeliveryFlag->Checked = $this->objFedexShipment->NotifyRecipientDeliveryFlag;
-			}
-			$this->chkFedexNotifyRecipientDeliveryFlag->TabIndex = 39;
-		}
-
-		// Create and Setup chkFedexNotifyOtherShipFlag
-		protected function chkFedexNotifyOtherShipFlag_Create() {
-			$this->chkFedexNotifyOtherShipFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifyOtherShipFlag->Name = QApplication::Translate('Ship');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifyOtherShipFlag->Checked = $this->objFedexShipment->NotifyOtherShipFlag;
-			}
-			$this->chkFedexNotifyOtherShipFlag->TabIndex = 41;
-		}
-
-		// Create and Setup chkFedexNotifyOtherExceptionFlag
-		protected function chkFedexNotifyOtherExceptionFlag_Create() {
-			$this->chkFedexNotifyOtherExceptionFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifyOtherExceptionFlag->Name = QApplication::Translate('Exception');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifyOtherExceptionFlag->Checked = $this->objFedexShipment->NotifyOtherExceptionFlag;
-			}
-			$this->chkFedexNotifyOtherExceptionFlag->TabIndex = 42;
-		}
-
-		// Create and Setup chkFedexNotifyOtherDeliveryFlag
-		protected function chkFedexNotifyOtherDeliveryFlag_Create() {
-			$this->chkFedexNotifyOtherDeliveryFlag = new QCheckBox($this->pnlFedExShipment);
-			$this->chkFedexNotifyOtherDeliveryFlag->Name = QApplication::Translate('Delivery');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->chkFedexNotifyOtherDeliveryFlag->Checked = $this->objFedexShipment->NotifyOtherDeliveryFlag;
-			}
-			$this->chkFedexNotifyOtherDeliveryFlag->TabIndex = 43;
-		}
-
-		protected function lstFedexLabelPrinterType_Create() {
-			$this->lstFedexLabelPrinterType = new QListBox($this->pnlFedExShipment);
-			$this->lstFedexLabelPrinterType->Name = QApplication::Translate('Label Printer Type');
-
-			$objFedexLabelPrinterTypeArray = FedExDC::get_label_printer_types();
-			if ($objFedexLabelPrinterTypeArray) foreach ($objFedexLabelPrinterTypeArray as $key => $value) {
-				$objListItem = new QListItem($value, $key);
-				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LabelPrinterType) && ($this->objFedexShipment->LabelPrinterType == $key)) {
-					$objListItem->Selected = true;
-				} else if (!$this->blnEditMode && QApplication::$TracmorSettings->FedexLabelPrinterType && QApplication::$TracmorSettings->FedexLabelPrinterType == $key) {
-					$objListItem->Selected = true;
-				}
-
-				$this->lstFedexLabelPrinterType->AddItem($objListItem);
-			}
-			$this->lstFedexLabelPrinterType->AddAction(new QChangeEvent(), new QAjaxAction('lstFedexLabelPrinterType_Select'));
-			$this->lstFedexLabelPrinterType->TabIndex=44;
-		}
-
-		protected function lstFedexLabelFormatType_Create() {
-			$this->lstFedexLabelFormatType = new QListBox($this->pnlFedExShipment);
-			$this->lstFedexLabelFormatType->Name = QApplication::Translate('Label Format Type');
-			$this->lstFedexLabelFormatType->AddItem(QApplication::Translate('- Select One -'), null);
-
-			$objFedexLabelFormatTypeArray = FedExDC::get_label_format_types();
-			if ($objFedexLabelFormatTypeArray) foreach ($objFedexLabelFormatTypeArray as $key => $value) {
-				$objListItem = new QListItem($value, $key);
-				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->LabelFormatType) && ($this->objFedexShipment->LabelFormatType == $key)) {
-					$objListItem->Selected = true;
-				} else if (!$this->blnEditMode && QApplication::$TracmorSettings->FedexLabelFormatType && QApplication::$TracmorSettings->FedexLabelFormatType == $key) {
-					$objListItem->Selected = true;
-				}
-				$this->lstFedexLabelFormatType->AddItem($objListItem);
-			}
-			$this->lstFedexLabelFormatType->TabIndex=45;
-		}
-
-		protected function txtFedexThermalPrinterPort_Create() {
-			$this->txtFedexThermalPrinterPort = new QTextBox($this->pnlFedExShipment);
-			$this->txtFedexThermalPrinterPort->Name = QApplication::Translate('Thermal Printer Port');
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				$this->txtFedexThermalPrinterPort->Text = $this->objFedexShipment->ThermalPrinterPort;
-			} else if (!$this->blnEditMode && QApplication::$TracmorSettings->FedexThermalPrinterPort) {
-				$this->txtFedexThermalPrinterPort->Text = QApplication::$TracmorSettings->FedexThermalPrinterPort;
-			}
-			$this->txtHoldAtLocationCity->TabIndex = 46;
 		}
 
 		// Create the text field to enter new asset codes to add to the transaction
@@ -2327,21 +1477,6 @@
 			}
 		}
 
-		// This is run every time a 'From Contact' is selected
-		// It loads the value for the 'Sender Email' for the FedEx shipment notification
-		protected function lstFromContact_Select() {
-			if ($this->lstFromContact->SelectedValue) {
-				$objContact = Contact::Load($this->lstFromContact->SelectedValue);
-				if ($objContact) {
-					if ($objContact->Email) {
-						$this->txtFedexNotifySenderEmail->Text = $objContact->Email;
-					} else {
-						$this->txtFedexNotifySenderEmail->Text = '';
-					}
-				}
-			}
-		}
-
 		// This is run every time a 'To Company' is selected
 		// It loads the values for the 'To Address' and 'To Contact' drop-downs for the selected company
 		protected function lstToCompany_Select() {
@@ -2412,111 +1547,9 @@
 		// This method is run when a Courier is selected
 		// Decides whether to display tracking number text box and display the FedEx shipment panel
 		protected function lstCourier_Select() {
-			// If FedEx is selected (currently the only other choice is 'Other', where the value is null)
-			if ($this->lstCourier->SelectedValue === 1) {
-				// make sure tracking number text box is not displayed
-				// FIXME: this is not currently done the "Qcodo way"
-				QApplication::ExecuteJavascript('document.getElementById("trackingNumber").style.display="none";');
-
-				// make sure the Hold At Location checkbox is unchecked
-				$this->chkHoldAtLocationFlag->Checked = false;
-
-				// Set the recipient phone if necessary
-				$this->lstToContact_Select();
-
-				// If a default Fedex Label Printer Type is specified and is not 'Laser Printer', show the thermal label options
-				if (QApplication::$TracmorSettings->FedexLabelPrinterType=='2' || QApplication::$TracmorSettings->FedexLabelPrinterType=='5') {
-					QApplication::ExecuteJavascript('document.getElementById("TLP").style.display="";');
-				}
-
-				// Show the FedEx shipment panel
-				$this->pnlFedExShipment->Display = true;
-
-			} else {
 				// Not FedEx so hide FedEx shipment panel and display tracking number text box
 				// FIXME: this is not currently done the "Qcodo way"
 				QApplication::ExecuteJavascript('document.getElementById("trackingNumber").style.display="";');
-
-				// Hide FedEx shipment panel
-				$this->pnlFedExShipment->Display = false;
-			}
-		}
-
-		protected function lstFxServiceType_Select() {
-			// Reload lstPackageType
-			$strSelectedPackageType = ($this->lstPackageType->SelectedValue) ? $this->lstPackageType->SelectedValue : null;
-			$this->lstPackageType->RemoveAllItems();
-			$this->LoadPackageTypes();
-			if ($strSelectedPackageType)
-				$this->lstPackageType->SelectedValue = $strSelectedPackageType;
-
-
-			//Reload lstBillTransportationTo
-			$strSelectedBillTransportationTo = ($this->lstBillTransportationTo->SelectedName) ? $this->lstBillTransportationTo->SelectedName : null;
-			$this->lstBillTransportationTo->RemoveAllItems();
-			$this->LoadPayTypes();
-			if ($strSelectedBillTransportationTo) {
-				// FIXME: when Qcodo supports setting SelectedName, we can simplify this code
-				for ($i=0; $i < $this->lstBillTransportationTo->ItemCount; $i++) {
-					$objListItem = $this->lstBillTransportationTo->GetItem($i);
-					if ($objListItem->Name == $strSelectedBillTransportationTo) {
-						$objListItem->Selected = true;
-					}
-				}
-			}
-		}
-
-		protected function lstFedexLabelPrinterType_Select() {
-			$strSelectedFedexLabelPrinterType = ($this->lstFedexLabelPrinterType->SelectedValue) ? $this->lstFedexLabelPrinterType->SelectedValue : null;
-			if ($strSelectedFedexLabelPrinterType == '2' || $strSelectedFedexLabelPrinterType == '5') {
-				QApplication::ExecuteJavascript('document.getElementById("TLP").style.display="";');
-			} else {
-				QApplication::ExecuteJavascript('document.getElementById("TLP").style.display="none";');
-			}
-		}
-
-		protected function lstFxServiceType_Update() {
-
-			$this->lstFxServiceType->RemoveAllItems();
-			$this->lstFxServiceType->Enabled = false;
-			$this->lstFxServiceType->Required = false;
-
-			if ($this->lstCourier->SelectedValue == 1 && $this->lstToAddress->SelectedValue && $this->lstFromAddress->SelectedValue && $this->lstShippingAccount->SelectedValue)
-			{
-				$this->lstFxServiceType->Enabled = true;
-				$this->lstFxServiceType->Required = true;
-				$this->lstFxServiceType->AddItem('- Select One -', null);
-
-				$objFedexServiceTypeArr = FedexServiceType::LoadAll(QQ::Clause(QQ::OrderBy(QQN::FedexServiceType()->ShortDescription)));
-				if ($objFedexServiceTypeArr) foreach ($objFedexServiceTypeArr as $objFedexServiceType) {
-					$objListItem = new QListItem($objFedexServiceType->ShortDescription, $objFedexServiceType->FedexServiceTypeId);
-					if ($this->objShipment->FedexServiceTypeId == $objFedexServiceType->FedexServiceTypeId) {
-						$objListItem->Selected = true;
-					}
-					$this->lstFxServiceType->AddItem($objListItem);
-				}
-			}
-		}
-
-		// Fill the txtToPhone field with the ToContact's phone number if it exists
-		protected function lstToContact_Select() {
-
-			if ($this->lstToContact->SelectedValue) {
-				$objContact = Contact::Load($this->lstToContact->SelectedValue);
-				if ($objContact) {
-					if ($objContact->PhoneOffice) {
-						$this->txtToPhone->Text = $objContact->PhoneOffice;
-					} else {
-						$this->txtToPhone->Text = '';
-					}
-
-					if ($objContact->Email) {
-						$this->txtFedexNotifyRecipientEmail->Text = $objContact->Email;
-					} else {
-						$this->txtFedexNotifyRecipientEmail->Text = '';
-					}
-				}
-			}
 		}
 
 		// Set the From Address Label text when it is selected from the drop-down
@@ -2551,7 +1584,7 @@
 			elseif ($this->lstShippingAccount->SelectedName == 'Other') {
 				$this->txtShippingAccountOther->Enabled = true;
 			}
-			$this->lstFxServiceType_Update();
+			//$this->lstFxServiceType_Update();
 		}
 
 		// This method, along with QDateTimePickerExt.inc, allow for a min and max date availble to be selected
@@ -3267,33 +2300,6 @@
 				$this->btnCompleteShipment->Warning = 'There are no assets or inventory in this shipment.';
 			}
 
-			// If Courier is Fedex, validate Fedex inputs
-			if ($this->objShipment->CourierId === 1) {
-				if (!$this->lstPackageType->SelectedValue) {
-					$blnError = true;
-					$this->lblPackageType->Warning = "Please select a package type.";
-					$this->lstPackageType->Warning = "Please select a package type.";
-				}
-				if (!$this->txtPackageWeight->Text) {
-					$blnError = true;
-					$this->lblPackageWeight->Warning = "Please enter a weight for this package.";
-					$this->txtPackageWeight->Warning = "Please enter a weight for this package.";
-				}
-
-				//if (!$this->lstWeightUnit->SelectedValue) {
-				//	$blnError = true;
-				//	$this->lstWeightUnit->Warning = "Please select a weight unit.";
-				//}
-				//if (!$this->txtValue->Text) {
-				//	$blnError = true;
-				//	$this->txtValue->Warning = "Please enter a value.";
-				//}
-				//if (!$this->lstCurrencyUnit->SelectedValue) {
-				//	$blnError = true;
-				//	$this->lstCurrencyUnit->Warning = "Please select a currency type.";
-				//}
-			}
-
 			if (!$blnError) {
 
 				try {
@@ -3320,24 +2326,6 @@
 							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
 						}
 
-						// If the courier is FedEx, create new fedexShipment
-						if ($this->lstCourier->SelectedValue === 1) {
-							if (!($this->objFedexShipment instanceof FedexShipment)) {
-								$this->objFedexShipment = new FedexShipment();
-							}
-							$this->objFedexShipment->ShipmentId = $this->objShipment->ShipmentId;
-							$this->UpdateFedexFields();
-							$this->objFedexShipment->Save(true);
-						}
-					}
-
-					// If courier is FedEx, initiate communication with FedEx
-					if(!$blnError && $this->objShipment->CourierId == 1) {
-						if (!$this->FedEx()) {
-							$blnError = true;
-							$objDatabase->TransactionRollback();
-							return;
-						}
 					}
 
 					if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
@@ -3673,14 +2661,6 @@
 					}
 				}
 
-				// Cancel FedEx Shipment
-				if ($this->objShipment->CourierId == 1) {
-					if (!$this->FedExCancel()) {
-						$objDatabase->TransactionRollback();
-						return;
-					}
-				}
-
 				// Set all 'Complete Shipment' information to null
 				// $this->objShipment->PackageTypeId = null;
 				// $this->objShipment->PackageWeight = null;
@@ -3747,68 +2727,6 @@
 						$this->txtShipmentNumber->Warning = 'That is a duplicate shipment number.';
 					}
 				}
-			}
-
-			if($this->lstFxServiceType->SelectedValue)
-			{
-				$objtoFxAddress = Address::Load($this->lstToAddress->SelectedValue);
-				if (!$objtoFxAddress || !$objtoFxAddress->PostalCode || !$objtoFxAddress->CountryId || !$objtoFxAddress->Address1) {
-					$blnError = true;
-					$this->lstFxServiceType->Warning = "Not a valid To Address.";
-				}
-				$objfromFxAddress = Address::Load($this->lstFromAddress->SelectedValue);
-				if (!$objfromFxAddress || !$objfromFxAddress->PostalCode || !$objfromFxAddress->Address1 || !$objfromFxAddress->CountryId) {
-					$blnError = true;
-					$this->lstFxServiceType->Warning = "Not a valid From Address.";
-				}
-
-				$objfromFxContact = Contact::Load($this->lstFromContact->SelectedValue);
-				if (!$objfromFxContact) {
-					$blnError = true;
-					$this->lstFxServiceType->Warning = "Not a valid From Contact.";
-				}
-				$objfromFxCompany = Company::Load($this->lstFromCompany->SelectedValue);
-				if (!$objfromFxCompany) {
-					$blnError = true;
-					$this->lstFxServiceType->Warning = "Not a valid From Company.";
-				}
-				elseif (!$objfromFxCompany->Telephone) {
-					$blnError = true;
-					$this->lstFxServiceType->Warning = "The Shipping Company must have a telephone number.";
-				}
-
-				$objShippingAccount = ShippingAccount::Load($this->lstShippingAccount->SelectedValue);
-				if (!$objShippingAccount) {
-					$blnError = true;
-					$this->lstFxServiceType->Warning = "Not a valid Shipping Account.";
-				}
-/*				$fed = new FedExDC($objShippingAccount->Value);
-
-				$aRet = $fed->subscribe(
-					array(
-						1 => $this->lblShipmentNumber->Text, // Don't really need this but can be used for ref
-						4003 => $objfromFxContact->__toString(),
-						4008 => $objfromFxAddress->Address1,
-						4009 => $objfromFxAddress->Address2,
-						4011 => $objfromFxAddress->City,
-						4012 => $objfromFxAddress->__toStringStateProvinceAbbreviation(),
-						4013 => $objfromFxAddress->PostalCode,
-						4014 => $objfromFxAddress->__toStringCountryAbbreviation(),
-						4015 => $this->FxStrip($objfromFxCompany->Telephone),
-					)
-				);
-
-				if ($error = $fed->getError()) {
-					$blnError = true;
-					$this->lstFxServiceType->Warning = $error;
-				}
-				elseif (!$aRet[498]) {
-					$blnError = true;
-					$this->lstFxServiceType->Warning = "Fedex response is improperly formed.";
-				}
-				else {
-					$this->objShipment->FedexMeterNumber = $aRet[498];
-				}*/
 			}
 
 			if (!$blnError) {
@@ -3891,14 +2809,6 @@
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
 							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
-						}
-
-						// If the courier is FedEx, create new fedexShipment
-						if ($this->lstCourier->SelectedValue === 1) {
-							$this->objFedexShipment = new FedexShipment();
-							$this->objFedexShipment->Shipment = $this->objShipment;
-							$this->UpdateFedexFields();
-							$this->objFedexShipment->Save();
 						}
 
 						$objDatabase->TransactionCommit();
@@ -4044,25 +2954,6 @@
 						if ($this->arrCustomFields) {
 							// Save the values from all of the custom field controls to save the shipment
 							CustomField::SaveControls($this->objShipment->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objShipment->ShipmentId, 10);
-						}
-
-						// If the courier is FedEx, save the fedexShipment
-						if ($this->lstCourier->SelectedValue === 1) {
-							if ($this->objFedexShipment) {
-								// FedexShipment already exists, so update it
-								$this->UpdateFedexFields();
-								$this->objFedexShipment->Save();
-							} else {
-								// FedexShipment doesn't exist yet, so create it
-								$this->objFedexShipment = new FedexShipment();
-								$this->objFedexShipment->Shipment = $this->objShipment;
-								$this->UpdateFedexFields();
-								$this->objFedexShipment->Save();
-							}
-						} else if ($this->objFedexShipment) {
-							// FedexShipment exists - delete it because the selected courier is no longer FedEx
-							$this->objFedexShipment->Delete();
-							$this->objFedexShipment = null;
 						}
 
 						$objDatabase->TransactionCommit();
@@ -4328,365 +3219,8 @@
 			$this->lstCourier_Select();
 			$this->txtTrackingNumber->Text = $this->objShipment->TrackingNumber;
 			$this->txtNote->Text = $this->objShipment->Transaction->Note;
-			if ($this->objFedexShipment) {
-				$this->txtToPhone->Text = $this->objFedexShipment->ToPhone;
-				$this->lstBillTransportationTo->SelectedValue = $this->objFedexShipment->PayType;
-				$this->lstShippingAccount->SelectedValue = $this->objFedexShipment->ShippingAccountId;
-				$this->txtRecipientThirdPartyAccount->Text = $this->objFedexShipment->PayerAccountNumber;
-				$this->txtReference->Text = $this->objFedexShipment->Reference;
-				$this->txtFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
-				$this->txtFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
-				$this->txtFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
-				$this->chkFedexNotifySenderShipFlag->Checked = $this->objFedexShipment->NotifySenderShipFlag;
-				$this->chkFedexNotifySenderExceptionFlag->Checked = $this->objFedexShipment->NotifySenderExceptionFlag;
-				$this->chkFedexNotifySenderDeliveryFlag->Checked = $this->objFedexShipment->NotifySenderDeliveryFlag;
-				$this->chkFedexNotifyRecipientShipFlag->Checked = $this->objFedexShipment->NotifyRecipientShipFlag;
-				$this->chkFedexNotifyRecipientExceptionFlag->Checked = $this->objFedexShipment->NotifyRecipientExceptionFlag;
-				$this->chkFedexNotifyRecipientDeliveryFlag->Checked = $this->objFedexShipment->NotifyRecipientDeliveryFlag;
-				$this->chkFedexNotifyOtherShipFlag->Checked = $this->objFedexShipment->NotifyOtherShipFlag;
-				$this->chkFedexNotifyOtherExceptionFlag->Checked = $this->objFedexShipment->NotifyOtherExceptionFlag;
-				$this->chkFedexNotifyOtherDeliveryFlag->Checked = $this->objFedexShipment->NotifyOtherDeliveryFlag;
-				$this->lstFxServiceType->SelectedValue = $this->objFedexShipment->FedexServiceTypeId;
-				$this->lstPackageType->SelectedValue = $this->objFedexShipment->PackageTypeId;
-				$this->txtPackageWeight->Text = $this->objFedexShipment->PackageWeight;
-				$this->lstWeightUnit->SelectedValue = $this->objFedexShipment->WeightUnitId;
-				$this->txtPackageLength->Text = $this->objFedexShipment->PackageLength;
-				$this->txtPackageWidth->Text = $this->objFedexShipment->PackageWidth;
-				$this->txtPackageHeight->Text = $this->objFedexShipment->PackageHeight;
-				$this->lstLengthUnit->SelectedValue = $this->objFedexShipment->LengthUnitId;
-				$this->txtValue->Text = $this->objFedexShipment->DeclaredValue;
-				$this->lstCurrencyUnit->SelectedValue = $this->objFedexShipment->CurrencyUnitId;
-				$this->chkSaturdayDeliveryFlag->Checked = $this->objFedexShipment->SaturdayDeliveryFlag;
-				$this->chkHoldAtLocationFlag->Checked = $this->objFedexShipment->HoldAtLocationFlag;
-				$this->txtHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
-				$this->txtHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
-				$this->lstHoldAtLocationState->SelectedValue = $this->objFedexShipment->HoldAtLocationState;
-				$this->txtHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
-				$this->lstFedexLabelPrinterType->SelectedValue = $this->objFedexShipment->LabelPrinterType;
-				$this->lstFedexLabelFormatType->SelectedValue = $this->objFedexShipment->LabelFormatType;
-				$this->txtFedexThermalPrinterPort->Text = $this->objFedexShipment->ThermalPrinterPort;
-			}
 			$this->arrCustomFields = CustomField::UpdateControls($this->objShipment->objCustomFieldArray, $this->arrCustomFields);
 		}
-
-		// Update FedEx Shipment Information
-		// Assigns new values to the fedexShipment object
-		protected function UpdateFedexFields() {
-			$this->objFedexShipment->ToPhone = $this->txtToPhone->Text;
-			$this->objFedexShipment->PayType = $this->lstBillTransportationTo->SelectedValue;
-
-			if ($this->lstBillTransportationTo->SelectedValue === 1) {
-				$this->objFedexShipment->ShippingAccountId = $this->lstShippingAccount->SelectedValue;
-				$this->objFedexShipment->PayerAccountNumber = null;
-			} else {
-				$this->objFedexShipment->PayerAccountNumber = $this->txtRecipientThirdPartyAccount->Text;
-				$this->objFedexShipment->ShippingAccountId = null;
-			}
-
-			$this->objFedexShipment->Reference = $this->txtReference->Text;
-			$this->objFedexShipment->NotifySenderEmail = $this->txtFedexNotifySenderEmail->Text;
-			$this->objFedexShipment->NotifyRecipientEmail = $this->txtFedexNotifyRecipientEmail->Text;
-			$this->objFedexShipment->NotifyOtherEmail = $this->txtFedexNotifyOtherEmail->Text;
-			$this->objFedexShipment->NotifySenderShipFlag = $this->chkFedexNotifySenderShipFlag->Checked;
-			$this->objFedexShipment->NotifySenderExceptionFlag = $this->chkFedexNotifySenderExceptionFlag->Checked;
-			$this->objFedexShipment->NotifySenderDeliveryFlag = $this->chkFedexNotifySenderDeliveryFlag->Checked;
-			$this->objFedexShipment->NotifyRecipientShipFlag = $this->chkFedexNotifyRecipientShipFlag->Checked;
-			$this->objFedexShipment->NotifyRecipientExceptionFlag = $this->chkFedexNotifyRecipientExceptionFlag->Checked;
-			$this->objFedexShipment->NotifyRecipientDeliveryFlag = $this->chkFedexNotifyRecipientDeliveryFlag->Checked;
-			$this->objFedexShipment->NotifyOtherShipFlag = $this->chkFedexNotifyOtherShipFlag->Checked;
-			$this->objFedexShipment->NotifyOtherExceptionFlag = $this->chkFedexNotifyOtherExceptionFlag->Checked;
-			$this->objFedexShipment->NotifyOtherDeliveryFlag = $this->chkFedexNotifyOtherDeliveryFlag->Checked;
-			$this->objFedexShipment->FedexServiceTypeId = $this->lstFxServiceType->SelectedValue;
-			$this->objFedexShipment->PackageTypeId = $this->lstPackageType->SelectedValue;
-			$this->objFedexShipment->PackageWeight = $this->txtPackageWeight->Text;
-			$this->objFedexShipment->WeightUnitId = $this->lstWeightUnit->SelectedValue;
-			$this->objFedexShipment->PackageLength = $this->txtPackageLength->Text;
-			$this->objFedexShipment->PackageWidth = $this->txtPackageWidth->Text;
-			$this->objFedexShipment->PackageHeight = $this->txtPackageHeight->Text;
-			$this->objFedexShipment->LengthUnitId = $this->lstLengthUnit->SelectedValue;
-			$this->objFedexShipment->DeclaredValue = $this->txtValue->Text;
-			$this->objFedexShipment->CurrencyUnitId = $this->lstCurrencyUnit->SelectedValue;
-			$this->objFedexShipment->SaturdayDeliveryFlag = $this->chkSaturdayDeliveryFlag->Checked;
-			$this->objFedexShipment->HoldAtLocationFlag = $this->chkHoldAtLocationFlag->Checked;
-			$this->objFedexShipment->HoldAtLocationAddress = $this->txtHoldAtLocationAddress->Text;
-			$this->objFedexShipment->HoldAtLocationCity = $this->txtHoldAtLocationCity->Text;
-			$this->objFedexShipment->HoldAtLocationState = $this->lstHoldAtLocationState->SelectedValue;
-			$this->objFedexShipment->HoldAtLocationPostalCode = $this->txtHoldAtLocationPostalCode->Text;
-			$this->objFedexShipment->LabelPrinterType = $this->lstFedexLabelPrinterType->SelectedValue;
-			if ($this->lstFedexLabelPrinterType->SelectedValue === 1) {
-				$this->objFedexShipment->LabelFormatType = '5';
-				$this->objFedexShipment->ThermalPrinterPort = null;
-			} else {
-				$this->objFedexShipment->LabelFormatType = $this->lstFedexLabelFormatType->SelectedValue;
-				$this->objFedexShipment->ThermalPrinterPort = $this->txtFedexThermalPrinterPort->Text;
-			}
-		}
-
-		// Load the Package Type options for the Shipment
-		protected function LoadPackageTypes() {
-			$this->lstPackageType->AddItem('- Select One -', null);
-			$objPackageTypeArray = PackageType::LoadAll(QQ::Clause(QQ::OrderBy(QQN::PackageType()->ShortDescription)));
-			if ($objPackageTypeArray) foreach ($objPackageTypeArray as $objPackageType) {
-
-				// FedexServiceTypeId 6 = 'FedEx Ground', PackageTypeId 1 = 'Other Packaging'
-				// For FedEx Ground shipments, allow only 'Other Packaging'
-				if ($this->lstFxServiceType->SelectedValue == 6 && $objPackageType->PackageTypeId !== 1) {
-					continue;
-				}
-				$objListItem = new QListItem($objPackageType->__toString(), $objPackageType->PackageTypeId);
-
-				if (($this->blnEditMode && $this->objFedexShipment && $this->objFedexShipment->PackageType) && ($this->objFedexShipment->PackageType->PackageTypeId == $objPackageType->PackageTypeId))
-					$objListItem->Selected = true;
-				$this->lstPackageType->AddItem($objListItem);
-			}
-		}
-
-		// Load the Pay Type options for the Shipment
-		protected function LoadPayTypes() {
-			$objPayTypeArray = ($this->lstFxServiceType->SelectedValue == 6) ? FedExDC::get_ground_pay_types() : FedExDC::get_express_pay_types();
-			if ($objPayTypeArray) foreach ($objPayTypeArray as $key => $value) {
-				$objListItem = new QListItem($value, $key);
-				$this->lstBillTransportationTo->AddItem($objListItem);
-			}
-		}
-
-		// Fedex
-		protected function FedEx(){
-
-			// create new FedExDC object
-			// $fed = new FedExDC($this->objShipment->ShippingAccount->Value);
-
-			$fxWeightUnit = WeightUnit::Load($this->lstWeightUnit->SelectedValue);
-			$fxLengthUnit = LengthUnit::Load($this->lstLengthUnit->SelectedValue);
-			if ($fxLengthUnit) {
-				$fxLengthUnitShortDescription = $fxLengthUnit->ShortDescription;
-			}
-			else {
-				$fxLengthUnitShortDescription = '';
-			}
-
-			// Package Type
-			$fxPackageType = PackageType::Load($this->lstPackageType->SelectedValue);
-
-			//$fxPackageCount // Not implemented yet - FIXME
-
-			$shipdate = $this->FxStrip($this->calShipDate->DateTime->__toString(QDateTime::FormatSoap));
-			$shipdate = substr($shipdate,0,8);
-
-			// create new FedExDC object
-			// $fed = new FedExDC($this->objShipment->ShippingAccount->Value, $this->objShipment->FedexMeterNumber);
-			if ($this->objFedexShipment->ShippingAccountId) {
-				$fed = new FedExDC($this->objFedexShipment->ShippingAccount->AccessId, $this->objFedexShipment->ShippingAccount->AccessCode);
-			}
-			else {
-				// if not billing to a sender account, use the default fedex account from admin_setting for FedEx communication
-				$objFedexAccount = ShippingAccount::Load(QApplication::$TracmorSettings->FedexAccountId);
-				$fed = new FedExDC($objFedexAccount->AccessId, $objFedexAccount->AccessCode);
-			}
-
-			if ($this->objFedexShipment->ToPhone) {
-				$strRecipientPhone = $this->objFedexShipment->ToPhone;
-			}
-			else {
-				$strRecipientPhone = '';
-			}
-
-			if(($this->objShipment->FromAddress->__toStringCountryAbbreviation() != $this->objShipment->ToAddress->__toStringCountryAbbreviation()) && ($this->objShipment->FromAddress->__toStringCountryAbbreviation() <> 'US' || $this->objShipment->ToAddress->__toStringCountryAbbreviation() != 'CA') && ($this->objShipment->ToAddress->__toStringCountryAbbreviation() != 'US' || $this->objShipment->FromAddress->__toStringCountryAbbreviation() != 'CA'))
-			{
-				$fxIntlSSN = ''; //$this->objShipment->FromContact->Social								//Sender's SSN
-				$fxCurrencyUnit = CurrencyUnit::Load($this->lstCurrencyUnit->SelectedValue);
-				$fxIntlCurrencyUnit = $fxCurrencyUnit->ShortDescription;								//Recipient Currency
-				$fxIntlCustomsValue = number_format(round($this->txtValue->Text,2), 2, '.', '');		//Total Customs Value
-				$fxIntlDutiesPayType = '1';																//Duties Pay Type
-				$fxIntlTermsofSale = '1';																//Terms of Sale
-				$fxIntlPartiestoTransation = 'N';														//Parties to Transaction
-			}
-			else
-			{
-				$fxIntlSSN = '';																		//Sender's SSN
-				$fxIntlCurrencyUnit = '';																//Recipient Currency
-				$fxIntlCustomsValue = '';																//Total Customs Value
-				$fxIntlDutiesPayType = '';																//Duties Pay Type
-				$fxIntlTermsofSale = '';																//Terms of Sale
-				$fxIntlPartiestoTransation = '';														//Parties to Transaction
-			}
-
-				$fdx_arr = array(
-						1 => $this->lblShipmentNumber->Text,											//Shipment #
-						4 => $this->objShipment->FromCompany->__toString(),								//Sender Company
-						32 => $this->objShipment->FromContact->__toString(),							//Sender Contact
-						5 => $this->objShipment->FromAddress->Address1,									//Sender Address1
-						6 => $this->objShipment->FromAddress->Address2,									//Sender Address2
-						7 => $this->objShipment->FromAddress->City,										//Sender City
-						8 => $this->objShipment->FromAddress->__toStringStateProvinceAbbreviation(),	//Sender State
-						9 => $this->objShipment->FromAddress->PostalCode,								//Sender Zip
-						117 => $this->objShipment->FromAddress->__toStringCountryAbbreviation(), 		//Sender Country
-						183 => $this->FxStrip($this->objShipment->FromCompany->Telephone),				//Sender Phone
-						11 => $this->objShipment->ToCompany->__toString(),								//Recipient Company
-						12 => $this->objShipment->ToContact->__toString(),								//Recipient Contact
-						13 => $this->objShipment->ToAddress->Address1,									//Recipient Address1
-						14 => $this->objShipment->ToAddress->Address2,									//Recipient Address2
-						15 => $this->objShipment->ToAddress->City,										//Recipient City
-						16 => $this->objShipment->ToAddress->__toStringStateProvinceAbbreviation(),		//Recipient State
-						17 => $this->objShipment->ToAddress->PostalCode,								//Recipient Zip
-						18 => $this->FxStrip($strRecipientPhone),										//Recipient Phone
-						50 => $this->objShipment->ToAddress->__toStringCountryAbbreviation(),			//Recipient Country
-						57 => round($this->txtPackageHeight->Text,0),									//Package Height
-						58 => round($this->txtPackageWidth->Text,0),									//Package Width
-						59 => round($this->txtPackageLength->Text,0),									//Package Length
-						23 => $this->lstBillTransportationTo->SelectedValue,							//Recipient Pay Type
-						20 => ($this->lstBillTransportationTo->SelectedValue !== 1) ? 					//Payer Account Number
-							  $this->txtRecipientThirdPartyAccount->Text :
-							  '',
-						75 => strtoupper($fxWeightUnit->ShortDescription),								//Weight Units
-						1116 => strtoupper(substr($fxLengthUnitShortDescription,0,1)),					//Volume Units
-						1273 => $fxPackageType->Value,													//Packaging Type ; 01 = Customer Packaging
-						1274 => $this->objFedexShipment->FedexServiceType->Value,						//Service Type ; 01 = Fedex Priority
-						1333 => '1',																	//Drop off Type ; 1 = Regular Pickup
-						1368 => 2,																		//Label Type ; 2 = 2D Common
-						1369 => $this->lstFedexLabelPrinterType->SelectedValue,							//Label Printer Type ; 1 = Laser Printer
-						1370 => ($this->lstFedexLabelPrinterType->SelectedValue === 1) ? 				//Label Media Type ; 5 = Plain Paper
-								5 :
-								$this->lstFedexLabelFormatType->SelectedValue,
-						2973 => 1,																		//Doc Tab Type Indicator; 1 = Zone 001
-						1607 => 'SHIPPING',
-						1608 => 'SPECIAL',
-						1609 => 'HANDLING',
-						1610 => 'DISCOUNT',
-						1611 => 'TOTAL',
-						1624 => '1416',
-						1625 => '1417',
-						1626 => '3107',
-						1627 => '1418',
-						1628 => '1419',
-						1401 => number_format(round($this->txtPackageWeight->Text, 1), 1, '.', ''),		//Total Package Weight
-						1201 => $this->txtFedexNotifySenderEmail->Text,									//Sender EMail
-						1202 => $this->txtFedexNotifyRecipientEmail->Text,								//Recipient EMail
-						1204 => $this->txtFedexNotifyOtherEmail->Text,									//Other Email
-						1554 => ($this->chkFedexNotifySenderShipFlag->Checked) ? 'Y' : 'N',				//Notify Sender of Shipment
-						1961 => ($this->chkFedexNotifySenderExceptionFlag->Checked) ? 'Y' : 'N',		//Notify Sender of Exceptions
-						1553 => ($this->chkFedexNotifySenderDeliveryFlag->Checked) ? 'Y' : 'N',			//Notify Sender of Delivery
-						1557 => ($this->chkFedexNotifyRecipientShipFlag->Checked) ? 'Y' : 'N',			//Notify Recipient of Shipment
-						1962 => ($this->chkFedexNotifyRecipientExceptionFlag->Checked) ? 'Y' : 'N',		//Notify Recipient of Exceptions
-						1556 => ($this->chkFedexNotifyRecipientDeliveryFlag->Checked) ? 'Y' : 'N',		//Notify Recipient of Delivery
-						1206 => ($this->chkFedexNotifyOtherShipFlag->Checked) ? 'Y' : 'N',				//Notify Other of Shipment
-						1960 => ($this->chkFedexNotifyOtherExceptionFlag->Checked) ? 'Y' : 'N',			//Notify Other of Exception
-						1551 => ($this->chkFedexNotifyOtherDeliveryFlag->Checked) ? 'Y' : 'N',			//Notify Other of Delivery
-						1139 => $fxIntlSSN,																//Sender's SSN
-						68 => $fxIntlCurrencyUnit,														//Recipient Currency
-						1266 => ($this->chkSaturdayDeliveryFlag->Checked) ? 'Y' : 'N',					//Saturday Delivery
-						1200 => ($this->chkHoldAtLocationFlag->Checked) ? 'Y' : 'N',					//Hold at Location flag
-						44 => ($this->chkHoldAtLocationFlag->Checked) ? 								//Hold at Location Address
-							  $this->txtHoldAtLocationAddress->Text :
-							  '',
-						46 => ($this->chkHoldAtLocationFlag->Checked) ?									//Hold at Location City
-							  $this->txtHoldAtLocationCity->Text :
-							  '',
-						47 => ($this->chkHoldAtLocationFlag->Checked && $this->objFedexShipment->HoldAtLocationStateObject) ? //Hold at Location State
-							  $this->objFedexShipment->HoldAtLocationStateObject->Abbreviation :
-							  '',
-						48 => ($this->chkHoldAtLocationFlag->Checked) ?									//Hold at Location Postal Code
-							  $this->txtHoldAtLocationPostalCode->Text :
-							  '',
-						1411 =>	$fxIntlCustomsValue,													//Total Customs Value
-						70 => $fxIntlDutiesPayType,														//Duties Pay Type
-						72 => $fxIntlTermsofSale,														//Terms of Sale
-						73 => $fxIntlPartiestoTransation,												//Parties to Transaction
-						79 => '',																		//Description of Contents
-						80 => '',																		//Country of Manufacture
-						24 => $shipdate,																//Ship Date
-						1119 => 'Y',																	//Future Shipment Date Flag
-						25 => $this->objFedexShipment->Reference										// Customer Reference
-				);
-
-			if($this->objFedexShipment->FedexServiceType->Value	== '92')
-			{
-				$ship_Ret = $fed->ground_ship($fdx_arr);
-			}
-			else
-			{
-				$ship_Ret = $fed->express_ship($fdx_arr);
-			}
-
-			if($error = $fed->getError())
-			{
-				$blnError = true;
-				$this->btnCompleteShipment->Warning = $error;
-				return false;
-			}
-			else
-			{
-				// decode and save label
-				$this->txtTrackingNumber->Text = $ship_Ret[29];
-
-				$strLabelExtension = '.png';
-				if ($this->objFedexShipment->LabelPrinterType == '2') {
-					$strLabelExtension = '.epl';
-				} else if ($this->objFedexShipment->LabelPrinterType == '5') {
-					$strLabelExtension = '.zpl';
-				}
-
-				$strLabelMimeType = ($this->objFedexShipment->LabelPrinterType == '2' || $this->objFedexShipment->LabelPrinterType == '5') ? 'text/plain' : 'image/png';
-				$fed->label('../images/shipping_labels/fedex/' . QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension);
-				if (AWS_S3) {
-					QApplication::MoveToS3(__DOCROOT__ . __IMAGE_ASSETS__ . '/shipping_labels/fedex', QApplication::$TracmorSettings->ImageUploadPrefix . $this->objShipment->ShipmentNumber . $strLabelExtension, $strLabelMimeType, '/images/shipping_labels/fedex');
-				}
-				return true;
-			}
-		}
-
-		// Cancel a FedEx shipment using the FedExDC class
-		protected function FedExCancel(){
-
-			// Create the new Fedex object
-			if ($this->objFedexShipment->ShippingAccountId) {
-				$fed = new FedExDC($this->objFedexShipment->ShippingAccount->AccessId, $this->objFedexShipment->ShippingAccount->AccessCode);
-			}
-			else {
-				// if not billing to a sender account, use the default fedex account from admin_setting for FedEx communication
-				$objFedexAccount = ShippingAccount::Load(QApplication::$TracmorSettings->FedexAccountId);
-				$fed = new FedExDC($objFedexAccount->AccessId, $objFedexAccount->AccessCode);
-			}
-
-			// create new FedExDC object
-			//$fed = new FedExDC($this->objShipment->ShippingAccount->Value, QApplication::$TracmorSettings->FedexMeterNumber);
-
-			// Populate an array with the necessary information
-			$fdx_arr = array(
-					1 => $this->objShipment->ShipmentNumber,											//Shipment #
-					29 => $this->objShipment->TrackingNumber											//Tracking Number
-			);
-
-			// If ground service
-			// if($this->objShipment->FedexServiceType->Value	== '92')
-			if ($this->objFedexShipment->FedexServiceType->Value == '92') {
-				$cancel_Ret = $fed->ground_cancel($fdx_arr);
-			}
-			// If express service
-			else {
-				$cancel_Ret = $fed->express_cancel($fdx_arr);
-			}
-
-			// If there is an error, display it and return false
-			if($error = $fed->getError()) {
-				$this->btnCancelCompleteShipment->Warning = $error;
-				return false;
-			}
-			else {
-				return true;
-			}
-		}
-
-		// Strip function -- remove '-' and '(' and ')'
-		protected function FxStrip($txtValue) {
-			$txtValue = str_replace('-','',$txtValue);
-			$txtValue = str_replace('(','',$txtValue);
-			$txtValue = str_replace(')','',$txtValue);
-			$txtValue = str_replace(' ','',$txtValue);
-
-			return $txtValue;
-		}
-
 
 		protected function DisplayLabels() {
 
@@ -4713,52 +3247,12 @@
 			$this->txtNewInventoryModelCode->Display = false;
 			$this->lstSourceLocation->Display = false;
 			$this->txtQuantity->Display = false;
-			$this->txtToPhone->Display = false;
-			$this->lstBillTransportationTo->Display = false;
-			$this->lstShippingAccount->Display = false;
-			$this->txtRecipientThirdPartyAccount->Display = false;
-			$this->txtReference->Display = false;
-			$this->txtFedexNotifySenderEmail->Display = false;
-			$this->txtFedexNotifyRecipientEmail->Display = false;
-			$this->txtFedexNotifyOtherEmail->Display = false;
-			$this->lstFxServiceType->Display = false;
-			$this->lstPackageType->Display = false;
-			$this->txtPackageWeight->Display = false;
-			$this->lstWeightUnit->Display = false;
-			$this->txtPackageLength->Display = false;
-			$this->txtPackageWidth->Display = false;
-			$this->txtPackageHeight->Display = false;
-			$this->lstLengthUnit->Display = false;
-			$this->txtValue->Display = false;
-			$this->lstCurrencyUnit->Display = false;
 			$this->lblNewFromCompany->Display = false;
 			$this->lblNewFromContact->Display = false;
 			$this->lblNewFromAddress->Display = false;
 			$this->lblNewToCompany->Display = false;
 			$this->lblNewToContact->Display = false;
 			$this->lblNewToAddress->Display = false;
-			$this->txtHoldAtLocationAddress->Display = false;
-			$this->txtHoldAtLocationCity->Display = false;
-			$this->lstHoldAtLocationState->Display = false;
-			$this->txtHoldAtLocationPostalCode->Display = false;
-			$this->lstFedexLabelPrinterType->Display = false;
-			$this->lstFedexLabelFormatType->Display = false;
-			$this->txtFedexThermalPrinterPort->Display = false;
-
-			// Disable (instead of hiding) Fedex Notification checkboxes
-			$this->chkFedexNotifySenderShipFlag->Enabled = false;
-			$this->chkFedexNotifySenderExceptionFlag->Enabled = false;
-			$this->chkFedexNotifySenderDeliveryFlag->Enabled = false;
-			$this->chkFedexNotifyRecipientShipFlag->Enabled = false;
-			$this->chkFedexNotifyRecipientExceptionFlag->Enabled = false;
-			$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = false;
-			$this->chkFedexNotifyOtherShipFlag->Enabled = false;
-			$this->chkFedexNotifyOtherExceptionFlag->Enabled = false;
-			$this->chkFedexNotifyOtherDeliveryFlag->Enabled = false;
-
-			// Disable (instead of hiding) FedEx Special Services checkboxes
-			$this->chkSaturdayDeliveryFlag->Enabled = false;
-			$this->chkHoldAtLocationFlag->Enabled = false;
 
 /*			if ($this->lblAdvanced->Text == 'Hide Advanced') {
 				$this->lblAdvanced_Click($this->FormId, $this->lblAdvanced->ControlId, null);
@@ -4799,32 +3293,7 @@
 			$this->lblCourier->Display = true;
 			$this->pnlNote->Display = true;
 			$this->lblTrackingNumber->Display = true;
-			$this->lblToPhone->Display = true;
-			$this->lblBillTransportationTo->Display = true;
-			$this->lblPayerAccount->Display = true;
-			$this->lblReference->Display = true;
-			$this->lblFedexNotifySenderEmail->Display = true;
-			$this->lblFedexNotifyRecipientEmail->Display = true;
-			$this->lblFedexNotifyOtherEmail->Display = true;
-			$this->lblFxServiceType->Display = true;
-			$this->lblPackageType->Display = true;
-			$this->lblPackageWeight->Display = true;
-			$this->lblPackageLength->Display = true;
-			$this->lblPackageWidth->Display = true;
-			$this->lblPackageHeight->Display = true;
-			$this->lblValue->Display = true;
-			$this->lblWeightUnit->Display = true;
-			$this->lblLengthUnit->Display = true;
-			$this->lblCurrencyUnit->Display = true;
-			$this->lblHoldAtLocationAddress->Display = true;
-			$this->lblHoldAtLocationCity->Display = true;
-			$this->lblHoldAtLocationState->Display = true;
-			$this->lblHoldAtLocationPostalCode->Display = true;
-			$this->lblFedexLabelPrinterType->Display = true;
-			$this->lblFedexLabelFormatType->Display = true;
-			$this->lblFedexThermalPrinterPort->Display = true;
 
-			// Display custom field labels
 			if ($this->arrCustomFields) {
 				CustomField::DisplayLabels($this->arrCustomFields);
 			}
@@ -4856,34 +3325,6 @@
 			$this->lblTrackingNumber->Text = $this->objShipment->__toStringTrackingNumber();
 			$this->pnlNote->Text = nl2br($this->objShipment->Transaction->Note);
 
-			if ($this->objFedexShipment) {
-				$this->lblToPhone->Text = $this->objFedexShipment->ToPhone;
-				$this->lblBillTransportationTo->Text = ($this->objFedexShipment->FedexServiceTypeId == 6) ? FedExDC::ground_pay_type($this->objFedexShipment->PayType) : FedExDC::express_pay_type($this->objFedexShipment->PayType);
-				$this->lblPayerAccount->Text = ($this->objFedexShipment->PayType === 1) ? $this->objFedexShipment->ShippingAccount->__toString() : $this->objFedexShipment->PayerAccountNumber;
-				$this->lblReference->Text = $this->objFedexShipment->Reference;
-				$this->lblFedexNotifySenderEmail->Text = $this->objFedexShipment->NotifySenderEmail;
-				$this->lblFedexNotifyRecipientEmail->Text = $this->objFedexShipment->NotifyRecipientEmail;
-				$this->lblFedexNotifyOtherEmail->Text = $this->objFedexShipment->NotifyOtherEmail;
-				$this->lblFxServiceType->Text = ($this->objFedexShipment->FedexServiceType) ? $this->objFedexShipment->FedexServiceType->__toString() : '';
-				$this->lblPackageType->Text = ($this->objFedexShipment->PackageType) ? $this->objFedexShipment->PackageType->__toString() : '';
-				$this->lblPackageWeight->Text = $this->objFedexShipment->PackageWeight;
-				$this->lblPackageLength->Text = $this->objFedexShipment->PackageLength;
-				$this->lblPackageWidth->Text = $this->objFedexShipment->PackageWidth;
-				$this->lblPackageHeight->Text = $this->objFedexShipment->PackageHeight;
-				$this->lblValue->Text = $this->objFedexShipment->DeclaredValue;
-				$this->lblWeightUnit->Text = $this->objFedexShipment->WeightUnit->__toString();
-				$this->lblLengthUnit->Text = $this->objFedexShipment->LengthUnit->__toString();
-				$this->lblCurrencyUnit->Text = $this->objFedexShipment->CurrencyUnit->__toString();
-				$this->lblHoldAtLocationAddress->Text = $this->objFedexShipment->HoldAtLocationAddress;
-				$this->lblHoldAtLocationCity->Text = $this->objFedexShipment->HoldAtLocationCity;
-				$this->lblHoldAtLocationState->Text = ($this->objFedexShipment->HoldAtLocationStateObject) ? $this->objFedexShipment->HoldAtLocationStateObject->__toString() : '';
-				$this->lblHoldAtLocationPostalCode->Text = $this->objFedexShipment->HoldAtLocationPostalCode;
-				$this->lblFedexLabelPrinterType->Text = FedExDC::label_printer_type($this->objFedexShipment->LabelPrinterType);
-				$this->lblFedexLabelFormatType->Text = FedExDC::label_format_type($this->objFedexShipment->LabelFormatType);
-				$this->lblFedexThermalPrinterPort->Text = $this->objFedexShipment->ThermalPrinterPort;
-			}
-
-			// Update custom labels
 			if ($this->arrCustomFields) {
 				CustomField::UpdateLabels($this->arrCustomFields);
 			}
@@ -4908,33 +3349,6 @@
 			$this->lblTrackingNumber->Display = false;
 
 
-			$this->lblToPhone->Display = false;
-			$this->lblBillTransportationTo->Display = false;
-			$this->lblPayerAccount->Display = false;
-			$this->lblReference->Display = false;
-			$this->lblFedexNotifySenderEmail->Display = false;
-			$this->lblFedexNotifyRecipientEmail->Display = false;
-			$this->lblFedexNotifyOtherEmail->Display = false;
-			$this->lblFxServiceType->Display = false;
-			$this->lblPackageType->Display = false;
-			$this->lblPackageWeight->Display = false;
-			$this->lblPackageLength->Display = false;
-			$this->lblPackageWidth->Display = false;
-			$this->lblPackageHeight->Display = false;
-			$this->lblValue->Display = false;
-			$this->lblWeightUnit->Display = false;
-			$this->lblLengthUnit->Display = false;
-			$this->lblCurrencyUnit->Display = false;
-			$this->lblHoldAtLocationAddress->Display = false;
-			$this->lblHoldAtLocationCity->Display = false;
-			$this->lblHoldAtLocationState->Display = false;
-			$this->lblHoldAtLocationPostalCode->Display = false;
-			$this->lblFedexLabelPrinterType->Display = false;
-			$this->lblFedexLabelFormatType->Display = false;
-			$this->lblFedexThermalPrinterPort->Display = false;
-
-
-			// Show Inputs
 			if (!$this->objShipment->ShippedFlag) {
 				$this->calShipDate->Display = true;
 				$this->lstFromCompany->Display = true;
@@ -4962,55 +3376,13 @@
 				$this->txtQuantity->Display = true;
 				$this->btnAddInventory->Display = true;
 
-				$this->txtToPhone->Display = true;
-				if ($this->lstBillTransportationTo->SelectedValue === 1) {
-					$this->lstShippingAccount->Display = true;
-				} else if ($this->blnEditMode) {
-					$this->txtRecipientThirdPartyAccount->Display = true;
-				}
-				$this->lstBillTransportationTo->Display = true;
-				$this->txtReference->Display = true;
-				$this->txtFedexNotifySenderEmail->Display = true;
-				$this->txtFedexNotifyRecipientEmail->Display = true;
-				$this->txtFedexNotifyOtherEmail->Display = true;
-				$this->lstFxServiceType->Display = true;
-				$this->lstPackageType->Display = true;
-				$this->txtPackageWeight->Display = true;
-				$this->lstWeightUnit->Display = true;
-				$this->txtPackageLength->Display = true;
-				$this->txtPackageWidth->Display = true;
-				$this->txtPackageHeight->Display = true;
-				$this->lstLengthUnit->Display = true;
-				$this->txtValue->Display = true;
-				$this->lstCurrencyUnit->Display = true;
-				$this->lblNewFromCompany->Display = true;
+    			$this->lblNewFromCompany->Display = true;
 				$this->lblNewFromContact->Display = true;
 				$this->lblNewFromAddress->Display = true;
 				$this->lblNewToCompany->Display = true;
 				$this->lblNewToContact->Display = true;
 				$this->lblNewToAddress->Display = true;
-				$this->txtHoldAtLocationAddress->Display = true;
-				$this->txtHoldAtLocationCity->Display = true;
-				$this->lstHoldAtLocationState->Display = true;
-				$this->txtHoldAtLocationPostalCode->Display = true;
-				$this->lstFedexLabelPrinterType->Display = true;
-				$this->lstFedexLabelFormatType->Display = true;
-				$this->txtFedexThermalPrinterPort->Display = true;
 
-				// Enable Fedex Notification Checkboxes (because they're disabled, not hidden)
-				$this->chkFedexNotifySenderShipFlag->Enabled = true;
-				$this->chkFedexNotifySenderExceptionFlag->Enabled = true;
-				$this->chkFedexNotifySenderDeliveryFlag->Enabled = true;
-				$this->chkFedexNotifyRecipientShipFlag->Enabled = true;
-				$this->chkFedexNotifyRecipientExceptionFlag->Enabled = true;
-				$this->chkFedexNotifyRecipientDeliveryFlag->Enabled = true;
-				$this->chkFedexNotifyOtherShipFlag->Enabled = true;
-				$this->chkFedexNotifyOtherExceptionFlag->Enabled = true;
-				$this->chkFedexNotifyOtherDeliveryFlag->Enabled = true;
-
-				//Enable FedEx Special Services Checkboxes (because they're disabled, not hidden)
-				$this->chkSaturdayDeliveryFlag->Enabled = true;
-				$this->chkHoldAtLocationFlag->Enabled = true;
 			}
 
 			if ($this->blnEditMode) {

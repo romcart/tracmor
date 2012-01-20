@@ -99,14 +99,6 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 
 .disclaimer { font-size:10px;font-family:arial; }
 
-.fedex_masthead { background-color:#660099;color:#FFFFFF;padding:0;font-weight:bold;font-size:12pt;height:36px; }
-.fedex_subheader {
-	color:#FF6600;
-	font-weight:bold;
-	font-size:9pt;
-	border-top:1px solid #FF6600;
-	padding-bottom:4px;
-}
 .save_notification {
 	color: darkgreen;
 	background-color: #D0FFC3;
