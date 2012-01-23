@@ -83,12 +83,7 @@
             else {
                 $user = UserAccount::Load((int)$this->CreatedBy);
             }
-            $email = $user->EmailAddress;
-            $default ="http://".$_SERVER['SERVER_NAME']."/".__SUBDIRECTORY__."/images/gravatar.gif";
-            $size = 40;
-            $grav_url = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $email ) ) ) . "?d=" . urlencode( $default ) . "&s=" . $size;
-
-            return $grav_url;
+            return $user->getProfileImage();
         }
 
         public function __toIconName() {

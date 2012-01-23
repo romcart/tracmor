@@ -80,7 +80,15 @@
 			
 			return QApplication::BooleanImage($this->AdminFlag);
 		}
-		
+
+        public function getProfileImage($size = 40){
+            $email = $this->EmailAddress;
+            $default ="http://".$_SERVER['SERVER_NAME']."/".__SUBDIRECTORY__."/images/gravatar.gif";
+            $strToReturn = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $email ) ) ) . "?d=" . urlencode( $default ) . "&s=" . $size;
+
+            return $strToReturn;
+        }
+
 		/**
 		 * Load a UserAccount Object based on the UserAccountId and PortableUserPin
 		 * Returns false if the ID and Pin do not match
