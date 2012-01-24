@@ -153,6 +153,50 @@
 			return sprintf('%s', $strToReturn);
 		}
 
+        public function __toStringData(){
+            switch($this->Transaction->TransactionTypeId){
+                case 1:
+                    return sprintf('from %s to %s', $this->__toStringSourceLocation(), $this->__toStringDestinationLocation());
+                    break;
+                case 2:
+                    if($this->Transaction->ModifiedByObject instanceof UserAccount){
+                        $user = $this->Transaction->ModifiedByObject->__toStringFullName();
+                    }
+                    else{
+                        $user = $this->Transaction->CreatedByObject->__toStringFullName();
+                    }
+                    return sprintf('from %s to %s', $user, $this->__toStringDestinationLocation());
+                    break;
+                case 3:
+                    if ($this->AssetTransactionCheckout) {
+                  		if ($this->AssetTransactionCheckout->ToContactId) {
+                  			    $strToReturn = $this->AssetTransactionCheckout->ToContact->__toStringWithLink();
+                    		}
+                    		else {
+                    			$strToReturn = $this->AssetTransactionCheckout->ToUser->__toStringFullName();
+                    		}
+                  		}
+                    return sprintf('from %s to %s',$this->__toStringSourceLocation() , $strToReturn);
+                    break;
+                case 6:
+                    $this->Transaction->Shipment = Shipment::LoadByTransactionId($this->TransactionId);
+                    return sprintf('from %s to %s',$this->__toStringSourceLocation(),$this->Transaction->ToStringCompanyWithLink());
+                    break;
+                case 7:
+                    $this->Transaction->Receipt = Receipt::LoadByTransactionId($this->TransactionId);
+                    if($this->Transaction->Receipt->ReceivedFlag){
+                        return sprintf('from %s to %s',$this->Transaction->ToStringCompanyWithLink(), $this->__toStringDestinationLocation());
+                    }
+                    else {
+                        return sprintf('from %s',$this->Transaction->ToStringCompanyWithLink());
+                    }
+                    break;
+                default:
+                    return '';
+                    break;
+            }
+        }
+
 		/**
 		 * Returns a boolean value - false if DestinationLocation is empty, true if it is not
 		 * AssetTransactions with an empty DestinationLocation are Pending Receipts
@@ -303,6 +347,14 @@
 
 			return $arrToReturn;
 		}
+
+        public static function CountAssetTransaction($intAssetId) {
+            return $arrToReturn = AssetTransaction::QueryCount(
+            					QQ::AndCondition(
+            						QQ::Equal(QQN::AssetTransaction()->AssetId, $intAssetId)/*,
+            						QQ::In(QQN::AssetTransaction()->Transaction->TransactionTypeId, array(1,2,3,6,7,8,9,10,11))*/)
+            				);
+        }
 
 		/**
 		 * Load an array of objAssetTransactions
@@ -623,5 +675,9 @@
 				QQ::NotEqual(QQN::AssetTransaction()->Asset->LinkedFlag, true))
 			);
 		}
-	}
+
+        private function __toStringCompany()
+        {
+        }
+    }
 ?>

@@ -45,37 +45,135 @@
 		 *
 		 * @return string a nicely formatted string representation of this object
 		 */
+
 		public function __toString() {
 			return sprintf('Transaction Object %s',  $this->intTransactionId);
 		}
-		
-		public function __toStringWithLink() {
-			// Shipment
-			if ($this->TransactionTypeId == 6) {
-				$objShipment = Shipment::LoadByTransactionId($this->TransactionId);
-				if ($objShipment) {
-					$strToReturn = sprintf('<a href="../shipping/shipment_edit.php?intShipmentId=%s">Ship</a>', $objShipment->ShipmentId);
-				}
-				else {
-					$strToReturn = '';
-				}
-			}
-			elseif ($this->TransactionTypeId == 7) {
-				$objReceipt = Receipt::LoadByTransactionId($this->TransactionId);
-				if ($objReceipt) {
-					$strToReturn = sprintf('<a href="../receiving/receipt_edit.php?intReceiptId=%s">Receipt</a>', $objReceipt->ReceiptId);
-				}
-				else {
-					$strToReturn = '';
-				}
-			}
-			else {
-				$strToReturn = sprintf('<a href="../common/transaction_edit.php?intTransactionId=%s">%s</a>', $this->TransactionId, $this->TransactionType->__toString());
-			}
-			
-			return $strToReturn;
-		}
-		
+
+        public function __toStringWithLink() {
+      			// Shipment
+      			if ($this->TransactionTypeId == 6) {
+      				$objShipment = Shipment::LoadByTransactionId($this->TransactionId);
+      				if ($objShipment) {
+      					$strToReturn = sprintf('<a href="../shipping/shipment_edit.php?intShipmentId=%s">Ship</a>', $objShipment->ShipmentId);
+      				}
+      				else {
+      					$strToReturn = '';
+      				}
+      			}
+      			elseif ($this->TransactionTypeId == 7) {
+      				$objReceipt = Receipt::LoadByTransactionId($this->TransactionId);
+      				if ($objReceipt) {
+      					$strToReturn = sprintf('<a href="../receiving/receipt_edit.php?intReceiptId=%s">Receipt</a>', $objReceipt->ReceiptId);
+      				}
+      				else {
+      					$strToReturn = '';
+      				}
+      			}
+      			else {
+      				$strToReturn = sprintf('<a href="../common/transaction_edit.php?intTransactionId=%s">%s</a>', $this->TransactionId, $this->TransactionType->__toString());
+      			}
+
+      			return $strToReturn;
+      		}
+        public function  __toStringCreated() {
+            if ($this->ModifiedBy){
+                $user = UserAccount::Load($this->ModifiedBy);
+            }
+            else {
+                $user = UserAccount::Load((int)$this->CreatedBy);
+            }
+            return $user->getProfileImage();
+        }
+
+        public function __toIconName() {
+            switch($this->TransactionTypeId){
+                case 1: return 'asset_move' ;
+                break;
+                case 2: return 'asset_checkin' ;
+                break;
+                case 3: return 'asset_checkout' ;
+                break;
+                case 6: return 'shipment' ;
+                break;
+                case 7: return 'receipt' ;
+                break;
+                case 8: return 'asset_reserve' ;
+                break;
+                case 9: return 'asset_reserve' ;
+                break;
+                case 10: return 'asset_archive' ;
+                break;
+                case 11: return 'asset_unarchive' ;
+                break;
+            }
+        }
+
+        public function __toStringVerbWithLink(){
+            if ($this->TransactionTypeId == 6) {
+         				$objShipment = Shipment::LoadByTransactionId($this->TransactionId);
+         				if ($objShipment) {
+                             if ($objShipment->ShippedFlag){
+                                 $verb = 'shipped';
+                             }
+                             else{
+                                 $verb = 'scheduled shipment';
+                             }
+         					$strToReturn = sprintf('<a href="../shipping/shipment_edit.php?intShipmentId=%s">%s</a>', $objShipment->ShipmentId, $verb);
+         				}
+         				else {
+         					$strToReturn = '';
+         				}
+         			}
+         			elseif ($this->TransactionTypeId == 7) {
+         				$objReceipt = Receipt::LoadByTransactionId($this->TransactionId);
+         				if ($objReceipt) {
+                             if ($objReceipt->ReceivedFlag){
+                                 $verb = 'received';
+                             }
+                             else{
+                                 $verb = 'scheduled receipt';
+                             }
+         					$strToReturn = sprintf('<a href="../receiving/receipt_edit.php?intReceiptId=%s">%s</a>', $objReceipt->ReceiptId, $verb);
+         				}
+         				else {
+         					$strToReturn = '';
+         				}
+         			}
+         			else {
+                         $verb = strtolower($this->TransactionType->__toString());
+                         if (str_word_count($verb)>1){
+                            $verb = explode(" ", $verb);
+                            $verb =  $verb[0] . 'ed ' . $verb[1];
+                         }
+                         else {
+                             $verb = $verb . 'd';
+                         }
+         				$strToReturn = sprintf('<a href="../common/transaction_edit.php?intTransactionId=%s">%s</a>', $this->TransactionId, $verb);
+         			}
+
+         			return $strToReturn;
+            return '';
+        }
+
+        public function  __toStringDate() {
+            if(!empty($this->ModifiedDate)){
+                return $this->ModifiedDate->PHPDate('F d, Y');
+            }
+            else{
+                return $this->CreationDate->PHPDate('F d, Y');
+            }
+        }
+
+        public function  __toStringUser() {
+            if(!empty($this->ModifiedBy)){
+                return $this->ModifiedByObject->__toStringFullName();
+            }
+            else{
+                return $this->CreatedByObject->__toStringFullName();
+            }
+        }
+
 		public function ToStringNumberWithLink() {
 			
 			$strToReturn = '';
@@ -117,6 +215,18 @@
 			
 			return $strToReturn;
 		}
+
+        public function ToStringCompanyWithLink(){
+            $strToReturn = '';
+
+         	if ($this->objShipment) {
+         		$strToReturn = sprintf('<a href="../contacts/company_edit.php?intCompanyId=%s">%s</a>', $this->objShipment->ToCompanyId, $this->objShipment->ToCompany->__toString());
+         	}
+         	elseif ($this->objReceipt) {
+         		$strToReturn = sprintf('<a href="../contacts/company_edit.php?intCompanyId=%s">%s</a>',$this->objReceipt->FromCompanyId, $this->objReceipt->FromCompany->__toString());
+         	}
+            return $strToReturn;
+        }
 		
 		public function ToStringContact() {
 

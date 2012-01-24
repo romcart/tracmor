@@ -145,15 +145,19 @@ $this->pnlAttachments->Render();
 		$this->btnArchive->Render();
 		echo '<br class="item_divider">';
 		echo '<br class="item_divider">';
-		echo '<div class="title">Transactions</div>';
-		$this->dtgAssetTransaction->RenderWithError();
+	//	echo '<div class="title">Transactions</div>';
+	//	$this->dtgAssetTransaction->RenderWithError();
 	}
 ?>
 <br class="item_divider">
 <?php
 if ($this->blnEditMode) {
-	$this->lblShipmentReceipt->Render();
-	$this->dtgShipmentReceipt->RenderWithError();
+//	$this->lblShipmentReceipt->Render();
+//	$this->dtgShipmentReceipt->RenderWithError();
+
+     $this->lblAssetHistory->Render();
+	 $this->dtgAssetHistory->RenderWithError();
+
 }
 
 $this->dlgNewAssetModel->Render();

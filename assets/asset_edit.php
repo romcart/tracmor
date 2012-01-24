@@ -137,6 +137,9 @@
 
 				// Specify the local databind method this datagrid will use
 				$this->ctlAssetEdit->dtgShipmentReceipt->SetDataBinder('dtgShipmentReceipt_Bind');
+                
+                // Specify the local databind method this datagrid will use
+				$this->ctlAssetEdit->dtgAssetHistory->SetDataBinder('dtgAssetHistory_Bind');
 			}
 
 			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
@@ -224,7 +227,7 @@
         $this->dtgChildAssets->ShowHeader = true;
         // added to fix items per page
 	       $this->dtgChildAssets->DataSource = $this->ctlAssetEdit->objChildAssetArray;
-         $intItemsPerPage = $this->dtgChildAssets->ItemsPerPage;
+           $intItemsPerPage = $this->dtgChildAssets->ItemsPerPage;
 	       $intItemOffset = ($this->dtgChildAssets->PageNumber - 1) * $intItemsPerPage;
 	       $arrDataSource = array_slice($this->ctlAssetEdit->objChildAssetArray, $intItemOffset, $intItemsPerPage);
 	      // end of fix
@@ -310,6 +313,20 @@
 
 				$this->ctlAssetEdit->dtgShipmentReceipt->DataSource = AssetTransaction::QueryArray($objCondition, $objClauses);
 			}
+		}
+
+ 		protected function dtgAssetHistory_Bind() {
+
+			// Get Total Count for Pagination
+                $this->ctlAssetEdit->dtgAssetHistory->TotalItemCount = AssetTransaction::CountAssetTransaction($this->ctlAssetEdit->objAsset->AssetId);
+                $objClauses = array();
+                $objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::In(QQN::AssetTransaction()->Transaction->TransactionTypeId, array(1,2,3,6,7,8,9,10,11))));
+                $intItemsPerPage = $this->ctlAssetEdit->dtgAssetHistory->ItemsPerPage;
+                $intItemOffset = ($this->ctlAssetEdit->dtgAssetHistory->PageNumber - 1) * $intItemsPerPage;
+                $arrDataSource = array_slice(AssetTransaction::QueryArray($objCondition, $objClauses), $intItemOffset, $intItemsPerPage);
+
+                $this->ctlAssetEdit->dtgAssetHistory->DataSource =$arrDataSource;
+
 		}
 
 		protected function dtgAssetTransact_Bind() {
@@ -524,7 +541,6 @@ CREATE FIELD METHODS
 		}
 
 		protected function btnAddChild_Click() {
-
 		  if ($this->txtAddChild->Text) {
   		  $objChildAsset = Asset::LoadByAssetCode($this->txtAddChild->Text);
   		  if ($objChildAsset) {
