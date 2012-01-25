@@ -170,7 +170,7 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 }
 .history_note{
     font-size: 12px;
-    color: gray;
+    color: #666666;
     float: left;
     padding:2px;
 }

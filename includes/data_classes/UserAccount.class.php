@@ -81,9 +81,10 @@
 			return QApplication::BooleanImage($this->AdminFlag);
 		}
 
-        public function getProfileImage($size = 40){
+        public function __getProfileImage(){
+            $size = 40;
             $email = $this->EmailAddress;
-            $default ="http://".$_SERVER['SERVER_NAME']."/".__SUBDIRECTORY__."/images/gravatar.gif";
+            $default ="http://".$_SERVER['SERVER_NAME'].__SUBDIRECTORY__."/images/gravatar.gif";
             $strToReturn = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $email ) ) ) . "?d=" . urlencode( $default ) . "&s=" . $size;
 
             return $strToReturn;

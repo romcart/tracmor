@@ -320,6 +320,8 @@
 			// Get Total Count for Pagination
                 $this->ctlAssetEdit->dtgAssetHistory->TotalItemCount = AssetTransaction::CountAssetTransaction($this->ctlAssetEdit->objAsset->AssetId);
                 $objClauses = array();
+                $objClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false);
+             	array_push($objClauses, $objClause);
                 $objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::In(QQN::AssetTransaction()->Transaction->TransactionTypeId, array(1,2,3,6,7,8,9,10,11))));
                 $intItemsPerPage = $this->ctlAssetEdit->dtgAssetHistory->ItemsPerPage;
                 $intItemOffset = ($this->ctlAssetEdit->dtgAssetHistory->PageNumber - 1) * $intItemsPerPage;

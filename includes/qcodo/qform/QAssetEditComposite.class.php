@@ -822,7 +822,7 @@ class QAssetEditComposite extends QControl {
 
 		$objPaginator = new QPaginator($this->dtgAssetHistory);
 		$this->dtgAssetHistory->Paginator = $objPaginator;
-		$this->dtgAssetHistory->ItemsPerPage = 20;
+		$this->dtgAssetHistory->ItemsPerPage = 10;
         $this->dtgAssetHistory->UseAjax = true;
 		$this->dtgAssetHistory->AddColumn(new QDataGridColumn('Type', '<img src="../images/icons/'.'<?= $_ITEM->Transaction->__toIconName() ?>'.'.png" />', array('CssClass' => 'dtg_column_history', 'HtmlEntities' => false,'Width'=>20)));
 		$this->dtgAssetHistory->AddColumn(new QDataGridColumn('Data',
@@ -834,7 +834,7 @@ class QAssetEditComposite extends QControl {
                                                <div class="gravatar" > <img src=<?= $_ITEM->Transaction->__toStringCreated() ?> />
                                                </div>
                                                <div class="history_note">
-                                               <?= $_ITEM->Transaction->Note ?>
+                                               <?= $_ITEM->Transaction->__toStringNote() ?>
                                                </div>',
                                               array('CssClass' => 'dtg_column_history', 'HtmlEntities' => false)));
         $objStyle = $this->dtgAssetHistory->RowStyle;

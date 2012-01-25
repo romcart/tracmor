@@ -77,13 +77,12 @@
       			return $strToReturn;
       		}
         public function  __toStringCreated() {
-            if ($this->ModifiedBy){
-                $user = UserAccount::Load($this->ModifiedBy);
+            if (!empty($this->ModifiedBy)){
+                return $this->ModifiedByObject->__getProfileImage();
             }
             else {
-                $user = UserAccount::Load((int)$this->CreatedBy);
+                return $this->CreatedByObject->__getProfileImage();
             }
-            return $user->getProfileImage();
         }
 
         public function __toIconName() {
@@ -171,6 +170,15 @@
             }
             else{
                 return $this->CreatedByObject->__toStringFullName();
+            }
+        }
+
+        public  function __toStringNote(){
+            if ($this->Note){
+                return $this->Note;
+            }
+            else{
+                return '[No note entered]';
             }
         }
 
