@@ -866,7 +866,7 @@
 				}
 			}
 
-			$this->lstToContact->AddAction(new QChangeEvent(), new QAjaxAction('lstToContact_Select'));
+		//	$this->lstToContact->AddAction(new QChangeEvent(), new QAjaxAction('lstToContact_Select'));
 			$this->lstToContact->TabIndex=5;
 		}
 
@@ -911,7 +911,7 @@
 			$this->lstCourier = new QListBox($this);
 			$this->lstCourier->Name = QApplication::Translate('Courier');
 			$this->lstCourier->Required = true;
-			if (!$this->blnEditMode)
+			//if (!$this->blnEditMode)
 				$this->lstCourier->AddItem('- Select One -', null);
 			$objCourierArray = Courier::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Courier()->ShortDescription)));
 			if ($objCourierArray) foreach ($objCourierArray as $objCourier) {
@@ -1474,6 +1474,21 @@
 						}
 					}
 				}
+			}
+		}
+
+		// This is run every time a 'From Contact' is selected
+		// It loads the value for the 'Sender Email' for the FedEx shipment notification
+		protected function lstFromContact_Select() {
+			if ($this->lstFromContact->SelectedValue) {
+				$objContact = Contact::Load($this->lstFromContact->SelectedValue);
+//				if ($objContact) {
+//					if ($objContact->Email) {
+//						$this->txtFedexNotifySenderEmail->Text = $objContact->Email;
+//					} else {
+//						$this->txtFedexNotifySenderEmail->Text = '';
+//					}
+//				}
 			}
 		}
 
@@ -2961,18 +2976,9 @@
 						$this->SetupShipment();
 						$this->DisplayLabels();
 
-						if ($this->objShipment->CourierId == 1) {
-							$this->txtTrackingNumber->Enabled = false;
-							$this->lstPackageType->Enabled = true;
-						}
-						else {
-							$this->txtTrackingNumber->Enabled = true;
-							$this->lstPackageType->Enabled = false;
-						}
 
-						// Reload lstPackageType
-						$this->lstPackageType->RemoveAllItems();
-						$this->LoadPackageTypes();
+						$this->txtTrackingNumber->Enabled = true;
+
 					}
 					catch (QExtendedOptimisticLockingException $objExc) {
 
