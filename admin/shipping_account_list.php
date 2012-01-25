@@ -25,7 +25,7 @@
 	QApplication::Authenticate();
 	// Include the classfile for ShippingAccountListFormBase
 	require(__FORMBASE_CLASSES__ . '/ShippingAccountListFormBase.class.php');
-	require_once('../shipping/fedexdc.class.php');
+
 
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality

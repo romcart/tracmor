@@ -53,8 +53,6 @@
 	<table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
 		<tr>
 			<td class="record_header">
-				<?php $this->lblFedexShippingLabelLink->Render(); ?>
-				&nbsp;
 				<?php $this->lblPackingListLink->Render(); ?>
 				<?php
 
@@ -181,8 +179,6 @@
 $this->pnlAttachments->Render();
 ?>
 
-<br class="item_divider" />
-<?php $this->pnlFedExShipment->Render(); ?>
 <br class="item_divider" />
 <div class="title">Assets to Ship</div>
 <table>
