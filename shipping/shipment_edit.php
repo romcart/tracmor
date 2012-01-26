@@ -928,7 +928,6 @@
 			else {
 				$this->lstCourier->AddItem('Other', null);
 			}
-			$this->lstCourier->AddAction(new QChangeEvent(), new QAjaxAction('lstCourier_Select'));
 			$this->lstCourier->TabIndex=7;
 		}
 
@@ -1557,14 +1556,6 @@
 					}
 				}
 			}
-		}
-
-		// This method is run when a Courier is selected
-		// Decides whether to display tracking number text box and display the FedEx shipment panel
-		protected function lstCourier_Select() {
-				// Not FedEx so hide FedEx shipment panel and display tracking number text box
-				// FIXME: this is not currently done the "Qcodo way"
-				QApplication::ExecuteJavascript('document.getElementById("trackingNumber").style.display="";');
 		}
 
 		// Set the From Address Label text when it is selected from the drop-down
@@ -3222,7 +3213,6 @@
 				$this->txtShipmentNumber->Text = $this->objShipment->ShipmentNumber;
 			}
 			$this->lstCourier->SelectedValue = $this->objShipment->CourierId;
-			$this->lstCourier_Select();
 			$this->txtTrackingNumber->Text = $this->objShipment->TrackingNumber;
 			$this->txtNote->Text = $this->objShipment->Transaction->Note;
 			$this->arrCustomFields = CustomField::UpdateControls($this->objShipment->objCustomFieldArray, $this->arrCustomFields);
