@@ -39,6 +39,21 @@
 		<td width="100%" valign="top">
 		<?php $this->ctlAssetEdit->Render(); ?>
 		<?php if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) { ?>
+        <br class="item_divider" />
+        <?php
+          $this->lblAssetHistory->Render();
+          $historyCount = AssetTransaction::CountAssetTransaction($this->ctlAssetEdit->objAsset->AssetId);
+          if ($historyCount>0){
+            ?>
+            <div class="dtr_results">
+            <?php  $this->dtrAssetHistory->Paginator->Render(); ?>
+            </div>
+            <?php  $this->dtrAssetHistory->Render();
+          }
+          else { ?>
+             <div class="dtr_results"><b>Results:</b> No items found.</div>
+            <?php
+          } ?>
 		<br class="item_divider" />
 		<?php $this->lblChildAssets->Render(); ?>
 	  <?php $this->pnlAddChildAsset->Render(); ?>

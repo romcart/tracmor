@@ -168,16 +168,35 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
     padding: 2px;
     float: left;
 }
-.history_note{
+.history_note {
     font-size: 12px;
     color: #666666;
     float: left;
     padding:2px;
 }
-.summary{
+.summary {
     font-weight:bold;
     margin-bottom: 5px;
 }
-.dtg_column_history {
+.dtr_column_history {
     border-top:1px solid #CCCCCC;
+}
+.dtr_results {
+    border:1px solid #CCCCCC;
+    padding:3px;
+    margin-right: 10px;
+}
+.transaction_type {
+    float:left;
+    width:25px;
+    padding:10px 0 0 10px;
+}
+.transaction_data {
+    float:left;
+    padding: 10px;
+}
+.datarepeater {
+    margin-right:10px;
+    border:1px solid #CCCCCC;
+    border-top:none;
 }

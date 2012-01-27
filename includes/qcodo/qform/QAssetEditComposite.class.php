@@ -45,7 +45,6 @@ class QAssetEditComposite extends QControl {
 	protected $lblParentAssetCode;
 	protected $lblIconParentAssetCode;
 	public $lblShipmentReceipt;
-    public $lblAssetHistory;
 	public $lblLockedToParent;
 
 
@@ -79,8 +78,7 @@ class QAssetEditComposite extends QControl {
 	// Transaction History Datagrid
 	public $dtgAssetTransaction;
 	public $dtgShipmentReceipt;
-    public $dtgAssetHistory;
-	// Custom Field Objects
+    // Custom Field Objects
 	// protected $objCustomFieldArray;
 	public $arrCustomFields;
 
@@ -175,10 +173,8 @@ class QAssetEditComposite extends QControl {
 			// Create the transaction history datagrid
 			$this->dtgAssetTransaction_Create();
 			$this->lblShipmentReceipt_Create();
-            $this->lblAssetHistory_Create();
-			$this->dtgShipmentReceipt_Create();
-            $this->dtgAssetHistory_Create();
-			$this->displayLabels();
+            $this->dtgShipmentReceipt_Create();
+        	$this->displayLabels();
 		}
 		// Display empty inputs to create a new asset
 		else {
@@ -804,45 +800,6 @@ class QAssetEditComposite extends QControl {
     $objStyle->CssClass = 'dtg_header';
 	}
 
-    protected function lblAssetHistory_Create() {
-		$this->lblAssetHistory = new QLabel($this);
-		$this->lblAssetHistory->Name = 'Asset History';
-		$this->lblAssetHistory->Text = 'Asset History';
-		$this->lblAssetHistory->CssClass = 'title';
-	}
-
-	protected function dtgAssetHistory_Create() {
-		$this->dtgAssetHistory = new QDataGrid($this);
-        $this->dtgAssetHistory->ShowHeader = false;
-		$this->dtgAssetHistory->Name = 'Asset History';
-		$this->dtgAssetHistory->CellPadding = 5;
-		$this->dtgAssetHistory->CellSpacing = 0;
-		$this->dtgAssetHistory->CssClass = "datagrid";
-
-
-		$objPaginator = new QPaginator($this->dtgAssetHistory);
-		$this->dtgAssetHistory->Paginator = $objPaginator;
-		$this->dtgAssetHistory->ItemsPerPage = 10;
-        $this->dtgAssetHistory->UseAjax = true;
-		$this->dtgAssetHistory->AddColumn(new QDataGridColumn('Type', '<img src="../images/icons/'.'<?= $_ITEM->Transaction->__toIconName() ?>'.'.png" />', array('CssClass' => 'dtg_column_history', 'HtmlEntities' => false,'Width'=>20)));
-		$this->dtgAssetHistory->AddColumn(new QDataGridColumn('Data',
-                                              '<div class="summary"><?= $_ITEM->Transaction->__toStringUser() ?>
-                                               <?= $_ITEM->Transaction->__toStringVerbWithLink() ?>
-                                               <?= $_ITEM->__toStringData() ?>
-                                               <?= $_ITEM->Transaction->__toStringDate() ?>
-                                               </div>
-                                               <div class="gravatar" > <img src=<?= $_ITEM->Transaction->__toStringCreated() ?> />
-                                               </div>
-                                               <div class="history_note">
-                                               <?= $_ITEM->Transaction->__toStringNote() ?>
-                                               </div>',
-                                              array('CssClass' => 'dtg_column_history', 'HtmlEntities' => false)));
-        $objStyle = $this->dtgAssetHistory->RowStyle;
-        $objStyle->ForeColor = '#000000';
-        $objStyle->BackColor = '#FFFFFF';
-        $objStyle->FontSize = 12;
-	}
-
 	// Asset Model List Selection Action
 	// Display the AssetModelCode for the given AssetModel once it is chosen
 	public function lstAssetModel_Select($strFormId, $strControlId, $strParameter) {
@@ -1138,8 +1095,7 @@ class QAssetEditComposite extends QControl {
 
 		$this->dtgAssetTransaction->MarkAsModified();
 		$this->dtgShipmentReceipt->MarkAsModified();
-        $this->dtgAssetHistory->MarkAsModified();
-		// Set the creation and modification fields to null because it hasn't been created or modified yet.
+        // Set the creation and modification fields to null because it hasn't been created or modified yet.
 		$this->lblModifiedDate->Text = '';
 		$this->lblCreationDate->Text = '';
 

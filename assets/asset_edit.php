@@ -52,6 +52,9 @@
 		// Child assets datagrid
 		protected $dtgChildAssets;
 
+        //Asset history datarepeater
+        protected $dtrAssetHistory;
+
 		// Buttons
 		protected $btnChildAssetsRemove;
 		protected $btnReassign;
@@ -65,6 +68,7 @@
 		protected $lblAddChild;
 		protected $lblChildAssets;
 		protected $lblAssetCode;
+        protected $lblAssetHistory;
 
 		// Status of Asset Search Tool
 		protected $intDlgStatus;
@@ -93,6 +97,8 @@
 			$this->ctlShortcutMenu_Create();
 
 			$this->ctlAssetEdit_Create();
+            $this->lblAssetHistory_Create();
+            $this->dtrAssetHistory_Create();
 
 			if (!$this->intTransactionTypeId) {
 			  $this->lblChildAssets_Create();
@@ -140,6 +146,9 @@
                 
                 // Specify the local databind method this datagrid will use
 				$this->ctlAssetEdit->dtgAssetHistory->SetDataBinder('dtgAssetHistory_Bind');
+
+                $this->dtrAssetHistory->SetDataBinder('dtrAssetHistory_Bind');
+
 			}
 
 			if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) {
@@ -220,6 +229,22 @@
 	    	$this->ctlAssetEdit->objChildAssetArray = array();
 	    }
 		}
+
+        protected function lblAssetHistory_Create() {
+    		$this->lblAssetHistory = new QLabel($this);
+    		$this->lblAssetHistory->Name = 'Asset History';
+    		$this->lblAssetHistory->Text = 'Asset History';
+    		$this->lblAssetHistory->CssClass = 'title';
+    	}
+
+        protected function dtrAssetHistory_Create(){
+            $this->dtrAssetHistory = new QDataRepeater($this);
+            $this->dtrAssetHistory->Paginator = new QPaginator($this);
+            $this->dtrAssetHistory->ItemsPerPage = 10;
+            $this->dtrAssetHistory->UseAjax = true;
+            $this->dtrAssetHistory->Template = 'dtr_asset_history.tpl.php';
+            $this->dtrAssetHistory->SetDataBinder('dtrAssetHistory_Bind');
+        }
 
 		protected function dtgChildAssets_Bind() {
 		  $this->dtgChildAssets->TotalItemCount = count($this->ctlAssetEdit->objChildAssetArray);
@@ -330,6 +355,20 @@
                 $this->ctlAssetEdit->dtgAssetHistory->DataSource =$arrDataSource;
 
 		}
+
+        protected function dtrAssetHistory_Bind() {
+
+     		// Get Total Count for Pagination
+            $this->dtrAssetHistory->TotalItemCount = AssetTransaction::CountAssetTransaction($this->ctlAssetEdit->objAsset->AssetId);
+            $objClauses = array();
+            $objClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false);
+            array_push($objClauses, $objClause);
+            $objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::In(QQN::AssetTransaction()->Transaction->TransactionTypeId, array(1,2,3,6,7,8,9,10,11))));
+            $intItemsPerPage = $this->dtrAssetHistory->ItemsPerPage;
+            $intItemOffset = ($this->dtrAssetHistory->PageNumber - 1) * $intItemsPerPage;
+            $arrDataSource = array_slice(AssetTransaction::QueryArray($objCondition, $objClauses), $intItemOffset, $intItemsPerPage);
+            $this->dtrAssetHistory->DataSource =$arrDataSource;
+     	}
 
 		protected function dtgAssetTransact_Bind() {
 

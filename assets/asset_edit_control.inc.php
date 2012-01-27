@@ -155,8 +155,8 @@ if ($this->blnEditMode) {
 //	$this->lblShipmentReceipt->Render();
 //	$this->dtgShipmentReceipt->RenderWithError();
 
-     $this->lblAssetHistory->Render();
-	 $this->dtgAssetHistory->RenderWithError();
+     //$this->lblAssetHistory->Render();
+	// $this->dtgAssetHistory->RenderWithError();
 
 }
 
