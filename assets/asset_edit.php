@@ -143,10 +143,8 @@
 
 				// Specify the local databind method this datagrid will use
 				$this->ctlAssetEdit->dtgShipmentReceipt->SetDataBinder('dtgShipmentReceipt_Bind');
-                
-                // Specify the local databind method this datagrid will use
-				$this->ctlAssetEdit->dtgAssetHistory->SetDataBinder('dtgAssetHistory_Bind');
 
+                // Specify the local databind method this datarepeater will use
                 $this->dtrAssetHistory->SetDataBinder('dtrAssetHistory_Bind');
 
 			}
@@ -338,22 +336,6 @@
 
 				$this->ctlAssetEdit->dtgShipmentReceipt->DataSource = AssetTransaction::QueryArray($objCondition, $objClauses);
 			}
-		}
-
- 		protected function dtgAssetHistory_Bind() {
-
-			// Get Total Count for Pagination
-                $this->ctlAssetEdit->dtgAssetHistory->TotalItemCount = AssetTransaction::CountAssetTransaction($this->ctlAssetEdit->objAsset->AssetId);
-                $objClauses = array();
-                $objClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false);
-             	array_push($objClauses, $objClause);
-                $objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::In(QQN::AssetTransaction()->Transaction->TransactionTypeId, array(1,2,3,6,7,8,9,10,11))));
-                $intItemsPerPage = $this->ctlAssetEdit->dtgAssetHistory->ItemsPerPage;
-                $intItemOffset = ($this->ctlAssetEdit->dtgAssetHistory->PageNumber - 1) * $intItemsPerPage;
-                $arrDataSource = array_slice(AssetTransaction::QueryArray($objCondition, $objClauses), $intItemOffset, $intItemsPerPage);
-
-                $this->ctlAssetEdit->dtgAssetHistory->DataSource =$arrDataSource;
-
 		}
 
         protected function dtrAssetHistory_Bind() {
