@@ -19,9 +19,6 @@
 			$this->strLabelForNext = QApplication::Translate('Next');
 		}
 
-        public function RenderWithResults(){
-            
-        }
 		public function GetControlHtml() {
 			$this->objPaginatedControl->DataBind();
 			$strStyle = $this->GetStyleAttributes();
