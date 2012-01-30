@@ -1,5 +1,6 @@
 <?php
 	class QPaginator extends QPaginatorBase {
+        public $renderWithResults = false;
 		// APPEARANCE
 		protected $intIndexCount = 10;
 
@@ -18,9 +19,11 @@
 			$this->strLabelForNext = QApplication::Translate('Next');
 		}
 
+        public function RenderWithResults(){
+            
+        }
 		public function GetControlHtml() {
 			$this->objPaginatedControl->DataBind();
-
 			$strStyle = $this->GetStyleAttributes();
 			if ($strStyle)
 				$strStyle = sprintf(' style="%s"', $strStyle);
@@ -159,6 +162,32 @@
 			}
 
 			$strToReturn .= '</span>';
+
+            if($this->renderWithResults) {
+                $results ='';
+                if($this->intTotalItemCount>0){
+                    $startItem = ($this->intPageNumber-1)*$this->intItemsPerPage+1;
+                    $this->intTotalItemCount < $this->intPageNumber*$this->intItemsPerPage ?
+                    $endItem = $this->intTotalItemCount:
+                    $endItem = $this->intPageNumber*$this->intItemsPerPage;
+                    $results = sprintf(' Viewing %s-%s of %s',
+                    $startItem,
+                    $endItem,
+                    $this->intTotalItemCount
+                    );
+                }
+                else {
+                    $results = ' No items found.';
+                }
+                $strToReturn = sprintf('<div class="dtr_results">
+                                           <div style="float:left;"><b>Results:</b>%s</div>
+                                           <div style="float:right;">%s</div>
+                                           <div style="clear: both;"></div>
+                                        </div>
+
+                                       ',
+                $results,$strToReturn);
+            }
 
 			return $strToReturn;
 		}
