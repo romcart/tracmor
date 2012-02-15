@@ -404,22 +404,6 @@ CREATE TABLE shipment (
     INDEX shipment_fkindex16 ( from_company_id ))
 ENGINE = INNODB;
 
-CREATE TABLE shipping_account (
-  shipping_account_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
-  courier_id          INTEGER UNSIGNED   NOT NULL,
-  short_description   VARCHAR(255)   NOT NULL,
-  access_id           VARCHAR(255)   NOT NULL,
-  access_code         VARCHAR(255)   NOT NULL,
-  created_by          INTEGER UNSIGNED   NULL,
-  creation_date       DATETIME   NULL   DEFAULT NULL,
-  modified_by         INTEGER UNSIGNED   NULL,
-  modified_date       TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
-    PRIMARY KEY ( shipping_account_id ),
-    INDEX shipping_account_fkindex1 ( courier_id ),
-    INDEX shipping_account_fkindex2 ( modified_by ),
-    INDEX shipping_account_fkindex3 ( created_by ))
-ENGINE = INNODB;
-
 CREATE TABLE courier (
   courier_id        INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   short_description VARCHAR(255)   NOT NULL,
@@ -1131,12 +1115,6 @@ ALTER TABLE shipment
   )
 ON Delete NO ACTION ON Update NO ACTION;
 
-ALTER TABLE shipping_account
-  ADD CONSTRAINT FOREIGN KEY( courier_id) references courier (
-    courier_id
-  )
-ON Delete NO ACTION ON Update NO ACTION;
-
 ALTER TABLE shipment
   ADD CONSTRAINT FOREIGN KEY( courier_id) references courier (
     courier_id
@@ -1395,22 +1373,10 @@ ALTER TABLE inventory_transaction
   )
 ON Delete SET NULL ON Update NO ACTION;
 
-ALTER TABLE shipping_account
-  ADD CONSTRAINT FOREIGN KEY( modified_by) references user_account (
-    user_account_id
-  )
-ON Delete SET NULL ON Update NO ACTION;
-
-ALTER TABLE shipping_account
-  ADD CONSTRAINT FOREIGN KEY( created_by) references user_account (
-    user_account_id
-  )
-ON Delete SET NULL ON Update NO ACTION;
-
 ALTER TABLE role_module
   ADD CONSTRAINT FOREIGN KEY( created_by) references user_account (
     user_account_id
-  )
+)
 ON Delete SET NULL ON Update NO ACTION;
 
 ALTER TABLE role_module
