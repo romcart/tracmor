@@ -870,6 +870,12 @@ CREATE FIELD METHODS
 				$this->DisplayChildAssets();
 			}
 			else {
+                $this->dtrAssetHistory->Paginator->Display = false;
+                $this->lblAssetHistory->Display = false;
+                $this->dtrAssetHistory->Display = false;
+                $this->dtrAssetHistory->Paginator->Visible = false;
+                $this->lblAssetHistory->Visible = false;
+                $this->dtrAssetHistory->Visible = false;
 				$this->ctlAssetEdit->Display = false;
 				$this->DisplayChildAssets();
 			}
