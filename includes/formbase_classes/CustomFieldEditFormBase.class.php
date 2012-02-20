@@ -21,6 +21,7 @@
 		protected $objCustomField;
 		protected $strTitleVerb;
 		protected $blnEditMode;
+    protected $blnAssetEntityType;
 
 		// Controls for CustomField's Data Fields
 		protected $lblCustomFieldId;
@@ -29,6 +30,8 @@
 		protected $txtShortDescription;
 		protected $chkActiveFlag;
 		protected $chkRequiredFlag;
+    protected $chkSearchableFlag;
+    protected $chkAllAssetModelsFlag;
 		protected $lstCreatedByObject;
 		protected $calCreationDate;
 		protected $lstModifiedByObject;
@@ -55,7 +58,7 @@
 				$this->blnEditMode = true;
 			} else {
 				$this->objCustomField = new CustomField();
-				$this->strTitleVerb = QApplication::Translate('Create');
+        $this->strTitleVerb = QApplication::Translate('Create');
 				$this->blnEditMode = false;
 			}
 		}
@@ -71,6 +74,8 @@
 			$this->txtShortDescription_Create();
 			$this->chkActiveFlag_Create();
 			$this->chkRequiredFlag_Create();
+      $this->chkSearchableFlag_Create();
+      $this->chkAllAssetModelsFlag_Create();
 			$this->lstCreatedByObject_Create();
 			$this->calCreationDate_Create();
 			$this->lstModifiedByObject_Create();
@@ -141,6 +146,18 @@
 			$this->chkRequiredFlag->Checked = $this->objCustomField->RequiredFlag;
 		}
 
+    // Create and Setup chkSearchableFlag
+    protected function chkSearchableFlag_Create() {
+      $this->chkSearchableFlag = new QCheckBox($this);
+      $this->chkSearchableFlag->Name = QApplication::Translate('Searchable Flag');
+      $this->chkSearchableFlag->Checked = $this->objCustomField->SearchableFlag;
+    }
+    // Create and Setup chkAllAssetModelsFlag
+    protected function chkAllAssetModelsFlag_Create(){
+      $this->chkAllAssetModelsFlag = new QCheckBox($this);
+      $this->chkAllAssetModelsFlag->Name = QApplication::Translate('All Asset Models');
+      $this->chkAllAssetModelsFlag->Checked = $this->objCustomField->AllAssetModelsFlag;
+    }
 		// Create and Setup lstCreatedByObject
 		protected function lstCreatedByObject_Create() {
 			$this->lstCreatedByObject = new QListBox($this);
@@ -216,13 +233,17 @@
 				$this->btnDelete->Visible = false;
 		}
 		
-		// Protected Update Methods
+		// Protected Update Methods (method is overloaded in custom_field_edit)
 		protected function UpdateCustomFieldFields() {
 			$this->objCustomField->CustomFieldQtypeId = $this->lstCustomFieldQtype->SelectedValue;
 			$this->objCustomField->DefaultCustomFieldValueId = $this->lstDefaultCustomFieldValue->SelectedValue;
 			$this->objCustomField->ShortDescription = $this->txtShortDescription->Text;
 			$this->objCustomField->ActiveFlag = $this->chkActiveFlag->Checked;
 			$this->objCustomField->RequiredFlag = $this->chkRequiredFlag->Checked;
+      $this->objCustomField->SearchbleFlag = $this->chkSearchableFlag->Checked;
+      if($this->blnAssetEntityType){
+      $this->objCustomField->AllAssetModelsFlag = $this->chkAllAssetModelsFlag->Checked; // check only if asset among searchable flag
+      }
 			$this->objCustomField->CreatedBy = $this->lstCreatedByObject->SelectedValue;
 			$this->objCustomField->CreationDate = $this->calCreationDate->DateTime;
 			$this->objCustomField->ModifiedBy = $this->lstModifiedByObject->SelectedValue;

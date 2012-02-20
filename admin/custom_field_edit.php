@@ -42,6 +42,8 @@
 	 */
 	class CustomFieldEditForm extends CustomFieldEditFormBase {
 
+    protected $arrAssetModels = array();
+
 		// Header Menu
 		protected $ctlHeaderMenu;
 
@@ -54,13 +56,24 @@
 		protected $dtgValue;
 		protected $lblHeaderCustomField;
 		protected $lblSelectionOption;
+   //Asset Models
+   // protected $chkAllAssetModels;
+    protected $lblAssetModelCode;
+    protected $lblAllAssetModels;
+    protected $txtAddAssetModel;
+ // protected $ctlAssetModelSearchTool;
+    protected $btnAddAssetModel;
+    protected $dtgAssetModels;
+//  protected $lblLookup;
+
 
 		protected function Form_Create() {
-
-			// Call SetupCustomField to either Load/Edit Existing or Create New
+      $this->blnAssetEntityType = false;
+      // Call SetupCustomField to either Load/Edit Existing or Create New
 			$this->SetupCustomField();
-
-			// Create the Header Menu
+      // Loading Asset Models for custom field if applyed
+      $this->arrAssetModels = AssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
+      // Create the Header Menu
 			$this->ctlHeaderMenu_Create();
 
 			// Create/Setup Controls for CustomField's Data Fields
@@ -72,14 +85,27 @@
 			$this->lstDefaultValue_Create();
 			$this->chkActiveFlag_Create();
 			$this->chkRequiredFlag_Create();
-			$this->lblHeaderCustomField_Create();
+      $this->lblHeaderCustomField_Create();
 			$this->lblSelectionOption_Create();
+      // asset model custom fields
+      $this->chkSearchableFlag_Create();
 
 			// Create/Setup Controls for Custom Field Options
 			// CustomFieldQtypeId 2 = Select
 			$this->txtValue_Create();
 			$this->btnAdd_Create();
 			$this->dtgValue_Create();
+
+      // EntityQtype 1 = Asset
+      $this->lblAllAssetModels_Create();
+      $this->chkAllAssetModelsFlag_Create();
+      $this->lblAssetModelCode_Create();
+      $this->txtAddAssetModel_Create();
+      $this->dtgAssetModels_Create();
+      //$this->ctlAssetModelSearchTool_Create();
+      $this->btnAddAssetModel_Create();
+
+
 
 			// If the Qtype is 'Select', show the list of options
 			if ($this->objCustomField->CustomFieldQtypeId == 2) {
@@ -110,7 +136,10 @@
 				$this->dtgValue->DataSource = CustomFieldValue::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId, $objClauses);
 				$this->dtgValue->ShowHeader = true;
 			}
-		}
+
+      // Set data binder for Asset Model DataGrig
+      $this->dtgAssetModels_Bind();
+    }
 
   	// Create and Setup the Header Composite Control
   	protected function ctlHeaderMenu_Create() {
@@ -123,7 +152,7 @@
 			$this->lstCustomFieldQtype->Name = QApplication::Translate('Field Type');
 			$this->lstCustomFieldQtype->Required = true;
 			foreach (CustomFieldQtype::$NameArray as $intId => $strValue)
-				$this->lstCustomFieldQtype->AddItem(new QListItem(ucfirst($strValue), $intId, $this->objCustomField->CustomFieldQtypeId == $intId));
+			$this->lstCustomFieldQtype->AddItem(new QListItem(ucfirst($strValue), $intId, $this->objCustomField->CustomFieldQtypeId == $intId));
 			$this->lstCustomFieldQtype->AddAction(new QChangeEvent(), new QAjaxAction('lstCustomFieldQtype_Change'));
 			if ($this->blnEditMode) {
 				// Even though sometimes this isn't displayed, it must be created because we use the selected value in some AJAX updates
@@ -146,7 +175,7 @@
 		// Create/Setup the list of EntityQtypes (either Assets or Inventory)
 		protected function chkEntityQtype_Create() {
 
-			$this->chkEntityQtype = new QCheckBoxList($this);
+      $this->chkEntityQtype = new QCheckBoxList($this);
 			$this->chkEntityQtype->Name = 'Active For';
 			/*
 			$this->chkEntityQtype->AddItem('Assets', 1);
@@ -175,6 +204,7 @@
 				foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
 					if ($objEntityQtypeCustomField->EntityQtypeId == 1) {
 						$objAssetListItem->Selected = true;
+            $this->blnAssetEntityType = true;
 					}
 					if ($objEntityQtypeCustomField->EntityQtypeId == 2) {
 						$objInventoryListItem->Selected = true;
@@ -215,9 +245,9 @@
 			$this->chkEntityQtype->AddItem($objAddressListItem);
 			$this->chkEntityQtype->AddItem($objShipmentListItem);
 			$this->chkEntityQtype->AddItem($objReceiptListItem);
-		}
-
-		// Create/Setup the Value textbox
+      $this->chkEntityQtype->AddAction(new QClickEvent(), new QServerAction('objAssetListItem_Click'));
+    }
+    // Create/Setup the Value textbox
 		protected function txtValue_Create() {
 
 			$this->txtValue = new QTextBox($this);
@@ -309,6 +339,10 @@
 			$this->chkRequiredFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
+    protected function chkSearchableFlag_Create() {
+     	parent::chkSearchableFlag_Create();
+    }
+
 		// Create/Setup the Short Description textbox
 		protected function txtShortDescription_Create() {
 			parent::txtShortDescription_Create();
@@ -332,6 +366,126 @@
 				$this->lblSelectionOption->Display = false;
 			}
 		}
+
+    protected function chkAllAssetModelsFlag_Create(){
+      parent::chkAllAssetModelsFlag_Create();
+      $this->chkAllAssetModelsFlag->CausesValidation = false;
+      $this->chkAllAssetModelsFlag->AddAction(new QChangeEvent(), new QAjaxAction('chkAllAssetModelsFlag_Click'));
+      $this->chkAllAssetModelsFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+      if(!$this->blnAssetEntityType){
+        $this->chkAllAssetModelsFlag->Visible = false;
+      }
+    }
+    //Create/Setup "Selection Option" label
+  	protected function lblAllAssetModels_Create() {
+  		$this->lblAllAssetModels = new QLabel($this);
+  		$this->lblAllAssetModels->Text = 'All Asset Models';
+ 			if (!$this->blnAssetEntityType) {
+         $this->lblAllAssetModels->Visible = false;
+      }
+  	}
+
+    //Create/Setup "Selection Option" label
+  	protected function lblAssetModelCode_Create() {
+  		$this->lblAssetModelCode = new QLabel($this);
+  		$this->lblAssetModelCode->Text = 'Asset Model Code:';
+      if (!$this->blnAssetEntityType||
+         $this->chkAllAssetModelsFlag->Checked) {
+
+         $this->lblAssetModelCode->Visible = false;
+        }
+  		}
+
+    protected function txtAddAssetModel_Create(){
+      $this->txtAddAssetModel = new QTextBox($this);
+      $this->txtAddAssetModel->Name = QApplication::Translate('Add Asset Model');
+      $this->txtAddAssetModel->CausesValidation = false;
+     	$this->txtAddAssetModel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAssetModel_Click'));
+     	$this->txtAddAssetModel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+      if (!$this->blnAssetEntityType ||
+        $this->chkAllAssetModelsFlag->Checked) {
+          $this->txtAddAssetModel->Visible = false;
+        }
+
+    }
+
+//    protected function ctlAssetModelSearchTool_Create() {
+//   	  //$this->ctlAssetModelSearchTool = new QInventorySearchToolComposite($this);
+//
+//   	  $this->lblLookup = new QLabel($this);
+// 		  $this->lblLookup->HtmlEntities = false;
+// 		  $this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+// 		 // $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
+// 		 // $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
+// 		 // $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+//   	}
+
+    // Create datagrid Asset Models
+    protected function dtgAssetModels_Create(){
+      $this->dtgAssetModels = new QDataGrid($this);
+      $this->dtgAssetModels->CellPadding = 5;
+      $this->dtgAssetModels->CellSpacing = 0;
+      $this->dtgAssetModels->CssClass = "datagrid";
+
+      // Enable AJAX - this won't work while using the DB profiler
+      $this->dtgAssetModels->UseAjax = true;
+
+      // Enable Pagination, and set to 20 items per page
+      $objPaginator = new QPaginator($this->dtgAssetModels);
+      $this->dtgAssetModels->Paginator = $objPaginator;
+      $this->dtgAssetModels->ItemsPerPage = 20;
+
+      $this->dtgAssetModels->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink($_ITEM,"bluelink"); ?>', array('CssClass' => "dtg_column" , 'HtmlEntities'=>false)));
+      $this->dtgAssetModels->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetModelsColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+
+      $objStyle = $this->dtgAssetModels->RowStyle;
+      $objStyle->ForeColor = '#000000';
+      $objStyle->BackColor = '#FFFFFF';
+      $objStyle->FontSize = 12;
+
+      $objStyle = $this->dtgAssetModels->AlternateRowStyle;
+      $objStyle->BackColor = '#EFEFEF';
+
+      $objStyle = $this->dtgAssetModels->HeaderRowStyle;
+      $objStyle->ForeColor = '#000000';
+      $objStyle->BackColor = '#EFEFEF';
+      $objStyle->CssClass = 'dtg_header';
+
+      if(!$this->blnAssetEntityType ||
+        $this->chkAllAssetModelsFlag->Checked){
+        $this->dtgAssetModels->Visible = false;
+      }
+
+    }
+
+    public function dtgAssetModels_Bind() {
+      $this->dtgAssetModels->TotalItemCount = count($this->arrAssetModels);
+       // AssetCustomFieldAssetModel::CountByCustomFieldId($this->objCustomField->CustomFieldId);
+   		if ($this->dtgAssetModels->TotalItemCount == 0) {
+   			$this->dtgAssetModels->ShowHeader = false;
+   		}
+   		else {
+        $intItemsPerPage =  $this->dtgAssetModels->ItemsPerPage;
+        $intItemOffset   = ($this->dtgAssetModels->PageNumber - 1) * $intItemsPerPage;
+        $arrDataSource   = array_slice($this->arrAssetModels, $intItemOffset, $intItemsPerPage);
+   			$this->dtgAssetModels->DataSource = $arrDataSource;
+   			$this->dtgAssetModels->ShowHeader = true;
+   		}
+    }
+
+
+    // Create/Setup the AddAssetModel button
+  		protected function btnAddAssetModel_Create() {
+
+  			$this->btnAddAssetModel = new QButton($this);
+  			$this->btnAddAssetModel->Text = 'Add';
+  			$this->btnAddAssetModel->AddAction(new QClickEvent(), new QAjaxAction('btnAddAssetModel_Click'));
+  			$this->btnAddAssetModel->CausesValidation = false;
+        if(!$this->blnAssetEntityType||
+          $this->chkAllAssetModelsFlag->Checked){
+          $this->btnAddAssetModel->Visible = false;
+        }
+  	}
 
 		// Create/Setup the Add button
 		protected function btnAdd_Create() {
@@ -405,6 +559,29 @@
       return $btnRemove->RenderWithError(false);
 		}
 
+    // Render the remove button column in the Asset Models datagrid
+  		public function RemoveAssetModelsColumn_Render(AssetCustomFieldAssetModel $objAssetCustomFieldAssetModel) {
+
+        $strControlId = 'btnAssetModelRemove' . $objAssetCustomFieldAssetModel->AssetModelId;
+        $btnAssetModelRemove = new QButton($this->dtgAssetModels/*, $strControlId*/);
+        $btnAssetModelRemove->Text = 'Remove';
+        $btnAssetModelRemove->ActionParameter = $objAssetCustomFieldAssetModel->AssetModelId;
+        $btnAssetModelRemove->AddAction(new QClickEvent(), new QAjaxAction('btnAssetModelRemove_Click'));
+        $btnAssetModelRemove->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAssetModelRemove_Click'));
+        $btnAssetModelRemove->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+        $btnAssetModelRemove->CausesValidation = false;
+        return $btnAssetModelRemove->RenderWithError(false);
+  		}
+
+    public function btnAssetModelRemove_Click($strFormId, $strControlId, $strParameter){
+       foreach ($this->arrAssetModels as $key => $objAssetModel) {
+         if($objAssetModel->AssetModelId == (int)$strParameter){
+           array_splice($this->arrAssetModels, $key,1);
+         }
+       }
+       $this->dtgAssetModels->Refresh();
+    }
+
 		// This method triggers when the required checkbox is clicked
 		protected function chkRequiredFlag_Click($strFormId, $strControlId, $strParameter) {
 
@@ -425,6 +602,15 @@
 				$this->lstDefaultValue->Enabled = false;
 			}
 		}
+
+    protected function chkAllAssetModelsFlag_Click() {
+      if ($this->chkAllAssetModelsFlag->Checked){
+        $this->DisplayAssetModels(false);
+      }
+      else{
+        $this->DisplayAssetModels(true);
+      }
+    }
 
 		// This method triggers when the custom field qtype listbox is changed
 		// This can only happen when creating a new custom field - the ability to change custom field types has been removed for Beta2
@@ -460,6 +646,72 @@
 				}
 			}
 		}
+
+    protected function objAssetListItem_Click(){
+      $EntityTypes = $this->chkEntityQtype->SelectedValues;
+      if (in_array('1',$EntityTypes)){
+        $this->blnAssetEntityType = true;
+        $this->lblAllAssetModels->Visible = true;
+        $this->chkAllAssetModelsFlag->Visible = true;
+        if(!$this->chkAllAssetModelsFlag->Checked){
+          $this->lblAssetModelCode->Display = true;
+          $this->txtAddAssetModel->Display = true;
+          $this->btnAddAssetModel->Display = true;
+          $this->dtgAssetModels->Display = true;
+          $this->DisplayAssetModels();
+        }
+      }
+      else{
+        $this->blnAssetEntityType = false;
+        $this->lblAllAssetModels->Visible = false;
+        $this->chkAllAssetModelsFlag->Visible = false;
+        $this->lblAssetModelCode->Visible = false;
+        $this->txtAddAssetModel->Visible = false;
+        $this->btnAddAssetModel->Visible = false;
+        $this->dtgAssetModels->Visible = false;
+      }
+    }
+
+    protected function btnAddAssetModel_Click() {
+      $blnError = false;
+      if (strlen(trim($this->txtAddAssetModel->Text)) == 0) {
+      	$blnError = true;
+      	$this->txtAddAssetModel->Warning = QApplication::Translate('You can not enter blank selection option.');
+      	}
+      if (!$blnError){
+        // $assetModelToAdd = AssetModel::QuerySingle(QQ::Equal(QQN::AssetModel()->ShortDescription,$this->txtAddAssetModel->Text));
+        // Check if quering asset model exists(QuerySingle method doesnt work!)
+        $assetModelToAdd = AssetModel::QueryArray(QQ::Equal(QQN::AssetModel()->AssetModelCode, $this->txtAddAssetModel->Text));
+        if (count($assetModelToAdd)>0){
+          $assetModelToAdd = $assetModelToAdd[0];
+          if($assetModelToAdd instanceof AssetModel){
+            // Check if asset model is already in list
+            if (count($this->arrAssetModels)>0){
+              foreach($this->arrAssetModels as $assetModel){
+                if ($assetModel->AssetModelId == $assetModelToAdd->AssetModelId){
+                  $blnError = true;
+                  $this->txtAddAssetModel->Warning = QApplication::Translate("That asset model has already been added.");
+                }
+              }
+            }
+            if(!$blnError){
+              $objAssetModelToAdd = new AssetCustomFieldAssetModel();
+              $objAssetModelToAdd->AssetModelId  = $assetModelToAdd->AssetModelId;
+              $objAssetModelToAdd->CustomFieldId = $this->objCustomField->CustomFieldId;
+              array_push($this->arrAssetModels,$objAssetModelToAdd);
+              $this->dtgAssetModels->Refresh();
+            }
+          }
+        }
+
+        else {
+          $blnError = true;
+          $this->txtAddAssetModel->Warning = QApplication::Translate("That asset model code does not exist.");
+        }
+        //$this->objAssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
+      }
+
+    }
 
 		// Remove button click action for each asset in the datagrid
 		// This only affects select custom fields, not text or textarea
@@ -564,6 +816,13 @@
 					$this->btnCancel->Warning = sprintf("'%s' is a Tracmor restricted word. Please choose another name for this custom field", $this->txtShortDescription->Text);
 				}
 
+        if (in_array('1', $this->chkEntityQtype->SelectedValues)
+            && !$this->chkAllAssetModelsFlag->Checked
+            && count($this->arrAssetModels)== 0){
+          $blnError = true;
+          $this->btnCancel->Warning = 'You must apply at least one Asset Model.';
+        }
+
 				if ($this->blnEditMode) {
 					$objCustomFieldDuplicate = CustomField::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::CustomField()->ShortDescription, $this->txtShortDescription->Text), QQ::NotEqual(QQN::CustomField()->CustomFieldId, $this->objCustomField->CustomFieldId)));
 				}
@@ -576,8 +835,9 @@
 				}
 
 				if (!$blnError) {
+
 					$this->UpdateCustomFieldFields();
-					$this->objCustomField->Save();
+          $this->objCustomField->Save();
 
 					// If this field is a required field
 					if ($this->objCustomField->RequiredFlag) {
@@ -651,9 +911,9 @@
 			$objDatabase = QApplication::$Database[1];
 			$objDatabase->NonQuery($strQuery);
 
-			$this->DeleteEntityQtypeCustomFields();
+      $this->DeleteEntityQtypeCustomFields();
 
-			parent::btnDelete_Click($strFormId, $strControlId, $strParameter);
+      parent::btnDelete_Click($strFormId, $strControlId, $strParameter);
 		}
 
 		// Protected Update Methods
@@ -680,6 +940,11 @@
 			$this->objCustomField->ShortDescription = $this->txtShortDescription->Text;
 			$this->objCustomField->ActiveFlag = $this->chkActiveFlag->Checked;
 			$this->objCustomField->RequiredFlag = $this->chkRequiredFlag->Checked;
+      $this->objCustomField->SearchableFlag = $this->chkSearchableFlag->Checked;
+      if($this->blnAssetEntityType){
+        $this->objCustomField->AllAssetModelsFlag = $this->chkAllAssetModelsFlag->Checked;
+      }
+
 		}
 
 		protected function UpdateEntityQtypeCustomFields() {
@@ -729,9 +994,18 @@
 						  $strQuery = sprintf("ALTER TABLE %s DROP `cfv_%s`;", $strHelperTable,  $this->objCustomField->CustomFieldId);
 						  $objDatabase->NonQuery($strQuery);
 						}
+            if($objEntityQtypeCustomField->EntityQtypeId == 1){
+              $this->DeleteAssetCustomFieldAssetModels();
+            }
 						// Delete the EntityQtypeCustomField last
 						$objEntityQtypeCustomField->Delete();
 					}
+          // Update Asset Models for Asset EntityQType
+          else {
+            if($objEntityQtypeCustomField->EntityQtypeId == 1){
+              $this->UpadateAssetModels();
+            }
+          }
 				}
 			}
 
@@ -741,7 +1015,12 @@
 			  foreach ($this->chkEntityQtype->SelectedItems as $objEntityQtypeItem) {
 					// If the field doesn't already exist, then it needs to be created
 					if (!($objEntityQtypeCustomField = EntityQtypeCustomField::LoadByEntityQtypeIdCustomFieldId($objEntityQtypeItem->Value, $this->objCustomField->CustomFieldId))) {
-						$objEntityQtypeCustomField = new EntityQtypeCustomField();
+					  // add asset models
+						if($objEntityQtypeItem->Value == 1){
+              $this->AppendAssetModels();
+            }
+
+            $objEntityQtypeCustomField = new EntityQtypeCustomField();
 						$objEntityQtypeCustomField->CustomFieldId = $this->objCustomField->CustomFieldId;
 						$objEntityQtypeCustomField->EntityQtypeId = $objEntityQtypeItem->Value;
 						$objEntityQtypeCustomField->Save();
@@ -803,9 +1082,31 @@
     				    $blnError = true;
     				  }
     				  if (!$blnError) {
-      				  $objDatabase = CustomField::GetDatabase();
-    					  $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `cfv_%s` is NULL;", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
-      				  $objDatabase->NonQuery($strQuery);
+              //  if(!($this->blnAssetEntityType&&!$this->chkAllAssetModelsFlag->Checked)){
+                  $objDatabase = CustomField::GetDatabase();
+                  $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `cfv_%s` is NULL;", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
+                  $objDatabase->NonQuery($strQuery);
+               /* }
+                else{
+
+                   // define assets to set default value
+                  $chosenAssetModels = array();
+                   foreach($this->arrAssetModels as $chosenAssetModel){
+                     $assetsToFill = Asset::LoadArrayByAssetModelId($chosenAssetModel->AssetModelId);
+                     if (count($assetsToFill>0)){
+                       foreach ($assetsToFill as $assetToFill){
+                         array_push($chosenAssetModels,$assetToFill->AssetId);
+                       }
+                     }
+                   }
+                  $chosenAssetModels =  implode(",", $chosenAssetModels);
+                  $objDatabase = CustomField::GetDatabase();
+                  print($chosenAssetModels);exit;
+                  $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `asset_id` IN ($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
+                  $objDatabase->NonQuery($strQuery);
+                  $strQuery = sprintf("UPDATE %s SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
+                  $objDatabase->NonQuery($strQuery);
+                }*/
     				  }
     				}
           }
@@ -815,14 +1116,19 @@
 
 		protected function DeleteEntityQtypeCustomFields(){
 			$objEntityQtypeCustomFieldArray = EntityQtypeCustomField::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
-			if ($objEntityQtypeCustomFieldArray) {
+     	if ($objEntityQtypeCustomFieldArray) {
 				foreach ($objEntityQtypeCustomFieldArray as $objEntityQtypeCustomField) {
 
-						// If the EntityQtype needs to be deleted, you must delete EntityQtypeId for all roles in RoleEntityQTypeCustomFieldAuthorization
+            // If the EntityQtype needs to be deleted, you must delete EntityQtypeId for all roles in RoleEntityQTypeCustomFieldAuthorization
 						$objRoleEntityCustomAuthArray=RoleEntityQtypeCustomFieldAuthorization::LoadArrayByEntityQtypeCustomFieldId($objEntityQtypeCustomField->EntityQtypeCustomFieldId);
 						if($objRoleEntityCustomAuthArray)foreach($objRoleEntityCustomAuthArray as $objRoleEntityCustomAuth){
 							$objRoleEntityCustomAuth->Delete();
 						}
+
+            // If there was Asset Type Custom field Delete AssetCustomField
+            if ($objEntityQtypeCustomField->EntityQtypeId == 1) {
+              $this->DeleteAssetCustomFieldAssetModels();
+            }
 
 						// If the helper table exists for that EntityQtype delete the columns in the helper table
 						if ($strHelperTableArray = CustomFieldValue::GetHelperTableByEntityQtypeId($objEntityQtypeCustomField->EntityQtypeId)) {
@@ -844,6 +1150,89 @@
 			$this->btnAdd->Visible = $blnValue;
 			$this->dtgValue->Visible = $blnValue;
 		}
+
+    protected function DisplayAssetModels($blnValue = true) {
+
+  		$this->txtAddAssetModel->Visible = $blnValue;
+  		$this->btnAddAssetModel->Visible = $blnValue;
+  		$this->dtgAssetModels->Visible = $blnValue;
+      $this->lblAssetModelCode->Visible = $blnValue;
+  	}
+    // Delete associated assetCustomFieldAssetModels
+    // used on Deleting CustomField, on Updating for not Asset Entity Type
+    private function DeleteAssetCustomFieldAssetModels(){
+      $arrToDelete = AssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
+      foreach ($arrToDelete as $itemToDelete){
+        $itemToDelete->Delete();
+      }
+    }
+    // Add associated assetCustomFieldAssetModels
+    // used on Save new CustomField, on Update CustomField for Asset Type instance if wasn't
+    // may be used after $this->objCustomField->Save();
+    private function AppendAssetModels(){
+      if($this->chkAllAssetModelsFlag->Checked){
+        $arrToAdd = AssetModel::LoadAll();
+        foreach ($arrToAdd as $itemToAdd){
+          $objAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
+          $objAssetCustomFieldAssetModel->AssetModelId  = $itemToAdd->AssetModelId;
+          $objAssetCustomFieldAssetModel->CustomFieldId = $this->objCustomField->CustomFieldId;
+          $objAssetCustomFieldAssetModel->Save();
+        }
+      }
+      else{
+        foreach ($this->arrAssetModels as $itemToAdd){
+        // if(!empty(AssetModel::Load($itemToAdd->AssetModelId)))
+          $itemToAdd->CustomFieldId = $this->objCustomField->CustomFieldId;
+          $itemToAdd->Save();
+        }
+      }
+    }
+
+    // Updating assigned Asset Models range
+    private function UpadateAssetModels(){
+
+      //If AssetModels not all or changed - some items might to be deleted
+      if(!$this->chkAllAssetModelsFlag->Checked){
+        $arrCurrentAssetModels = AssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
+        foreach ($arrCurrentAssetModels as $currentAssetModel){
+          $blnExists = false;
+          foreach ($this->arrAssetModels as $newAssetModel){
+            if($newAssetModel->AssetModelId == $currentAssetModel->AssetModelId){
+              $blnExists = true;
+            }
+          }
+          if(!$blnExists){
+            $currentAssetModel->Delete();
+          }
+        }
+      }
+      // Load All Asset Models to add
+      else{
+        $this->arrAssetModels = array();
+        $arrAssetModels = AssetModel::LoadAll();
+        foreach($arrAssetModels as $assetModel){
+          $newAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
+          $newAssetCustomFieldAssetModel->CustomFieldId  = $this->objCustomField->CustomFieldId;
+          $newAssetCustomFieldAssetModel->AssetModelId   = $assetModel->AssetModelId;
+          array_push($this->arrAssetModels,$newAssetCustomFieldAssetModel);
+        }
+      }
+      // Adding new assigned Model Assets
+      $arrCurrentAssetModels = AssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
+      foreach ($this->arrAssetModels as $newAssetModel){
+        $blnExists = false;
+        foreach($arrCurrentAssetModels as $currentAssetModel){
+          if($newAssetModel->AssetModelId == $currentAssetModel->AssetModelId){
+            $blnExists = true;
+              break;
+          }
+        }
+        if (!$blnExists){
+          $newAssetModel->Save();
+        }
+      }
+    }
+
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using

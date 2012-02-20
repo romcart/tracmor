@@ -75,6 +75,10 @@
 							<td class="record_field_name">Required: </td>
 							<td class="record_field_edit"><?php $this->chkRequiredFlag->RenderWithError(); ?></td>
 						</tr>
+            <tr>
+              <td class="record_field_name">Searchable: </td>
+              <td class="record_field_edit"><?php $this->chkSearchableFlag->RenderWithError(); ?></td>
+            </tr>
 						<tr>
 							<td class="record_field_name">Default Value: </td>
 							<td class="record_field_edit"><?php $this->txtDefaultValue->RenderWithError(); $this->lstDefaultValue->RenderWithError(); ?></td>
@@ -84,7 +88,7 @@
 			</tr>
 		</table>
 		<br />
-		<table>
+      <table>
 			<tr>
 				<td class="record_field_name"><?php $this->lblSelectionOption->Render(); ?> </td>
 				<td><?php $this->txtValue->RenderWithError(); ?></td>
@@ -92,7 +96,22 @@
 			</tr>
 		</table>
 		<?php $this->dtgValue->RenderWithError(); ?>
-
+		<table>
+      <tr>
+				<td class="record_field_name">
+          <?php $this->lblAssetModelCode->Render(); ?>
+          <?php $this->txtAddAssetModel->RenderWithError(); ?>
+          <?php //$this->ctlAssetModelSearchTool->Render(); ?>
+        </td>
+        <td>
+				  <?php $this->btnAddAssetModel->Render(); ?>
+        </td>
+			</tr>
+		</table>
+    <?php $this->chkAllAssetModelsFlag->Render(); ?> <?php $this->lblAllAssetModels->Render(); ?>
+		<?php $this->dtgAssetModels->RenderWithError(); ?>
+    <br />
+    <br />
 
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>
