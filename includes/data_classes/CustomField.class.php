@@ -466,9 +466,9 @@
 		 * @param integer $intEntityId e.g., AssetId, InventoryId
 		 * @return Array $objCustomFieldArray of CustomField objects
 		 */
-		public static function LoadObjCustomFieldArray($intEntityQtypeId, $blnEditMode, $intEntityId = null) {
+		public static function LoadObjCustomFieldArray($intEntityQtypeId, $blnEditMode, $intEntityId = null, $searchable = false) {
 			$objExpansionMap[CustomField::ExpandDefaultCustomFieldValue] = true;
-			$objCustomFieldArray = CustomField::LoadArrayByActiveFlagEntity(true, $intEntityQtypeId, null, null, $objExpansionMap);
+			$objCustomFieldArray = CustomField::LoadArrayByActiveFlagEntity(true, $intEntityQtypeId, null, null, $objExpansionMap, $searchable);
 			if ($objCustomFieldArray && $blnEditMode) {
 				foreach ($objCustomFieldArray as $objCustomField) {
 					$objCustomField->LoadExpandedArrayByEntity($intEntityQtypeId, $intEntityId);
@@ -510,13 +510,19 @@
 		 * @param Object ExpansionMap $objExpansionMap
 		 * @return Array CustomField[]
 		 */
-		public static function LoadArrayByActiveFlagEntity($blnActiveFlag, $intEntityQtypeId, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayByActiveFlagEntity($blnActiveFlag, $intEntityQtypeId, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $searchable = false) {
 			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
 			CustomField::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
 			// Properly Escape All Input Parameters using Database->SqlVariable()
 			$blnActiveFlag = $objDatabase->SqlVariable($blnActiveFlag, true);
 			$intEntityQtypeId = $objDatabase->SqlVariable($intEntityQtypeId, true);
+
+     // Add searching mode
+      $strSearchable = '';
+      if ($searchable){
+        $strSearchable = ' `custom_field`.`searchable_flag` = 1 AND ';
+      }
 
 			// Setup the SQL Query
 			$strQuery = sprintf('
@@ -529,15 +535,16 @@
 					`custom_field` AS `custom_field`
 					%s
 				WHERE
+				  %s
 					`custom_field`.`active_flag` %s AND
 					`custom_field`.`custom_field_id` = `entity_qtype_custom_field`.`custom_field_id` AND
 					`entity_qtype_custom_field`.`entity_qtype_id` %s
 				%s
-				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom,
+				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom, $strSearchable,
 				$blnActiveFlag, $intEntityQtypeId, 
 				$strOrderBy, $strLimitSuffix);
 
-			// Perform the Query and Instantiate the Result
+   			// Perform the Query and Instantiate the Result
 			$objDbResult = $objDatabase->Query($strQuery);
 			return CustomField::InstantiateDbResult($objDbResult);
 		}
