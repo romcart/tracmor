@@ -33,7 +33,6 @@ class QAssetEditComposite extends QControl {
 	protected $lblAssetModel;
 	protected $lblLocation;
 	protected $lblAssetModelCode;
-  protected $lblAssetCustomFields;
 	protected $lblManufacturer;
 	protected $lblCategory;
 	protected $lblReservedBy;
@@ -112,8 +111,7 @@ class QAssetEditComposite extends QControl {
     $this->lblHeaderAssetCode_Create();
 		$this->lblLocation_Create();
 		$this->lblAssetModelCode_Create();
-    $this->lblAssetCustomFields_Create();
-		$this->lblManufacturer_Create();
+    $this->lblManufacturer_Create();
 		$this->lblCategory_Create();
 		$this->lblReservedBy_Create();
 		$this->lblCheckedOutTo_Create();
@@ -238,8 +236,12 @@ class QAssetEditComposite extends QControl {
 	protected function customFields_Create() {
 
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
-		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
-
+		if($this->blnEditMode){
+    $this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId, false, $this->objAsset->AssetModelId);
+    }
+    else{
+      $this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId, false, 'all');
+    }
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this, true, true);
 
@@ -375,14 +377,6 @@ class QAssetEditComposite extends QControl {
 		// It is better to use late-binding here because we are only getting one record
 		$this->lblAssetModelCode = new QLabel($this);
 		$this->lblAssetModelCode->Name = 'Asset Model Code';
-	}
-
-  // Create the Asset Custom Fields label
-	protected function lblAssetCustomFields_Create() {
-		// It is better to use late-binding here because we are only getting one record
-		$this->lblAssetCustomFields = new QLabel($this);
-		$this->lblAssetCustomFields->Name = 'Asset Custom Fields';
-    $this->lblAssetCustomFields->HtmlEntities = true;
 	}
 
 	// Create the Manufacturer Label
@@ -831,11 +825,11 @@ class QAssetEditComposite extends QControl {
 				if ($objAssetModel->Category) {
 					$this->lblCategory->Text = $objAssetModel->Category->ShortDescription;
 				}
-        if($objAssetModel->AssetModelId){
-          $this->lblAssetCustomFields->Text = $this->LoadAssetCustomFields($objAssetModel->AssetModelId);
+        if ($objAssetModel->AssetModelId){
+          $this->reloadCustomFields($objAssetModel->AssetModelId);
         }
         else{
-          $this->lblAssetCustomFields->Text = '-' ;
+          $this->reloadCustomFields('all');
         }
 			}
 		}
@@ -1424,8 +1418,7 @@ class QAssetEditComposite extends QControl {
 		if ($this->objAsset->AssetModelId) {
 			$this->lblAssetModel->Text = $this->objAsset->AssetModel->__toStringWithLink();
 			$this->lblAssetModelCode->Text = $this->objAsset->AssetModel->AssetModelCode;
-      $this->lblAssetCustomFields->Text = $this->LoadAssetCustomFields($this->objAsset->AssetModel->AssetModelId);
-			if ($this->objAsset->AssetModel->CategoryId) {
+      	if ($this->objAsset->AssetModel->CategoryId) {
 				$this->lblCategory->Text = $this->objAsset->AssetModel->Category->__toString();
 			}
 			if ($this->objAsset->AssetModel->ManufacturerId) {
@@ -1517,6 +1510,23 @@ class QAssetEditComposite extends QControl {
 				}
 			}
 		}
+    //
+  public function reloadCustomFields($intAssetModelId){
+    // Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
+          $this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId, false, $intAssetModelId);
+
+    		// Create the Custom Field Controls - labels and inputs (text or list) for each
+    		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this, true, true);
+
+    		// Add TabIndex for all txt custom fields
+    		foreach ($this->arrCustomFields as $arrCustomField) {
+    		  if (array_key_exists('input', $arrCustomField))
+    		    $arrCustomField['input']->TabIndex = $this->GetNextTabIndex();
+    		}
+
+    		//Setup Custom Fields
+    		$this->UpdateCustomFields();
+  }
 	//Set display logic of the GreenPlusButton of AssetModel
 	protected function UpdateAssetModelAccess() {
 		//checks if the entity 4 (AssetModel) has edit authorization
@@ -1528,19 +1538,6 @@ class QAssetEditComposite extends QControl {
 			$this->lblNewAssetModel->Visible=false;
 		}
 	}
-  // Load Asset Custom Fields
-  private function LoadAssetCustomFields($intAssetModelId){
-    $strAssetCustomField = '';
-      $arrAssetCustomFields = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($intAssetModelId);
-        foreach ($arrAssetCustomFields as $anAssetCustomField){
-          if (!empty($strAssetCustomField)){
-            $strAssetCustomField .= ', ';
-          }
-          $strAssetCustomField .= $anAssetCustomField->CustomField->ShortDescription;
-        }
-    return $strAssetCustomField;
-  }
-
 	public function getShipReceiveDate($objItem) {
 	  if ($objItem->Transaction->TransactionTypeId == 6) {
 	    return $objItem->Transaction->Shipment->ShipDate;

@@ -113,7 +113,7 @@
 				}
 			}
 		}
-		
+
 		/**
 		 * This method returns the name of the helper table based on their entity_qtype_id
 		 * @param integer $intEntityQtypeId
@@ -466,7 +466,7 @@
 		 * @param integer $intEntityId e.g., AssetId, InventoryId
 		 * @return Array $objCustomFieldArray of CustomField objects
 		 */
-		public static function LoadObjCustomFieldArray($intEntityQtypeId, $blnEditMode, $intEntityId = null, $searchable = false) {
+		public static function LoadObjCustomFieldArray($intEntityQtypeId, $blnEditMode, $intEntityId = null, $searchable = false, $intAssetModel = null) {
 			$objExpansionMap[CustomField::ExpandDefaultCustomFieldValue] = true;
 			$objCustomFieldArray = CustomField::LoadArrayByActiveFlagEntity(true, $intEntityQtypeId, null, null, $objExpansionMap, $searchable);
 			if ($objCustomFieldArray && $blnEditMode) {
@@ -474,7 +474,35 @@
 					$objCustomField->LoadExpandedArrayByEntity($intEntityQtypeId, $intEntityId);
 				}
 			}
-			
+      // Custom Fiedls load for Asset in asset_edit
+       if($intAssetModel){
+        $arrCustomFieldsForAssetModel = array();
+        // Select only
+      if(is_int($intAssetModel)){
+          $arrAssetCustomFields = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($intAssetModel);
+          foreach($arrAssetCustomFields as $anAssetCustomField){
+            $arrCustomFieldsForAssetModel[] = $anAssetCustomField->CustomField->CustomFieldId;
+          }
+        }
+        // find
+        elseif($intAssetModel == 'all') {
+          $arrAssetCustomFields = EntityQtypeCustomField::LoadArrayByEntityQtypeId(1);
+          foreach($arrAssetCustomFields as $anAssetCustomField){
+            if($anAssetCustomField->CustomField->AllAssetModelsFlag){
+              $arrCustomFieldsForAssetModel[] = $anAssetCustomField->CustomField->CustomFieldId;
+            }
+          }
+        }
+        $arrForAssetModel = array();
+        foreach ($objCustomFieldArray as $objCustomField)
+        {
+          if(in_array($objCustomField->CustomFieldId,$arrCustomFieldsForAssetModel)){
+            $arrForAssetModel[] = $objCustomField;
+          }
+        }
+        $objCustomFieldArray = $arrForAssetModel;
+      }
+
 			if($objCustomFieldArray)foreach ($objCustomFieldArray as $objCustomField) {
 				$objEntityQtypeCustomField=EntityQtypeCustomField::LoadByEntityQtypeIdCustomFieldId($intEntityQtypeId,$objCustomField->CustomFieldId);
 				if($objEntityQtypeCustomField){					
