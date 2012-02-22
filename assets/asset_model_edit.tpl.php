@@ -114,7 +114,10 @@
 				</td>
 			</tr>
 		</table>
-		
+<?php
+$this->chkAssetCustomFields->RenderWithName();
+?>
+
 <?php
 $this->pnlAttachments->Render();
 ?>
