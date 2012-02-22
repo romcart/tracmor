@@ -273,10 +273,18 @@
 
 		// Control ServerActions
 		public function btnSave_Click($strFormId, $strControlId, $strParameter) {
-			$this->UpdateAssetModelFields();
+      $this->UpdateAssetModelFields();
 			$this->objAssetModel->Save();
-
-
+      // Adding AssetCustomFieldsAssetModels with allAssetModel flag checked
+      $arrAllAssetModelsFlaggedObjects = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
+      foreach ($arrAllAssetModelsFlaggedObjects as $arrAllAssetModelsFlaggedObject){
+        if ($arrAllAssetModelsFlaggedObject->CustomField->AllAssetModelsFlag){
+          $newAssetCustomField = new AssetCustomFieldAssetModel();
+          $newAssetCustomField->CustomFieldId = $arrAllAssetModelsFlaggedObject->CustomField->CustomFieldId;
+          $newAssetCustomField->AssetModelId  = $this->objAssetModel->AssetModelId;
+          $newAssetCustomField->Save();
+        }
+      }
 			$this->CloseSelf(true);
 		}
 

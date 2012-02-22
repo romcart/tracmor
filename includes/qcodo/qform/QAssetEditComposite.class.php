@@ -33,6 +33,7 @@ class QAssetEditComposite extends QControl {
 	protected $lblAssetModel;
 	protected $lblLocation;
 	protected $lblAssetModelCode;
+  protected $lblAssetCustomFields;
 	protected $lblManufacturer;
 	protected $lblCategory;
 	protected $lblReservedBy;
@@ -111,6 +112,7 @@ class QAssetEditComposite extends QControl {
     $this->lblHeaderAssetCode_Create();
 		$this->lblLocation_Create();
 		$this->lblAssetModelCode_Create();
+    $this->lblAssetCustomFields_Create();
 		$this->lblManufacturer_Create();
 		$this->lblCategory_Create();
 		$this->lblReservedBy_Create();
@@ -373,6 +375,14 @@ class QAssetEditComposite extends QControl {
 		// It is better to use late-binding here because we are only getting one record
 		$this->lblAssetModelCode = new QLabel($this);
 		$this->lblAssetModelCode->Name = 'Asset Model Code';
+	}
+
+  // Create the Asset Custom Fields label
+	protected function lblAssetCustomFields_Create() {
+		// It is better to use late-binding here because we are only getting one record
+		$this->lblAssetCustomFields = new QLabel($this);
+		$this->lblAssetCustomFields->Name = 'Asset Custom Fields';
+    $this->lblAssetCustomFields->HtmlEntities = true;
 	}
 
 	// Create the Manufacturer Label
@@ -821,6 +831,12 @@ class QAssetEditComposite extends QControl {
 				if ($objAssetModel->Category) {
 					$this->lblCategory->Text = $objAssetModel->Category->ShortDescription;
 				}
+        if($objAssetModel->AssetModelId){
+          $this->lblAssetCustomFields->Text = $this->LoadAssetCustomFields($objAssetModel->AssetModelId);
+        }
+        else{
+          $this->lblAssetCustomFields->Text = '-' ;
+        }
 			}
 		}
 	}
@@ -1408,6 +1424,7 @@ class QAssetEditComposite extends QControl {
 		if ($this->objAsset->AssetModelId) {
 			$this->lblAssetModel->Text = $this->objAsset->AssetModel->__toStringWithLink();
 			$this->lblAssetModelCode->Text = $this->objAsset->AssetModel->AssetModelCode;
+      $this->lblAssetCustomFields->Text = $this->LoadAssetCustomFields($this->objAsset->AssetModel->AssetModelId);
 			if ($this->objAsset->AssetModel->CategoryId) {
 				$this->lblCategory->Text = $this->objAsset->AssetModel->Category->__toString();
 			}
@@ -1511,6 +1528,18 @@ class QAssetEditComposite extends QControl {
 			$this->lblNewAssetModel->Visible=false;
 		}
 	}
+  // Load Asset Custom Fields
+  private function LoadAssetCustomFields($intAssetModelId){
+    $strAssetCustomField = '';
+      $arrAssetCustomFields = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($intAssetModelId);
+        foreach ($arrAssetCustomFields as $anAssetCustomField){
+          if (!empty($strAssetCustomField)){
+            $strAssetCustomField .= ', ';
+          }
+          $strAssetCustomField .= $anAssetCustomField->CustomField->ShortDescription;
+        }
+    return $strAssetCustomField;
+  }
 
 	public function getShipReceiveDate($objItem) {
 	  if ($objItem->Transaction->TransactionTypeId == 6) {
