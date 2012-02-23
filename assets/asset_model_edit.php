@@ -379,13 +379,17 @@ class AssetModelEditForm extends AssetModelEditFormBase {
         if($this->blnEditMode){
           $selected = in_array($arrAssetCustomFieldOption->CustomField->CustomFieldId,$arrChosenCustomFieldId);
         }
-        else{
+   /*     else{
           $selected = $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag;
         }
+   *///Excluding AllAssetModelsFligged Items just untill stupping qcodo 4.22
+        if(!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
+          &&$arrAssetCustomFieldOption->CustomField->ActiveFlag){
         $this->chkAssetCustomFields->AddItem(new QListItem($arrAssetCustomFieldOption->CustomField->ShortDescription,
                                                            $arrAssetCustomFieldOption->CustomField->CustomFieldId,
                                                            $selected
                                                            ));
+        }
       }
     }
     else {

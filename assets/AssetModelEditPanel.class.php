@@ -142,7 +142,16 @@
 			
 			$this->UpdateAssetModelFields();
 			$this->objAssetModel->Save();
-			
+			// Adding AssetCustomFieldsAssetModels with allAssetModel flag checked
+      $arrAllAssetModelsFlaggedObjects = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
+      foreach ($arrAllAssetModelsFlaggedObjects as $arrAllAssetModelsFlaggedObject){
+        if ($arrAllAssetModelsFlaggedObject->CustomField->AllAssetModelsFlag){
+          $newAssetCustomField = new AssetCustomFieldAssetModel();
+          $newAssetCustomField->CustomFieldId = $arrAllAssetModelsFlaggedObject->CustomField->CustomFieldId;
+          $newAssetCustomField->AssetModelId  = $this->objAssetModel->AssetModelId;
+          $newAssetCustomField->Save();
+        }
+      }
 			// Assign input values to custom fields
 			if ($this->arrCustomFields) {
 				// Save the values from all of the custom field controls
