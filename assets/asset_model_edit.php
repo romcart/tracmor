@@ -393,7 +393,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
       }
     }
     else {
-      $this->chkAssetCustomFields->display = false;
+      $this->chkAssetCustomFields->Display = false;
     }
   }
 
