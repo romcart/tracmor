@@ -31,12 +31,11 @@
 		protected $chkActiveFlag;
 		protected $chkRequiredFlag;
     protected $chkSearchableFlag;
-    protected $chkAllAssetModelsFlag;
 		protected $lstCreatedByObject;
 		protected $calCreationDate;
 		protected $lstModifiedByObject;
 		protected $lblModifiedDate;
-
+    protected $rblAllAssetModels;
 		// Other ListBoxes (if applicable) via Unique ReverseReferences and ManyToMany References
 
 		// Button Actions
@@ -75,12 +74,11 @@
 			$this->chkActiveFlag_Create();
 			$this->chkRequiredFlag_Create();
       $this->chkSearchableFlag_Create();
-      $this->chkAllAssetModelsFlag_Create();
 			$this->lstCreatedByObject_Create();
 			$this->calCreationDate_Create();
 			$this->lstModifiedByObject_Create();
 			$this->lblModifiedDate_Create();
-
+      $this->rblAllAssetModels_Create();
 			// Create/Setup ListBoxes (if applicable) via Unique ReverseReferences and ManyToMany References
 
 			// Create/Setup Button Action controls
@@ -152,11 +150,17 @@
       $this->chkSearchableFlag->Name = QApplication::Translate('Searchable Flag');
       $this->chkSearchableFlag->Checked = $this->objCustomField->SearchableFlag;
     }
-    // Create and Setup chkAllAssetModelsFlag
-    protected function chkAllAssetModelsFlag_Create(){
-      $this->chkAllAssetModelsFlag = new QCheckBox($this);
-      $this->chkAllAssetModelsFlag->Name = QApplication::Translate('All Asset Models');
-      $this->chkAllAssetModelsFlag->Checked = $this->objCustomField->AllAssetModelsFlag;
+    // Create and Setup rblAllAssetModels
+    protected function rblAllAssetModels_Create(){
+      $this->rblAllAssetModels = new QRadioButtonList($this);
+      if($this->objCustomField->CustomFieldId){
+        $checked = $this->objCustomField->AllAssetModelsFlag;
+      }
+      else{
+        $checked = true;
+      }
+      $this->rblAllAssetModels->AddItem(new QListItem('All Asset Models',1,$checked));
+      $this->rblAllAssetModels->AddItem(new QListItem('Specific Asset Models',2,!$checked));
     }
 		// Create and Setup lstCreatedByObject
 		protected function lstCreatedByObject_Create() {
@@ -241,9 +245,13 @@
 			$this->objCustomField->ActiveFlag = $this->chkActiveFlag->Checked;
 			$this->objCustomField->RequiredFlag = $this->chkRequiredFlag->Checked;
       $this->objCustomField->SearchbleFlag = $this->chkSearchableFlag->Checked;
-      if($this->blnAssetEntityType){
-      $this->objCustomField->AllAssetModelsFlag = $this->chkAllAssetModelsFlag->Checked; // check only if asset among searchable flag
+      if($this->blnAssetEntityType&&$this->rblAllAssetModels->SelectedValue==1){
+        $this->objCustomField->AllAssetModelsFlag = true;
       }
+      else{
+        $this->objCustomField->AllAssetModelsFlag = false;
+      }
+
 			$this->objCustomField->CreatedBy = $this->lstCreatedByObject->SelectedValue;
 			$this->objCustomField->CreationDate = $this->calCreationDate->DateTime;
 			$this->objCustomField->ModifiedBy = $this->lstModifiedByObject->SelectedValue;

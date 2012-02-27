@@ -96,20 +96,25 @@
 			</tr>
 		</table>
 		<?php $this->dtgValue->RenderWithError(); ?>
+    <br />
+    <?php $this->rblAllAssetModels->Render(); ?>
 		<table>
       <tr>
 				<td class="record_field_name">
           <?php $this->lblAssetModelCode->Render(); ?>
-          <?php $this->txtAddAssetModel->RenderWithError(); ?>
-          <?php //$this->ctlAssetModelSearchTool->Render(); ?>
+          <?php $this->lstAddAssetModel->RenderWithError(); ?>
         </td>
-        <td>
+        <td valign="top">
+          <?php $this->ctlAssetModelSearchTool->Render(); ?>
+          <?php $this->lblLookup->Render(); ?>
+        </td>
+        <td valign="top">
 				  <?php $this->btnAddAssetModel->Render(); ?>
         </td>
 			</tr>
 		</table>
-    <?php $this->chkAllAssetModelsFlag->Render(); ?> <?php $this->lblAllAssetModels->Render(); ?>
-		<?php $this->dtgAssetModels->RenderWithError(); ?>
+
+   	<?php $this->dtgAssetModels->RenderWithError(); ?>
     <br />
     <br />
 

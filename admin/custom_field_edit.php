@@ -57,14 +57,13 @@
 		protected $lblHeaderCustomField;
 		protected $lblSelectionOption;
    //Asset Models
-   // protected $chkAllAssetModels;
     protected $lblAssetModelCode;
     protected $lblAllAssetModels;
-    protected $txtAddAssetModel;
- // protected $ctlAssetModelSearchTool;
+    protected $lstAddAssetModel;
+    protected $ctlAssetModelSearchTool;
     protected $btnAddAssetModel;
     protected $dtgAssetModels;
-//  protected $lblLookup;
+    protected $lblLookup;
 
 
 		protected function Form_Create() {
@@ -97,12 +96,12 @@
 			$this->dtgValue_Create();
 
       // EntityQtype 1 = Asset
+      $this->rblAllAssetModels_Create();
       $this->lblAllAssetModels_Create();
-      $this->chkAllAssetModelsFlag_Create();
       $this->lblAssetModelCode_Create();
-      $this->txtAddAssetModel_Create();
+      $this->lstAddAssetModel_Create();
       $this->dtgAssetModels_Create();
-      //$this->ctlAssetModelSearchTool_Create();
+      $this->ctlAssetModelSearchTool_Create();
       $this->btnAddAssetModel_Create();
 
 
@@ -367,20 +366,18 @@
 			}
 		}
 
-    protected function chkAllAssetModelsFlag_Create(){
-      parent::chkAllAssetModelsFlag_Create();
-      $this->chkAllAssetModelsFlag->CausesValidation = false;
-      $this->chkAllAssetModelsFlag->AddAction(new QChangeEvent(), new QAjaxAction('chkAllAssetModelsFlag_Click'));
-      $this->chkAllAssetModelsFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-      if(!$this->blnAssetEntityType){
-        $this->chkAllAssetModelsFlag->Visible = false;
-      }
+    protected function rblAllAssetModels_Create(){
+    parent::rblAllAssetModels_Create();
+    $this->rblAllAssetModels->AddAction(new QClickEvent(), new QServerAction('rblAssetAssetModels_Click'));
+    if(!$this->blnAssetEntityType){
+      $this->rblAllAssetModels->Visible = false;
+    }
     }
     //Create/Setup "Selection Option" label
   	protected function lblAllAssetModels_Create() {
   		$this->lblAllAssetModels = new QLabel($this);
   		$this->lblAllAssetModels->Text = 'All Asset Models';
- 			if (!$this->blnAssetEntityType) {
+ 			if (!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1) {
          $this->lblAllAssetModels->Visible = false;
       }
   	}
@@ -390,35 +387,44 @@
   		$this->lblAssetModelCode = new QLabel($this);
   		$this->lblAssetModelCode->Text = 'Asset Model Code:';
       if (!$this->blnAssetEntityType||
-         $this->chkAllAssetModelsFlag->Checked) {
+         $this->rblAllAssetModels->SelectedValue == 1) {
 
          $this->lblAssetModelCode->Visible = false;
         }
   		}
 
-    protected function txtAddAssetModel_Create(){
-      $this->txtAddAssetModel = new QTextBox($this);
-      $this->txtAddAssetModel->Name = QApplication::Translate('Add Asset Model');
-      $this->txtAddAssetModel->CausesValidation = false;
-     	$this->txtAddAssetModel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAssetModel_Click'));
-     	$this->txtAddAssetModel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-      if (!$this->blnAssetEntityType ||
-        $this->chkAllAssetModelsFlag->Checked) {
-          $this->txtAddAssetModel->Visible = false;
-        }
+    protected function lstAddAssetModel_Create(){
+      $this->lstAddAssetModel = new QListBox($this);
+      $this->lstAddAssetModel->Name = QApplication::Translate('Add Asset Model');
+      $this->lstAddAssetModel->CausesValidation = false;
+      $arrAssetModels = AssetModel::LoadAll();
+      $this->lstAddAssetModel->AddItem(new QListItem('-Select One-',null));
+      foreach($arrAssetModels as $objAssetModel){
+        $this->lstAddAssetModel->AddItem(new QListItem(sprintf('%s - %s',$objAssetModel->AssetModelCode,$objAssetModel->ShortDescription),
+                                                       $objAssetModel->AssetModelId));
+      }
+      if (!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1) {
+        $this->lstAddAssetModel->Visible = false;
+      }
 
     }
 
-//    protected function ctlAssetModelSearchTool_Create() {
-//   	  //$this->ctlAssetModelSearchTool = new QInventorySearchToolComposite($this);
-//
-//   	  $this->lblLookup = new QLabel($this);
-// 		  $this->lblLookup->HtmlEntities = false;
-// 		  $this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
-// 		 // $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
-// 		 // $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlInventorySearchTool, 'lblLookup_Click'));
-// 		 // $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-//   	}
+    protected function ctlAssetModelSearchTool_Create() {
+      $this->ctlAssetModelSearchTool = new QAssetModelSearchToolComposite($this);
+      $this->lblLookup = new QLabel($this);
+      $this->lblLookup->HtmlEntities = false;
+      $this->lblLookup->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+      $this->lblLookup->AddAction(new QClickEvent(), new QAjaxControlAction($this->ctlAssetModelSearchTool, 'lblLookup_Click'));
+      $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlAssetModelSearchTool, 'lblLookup_Click'));
+      $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+      if(!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1){
+        $this->lblLookup->Visible = false;
+      }
+    }
+
+    protected function lblLookup_Click(){
+      
+    }
 
     // Create datagrid Asset Models
     protected function dtgAssetModels_Create(){
@@ -451,8 +457,7 @@
       $objStyle->BackColor = '#EFEFEF';
       $objStyle->CssClass = 'dtg_header';
 
-      if(!$this->blnAssetEntityType ||
-        $this->chkAllAssetModelsFlag->Checked){
+      if(!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1){
         $this->dtgAssetModels->Visible = false;
       }
 
@@ -479,10 +484,9 @@
 
   			$this->btnAddAssetModel = new QButton($this);
   			$this->btnAddAssetModel->Text = 'Add';
-  			$this->btnAddAssetModel->AddAction(new QClickEvent(), new QAjaxAction('btnAddAssetModel_Click'));
-  			$this->btnAddAssetModel->CausesValidation = false;
-        if(!$this->blnAssetEntityType||
-          $this->chkAllAssetModelsFlag->Checked){
+  		  $this->btnAddAssetModel->AddAction(new QClickEvent(), new QAjaxAction('btnAddAssetModel_Click'));
+        $this->btnAddAssetModel->CausesValidation = false;
+        if(!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1){
           $this->btnAddAssetModel->Visible = false;
         }
   	}
@@ -603,8 +607,8 @@
 			}
 		}
 
-    protected function chkAllAssetModelsFlag_Click() {
-      if ($this->chkAllAssetModelsFlag->Checked){
+    protected function rblAssetAssetModels_Click(){
+      if ($this->rblAllAssetModels->SelectedValue == 1){
         $this->DisplayAssetModels(false);
       }
       else{
@@ -650,12 +654,12 @@
     protected function objAssetListItem_Click(){
       $EntityTypes = $this->chkEntityQtype->SelectedValues;
       if (in_array('1',$EntityTypes)){
+        $this->rblAllAssetModels->Visible = true;
         $this->blnAssetEntityType = true;
-        $this->lblAllAssetModels->Visible = true;
-        $this->chkAllAssetModelsFlag->Visible = true;
-        if(!$this->chkAllAssetModelsFlag->Checked){
+        if($this->rblAllAssetModels->SelectedValue == 2){
           $this->lblAssetModelCode->Display = true;
-          $this->txtAddAssetModel->Display = true;
+          $this->lstAddAssetModel->Display = true;
+          $this->lblLookup->Visible = true;
           $this->btnAddAssetModel->Display = true;
           $this->dtgAssetModels->Display = true;
           $this->DisplayAssetModels();
@@ -663,25 +667,26 @@
       }
       else{
         $this->blnAssetEntityType = false;
+        $this->rblAllAssetModels->Visible = false;
         $this->lblAllAssetModels->Visible = false;
-        $this->chkAllAssetModelsFlag->Visible = false;
         $this->lblAssetModelCode->Visible = false;
-        $this->txtAddAssetModel->Visible = false;
+        $this->lstAddAssetModel->Visible = false;
+        $this->lblLookup->Visible = false;
         $this->btnAddAssetModel->Visible = false;
         $this->dtgAssetModels->Visible = false;
       }
     }
 
-    protected function btnAddAssetModel_Click() {
+    protected function btnAddAssetModel_Click(){
       $blnError = false;
-      if (strlen(trim($this->txtAddAssetModel->Text)) == 0) {
-      	$blnError = true;
-      	$this->txtAddAssetModel->Warning = QApplication::Translate('You can not enter blank selection option.');
-      	}
+      if ($this->lstAddAssetModel->SelectedValue == null) {
+        $blnError = true;
+        $this->lstAddAssetModel->Warning = QApplication::Translate('You 7 can not enter blank selection option.' . $this->lstAddAssetModel->SelectedValue);
+      }
       if (!$blnError){
         // $assetModelToAdd = AssetModel::QuerySingle(QQ::Equal(QQN::AssetModel()->ShortDescription,$this->txtAddAssetModel->Text));
         // Check if quering asset model exists(QuerySingle method doesnt work!)
-        $assetModelToAdd = AssetModel::QueryArray(QQ::Equal(QQN::AssetModel()->AssetModelCode, $this->txtAddAssetModel->Text));
+        $assetModelToAdd = AssetModel::QueryArray(QQ::Equal(QQN::AssetModel()->AssetModelId, $this->lstAddAssetModel->SelectedValue));
         if (count($assetModelToAdd)>0){
           $assetModelToAdd = $assetModelToAdd[0];
           if($assetModelToAdd instanceof AssetModel){
@@ -690,7 +695,7 @@
               foreach($this->arrAssetModels as $assetModel){
                 if ($assetModel->AssetModelId == $assetModelToAdd->AssetModelId){
                   $blnError = true;
-                  $this->txtAddAssetModel->Warning = QApplication::Translate("That asset model has already been added.");
+                  $this->lstAddAssetModel->Warning = QApplication::Translate("That asset model has already been added.");
                 }
               }
             }
@@ -706,11 +711,9 @@
 
         else {
           $blnError = true;
-          $this->txtAddAssetModel->Warning = QApplication::Translate("That asset model code does not exist.");
+          $this->lstAddAssetModel->Warning = QApplication::Translate("That asset model code does not exist.");
         }
-        //$this->objAssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
       }
-
     }
 
 		// Remove button click action for each asset in the datagrid
@@ -791,6 +794,39 @@
 			$this->txtValue->Focus();
 		}
 
+        public function btnAssetModelSearchToolAdd_Click() {
+          $this->ctlAssetModelSearchTool->lblWarning->Text = "";
+          $intSelectedAssetModelId = $this->ctlAssetModelSearchTool->ctlAssetModelSearch->dtgAssetModel->GetSelected("AssetModelId");
+          if (count($intSelectedAssetModelId) < 1) {
+            $this->ctlAssetModelSearchTool->lblWarning->Text = "No selected asset models.";
+          }
+          else {
+            $lblNewWarning = "";
+            foreach (AssetModel::QueryArray(QQ::In(QQN::AssetModel()->AssetModelId, $intSelectedAssetModelId)) as $objNewAssetModel) {
+              $blnExists = false;
+              foreach($this->arrAssetModels as $objAssetModel){
+                if($objAssetModel->AssetModelId == $objNewAssetModel->AssetModelId){
+                  $blnExists = true;
+                }
+              }
+              if($blnExists){
+                $lblNewWarning .= sprintf("<br />%s - already in list", $objNewAssetModel->AssetModelCode);
+              }
+              else{
+                $objAssetModelToAdd = new AssetCustomFieldAssetModel();
+                $objAssetModelToAdd->AssetModelId  = $objNewAssetModel->AssetModelId;
+                $objAssetModelToAdd->CustomFieldId = $this->objCustomField->CustomFieldId;
+                array_push($this->arrAssetModels,$objAssetModelToAdd);
+              }
+            }
+            $this->lstAddAssetModel->Warning = $lblNewWarning;
+            $this->ctlAssetModelSearchTool->dlgAssetModelSearchTool->HideDialogBox();
+          }
+            // Uncheck all items but SelectAll checkbox
+          $this->UncheckAllItems();
+          $this->dtgAssetModels->Refresh();
+        }
+
 		// Control AjaxActions
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 
@@ -817,7 +853,7 @@
 				}
 
         if (in_array('1', $this->chkEntityQtype->SelectedValues)
-            && !$this->chkAllAssetModelsFlag->Checked
+            && $this->rblAllAssetModels->SelectedValue==2
             && count($this->arrAssetModels)== 0){
           $blnError = true;
           $this->btnCancel->Warning = 'You must apply at least one Asset Model.';
@@ -941,8 +977,11 @@
 			$this->objCustomField->ActiveFlag = $this->chkActiveFlag->Checked;
 			$this->objCustomField->RequiredFlag = $this->chkRequiredFlag->Checked;
       $this->objCustomField->SearchableFlag = $this->chkSearchableFlag->Checked;
-      if($this->blnAssetEntityType){
-        $this->objCustomField->AllAssetModelsFlag = $this->chkAllAssetModelsFlag->Checked;
+      if($this->blnAssetEntityType&&$this->rblAllAssetModels->SelectedValue==1){
+        $this->objCustomField->AllAssetModelsFlag = true;
+      }
+      else{
+        $this->objCustomField->AllAssetModelsFlag = false;
       }
 
 		}
@@ -1146,16 +1185,17 @@
 		// Display the fields for adding options to select lists
 		protected function DisplayOptions($blnValue = true) {
 
-			$this->txtValue->Visible = $blnValue;
-			$this->btnAdd->Visible = $blnValue;
-			$this->dtgValue->Visible = $blnValue;
+			$this->txtValue->Visible  = $blnValue;
+			$this->btnAdd->Visible    = $blnValue;
+			$this->dtgValue->Visible  = $blnValue;
 		}
 
     protected function DisplayAssetModels($blnValue = true) {
 
-  		$this->txtAddAssetModel->Visible = $blnValue;
-  		$this->btnAddAssetModel->Visible = $blnValue;
-  		$this->dtgAssetModels->Visible = $blnValue;
+  	  $this->lstAddAssetModel->Visible  = $blnValue;
+      $this->lblLookup->Visible         = $blnValue;
+  	  $this->btnAddAssetModel->Visible  = $blnValue;
+  		$this->dtgAssetModels->Visible  = $blnValue;
       $this->lblAssetModelCode->Visible = $blnValue;
   	}
     // Delete associated assetCustomFieldAssetModels
@@ -1170,7 +1210,7 @@
     // used on Save new CustomField, on Update CustomField for Asset Type instance if wasn't
     // may be used after $this->objCustomField->Save();
     private function AppendAssetModels(){
-      if($this->chkAllAssetModelsFlag->Checked){
+      if($this->rblAllAssetModels->SelectedValue == 1){
         $arrToAdd = AssetModel::LoadAll();
         foreach ($arrToAdd as $itemToAdd){
           $objAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
@@ -1187,12 +1227,20 @@
         }
       }
     }
+    // Uncheck all items but SelectAll checkbox
+    public function UncheckAllItems() {
+      foreach ($this->GetAllControls() as $objControl) {
+        if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+          $objControl->Checked = false;
+        }
+      }
+    }
 
     // Updating assigned Asset Models range
     private function UpadateAssetModels(){
 
       //If AssetModels not all or changed - some items might to be deleted
-      if(!$this->chkAllAssetModelsFlag->Checked){
+      if(!($this->rblAllAssetModels->SelectedValue == 1)){
         $arrCurrentAssetModels = AssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
         foreach ($arrCurrentAssetModels as $currentAssetModel){
           $blnExists = false;
