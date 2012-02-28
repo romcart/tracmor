@@ -79,19 +79,20 @@
 				// If short_description have been modified
 				if ($this->ShortDescription != $objOldCustomFieldValue->ShortDescription) {
   				if ($objCustomField = $this->CustomField) {
-  				  $objDatabase = CustomFieldValue::GetDatabase();
+  				  $objDatabase = CustomFieldValue::GetDatabase();/*
   				  $objCustomFieldSelectionArray = CustomFieldSelection::LoadArrayByCustomFieldValueId($this->CustomFieldValueId);
   				  foreach ($objCustomFieldSelectionArray as $objCustomFieldSelection) {
   				    // If helper table exists
   				    if ($strHelperTableArray = $this->GetHelperTableByEntityQtypeId($objCustomFieldSelection->EntityQtypeId)) {
   				      $strHelperTable = $strHelperTableArray[0];
   				      $strTableName = $strHelperTableArray[1];
-      				  
+
   				      // Update the data into helper table
       				  $strQuery = sprintf("UPDATE %s SET `cfv_%s`=%s WHERE `%s_id`='%s';", $strHelperTable, $objCustomField->CustomFieldId, $objDatabase->SqlVariable($this->ShortDescription), $strTableName, $objCustomFieldSelection->EntityId);
         			  $objDatabase->NonQuery($strQuery);
       				}
   				  }
+            */
   				}
 				}
 			}

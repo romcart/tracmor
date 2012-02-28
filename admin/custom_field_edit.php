@@ -914,9 +914,27 @@
 						// Update the EntityQtypeCustomFields if they have changed (or if it is a new custom field
 						$this->UpdateEntityQtypeCustomFields();
 						// Update all of the CustomFieldSelections and values for the EntityQtypes
-						if (!$blnDefaultIsNone) {
-						  $this->objCustomField->UpdateRequiredFieldSelections();
-						}
+            	 if (!$blnDefaultIsNone) {
+                 $this->objCustomField->UpdateRequiredFieldSelections();
+                 // impove logic for asset customfields
+                 if($this->blnAssetEntityType&&$this->rblAllAssetModels->SelectedValue==2){
+                   // define assets to set default value
+                   $chosenAssetModels = array();
+                   foreach($this->arrAssetModels as $chosenAssetModel){
+                     $assetsToFill = Asset::LoadArrayByAssetModelId($chosenAssetModel->AssetModelId);
+                     if (count($assetsToFill>0)){
+                       foreach ($assetsToFill as $assetToFill){
+                         array_push($chosenAssetModels,$assetToFill->AssetId);
+                       }
+                     }
+                   }
+                   $chosenAssetModels =  implode(",", $chosenAssetModels);
+                   $objDatabase = CustomField::GetDatabase();
+                   $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $this->objCustomField->CustomFieldId);
+                   $objDatabase->NonQuery($strQuery);
+                 }
+               }
+
 					}
 					// If the field is not a required field
 					else {
@@ -1121,14 +1139,15 @@
     				    $blnError = true;
     				  }
     				  if (!$blnError) {
-              //  if(!($this->blnAssetEntityType&&!$this->chkAllAssetModelsFlag->Checked)){
+                if(!(($objEntityQtypeItem->Value== 1)&&($this->rblAllAssetModels->SelectedValue==2))
+                   ){
+                  //print($objEntityQtypeItem->Value.$this->rblAllAssetModels->SelectedValue);exit;
                   $objDatabase = CustomField::GetDatabase();
                   $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `cfv_%s` is NULL;", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
                   $objDatabase->NonQuery($strQuery);
-               /* }
+                }
                 else{
-
-                   // define assets to set default value
+                  // define assets to set default value
                   $chosenAssetModels = array();
                    foreach($this->arrAssetModels as $chosenAssetModel){
                      $assetsToFill = Asset::LoadArrayByAssetModelId($chosenAssetModel->AssetModelId);
@@ -1140,12 +1159,11 @@
                    }
                   $chosenAssetModels =  implode(",", $chosenAssetModels);
                   $objDatabase = CustomField::GetDatabase();
-                  print($chosenAssetModels);exit;
                   $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `asset_id` IN ($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
                   $objDatabase->NonQuery($strQuery);
-                  $strQuery = sprintf("UPDATE %s SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
+                  $strQuery = sprintf("UPDATE %s SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId);
                   $objDatabase->NonQuery($strQuery);
-                }*/
+                 }
     				  }
     				}
           }
