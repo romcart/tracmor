@@ -383,8 +383,15 @@ class AssetModelEditForm extends AssetModelEditFormBase {
           $selected = $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag;
         }
    *///Excluding AllAssetModelsFligged Items just untill stupping qcodo 4.22
+        $role=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(
+          QApplication::$objRoleModule->RoleId,
+          $arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
+          2
+        );
         if(!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
-          &&$arrAssetCustomFieldOption->CustomField->ActiveFlag){
+          &&$arrAssetCustomFieldOption->CustomField->ActiveFlag
+          && (int)$role->AuthorizedFlag==1
+        ){
         $this->chkAssetCustomFields->AddItem(new QListItem($arrAssetCustomFieldOption->CustomField->ShortDescription,
                                                            $arrAssetCustomFieldOption->CustomField->CustomFieldId,
                                                            $selected
@@ -392,7 +399,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
         }
       }
     }
-    else {
+    if ($this->chkAssetCustomFields->ItemCount==0){
       $this->chkAssetCustomFields->Display = false;
     }
   }
