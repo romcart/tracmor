@@ -1424,8 +1424,8 @@
         }
         $arrToClear = array();
         foreach (EntityQtypeCustomField::LoadArrayByEntityQtypeId(1) as $objAssetCustomField){
-          if(!in_array($objAssetCustomField->CustomField,$arrAllowed)){
-            $arrToClear[]=$objAssetCustomField->CustomField;
+          if(!in_array($objAssetCustomField->CustomFieldId,$arrAllowed)){
+            $arrToClear[]=$objAssetCustomField->CustomFieldId;
           }
         }
         if($intCustomFieldId){

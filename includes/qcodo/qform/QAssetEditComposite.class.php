@@ -1037,7 +1037,32 @@ class QAssetEditComposite extends QControl {
 					// Reload all custom fields
 					$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
 
-					// Commit the above transactions to the database
+                // Update not allowed custom fields set to null
+
+        $arrAllowed = array( );
+        foreach (AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAsset->AssetModelId) as $objAssetCustomField){
+          $arrAllowed[]=$objAssetCustomField->CustomFieldId;
+        }
+        $arrToClear = array();
+
+        foreach (EntityQtypeCustomField::LoadArrayByEntityQtypeId(1) as $objAssetCustomField){
+          if(!in_array($objAssetCustomField->CustomFieldId,$arrAllowed)){
+            $arrToClear[]=$objAssetCustomField->CustomFieldId;
+          }
+        }
+        if($this->objAsset->AssetId){
+          foreach ($arrToClear as $idToBeNull)
+          {
+            $arrForQuery[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
+          }
+          $objDatabase = Asset::GetDatabase();
+          $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $arrForQuery), $this->objAsset->AssetId);
+        //  print($strQuery); exit;
+          $objDatabase->NonQuery($strQuery);
+        }
+
+
+  				// Commit the above transactions to the database
 					$objDatabase->TransactionCommit();
 
 					// Hide inputs and display labels
