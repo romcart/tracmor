@@ -25,6 +25,7 @@
 	require(__DOCROOT__ . __PHP_ASSETS__ . '/csv/DataSource.php');
 
 	class AssetModelImportForm extends QForm {
+    protected $output;
 		// Header Menu
 		protected $ctlHeaderMenu;
 
@@ -979,6 +980,16 @@
                   $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $this->strModelValuesArray)));
                   $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
+                   // Update for asset custom fields with allAssetModesF Flag
+                    $arrAllAssetModelsFlaggedObjects = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
+                    foreach ($arrAllAssetModelsFlaggedObjects as $arrAllAssetModelsFlaggedObject){
+                      if ($arrAllAssetModelsFlaggedObject->CustomField->AllAssetModelsFlag){
+                        $newAssetCustomField = new AssetCustomFieldAssetModel();
+                        $newAssetCustomField->CustomFieldId = $arrAllAssetModelsFlaggedObject->CustomField->CustomFieldId;
+                        $newAssetCustomField->AssetModelId  = $intInsertId;
+                        $newAssetCustomField->Save();
+                      }
+                    }
                   	$strModelIdArray = array();
                   	$strCFVArray = array();
                   	for ($i=0; $i<count($objNewAssetModelArray); $i++) {

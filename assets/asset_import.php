@@ -937,6 +937,13 @@
                         $strCFV = $objAsset->GetVirtualAttribute($objCustomField->CustomFieldId);
                         $strCFVArray[] = sprintf("`cfv_%s`='%s'", $objCustomField->CustomFieldId, $strCFV);
                       }
+                      // Update values for custom field set not allowed to model
+                      $arrToClear = $this->substactNotAllowedFields($objAsset->AssetModelId,null);
+                      foreach ($arrToClear as $idToBeNull)
+                      {
+                        $strCFVArray[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
+                      }
+
                       if (isset($strCFVArray) && count($strCFVArray)) {
                         $strCFVQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemId);
                       }
@@ -986,7 +993,9 @@
                     	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES %s", implode(", ", $strAssetIdArray));
                     }
                     $objDatabase->NonQuery($strQuery);
-                  }
+                    $theAsset = Asset::Load($intInsertId);
+                    $objDatabase->NonQuery($this->substactNotAllowedFields($theAsset->AssetModelId,$theAsset->AssetId));
+                   }
 
                   $this->strAssetValuesArray = array();
                 }
@@ -1004,6 +1013,10 @@
                       }
                       if (isset($strCFVArray) && count($strCFVArray)) {
                         $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
+                        $objDatabase->NonQuery($strQuery);
+                        // insert nulls where not allowed
+                        $theAsset = Asset::Load($intItemKey);
+                        $strQuery = $this->substactNotAllowedFields($theAsset->AssetModelId,$theAsset->AssetId);
                         $objDatabase->NonQuery($strQuery);
                       }
                     }
@@ -1402,6 +1415,31 @@
  	        unset($this->btnRemoveArray[$intId]);
  	      }
  	    }
+      //Returns array of custom field ids not allowed for asset with defined Asset Model
+      // or query sting wich sets to null not allowed fields
+      protected function substactNotAllowedFields($intAssetModelId,$intCustomFieldId = null){
+        $arrAllowed = array( );
+        foreach (AssetCustomFieldAssetModel::LoadArrayByAssetModelId($intAssetModelId) as $objAssetCustomField){
+          $arrAllowed[]=$objAssetCustomField->CustomFieldId;
+        }
+        $arrToClear = array();
+        foreach (EntityQtypeCustomField::LoadArrayByEntityQtypeId(1) as $objAssetCustomField){
+          if(!in_array($objAssetCustomField->CustomField,$arrAllowed)){
+            $arrToClear[]=$objAssetCustomField->CustomField;
+          }
+        }
+        if($intCustomFieldId){
+          foreach ($arrToClear as $idToBeNull)
+          {
+            $arrForQuery[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
+          }
+          return sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $arrForQuery), $intCustomFieldId);
+
+        }
+        else{
+        return $arrToClear;
+        }
+      }
 
 	}
 	// Go ahead and run this form object to generate the page
