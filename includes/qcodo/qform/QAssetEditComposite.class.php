@@ -1534,6 +1534,9 @@ class QAssetEditComposite extends QControl {
 					}
 				}
 			}
+            else {
+                $this->Refresh();
+            }
 		}
     //
   public function reloadCustomFields($intAssetModelId){
