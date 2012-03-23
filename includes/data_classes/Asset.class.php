@@ -147,6 +147,31 @@
 			return $strToReturn;
 		}
 		
+		public function LoadByAssetCodeWithCustomFields($strAssetCode) {
+			Asset::QueryHelper($objDatabase);
+			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
+
+			// Setup the SQL Query
+			$strQuery = sprintf("
+				SELECT 
+					`asset`.* 
+					%s
+				FROM 
+					`asset` 
+					%s
+				WHERE `asset`.`asset_code` = '%s'
+			", 
+			$arrCustomFieldSql['strSelect'],
+			$arrCustomFieldSql['strFrom'],
+			$strAssetCode);
+			
+			// Perform the Query and Instantiate the Result
+			$objDbResult = $objDatabase->Query($strQuery);
+
+			$arrAssets = Asset::InstantiateDbResult($objDbResult);
+			return $arrAssets[0];
+		}
+
 		/**
 		 * Load all Assets
 		 * @param string $strOrderBy

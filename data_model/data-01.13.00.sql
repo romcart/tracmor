@@ -13,7 +13,8 @@ INSERT INTO `datagrid` (`short_description`) VALUES
 	('asset_audit_list'),
 	('inventory_audit_list'),
 	('location_list'),
-	('user_list');
+	('user_list'),
+	('asset_transaction');
 
 INSERT INTO `notification` (`notification_id`, `short_description`, `long_description`, `criteria`, `frequency`, `enabled_flag`) VALUES
 	(1,'Overdue Receipt','Send notification when a receipt is overdue','10','once',false);
