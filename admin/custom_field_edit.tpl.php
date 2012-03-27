@@ -101,7 +101,7 @@
 		<table>
       <tr>
 				<td class="record_field_name">
-          <?php $this->lblAssetModelCode->Render(); ?>
+          <?php $this->lblAssetModel->Render(); ?>
           <?php $this->lstAddAssetModel->RenderWithError(); ?>
         </td>
         <td valign="top">

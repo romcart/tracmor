@@ -57,7 +57,7 @@
 		protected $lblHeaderCustomField;
 		protected $lblSelectionOption;
    //Asset Models
-    protected $lblAssetModelCode;
+    protected $lblAssetModel;
     protected $lblAllAssetModels;
     protected $lstAddAssetModel;
     protected $ctlAssetModelSearchTool;
@@ -98,7 +98,7 @@
       // EntityQtype 1 = Asset
       $this->rblAllAssetModels_Create();
       $this->lblAllAssetModels_Create();
-      $this->lblAssetModelCode_Create();
+      $this->lblAssetModel_Create();
       $this->lstAddAssetModel_Create();
       $this->dtgAssetModels_Create();
       $this->ctlAssetModelSearchTool_Create();
@@ -383,13 +383,13 @@
   	}
 
     //Create/Setup "Selection Option" label
-  	protected function lblAssetModelCode_Create() {
-  		$this->lblAssetModelCode = new QLabel($this);
-  		$this->lblAssetModelCode->Text = 'Asset Model Code:';
+  	protected function lblAssetModel_Create() {
+  		$this->lblAssetModel = new QLabel($this);
+  		$this->lblAssetModel->Text = 'Asset Model:';
       if (!$this->blnAssetEntityType||
          $this->rblAllAssetModels->SelectedValue == 1) {
 
-         $this->lblAssetModelCode->Visible = false;
+         $this->lblAssetModel->Visible = false;
         }
   		}
 
@@ -657,7 +657,7 @@
         $this->rblAllAssetModels->Visible = true;
         $this->blnAssetEntityType = true;
         if($this->rblAllAssetModels->SelectedValue == 2){
-          $this->lblAssetModelCode->Display = true;
+          $this->lblAssetModel->Display = true;
           $this->lstAddAssetModel->Display = true;
           $this->lblLookup->Visible = true;
           $this->btnAddAssetModel->Display = true;
@@ -669,7 +669,7 @@
         $this->blnAssetEntityType = false;
         $this->rblAllAssetModels->Visible = false;
         $this->lblAllAssetModels->Visible = false;
-        $this->lblAssetModelCode->Visible = false;
+        $this->lblAssetModel->Visible = false;
         $this->lstAddAssetModel->Visible = false;
         $this->lblLookup->Visible = false;
         $this->btnAddAssetModel->Visible = false;
@@ -1214,7 +1214,7 @@
       $this->lblLookup->Visible         = $blnValue;
   	  $this->btnAddAssetModel->Visible  = $blnValue;
   		$this->dtgAssetModels->Visible  = $blnValue;
-      $this->lblAssetModelCode->Visible = $blnValue;
+      $this->lblAssetModel->Visible = $blnValue;
   	}
     // Delete associated assetCustomFieldAssetModels
     // used on Deleting CustomField, on Updating for not Asset Entity Type
