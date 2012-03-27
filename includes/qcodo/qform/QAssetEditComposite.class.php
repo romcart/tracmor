@@ -1050,7 +1050,7 @@ class QAssetEditComposite extends QControl {
             $arrToClear[]=$objAssetCustomField->CustomFieldId;
           }
         }
-        if($this->objAsset->AssetId){
+        if($this->objAsset->AssetId && count($arrToClear)){
         	$arrForQuery = array();
           foreach ($arrToClear as $idToBeNull)
           {
