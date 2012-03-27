@@ -1051,6 +1051,7 @@ class QAssetEditComposite extends QControl {
           }
         }
         if($this->objAsset->AssetId){
+        	$arrForQuery = array();
           foreach ($arrToClear as $idToBeNull)
           {
             $arrForQuery[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
