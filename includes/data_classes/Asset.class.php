@@ -940,7 +940,7 @@
 		 * @param int $intParentAssetId AssetId of the parent asset to load linked assets
 		 * @return mixed
 		 */
-		public function LoadChildLinkedArrayByParentAssetId($intParentAssetId) {
+		/*public function LoadChildLinkedArrayByParentAssetId($intParentAssetId) {
 		  $objLinkedAssetArray = array();
 		  $objChildAssetArray = Asset::LoadArrayByParentAssetIdLinkedFlag($intParentAssetId, 1);
 		  if ($objChildAssetArray && count($objChildAssetArray)) {
@@ -958,6 +958,55 @@
 		  else {
 		    return false;
 		  }
+		}*/
+
+		/**
+		 * Loads array of Child Linked Asset Objects with custom field virtual attributes
+		 *
+		 * @param int $intParentAssetId AssetId of the parent asset to load linked assets
+		 * @return mixed
+		 */
+		public function LoadChildLinkedArrayByParentAssetId($intParentAssetId) {
+			$objLinkedAssetArray = array();
+			
+			Asset::QueryHelper($objDatabase);
+			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
+
+			// Setup the SQL Query
+			$strQuery = sprintf("
+				SELECT 
+					`asset`.* 
+					%s
+				FROM 
+					`asset` 
+					%s
+				WHERE `asset`.`parent_asset_id` = %s
+				AND `asset`.`linked_flag` = 1
+			", 
+			$arrCustomFieldSql['strSelect'],
+			$arrCustomFieldSql['strFrom'],
+			$intParentAssetId);
+			
+			// Perform the Query and Instantiate the Result
+			$objDbResult = $objDatabase->Query($strQuery);
+
+			$objChildAssetArray = Asset::InstantiateDbResult($objDbResult);
+
+			if ($objChildAssetArray && count($objChildAssetArray)) {
+				foreach ($objChildAssetArray as $objLinkedAsset) {
+					$objLinkedAssetArray[] = $objLinkedAsset;
+					$objNewLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objLinkedAsset->AssetId);
+				
+					if ($objNewLinkedAssetArray) {
+						foreach ($objNewLinkedAssetArray as $objLinkedAsset2) {
+							$objLinkedAssetArray[] = $objLinkedAsset2;
+						}
+					}
+				}
+				return $objLinkedAssetArray;
+			} else {
+				return false;
+			}
 		}
 
 		/**
