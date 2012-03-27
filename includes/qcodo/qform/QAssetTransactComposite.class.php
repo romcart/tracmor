@@ -979,7 +979,7 @@ class QAssetTransactComposite extends QControl {
 		// Redeclare in case the asset has been edited
 		$this->objAssetArray = null;
 		if ($this->blnEditMode && $this->objAsset instanceof Asset) {
-			$this->objAssetArray[] = Asset::Load($this->objAsset->AssetId);
+			$this->objAssetArray[] = Asset::LoadByAssetCodeWithCustomFields($this->objAsset->AssetCode);
 			// Load all child assets
 			$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($this->objAsset->AssetId);
 			if ($objLinkedAssetArray) {
