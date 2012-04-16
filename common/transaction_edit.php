@@ -41,7 +41,7 @@
 		
 		protected $lblCreationDate;
 		protected $lblUser;
-		protected $lblNote;
+		protected $pnlNote;
 		protected $dtgEntity;
 		protected $ctlHeaderMenu;
 		protected $ctlShortcutMenu;
@@ -67,7 +67,7 @@
 			
 			// $this->lblLocation_Create();
 			$this->lblUser_Create();
-			$this->lblNote_Create();
+			$this->pnlNote_Create();
 			$this->lblCreationDate_Create();
 			$this->dtgEntity_Create();
 			$this->ctlHeaderMenu_Create();
@@ -103,10 +103,11 @@
 		}		
 		
 		// Create the note label
-		protected function lblNote_Create() {
-			$this->lblNote = new QLabel($this);
-			$this->lblNote->Name = 'Note';
-			$this->lblNote->Text = $this->objTransaction->Note;
+		protected function pnlNote_Create() {
+			$this->pnlNote = new QPanel($this);
+			$this->pnlNote->CssClass = 'scrollBox';
+			$this->pnlNote->Name = 'Note';
+			$this->pnlNote->Text = nl2br($this->objTransaction->Note);
 		}
 		
 		// Create the datagrid of entities included in the transaction

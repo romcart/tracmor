@@ -63,7 +63,7 @@
 		</tr>
 		<tr>
 			<td class="record_field_name">Note:</td>
-			<td class="record_field_value"><?php $this->lblNote->Render(); ?></td>
+			<td class="record_field_value"><?php $this->pnlNote->Render(); ?></td>
 		</tr>
 	</table>
 	<br class="item_divide" />

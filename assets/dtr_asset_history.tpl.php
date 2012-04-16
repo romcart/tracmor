@@ -15,7 +15,7 @@
               <img src=<?php _p($_ITEM->Transaction->__toStringCreated()) ?> />
           </div>
           <div class="history_note">
-          <?php _p($_ITEM->Transaction->__toStringNote()) ?>
+          <?php _p(nl2br($_ITEM->Transaction->__toStringNote()), false) ?>
           </div>
       </div>
     </div>
