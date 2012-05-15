@@ -59,6 +59,9 @@
 		public function __toStringWithAssetCountLink($cssClass=null) {
 			return sprintf('<a href="../assets/asset_list.php?intAssetModelId=%s" class="%s">(%s)</a>', $this->AssetModelId, $cssClass, $this->intAssetCount);
 		}
+    public function __toStringAssetCount() {
+      return sprintf('(%s)', $this->intAssetCount);
+    }
 
 		// This adds the created by and creation date before saving a new asset model
 		public function Save($blnForceInsert = false, $blnForceUpdate = false) {

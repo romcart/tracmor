@@ -60,3 +60,4 @@
 		}
 	?>
 </table>
+<?php $_CONTROL->chkAssetCustomFields->RenderWithName(); ?>

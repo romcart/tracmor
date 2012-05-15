@@ -46,6 +46,8 @@
 		public $ifcImage;
 		// An array of custom fields
 		public $arrCustomFields;
+    // Asset Custom fields
+    public $chkAssetCustomFields;
 		
 		public function __construct($objParentObject, $strClosePanelMethod, $objAssetModel = null, $strControlId = null) {
 			
@@ -55,12 +57,16 @@
 				$objExc->IncrementOffset();
 				throw $objExc;
 			}
+
+      // Create
 			
 			// Create the Image File Control
 			$this->ifcImage_Create();
 			// Create all custom asset model fields
 			$this->customFields_Create();
-			
+      // Create Asset Custom Fields
+      $this->chkAssetCustomFields_Create();
+
 			$this->UpdateCustomFields();
 			
 			// Modify Code Generated Controls
@@ -136,22 +142,57 @@
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
 			$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this, false, true, false);
 		}
+
+    protected function chkAssetCustomFields_Create(){
+      $this->chkAssetCustomFields = new QCheckBoxList($this);
+      $this->chkAssetCustomFields->Name = 'Asset Custom Fields:';
+
+      $arrAssetCustomFiieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
+      if(count($arrAssetCustomFiieldOptions)>0){
+        if ($this->blnEditMode){
+          $arrChosenCustomFieldId = array();
+          $arrChosenCustomField = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
+          foreach ($arrChosenCustomField as $objChosenCustomField){
+            $arrChosenCustomFieldId[] = $objChosenCustomField->CustomFieldId;
+          }
+        }
+        foreach($arrAssetCustomFiieldOptions as $arrAssetCustomFieldOption){
+          $selected = false;
+          if($this->blnEditMode){
+            $selected = in_array($arrAssetCustomFieldOption->CustomField->CustomFieldId,$arrChosenCustomFieldId);
+          }
+          /*     else{
+                 $selected = $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag;
+               }
+          *///Excluding AllAssetModelsFligged Items just untill stupping qcodo 4.22
+          $role=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(
+            QApplication::$objRoleModule->RoleId,
+            $arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
+            2
+          );
+          if(!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
+            &&$arrAssetCustomFieldOption->CustomField->ActiveFlag
+            && (int)$role->AuthorizedFlag==1){
+            $this->chkAssetCustomFields->AddItem(new QListItem($arrAssetCustomFieldOption->CustomField->ShortDescription,
+              $arrAssetCustomFieldOption->CustomField->CustomFieldId,
+              $selected
+            ));
+          }
+        }
+      }
+      if ($this->chkAssetCustomFields->ItemCount==0){
+        $this->chkAssetCustomFields->Display = false;
+      }
+    }
 		
 		// Save Button Click Actions
 		public function btnSave_Click($strFormId, $strControlId, $strParameter) {
 			
 			$this->UpdateAssetModelFields();
 			$this->objAssetModel->Save();
+
 			// Adding AssetCustomFieldsAssetModels with allAssetModel flag checked
-      $arrAllAssetModelsFlaggedObjects = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
-      foreach ($arrAllAssetModelsFlaggedObjects as $arrAllAssetModelsFlaggedObject){
-        if ($arrAllAssetModelsFlaggedObject->CustomField->AllAssetModelsFlag){
-          $newAssetCustomField = new AssetCustomFieldAssetModel();
-          $newAssetCustomField->CustomFieldId = $arrAllAssetModelsFlaggedObject->CustomField->CustomFieldId;
-          $newAssetCustomField->AssetModelId  = $this->objAssetModel->AssetModelId;
-          $newAssetCustomField->Save();
-        }
-      }
+      $this->UpdateAssetModelCustomFields();
 			// Assign input values to custom fields
 			if ($this->arrCustomFields) {
 				// Save the values from all of the custom field controls
@@ -203,5 +244,54 @@
 			}
 			
 		}
+    protected function UpdateAssetModelCustomFields(){
+
+      $arrAssetCustomFieldsToAdd = array();
+      $this->chkAssetCustomFields->SelectedValues;
+      // Generate array of Custom Field values for All Asset Models must be presented in all cases
+      $arrAllAssetModelsFlaggedObjects = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
+      $arrAllAssetModelsFlag = array();
+      foreach ($arrAllAssetModelsFlaggedObjects as $arrAllAssetModelsFlaggedObject){
+        if ($arrAllAssetModelsFlaggedObject->CustomField->AllAssetModelsFlag){
+          $arrAllAssetModelsFlag[] = $arrAllAssetModelsFlaggedObject->CustomField->CustomFieldId;
+        }
+      }
+
+      $arrAssetCustomFieldsToAdd = array_merge($this->chkAssetCustomFields->SelectedValues,$arrAllAssetModelsFlag);
+      $arrAssetCustomFieldsToAdd = array_unique($arrAssetCustomFieldsToAdd);
+
+      // If new asset model add AssetCustomFields for All together with selected
+      if(!$this->blnEditMode){
+        foreach($arrAssetCustomFieldsToAdd as $keyAssetCustomField){
+          $newAssetCustomField = new AssetCustomFieldAssetModel();
+          $newAssetCustomField->CustomFieldId = $keyAssetCustomField;
+          $newAssetCustomField->AssetModelId  = $this->objAssetModel->AssetModelId;
+          $newAssetCustomField->Save();
+        }
+      }
+      // Delete items if unchecked
+      else{
+        $currentAssetCustomFields = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
+        foreach($currentAssetCustomFields as $currentAssetCustomField){
+          if (!(in_array($currentAssetCustomField->CustomField->CustomFieldId,$arrAssetCustomFieldsToAdd))){
+            $currentAssetCustomField->Delete();
+          }
+        }
+        foreach($arrAssetCustomFieldsToAdd as $keyAssetCustomField){
+          $blnToAdd = true;
+          foreach($currentAssetCustomFields as $currentAssetCustomField){
+            if ($currentAssetCustomField->CustomField->CustomFieldId == $arrAssetCustomFieldsToAdd){
+              $blnToAdd = false;
+            }
+          }
+          if($blnToAdd){
+            $newAssetCustomField = new AssetCustomFieldAssetModel();
+            $newAssetCustomField->CustomFieldId = $keyAssetCustomField;
+            $newAssetCustomField->AssetModelId  = $this->objAssetModel->AssetModelId;
+            $newAssetCustomField->Save();
+          }
+        }
+      }
+    }
 	}
 ?>

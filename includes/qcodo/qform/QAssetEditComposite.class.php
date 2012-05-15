@@ -1035,9 +1035,35 @@ class QAssetEditComposite extends QControl {
 
 					// This was necessary because it was not saving the changes of a second edit/save in a row
 					// Reload all custom fields
-					$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId);
+					$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId, $this->objAsset->AssetModelId);
 
-					// Commit the above transactions to the database
+                // Update not allowed custom fields set to null
+
+        $arrAllowed = array( );
+        foreach (AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAsset->AssetModelId) as $objAssetCustomField){
+          $arrAllowed[]=$objAssetCustomField->CustomFieldId;
+        }
+        $arrToClear = array();
+
+        foreach (EntityQtypeCustomField::LoadArrayByEntityQtypeId(1) as $objAssetCustomField){
+          if(!in_array($objAssetCustomField->CustomFieldId,$arrAllowed)){
+            $arrToClear[]=$objAssetCustomField->CustomFieldId;
+          }
+        }
+        if($this->objAsset->AssetId && count($arrToClear)){
+        	$arrForQuery = array();
+          foreach ($arrToClear as $idToBeNull)
+          {
+            $arrForQuery[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
+          }
+          $objDatabase = Asset::GetDatabase();
+          $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $arrForQuery), $this->objAsset->AssetId);
+        //  print($strQuery); exit;
+          $objDatabase->NonQuery($strQuery);
+        }
+
+
+  				// Commit the above transactions to the database
 					$objDatabase->TransactionCommit();
 
 					// Hide inputs and display labels
@@ -1098,7 +1124,7 @@ class QAssetEditComposite extends QControl {
 		// Instantiate new Asset object
 		$this->objAsset = new Asset();
 		// Load custom fields for asset with values from original asset
-		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, true, $objAssetToClone->AssetId);
+		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, true, $objAssetToClone->AssetId, $objAssetToClone->AssetModelId);
 		// Set the asset_code to null because they are unique
 		$this->lblHeaderAssetCode->Text = 'New Asset';
 		$this->txtAssetCode->Text = '';
@@ -1509,6 +1535,9 @@ class QAssetEditComposite extends QControl {
 					}
 				}
 			}
+            else {
+                $this->Refresh();
+            }
 		}
     //
   public function reloadCustomFields($intAssetModelId){

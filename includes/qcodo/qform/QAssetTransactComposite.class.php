@@ -440,6 +440,7 @@ class QAssetTransactComposite extends QControl {
 	protected function dtgAssetTransact_Create() {
 
 		$this->dtgAssetTransact = new QDataGrid($this);
+		$this->dtgAssetTransact->Name = 'asset_transaction';
 		$this->dtgAssetTransact->CellPadding = 5;
 		$this->dtgAssetTransact->CellSpacing = 0;
 		$this->dtgAssetTransact->CssClass = "datagrid";
@@ -451,17 +452,25 @@ class QAssetTransactComposite extends QControl {
     $objPaginator = new QPaginator($this->dtgAssetTransact);
     $this->dtgAssetTransact->Paginator = $objPaginator;
     $this->dtgAssetTransact->ItemsPerPage = 20;
+    $this->dtgAssetTransact->ShowColumnToggle = true;
 
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => 200, 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Current Location', '<?= $_ITEM->Location->__toString() ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    $this->dtgAssetTransact->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    $this->dtgAssetTransact->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => 200, 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    $this->dtgAssetTransact->AddColumn(new QDataGridColumnExt('Current Location', '<?= $_ITEM->Location->__toString() ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 
-/*    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="asset_code ASC"', 'ReverseSortByCommand="asset_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false"'));
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', 'Width=200', 'SortByCommand="asset__asset_model_id__short_description ASC"', 'ReverseSortByCommand="asset__asset_model_id__short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false"'));
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Current Location', '<?= $_ITEM->Location->__toString() ?>', 'SortByCommand="asset__location_id__short_description ASC"', 'ReverseSortByCommand="asset__location_id__short_description DESC"', 'CssClass=dtg_column', 'HtmlEntities=false"'));
-    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveColumn_Render($_ITEM) ?>', 'CssClass=dtg_column', 'HtmlEntities=false"'));
-*/
+    // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+    $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
+    if ($objCustomFieldArray) {
+    	foreach ($objCustomFieldArray as $objCustomField) {
+    		//Only add the custom field column if the role has authorization to view it.
+    		if($objCustomField->objRoleAuthView && $objCustomField->objRoleAuthView->AuthorizedFlag){
+    			$this->dtgAssetTransact->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+    		}
+    	}
+    }
+
+    $this->dtgAssetTransact->AddColumn(new QDataGridColumnExt('Action', '<?= $_FORM->RemoveColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+
     $objStyle = $this->dtgAssetTransact->RowStyle;
     $objStyle->ForeColor = '#000000';
     $objStyle->BackColor = '#FFFFFF';
@@ -508,7 +517,7 @@ class QAssetTransactComposite extends QControl {
 			}
 
 			if (!$blnError) {
-			  $objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
+			  $objNewAsset = Asset::LoadByAssetCodeWithCustomFields($this->txtNewAssetCode->Text);
 				if (!($objNewAsset instanceof Asset)) {
 					$blnError = true;
 					$this->txtNewAssetCode->Warning = "That asset code does not exist.";
@@ -970,7 +979,7 @@ class QAssetTransactComposite extends QControl {
 		// Redeclare in case the asset has been edited
 		$this->objAssetArray = null;
 		if ($this->blnEditMode && $this->objAsset instanceof Asset) {
-			$this->objAssetArray[] = Asset::Load($this->objAsset->AssetId);
+			$this->objAssetArray[] = Asset::LoadByAssetCodeWithCustomFields($this->objAsset->AssetCode);
 			// Load all child assets
 			$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($this->objAsset->AssetId);
 			if ($objLinkedAssetArray) {
