@@ -711,7 +711,7 @@
 
         else {
           $blnError = true;
-          $this->lstAddAssetModel->Warning = QApplication::Translate("That asset model code does not exist.");
+          $this->lstAddAssetModel->Warning = QApplication::Translate("That model number does not exist.");
         }
       }
     }
@@ -832,7 +832,7 @@
 
 			try {
 
-				$arrRestrictedFields = array('asset code', 'model', 'category', 'manufacturer', 'location', 'assets', 'name', 'asset model code', 'inventory code', 'quantity', 'company name', 'city', 'state/province', 'country', 'title', 'company', 'email', 'address', 'shipment number', 'ship date', 'ship to company', 'ship to contact', 'ship to address', 'scheduled by', 'status', 'tracking', 'receipt number', 'receive from company', 'receive from contact', 'description', 'account', 'courier', 'account number', 'field name', 'type', 'enabled', 'required', 'role', 'username', 'user role', 'active', 'admin');
+				$arrRestrictedFields = array('asset code', 'model', 'category', 'manufacturer', 'location', 'assets', 'name', 'asset model code', 'model number', 'inventory code', 'quantity', 'company name', 'city', 'state/province', 'country', 'title', 'company', 'email', 'address', 'shipment number', 'ship date', 'ship to company', 'ship to contact', 'ship to address', 'scheduled by', 'status', 'tracking', 'receipt number', 'receive from company', 'receive from contact', 'description', 'account', 'courier', 'account number', 'field name', 'type', 'enabled', 'required', 'role', 'username', 'user role', 'active', 'admin');
 
 				$blnError = false;
 
