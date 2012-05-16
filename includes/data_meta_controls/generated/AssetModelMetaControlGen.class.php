@@ -405,7 +405,7 @@
 		 */
 		public function txtAssetModelCode_Create($strControlId = null) {
 			$this->txtAssetModelCode = new QTextBox($this->objParentObject, $strControlId);
-			$this->txtAssetModelCode->Name = QApplication::Translate('Asset Model Code');
+			$this->txtAssetModelCode->Name = QApplication::Translate('Model Number');
 			$this->txtAssetModelCode->Text = $this->objAssetModel->AssetModelCode;
 			$this->txtAssetModelCode->MaxLength = AssetModel::AssetModelCodeMaxLength;
 			return $this->txtAssetModelCode;
@@ -418,7 +418,7 @@
 		 */
 		public function lblAssetModelCode_Create($strControlId = null) {
 			$this->lblAssetModelCode = new QLabel($this->objParentObject, $strControlId);
-			$this->lblAssetModelCode->Name = QApplication::Translate('Asset Model Code');
+			$this->lblAssetModelCode->Name = QApplication::Translate('Model Number');
 			$this->lblAssetModelCode->Text = $this->objAssetModel->AssetModelCode;
 			return $this->lblAssetModelCode;
 		}

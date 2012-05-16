@@ -165,7 +165,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function lblAssetModelCode_Create() {
 		// It is better to use late-binding here because we are only getting one record
 		$this->lblAssetModelCode = new QLabel($this);
-		$this->lblAssetModelCode->Name = 'Asset Model Code';
+		$this->lblAssetModelCode->Name = 'Model Number';
 		if ($this->blnEditMode) {
 			$this->lblAssetModelCode->Text = $this->objAssetModel->AssetModelCode;
 		}
@@ -424,7 +424,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		}
 
 		if (trim($this->txtAssetModelCode->Text) == "") {
-			$this->txtAssetModelCode->Warning = 'Asset model code is required';
+			$this->txtAssetModelCode->Warning = 'Model number is required';
 			$blnError = true;
 		}
 

@@ -376,7 +376,7 @@ class QAssetEditComposite extends QControl {
 	protected function lblAssetModelCode_Create() {
 		// It is better to use late-binding here because we are only getting one record
 		$this->lblAssetModelCode = new QLabel($this);
-		$this->lblAssetModelCode->Name = 'Asset Model Code';
+		$this->lblAssetModelCode->Name = 'Model Number';
 	}
 
 	// Create the Manufacturer Label

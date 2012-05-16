@@ -188,7 +188,7 @@
 
 	  protected function txtAssetModelCode_Create() {
 	  	$this->txtAssetModelCode = new QTextBox($this);
-	  	$this->txtAssetModelCode->Name = 'Asset Model Code';
+	  	$this->txtAssetModelCode->Name = 'Model Number';
 	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
 	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }

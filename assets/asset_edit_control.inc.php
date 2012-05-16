@@ -38,7 +38,7 @@
 
 		$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false));
 		$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false));
-		$arrAssetFields[] = array('name' => 'Asset Model Code:',  'value' => $this->lblAssetModelCode->Render(false));
+		$arrAssetFields[] = array('name' => 'Model Number:',  'value' => $this->lblAssetModelCode->Render(false));
     if (!$this->blnEditMode) {
 			$arrAssetFields[] = array('name' => 'Location:',     'value' => $this->lstLocation->RenderWithError(false));
 		}

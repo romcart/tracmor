@@ -156,7 +156,7 @@ class QAdvancedSearchComposite extends QControl {
 
   protected function txtAssetModelCode_Create() {
     $this->txtAssetModelCode = new QTextBox($this);
-		$this->txtAssetModelCode->Name = 'Asset Model Code';
+		$this->txtAssetModelCode->Name = 'Model Number';
     $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
     $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
     // if ($this->objParentObject instanceof AssetListFormBase) {
