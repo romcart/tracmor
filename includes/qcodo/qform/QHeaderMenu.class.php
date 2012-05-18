@@ -73,7 +73,8 @@ class QHeaderMenu extends QControl {
 		ob_clean();
 
 		// Evaluate the template
-		require('../common/header_menu.tpl.php');
+		//require('../common/header_menu.tpl.php');
+		require(__DOCROOT__ . __SUBDIRECTORY__ . '/common/header_menu.tpl.php');
 		$strTemplateEvaluated = ob_get_contents();
 		ob_clean();
 
