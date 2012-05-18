@@ -388,9 +388,12 @@ class AssetModelEditForm extends AssetModelEditFormBase {
           $arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
           2
         );
+        if($role instanceof RoleEntityQtypeCustomFieldAuthorization){
+           $role = $role->AuthorizedFlag;
+        }
         if(!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
           &&$arrAssetCustomFieldOption->CustomField->ActiveFlag
-          && (int)$role->AuthorizedFlag==1
+          && (int)$role==1
         ){
         $this->chkAssetCustomFields->AddItem(new QListItem($arrAssetCustomFieldOption->CustomField->ShortDescription,
                                                            $arrAssetCustomFieldOption->CustomField->CustomFieldId,
@@ -591,7 +594,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 
 
-		// Display Asset Code and Asset Model input for edit mode
+		// Display Asset Tag and Asset Model input for edit mode
 		// new: if the user is authorized to edit the built-in fields.
 		//If the user is not authorized to edit built-in fields, the fields are render as labels.
 		if(!$this->blnEditBuiltInFields){

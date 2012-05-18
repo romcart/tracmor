@@ -197,7 +197,7 @@
 
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15px', 'Display=false'));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => "15px", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Tag', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array('CssClass' => "dtg_column", 'Width' => "30%")));
 
@@ -460,7 +460,7 @@ CREATE FIELD METHODS
 		  $this->pnlAddChildAsset->Template = "asset_pnl_add_child_asset.tpl.php";
 
 		  $this->lblAssetCode = new QLabel($this->pnlAddChildAsset);
-		  $this->lblAssetCode->Text = "Asset Code:";
+		  $this->lblAssetCode->Text = "Asset Tag:";
 
 		  $this->btnAddChild = new QButton($this->pnlAddChildAsset);
 		  $this->btnAddChild->Text = "Add Child";
@@ -585,10 +585,10 @@ CREATE FIELD METHODS
                 }
             }
   		    if ($objChildAsset->ParentAssetId&&$blnAssetNotRemoved){
-              $this->txtAddChild->Warning = "That asset code already have the parent asset code. Please try another.";
+              $this->txtAddChild->Warning = "That asset tag already have the parent asset tag. Please try another.";
             }
   		    elseif ($objChildAsset->AssetCode == $this->objAsset->AssetCode) {
-  		      $this->txtAddChild->Warning = "That asset code does not exist. Please try another.";
+  		      $this->txtAddChild->Warning = "That asset tag does not exist. Please try another.";
   		    }
   		    else {
   		      $objChildAsset->LinkedFlag = false;
@@ -600,7 +600,7 @@ CREATE FIELD METHODS
   		    }
   		  }
   		  else {
-  		    $this->txtAddChild->Warning = "That asset code does not exist. Please try another.";
+  		    $this->txtAddChild->Warning = "That asset tag does not exist. Please try another.";
   		  }
 		  }
 		  else {
@@ -698,11 +698,11 @@ CREATE FIELD METHODS
           }
           elseif ($objAsset->CheckedOutFlag || $objAsset->ReservedFlag || $objAsset->ArchivedFlag || $objAsset->LocationId == 2 && $objAsset->LocationId == 3 || $objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objAsset->AssetId)) {
       		  $blnError = true;
-      		  $this->btnUnlink->Warning .= "Child asset code (" . $objAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+      		  $this->btnUnlink->Warning .= "Child asset tag (" . $objAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
       		}
       		elseif ($this->objAsset->CheckedOutFlag || $this->objAsset->ReservedFlag || $this->objAsset->ArchivedFlag || $this->objAsset->LocationId == 2 && $this->objAsset->LocationId == 3 || $this->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($this->objAsset->AssetId)) {
       		  $blnError = true;
-      		  $this->btnUnlink->Warning .= "Parent asset code (" . $this->objAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
+      		  $this->btnUnlink->Warning .= "Parent asset tag (" . $this->objAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.<br />";
       		}
       		else {
       		  $objAsset->LinkedFlag = true;
@@ -775,7 +775,7 @@ CREATE FIELD METHODS
                   unset($objNewChildAssetArray[$intAssetId]);
                 }
                 else{
-                  $this->ctlAssetSearchTool->lblWarning->Text = "Parent and child asset codes cannot be the same.";
+                  $this->ctlAssetSearchTool->lblWarning->Text = "Parent and child asset tags cannot be the same.";
                   $blnError = true;
                 }
               }
@@ -806,7 +806,7 @@ CREATE FIELD METHODS
             $intSelectedAssetCount++;
             $objNewChildAsset = Asset::LoadByAssetId($intAssetId);
             if ($objNewChildAsset && $objNewChildAsset->ParentAssetId) {
-    		      $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") already have the parent asset code. Please try another.<br />";
+    		      $this->ctlAssetSearchTool->lblWarning->Text .= "Asset tag (" . $objNewChildAsset->AssetCode . ") already have the parent asset tag. Please try another.<br />";
     		      $blnError = true;
             }
             elseif ($objNewChildAsset->AssetCode != $this->objAsset->AssetCode) {
@@ -815,7 +815,7 @@ CREATE FIELD METHODS
               $arrCheckedAssets[] = $objNewChildAsset;
             }
             else {
-              $this->ctlAssetSearchTool->lblWarning->Text .= "Asset code (" . $objNewChildAsset->AssetCode . ") must not be the same as asset code.<br />";
+              $this->ctlAssetSearchTool->lblWarning->Text .= "Asset tag (" . $objNewChildAsset->AssetCode . ") must not be the same as asset tag.<br />";
               $blnError = true;
             }
           }
@@ -842,11 +842,11 @@ CREATE FIELD METHODS
           }
           else {
             if (!($objParentAsset = Asset::LoadByAssetId($intSelectedAssetId[0]))) {
-              $this->ctlAssetSearchTool->lblWarning->Text = "That asset code does not exist. Please try another.";
+              $this->ctlAssetSearchTool->lblWarning->Text = "That asset tag does not exist. Please try another.";
 
             }
             elseif ($objParentAsset->AssetId == $this->objAsset->AssetId) {
-        			$this->ctlAssetSearchTool->lblWarning->Text = "Parent asset code must not be the same as asset code. Please try another.";
+        			$this->ctlAssetSearchTool->lblWarning->Text = "Parent asset tag must not be the same as asset tag. Please try another.";
             }
             else {
               $this->ctlAssetEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
@@ -965,7 +965,7 @@ CREATE FIELD METHODS
       }
       $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Parent Asset";
       $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
-		  $this->intDlgStatus = 3; // Adding the Parent Asset Code
+		  $this->intDlgStatus = 3; // Adding the Parent Asset Tag
 		}
 
 		// This is run every time a 'To Company' is selected in CheckOut Transaction

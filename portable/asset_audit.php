@@ -34,14 +34,14 @@ if ($_POST) {
           $arrAssetCode =  array_unique(explode('#',$strAssetCodeArray));
           foreach ($arrAssetCode as $strAssetCode) {
           	$objNewAsset = Asset::LoadByAssetCode($strAssetCode);
-          	// Asset Code must be exist
+          	// Asset Tag must be exist
       			if (!($objNewAsset instanceof Asset)) {
       				$blnError = true;
-      				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
+      				$strWarning .= $strAssetCode." - That asset tag does not exist.<br />";
       			}
       			elseif ($objNewAsset->ArchivedFlag) {
       				$blnError = true;
-      				$strWarning .= $strAssetCode." - That asset code is invalid.<br />";
+      				$strWarning .= $strAssetCode." - That asset tag is invalid.<br />";
       			}
       			elseif ($objNewAsset->LinkedFlag) {
       			  $blnError = true;
@@ -149,17 +149,17 @@ if ($_POST) {
   			$objNewAsset = Asset::LoadByAssetCode($strAssetCode);
   			if (!($objNewAsset instanceof Asset)) {
   				$blnError = true;
-  				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
+  				$strWarning .= $strAssetCode." - That asset tag does not exist.<br />";
   			}
   			else {
-  			  // Check a duplicate asset code
+  			  // Check a duplicate asset tag
   			  if ($_POST['main_result'] && strstr($_POST['main_result'],$strAssetCode)) {
             $arrLocationAsset = explode('|',$_POST['main_result']);
             foreach ($arrLocationAsset as $strLocationAsset) {
              	list($strLocation, $strAsset) = split('[:]',$strLocationAsset,2);
              	if ($strAsset && strstr($strAsset,$strAssetCode)) {
              	  $blnError = true;
-             	  $strWarning .= $strAssetCode." - That asset code has already been added.<br />";
+             	  $strWarning .= $strAssetCode." - That asset tag has already been added.<br />";
              	}
             }
           }
@@ -167,7 +167,7 @@ if ($_POST) {
   			}
   		}
   		else {
-  			$strWarning .= "Please enter an asset code.<br />";
+  			$strWarning .= "Please enter an asset tag.<br />";
   		}
   	}
   	// Location must be exist
@@ -223,7 +223,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 		<td valign="top"><input type="text" id="location" onkeypress="javascript:if(event.keyCode=='13') AddAuditLocation();" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
 	</tr>
 	<tr>
-		<td align="right"><h2>Asset Code:</h2><input style="display:none" type="button" value="Add Asset" id="btn_add_asset" onclick="javascript:AddAuditAsset();" disabled></td>
+		<td align="right"><h2>Asset Tag:</h2><input style="display:none" type="button" value="Add Asset" id="btn_add_asset" onclick="javascript:AddAuditAsset();" disabled></td>
 		<td valign="top"><input type="text" id="asset_code" onkeypress="javascript:if(event.keyCode=='13') AddAuditAsset();" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'" disabled></td>
 	</tr>
 	<form method="post" name="nextlocation_form" onsubmit="javascript:return NextLocation();">

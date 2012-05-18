@@ -141,7 +141,7 @@ class QAssetEditComposite extends QControl {
 		// Create all custom asset fields
 		$this->customFields_Create();
 
-		// Create parent asset code field
+		// Create parent asset tag field
 		$this->txtParentAssetCode_Create();
 		$this->chkLockToParent_Create();
 
@@ -191,7 +191,7 @@ class QAssetEditComposite extends QControl {
 
 	public function Validate() {
 		if (!$this->chkAutoGenerateAssetCode->Checked && trim($this->txtAssetCode->Text) == "") {
-			$this->txtAssetCode->Warning = 'Asset code is required';
+			$this->txtAssetCode->Warning = 'Asset tag is required';
 			return false;
 		}
 		return true;
@@ -256,10 +256,10 @@ class QAssetEditComposite extends QControl {
 
 
 	}
-	// Create the Asset Code text input
+	// Create the Asset Tag text input
 	protected function txtAssetCode_Create() {
 		$this->txtAssetCode = new QTextBox($this);
-		$this->txtAssetCode->Name = 'Asset Code';
+		$this->txtAssetCode->Name = 'Asset Tag';
 		$this->txtAssetCode->Required = true;
 		$this->txtAssetCode->CausesValidation = true;
 		$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnSave_Click'));
@@ -268,7 +268,7 @@ class QAssetEditComposite extends QControl {
 		$this->intNextTabIndex++;
 	}
 
-	// Create the Asset Code text input
+	// Create the Asset Tag text input
 	protected function txtParentAssetCode_Create() {
 		$this->txtParentAssetCode = new QTextBox($this);
 		$this->txtParentAssetCode->Name = 'Parent Asset';
@@ -354,7 +354,7 @@ class QAssetEditComposite extends QControl {
 		$this->intNextTabIndex++;
 	}
 
-	// Create The Header Asset Code label
+	// Create The Header Asset Tag label
 	protected function lblHeaderAssetCode_Create() {
 		$this->lblHeaderAssetCode = new QLabel($this);
 	}
@@ -434,10 +434,10 @@ class QAssetEditComposite extends QControl {
 		}
 	}
 
-	// Create the Asset Code label
+	// Create the Asset Tag label
 	protected function lblAssetCode_Create() {
 		$this->lblAssetCode = new QLabel($this);
-		$this->lblAssetCode->Name = 'Asset Code';
+		$this->lblAssetCode->Name = 'Asset Tag';
 	}
 
 	// Create the Creation Date Label
@@ -477,7 +477,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblParentAssetCode->HtmlEntities = false;
 	}
 
-	// Create the Auto Generate Asset Code Checkbox
+	// Create the Auto Generate Asset Tag Checkbox
 	protected function chkAutoGenerateAssetCode_Create() {
 		$this->chkAutoGenerateAssetCode = new QCheckBox($this);
 		$this->chkAutoGenerateAssetCode->Name = 'Auto Generate';
@@ -893,11 +893,11 @@ class QAssetEditComposite extends QControl {
 					}
 				}
 
-				// Check to see if the asset code already exists
+				// Check to see if the asset tag already exists
 				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
 				if ($AssetDuplicate) {
 					$blnError = true;
-					$this->txtAssetCode->Warning = "That asset code is already in use. Please try another.";
+					$this->txtAssetCode->Warning = "That asset tag is already in use. Please try another.";
 				}
 
 				if (!$blnError && $this->txtParentAssetCode->Text) {
@@ -905,7 +905,7 @@ class QAssetEditComposite extends QControl {
     				$objParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
     				if (!$objParentAsset) {
     				  $blnError = true;
-    					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
+    					$this->txtParentAssetCode->Warning = "That asset tag does not exist. Please try another.";
     				}
 					else if ($this->chkLockToParent->Checked && $objParentAsset->LocationId != $this->lstLocation->SelectedValue) {
 						// If locking child to parent, make sure assets are at the same location
@@ -913,7 +913,7 @@ class QAssetEditComposite extends QControl {
 						$this->chkLockToParent->Warning = 'Cannot lock to parent asset at another location.';
 					} else if ($this->chkLockToParent->Checked && ($objParentAsset->CheckedOutFlag || $objParentAsset->ReservedFlag || $objParentAsset->ArchivedFlag || $objParentAsset->LocationId == 2 || $objParentAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objParentAsset->AssetId))) {
 						$blnError = true;
-						$this->chkLockToParent->Warning = "Parent asset code (" . $objParentAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
+						$this->chkLockToParent->Warning = "Parent asset tag (" . $objParentAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
 					}
     				else {
     				  $this->objAsset->ParentAssetId = $objParentAsset->AssetId;
@@ -924,7 +924,7 @@ class QAssetEditComposite extends QControl {
 				  }
 				  else {
 				    $blnError = true;
-    				$this->txtParentAssetCode->Warning = "Parent asset code must not be the same as asset code. Please try another.";
+    				$this->txtParentAssetCode->Warning = "Parent asset tag must not be the same as asset tag. Please try another.";
 				  }
 				}
 				else {
@@ -958,20 +958,20 @@ class QAssetEditComposite extends QControl {
 
 			if ($this->blnEditMode) {
 
-				// Check to see if the asset code already exists (and is not the asset code of the asset that the user is currently editing
+				// Check to see if the asset tag already exists (and is not the asset tag of the asset that the user is currently editing
 				$AssetDuplicate = Asset::LoadByAssetCode($this->txtAssetCode->Text);
 				if ($AssetDuplicate && $AssetDuplicate->AssetId != $this->objAsset->AssetId) {
 					$blnError = true;
-					$this->txtAssetCode->Warning = "That asset code is already in use. Please try another.";
+					$this->txtAssetCode->Warning = "That asset tag is already in use. Please try another.";
 				}
 
 				if (!$blnError && $this->txtParentAssetCode->Text) {
-				  // Check if the parent asset code is already a child asset of this asset
+				  // Check if the parent asset tag is already a child asset of this asset
 				  $arrChildAsset = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
 				  foreach ($arrChildAsset as $objChildAsset) {
 				    if ($objChildAsset->AssetCode == $this->txtParentAssetCode->Text) {
 				      $blnError = true;
-				      $this->txtParentAssetCode->Warning = "Parent asset code is already a child of this asset. Please try another.";
+				      $this->txtParentAssetCode->Warning = "Parent asset tag is already a child of this asset. Please try another.";
 				      break;
 				    }
 				  }
@@ -980,7 +980,7 @@ class QAssetEditComposite extends QControl {
       				$objParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
       				if (!$objParentAsset) {
       				  $blnError = true;
-      					$this->txtParentAssetCode->Warning = "That asset code does not exist. Please try another.";
+      					$this->txtParentAssetCode->Warning = "That asset tag does not exist. Please try another.";
       				}
 					else if ($this->chkLockToParent->Checked && !($this->objAsset->ParentAssetId == $objParentAsset->AssetId && $this->objAsset->LinkedFlag == 1) && $objParentAsset->LocationId != $this->objAsset->LocationId) {
 						// If locking child to parent, make sure assets are at the same location
@@ -988,7 +988,7 @@ class QAssetEditComposite extends QControl {
 						$this->chkLockToParent->Warning = 'Cannot lock to parent asset at another location.';
 					} else if ($this->chkLockToParent->Checked && !($this->objAsset->ParentAssetId == $objParentAsset->AssetId && $this->objAsset->LinkedFlag == 1) && ($objParentAsset->CheckedOutFlag || $objParentAsset->ReservedFlag || $objParentAsset->ArchivedFlag || $objParentAsset->LocationId == 2 || $objParentAsset->LocationId == 5 || AssetTransaction::PendingTransaction($objParentAsset->AssetId))) {
 						$blnError = true;
-						$this->chkLockToParent->Warning = "Parent asset code (" . $objParentAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
+						$this->chkLockToParent->Warning = "Parent asset tag (" . $objParentAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
 					} else if ($this->chkLockToParent->Checked && !($this->objAsset->ParentAssetId == $objParentAsset->AssetId && $this->objAsset->LinkedFlag == 1) && ($this->objAsset->CheckedOutFlag || $this->objAsset->ReservedFlag || $this->objAsset->ArchivedFlag || $this->objAsset->LocationId == 2 || $this->objAsset->LocationId == 5 || AssetTransaction::PendingTransaction($this->objAsset->AssetId))) {
 						$blnError = true;
 						$this->chkLockToParent->Warning .= "Child asset must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
@@ -1005,7 +1005,7 @@ class QAssetEditComposite extends QControl {
   				  }
   				  else {
   				    $blnError = true;
-      				$this->txtParentAssetCode->Warning = "Parent asset code must not be the same as asset code. Please try another.";
+      				$this->txtParentAssetCode->Warning = "Parent asset tag must not be the same as asset tag. Please try another.";
   				  }
 				  }
 				}
@@ -1135,7 +1135,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblModifiedDate->Text = '';
 		$this->lblCreationDate->Text = '';
 
-		// Show the inputs so the user can change any information and add the asset code
+		// Show the inputs so the user can change any information and add the asset tag
 		$this->displayInputs();
 	}
 
@@ -1329,7 +1329,7 @@ class QAssetEditComposite extends QControl {
 	$this->atcAttach->btnUpload->Display = false;
 	$this->btnPrintAssetTag->Display = false;
 
-    // Display Asset Code and Asset Model input for edit mode
+    // Display Asset Tag and Asset Model input for edit mode
     // new: if the user is authorized to edit the built-in fields.
 		if($this->blnEditBuiltInFields){
 			$this->txtAssetCode->Display = true;

@@ -144,10 +144,10 @@ class QAssetTransactComposite extends QControl {
 	}
 
 	// I'm pretty sure that this is not necessary
-	// Create the Asset Code label
+	// Create the Asset Tag label
 	protected function lblAssetCode_Create() {
 		$this->lblAssetCode = new QLabel($this);
-		$this->lblAssetCode->Name = 'Asset Code';
+		$this->lblAssetCode->Name = 'Asset Tag';
 		$this->lblAssetCode->Text = $this->objAsset->AssetCode;
 	}
 
@@ -174,11 +174,11 @@ class QAssetTransactComposite extends QControl {
 		$this->lstLocation->CausesValidation = false;
 	}
 
-	// Create the text field to enter new asset codes to add to the transaction
+	// Create the text field to enter new asset tags to add to the transaction
 	// Eventually this field will receive information from the AML
 	protected function txtNewAssetCode_Create() {
 		$this->txtNewAssetCode = new QTextBox($this);
-		$this->txtNewAssetCode->Name = 'Asset Code';
+		$this->txtNewAssetCode->Name = 'Asset Tag';
 		$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnAdd_Click'));
 		$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->txtNewAssetCode->CausesValidation = false;

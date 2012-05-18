@@ -490,7 +490,7 @@
 		 */
 		public function txtAssetCode_Create($strControlId = null) {
 			$this->txtAssetCode = new QTextBox($this->objParentObject, $strControlId);
-			$this->txtAssetCode->Name = QApplication::Translate('Asset Code');
+			$this->txtAssetCode->Name = QApplication::Translate('Asset Tag');
 			$this->txtAssetCode->Text = $this->objAsset->AssetCode;
 			$this->txtAssetCode->Required = true;
 			$this->txtAssetCode->MaxLength = Asset::AssetCodeMaxLength;
@@ -504,7 +504,7 @@
 		 */
 		public function lblAssetCode_Create($strControlId = null) {
 			$this->lblAssetCode = new QLabel($this->objParentObject, $strControlId);
-			$this->lblAssetCode->Name = QApplication::Translate('Asset Code');
+			$this->lblAssetCode->Name = QApplication::Translate('Asset Tag');
 			$this->lblAssetCode->Text = $this->objAsset->AssetCode;
 			$this->lblAssetCode->Required = true;
 			return $this->lblAssetCode;

@@ -832,7 +832,7 @@
 
 			try {
 
-				$arrRestrictedFields = array('asset code', 'model', 'category', 'manufacturer', 'location', 'assets', 'name', 'asset model code', 'model number', 'inventory code', 'quantity', 'company name', 'city', 'state/province', 'country', 'title', 'company', 'email', 'address', 'shipment number', 'ship date', 'ship to company', 'ship to contact', 'ship to address', 'scheduled by', 'status', 'tracking', 'receipt number', 'receive from company', 'receive from contact', 'description', 'account', 'courier', 'account number', 'field name', 'type', 'enabled', 'required', 'role', 'username', 'user role', 'active', 'admin');
+				$arrRestrictedFields = array('asset code','asset tag', 'model', 'category', 'manufacturer', 'location', 'assets', 'name', 'asset model code', 'model number', 'inventory code', 'quantity', 'company name', 'city', 'state/province', 'country', 'title', 'company', 'email', 'address', 'shipment number', 'ship date', 'ship to company', 'ship to contact', 'ship to address', 'scheduled by', 'status', 'tracking', 'receipt number', 'receive from company', 'receive from contact', 'description', 'account', 'courier', 'account number', 'field name', 'type', 'enabled', 'required', 'role', 'username', 'user role', 'active', 'admin');
 
 				$blnError = false;
 

@@ -152,7 +152,7 @@
 		// Create and Setup txtAssetCode
 		protected function txtAssetCode_Create() {
 			$this->txtAssetCode = new QTextBox($this);
-			$this->txtAssetCode->Name = QApplication::Translate('Asset Code');
+			$this->txtAssetCode->Name = QApplication::Translate('Asset Tag');
 			$this->txtAssetCode->Text = $this->objAsset->AssetCode;
 			$this->txtAssetCode->Required = true;
 			$this->txtAssetCode->MaxLength = Asset::AssetCodeMaxLength;

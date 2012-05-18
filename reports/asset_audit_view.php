@@ -87,7 +87,7 @@
       
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Location', '<?= $_ITEM->Location->ShortDescription ?>',
   			array('OrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AuditScan()->LocationId, false), 'CssClass' => 'dtg_column')));
-  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM->Asset->AssetCode ?>',
+  		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Tag', '<?= $_ITEM->Asset->AssetCode ?>',
   			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetCode, false), 'CssClass' => 'dtg_column')));
   		$this->dtgAudit->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM->Asset->AssetModel->ShortDescription ?>',
   			array('OrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(AuditScan::AuditScanExt()->Asset->AssetModel->ShortDescription, false), 'CssClass' => 'dtg_column')));

@@ -572,7 +572,7 @@
           $this->dtgUpdatedAsset->ShowColumnToggle = false;
           $this->dtgUpdatedAsset->ShowExportCsv = false;
           $this->dtgUpdatedAsset->ShowHeader = false;
-          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Tag', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Create the label for successful import
           $this->lblImportSuccess = new QLabel($this);
@@ -604,7 +604,7 @@
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QTerminateAction());
         }
         else {
-          $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Short Description and Location).";
+          $this->btnNext->Warning = "You must select all required fields (Asset Tag, Asset Model Short Description and Location).";
           $blnError = true;
         }
 		  }
@@ -1142,7 +1142,7 @@
 	    if ($this->lstImportAction->SelectedValue == 2) {
 	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    }
-	    $lstMapHeader->AddItem("Asset Code", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Asset Tag", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Asset Model", "Asset Model", ($strName == 'asset model') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Parent Asset", "Parent Asset", ($strName == 'parent asset') ? true : false, $strAssetGroup);

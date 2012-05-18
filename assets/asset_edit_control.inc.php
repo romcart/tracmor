@@ -24,8 +24,8 @@
 
 	//Only display the built-in fields if the user is authorized according to FLA(Field-Level-Authorization)
 	// Built-in fields for Assets are:
-	// Asset Code
-	// Asset Model
+	// Asset Tag
+	// Model
 
 		if (!$this->blnEditMode){
 			$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lstAssetModel->RenderWithError(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));
@@ -34,7 +34,7 @@
 			$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lstAssetModel->Render(false) . $this->lblNewAssetModel->Render(false) . $this->lblAssetModel->Render(false));
 		}
 
-		$arrAssetFields[] = array('name' => 'Asset Code:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
+		$arrAssetFields[] = array('name' => 'Asset Tag:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
 
 		$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false));
 		$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false));

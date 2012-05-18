@@ -14,7 +14,7 @@ $strJavaScriptCode = "";
 
 if ($_POST && $_POST['method'] == 'complete_transaction') {
 	/*
-	Run error checking on the array of asset codes and the destination location
+	Run error checking on the array of asset tags and the destination location
 	If there are no errors, then you will add the transaction to the database.
 		That will include an entry in the Transaction and Asset Transaction table.
 		You will also have to change the asset.location_id to the destination location
@@ -28,15 +28,15 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	  list($strAssetCode, $strLocation) = split('[|]',$strAssetCodeLocation,2);
 		if ($strAssetCode && $strLocation) {
 			// Begin error checking
-			// Asset Code must match an existing asset in the system
+			// Asset Tag must match an existing asset in the system
 			$objNewAsset = Asset::LoadByAssetCode($strAssetCode);
 			if (!($objNewAsset instanceof Asset)) {
 				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
+				$strWarning .= $strAssetCode." - That asset tag does not exist.<br />";
 			}
 			elseif ($objNewAsset->ArchivedFlag) {
 				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset code is invalid.<br />";
+				$strWarning .= $strAssetCode." - That asset tag is invalid.<br />";
 			}
 			elseif ($objNewAsset->LinkedFlag) {
 			  $blnError = true;
@@ -74,7 +74,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			  }
 			  else {
 			    $blnError = true;
-			    $strWarning .= $strAssetCode." - That is a duplicate asset code.<br />";
+			    $strWarning .= $strAssetCode." - That is a duplicate asset tag.<br />";
 			  }
 			}
 
@@ -146,7 +146,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 ?>
 <table border=0 style="padding-top:16px;">
 	<tr>
-		<td align="right"><h2>Asset Code:</h2></td>
+		<td align="right"><h2>Asset Tag:</h2></td>
 		<td valign="top"><input type="text" id="asset_code" size="10" onkeypress="javascript:if(event.keyCode=='13') document.getElementById('destination_location').focus();" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
 	</tr>
 	<tr>

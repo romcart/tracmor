@@ -686,7 +686,7 @@
           $this->dtgAsset->ShowColumnToggle = false;
           $this->dtgAsset->ShowExportCsv = false;
           $this->dtgAsset->ShowHeader = false;
-          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Tag', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Updated assets
           $this->dtgUpdatedAsset = new QDataGrid($this);
@@ -698,7 +698,7 @@
           $this->dtgUpdatedAsset->ShowColumnToggle = false;
           $this->dtgUpdatedAsset->ShowExportCsv = false;
           $this->dtgUpdatedAsset->ShowHeader = false;
-          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Tag', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Create the label for successful import
           $this->lblImportSuccess = new QLabel($this);
@@ -730,7 +730,7 @@
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QTerminateAction());
         }
         else {
-          $this->btnNext->Warning = "You must select all required fields (Asset Code, Model Number, Asset Model Short Description, Location, Category and Manufacturer).";
+          $this->btnNext->Warning = "You must select all required fields (Asset Tag, Model Number, Asset Model Short Description, Location, Category and Manufacturer).";
           $blnError = true;
         }
 		  }
@@ -1502,7 +1502,7 @@
 	    $strAssetGroup = "Asset";
 	    $strAssetModelGroup = "Asset Model";
 	    $lstMapHeader->AddItem("- Not Mapped -", null);
-	    $lstMapHeader->AddItem("Asset Code", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Asset Tag", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
 	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
 	    }

@@ -588,7 +588,7 @@
           $this->dtgUpdatedAsset->ShowColumnToggle = false;
           $this->dtgUpdatedAsset->ShowExportCsv = false;
           $this->dtgUpdatedAsset->ShowHeader = false;
-          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Tag', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Create the label for successful import
           $this->lblImportSuccess = new QLabel($this);
@@ -1142,7 +1142,7 @@
 	    $lstMapHeader->Name = "lst".$intId;
 	    $strAssetModelGroup = "Asset Model";
 	    $lstMapHeader->AddItem("- Not Mapped -", null);
-	    /*$lstMapHeader->AddItem("Asset Code", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    /*$lstMapHeader->AddItem("Asset Tag", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
 	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
 	    }
