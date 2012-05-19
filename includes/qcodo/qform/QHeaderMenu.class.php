@@ -109,9 +109,9 @@ class QHeaderMenu extends QControl {
 	
 	protected function lblLogo_Create() {
 		$this->lblLogo = new QLabel($this);
-		$strImagePath = (AWS_S3) ? sprintf('https://s3.amazonaws.com/%s/images', AWS_BUCKET) : '../images';
+		$strImagePath = (AWS_S3) ? sprintf('https://s3.amazonaws.com/%s/images', AWS_BUCKET) : __IMAGE_ASSETS__;
 		if (!QApplication::$TracmorSettings->CompanyLogo) {
-			$this->lblLogo->Text = '<img src="../images/empty.gif">';
+			$this->lblLogo->Text = '<img src="<' . __IMAGE_ASSETS__ . '/empty.gif">';
 		} else {
 			$this->lblLogo->Text = sprintf('<img src="%s/%s">', $strImagePath, QApplication::$TracmorSettings->CompanyLogo);
 		}
