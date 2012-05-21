@@ -191,7 +191,7 @@
 			$objEntityQtypeCustomFieldArray = EntityQtypeCustomField::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
 			$objAssetListItem = new QListItem('Assets', 1);
 			$objInventoryListItem = new QListItem('Inventory', 2);
-			$objAssetModelListItem = new QListItem('Asset Model', 4);
+			$objAssetModelListItem = new QListItem('Model', 4);
 			$objManufacturerListItem = new QListItem('Manufacturer', 5);
 			$objCategoryListItem = new QListItem('Category', 6);
 			$objCompanyListItem = new QListItem('Company', 7);
@@ -376,7 +376,7 @@
     //Create/Setup "Selection Option" label
   	protected function lblAllAssetModels_Create() {
   		$this->lblAllAssetModels = new QLabel($this);
-  		$this->lblAllAssetModels->Text = 'All Asset Models';
+  		$this->lblAllAssetModels->Text = 'All Models';
  			if (!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1) {
          $this->lblAllAssetModels->Visible = false;
       }
@@ -385,7 +385,7 @@
     //Create/Setup "Selection Option" label
   	protected function lblAssetModel_Create() {
   		$this->lblAssetModel = new QLabel($this);
-  		$this->lblAssetModel->Text = 'Asset Model:';
+  		$this->lblAssetModel->Text = 'Model:';
       if (!$this->blnAssetEntityType||
          $this->rblAllAssetModels->SelectedValue == 1) {
 
@@ -395,7 +395,7 @@
 
     protected function lstAddAssetModel_Create(){
       $this->lstAddAssetModel = new QListBox($this);
-      $this->lstAddAssetModel->Name = QApplication::Translate('Add Asset Model');
+      $this->lstAddAssetModel->Name = QApplication::Translate('Add Model');
       $this->lstAddAssetModel->CausesValidation = false;
       $arrAssetModels = AssetModel::LoadAll();
       $this->lstAddAssetModel->AddItem(new QListItem('-Select One-',null));
@@ -441,7 +441,7 @@
       $this->dtgAssetModels->Paginator = $objPaginator;
       $this->dtgAssetModels->ItemsPerPage = 20;
 
-      $this->dtgAssetModels->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink($_ITEM,"bluelink"); ?>', array('CssClass' => "dtg_column" , 'HtmlEntities'=>false)));
+      $this->dtgAssetModels->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink($_ITEM,"bluelink"); ?>', array('CssClass' => "dtg_column" , 'HtmlEntities'=>false)));
       $this->dtgAssetModels->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetModelsColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 
       $objStyle = $this->dtgAssetModels->RowStyle;
@@ -695,7 +695,7 @@
               foreach($this->arrAssetModels as $assetModel){
                 if ($assetModel->AssetModelId == $assetModelToAdd->AssetModelId){
                   $blnError = true;
-                  $this->lstAddAssetModel->Warning = QApplication::Translate("That asset model has already been added.");
+                  $this->lstAddAssetModel->Warning = QApplication::Translate("That model has already been added.");
                 }
               }
             }
@@ -798,7 +798,7 @@
           $this->ctlAssetModelSearchTool->lblWarning->Text = "";
           $intSelectedAssetModelId = $this->ctlAssetModelSearchTool->ctlAssetModelSearch->dtgAssetModel->GetSelected("AssetModelId");
           if (count($intSelectedAssetModelId) < 1) {
-            $this->ctlAssetModelSearchTool->lblWarning->Text = "No selected asset models.";
+            $this->ctlAssetModelSearchTool->lblWarning->Text = "No selected models.";
           }
           else {
             $lblNewWarning = "";
@@ -856,7 +856,7 @@
             && $this->rblAllAssetModels->SelectedValue==2
             && count($this->arrAssetModels)== 0){
           $blnError = true;
-          $this->btnCancel->Warning = 'You must apply at least one Asset Model.';
+          $this->btnCancel->Warning = 'You must apply at least one Model.';
         }
 
 				if ($this->blnEditMode) {

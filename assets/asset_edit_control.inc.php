@@ -28,10 +28,10 @@
 	// Model
 
 		if (!$this->blnEditMode){
-			$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lstAssetModel->RenderWithError(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));
+			$arrAssetFields[] = array('name' => 'Model:',  'value' => $this->lstAssetModel->RenderWithError(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));
 		}
 		else{
-			$arrAssetFields[] = array('name' => 'Asset Model:',  'value' => $this->lstAssetModel->Render(false) . $this->lblNewAssetModel->Render(false) . $this->lblAssetModel->Render(false));
+			$arrAssetFields[] = array('name' => 'Model:',  'value' => $this->lstAssetModel->Render(false) . $this->lblNewAssetModel->Render(false) . $this->lblAssetModel->Render(false));
 		}
 
 		$arrAssetFields[] = array('name' => 'Asset Tag:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));

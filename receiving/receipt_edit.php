@@ -694,7 +694,7 @@
 		// Create the Asset Model List for creating new assets
 		protected function lstAssetModel_Create() {
 			$this->lstAssetModel = new QListBox($this);
-			$this->lstAssetModel->Name = 'Asset Model';
+			$this->lstAssetModel->Name = 'Model';
 			$this->lstAssetModel->AddItem('- Select One -', null, true);
 			$this->lstAssetModel->Display = false;
 		}
@@ -1382,7 +1382,7 @@
 				}
 				elseif (!$this->lstAssetModel->SelectedValue) {
 				  $blnError = true;
-					$this->txtNewAssetCode->Warning = 'You must select one asset model.';
+					$this->txtNewAssetCode->Warning = 'You must select one model.';
 				}
 				if (!$blnError) {
 					$objNewAsset = new Asset();

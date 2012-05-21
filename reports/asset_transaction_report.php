@@ -170,7 +170,7 @@
 
 	  protected function txtShortDescription_Create() {
 	    $this->txtShortDescription = new QTextBox($this);
-			$this->txtShortDescription->Name = 'Asset Model';
+			$this->txtShortDescription->Name = 'Model';
 			// Because the enter key will also call form.submit() on some browsers, which we
       // absolutely DON'T want to have happen, let's be sure to terminate any additional
       // actions on EnterKey
@@ -359,7 +359,7 @@
                 </ROW>
                 <ROW>
                   <COL CELLCLASS='report_column_header'>Asset Tag:</COL>
-                  <COL CELLCLASS='report_column_header'>Asset Model:</COL>
+                  <COL CELLCLASS='report_column_header'>Model:</COL>
                   <COL CELLCLASS='report_column_header'>From:</COL>
                   <COL CELLCLASS='report_column_header'>To:</COL>
                   $strXmlColNameByCustomField

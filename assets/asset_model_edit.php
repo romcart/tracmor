@@ -148,7 +148,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	// Create the Short Description label (Asset Model Name)
 	protected function lblShortDescription_Create() {
 		$this->lblShortDescription = new QLabel($this);
-		$this->lblShortDescription->Name = 'Asset Model';
+		$this->lblShortDescription->Name = 'Model';
 		if ($this->blnEditMode) {
 			$this->lblShortDescription->Text = $this->objAssetModel->__toString();
 		}
@@ -157,7 +157,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	// Create the Asset Model Header label (Asset Model Name)
 	protected function lblAssetModelHeader_Create() {
 		$this->lblAssetModelHeader = new QLabel($this);
-		$this->lblAssetModelHeader->Name = 'Asset Model';
+		$this->lblAssetModelHeader->Name = 'Model';
 		$this->lblAssetModelHeader->Text = $this->objAssetModel->__toString();
 	}
 
@@ -339,7 +339,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function btnDelete_Create() {
 		$this->btnDelete = new QButton($this);
 		$this->btnDelete->Text = 'Delete';
-		$this->btnDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you SURE you want to DELETE this Asset Model?'));
+		$this->btnDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you SURE you want to DELETE this Model?'));
 		$this->btnDelete->AddAction(new QClickEvent(), new QServerAction('btnDelete_Click'));
 		$this->btnDelete->CausesValidation = false;
 		if (!$this->blnEditMode) {
@@ -507,7 +507,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		catch (QDatabaseExceptionBase $objExc) {
 			$objDatabase->TransactionRollback();
 			if ($objExc->ErrorNumber == 1451) {
-				$this->btnDelete->Warning = 'This asset model cannot be deleted because it is associated with one or more assets.';
+				$this->btnDelete->Warning = 'This model cannot be deleted because it is associated with one or more assets.';
 			}
 			else {
 				throw new QDatabaseExceptionBase();

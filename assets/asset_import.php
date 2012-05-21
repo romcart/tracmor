@@ -560,7 +560,7 @@
           $this->dtgAsset->ShowColumnToggle = false;
           $this->dtgAsset->ShowExportCsv = false;
           $this->dtgAsset->ShowHeader = false;
-          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgAsset->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Updated assets
           $this->dtgUpdatedAsset = new QDataGrid($this);
@@ -1143,7 +1143,7 @@
 	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    }
 	    $lstMapHeader->AddItem("Asset Tag", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Asset Model", "Asset Model", ($strName == 'asset model') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Model", "Asset Model", ($strName == 'asset model') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Parent Asset", "Parent Asset", ($strName == 'parent asset') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Locked To Parent", "Locked To Parent", ($strName == 'locked to parent') ? true : false, $strAssetGroup);

@@ -317,7 +317,7 @@ class QAssetEditComposite extends QControl {
 	// Create and Setup lstAssetModel
 	protected function lstAssetModel_Create() {
 		$this->lstAssetModel = new QListBox($this);
-		$this->lstAssetModel->Name = 'Asset Model';
+		$this->lstAssetModel->Name = 'Model';
 		$this->lstAssetModel->Required = true;
 		if (!$this->blnEditMode)
 			$this->lstAssetModel->AddItem('- Select One -', null);
@@ -362,7 +362,7 @@ class QAssetEditComposite extends QControl {
 	// Create The Asset Model label (Asset Name)
 	protected function lblAssetModel_Create() {
 		$this->lblAssetModel = new QLabel($this);
-		$this->lblAssetModel->Name = 'Asset Model';
+		$this->lblAssetModel->Name = 'Model';
 		$this->lblAssetModel->HtmlEntities = false;
 	}
 
@@ -465,7 +465,7 @@ class QAssetEditComposite extends QControl {
 		$this->lblNewAssetModel = new QLabel($this);
 		$this->lblNewAssetModel->HtmlEntities = false;
 		$this->lblNewAssetModel->Text = '<img src="../images/add.png">';
-		$this->lblNewAssetModel->ToolTip = "New Asset Model";
+		$this->lblNewAssetModel->ToolTip = "New Model";
 		$this->lblNewAssetModel->CssClass = "add_icon";
 	  $this->lblNewAssetModel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'lblNewAssetModel_Click'));
 	}

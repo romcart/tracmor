@@ -122,7 +122,7 @@
 		// Create and Setup lstAssetModel
 		protected function lstAssetModel_Create() {
 			$this->lstAssetModel = new QListBox($this);
-			$this->lstAssetModel->Name = QApplication::Translate('Asset Model');
+			$this->lstAssetModel->Name = QApplication::Translate('Model');
 			$this->lstAssetModel->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstAssetModel->AddItem(QApplication::Translate('- Select One -'), null);

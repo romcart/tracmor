@@ -198,7 +198,7 @@
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15px', 'Display=false'));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => "15px", 'HtmlEntities' => false)));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Tag', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
+	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
 	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array('CssClass' => "dtg_column", 'Width' => "30%")));
 
 	    //$this->dtgChildAssets->SortColumnIndex = 2;

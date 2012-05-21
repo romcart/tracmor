@@ -62,7 +62,7 @@
 		//}		
 	?>
 		
-		<div class="title">Asset Models: <?php $this->lblAssetModelHeader->Render(); ?></div>
+		<div class="title">Models: <?php $this->lblAssetModelHeader->Render(); ?></div>
 		<table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
 			<tr>
 				<td class="record_header">
