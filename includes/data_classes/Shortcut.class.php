@@ -50,7 +50,12 @@
 		}
 		
 		public function __toStringWithLink($strCssClass = null) {
-			return sprintf('<a href="%s" class="%s">%s</a>', $this->strLink, $strCssClass, $this->__toString());
+			
+			if (strpos($this->strLink, '..') === 0) {
+				$this->strLink = substr($this->strLink, 2);
+			}
+			
+			return sprintf('<a href="%s%s" class="%s">%s</a>', __SUBDIRECTORY__, $this->strLink, $strCssClass, $this->__toString());
 		}
 		
 		public function __toStringIcon() {

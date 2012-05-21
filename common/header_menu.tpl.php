@@ -25,7 +25,7 @@
 	<table width="100%" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
-				<table cellpadding="0" cellspacing="0" width="100%" style="background:url(../images/main_header_bg.png); background-repeat: repeat-x;">
+				<table cellpadding="0" cellspacing="0" width="100%" style="background:url(<?php echo __IMAGE_ASSETS__ . '/main_header_bg.png'; ?>); background-repeat: repeat-x;">
 					<tr style="height:64px">
 						<td>
 							<table cellpadding="0" cellspacing="0" style="width:100%;">
@@ -40,22 +40,22 @@
 						<td>
 							<table cellpadding="0" cellspacing="0" style="width:100%;">
 								<tr style="height:24px">
-									<td style="width:15px;background-image: url(../images/emptyTabSpace.gif); background-repeat:repeat-x;"><img src="../images/empty.gif" width="15" height="1"></td>
+									<td style="width:15px;background-image: url(<?php echo __IMAGE_ASSETS__ . '/emptyTabSpace.gif'; ?>); background-repeat:repeat-x;"><img src="<?php echo __IMAGE_ASSETS__ . '/empty.gif'; ?>" width="15" height="1"></td>
 									<?php
 									
 										if ($this->objRoleModuleArray) {
 											foreach ($this->objRoleModuleArray as $objRoleModule) {
-												$link = '../' . $objRoleModule->Module->ShortDescription . '/';
+												$link = __SUBDIRECTORY__ . '/' . $objRoleModule->Module->ShortDescription . '/';
 												if (QApplication::$objRoleModule && QApplication::$objRoleModule->ModuleId == $objRoleModule->ModuleId) {
 													$strTabClass = 'current_tab_';
 												}
 												else {
 													$strTabClass = 'other_tab_';
 												}
-												echo(sprintf('<td class="%sleft"><img src="../images/empty.gif" width="12" height="1"></td>', $strTabClass));
+												echo(sprintf('<td class="%sleft"><img src="%s/empty.gif" width="12" height="1"></td>', $strTabClass, __IMAGE_ASSETS__));
 												echo(sprintf('<td class="%smiddle"><a href="%s" class="%slabel" border="0">%s</a></td>', $strTabClass, $link, $strTabClass, ucfirst($objRoleModule->Module->ShortDescription)));
-												echo(sprintf('<td class="%sright"><img src="../images/empty.gif" width="12" height="1"></td>', $strTabClass));
-												echo('<td class="empty_tab_space"><img src="../images/empty.gif" width="1" height="1"></td>');
+												echo(sprintf('<td class="%sright"><img src="%s/empty.gif" width="12" height="1"></td>', $strTabClass, __IMAGE_ASSETS__));
+												echo(sprintf('<td class="empty_tab_space"><img src="%s/empty.gif" width="1" height="1"></td>', __IMAGE_ASSETS__));
 											}
 										}
 									?>
@@ -68,9 +68,9 @@
 											else {
 												$strTabClass = 'current_tab_';
 											}
-											echo(sprintf('<td class="%sleft"><img src="../images/empty.gif" width="12" height="1"></td>', $strTabClass));
-											echo(sprintf('<td class="%smiddle"><a href="%s" class="%slabel">Admin</a></td>', $strTabClass, '../admin/', $strTabClass));
-											echo(sprintf('<td class="%sright"><img src="../images/empty.gif" width="12" height="1"></td>', $strTabClass));
+											echo(sprintf('<td class="%sleft"><img src="%s/empty.gif" width="12" height="1"></td>', $strTabClass, __IMAGE_ASSETS__));
+											echo(sprintf('<td class="%smiddle"><a href="%s" class="%slabel">Admin</a></td>', $strTabClass, __SUBDIRECTORY__ . '/admin/', $strTabClass));
+											echo(sprintf('<td class="%sright"><img src="%s/empty.gif" width="12" height="1"></td>', $strTabClass, __IMAGE_ASSETS__));
 										}
 									?>
 									<td class="empty_tab_space" width="100%">&nbsp;</td>
