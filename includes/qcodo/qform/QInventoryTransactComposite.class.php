@@ -280,7 +280,8 @@ class QInventoryTransactComposite extends QControl {
 					$this->lstSourceLocation->Enabled = true;
 					$this->txtQuantity->Enabled = true;
 				}
-				else {
+                // Exclude restock transaction type as it doesn't contain Source Location parameter
+				elseif($this->intTransactionTypeId != 4) {
 					$this->txtNewInventoryModelCode->Warning = 'There is no inventory for that inventory code';
 					$this->lstSourceLocation->Enabled = false;
 					$this->txtQuantity->Enabled = false;
