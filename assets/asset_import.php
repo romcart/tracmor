@@ -1424,20 +1424,21 @@
         }
         $arrToClear = array();
         foreach (EntityQtypeCustomField::LoadArrayByEntityQtypeId(1) as $objAssetCustomField){
-          if(!in_array($objAssetCustomField->CustomFieldId,$arrAllowed)){
+          if(!in_array($objAssetCustomField->CustomFieldId,$arrAllowed) && $objAssetCustomField->CustomField->AllAssetModelsFlag != 1){
             $arrToClear[]=$objAssetCustomField->CustomFieldId;
           }
         }
         if($intCustomFieldId){
-          foreach ($arrToClear as $idToBeNull)
-          {
-            $arrForQuery[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
-          }
-          return sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $arrForQuery), $intCustomFieldId);
-
+        	if ($arrToClear && count($arrToClear) > 0) {
+	          foreach ($arrToClear as $idToBeNull)
+	          {
+	            $arrForQuery[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
+	          }
+	          return sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $arrForQuery), $intCustomFieldId);
+        	}
         }
         else{
-        return $arrToClear;
+        	return $arrToClear;
         }
       }
 
