@@ -1046,7 +1046,7 @@ class QAssetEditComposite extends QControl {
         $arrToClear = array();
 
         foreach (EntityQtypeCustomField::LoadArrayByEntityQtypeId(1) as $objAssetCustomField){
-          if(!in_array($objAssetCustomField->CustomFieldId,$arrAllowed)){
+          if(!in_array($objAssetCustomField->CustomFieldId,$arrAllowed) && $objAssetCustomField->CustomField->AllAssetModelsFlag != 1){
             $arrToClear[]=$objAssetCustomField->CustomFieldId;
           }
         }

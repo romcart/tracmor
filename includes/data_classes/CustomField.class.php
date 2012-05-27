@@ -496,7 +496,7 @@
         $arrForAssetModel = array();
         foreach ($objCustomFieldArray as $objCustomField)
         {
-          if(in_array($objCustomField->CustomFieldId,$arrCustomFieldsForAssetModel)){
+          if(in_array($objCustomField->CustomFieldId,$arrCustomFieldsForAssetModel) || $objCustomField->AllAssetModelsFlag == 1){
             $arrForAssetModel[] = $objCustomField;
           }
         }
