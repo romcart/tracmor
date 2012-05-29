@@ -176,6 +176,35 @@
             }
 		}
 
+        public function LoadByAssetIdWithCustomFields($strAssetId) {
+            Asset::QueryHelper($objDatabase);
+            $arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
+
+            // Setup the SQL Query
+            $strQuery = sprintf("
+				SELECT
+					`asset`.*
+					%s
+				FROM
+					`asset`
+					%s
+				WHERE `asset`.`asset_id` = '%s'
+			",
+                $arrCustomFieldSql['strSelect'],
+                $arrCustomFieldSql['strFrom'],
+                $strAssetId);
+
+            // Perform the Query and Instantiate the Result
+            $objDbResult = $objDatabase->Query($strQuery);
+            $arrAssets = Asset::InstantiateDbResult($objDbResult);
+            if(count($arrAssets)>0){
+                return $arrAssets[0];
+            }
+            else {
+                return null;
+            }
+        }
+
 		/**
 		 * Load all Assets
 		 * @param string $strOrderBy
