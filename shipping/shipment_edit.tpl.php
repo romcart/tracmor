@@ -141,8 +141,8 @@
 									<td class="record_field_name">Shipping Courier:</td>
 									<td class="record_field_value"><?php $this->lstCourier->RenderWithError();$this->lblCourier->Render(); ?></td>
 								</tr>
-								<?php $tnDisplay = ($this->blnEditMode && $this->objShipment->CourierId===1 && !$this->objShipment->ShippedFlag) ? "display:none;" : ""; ?>
-								<tr id="trackingNumber" style="<?php echo($tnDisplay); ?>">
+								<?php //$tnDisplay = ($this->blnEditMode && !$this->objShipment->ShippedFlag) ? "display:none;" : ""; ?>
+								<tr id="trackingNumber" style="<?php //echo($tnDisplay); ?>">
 									<td class="record_field_name">Tracking Number:</td>
 									<td class="record_field_value"><?php $this->txtTrackingNumber->RenderWithError();$this->lblTrackingNumber->Render(); ?>&nbsp;</td>
 								</tr>								

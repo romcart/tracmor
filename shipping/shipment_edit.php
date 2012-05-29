@@ -140,7 +140,7 @@
 		protected $objTransaction;
 		protected $dttNow;
 		protected $dttFiveDaysFromNow;
-		protected $objFedexShipment;
+		//protected $objFedexShipment;
     protected $receiveInternalShipmentTransaction;
 
 		// Integers
@@ -167,11 +167,11 @@
 			$this->SetupShipment();
 
 			// If the courier is FedEx, load the FedexShipment object
-			if ($this->blnEditMode) {
-				if ($this->objShipment->CourierId === 1) {
-					$this->objFedexShipment = FedexShipment::LoadByShipmentId($this->objShipment->ShipmentId);
-				}
-			}
+			//if ($this->blnEditMode) {
+			//	if ($this->objShipment->CourierId === 1) {
+			//		$this->objFedexShipment = FedexShipment::LoadByShipmentId($this->objShipment->ShipmentId);
+			//	}
+			//}
 
 			$this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
 
@@ -619,20 +619,20 @@
 		}
 
 		// Create and Setup lblSenderLabel
-		protected function lblSenderLabel_Create() {
-			$this->lblSenderLabel = new QLabel($this->pnlFedExShipment);
-			$this->lblSenderLabel->Name = 'Sender';
-			if ($this->blnEditMode && $this->objFedexShipment) {
-				if ($this->objFedexShipment->PayType === 1) {
-					$this->lblSenderLabel->Text = 'Sender Account';
-				} else {
-					$this->lblSenderLabel->Text = 'Recipient/third party<br>account';
-				}
-			} else {
-				$this->lblSenderLabel->Text = 'Sender Account';
-			}
-			$this->lblSenderLabel->HtmlEntities=false;
-		}
+		//protected function lblSenderLabel_Create() {
+		//	$this->lblSenderLabel = new QLabel($this->pnlFedExShipment);
+		//	$this->lblSenderLabel->Name = 'Sender';
+			//if ($this->blnEditMode && $this->objFedexShipment) {
+			//	if ($this->objFedexShipment->PayType === 1) {
+			//		$this->lblSenderLabel->Text = 'Sender Account';
+			//	} else {
+			//		$this->lblSenderLabel->Text = 'Recipient/third party<br>account';
+			//	}
+			//} else {
+			//	$this->lblSenderLabel->Text = 'Sender Account';
+			//}
+			//$this->lblSenderLabel->HtmlEntities=false;
+		//}
 
 		protected function lblNewFromCompany_Create() {
 			$this->lblNewFromCompany = new QLabel($this);
@@ -2539,14 +2539,14 @@
 
 					if ($this->blnEditMode) {
 						$this->UpdateShipmentFields();
-						if ($this->objShipment->CourierId === 1) {
-							$this->UpdateFedexFields();
-						}
+						//if ($this->objShipment->CourierId === 1) {
+						//	$this->UpdateFedexFields();
+						//}
 					}
-					elseif ($this->objShipment->CourierId === 1) {
-						// Update $this->objShipment with FedEx tracking number
-						$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
-					}
+					//elseif ($this->objShipment->CourierId === 1) {
+					//	// Update $this->objShipment with FedEx tracking number
+					//	$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
+					//}
 
 					$this->objShipment->ShippedFlag = true;
 					// $this->objShipment->Save(false, true);
@@ -3200,7 +3200,7 @@
 		// This resets control values when Cancel is clicked
 		protected function UpdateShipmentControls() {
 			$this->lstToContact->SelectedValue = $this->objShipment->ToContactId;
-			$this->lstToContact_Select();
+			//$this->lstToContact_Select();
 			$this->lstFromCompany->SelectedValue = $this->objShipment->FromCompanyId;
 			$this->lstFromContact->SelectedValue = $this->objShipment->FromContactId;
 			$this->calShipDate->DateTime = $this->objShipment->ShipDate;
@@ -3432,7 +3432,7 @@
 
 		public function CloseNewToContactPanel($blnUpdates) {
 			$this->lstToContact->Enabled = true;
-			$this->lstToContact_Select();
+			//$this->lstToContact_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
 
