@@ -365,8 +365,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
     $this->chkAssetCustomFields = new QCheckBoxList($this);
     $this->chkAssetCustomFields->Name = 'Asset Custom Fields:';
 
-    $arrAssetCustomFiieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
-    if(count($arrAssetCustomFiieldOptions)>0){
+    $arrAssetCustomFieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
+    if(count($arrAssetCustomFieldOptions)>0){
       if ($this->blnEditMode){
         $arrChosenCustomFieldId = array();
         $arrChosenCustomField = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
@@ -374,15 +374,16 @@ class AssetModelEditForm extends AssetModelEditFormBase {
           $arrChosenCustomFieldId[] = $objChosenCustomField->CustomFieldId;
         }
       }
-      foreach($arrAssetCustomFiieldOptions as $arrAssetCustomFieldOption){
+      foreach($arrAssetCustomFieldOptions as $arrAssetCustomFieldOption){
         $selected = false;
+        $blnEnabled = false;
         if($this->blnEditMode){
           $selected = in_array($arrAssetCustomFieldOption->CustomField->CustomFieldId,$arrChosenCustomFieldId);
         }
    /*     else{
           $selected = $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag;
         }
-   *///Excluding AllAssetModelsFligged Items just untill stupping qcodo 4.22
+   *///Excluding AllAssetModelsFlagged Items just until setup qcodo 4.22
         $role=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(
           QApplication::$objRoleModule->RoleId,
           $arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
@@ -390,6 +391,12 @@ class AssetModelEditForm extends AssetModelEditFormBase {
         );
         if($role instanceof RoleEntityQtypeCustomFieldAuthorization){
            $role = $role->AuthorizedFlag;
+        }
+        if (!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
+            &&$arrAssetCustomFieldOption->CustomField->ActiveFlag
+            && (int)$role==1
+            &&$this->blnEditMode){
+            $blnEnabled = true;
         }
         if(!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
           &&$arrAssetCustomFieldOption->CustomField->ActiveFlag
@@ -399,6 +406,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
                                                            $arrAssetCustomFieldOption->CustomField->CustomFieldId,
                                                            $selected
                                                            ));
+
         }
       }
     }
