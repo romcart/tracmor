@@ -167,17 +167,19 @@
                     }
                     return sprintf('from %s to %s', $user, $this->__toStringDestinationLocation());
                     break;
-                case 3:
-                    if ($this->AssetTransactionCheckout) {
-                  		if ($this->AssetTransactionCheckout->ToContactId) {
-                  			    $strToReturn = $this->AssetTransactionCheckout->ToContact->__toStringWithLink();
-                    		}
-                    		else {
-                    			$strToReturn = $this->AssetTransactionCheckout->ToUser->__toStringFullName();
-                    		}
-                  		}
-                    return sprintf('from %s to %s',$this->__toStringSourceLocation() , $strToReturn);
-                    break;
+				case 3:
+					if ($this->AssetTransactionCheckout) {
+						if ($this->AssetTransactionCheckout->ToContactId) {
+							$strToReturn = $this->AssetTransactionCheckout->ToContact->__toStringWithLink();
+						} else {
+							$strToReturn = $this->AssetTransactionCheckout->ToUser->__toStringFullName();
+						}
+					} else {
+						$strToReturn = $this->Transaction->CreatedByObject->__toStringFullName();
+					}
+
+					return sprintf('from %s to %s',$this->__toStringSourceLocation() , $strToReturn);
+					break;
                 case 6:
                     $this->Transaction->Shipment = Shipment::LoadByTransactionId($this->TransactionId);
                     return sprintf('from %s to %s',$this->__toStringSourceLocation(),$this->Transaction->ToStringCompanyWithLink());
