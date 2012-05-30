@@ -688,6 +688,7 @@
               //$this->FileCsvData->appendRow($this->FileCsvData->getHeaders());
             }
             if ($this->intImportStep == 2) {
+            	$strAssetCFVArray = array();
               $objNewAssetArray = array();
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
@@ -855,6 +856,13 @@
                         $objNewAssetArray[] = $strAssetCode;
                         if (isset($strCFVArray) && count($strCFVArray)) {
                           $strAssetCFVArray[] = implode(', ', $strCFVArray);
+                         /*if ($j == 2) {
+                          	echo "strAssetCFVArray: ";
+                          	print_r($strAssetCFVArray);
+                          	echo "strCFVArray: ";
+                          	print_r($strCFVArray);
+                          	exit;
+                          }*/
                         }
                         else {
                           $strAssetCFVArray[] = "";
@@ -983,6 +991,13 @@
                       $strCFVArray[$i] = sprintf("('%s', %s)", $intInsertId+$i, $strAssetCFVArray[$i]);
                       $strAssetIdArray[$i] = sprintf("(%s)", $intInsertId+$i);
                     }
+                    /*if ($j == 1) {
+                    	echo "strCFVArray: ";
+                    	print_r($strCFVArray);
+                    	echo "strAssetCFVArray: ";
+                    	print_r($strAssetCFVArray);
+                    	exit;
+                    }*/
                     $strCFVNameArray = array();
                     foreach ($arrAssetCustomField as $objCustomField) {
                       $strCFVNameArray[] = sprintf("`cfv_%s`", $objCustomField->CustomFieldId);
@@ -994,7 +1009,11 @@
                     }
                     $objDatabase->NonQuery($strQuery);
                     $theAsset = Asset::Load($intInsertId);
-                    $objDatabase->NonQuery($this->substactNotAllowedFields($theAsset->AssetModelId,$theAsset->AssetId));
+                    $strQuery = $this->substactNotAllowedFields($theAsset->AssetModelId,$theAsset->AssetId);
+                    if (!empty($strQuery)) {
+                    //$objDatabase->NonQuery($this->substactNotAllowedFields($theAsset->AssetModelId,$theAsset->AssetId));
+                    	$objDatabase->NonQuery($strQuery);
+                    }
                    }
 
                   $this->strAssetValuesArray = array();
