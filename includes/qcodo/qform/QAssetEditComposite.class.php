@@ -1124,7 +1124,7 @@ class QAssetEditComposite extends QControl {
 		// Instantiate new Asset object
 		$this->objAsset = new Asset();
 		// Load custom fields for asset with values from original asset
-		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, true, $objAssetToClone->AssetId, $objAssetToClone->AssetModelId);
+		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, true, $objAssetToClone->AssetId, false,$objAssetToClone->AssetModelId);
 		// Set the asset_code to null because they are unique
 		$this->lblHeaderAssetCode->Text = 'New Asset';
 		$this->txtAssetCode->Text = '';
