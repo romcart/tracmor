@@ -1035,7 +1035,7 @@ class QAssetEditComposite extends QControl {
 
 					// This was necessary because it was not saving the changes of a second edit/save in a row
 					// Reload all custom fields
-					$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId, $this->objAsset->AssetModelId);
+					$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId, false,$this->objAsset->AssetModelId);
 
                 // Update not allowed custom fields set to null
 
@@ -1124,7 +1124,7 @@ class QAssetEditComposite extends QControl {
 		// Instantiate new Asset object
 		$this->objAsset = new Asset();
 		// Load custom fields for asset with values from original asset
-		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, true, $objAssetToClone->AssetId, $objAssetToClone->AssetModelId);
+		$this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, true, $objAssetToClone->AssetId, false,$objAssetToClone->AssetModelId);
 		// Set the asset_code to null because they are unique
 		$this->lblHeaderAssetCode->Text = 'New Asset';
 		$this->txtAssetCode->Text = '';
