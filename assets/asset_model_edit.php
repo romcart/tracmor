@@ -405,13 +405,16 @@ class AssetModelEditForm extends AssetModelEditFormBase {
     if ($this->chkAssetCustomFields->ItemCount==0){
       $this->chkAssetCustomFields->Display = false;
     }
+    if($this->blnEditMode) {
+      $this->chkAssetCustomFields->Enabled = false;
+    }
   }
 
 	// Edit Button Click
 	protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 
 		$this->displayInputs();
-
+        $this->chkAssetCustomFields->Enabled = true;
 		$this->UpdateBuiltInFields();
 		$this->UpdateCustomFields();
 	}
@@ -466,6 +469,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			// Reload all custom fields
 			$this->objAssetModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(4, $this->blnEditMode, $this->objAssetModel->AssetModelId);
 			$this->displayLabels();
+            $this->chkAssetCustomFields->Enabled = false;
 		}
 		else {
 			// Display the asset model list page
