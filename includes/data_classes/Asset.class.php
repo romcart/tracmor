@@ -169,7 +169,12 @@
 			$objDbResult = $objDatabase->Query($strQuery);
 
 			$arrAssets = Asset::InstantiateDbResult($objDbResult);
-			return $arrAssets[0];
+            if(count($arrAssets)>0){
+                return $arrAssets[0];
+            }
+            else {
+                return null;
+            }
 		}
 
         public function LoadByAssetIdWithCustomFields($strAssetId) {
