@@ -2048,7 +2048,9 @@
 			}
 
 			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
-				if ($objReceipt = Receipt::LoadByReceiptNumber($this->txtReceiptNumber->Text)) {
+				if(trim($this->txtReceiptNumber->Text)==''){
+					$blnError = true;
+					$this->txtReceiptNumber->Warning = 'Receipt number is a required field.';
 					if ($objReceipt->ReceiptId != $this->objReceipt->ReceiptId) {
 						$blnError = true;
 						$this->txtReceiptNumber->Warning = 'That is a duplicate receipt number.';
