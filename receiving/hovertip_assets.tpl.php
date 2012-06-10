@@ -1,8 +1,8 @@
 <table cellpadding="0" cellspacing="8" border="0">
 	<thead>
 	<tr>
-		<th><strong>Asset Code</strong></th>
-		<td><strong>Model</strong></th>
+		<th><strong>Asset Tag</strong></th>
+		<th><strong>Model</strong></th>
 		<th><strong>Status</strong></th>
 	</tr>
 	</thead>

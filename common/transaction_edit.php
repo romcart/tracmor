@@ -130,7 +130,7 @@
 	    // These datagrids are not sortable because they would need early expansion
 	    // Sorting is possible to implement but not worth the time right now
 	    if ($this->objTransaction->EntityQtypeId == EntityQtype::Asset) {
-		    $this->dtgEntity->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+		    $this->dtgEntity->AddColumn(new QDataGridColumn('Asset Tag', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 		    $this->dtgEntity->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink($_ITEM->Asset->AssetModel,"bluelink") ?>', 'Width=200', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 		    $this->dtgEntity->AddColumn(new QDataGridColumn('Source', '<?= $_ITEM->SourceLocation->__toString() ?>', 'CssClass="dtg_column"'));
 		    $this->dtgEntity->AddColumn(new QDataGridColumn('Destination', '<?= $_ITEM->__toStringDestinationLocation() ?>', 'CssClass="dtg_column"'));

@@ -170,7 +170,7 @@
 
 	  protected function txtShortDescription_Create() {
 	    $this->txtShortDescription = new QTextBox($this);
-			$this->txtShortDescription->Name = 'Asset Model';
+			$this->txtShortDescription->Name = 'Model';
 			// Because the enter key will also call form.submit() on some browsers, which we
       // absolutely DON'T want to have happen, let's be sure to terminate any additional
       // actions on EnterKey
@@ -181,14 +181,14 @@
 
 	  protected function txtAssetCode_Create() {
 	  	$this->txtAssetCode = new QTextBox($this);
-	  	$this->txtAssetCode->Name = 'Asset Code';
+	  	$this->txtAssetCode->Name = 'Asset Tag';
 	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
 	  	$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 
 	  protected function txtAssetModelCode_Create() {
 	  	$this->txtAssetModelCode = new QTextBox($this);
-	  	$this->txtAssetModelCode->Name = 'Asset Model Code';
+	  	$this->txtAssetModelCode->Name = 'Model Number';
 	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnGenerate_Click'));
 	  	$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
@@ -358,8 +358,8 @@
                   <COL ALIGN='LEFT' TYPE='EXPRESSION' COLSPAN='".(4 + $intCustomFieldCount)."' CELLCLASS='report_cell'>\$this->getValue('asset_transaction__transaction_id__note')</COL>
                 </ROW>
                 <ROW>
-                  <COL CELLCLASS='report_column_header'>Asset Code:</COL>
-                  <COL CELLCLASS='report_column_header'>Asset Model:</COL>
+                  <COL CELLCLASS='report_column_header'>Asset Tag:</COL>
+                  <COL CELLCLASS='report_column_header'>Model:</COL>
                   <COL CELLCLASS='report_column_header'>From:</COL>
                   <COL CELLCLASS='report_column_header'>To:</COL>
                   $strXmlColNameByCustomField

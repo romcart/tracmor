@@ -59,7 +59,8 @@ class QShortcutMenu extends QControl {
 		ob_clean();
 
 		// Evaluate the template
-		require('../common/shortcut_menu.tpl.php');
+		//require('../common/shortcut_menu.tpl.php');
+		require(__DOCROOT__ . __SUBDIRECTORY__ . '/common/shortcut_menu.tpl.php');
 		$strTemplateEvaluated = ob_get_contents();
 		ob_clean();
 

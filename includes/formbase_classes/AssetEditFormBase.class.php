@@ -122,7 +122,7 @@
 		// Create and Setup lstAssetModel
 		protected function lstAssetModel_Create() {
 			$this->lstAssetModel = new QListBox($this);
-			$this->lstAssetModel->Name = QApplication::Translate('Asset Model');
+			$this->lstAssetModel->Name = QApplication::Translate('Model');
 			$this->lstAssetModel->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstAssetModel->AddItem(QApplication::Translate('- Select One -'), null);
@@ -152,7 +152,7 @@
 		// Create and Setup txtAssetCode
 		protected function txtAssetCode_Create() {
 			$this->txtAssetCode = new QTextBox($this);
-			$this->txtAssetCode->Name = QApplication::Translate('Asset Code');
+			$this->txtAssetCode->Name = QApplication::Translate('Asset Tag');
 			$this->txtAssetCode->Text = $this->objAsset->AssetCode;
 			$this->txtAssetCode->Required = true;
 			$this->txtAssetCode->MaxLength = Asset::AssetCodeMaxLength;

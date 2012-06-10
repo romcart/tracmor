@@ -576,7 +576,7 @@
           $this->dtgAssetModel->ShowColumnToggle = false;
           $this->dtgAssetModel->ShowExportCsv = false;
           $this->dtgAssetModel->ShowHeader = false;
-          $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Updated assets
           $this->dtgUpdatedAsset = new QDataGrid($this);
@@ -588,7 +588,7 @@
           $this->dtgUpdatedAsset->ShowColumnToggle = false;
           $this->dtgUpdatedAsset->ShowExportCsv = false;
           $this->dtgUpdatedAsset->ShowHeader = false;
-          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Code', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+          $this->dtgUpdatedAsset->AddColumn(new QDataGridColumnExt('Asset Tag', '<?= $_ITEM ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
 
           // Create the label for successful import
           $this->lblImportSuccess = new QLabel($this);
@@ -620,7 +620,7 @@
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QTerminateAction());
         }
         else {
-          $this->btnNext->Warning = "You must select all required fields (Asset Model Code, Asset Model Short Description, Category and Manufacturer).";
+          $this->btnNext->Warning = "You must select all required fields (Model Number, Model Short Description, Category and Manufacturer).";
           $blnError = true;
         }
 		  }
@@ -673,7 +673,7 @@
             foreach (AssetModel::LoadAllIntoExtendedArray() as $arrAssetModel) {
               $strAssetModelArray[] = strtolower(sprintf("%s_%s_%s_%s", addslashes($arrAssetModel['model_code']),  addslashes($arrAssetModel['short_description']),  $arrAssetModel['category_id'], $arrAssetModel['manufacturer_id']));
             }
-            $this->btnNext->Warning = sprintf("Please wait... Asset Model import complete: %s%s", ceil(($this->intCurrentFile+1)*200/$this->intTotalCount*100), "%");
+            $this->btnNext->Warning = sprintf("Please wait... Model import complete: %s%s", ceil(($this->intCurrentFile+1)*200/$this->intTotalCount*100), "%");
           }
           // Asset
           /*elseif ($this->intImportStep == 5) {
@@ -1142,7 +1142,7 @@
 	    $lstMapHeader->Name = "lst".$intId;
 	    $strAssetModelGroup = "Asset Model";
 	    $lstMapHeader->AddItem("- Not Mapped -", null);
-	    /*$lstMapHeader->AddItem("Asset Code", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    /*$lstMapHeader->AddItem("Asset Tag", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
 	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
 	    }
@@ -1155,7 +1155,7 @@
 	    if ($this->lstImportAction->SelectedValue == 2) {
 	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    }
-	    $lstMapHeader->AddItem("Asset Model Code", "Asset Model Code", ($strName == 'asset model code') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Model Number", "Asset Model Code", ($strName == 'asset model code') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", ($strName == 'asset model short description') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", ($strName == 'asset model long description') ? true : false, $strAssetModelGroup);
 	    $lstMapHeader->AddItem("Category", "Category", ($strName == 'category') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');

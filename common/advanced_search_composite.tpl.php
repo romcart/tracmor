@@ -26,7 +26,7 @@
 
 	// Show Asset Model Code for Asset Search
 	if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
-		$arrAdvancedSearchFields[] = array('name' => 'Asset Model Code:',  'value' => $this->txtAssetModelCode->RenderWithError(false));
+		$arrAdvancedSearchFields[] = array('name' => 'Model Number:',  'value' => $this->txtAssetModelCode->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Reserved By:', 'value' => $this->lstReservedBy->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Checked Out By:', 'value' => $this->lstCheckedOutBy->RenderWithError(false));
 		$arrAdvancedSearchFields[] = array('name' => 'Checked Out To User:', 'value' => $this->lstCheckedOutToUser->RenderWithError(false));

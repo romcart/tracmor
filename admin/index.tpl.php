@@ -61,7 +61,7 @@
 							<td class="record_field_edit"><?php $this->txtSearchResultsPerPage->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Minimum Asset Code: </td>
+							<td class="record_field_name">Minimum Asset Tag: </td>
 							<td class="record_field_edit"><?php $this->txtMinAssetCode->RenderWithError(); ?></td>
 						</tr>
 						<tr>

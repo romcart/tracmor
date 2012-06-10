@@ -14,7 +14,7 @@ $strJavaScriptCode = "";
 
 if ($_POST && $_POST['method'] == 'complete_transaction') {
 	/*
-	Run error checking on the array of asset codes and the destination location
+	Run error checking on the array of asset tags and the destination location
 	If there are no errors, then you will add the transaction to the database.
 		That will include an entry in the Transaction and Asset Transaction table.
 		You will also have to change the asset.location_id to the destination location
@@ -28,11 +28,11 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			$objNewAsset = Asset::LoadByAssetCode($strAssetCode);
 			if (!($objNewAsset instanceof Asset)) {
 				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset code does not exist.<br />";
+				$strWarning .= $strAssetCode." - That asset tag does not exist.<br />";
 			}
 			elseif ($objNewAsset->ArchivedFlag) {
 				$blnError = true;
-				$strWarning .= $strAssetCode." - That asset code is invalid.<br />";
+				$strWarning .= $strAssetCode." - That asset tag is invalid.<br />";
 			}
 			elseif ($objNewAsset->LinkedFlag) {
 			  $blnError = true;
@@ -70,7 +70,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 			}
 		}
 		else {
-			$strWarning .= "Please enter an asset code.<br />";
+			$strWarning .= "Please enter an asset tag.<br />";
 		}
 	}
 
@@ -145,7 +145,7 @@ if (!isset($blnTransactionComplete) ||  !$blnTransactionComplete) {
 ?>
 <table border=0 style="padding-top:16px;">
 	<tr>
-		<td align="right"><h2>Asset Code:</h2></td>
+		<td align="right"><h2>Asset Tag:</h2></td>
 		<td valign="top"><input type="text" id="asset_code" onkeypress="javascript:if(event.keyCode=='13') AddAsset();" style="width:170px;font-size:32;border:2px solid #AAAAAA;background-color:#FFFFFF;" onfocus="this.style.backgroundColor='lightyellow'" onblur="this.style.backgroundColor='#FFFFFF'"></td>
 	</tr>
 	<form method="post" name="main_form" onsubmit="javascript:return CompleteMove();">

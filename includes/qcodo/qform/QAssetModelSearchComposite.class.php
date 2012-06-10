@@ -88,7 +88,7 @@ class QAssetModelSearchComposite extends QControl {
 
     $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->Category->__toString(); ?>', 'SortByCommand="asset_model__category_id__short_description ASC"', 'ReverseSortByCommand="asset_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->Manufacturer->__toString(); ?>', 'SortByCommand="asset_model__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset_model__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
-    $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Asset Model Code', '<?= htmlentities(QString::Truncate($_ITEM->AssetModelCode, 200)); ?>', 'FontBold=true', 'SortByCommand="asset_model_code ASC"', 'ReverseSortByCommand="asset_model_code DESC"', 'CssClass="dtg_column"'));
+    $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Model Number', '<?= htmlentities(QString::Truncate($_ITEM->AssetModelCode, 200)); ?>', 'FontBold=true', 'SortByCommand="asset_model_code ASC"', 'ReverseSortByCommand="asset_model_code DESC"', 'CssClass="dtg_column"'));
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
     $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::AssetModel, false);
@@ -291,7 +291,7 @@ class QAssetModelSearchComposite extends QControl {
 
   protected function txtAssetModelCode_Create() {
     $this->txtAssetModelCode = new QTextBox($this);
-    $this->txtAssetModelCode->Name = 'Asset Model Code';
+    $this->txtAssetModelCode->Name = 'Model Number';
     if ($this->blnUseAjax) {
      $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this,'btnSearch_Click'));
     }
