@@ -364,52 +364,54 @@ class AssetModelEditForm extends AssetModelEditFormBase {
   protected function chkAssetCustomFields_Create(){
     $this->chkAssetCustomFields = new QCheckBoxList($this);
     $this->chkAssetCustomFields->Name = 'Asset Custom Fields:';
-
-    $arrAssetCustomFiieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
-    if(count($arrAssetCustomFiieldOptions)>0){
-      if ($this->blnEditMode){
-        $arrChosenCustomFieldId = array();
-        $arrChosenCustomField = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
-        foreach ($arrChosenCustomField as $objChosenCustomField){
-          $arrChosenCustomFieldId[] = $objChosenCustomField->CustomFieldId;
-        }
-      }
-      foreach($arrAssetCustomFiieldOptions as $arrAssetCustomFieldOption){
-        $selected = false;
-        if($this->blnEditMode){
-          $selected = in_array($arrAssetCustomFieldOption->CustomField->CustomFieldId,$arrChosenCustomFieldId);
-        }
-   /*     else{
-          $selected = $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag;
-        }
-   *///Excluding AllAssetModelsFligged Items just untill stupping qcodo 4.22
-        $role=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(
-          QApplication::$objRoleModule->RoleId,
-          $arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
-          2
-        );
-        if($role instanceof RoleEntityQtypeCustomFieldAuthorization){
-           $role = $role->AuthorizedFlag;
-        }
-        if(!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
-          &&$arrAssetCustomFieldOption->CustomField->ActiveFlag
-          && (int)$role==1
-        ){
-        $this->chkAssetCustomFields->AddItem(new QListItem($arrAssetCustomFieldOption->CustomField->ShortDescription,
-                                                           $arrAssetCustomFieldOption->CustomField->CustomFieldId,
-                                                           $selected
-                                                           ));
-        }
-      }
-    }
-    if ($this->chkAssetCustomFields->ItemCount==0){
-      $this->chkAssetCustomFields->Display = false;
-    }
-    if($this->blnEditMode) {
-      $this->chkAssetCustomFields->Enabled = false;
-    }
+    $this->chkAssetCustomFields_Refresh();
   }
 
+	protected function chkAssetCustomFields_Refresh(){
+		$arrAssetCustomFieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
+		if(count($arrAssetCustomFieldOptions)>0){
+			if ($this->blnEditMode){
+				$arrChosenCustomFieldId = array();
+				$arrChosenCustomField = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
+				foreach ($arrChosenCustomField as $objChosenCustomField){
+					$arrChosenCustomFieldId[] = $objChosenCustomField->CustomFieldId;
+				}
+			}
+			foreach($arrAssetCustomFieldOptions as $arrAssetCustomFieldOption){
+				$selected = false;
+				if($this->blnEditMode){
+					$selected = in_array($arrAssetCustomFieldOption->CustomField->CustomFieldId,$arrChosenCustomFieldId);
+				}
+				/*     else{
+	   $selected = $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag;
+	 }
+*///Excluding AllAssetModelsFlaged Items just until setup qcodo 4.22
+				$role=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(
+					QApplication::$objRoleModule->RoleId,
+					$arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
+					2
+				);
+				if($role instanceof RoleEntityQtypeCustomFieldAuthorization){
+					$role = $role->AuthorizedFlag;
+				}
+				if(!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
+					&&$arrAssetCustomFieldOption->CustomField->ActiveFlag
+					&& (int)$role==1
+				){
+					$this->chkAssetCustomFields->AddItem(new QListItem($arrAssetCustomFieldOption->CustomField->ShortDescription,
+						$arrAssetCustomFieldOption->CustomField->CustomFieldId,
+						$selected
+					));
+				}
+			}
+		}
+		if ($this->chkAssetCustomFields->ItemCount==0){
+			$this->chkAssetCustomFields->Display = false;
+		}
+		if($this->blnEditMode) {
+			$this->chkAssetCustomFields->Enabled = false;
+		}
+	}
 	// Edit Button Click
 	protected function btnEdit_Click($strFormId, $strControlId, $strParameter) {
 
@@ -483,6 +485,10 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		if ($this->blnEditMode) {
 			$this->displayLabels();
 			$this->UpdateAssetModelControls();
+			$this->chkAssetCustomFields->RemoveAllItems();
+			$this->chkAssetCustomFields_Refresh();
+			$this->chkAssetCustomFields->Enabled = false;
+
 		}
 		else {
 			QApplication::Redirect('asset_model_list.php');
