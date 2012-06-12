@@ -67,7 +67,6 @@
 		protected $lblNewToContact;
 		protected $lblNewToAddress;
 
-
 		// Inputs
 		protected $txtReceiptNumber;
 		protected $txtNote;
