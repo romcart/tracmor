@@ -2306,6 +2306,23 @@
 				$this->btnCompleteShipment->Warning = 'There are no assets or inventory in this shipment.';
 			}
 
+			if($this->objAssetTransactionArray){
+				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+					if ($objAssetTransaction->Asset instanceof Asset) {
+						$arrAssetTransactions = AssetTransaction::LoadArrayByAssetId($objAssetTransaction->Asset->AssetId);
+						if (count($arrAssetTransactions)>0){
+							foreach ($arrAssetTransactions as $chkObjAssetTransaction){
+								$transaction = Transaction::load($chkObjAssetTransaction->TransactionId);
+								if($transaction->TransactionTypeId == 6 && $transaction->Shipment->ShippedFlag){
+									$blnError = true;
+									$this->btnCompleteShipment->Warning = $objAssetTransaction->Asset->__toStringWithLink() . ' already shipped.';
+								}
+							}
+						}
+					}
+				}
+			}
+
 			if (!$blnError) {
 
 				try {
