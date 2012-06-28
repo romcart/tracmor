@@ -123,7 +123,7 @@
 								</tr>
 								<tr style="<?php if (!$this->blnEditMode) { echo('display:none'); } ?>">
 									<td class="record_field_name">Date Received:</td>
-									<td class="record_field_value"><?php $this->lblReceiptDate->Render(); ?></td>
+									<td class="record_field_value"><?php $this->lblReceiptDate->Render(); ?><?php $this->calDateReceived->Render(); ?></td>
 								</tr>
 								<?php if (!empty($arrReceiptFields)) {
 									foreach ($arrReceiptFields as $field) {
