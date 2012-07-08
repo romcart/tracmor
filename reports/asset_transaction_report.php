@@ -52,6 +52,8 @@
 		protected $chkCheckOut;
 		protected $chkReserve;
 		protected $chkUnreserve;
+		protected $chkArchive;
+		protected $chkUnarchive;
 		protected $lblAssetModelId;
 		protected $lblReport;
 		protected $arrCustomFields;
@@ -209,6 +211,12 @@
 	  	$this->chkUnreserve = new QCheckBox($this);
 	  	$this->chkUnreserve->Text = 'Unreserve';
 	  	$this->chkUnreserve->Checked = true;
+		  $this->chkArchive = new QCheckBox($this);
+		  $this->chkArchive->Text = 'Archive';
+		  $this->chkArchive->Checked = true;
+		  $this->chkUnarchive = new QCheckBox($this);
+		  $this->chkUnarchive->Text = 'Unarchive';
+		  $this->chkUnarchive->Checked = true;
 	  }
 
 	  protected function lblAssetModelId_Create() {
@@ -300,7 +308,7 @@
       $objExpansionMap[AssetTransaction::ExpandTransaction][Transaction::ExpandTransactionType] = true;
       $objExpansionMap[AssetTransaction::ExpandTransaction][Transaction::ExpandCreatedByObject ] = true;
       $objExpansionMap[AssetTransaction::ExpandTransaction][Transaction::ExpandModifiedByObject] = true;
-	  
+
 
       $arrTransactionTypes = array();
       // Create an array of checked transaction types
@@ -319,6 +327,12 @@
       if ($this->chkUnreserve->Checked) {
         $arrTransactionTypes[] = 9;
       }
+	  if($this->chkArchive->Checked){
+	  	$arrTransactionTypes[]= 10;
+	  }
+	  if($this->chkUnarchive->Checked){
+	  	$arrTransactionTypes[]= 11;
+	  }
       // Archived assets will be included in the Asset Transaction Report
       //$arrTransactionTypes[] = 10;
 
