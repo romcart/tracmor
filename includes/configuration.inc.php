@@ -66,6 +66,19 @@
 
 	define('ERROR_LOG_PATH', null);
 	define('ERROR_LOG_FLAG', false);
-//	define('ERROR_FRIENDLY_PAGE_PATH', '/absolute/path/to/friendly_error_page.html');
-//	define('ERROR_FRIENDLY_AJAX_MESSAGE', 'Oops!  An error has occurred.\r\n\r\nThe error was logged, and we will take a look into this right away.');
+	//define('ERROR_FRIENDLY_PAGE_PATH', '/absolute/path/to/friendly_error_page.html');
+	//define('ERROR_FRIENDLY_AJAX_MESSAGE', 'Oops!  An error has occurred.\r\n\r\nThe error was logged, and we will take a look into this right away.');
+
+	// It is highly recommended to change this to false if all your servers are running PHP 5.3 or above.
+	// See http://www.openwall.com/phpass/ for more information.
+	define('PORTABLE_PASSWORDS', true);
+
+	// If using Amazon S3 for storage, change AWS_S3 to true and enter AWS info.
+	DEFINE('AWS_S3', false);
+	DEFINE('AWS_ACCESS_KEY', '');
+	DEFINE('AWS_SECRET_KEY', '');
+	DEFINE('AWS_BUCKET', '');
+	
+	// Location of tmp directory
+	DEFINE('__TRACMOR_TMP__', '/tmp');
 ?>

@@ -20,6 +20,7 @@
 	 */
 
 	require_once('./includes/prepend.inc.php');
+	require('./includes/php/PasswordHash.php');
 
 	class LoginForm extends QForm {
 
@@ -88,6 +89,8 @@
 			$objUserAccount = UserAccount::LoadByUsername($strUsername);
 			$errorMessage = 'Invalid username or password.';
 
+			$objHasher = new PasswordHash(8, PORTABLE_PASSWORDS);
+
 			// Check if that username exists
 			if (!$objUserAccount) {
 				$blnError = true;
@@ -99,7 +102,7 @@
 				$this->txtPassword->Warning = $errorMessage;
 			}
 			// Check to see if the password hashes match
-			elseif (sha1($strPassword) != $objUserAccount->PasswordHash) {
+			elseif (!$objHasher->CheckPassword(sha1($strPassword), $objUserAccount->PasswordHash)) {
 				$blnError = true;
 				$this->txtPassword->Warning = $errorMessage;
 			}
