@@ -118,7 +118,7 @@
 			// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 			$this->objCategory->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(6, $this->blnEditMode, $this->objCategory->CategoryId);
 			// Create the Custom Field Controls - labels and inputs (text or list) for each
-			$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCategory->objCustomFieldArray, $this->blnEditMode, $this, true, true);
+			$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCategory->objCustomFieldArray, $this->blnEditMode, $this, true, true, false);
 		}
 
 		// Setup btnSave
