@@ -197,7 +197,7 @@
 		 * @var string strPasswordHash
 		 */
 		protected $strPasswordHash;
-		const PasswordHashMaxLength = 40;
+		const PasswordHashMaxLength = 60;
 		const PasswordHashDefault = null;
 
 
