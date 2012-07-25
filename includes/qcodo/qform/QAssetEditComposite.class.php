@@ -835,6 +835,7 @@ class QAssetEditComposite extends QControl {
 				$this->displayInputs();
 			}
 		}
+        $this->lstAssetModel->Focus();
 		$this->lstAssetModel->TabIndex = 1;
 		$this->txtAssetCode->TabIndex = 2;
 	}

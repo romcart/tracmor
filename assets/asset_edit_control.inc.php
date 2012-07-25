@@ -80,6 +80,7 @@
 		<td class="record_header">
 			<?php
 				$this->btnEdit->Render();
+			    $this->btnSave->TabIndex = 0;
 				$this->btnSave->RenderWithError();
 				echo('&nbsp;');
 				$this->btnCancel->RenderWithError();
