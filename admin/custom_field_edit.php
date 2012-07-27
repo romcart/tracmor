@@ -244,7 +244,7 @@
 			$this->chkEntityQtype->AddItem($objAddressListItem);
 			$this->chkEntityQtype->AddItem($objShipmentListItem);
 			$this->chkEntityQtype->AddItem($objReceiptListItem);
-      $this->chkEntityQtype->AddAction(new QClickEvent(), new QServerAction('objAssetListItem_Click'));
+      $this->chkEntityQtype->AddAction(new QClickEvent(), new QAjaxAction('objAssetListItem_Click'));
     }
     // Create/Setup the Value textbox
 		protected function txtValue_Create() {
@@ -368,9 +368,9 @@
 
     protected function rblAllAssetModels_Create(){
     parent::rblAllAssetModels_Create();
-    $this->rblAllAssetModels->AddAction(new QClickEvent(), new QServerAction('rblAssetAssetModels_Click'));
+    $this->rblAllAssetModels->AddAction(new QClickEvent(), new QAjaxAction('rblAssetAssetModels_Click'));
     if(!$this->blnAssetEntityType){
-      $this->rblAllAssetModels->Visible = false;
+      $this->rblAllAssetModels->Display = false;
     }
     }
     //Create/Setup "Selection Option" label
@@ -378,7 +378,7 @@
   		$this->lblAllAssetModels = new QLabel($this);
   		$this->lblAllAssetModels->Text = 'All Asset Models';
  			if (!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1) {
-         $this->lblAllAssetModels->Visible = false;
+         $this->lblAllAssetModels->Display = false;
       }
   	}
 
@@ -389,7 +389,7 @@
       if (!$this->blnAssetEntityType||
          $this->rblAllAssetModels->SelectedValue == 1) {
 
-         $this->lblAssetModel->Visible = false;
+         $this->lblAssetModel->Display = false;
         }
   		}
 
@@ -404,7 +404,7 @@
                                                        $objAssetModel->AssetModelId));
       }
       if (!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1) {
-        $this->lstAddAssetModel->Visible = false;
+        $this->lstAddAssetModel->Display = false;
       }
 
     }
@@ -418,7 +418,7 @@
       $this->lblLookup->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this->ctlAssetModelSearchTool, 'lblLookup_Click'));
       $this->lblLookup->AddAction(new QEnterKeyEvent(), new QTerminateAction());
       if(!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1){
-        $this->lblLookup->Visible = false;
+        $this->lblLookup->Display = false;
       }
     }
 
@@ -458,7 +458,7 @@
       $objStyle->CssClass = 'dtg_header';
 
       if(!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1){
-        $this->dtgAssetModels->Visible = false;
+        $this->dtgAssetModels->Display = false;
       }
 
     }
@@ -487,7 +487,7 @@
   		  $this->btnAddAssetModel->AddAction(new QClickEvent(), new QAjaxAction('btnAddAssetModel_Click'));
         $this->btnAddAssetModel->CausesValidation = false;
         if(!$this->blnAssetEntityType||$this->rblAllAssetModels->SelectedValue==1){
-          $this->btnAddAssetModel->Visible = false;
+          $this->btnAddAssetModel->Display = false;
         }
   	}
 
@@ -654,12 +654,12 @@
     protected function objAssetListItem_Click(){
       $EntityTypes = $this->chkEntityQtype->SelectedValues;
       if (in_array('1',$EntityTypes)){
-        $this->rblAllAssetModels->Visible = true;
+        $this->rblAllAssetModels->Display = true;
         $this->blnAssetEntityType = true;
         if($this->rblAllAssetModels->SelectedValue == 2){
           $this->lblAssetModel->Display = true;
           $this->lstAddAssetModel->Display = true;
-          $this->lblLookup->Visible = true;
+          $this->lblLookup->Display = true;
           $this->btnAddAssetModel->Display = true;
           $this->dtgAssetModels->Display = true;
           $this->DisplayAssetModels();
@@ -667,13 +667,13 @@
       }
       else{
         $this->blnAssetEntityType = false;
-        $this->rblAllAssetModels->Visible = false;
-        $this->lblAllAssetModels->Visible = false;
-        $this->lblAssetModel->Visible = false;
-        $this->lstAddAssetModel->Visible = false;
-        $this->lblLookup->Visible = false;
-        $this->btnAddAssetModel->Visible = false;
-        $this->dtgAssetModels->Visible = false;
+        $this->rblAllAssetModels->Display = false;
+        $this->lblAllAssetModels->Display = false;
+        $this->lblAssetModel->Display = false;
+        $this->lstAddAssetModel->Display = false;
+        $this->lblLookup->Display = false;
+        $this->btnAddAssetModel->Display = false;
+        $this->dtgAssetModels->Display = false;
       }
     }
 
@@ -1203,18 +1203,18 @@
 		// Display the fields for adding options to select lists
 		protected function DisplayOptions($blnValue = true) {
 
-			$this->txtValue->Visible  = $blnValue;
-			$this->btnAdd->Visible    = $blnValue;
-			$this->dtgValue->Visible  = $blnValue;
+			$this->txtValue->Display  = $blnValue;
+			$this->btnAdd->Display    = $blnValue;
+			$this->dtgValue->Display  = $blnValue;
 		}
 
     protected function DisplayAssetModels($blnValue = true) {
 
-  	  $this->lstAddAssetModel->Visible  = $blnValue;
-      $this->lblLookup->Visible         = $blnValue;
-  	  $this->btnAddAssetModel->Visible  = $blnValue;
-  		$this->dtgAssetModels->Visible  = $blnValue;
-      $this->lblAssetModel->Visible = $blnValue;
+  	  $this->lstAddAssetModel->Display  = $blnValue;
+      $this->lblLookup->Display         = $blnValue;
+  	  $this->btnAddAssetModel->Display  = $blnValue;
+  		$this->dtgAssetModels->Display  = $blnValue;
+      $this->lblAssetModel->Display = $blnValue;
   	}
     // Delete associated assetCustomFieldAssetModels
     // used on Deleting CustomField, on Updating for not Asset Entity Type
