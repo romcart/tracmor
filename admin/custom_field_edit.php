@@ -1229,13 +1229,15 @@
     // may be used after $this->objCustomField->Save();
     private function AppendAssetModels(){
       if($this->rblAllAssetModels->SelectedValue == 1){
-        $arrToAdd = AssetModel::LoadAll();
-        foreach ($arrToAdd as $itemToAdd){
+//        $arrToAdd = AssetModel::LoadAll();
+//        foreach ($arrToAdd as $itemToAdd){
           $objAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
-          $objAssetCustomFieldAssetModel->AssetModelId  = $itemToAdd->AssetModelId;
-          $objAssetCustomFieldAssetModel->CustomFieldId = $this->objCustomField->CustomFieldId;
-          $objAssetCustomFieldAssetModel->Save();
-        }
+//          $objAssetCustomFieldAssetModel->AssetModelId  = $itemToAdd->AssetModelId;
+//          $objAssetCustomFieldAssetModel->CustomFieldId = $this->objCustomField->CustomFieldId;
+//          $objAssetCustomFieldAssetModel->Save();
+//        }
+		  $this->DeleteAssetCustomFieldAssetModels();
+		  // $objAssetCustomFieldAssetModel->deleteAllByCustomField($this->objCustomField->CustomFieldId);
       }
       else{
         foreach ($this->arrAssetModels as $itemToAdd){

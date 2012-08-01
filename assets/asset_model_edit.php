@@ -57,8 +57,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected $atcAttach;
 	protected $pnlAttachments;
 
-  // Set Asset Custom Fields chekbox list
+  // Set Asset Custom Fields checkbox list
   protected $chkAssetCustomFields;
+
+	// Set checkbox list for all Asset Model
+	protected  $chkCustomFieldsForAllModels;
 
 	// Custom Field Objects
 	public $arrCustomFields;
@@ -103,8 +106,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		// Create all custom asset fields
 		$this->customFields_Create();
 
-    // Create Asset Custom Fields multi-select checkbox;
-    $this->chkAssetCustomFields_Create();
+        // Create Asset Custom Fields multi-select checkbox;
+        $this->chkAssetCustomFields_Create();
+
+		// Create checkbox_list
+		$this->chkCustomFieldsForAll_Create();
 
 		// Create/Setup Button Action controls
 		$this->btnEdit_Create();
@@ -360,12 +366,57 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->pnlAttachments = new QAttachments($this, null, EntityQtype::AssetModel, $this->objAssetModel->AssetModelId);
 	}
 
-  // Setup Asset Custom Fields multi-select check box
-  protected function chkAssetCustomFields_Create(){
-    $this->chkAssetCustomFields = new QCheckBoxList($this);
-    $this->chkAssetCustomFields->Name = 'Asset Custom Fields:';
-    $this->chkAssetCustomFields_Refresh();
-  }
+	// Setup Asset Custom Fields multi-select check box
+	protected function chkAssetCustomFields_Create(){
+	$this->chkAssetCustomFields = new QCheckBoxList($this);
+	$this->chkAssetCustomFields->Name = 'Asset Custom Fields:';
+	$this->chkAssetCustomFields_Refresh();
+	}
+
+	// Setup Asset Custom Fields multi-select check box
+	protected function chkCustomFieldsForAll_Create(){
+		$this->chkCustomFieldsForAllModels = new QCheckBoxList($this);
+		$this->chkCustomFieldsForAllModels->Name = 'Asset Custom Fields for all Models:';
+		$arrAssetCustomFieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(
+			                                                      QApplication::Translate(EntityQtype::Asset));
+		if(count($arrAssetCustomFieldOptions)>0){
+			if ($this->blnEditMode){
+				$arrChosenCustomFieldId = array();
+				$arrChosenCustomField = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
+				foreach ($arrChosenCustomField as $objChosenCustomField){
+					$arrChosenCustomFieldId[] = $objChosenCustomField->CustomFieldId;
+				}
+			}
+			foreach($arrAssetCustomFieldOptions as $arrAssetCustomFieldOption){
+				$selected = false;
+				if($this->blnEditMode){
+					$selected = in_array($arrAssetCustomFieldOption->CustomField->CustomFieldId,$arrChosenCustomFieldId);
+				}
+				/*     else{
+	   $selected = $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag;
+	 }
+*///Excluding AllAssetModelsFlaged Items just until setup qcodo 4.22
+				$role=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(
+					QApplication::$objRoleModule->RoleId,
+					$arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
+					2
+				);
+				if($role instanceof RoleEntityQtypeCustomFieldAuthorization){
+					$role = $role->AuthorizedFlag;
+				}
+				if($arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
+					&&$arrAssetCustomFieldOption->CustomField->ActiveFlag
+					&& (int)$role==1
+				){
+					$this->chkCustomFieldsForAllModels->AddItem(new QListItem($arrAssetCustomFieldOption->CustomField->ShortDescription,
+						$arrAssetCustomFieldOption->CustomField->CustomFieldId,
+						true
+					));
+				}
+			}
+		}
+		$this->chkCustomFieldsForAllModels->Enabled = false;
+	}
 
 	protected function chkAssetCustomFields_Refresh(){
 		$arrAssetCustomFieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
@@ -692,6 +743,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
     $arrAssetCustomFieldsToAdd = array();
     $this->chkAssetCustomFields->SelectedValues;
     // Generate array of Custom Field values for All Asset Models must be presented in all cases
+  	/*
     $arrAllAssetModelsFlaggedObjects = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
     $arrAllAssetModelsFlag = array();
     foreach ($arrAllAssetModelsFlaggedObjects as $arrAllAssetModelsFlaggedObject){
@@ -701,7 +753,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
     }
 
      $arrAssetCustomFieldsToAdd = array_merge($this->chkAssetCustomFields->SelectedValues,$arrAllAssetModelsFlag);
-     $arrAssetCustomFieldsToAdd = array_unique($arrAssetCustomFieldsToAdd);
+    */
+     $arrAssetCustomFieldsToAdd = array_unique($this->chkAssetCustomFields->SelectedValues);
 
     // If new asset model add AssetCustomFields for All together with selected
       if(!$this->blnEditMode){
