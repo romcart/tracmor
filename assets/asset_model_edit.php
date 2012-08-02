@@ -487,9 +487,9 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			return;
 		}
 
-    $this->UpdateAssetModelFields();
+        $this->UpdateAssetModelFields();
 		$this->objAssetModel->Save();
-    $this->UpdateAssetModelCustomFields();
+        $this->UpdateAssetModelCustomFields();
 		// Assign input values to custom fields
 		if ($this->arrCustomFields) {
 
@@ -736,8 +736,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
   //
   protected function UpdateAssetModelCustomFields(){
 
-    $arrAssetCustomFieldsToAdd = array();
-    $this->chkAssetCustomFields->SelectedValues;
+    //$arrAssetCustomFieldsToAdd = array();
+    // $this->chkAssetCustomFields->SelectedValues;
     // Generate array of Custom Field values for All Asset Models must be presented in all cases
   	/*
     $arrAllAssetModelsFlaggedObjects = EntityQtypeCustomField::LoadArrayByEntityQtypeId(QApplication::Translate(EntityQtype::Asset));
@@ -766,13 +766,30 @@ class AssetModelEditForm extends AssetModelEditFormBase {
         $currentAssetCustomFields = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
         foreach($currentAssetCustomFields as $currentAssetCustomField){
           if (!(in_array($currentAssetCustomField->CustomField->CustomFieldId,$arrAssetCustomFieldsToAdd))){
+			// If blnEditMode some Assets for this Model can be already assigned and them values
+			// for this custom field must be set to null
+			$arrAssetsAssignedToModel = new Asset;
+			$arrAssetsAssignedToModel = $arrAssetsAssignedToModel->LoadArrayByAssetModelId(
+			                                                       $this->objAssetModel->AssetModelId);
+			if(count($arrAssetsAssignedToModel)>0){
+		    $arrAssetOfModel = array();
+			foreach($arrAssetsAssignedToModel as $objAssetAssignedToModel)  {
+				array_push($arrAssetOfModel, $objAssetAssignedToModel->AssetId);
+		        }
+				$arrAssetOfModel = implode(",",$arrAssetOfModel);
+				//print $arrAssetOfModel; exit;
+				$objDatabase = CustomField::GetDatabase();
+				$strQuery = sprintf("UPDATE `asset_custom_field_helper` SET `cfv_%s`= NULL WHERE `asset_id` IN($arrAssetOfModel);",$currentAssetCustomField->CustomFieldId);
+				$objDatabase->NonQuery($strQuery);
+            }
+			// then Delete Associations
             $currentAssetCustomField->Delete();
           }
         }
         foreach($arrAssetCustomFieldsToAdd as $keyAssetCustomField){
           $blnToAdd = true;
           foreach($currentAssetCustomFields as $currentAssetCustomField){
-            if ($currentAssetCustomField->CustomField->CustomFieldId == $arrAssetCustomFieldsToAdd){
+            if ($currentAssetCustomField->CustomField->CustomFieldId == $keyAssetCustomField){
               $blnToAdd = false;
             }
           }
@@ -781,6 +798,32 @@ class AssetModelEditForm extends AssetModelEditFormBase {
             $newAssetCustomField->CustomFieldId = $keyAssetCustomField;
             $newAssetCustomField->AssetModelId  = $this->objAssetModel->AssetModelId;
             $newAssetCustomField->Save();
+
+			// If custom field is required add default value to appropriate Assets
+			  $objCustomFieldToAdd = new CustomField;
+			  $objCustomFieldToAdd = $objCustomFieldToAdd->Load($keyAssetCustomField);
+
+			  if ($objCustomFieldToAdd->RequiredFlag){
+			  $arrAssetsAssignedToModel = new Asset;
+			  $arrAssetsAssignedToModel = $arrAssetsAssignedToModel->LoadArrayByAssetModelId(
+			 															 $this->objAssetModel->AssetModelId);
+
+			  if(count($arrAssetsAssignedToModel)>0){
+				  $txtDefaultValue = CustomFieldValue::LoadByCustomFieldValueId($objCustomFieldToAdd->DefaultCustomFieldValueId);
+
+				  $arrAssetOfModel = array();
+				  foreach($arrAssetsAssignedToModel as $objAssetAssignedToModel)  {
+					  array_push($arrAssetOfModel, $objAssetAssignedToModel->AssetId);
+				  }
+				  $arrAssetOfModel = implode(",",$arrAssetOfModel);
+				  $objDatabase = CustomField::GetDatabase();
+				  $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET `cfv_%s`= %s WHERE `asset_id` IN($arrAssetOfModel);",
+					                  $keyAssetCustomField,
+									  $txtDefaultValue);
+				  $objDatabase->NonQuery($strQuery);
+			  }
+			  }
+			//
           }
         }
       }
