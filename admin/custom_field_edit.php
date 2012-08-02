@@ -1276,14 +1276,15 @@
       }
       // Load All Asset Models to add
       else{
-        $this->arrAssetModels = array();
-        $arrAssetModels = AssetModel::LoadAll();
-        foreach($arrAssetModels as $assetModel){
-          $newAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
-          $newAssetCustomFieldAssetModel->CustomFieldId  = $this->objCustomField->CustomFieldId;
-          $newAssetCustomFieldAssetModel->AssetModelId   = $assetModel->AssetModelId;
-          array_push($this->arrAssetModels,$newAssetCustomFieldAssetModel);
-        }
+//        $this->arrAssetModels = array();
+//        $arrAssetModels = AssetModel::LoadAll();
+//        foreach($arrAssetModels as $assetModel){
+//          $newAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
+//          $newAssetCustomFieldAssetModel->CustomFieldId  = $this->objCustomField->CustomFieldId;
+//          $newAssetCustomFieldAssetModel->AssetModelId   = $assetModel->AssetModelId;
+//          array_push($this->arrAssetModels,$newAssetCustomFieldAssetModel);
+//        }
+		$this->DeleteAssetCustomFieldAssetModels();
       }
       // Adding new assigned Model Assets
       $arrCurrentAssetModels = AssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
