@@ -1,4 +1,4 @@
-ALTER TABLE  `custom_field` ADD  `all_asset_models_flag` BIT( 1 ) NULL AFTER  `required_flag`;
+ALTER TABLE  `custom_field` ADD  `all_asset_models_flag` BIT( 1 ) NULL DEFAULT 1 AFTER  `required_flag`;
 ALTER TABLE  `custom_field` ADD  `searchable_flag` BIT( 1 ) NULL AFTER  `all_asset_models_flag`;
 
 CREATE TABLE asset_custom_field_asset_model (

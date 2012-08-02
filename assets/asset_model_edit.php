@@ -392,10 +392,6 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 				if($this->blnEditMode){
 					$selected = in_array($arrAssetCustomFieldOption->CustomField->CustomFieldId,$arrChosenCustomFieldId);
 				}
-				/*     else{
-	   $selected = $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag;
-	 }
-*///Excluding AllAssetModelsFlaged Items just until setup qcodo 4.22
 				$role=RoleEntityQtypeCustomFieldAuthorization::LoadByRoleIdEntityQtypeCustomFieldIdAuthorizationId(
 					QApplication::$objRoleModule->RoleId,
 					$arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
