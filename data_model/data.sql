@@ -495,7 +495,7 @@ INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
 	(20,'check_out_to_contacts',NULL),
 	(21,'due_date_required',NULL),
 	(22,'reason_required',NULL),
-	(23,'default_check_out_period','24');
+	(23,'default_check_out_period','24'),
 	(24,'depreciation_flag','1');
 
 INSERT INTO `shortcut` (`module_id`, `authorization_id`, `transaction_type_id`, `short_description`, `link`, `image_path`, `entity_qtype_id`, `create_flag`) VALUES
