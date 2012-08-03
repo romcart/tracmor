@@ -48,7 +48,7 @@ INSERT INTO `user_account` (`user_account_id`, `first_name`, `last_name`, `usern
 INSERT INTO `custom_field_qtype` (`name`) VALUES
 	('text'),
 	('select'),
-	('textarea');
+	('text area');
 
 INSERT INTO `entity_qtype` (`entity_qtype_id`, `name`) VALUES
 	(1,'Asset'),

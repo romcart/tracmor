@@ -27,6 +27,10 @@ try {
 	$strQuery = "INSERT INTO `_version` (`version`) VALUES ('0.4.0')";
 	$objDatabase->NonQuery($strQuery);
 
+	// Change `textarea` custom field type name to `text area`
+	$strQuery = "UPDATE `custom_field_qtype` SET `name` = 'text area' WHERE `custom_field_qtype_id` = 3";
+	$objDatabase->NonQuery($strQuery);
+
 	// Change password_hash length to varchar(60)
 	$strQuery = "ALTER TABLE  `user_account` CHANGE  `password_hash`  `password_hash` VARCHAR( 60 ) NOT NULL";
 	$objDatabase->NonQuery($strQuery);

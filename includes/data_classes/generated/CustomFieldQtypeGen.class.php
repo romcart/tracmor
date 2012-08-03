@@ -27,7 +27,7 @@
 		public static $NameArray = array(
 			1 => 'text',
 			2 => 'select',
-			3 => 'textarea');
+			3 => 'text area');
 
 		public static $TokenArray = array(
 			1 => 'text',
@@ -38,7 +38,7 @@
 			switch ($intCustomFieldQtypeId) {
 				case 1: return 'text';
 				case 2: return 'select';
-				case 3: return 'textarea';
+				case 3: return 'text area';
 				default:
 					throw new QCallerException(sprintf('Invalid intCustomFieldQtypeId: %s', $intCustomFieldQtypeId));
 			}
