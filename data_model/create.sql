@@ -1,4 +1,6 @@
-CREATE TABLE `_version` (`version` VARCHAR(50)) ENGINE = INNODB;
+CREATE TABLE `_version` (
+`version` VARCHAR(50),
+PRIMARY KEY ( `version`)) ENGINE = INNODB;
 
 CREATE TABLE category (
   category_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -237,7 +239,7 @@ CREATE TABLE custom_field (
   short_description             VARCHAR(255)   NOT NULL,
   active_flag                   BIT   NULL,
   required_flag                 BIT   NULL,
-  all_asset_models_flag         BIT   NULL,
+  all_asset_models_flag         BIT   NULL  DEFAULT 1,
   searchable_flag               BIT   NULL,
   created_by                    INTEGER UNSIGNED   NULL,
   creation_date                 DATETIME   NULL,
@@ -768,6 +770,7 @@ CREATE TABLE  depreciation_class(
    PRIMARY KEY (depreciation_class_id),
    INDEX depreciation_class_fkindex1 ( depreciation_class_id ),
    UNIQUE (depreciation_method_qtype_id),
+   UNIQUE (short_description),
    INDEX depreciation_class_fkindex2 ( depreciation_method_qtype_id )
 )
 ENGINE = INNODB;
