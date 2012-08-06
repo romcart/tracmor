@@ -72,6 +72,10 @@
 							<td class="record_field_name">Strict Check-In Policy: </td>
 							<td class="record_field_edit"><?php //$this->chkStrictCheckinPolicy->RenderWithError(); ?></td>
 						</tr>-->
+						<tr>
+							<td class="record_field_name">Asset Depreciation: </td>
+							<td class="record_field_edit"><?php $this->chkAssetDepreciation->RenderWithError(); ?></td>
+						</tr>
 					</table>
 				</td>
 			</tr>
