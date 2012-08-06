@@ -34,6 +34,7 @@
 		protected $chkStrictCheckinPolicy;
 		protected $pnlSaveNotification;
 		protected $txtSearchResultsPerPage;
+		protected $chkAssetDepreciation;
 
 		// Buttons
 		protected $btnSave;
@@ -48,6 +49,7 @@
 			$this->chkPortablePinRequired_Create();
 			//$this->chkStrictCheckinPolicy_Create();
 			$this->txtSearchResultsPerPage_Create();
+			$this->chkAssetDepreciation_Create();
 
 			// Create Buttons
 			$this->btnSave_Create();
@@ -110,6 +112,17 @@
 				$this->chkStrictCheckinPolicy->Checked = false;
 			}
 		}
+		// Asset Depreciation option
+		protected function chkAssetDepreciation_Create(){
+			$this->chkAssetDepreciation = new QCheckBox($this);
+			$this->chkAssetDepreciation->Name = "Asset Depreciation";
+			if (QApplication::$TracmorSettings->DepreciationFlag == '1') {
+				$this->chkAssetDepreciation->Checked = true;
+			} else {
+				$this->chkAssetDepreciation->Checked = false;
+			}
+		}
+
 
 		// Create and Setup the SearchResultsPerPage Text Field
 		protected function txtSearchResultsPerPage_Create() {
@@ -219,7 +232,7 @@
 			// We have to cast these to string because the admin_settings value column is TEXT, and checkboxes give boolean values
 			QApplication::$TracmorSettings->PortablePinRequired = (string) $this->chkPortablePinRequired->Checked;
 			//QApplication::$TracmorSettings->StrictCheckinPolicy = (string) $this->chkStrictCheckinPolicy->Checked;
-
+			QApplication::$TracmorSettings->DepreciationFlag = (string) $this->chkAssetDepreciation->Checked;
 			// Show saved notification
 			$this->pnlSaveNotification->Display = true;
 		}
