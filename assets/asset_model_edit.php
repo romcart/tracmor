@@ -49,10 +49,13 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected $lblAssetModelCode;
 	protected $lblCategory;
 	protected $lblManufacturer;
+	protected $lblDefaultDepreciationClass;
 	protected $btnEdit;
 	protected $ifcImage;
 	protected $lblImage;
 	protected $pnlLongDescription;
+
+	protected $lstDefaultDepreciationClass;
 
 	protected $atcAttach;
 	protected $pnlAttachments;
@@ -99,6 +102,12 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		// Image label must be created AFTER image control
 		$this->lblImage_Create();
 		$this->pnlLongDescription_Create();
+
+
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->lblDefaultDepreciationClass_Create();
+			$this->lstDefaultDepreciationClass_Create();
+		}
 
 		// Set a variable which defines whether the built-in fields must be rendered or not.
 		$this->UpdateBuiltInFields();
@@ -195,6 +204,22 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		}
 	}
 
+	// Create the Depreciation Class Label
+	protected function lblDefaultDepreciationClass_Create(){
+		$this->lblDefaultDepreciationClass = new QLabel($this);
+		$this->lblDefaultDepreciationClass->Name = 'Depreciation Class';
+
+		if($this->blnEditMode){
+			if($this->objAssetModel->DefaultDepreciationClass == 0){
+			$this->lblDefaultDepreciationClass->Text = '';
+			}
+			else{
+			$this->lblDefaultDepreciationClass->Text = $this->objAssetModel->DefaultDepreciationClass->ShortDescription;
+			}
+		}
+
+	}
+
 	// Output the image
 	protected function lblImage_Create() {
 		$this->lblImage = new QLabel($this);
@@ -285,7 +310,9 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lstManufacturer->Name = QApplication::Translate('Manufacturer');
 		$this->lstManufacturer->Required = true;
 		if (!$this->blnEditMode)
-		$this->lstManufacturer->AddItem('- Select One -', null);
+		{
+			$this->lstManufacturer->AddItem('- Select One -', null);
+		}
 		// $objManufacturerArray = Manufacturer::LoadAll('short_description ASC');
 		$objManufacturerArray = Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription)));
 		if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
@@ -308,6 +335,25 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this, true, true);
 
 		$this->UpdateCustomFields();
+	}
+
+	// Create Depreciation Class select
+
+	protected function lstDefaultDepreciationClass_Create(){
+		$this->lstDefaultDepreciationClass = new QListBox($this);
+		$this->lstDefaultDepreciationClass->Name = QApplication::Translate('Depreciation Class');
+		//if (!$this->blnEditMode)
+			$this->lstDefaultDepreciationClass->AddItem('- Select One -', null);
+		$objDepreciationClassArray = DepreciationClass::LoadAll();
+
+		if (is_array($objDepreciationClassArray)) {
+			foreach ($objDepreciationClassArray as $objDepreciationClass) {
+				$objListItem = new QListItem($objDepreciationClass->ShortDescription, $objDepreciationClass->DepreciationClassId);
+				if (($this->objAssetModel->DefaultDepreciationClass) && ($this->objAssetModel->DefaultDepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
+					$objListItem->Selected = true;
+				$this->lstDefaultDepreciationClass->AddItem($objListItem);
+			}
+		}
 	}
 
 	// Setup Save Button
@@ -618,6 +664,12 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblManufacturer->Display = true;
 		$this->pnlLongDescription->Display = true;
 
+		// Display Depreciation label if option enabled
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->lblDefaultDepreciationClass->Display = true;
+			$this->lstDefaultDepreciationClass->Display = false;
+		}
+
 		// Display Edit and Delete buttons
 		$this->btnEdit->Display = true;
 		$this->btnDelete->Display = true;
@@ -649,7 +701,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->txtLongDescription->Display = true;
 		$this->ifcImage->Display = true;
 
-
+		// Display Depreciation field if enabled
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->lblDefaultDepreciationClass->Display = false;
+			$this->lstDefaultDepreciationClass->Display = true;
+		}
 
 		// Display Asset Code and Asset Model input for edit mode
 		// new: if the user is authorized to edit the built-in fields.

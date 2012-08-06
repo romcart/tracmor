@@ -46,7 +46,7 @@
 			$arrAssetModelFields[] = array('name' => 'Asset Model Code:', 'value' => $this->lblAssetModelCode->Render(false) . $this->txtAssetModelCode->RenderWithError(false));
 			$arrAssetModelFields[] = array('name' => 'Long Description:', 'value' => $this->pnlLongDescription->Render(false) . $this->txtLongDescription->RenderWithError(false));
 			$arrAssetModelFields[] = array('name' => 'Image:', 'value' => $this->ifcImage->RenderWithError(false) . $this->lblImage->Render(false));
-		// Custom Fields
+			// Custom Fields
 		if ($this->arrCustomFields) {
 			foreach ($this->arrCustomFields as $field) {
 					if(!$this->blnEditMode || $field['blnView'])
@@ -54,6 +54,12 @@
 				}
 				
 		}
+			if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+				$arrAssetModelFields[] = array('name' => 'Depreciation Class:',
+					                           'value'=>  $this->lblDefaultDepreciationClass->Render(false)
+												          . $this->lstDefaultDepreciationClass->RenderWithError(false)
+				);
+			}
 		
 		// Display Metadata fields if this is not a new contact
 		//if ($this->blnEditMode) {
