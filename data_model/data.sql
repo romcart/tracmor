@@ -530,5 +530,9 @@ INSERT INTO `shortcut` (`module_id`, `authorization_id`, `transaction_type_id`, 
         (2,2,10,'Archive Assets','../assets/asset_edit.php?intTransactionTypeId=10','asset_archive.png',1,0),
         (2,2,11,'Unarchive Assets','../assets/asset_edit.php?intTransactionTypeId=11','asset_unarchive.png',1,0);
 
+INSERT INTO `depreciation_method_qtype` (`depreciation_method_qtype_id`, `short_description`) VALUES (1, 'Straight Line');
+
+INSERT INTO `depreciation_class` (`depreciation_class_id`, `depreciation_method_qtype_id`, `short_description`) VALUES (1, 1, 'Straight Line Depreciation');
+
 SET FOREIGN_KEY_CHECKS = 1;
 
