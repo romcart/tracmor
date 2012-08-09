@@ -542,9 +542,9 @@
           // Add new ajax actions for button
           $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
-    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
-    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
-    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
+			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
+			$this->btnNext->AddAction(new QEnterKeyEvent(), new QTerminateAction());
           $this->btnNext->Warning = "Please wait...";
           $this->intImportStep = 2;
           $this->intCurrentFile = 0;
@@ -1167,8 +1167,15 @@
 	    $lstMapHeader->AddItem("Parent Asset", "Parent Asset", ($strName == 'parent asset') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Locked To Parent", "Locked To Parent", ($strName == 'locked to parent') ? true : false, $strAssetGroup);
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
+			// Add style to Required Fields for All Asset Models
+			if($objCustomField->RequiredFlag&&$objCustomField->AllAssetModelsFlag){
+				$lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup, 'CssClass="redtext"');
+
+			}
+			else{
 	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
-	    }
+			}
+			}
 	    /*$lstMapHeader->AddItem("Created By", "Created By", ($strName == 'created by') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Created Date", "Created Date", ($strName == 'created date') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Modified By", "Modified By", ($strName == 'modified by') ? true : false, $strAssetGroup);
