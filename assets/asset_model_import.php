@@ -977,7 +977,7 @@
                   //var_dump($this->strModelValuesArray);
                   //exit();
 
-                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", htmlspecialchars_decode(implode(", ", $this->strModelValuesArray))));
+                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", str_replace('&quot;','"', implode(", ", $this->strModelValuesArray))));
                   $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
                    // Update for asset custom fields with allAssetModesF Flag
