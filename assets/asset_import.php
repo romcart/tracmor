@@ -455,12 +455,32 @@
 		    }
 		  }
 		  elseif ($this->intStep == 2) {
-		    // Step 2 complete
+		      // Step 2 complete
+			  $blnRequiredAllAssetCustomFields = true;
 		    $blnError = false;
         $blnAssetCode = false;
         $blnAssetModelShortDescription = false;
         $blnLocation = false;
         $blnAssetId = false;
+
+		// $array Required Custom Fields for All Asset Models
+		$arrAssetCustomFieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(
+				  QApplication::Translate(EntityQtype::Asset));
+		// generate error flag and field names which are required for export;
+	    $arrRequiredAllAssetCustomFields = array();
+		foreach($arrAssetCustomFieldOptions as $arrAssetCustomFieldOption){
+         $log = '';
+		if($arrAssetCustomFieldOption->CustomField->RequiredFlag
+		   && $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag){
+		   $arrRequiredAllAssetCustomFields[] = $arrAssetCustomFieldOption->CustomField->ShortDescription;
+		if(!in_array($arrAssetCustomFieldOption->CustomField->ShortDescription,$this->getLstKeys())){
+			$blnRequiredAllAssetCustomFields = false;
+		};
+
+		}
+		}
+		//$arrRequiredFields =
+		//
         // Checking errors (Model Short Description, Model Code, Category and Manufacturer must be selected)
         for ($i=0; $i < count($this->lstMapHeaderArray)-1; $i++) {
           $lstMapHeader = $this->lstMapHeaderArray[$i];
@@ -506,7 +526,12 @@
           }
         }
         // If all required fields have no errors
-        if (!$blnError && $blnAssetCode && $blnAssetModelShortDescription && $blnLocation && ($this->lstImportAction->SelectedValue != 2 || $blnAssetId)) {
+        if (!$blnError
+		    && $blnRequiredAllAssetCustomFields
+			&& $blnAssetCode
+			&& $blnAssetModelShortDescription
+			&& $blnLocation
+			&& ($this->lstImportAction->SelectedValue != 2 || $blnAssetId)) {
           $this->btnNext->Warning = "";
           // Setup keys for main required fields
           foreach ($this->arrTracmorField as $key => $value) {
@@ -604,7 +629,11 @@
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QTerminateAction());
         }
         else {
-          $this->btnNext->Warning = "You must select all required fields (Asset Code, Asset Model Short Description and Location).";
+		  $strRequiredAllAssetCustomFields = '';
+		  if(count($arrRequiredAllAssetCustomFields)>0){
+			$strRequiredAllAssetCustomFields = implode(", ",$arrRequiredAllAssetCustomFields) .", ";
+		  }
+          $this->btnNext->Warning = "You must select all required fields (".$strRequiredAllAssetCustomFields." Asset Code, Asset Model Short Description and Location).";
           $blnError = true;
         }
 		  }
@@ -1467,6 +1496,20 @@
         	return $arrToClear;
         }
       }
+	public function getLstKeys(){
+		$arrToReturn = array();
+		foreach($this->lstMapHeaderArray as $item){
+			if(get_class($item)=='QListBox'){
+				if(is_numeric(str_replace('asset_','',$item->SelectedValue))){
+					$arrToReturn[] = CustomField::Load(str_replace('asset_','',$item->SelectedValue))->ShortDescription;
+				}
+				else{
+					$arrToReturn[] = $item->SelectedValue;
+				}
+			}
+		}
+		return $arrToReturn;
+	}
 
 	}
 	// Go ahead and run this form object to generate the page
