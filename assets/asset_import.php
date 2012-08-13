@@ -469,7 +469,6 @@
 		// generate error flag and field names which are required for export;
 	    $arrRequiredAllAssetCustomFields = array();
 		foreach($arrAssetCustomFieldOptions as $arrAssetCustomFieldOption){
-         $log = '';
 		if($arrAssetCustomFieldOption->CustomField->RequiredFlag
 		   && $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag){
 		   $arrRequiredAllAssetCustomFields[] = $arrAssetCustomFieldOption->CustomField->ShortDescription;
@@ -479,9 +478,7 @@
 
 		}
 		}
-		//$arrRequiredFields =
-		//
-        // Checking errors (Model Short Description, Model Code, Category and Manufacturer must be selected)
+	    // Checking errors (Model Short Description, Model Code, Category and Manufacturer must be selected)
         for ($i=0; $i < count($this->lstMapHeaderArray)-1; $i++) {
           $lstMapHeader = $this->lstMapHeaderArray[$i];
           $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
@@ -750,6 +747,30 @@
                   }
                 }
                 $blnError = false;
+				// Skip records with not filled required custom fields
+				 $log = '' ;
+				if($intAssetModelId)  {
+					foreach($intAssetCustomFieldKeyArray as $k => $v){ $log .= 'k'.$k.'='.$v;}
+
+					// Load Specific asset model custom field
+					$arrRequiredSpecificAssetCustomFields = AssetCustomFieldAssetModel::
+						                                    LoadArrayByAssetModelId($intAssetModelId);
+
+					foreach($arrRequiredSpecificAssetCustomFields as $objRequiredCustomField){
+						if($objRequiredCustomField->CustomField->RequiredFlag){
+							$log.= $objRequiredCustomField->CustomField->CustomFieldId;
+						    if(!in_array($objRequiredCustomField->CustomField->CustomFieldId,$intAssetCustomFieldKeyArray)
+							   ||empty($strRowArray[array_search($objRequiredCustomField->CustomField->CustomFieldId,
+								       $intAssetCustomFieldKeyArray)])
+							){
+								$blnError = true;
+							//   $log .= "<h1>".$objRequiredCustomField->CustomField->ShortDescription.$objRequiredCustomField->CustomField->CustomFieldId." is empty</h1>";
+							}
+						}
+					}
+				}
+			 	//print $log; exit;
+				if(!$blnError){
                 if (isset($intParentAssetKey) && isset($strRowArray[$intParentAssetKey])) {
                   $strKeyArray = array_keys($arrAssetId, strtolower(trim($strRowArray[$intParentAssetKey])));
                   if (count($strKeyArray)) {
@@ -774,7 +795,7 @@
                   $intParentAssetId = null;
                   $blnLinked = 0;
                 }
-
+				}
                 /*$strKeyArray = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])));
                 if (count($strKeyArray)) {
                   $intCategoryId = $strKeyArray[0];
