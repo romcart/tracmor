@@ -38,117 +38,28 @@
 
 	class RoleModuleAuthorizationMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var RoleModuleAuthorization objRoleModuleAuthorization
-		 * @access protected
-		 */
 		protected $objRoleModuleAuthorization;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of RoleModuleAuthorization's individual data fields
-        /**
-         * @var QLabel lblRoleModuleAuthorizationId;
-         * @access protected
-         */
 		protected $lblRoleModuleAuthorizationId;
-
-        /**
-         * @var QListBox lstRoleModule;
-         * @access protected
-         */
 		protected $lstRoleModule;
-
-        /**
-         * @var QListBox lstAuthorization;
-         * @access protected
-         */
 		protected $lstAuthorization;
-
-        /**
-         * @var QListBox lstAuthorizationLevel;
-         * @access protected
-         */
 		protected $lstAuthorizationLevel;
-
-        /**
-         * @var QListBox lstCreatedByObject;
-         * @access protected
-         */
 		protected $lstCreatedByObject;
-
-        /**
-         * @var QDateTimePicker calCreationDate;
-         * @access protected
-         */
 		protected $calCreationDate;
-
-        /**
-         * @var QListBox lstModifiedByObject;
-         * @access protected
-         */
 		protected $lstModifiedByObject;
-
-        /**
-         * @var QLabel lblModifiedDate;
-         * @access protected
-         */
 		protected $lblModifiedDate;
 
-
 		// Controls that allow the viewing of RoleModuleAuthorization's individual data fields
-        /**
-         * @var QLabel lblRoleModuleId
-         * @access protected
-         */
 		protected $lblRoleModuleId;
-
-        /**
-         * @var QLabel lblAuthorizationId
-         * @access protected
-         */
 		protected $lblAuthorizationId;
-
-        /**
-         * @var QLabel lblAuthorizationLevelId
-         * @access protected
-         */
 		protected $lblAuthorizationLevelId;
-
-        /**
-         * @var QLabel lblCreatedBy
-         * @access protected
-         */
 		protected $lblCreatedBy;
-
-        /**
-         * @var QLabel lblCreationDate
-         * @access protected
-         */
 		protected $lblCreationDate;
-
-        /**
-         * @var QLabel lblModifiedBy
-         * @access protected
-         */
 		protected $lblModifiedBy;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -265,28 +176,19 @@
 		/**
 		 * Create and setup QListBox lstRoleModule
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstRoleModule_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstRoleModule_Create($strControlId = null) {
 			$this->lstRoleModule = new QListBox($this->objParentObject, $strControlId);
 			$this->lstRoleModule->Name = QApplication::Translate('Role Module');
 			$this->lstRoleModule->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objRoleModuleCursor = RoleModule::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objRoleModule = RoleModule::InstantiateCursor($objRoleModuleCursor)) {
+			$objRoleModuleArray = RoleModule::LoadAll();
+			if ($objRoleModuleArray) foreach ($objRoleModuleArray as $objRoleModule) {
 				$objListItem = new QListItem($objRoleModule->__toString(), $objRoleModule->RoleModuleId);
 				if (($this->objRoleModuleAuthorization->RoleModule) && ($this->objRoleModuleAuthorization->RoleModule->RoleModuleId == $objRoleModule->RoleModuleId))
 					$objListItem->Selected = true;
 				$this->lstRoleModule->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstRoleModule;
 		}
 
@@ -305,28 +207,19 @@
 		/**
 		 * Create and setup QListBox lstAuthorization
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAuthorization_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstAuthorization_Create($strControlId = null) {
 			$this->lstAuthorization = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAuthorization->Name = QApplication::Translate('Authorization');
 			$this->lstAuthorization->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objAuthorizationCursor = Authorization::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objAuthorization = Authorization::InstantiateCursor($objAuthorizationCursor)) {
+			$objAuthorizationArray = Authorization::LoadAll();
+			if ($objAuthorizationArray) foreach ($objAuthorizationArray as $objAuthorization) {
 				$objListItem = new QListItem($objAuthorization->__toString(), $objAuthorization->AuthorizationId);
 				if (($this->objRoleModuleAuthorization->Authorization) && ($this->objRoleModuleAuthorization->Authorization->AuthorizationId == $objAuthorization->AuthorizationId))
 					$objListItem->Selected = true;
 				$this->lstAuthorization->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstAuthorization;
 		}
 
@@ -345,28 +238,19 @@
 		/**
 		 * Create and setup QListBox lstAuthorizationLevel
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAuthorizationLevel_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstAuthorizationLevel_Create($strControlId = null) {
 			$this->lstAuthorizationLevel = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAuthorizationLevel->Name = QApplication::Translate('Authorization Level');
 			$this->lstAuthorizationLevel->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objAuthorizationLevelCursor = AuthorizationLevel::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objAuthorizationLevel = AuthorizationLevel::InstantiateCursor($objAuthorizationLevelCursor)) {
+			$objAuthorizationLevelArray = AuthorizationLevel::LoadAll();
+			if ($objAuthorizationLevelArray) foreach ($objAuthorizationLevelArray as $objAuthorizationLevel) {
 				$objListItem = new QListItem($objAuthorizationLevel->__toString(), $objAuthorizationLevel->AuthorizationLevelId);
 				if (($this->objRoleModuleAuthorization->AuthorizationLevel) && ($this->objRoleModuleAuthorization->AuthorizationLevel->AuthorizationLevelId == $objAuthorizationLevel->AuthorizationLevelId))
 					$objListItem->Selected = true;
 				$this->lstAuthorizationLevel->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstAuthorizationLevel;
 		}
 
@@ -385,28 +269,19 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCreatedByObject_Create($strControlId = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
+			$objCreatedByObjectArray = UserAccount::LoadAll();
+			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objRoleModuleAuthorization->CreatedByObject) && ($this->objRoleModuleAuthorization->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 
@@ -454,28 +329,19 @@
 		/**
 		 * Create and setup QListBox lstModifiedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModifiedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstModifiedByObject_Create($strControlId = null) {
 			$this->lstModifiedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModifiedByObject->Name = QApplication::Translate('Modified By Object');
 			$this->lstModifiedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objModifiedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objModifiedByObject = UserAccount::InstantiateCursor($objModifiedByObjectCursor)) {
+			$objModifiedByObjectArray = UserAccount::LoadAll();
+			if ($objModifiedByObjectArray) foreach ($objModifiedByObjectArray as $objModifiedByObject) {
 				$objListItem = new QListItem($objModifiedByObject->__toString(), $objModifiedByObject->UserAccountId);
 				if (($this->objRoleModuleAuthorization->ModifiedByObject) && ($this->objRoleModuleAuthorization->ModifiedByObject->UserAccountId == $objModifiedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstModifiedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstModifiedByObject;
 		}
 

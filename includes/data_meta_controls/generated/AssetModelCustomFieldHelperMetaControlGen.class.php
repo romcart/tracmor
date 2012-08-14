@@ -24,45 +24,16 @@
 
 	class AssetModelCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var AssetModelCustomFieldHelper objAssetModelCustomFieldHelper
-		 * @access protected
-		 */
 		protected $objAssetModelCustomFieldHelper;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of AssetModelCustomFieldHelper's individual data fields
-        /**
-         * @var QListBox lstAssetModel;
-         * @access protected
-         */
 		protected $lstAssetModel;
 
-
 		// Controls that allow the viewing of AssetModelCustomFieldHelper's individual data fields
-        /**
-         * @var QLabel lblAssetModelId
-         * @access protected
-         */
 		protected $lblAssetModelId;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -164,30 +135,21 @@
 		/**
 		 * Create and setup QListBox lstAssetModel
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAssetModel_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstAssetModel_Create($strControlId = null) {
 			$this->lstAssetModel = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAssetModel->Name = QApplication::Translate('Asset Model');
 			$this->lstAssetModel->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstAssetModel->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objAssetModelCursor = AssetModel::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objAssetModel = AssetModel::InstantiateCursor($objAssetModelCursor)) {
+			$objAssetModelArray = AssetModel::LoadAll();
+			if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
 				$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
 				if (($this->objAssetModelCustomFieldHelper->AssetModel) && ($this->objAssetModelCustomFieldHelper->AssetModel->AssetModelId == $objAssetModel->AssetModelId))
 					$objListItem->Selected = true;
 				$this->lstAssetModel->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstAssetModel;
 		}
 

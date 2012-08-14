@@ -42,145 +42,36 @@
 
 	class TransactionMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var Transaction objTransaction
-		 * @access protected
-		 */
 		protected $objTransaction;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Transaction's individual data fields
-        /**
-         * @var QLabel lblTransactionId;
-         * @access protected
-         */
 		protected $lblTransactionId;
-
-        /**
-         * @var QListBox lstEntityQtype;
-         * @access protected
-         */
 		protected $lstEntityQtype;
-
-        /**
-         * @var QListBox lstTransactionType;
-         * @access protected
-         */
 		protected $lstTransactionType;
-
-        /**
-         * @var QTextBox txtNote;
-         * @access protected
-         */
 		protected $txtNote;
-
-        /**
-         * @var QListBox lstCreatedByObject;
-         * @access protected
-         */
 		protected $lstCreatedByObject;
-
-        /**
-         * @var QDateTimePicker calCreationDate;
-         * @access protected
-         */
 		protected $calCreationDate;
-
-        /**
-         * @var QListBox lstModifiedByObject;
-         * @access protected
-         */
 		protected $lstModifiedByObject;
-
-        /**
-         * @var QLabel lblModifiedDate;
-         * @access protected
-         */
 		protected $lblModifiedDate;
 
-
 		// Controls that allow the viewing of Transaction's individual data fields
-        /**
-         * @var QLabel lblEntityQtypeId
-         * @access protected
-         */
 		protected $lblEntityQtypeId;
-
-        /**
-         * @var QLabel lblTransactionTypeId
-         * @access protected
-         */
 		protected $lblTransactionTypeId;
-
-        /**
-         * @var QLabel lblNote
-         * @access protected
-         */
 		protected $lblNote;
-
-        /**
-         * @var QLabel lblCreatedBy
-         * @access protected
-         */
 		protected $lblCreatedBy;
-
-        /**
-         * @var QLabel lblCreationDate
-         * @access protected
-         */
 		protected $lblCreationDate;
-
-        /**
-         * @var QLabel lblModifiedBy
-         * @access protected
-         */
 		protected $lblModifiedBy;
 
-
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
-        /**
-         * @var QListBox lstReceipt
-         * @access protected
-         */
 		protected $lstReceipt;
-
-        /**
-         * @var QListBox lstShipment
-         * @access protected
-         */
 		protected $lstShipment;
 
-
 		// QLabel Controls (if applicable) to view Unique ReverseReferences and ManyToMany References
-        /**
-         * @var QLabel lblReceipt
-         * @access protected
-         */
 		protected $lblReceipt;
-
-        /**
-         * @var QLabel lblShipment
-         * @access protected
-         */
 		protected $lblShipment;
-
 
 
 		/**
@@ -299,8 +190,8 @@
 			$this->lstEntityQtype = new QListBox($this->objParentObject, $strControlId);
 			$this->lstEntityQtype->Name = QApplication::Translate('Entity Qtype');
 			$this->lstEntityQtype->Required = true;
-
-			$this->lstEntityQtype->AddItems(EntityQtype::$NameArray, $this->objTransaction->EntityQtypeId);
+			foreach (EntityQtype::$NameArray as $intId => $strValue)
+				$this->lstEntityQtype->AddItem(new QListItem($strValue, $intId, $this->objTransaction->EntityQtypeId == $intId));
 			return $this->lstEntityQtype;
 		}
 
@@ -320,30 +211,21 @@
 		/**
 		 * Create and setup QListBox lstTransactionType
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstTransactionType_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstTransactionType_Create($strControlId = null) {
 			$this->lstTransactionType = new QListBox($this->objParentObject, $strControlId);
 			$this->lstTransactionType->Name = QApplication::Translate('Transaction Type');
 			$this->lstTransactionType->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstTransactionType->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objTransactionTypeCursor = TransactionType::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objTransactionType = TransactionType::InstantiateCursor($objTransactionTypeCursor)) {
+			$objTransactionTypeArray = TransactionType::LoadAll();
+			if ($objTransactionTypeArray) foreach ($objTransactionTypeArray as $objTransactionType) {
 				$objListItem = new QListItem($objTransactionType->__toString(), $objTransactionType->TransactionTypeId);
 				if (($this->objTransaction->TransactionType) && ($this->objTransaction->TransactionType->TransactionTypeId == $objTransactionType->TransactionTypeId))
 					$objListItem->Selected = true;
 				$this->lstTransactionType->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstTransactionType;
 		}
 
@@ -388,28 +270,19 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCreatedByObject_Create($strControlId = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
+			$objCreatedByObjectArray = UserAccount::LoadAll();
+			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objTransaction->CreatedByObject) && ($this->objTransaction->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 
@@ -457,28 +330,19 @@
 		/**
 		 * Create and setup QListBox lstModifiedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModifiedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstModifiedByObject_Create($strControlId = null) {
 			$this->lstModifiedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModifiedByObject->Name = QApplication::Translate('Modified By Object');
 			$this->lstModifiedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objModifiedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objModifiedByObject = UserAccount::InstantiateCursor($objModifiedByObjectCursor)) {
+			$objModifiedByObjectArray = UserAccount::LoadAll();
+			if ($objModifiedByObjectArray) foreach ($objModifiedByObjectArray as $objModifiedByObject) {
 				$objListItem = new QListItem($objModifiedByObject->__toString(), $objModifiedByObject->UserAccountId);
 				if (($this->objTransaction->ModifiedByObject) && ($this->objTransaction->ModifiedByObject->UserAccountId == $objModifiedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstModifiedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstModifiedByObject;
 		}
 
@@ -512,32 +376,22 @@
 		/**
 		 * Create and setup QListBox lstReceipt
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstReceipt_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstReceipt_Create($strControlId = null) {
 			$this->lstReceipt = new QListBox($this->objParentObject, $strControlId);
 			$this->lstReceipt->Name = QApplication::Translate('Receipt');
 			$this->lstReceipt->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objReceiptCursor = Receipt::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objReceipt = Receipt::InstantiateCursor($objReceiptCursor)) {
+			$objReceiptArray = Receipt::LoadAll();
+			if ($objReceiptArray) foreach ($objReceiptArray as $objReceipt) {
 				$objListItem = new QListItem($objReceipt->__toString(), $objReceipt->ReceiptId);
 				if ($objReceipt->TransactionId == $this->objTransaction->TransactionId)
 					$objListItem->Selected = true;
 				$this->lstReceipt->AddItem($objListItem);
 			}
-
 			// Because Receipt's Receipt is not null, if a value is already selected, it cannot be changed.
 			if ($this->lstReceipt->SelectedValue)
 				$this->lstReceipt->Enabled = false;
-
-			// Return the QListBox
 			return $this->lstReceipt;
 		}
 
@@ -556,32 +410,22 @@
 		/**
 		 * Create and setup QListBox lstShipment
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstShipment_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstShipment_Create($strControlId = null) {
 			$this->lstShipment = new QListBox($this->objParentObject, $strControlId);
 			$this->lstShipment->Name = QApplication::Translate('Shipment');
 			$this->lstShipment->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objShipmentCursor = Shipment::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objShipment = Shipment::InstantiateCursor($objShipmentCursor)) {
+			$objShipmentArray = Shipment::LoadAll();
+			if ($objShipmentArray) foreach ($objShipmentArray as $objShipment) {
 				$objListItem = new QListItem($objShipment->__toString(), $objShipment->ShipmentId);
 				if ($objShipment->TransactionId == $this->objTransaction->TransactionId)
 					$objListItem->Selected = true;
 				$this->lstShipment->AddItem($objListItem);
 			}
-
 			// Because Shipment's Shipment is not null, if a value is already selected, it cannot be changed.
 			if ($this->lstShipment->SelectedValue)
 				$this->lstShipment->Enabled = false;
-
-			// Return the QListBox
 			return $this->lstShipment;
 		}
 

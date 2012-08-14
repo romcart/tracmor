@@ -30,75 +30,21 @@
 
 	class NotificationUserAccountMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var NotificationUserAccount objNotificationUserAccount
-		 * @access protected
-		 */
 		protected $objNotificationUserAccount;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of NotificationUserAccount's individual data fields
-        /**
-         * @var QLabel lblNotificationUserAccountId;
-         * @access protected
-         */
 		protected $lblNotificationUserAccountId;
-
-        /**
-         * @var QListBox lstUserAccount;
-         * @access protected
-         */
 		protected $lstUserAccount;
-
-        /**
-         * @var QListBox lstNotification;
-         * @access protected
-         */
 		protected $lstNotification;
-
-        /**
-         * @var QTextBox txtLevel;
-         * @access protected
-         */
 		protected $txtLevel;
 
-
 		// Controls that allow the viewing of NotificationUserAccount's individual data fields
-        /**
-         * @var QLabel lblUserAccountId
-         * @access protected
-         */
 		protected $lblUserAccountId;
-
-        /**
-         * @var QLabel lblNotificationId
-         * @access protected
-         */
 		protected $lblNotificationId;
-
-        /**
-         * @var QLabel lblLevel
-         * @access protected
-         */
 		protected $lblLevel;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -215,30 +161,21 @@
 		/**
 		 * Create and setup QListBox lstUserAccount
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstUserAccount_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstUserAccount_Create($strControlId = null) {
 			$this->lstUserAccount = new QListBox($this->objParentObject, $strControlId);
 			$this->lstUserAccount->Name = QApplication::Translate('User Account');
 			$this->lstUserAccount->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstUserAccount->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objUserAccountCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objUserAccount = UserAccount::InstantiateCursor($objUserAccountCursor)) {
+			$objUserAccountArray = UserAccount::LoadAll();
+			if ($objUserAccountArray) foreach ($objUserAccountArray as $objUserAccount) {
 				$objListItem = new QListItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);
 				if (($this->objNotificationUserAccount->UserAccount) && ($this->objNotificationUserAccount->UserAccount->UserAccountId == $objUserAccount->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstUserAccount->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstUserAccount;
 		}
 
@@ -258,30 +195,21 @@
 		/**
 		 * Create and setup QListBox lstNotification
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstNotification_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstNotification_Create($strControlId = null) {
 			$this->lstNotification = new QListBox($this->objParentObject, $strControlId);
 			$this->lstNotification->Name = QApplication::Translate('Notification');
 			$this->lstNotification->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstNotification->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objNotificationCursor = Notification::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objNotification = Notification::InstantiateCursor($objNotificationCursor)) {
+			$objNotificationArray = Notification::LoadAll();
+			if ($objNotificationArray) foreach ($objNotificationArray as $objNotification) {
 				$objListItem = new QListItem($objNotification->__toString(), $objNotification->NotificationId);
 				if (($this->objNotificationUserAccount->Notification) && ($this->objNotificationUserAccount->Notification->NotificationId == $objNotification->NotificationId))
 					$objListItem->Selected = true;
 				$this->lstNotification->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstNotification;
 		}
 

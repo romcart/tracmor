@@ -393,7 +393,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -455,7 +455,7 @@
 		 * Static Qcodo Query method to query for a single Shipment object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Shipment the queried object
 		 */
@@ -468,38 +468,16 @@
 				throw $objExc;
 			}
 
-			// Perform the Query
+			// Perform the Query, Get the First Row, and Instantiate a new Shipment object
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-
-			// Instantiate a new Shipment object and return it
-
-			// Do we have to expand anything?
-			if ($objQueryBuilder->ExpandAsArrayNodes) {
-				$objToReturn = array();
-				while ($objDbRow = $objDbResult->GetNextRow()) {
-					$objItem = Shipment::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
-					if ($objItem) $objToReturn[] = $objItem;
-				}
-
-				if (count($objToReturn)) {
-					// Since we only want the object to return, lets return the object and not the array.
-					return $objToReturn[0];
-				} else {
-					return null;
-				}
-			} else {
-				// No expands just return the first row
-				$objDbRow = $objDbResult->GetNextRow();
-				if (is_null($objDbRow)) return null;
-				return Shipment::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
-			}
+			return Shipment::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Shipment objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Shipment[] the queried objects as an array
 		 */
@@ -518,35 +496,10 @@
 		}
 
 		/**
-		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
-		 * Uses BuildQueryStatment to perform most of the work.
-		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
-		 * @return QDatabaseResultBase the cursor resource instance
-		 */
-		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
-			// Get the query statement
-			try {
-				$strQuery = Shipment::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-
-			// Perform the query
-			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-		
-			// Return the results cursor
-			$objDbResult->QueryBuilder = $objQueryBuilder;
-			return $objDbResult;
-		}
-
-		/**
 		 * Static Qcodo Query method to query for a count of Shipment objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -670,7 +623,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Shipment::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param QDatabaseRowBase $objDbRow
+		 * @param DatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -814,7 +767,7 @@
 
 		/**
 		 * Instantiate an array of Shipments from a Database Result
-		 * @param QDatabaseResultBase $objDbResult
+		 * @param DatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Shipment[]
@@ -847,32 +800,6 @@
 			return $objToReturn;
 		}
 
-		/**
-		 * Instantiate a single Shipment object from a query cursor (e.g. a DB ResultSet).
-		 * Cursor is automatically moved to the "next row" of the result set.
-		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
-		 * @param QDatabaseResultBase $objDbResult cursor resource
-		 * @return Shipment next row resulting from the query
-		 */
-		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
-			// If blank resultset, then return empty result
-			if (!$objDbResult) return null;
-
-			// If empty resultset, then return empty result
-			$objDbRow = $objDbResult->GetNextRow();
-			if (!$objDbRow) return null;
-
-			// We need the Column Aliases
-			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
-			if (!$strColumnAliasArray) $strColumnAliasArray = array();
-
-			// Pull Expansions (if applicable)
-			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
-
-			// Load up the return result with a row and return it
-			return Shipment::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
-		}
-
 
 
 
@@ -886,10 +813,9 @@
 		 * @param integer $intShipmentId
 		 * @return Shipment
 		*/
-		public static function LoadByShipmentId($intShipmentId, $objOptionalClauses = null) {
+		public static function LoadByShipmentId($intShipmentId) {
 			return Shipment::QuerySingle(
 				QQ::Equal(QQN::Shipment()->ShipmentId, $intShipmentId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -899,10 +825,9 @@
 		 * @param string $strShipmentNumber
 		 * @return Shipment
 		*/
-		public static function LoadByShipmentNumber($strShipmentNumber, $objOptionalClauses = null) {
+		public static function LoadByShipmentNumber($strShipmentNumber) {
 			return Shipment::QuerySingle(
 				QQ::Equal(QQN::Shipment()->ShipmentNumber, $strShipmentNumber)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -912,10 +837,9 @@
 		 * @param integer $intTransactionId
 		 * @return Shipment
 		*/
-		public static function LoadByTransactionId($intTransactionId, $objOptionalClauses = null) {
+		public static function LoadByTransactionId($intTransactionId) {
 			return Shipment::QuerySingle(
 				QQ::Equal(QQN::Shipment()->TransactionId, $intTransactionId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -931,8 +855,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->FromAddressId, $intFromAddressId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -945,11 +868,10 @@
 		 * @param integer $intFromAddressId
 		 * @return int
 		*/
-		public static function CountByFromAddressId($intFromAddressId, $objOptionalClauses = null) {
+		public static function CountByFromAddressId($intFromAddressId) {
 			// Call Shipment::QueryCount to perform the CountByFromAddressId query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->FromAddressId, $intFromAddressId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -965,8 +887,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->ToAddressId, $intToAddressId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -979,11 +900,10 @@
 		 * @param integer $intToAddressId
 		 * @return int
 		*/
-		public static function CountByToAddressId($intToAddressId, $objOptionalClauses = null) {
+		public static function CountByToAddressId($intToAddressId) {
 			// Call Shipment::QueryCount to perform the CountByToAddressId query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->ToAddressId, $intToAddressId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -999,8 +919,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->ToCompanyId, $intToCompanyId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1013,11 +932,10 @@
 		 * @param integer $intToCompanyId
 		 * @return int
 		*/
-		public static function CountByToCompanyId($intToCompanyId, $objOptionalClauses = null) {
+		public static function CountByToCompanyId($intToCompanyId) {
 			// Call Shipment::QueryCount to perform the CountByToCompanyId query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->ToCompanyId, $intToCompanyId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -1033,8 +951,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->CourierId, $intCourierId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1047,11 +964,10 @@
 		 * @param integer $intCourierId
 		 * @return int
 		*/
-		public static function CountByCourierId($intCourierId, $objOptionalClauses = null) {
+		public static function CountByCourierId($intCourierId) {
 			// Call Shipment::QueryCount to perform the CountByCourierId query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->CourierId, $intCourierId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -1067,8 +983,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1081,11 +996,10 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
+		public static function CountByCreatedBy($intCreatedBy) {
 			// Call Shipment::QueryCount to perform the CountByCreatedBy query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->CreatedBy, $intCreatedBy)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -1101,8 +1015,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1115,11 +1028,10 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
+		public static function CountByModifiedBy($intModifiedBy) {
 			// Call Shipment::QueryCount to perform the CountByModifiedBy query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->ModifiedBy, $intModifiedBy)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -1135,8 +1047,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->FromContactId, $intFromContactId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1149,11 +1060,10 @@
 		 * @param integer $intFromContactId
 		 * @return int
 		*/
-		public static function CountByFromContactId($intFromContactId, $objOptionalClauses = null) {
+		public static function CountByFromContactId($intFromContactId) {
 			// Call Shipment::QueryCount to perform the CountByFromContactId query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->FromContactId, $intFromContactId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -1169,8 +1079,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->ToContactId, $intToContactId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1183,11 +1092,10 @@
 		 * @param integer $intToContactId
 		 * @return int
 		*/
-		public static function CountByToContactId($intToContactId, $objOptionalClauses = null) {
+		public static function CountByToContactId($intToContactId) {
 			// Call Shipment::QueryCount to perform the CountByToContactId query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->ToContactId, $intToContactId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -1203,8 +1111,7 @@
 			try {
 				return Shipment::QueryArray(
 					QQ::Equal(QQN::Shipment()->FromCompanyId, $intFromCompanyId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1217,11 +1124,10 @@
 		 * @param integer $intFromCompanyId
 		 * @return int
 		*/
-		public static function CountByFromCompanyId($intFromCompanyId, $objOptionalClauses = null) {
+		public static function CountByFromCompanyId($intFromCompanyId) {
 			// Call Shipment::QueryCount to perform the CountByFromCompanyId query
 			return Shipment::QueryCount(
 				QQ::Equal(QQN::Shipment()->FromCompanyId, $intFromCompanyId)
-			, $objOptionalClauses
 			);
 		}
 
@@ -1234,9 +1140,9 @@
 
 
 
-		//////////////////////////////////////
-		// SAVE, DELETE, RELOAD and JOURNALING
-		//////////////////////////////////////
+		//////////////////////////
+		// SAVE, DELETE AND RELOAD
+		//////////////////////////
 
 		/**
 		 * Save this Shipment
@@ -1291,10 +1197,6 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intShipmentId = $objDatabase->InsertId('shipment', 'shipment_id');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
-
 				} else {
 					// Perform an UPDATE query
 
@@ -1338,9 +1240,6 @@
 						WHERE
 							`shipment_id` = ' . $objDatabase->SqlVariable($this->intShipmentId) . '
 					');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 		
@@ -1415,9 +1314,6 @@
 					`shipment`
 				WHERE
 					`shipment_id` = ' . $objDatabase->SqlVariable($this->intShipmentId) . '');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -1477,84 +1373,6 @@
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
 		}
-
-		/**
-		 * Journals the current object into the Log database.
-		 * Used internally as a helper method.
-		 * @param string $strJournalCommand
-		 */
-		public function Journal($strJournalCommand) {
-			$objDatabase = Shipment::GetDatabase()->JournalingDatabase;
-
-			$objDatabase->NonQuery('
-				INSERT INTO `shipment` (
-					`shipment_id`,
-					`shipment_number`,
-					`transaction_id`,
-					`from_company_id`,
-					`from_contact_id`,
-					`from_address_id`,
-					`to_company_id`,
-					`to_contact_id`,
-					`to_address_id`,
-					`courier_id`,
-					`tracking_number`,
-					`ship_date`,
-					`shipped_flag`,
-					`created_by`,
-					`creation_date`,
-					`modified_by`,
-					__sys_login_id,
-					__sys_action,
-					__sys_date
-				) VALUES (
-					' . $objDatabase->SqlVariable($this->intShipmentId) . ',
-					' . $objDatabase->SqlVariable($this->strShipmentNumber) . ',
-					' . $objDatabase->SqlVariable($this->intTransactionId) . ',
-					' . $objDatabase->SqlVariable($this->intFromCompanyId) . ',
-					' . $objDatabase->SqlVariable($this->intFromContactId) . ',
-					' . $objDatabase->SqlVariable($this->intFromAddressId) . ',
-					' . $objDatabase->SqlVariable($this->intToCompanyId) . ',
-					' . $objDatabase->SqlVariable($this->intToContactId) . ',
-					' . $objDatabase->SqlVariable($this->intToAddressId) . ',
-					' . $objDatabase->SqlVariable($this->intCourierId) . ',
-					' . $objDatabase->SqlVariable($this->strTrackingNumber) . ',
-					' . $objDatabase->SqlVariable($this->dttShipDate) . ',
-					' . $objDatabase->SqlVariable($this->blnShippedFlag) . ',
-					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
-					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
-					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
-					' . $objDatabase->SqlVariable($strJournalCommand) . ',
-					NOW()
-				);
-			');
-		}
-
-		/**
-		 * Gets the historical journal for an object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @param integer intShipmentId
-		 * @return Shipment[]
-		 */
-		public static function GetJournalForId($intShipmentId) {
-			$objDatabase = Shipment::GetDatabase()->JournalingDatabase;
-
-			$objResult = $objDatabase->Query('SELECT * FROM shipment WHERE shipment_id = ' .
-				$objDatabase->SqlVariable($intShipmentId) . ' ORDER BY __sys_date');
-
-			return Shipment::InstantiateDbResult($objResult);
-		}
-
-		/**
-		 * Gets the historical journal for this object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @return Shipment[]
-		 */
-		public function GetJournal() {
-			return Shipment::GetJournalForId($this->intShipmentId);
-		}
-
 
 
 
@@ -2747,36 +2565,6 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
-	/**
-	 * @property-read QQNode $ShipmentId
-	 * @property-read QQNode $ShipmentNumber
-	 * @property-read QQNode $TransactionId
-	 * @property-read QQNodeTransaction $Transaction
-	 * @property-read QQNode $FromCompanyId
-	 * @property-read QQNodeCompany $FromCompany
-	 * @property-read QQNode $FromContactId
-	 * @property-read QQNodeContact $FromContact
-	 * @property-read QQNode $FromAddressId
-	 * @property-read QQNodeAddress $FromAddress
-	 * @property-read QQNode $ToCompanyId
-	 * @property-read QQNodeCompany $ToCompany
-	 * @property-read QQNode $ToContactId
-	 * @property-read QQNodeContact $ToContact
-	 * @property-read QQNode $ToAddressId
-	 * @property-read QQNodeAddress $ToAddress
-	 * @property-read QQNode $CourierId
-	 * @property-read QQNodeCourier $Courier
-	 * @property-read QQNode $TrackingNumber
-	 * @property-read QQNode $ShipDate
-	 * @property-read QQNode $ShippedFlag
-	 * @property-read QQNode $CreatedBy
-	 * @property-read QQNodeUserAccount $CreatedByObject
-	 * @property-read QQNode $CreationDate
-	 * @property-read QQNode $ModifiedBy
-	 * @property-read QQNodeUserAccount $ModifiedByObject
-	 * @property-read QQNode $ModifiedDate
-	 * @property-read QQReverseReferenceNodeShipmentCustomFieldHelper $ShipmentCustomFieldHelper
-	 */
 	class QQNodeShipment extends QQNode {
 		protected $strTableName = 'shipment';
 		protected $strPrimaryKey = 'shipment_id';
@@ -2852,38 +2640,7 @@
 			}
 		}
 	}
-	
-	/**
-	 * @property-read QQNode $ShipmentId
-	 * @property-read QQNode $ShipmentNumber
-	 * @property-read QQNode $TransactionId
-	 * @property-read QQNodeTransaction $Transaction
-	 * @property-read QQNode $FromCompanyId
-	 * @property-read QQNodeCompany $FromCompany
-	 * @property-read QQNode $FromContactId
-	 * @property-read QQNodeContact $FromContact
-	 * @property-read QQNode $FromAddressId
-	 * @property-read QQNodeAddress $FromAddress
-	 * @property-read QQNode $ToCompanyId
-	 * @property-read QQNodeCompany $ToCompany
-	 * @property-read QQNode $ToContactId
-	 * @property-read QQNodeContact $ToContact
-	 * @property-read QQNode $ToAddressId
-	 * @property-read QQNodeAddress $ToAddress
-	 * @property-read QQNode $CourierId
-	 * @property-read QQNodeCourier $Courier
-	 * @property-read QQNode $TrackingNumber
-	 * @property-read QQNode $ShipDate
-	 * @property-read QQNode $ShippedFlag
-	 * @property-read QQNode $CreatedBy
-	 * @property-read QQNodeUserAccount $CreatedByObject
-	 * @property-read QQNode $CreationDate
-	 * @property-read QQNode $ModifiedBy
-	 * @property-read QQNodeUserAccount $ModifiedByObject
-	 * @property-read QQNode $ModifiedDate
-	 * @property-read QQReverseReferenceNodeShipmentCustomFieldHelper $ShipmentCustomFieldHelper
-	 * @property-read QQNode $_PrimaryKeyNode
-	 */
+
 	class QQReverseReferenceNodeShipment extends QQReverseReferenceNode {
 		protected $strTableName = 'shipment';
 		protected $strPrimaryKey = 'shipment_id';

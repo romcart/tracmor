@@ -192,7 +192,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -254,7 +254,7 @@
 		 * Static Qcodo Query method to query for a single Country object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Country the queried object
 		 */
@@ -267,38 +267,16 @@
 				throw $objExc;
 			}
 
-			// Perform the Query
+			// Perform the Query, Get the First Row, and Instantiate a new Country object
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-
-			// Instantiate a new Country object and return it
-
-			// Do we have to expand anything?
-			if ($objQueryBuilder->ExpandAsArrayNodes) {
-				$objToReturn = array();
-				while ($objDbRow = $objDbResult->GetNextRow()) {
-					$objItem = Country::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
-					if ($objItem) $objToReturn[] = $objItem;
-				}
-
-				if (count($objToReturn)) {
-					// Since we only want the object to return, lets return the object and not the array.
-					return $objToReturn[0];
-				} else {
-					return null;
-				}
-			} else {
-				// No expands just return the first row
-				$objDbRow = $objDbResult->GetNextRow();
-				if (is_null($objDbRow)) return null;
-				return Country::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
-			}
+			return Country::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Country objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Country[] the queried objects as an array
 		 */
@@ -317,35 +295,10 @@
 		}
 
 		/**
-		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
-		 * Uses BuildQueryStatment to perform most of the work.
-		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
-		 * @return QDatabaseResultBase the cursor resource instance
-		 */
-		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
-			// Get the query statement
-			try {
-				$strQuery = Country::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-
-			// Perform the query
-			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-		
-			// Return the results cursor
-			$objDbResult->QueryBuilder = $objQueryBuilder;
-			return $objDbResult;
-		}
-
-		/**
 		 * Static Qcodo Query method to query for a count of Country objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -457,7 +410,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Country::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param QDatabaseRowBase $objDbRow
+		 * @param DatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -571,7 +524,7 @@
 
 		/**
 		 * Instantiate an array of Countries from a Database Result
-		 * @param QDatabaseResultBase $objDbResult
+		 * @param DatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Country[]
@@ -604,32 +557,6 @@
 			return $objToReturn;
 		}
 
-		/**
-		 * Instantiate a single Country object from a query cursor (e.g. a DB ResultSet).
-		 * Cursor is automatically moved to the "next row" of the result set.
-		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
-		 * @param QDatabaseResultBase $objDbResult cursor resource
-		 * @return Country next row resulting from the query
-		 */
-		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
-			// If blank resultset, then return empty result
-			if (!$objDbResult) return null;
-
-			// If empty resultset, then return empty result
-			$objDbRow = $objDbResult->GetNextRow();
-			if (!$objDbRow) return null;
-
-			// We need the Column Aliases
-			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
-			if (!$strColumnAliasArray) $strColumnAliasArray = array();
-
-			// Pull Expansions (if applicable)
-			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
-
-			// Load up the return result with a row and return it
-			return Country::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
-		}
-
 
 
 
@@ -643,10 +570,9 @@
 		 * @param integer $intCountryId
 		 * @return Country
 		*/
-		public static function LoadByCountryId($intCountryId, $objOptionalClauses = null) {
+		public static function LoadByCountryId($intCountryId) {
 			return Country::QuerySingle(
 				QQ::Equal(QQN::Country()->CountryId, $intCountryId)
-			, $objOptionalClauses
 			);
 		}
 
@@ -659,9 +585,9 @@
 
 
 
-		//////////////////////////////////////
-		// SAVE, DELETE, RELOAD and JOURNALING
-		//////////////////////////////////////
+		//////////////////////////
+		// SAVE, DELETE AND RELOAD
+		//////////////////////////
 
 		/**
 		 * Save this Country
@@ -694,10 +620,6 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intCountryId = $objDatabase->InsertId('country', 'country_id');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
-
 				} else {
 					// Perform an UPDATE query
 
@@ -715,9 +637,6 @@
 						WHERE
 							`country_id` = ' . $objDatabase->SqlVariable($this->intCountryId) . '
 					');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -751,9 +670,6 @@
 					`country`
 				WHERE
 					`country_id` = ' . $objDatabase->SqlVariable($this->intCountryId) . '');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -801,62 +717,6 @@
 			$this->blnStateFlag = $objReloaded->blnStateFlag;
 			$this->blnProvinceFlag = $objReloaded->blnProvinceFlag;
 		}
-
-		/**
-		 * Journals the current object into the Log database.
-		 * Used internally as a helper method.
-		 * @param string $strJournalCommand
-		 */
-		public function Journal($strJournalCommand) {
-			$objDatabase = Country::GetDatabase()->JournalingDatabase;
-
-			$objDatabase->NonQuery('
-				INSERT INTO `country` (
-					`country_id`,
-					`short_description`,
-					`abbreviation`,
-					`state_flag`,
-					`province_flag`,
-					__sys_login_id,
-					__sys_action,
-					__sys_date
-				) VALUES (
-					' . $objDatabase->SqlVariable($this->intCountryId) . ',
-					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
-					' . $objDatabase->SqlVariable($this->strAbbreviation) . ',
-					' . $objDatabase->SqlVariable($this->blnStateFlag) . ',
-					' . $objDatabase->SqlVariable($this->blnProvinceFlag) . ',
-					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
-					' . $objDatabase->SqlVariable($strJournalCommand) . ',
-					NOW()
-				);
-			');
-		}
-
-		/**
-		 * Gets the historical journal for an object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @param integer intCountryId
-		 * @return Country[]
-		 */
-		public static function GetJournalForId($intCountryId) {
-			$objDatabase = Country::GetDatabase()->JournalingDatabase;
-
-			$objResult = $objDatabase->Query('SELECT * FROM country WHERE country_id = ' .
-				$objDatabase->SqlVariable($intCountryId) . ' ORDER BY __sys_date');
-
-			return Country::InstantiateDbResult($objResult);
-		}
-
-		/**
-		 * Gets the historical journal for this object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @return Country[]
-		 */
-		public function GetJournal() {
-			return Country::GetJournalForId($this->intCountryId);
-		}
-
 
 
 
@@ -1093,12 +953,6 @@
 				WHERE
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->CountryId = $this->intCountryId;
-				$objAddress->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1125,12 +979,6 @@
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
 					`country_id` = ' . $objDatabase->SqlVariable($this->intCountryId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->CountryId = null;
-				$objAddress->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1143,14 +991,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Country::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Address::LoadArrayByCountryId($this->intCountryId) as $objAddress) {
-					$objAddress->CountryId = null;
-					$objAddress->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1185,11 +1025,6 @@
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
 					`country_id` = ' . $objDatabase->SqlVariable($this->intCountryId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -1202,13 +1037,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Country::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Address::LoadArrayByCountryId($this->intCountryId) as $objAddress) {
-					$objAddress->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1275,12 +1103,6 @@
 				WHERE
 					`state_province_id` = ' . $objDatabase->SqlVariable($objStateProvince->StateProvinceId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objStateProvince->CountryId = $this->intCountryId;
-				$objStateProvince->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1307,12 +1129,6 @@
 					`state_province_id` = ' . $objDatabase->SqlVariable($objStateProvince->StateProvinceId) . ' AND
 					`country_id` = ' . $objDatabase->SqlVariable($this->intCountryId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objStateProvince->CountryId = null;
-				$objStateProvince->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1325,14 +1141,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Country::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (StateProvince::LoadArrayByCountryId($this->intCountryId) as $objStateProvince) {
-					$objStateProvince->CountryId = null;
-					$objStateProvince->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1367,11 +1175,6 @@
 					`state_province_id` = ' . $objDatabase->SqlVariable($objStateProvince->StateProvinceId) . ' AND
 					`country_id` = ' . $objDatabase->SqlVariable($this->intCountryId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objStateProvince->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -1384,13 +1187,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Country::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (StateProvince::LoadArrayByCountryId($this->intCountryId) as $objStateProvince) {
-					$objStateProvince->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1569,15 +1365,6 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
-	/**
-	 * @property-read QQNode $CountryId
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $Abbreviation
-	 * @property-read QQNode $StateFlag
-	 * @property-read QQNode $ProvinceFlag
-	 * @property-read QQReverseReferenceNodeAddress $Address
-	 * @property-read QQReverseReferenceNodeStateProvince $StateProvince
-	 */
 	class QQNodeCountry extends QQNode {
 		protected $strTableName = 'country';
 		protected $strPrimaryKey = 'country_id';
@@ -1611,17 +1398,7 @@
 			}
 		}
 	}
-	
-	/**
-	 * @property-read QQNode $CountryId
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $Abbreviation
-	 * @property-read QQNode $StateFlag
-	 * @property-read QQNode $ProvinceFlag
-	 * @property-read QQReverseReferenceNodeAddress $Address
-	 * @property-read QQReverseReferenceNodeStateProvince $StateProvince
-	 * @property-read QQNode $_PrimaryKeyNode
-	 */
+
 	class QQReverseReferenceNodeCountry extends QQReverseReferenceNode {
 		protected $strTableName = 'country';
 		protected $strPrimaryKey = 'country_id';

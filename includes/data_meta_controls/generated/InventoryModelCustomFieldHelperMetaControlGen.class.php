@@ -18,51 +18,30 @@
 	 * property-read InventoryModelCustomFieldHelper $InventoryModelCustomFieldHelper the actual InventoryModelCustomFieldHelper data class being edited
 	 * property QListBox $InventoryModelIdControl
 	 * property-read QLabel $InventoryModelIdLabel
+	 * property QTextBox $Cfv2Control
+	 * property-read QLabel $Cfv2Label
+	 * property QTextBox $Cfv4Control
+	 * property-read QLabel $Cfv4Label
 	 * property-read string $TitleVerb a verb indicating whether or not this is being edited or created
 	 * property-read boolean $EditMode a boolean indicating whether or not this is being edited or created
 	 */
 
 	class InventoryModelCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var InventoryModelCustomFieldHelper objInventoryModelCustomFieldHelper
-		 * @access protected
-		 */
 		protected $objInventoryModelCustomFieldHelper;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of InventoryModelCustomFieldHelper's individual data fields
-        /**
-         * @var QListBox lstInventoryModel;
-         * @access protected
-         */
 		protected $lstInventoryModel;
-
+		protected $txtCfv2;
+		protected $txtCfv4;
 
 		// Controls that allow the viewing of InventoryModelCustomFieldHelper's individual data fields
-        /**
-         * @var QLabel lblInventoryModelId
-         * @access protected
-         */
 		protected $lblInventoryModelId;
-
+		protected $lblCfv2;
+		protected $lblCfv4;
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -164,30 +143,21 @@
 		/**
 		 * Create and setup QListBox lstInventoryModel
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstInventoryModel_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstInventoryModel_Create($strControlId = null) {
 			$this->lstInventoryModel = new QListBox($this->objParentObject, $strControlId);
 			$this->lstInventoryModel->Name = QApplication::Translate('Inventory Model');
 			$this->lstInventoryModel->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstInventoryModel->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objInventoryModelCursor = InventoryModel::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objInventoryModel = InventoryModel::InstantiateCursor($objInventoryModelCursor)) {
+			$objInventoryModelArray = InventoryModel::LoadAll();
+			if ($objInventoryModelArray) foreach ($objInventoryModelArray as $objInventoryModel) {
 				$objListItem = new QListItem($objInventoryModel->__toString(), $objInventoryModel->InventoryModelId);
 				if (($this->objInventoryModelCustomFieldHelper->InventoryModel) && ($this->objInventoryModelCustomFieldHelper->InventoryModel->InventoryModelId == $objInventoryModel->InventoryModelId))
 					$objListItem->Selected = true;
 				$this->lstInventoryModel->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstInventoryModel;
 		}
 
@@ -202,6 +172,56 @@
 			$this->lblInventoryModelId->Text = ($this->objInventoryModelCustomFieldHelper->InventoryModel) ? $this->objInventoryModelCustomFieldHelper->InventoryModel->__toString() : null;
 			$this->lblInventoryModelId->Required = true;
 			return $this->lblInventoryModelId;
+		}
+
+		/**
+		 * Create and setup QTextBox txtCfv2
+		 * @param string $strControlId optional ControlId to use
+		 * @return QTextBox
+		 */
+		public function txtCfv2_Create($strControlId = null) {
+			$this->txtCfv2 = new QTextBox($this->objParentObject, $strControlId);
+			$this->txtCfv2->Name = QApplication::Translate('Cfv 2');
+			$this->txtCfv2->Text = $this->objInventoryModelCustomFieldHelper->Cfv2;
+			$this->txtCfv2->TextMode = QTextMode::MultiLine;
+			return $this->txtCfv2;
+		}
+
+		/**
+		 * Create and setup QLabel lblCfv2
+		 * @param string $strControlId optional ControlId to use
+		 * @return QLabel
+		 */
+		public function lblCfv2_Create($strControlId = null) {
+			$this->lblCfv2 = new QLabel($this->objParentObject, $strControlId);
+			$this->lblCfv2->Name = QApplication::Translate('Cfv 2');
+			$this->lblCfv2->Text = $this->objInventoryModelCustomFieldHelper->Cfv2;
+			return $this->lblCfv2;
+		}
+
+		/**
+		 * Create and setup QTextBox txtCfv4
+		 * @param string $strControlId optional ControlId to use
+		 * @return QTextBox
+		 */
+		public function txtCfv4_Create($strControlId = null) {
+			$this->txtCfv4 = new QTextBox($this->objParentObject, $strControlId);
+			$this->txtCfv4->Name = QApplication::Translate('Cfv 4');
+			$this->txtCfv4->Text = $this->objInventoryModelCustomFieldHelper->Cfv4;
+			$this->txtCfv4->TextMode = QTextMode::MultiLine;
+			return $this->txtCfv4;
+		}
+
+		/**
+		 * Create and setup QLabel lblCfv4
+		 * @param string $strControlId optional ControlId to use
+		 * @return QLabel
+		 */
+		public function lblCfv4_Create($strControlId = null) {
+			$this->lblCfv4 = new QLabel($this->objParentObject, $strControlId);
+			$this->lblCfv4->Name = QApplication::Translate('Cfv 4');
+			$this->lblCfv4->Text = $this->objInventoryModelCustomFieldHelper->Cfv4;
+			return $this->lblCfv4;
 		}
 
 
@@ -229,6 +249,12 @@
 			}
 			if ($this->lblInventoryModelId) $this->lblInventoryModelId->Text = ($this->objInventoryModelCustomFieldHelper->InventoryModel) ? $this->objInventoryModelCustomFieldHelper->InventoryModel->__toString() : null;
 
+			if ($this->txtCfv2) $this->txtCfv2->Text = $this->objInventoryModelCustomFieldHelper->Cfv2;
+			if ($this->lblCfv2) $this->lblCfv2->Text = $this->objInventoryModelCustomFieldHelper->Cfv2;
+
+			if ($this->txtCfv4) $this->txtCfv4->Text = $this->objInventoryModelCustomFieldHelper->Cfv4;
+			if ($this->lblCfv4) $this->lblCfv4->Text = $this->objInventoryModelCustomFieldHelper->Cfv4;
+
 		}
 
 
@@ -253,6 +279,8 @@
 			try {
 				// Update any fields for controls that have been created
 				if ($this->lstInventoryModel) $this->objInventoryModelCustomFieldHelper->InventoryModelId = $this->lstInventoryModel->SelectedValue;
+				if ($this->txtCfv2) $this->objInventoryModelCustomFieldHelper->Cfv2 = $this->txtCfv2->Text;
+				if ($this->txtCfv4) $this->objInventoryModelCustomFieldHelper->Cfv4 = $this->txtCfv4->Text;
 
 				// Update any UniqueReverseReferences (if any) for controls that have been created for it
 
@@ -301,6 +329,18 @@
 				case 'InventoryModelIdLabel':
 					if (!$this->lblInventoryModelId) return $this->lblInventoryModelId_Create();
 					return $this->lblInventoryModelId;
+				case 'Cfv2Control':
+					if (!$this->txtCfv2) return $this->txtCfv2_Create();
+					return $this->txtCfv2;
+				case 'Cfv2Label':
+					if (!$this->lblCfv2) return $this->lblCfv2_Create();
+					return $this->lblCfv2;
+				case 'Cfv4Control':
+					if (!$this->txtCfv4) return $this->txtCfv4_Create();
+					return $this->txtCfv4;
+				case 'Cfv4Label':
+					if (!$this->lblCfv4) return $this->lblCfv4_Create();
+					return $this->lblCfv4;
 				default:
 					try {
 						return parent::__get($strName);
@@ -325,6 +365,10 @@
 					// Controls that point to InventoryModelCustomFieldHelper fields
 					case 'InventoryModelIdControl':
 						return ($this->lstInventoryModel = QType::Cast($mixValue, 'QControl'));
+					case 'Cfv2Control':
+						return ($this->txtCfv2 = QType::Cast($mixValue, 'QControl'));
+					case 'Cfv4Control':
+						return ($this->txtCfv4 = QType::Cast($mixValue, 'QControl'));
 					default:
 						return parent::__set($strName, $mixValue);
 				}

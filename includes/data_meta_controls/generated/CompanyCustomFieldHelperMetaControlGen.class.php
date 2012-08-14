@@ -24,45 +24,16 @@
 
 	class CompanyCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var CompanyCustomFieldHelper objCompanyCustomFieldHelper
-		 * @access protected
-		 */
 		protected $objCompanyCustomFieldHelper;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of CompanyCustomFieldHelper's individual data fields
-        /**
-         * @var QListBox lstCompany;
-         * @access protected
-         */
 		protected $lstCompany;
 
-
 		// Controls that allow the viewing of CompanyCustomFieldHelper's individual data fields
-        /**
-         * @var QLabel lblCompanyId
-         * @access protected
-         */
 		protected $lblCompanyId;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -164,30 +135,21 @@
 		/**
 		 * Create and setup QListBox lstCompany
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCompany_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCompany_Create($strControlId = null) {
 			$this->lstCompany = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCompany->Name = QApplication::Translate('Company');
 			$this->lstCompany->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstCompany->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCompanyCursor = Company::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCompany = Company::InstantiateCursor($objCompanyCursor)) {
+			$objCompanyArray = Company::LoadAll();
+			if ($objCompanyArray) foreach ($objCompanyArray as $objCompany) {
 				$objListItem = new QListItem($objCompany->__toString(), $objCompany->CompanyId);
 				if (($this->objCompanyCustomFieldHelper->Company) && ($this->objCompanyCustomFieldHelper->Company->CompanyId == $objCompany->CompanyId))
 					$objListItem->Selected = true;
 				$this->lstCompany->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCompany;
 		}
 

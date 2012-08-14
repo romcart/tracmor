@@ -40,135 +40,31 @@
 
 	class ShortcutMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var Shortcut objShortcut
-		 * @access protected
-		 */
 		protected $objShortcut;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Shortcut's individual data fields
-        /**
-         * @var QLabel lblShortcutId;
-         * @access protected
-         */
 		protected $lblShortcutId;
-
-        /**
-         * @var QListBox lstModule;
-         * @access protected
-         */
 		protected $lstModule;
-
-        /**
-         * @var QListBox lstAuthorization;
-         * @access protected
-         */
 		protected $lstAuthorization;
-
-        /**
-         * @var QListBox lstTransactionType;
-         * @access protected
-         */
 		protected $lstTransactionType;
-
-        /**
-         * @var QTextBox txtShortDescription;
-         * @access protected
-         */
 		protected $txtShortDescription;
-
-        /**
-         * @var QTextBox txtLink;
-         * @access protected
-         */
 		protected $txtLink;
-
-        /**
-         * @var QTextBox txtImagePath;
-         * @access protected
-         */
 		protected $txtImagePath;
-
-        /**
-         * @var QListBox lstEntityQtype;
-         * @access protected
-         */
 		protected $lstEntityQtype;
-
-        /**
-         * @var QCheckBox chkCreateFlag;
-         * @access protected
-         */
 		protected $chkCreateFlag;
 
-
 		// Controls that allow the viewing of Shortcut's individual data fields
-        /**
-         * @var QLabel lblModuleId
-         * @access protected
-         */
 		protected $lblModuleId;
-
-        /**
-         * @var QLabel lblAuthorizationId
-         * @access protected
-         */
 		protected $lblAuthorizationId;
-
-        /**
-         * @var QLabel lblTransactionTypeId
-         * @access protected
-         */
 		protected $lblTransactionTypeId;
-
-        /**
-         * @var QLabel lblShortDescription
-         * @access protected
-         */
 		protected $lblShortDescription;
-
-        /**
-         * @var QLabel lblLink
-         * @access protected
-         */
 		protected $lblLink;
-
-        /**
-         * @var QLabel lblImagePath
-         * @access protected
-         */
 		protected $lblImagePath;
-
-        /**
-         * @var QLabel lblEntityQtypeId
-         * @access protected
-         */
 		protected $lblEntityQtypeId;
-
-        /**
-         * @var QLabel lblCreateFlag
-         * @access protected
-         */
 		protected $lblCreateFlag;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -285,30 +181,21 @@
 		/**
 		 * Create and setup QListBox lstModule
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModule_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstModule_Create($strControlId = null) {
 			$this->lstModule = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModule->Name = QApplication::Translate('Module');
 			$this->lstModule->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstModule->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objModuleCursor = Module::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objModule = Module::InstantiateCursor($objModuleCursor)) {
+			$objModuleArray = Module::LoadAll();
+			if ($objModuleArray) foreach ($objModuleArray as $objModule) {
 				$objListItem = new QListItem($objModule->__toString(), $objModule->ModuleId);
 				if (($this->objShortcut->Module) && ($this->objShortcut->Module->ModuleId == $objModule->ModuleId))
 					$objListItem->Selected = true;
 				$this->lstModule->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstModule;
 		}
 
@@ -328,28 +215,19 @@
 		/**
 		 * Create and setup QListBox lstAuthorization
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAuthorization_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstAuthorization_Create($strControlId = null) {
 			$this->lstAuthorization = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAuthorization->Name = QApplication::Translate('Authorization');
 			$this->lstAuthorization->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objAuthorizationCursor = Authorization::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objAuthorization = Authorization::InstantiateCursor($objAuthorizationCursor)) {
+			$objAuthorizationArray = Authorization::LoadAll();
+			if ($objAuthorizationArray) foreach ($objAuthorizationArray as $objAuthorization) {
 				$objListItem = new QListItem($objAuthorization->__toString(), $objAuthorization->AuthorizationId);
 				if (($this->objShortcut->Authorization) && ($this->objShortcut->Authorization->AuthorizationId == $objAuthorization->AuthorizationId))
 					$objListItem->Selected = true;
 				$this->lstAuthorization->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstAuthorization;
 		}
 
@@ -368,28 +246,19 @@
 		/**
 		 * Create and setup QListBox lstTransactionType
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstTransactionType_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstTransactionType_Create($strControlId = null) {
 			$this->lstTransactionType = new QListBox($this->objParentObject, $strControlId);
 			$this->lstTransactionType->Name = QApplication::Translate('Transaction Type');
 			$this->lstTransactionType->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objTransactionTypeCursor = TransactionType::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objTransactionType = TransactionType::InstantiateCursor($objTransactionTypeCursor)) {
+			$objTransactionTypeArray = TransactionType::LoadAll();
+			if ($objTransactionTypeArray) foreach ($objTransactionTypeArray as $objTransactionType) {
 				$objListItem = new QListItem($objTransactionType->__toString(), $objTransactionType->TransactionTypeId);
 				if (($this->objShortcut->TransactionType) && ($this->objShortcut->TransactionType->TransactionTypeId == $objTransactionType->TransactionTypeId))
 					$objListItem->Selected = true;
 				$this->lstTransactionType->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstTransactionType;
 		}
 
@@ -493,8 +362,8 @@
 			$this->lstEntityQtype = new QListBox($this->objParentObject, $strControlId);
 			$this->lstEntityQtype->Name = QApplication::Translate('Entity Qtype');
 			$this->lstEntityQtype->Required = true;
-
-			$this->lstEntityQtype->AddItems(EntityQtype::$NameArray, $this->objShortcut->EntityQtypeId);
+			foreach (EntityQtype::$NameArray as $intId => $strValue)
+				$this->lstEntityQtype->AddItem(new QListItem($strValue, $intId, $this->objShortcut->EntityQtypeId == $intId));
 			return $this->lstEntityQtype;
 		}
 

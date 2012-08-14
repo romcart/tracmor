@@ -223,7 +223,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -285,7 +285,7 @@
 		 * Static Qcodo Query method to query for a single CustomFieldValue object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return CustomFieldValue the queried object
 		 */
@@ -298,38 +298,16 @@
 				throw $objExc;
 			}
 
-			// Perform the Query
+			// Perform the Query, Get the First Row, and Instantiate a new CustomFieldValue object
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-
-			// Instantiate a new CustomFieldValue object and return it
-
-			// Do we have to expand anything?
-			if ($objQueryBuilder->ExpandAsArrayNodes) {
-				$objToReturn = array();
-				while ($objDbRow = $objDbResult->GetNextRow()) {
-					$objItem = CustomFieldValue::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
-					if ($objItem) $objToReturn[] = $objItem;
-				}
-
-				if (count($objToReturn)) {
-					// Since we only want the object to return, lets return the object and not the array.
-					return $objToReturn[0];
-				} else {
-					return null;
-				}
-			} else {
-				// No expands just return the first row
-				$objDbRow = $objDbResult->GetNextRow();
-				if (is_null($objDbRow)) return null;
-				return CustomFieldValue::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
-			}
+			return CustomFieldValue::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of CustomFieldValue objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return CustomFieldValue[] the queried objects as an array
 		 */
@@ -348,35 +326,10 @@
 		}
 
 		/**
-		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
-		 * Uses BuildQueryStatment to perform most of the work.
-		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
-		 * @return QDatabaseResultBase the cursor resource instance
-		 */
-		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
-			// Get the query statement
-			try {
-				$strQuery = CustomFieldValue::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-
-			// Perform the query
-			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-		
-			// Return the results cursor
-			$objDbResult->QueryBuilder = $objQueryBuilder;
-			return $objDbResult;
-		}
-
-		/**
 		 * Static Qcodo Query method to query for a count of CustomFieldValue objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -490,7 +443,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this CustomFieldValue::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param QDatabaseRowBase $objDbRow
+		 * @param DatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -602,7 +555,7 @@
 
 		/**
 		 * Instantiate an array of CustomFieldValues from a Database Result
-		 * @param QDatabaseResultBase $objDbResult
+		 * @param DatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return CustomFieldValue[]
@@ -635,32 +588,6 @@
 			return $objToReturn;
 		}
 
-		/**
-		 * Instantiate a single CustomFieldValue object from a query cursor (e.g. a DB ResultSet).
-		 * Cursor is automatically moved to the "next row" of the result set.
-		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
-		 * @param QDatabaseResultBase $objDbResult cursor resource
-		 * @return CustomFieldValue next row resulting from the query
-		 */
-		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
-			// If blank resultset, then return empty result
-			if (!$objDbResult) return null;
-
-			// If empty resultset, then return empty result
-			$objDbRow = $objDbResult->GetNextRow();
-			if (!$objDbRow) return null;
-
-			// We need the Column Aliases
-			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
-			if (!$strColumnAliasArray) $strColumnAliasArray = array();
-
-			// Pull Expansions (if applicable)
-			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
-
-			// Load up the return result with a row and return it
-			return CustomFieldValue::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
-		}
-
 
 
 
@@ -674,10 +601,9 @@
 		 * @param integer $intCustomFieldValueId
 		 * @return CustomFieldValue
 		*/
-		public static function LoadByCustomFieldValueId($intCustomFieldValueId, $objOptionalClauses = null) {
+		public static function LoadByCustomFieldValueId($intCustomFieldValueId) {
 			return CustomFieldValue::QuerySingle(
 				QQ::Equal(QQN::CustomFieldValue()->CustomFieldValueId, $intCustomFieldValueId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -693,8 +619,7 @@
 			try {
 				return CustomFieldValue::QueryArray(
 					QQ::Equal(QQN::CustomFieldValue()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -707,11 +632,10 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
+		public static function CountByCreatedBy($intCreatedBy) {
 			// Call CustomFieldValue::QueryCount to perform the CountByCreatedBy query
 			return CustomFieldValue::QueryCount(
 				QQ::Equal(QQN::CustomFieldValue()->CreatedBy, $intCreatedBy)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -727,8 +651,7 @@
 			try {
 				return CustomFieldValue::QueryArray(
 					QQ::Equal(QQN::CustomFieldValue()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -741,11 +664,10 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
+		public static function CountByModifiedBy($intModifiedBy) {
 			// Call CustomFieldValue::QueryCount to perform the CountByModifiedBy query
 			return CustomFieldValue::QueryCount(
 				QQ::Equal(QQN::CustomFieldValue()->ModifiedBy, $intModifiedBy)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -761,8 +683,7 @@
 			try {
 				return CustomFieldValue::QueryArray(
 					QQ::Equal(QQN::CustomFieldValue()->CustomFieldId, $intCustomFieldId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -775,11 +696,10 @@
 		 * @param integer $intCustomFieldId
 		 * @return int
 		*/
-		public static function CountByCustomFieldId($intCustomFieldId, $objOptionalClauses = null) {
+		public static function CountByCustomFieldId($intCustomFieldId) {
 			// Call CustomFieldValue::QueryCount to perform the CountByCustomFieldId query
 			return CustomFieldValue::QueryCount(
 				QQ::Equal(QQN::CustomFieldValue()->CustomFieldId, $intCustomFieldId)
-			, $objOptionalClauses
 			);
 		}
 
@@ -792,9 +712,9 @@
 
 
 
-		//////////////////////////////////////
-		// SAVE, DELETE, RELOAD and JOURNALING
-		//////////////////////////////////////
+		//////////////////////////
+		// SAVE, DELETE AND RELOAD
+		//////////////////////////
 
 		/**
 		 * Save this CustomFieldValue
@@ -829,10 +749,6 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intCustomFieldValueId = $objDatabase->InsertId('custom_field_value', 'custom_field_value_id');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
-
 				} else {
 					// Perform an UPDATE query
 
@@ -866,9 +782,6 @@
 						WHERE
 							`custom_field_value_id` = ' . $objDatabase->SqlVariable($this->intCustomFieldValueId) . '
 					');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -914,9 +827,6 @@
 					`custom_field_value`
 				WHERE
 					`custom_field_value_id` = ' . $objDatabase->SqlVariable($this->intCustomFieldValueId) . '');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -966,64 +876,6 @@
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
 		}
-
-		/**
-		 * Journals the current object into the Log database.
-		 * Used internally as a helper method.
-		 * @param string $strJournalCommand
-		 */
-		public function Journal($strJournalCommand) {
-			$objDatabase = CustomFieldValue::GetDatabase()->JournalingDatabase;
-
-			$objDatabase->NonQuery('
-				INSERT INTO `custom_field_value` (
-					`custom_field_value_id`,
-					`custom_field_id`,
-					`short_description`,
-					`created_by`,
-					`creation_date`,
-					`modified_by`,
-					__sys_login_id,
-					__sys_action,
-					__sys_date
-				) VALUES (
-					' . $objDatabase->SqlVariable($this->intCustomFieldValueId) . ',
-					' . $objDatabase->SqlVariable($this->intCustomFieldId) . ',
-					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
-					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
-					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
-					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
-					' . $objDatabase->SqlVariable($strJournalCommand) . ',
-					NOW()
-				);
-			');
-		}
-
-		/**
-		 * Gets the historical journal for an object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @param integer intCustomFieldValueId
-		 * @return CustomFieldValue[]
-		 */
-		public static function GetJournalForId($intCustomFieldValueId) {
-			$objDatabase = CustomFieldValue::GetDatabase()->JournalingDatabase;
-
-			$objResult = $objDatabase->Query('SELECT * FROM custom_field_value WHERE custom_field_value_id = ' .
-				$objDatabase->SqlVariable($intCustomFieldValueId) . ' ORDER BY __sys_date');
-
-			return CustomFieldValue::InstantiateDbResult($objResult);
-		}
-
-		/**
-		 * Gets the historical journal for this object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @return CustomFieldValue[]
-		 */
-		public function GetJournal() {
-			return CustomFieldValue::GetJournalForId($this->intCustomFieldValueId);
-		}
-
 
 
 
@@ -1398,12 +1250,6 @@
 				WHERE
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objCustomField->DefaultCustomFieldValueId = $this->intCustomFieldValueId;
-				$objCustomField->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1430,12 +1276,6 @@
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . ' AND
 					`default_custom_field_value_id` = ' . $objDatabase->SqlVariable($this->intCustomFieldValueId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objCustomField->DefaultCustomFieldValueId = null;
-				$objCustomField->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1448,14 +1288,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = CustomFieldValue::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (CustomField::LoadArrayByDefaultCustomFieldValueId($this->intCustomFieldValueId) as $objCustomField) {
-					$objCustomField->DefaultCustomFieldValueId = null;
-					$objCustomField->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1490,11 +1322,6 @@
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . ' AND
 					`default_custom_field_value_id` = ' . $objDatabase->SqlVariable($this->intCustomFieldValueId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objCustomField->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -1507,13 +1334,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = CustomFieldValue::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (CustomField::LoadArrayByDefaultCustomFieldValueId($this->intCustomFieldValueId) as $objCustomField) {
-					$objCustomField->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1747,19 +1567,6 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
-	/**
-	 * @property-read QQNode $CustomFieldValueId
-	 * @property-read QQNode $CustomFieldId
-	 * @property-read QQNodeCustomField $CustomField
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $CreatedBy
-	 * @property-read QQNodeUserAccount $CreatedByObject
-	 * @property-read QQNode $CreationDate
-	 * @property-read QQNode $ModifiedBy
-	 * @property-read QQNodeUserAccount $ModifiedByObject
-	 * @property-read QQNode $ModifiedDate
-	 * @property-read QQReverseReferenceNodeCustomField $CustomFieldAsDefault
-	 */
 	class QQNodeCustomFieldValue extends QQNode {
 		protected $strTableName = 'custom_field_value';
 		protected $strPrimaryKey = 'custom_field_value_id';
@@ -1801,21 +1608,7 @@
 			}
 		}
 	}
-	
-	/**
-	 * @property-read QQNode $CustomFieldValueId
-	 * @property-read QQNode $CustomFieldId
-	 * @property-read QQNodeCustomField $CustomField
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $CreatedBy
-	 * @property-read QQNodeUserAccount $CreatedByObject
-	 * @property-read QQNode $CreationDate
-	 * @property-read QQNode $ModifiedBy
-	 * @property-read QQNodeUserAccount $ModifiedByObject
-	 * @property-read QQNode $ModifiedDate
-	 * @property-read QQReverseReferenceNodeCustomField $CustomFieldAsDefault
-	 * @property-read QQNode $_PrimaryKeyNode
-	 */
+
 	class QQReverseReferenceNodeCustomFieldValue extends QQReverseReferenceNode {
 		protected $strTableName = 'custom_field_value';
 		protected $strPrimaryKey = 'custom_field_value_id';

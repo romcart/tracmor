@@ -28,63 +28,19 @@
 
 	class CourierMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var Courier objCourier
-		 * @access protected
-		 */
 		protected $objCourier;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Courier's individual data fields
-        /**
-         * @var QLabel lblCourierId;
-         * @access protected
-         */
 		protected $lblCourierId;
-
-        /**
-         * @var QTextBox txtShortDescription;
-         * @access protected
-         */
 		protected $txtShortDescription;
-
-        /**
-         * @var QCheckBox chkActiveFlag;
-         * @access protected
-         */
 		protected $chkActiveFlag;
 
-
 		// Controls that allow the viewing of Courier's individual data fields
-        /**
-         * @var QLabel lblShortDescription
-         * @access protected
-         */
 		protected $lblShortDescription;
-
-        /**
-         * @var QLabel lblActiveFlag
-         * @access protected
-         */
 		protected $lblActiveFlag;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 

@@ -34,99 +34,25 @@
 
 	class AuditScanMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var AuditScan objAuditScan
-		 * @access protected
-		 */
 		protected $objAuditScan;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of AuditScan's individual data fields
-        /**
-         * @var QLabel lblAuditScanId;
-         * @access protected
-         */
 		protected $lblAuditScanId;
-
-        /**
-         * @var QListBox lstAudit;
-         * @access protected
-         */
 		protected $lstAudit;
-
-        /**
-         * @var QListBox lstLocation;
-         * @access protected
-         */
 		protected $lstLocation;
-
-        /**
-         * @var QIntegerTextBox txtEntityId;
-         * @access protected
-         */
 		protected $txtEntityId;
-
-        /**
-         * @var QIntegerTextBox txtCount;
-         * @access protected
-         */
 		protected $txtCount;
-
-        /**
-         * @var QIntegerTextBox txtSystemCount;
-         * @access protected
-         */
 		protected $txtSystemCount;
 
-
 		// Controls that allow the viewing of AuditScan's individual data fields
-        /**
-         * @var QLabel lblAuditId
-         * @access protected
-         */
 		protected $lblAuditId;
-
-        /**
-         * @var QLabel lblLocationId
-         * @access protected
-         */
 		protected $lblLocationId;
-
-        /**
-         * @var QLabel lblEntityId
-         * @access protected
-         */
 		protected $lblEntityId;
-
-        /**
-         * @var QLabel lblCount
-         * @access protected
-         */
 		protected $lblCount;
-
-        /**
-         * @var QLabel lblSystemCount
-         * @access protected
-         */
 		protected $lblSystemCount;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -243,30 +169,21 @@
 		/**
 		 * Create and setup QListBox lstAudit
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAudit_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstAudit_Create($strControlId = null) {
 			$this->lstAudit = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAudit->Name = QApplication::Translate('Audit');
 			$this->lstAudit->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstAudit->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objAuditCursor = Audit::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objAudit = Audit::InstantiateCursor($objAuditCursor)) {
+			$objAuditArray = Audit::LoadAll();
+			if ($objAuditArray) foreach ($objAuditArray as $objAudit) {
 				$objListItem = new QListItem($objAudit->__toString(), $objAudit->AuditId);
 				if (($this->objAuditScan->Audit) && ($this->objAuditScan->Audit->AuditId == $objAudit->AuditId))
 					$objListItem->Selected = true;
 				$this->lstAudit->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstAudit;
 		}
 
@@ -286,30 +203,21 @@
 		/**
 		 * Create and setup QListBox lstLocation
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstLocation_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstLocation_Create($strControlId = null) {
 			$this->lstLocation = new QListBox($this->objParentObject, $strControlId);
 			$this->lstLocation->Name = QApplication::Translate('Location');
 			$this->lstLocation->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstLocation->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objLocationCursor = Location::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objLocation = Location::InstantiateCursor($objLocationCursor)) {
+			$objLocationArray = Location::LoadAll();
+			if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
 				$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
 				if (($this->objAuditScan->Location) && ($this->objAuditScan->Location->LocationId == $objLocation->LocationId))
 					$objListItem->Selected = true;
 				$this->lstLocation->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstLocation;
 		}
 

@@ -42,147 +42,33 @@
 
 	class AttachmentMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var Attachment objAttachment
-		 * @access protected
-		 */
 		protected $objAttachment;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Attachment's individual data fields
-        /**
-         * @var QLabel lblAttachmentId;
-         * @access protected
-         */
 		protected $lblAttachmentId;
-
-        /**
-         * @var QListBox lstEntityQtype;
-         * @access protected
-         */
 		protected $lstEntityQtype;
-
-        /**
-         * @var QIntegerTextBox txtEntityId;
-         * @access protected
-         */
 		protected $txtEntityId;
-
-        /**
-         * @var QTextBox txtFilename;
-         * @access protected
-         */
 		protected $txtFilename;
-
-        /**
-         * @var QTextBox txtTmpFilename;
-         * @access protected
-         */
 		protected $txtTmpFilename;
-
-        /**
-         * @var QTextBox txtFileType;
-         * @access protected
-         */
 		protected $txtFileType;
-
-        /**
-         * @var QTextBox txtPath;
-         * @access protected
-         */
 		protected $txtPath;
-
-        /**
-         * @var QIntegerTextBox txtSize;
-         * @access protected
-         */
 		protected $txtSize;
-
-        /**
-         * @var QListBox lstCreatedByObject;
-         * @access protected
-         */
 		protected $lstCreatedByObject;
-
-        /**
-         * @var QDateTimePicker calCreationDate;
-         * @access protected
-         */
 		protected $calCreationDate;
 
-
 		// Controls that allow the viewing of Attachment's individual data fields
-        /**
-         * @var QLabel lblEntityQtypeId
-         * @access protected
-         */
 		protected $lblEntityQtypeId;
-
-        /**
-         * @var QLabel lblEntityId
-         * @access protected
-         */
 		protected $lblEntityId;
-
-        /**
-         * @var QLabel lblFilename
-         * @access protected
-         */
 		protected $lblFilename;
-
-        /**
-         * @var QLabel lblTmpFilename
-         * @access protected
-         */
 		protected $lblTmpFilename;
-
-        /**
-         * @var QLabel lblFileType
-         * @access protected
-         */
 		protected $lblFileType;
-
-        /**
-         * @var QLabel lblPath
-         * @access protected
-         */
 		protected $lblPath;
-
-        /**
-         * @var QLabel lblSize
-         * @access protected
-         */
 		protected $lblSize;
-
-        /**
-         * @var QLabel lblCreatedBy
-         * @access protected
-         */
 		protected $lblCreatedBy;
-
-        /**
-         * @var QLabel lblCreationDate
-         * @access protected
-         */
 		protected $lblCreationDate;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -305,8 +191,8 @@
 			$this->lstEntityQtype = new QListBox($this->objParentObject, $strControlId);
 			$this->lstEntityQtype->Name = QApplication::Translate('Entity Qtype');
 			$this->lstEntityQtype->Required = true;
-
-			$this->lstEntityQtype->AddItems(EntityQtype::$NameArray, $this->objAttachment->EntityQtypeId);
+			foreach (EntityQtype::$NameArray as $intId => $strValue)
+				$this->lstEntityQtype->AddItem(new QListItem($strValue, $intId, $this->objAttachment->EntityQtypeId == $intId));
 			return $this->lstEntityQtype;
 		}
 
@@ -482,30 +368,21 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCreatedByObject_Create($strControlId = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
+			$objCreatedByObjectArray = UserAccount::LoadAll();
+			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objAttachment->CreatedByObject) && ($this->objAttachment->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 

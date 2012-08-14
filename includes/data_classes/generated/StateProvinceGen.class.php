@@ -176,7 +176,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -238,7 +238,7 @@
 		 * Static Qcodo Query method to query for a single StateProvince object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return StateProvince the queried object
 		 */
@@ -251,38 +251,16 @@
 				throw $objExc;
 			}
 
-			// Perform the Query
+			// Perform the Query, Get the First Row, and Instantiate a new StateProvince object
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-
-			// Instantiate a new StateProvince object and return it
-
-			// Do we have to expand anything?
-			if ($objQueryBuilder->ExpandAsArrayNodes) {
-				$objToReturn = array();
-				while ($objDbRow = $objDbResult->GetNextRow()) {
-					$objItem = StateProvince::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
-					if ($objItem) $objToReturn[] = $objItem;
-				}
-
-				if (count($objToReturn)) {
-					// Since we only want the object to return, lets return the object and not the array.
-					return $objToReturn[0];
-				} else {
-					return null;
-				}
-			} else {
-				// No expands just return the first row
-				$objDbRow = $objDbResult->GetNextRow();
-				if (is_null($objDbRow)) return null;
-				return StateProvince::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
-			}
+			return StateProvince::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of StateProvince objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return StateProvince[] the queried objects as an array
 		 */
@@ -301,35 +279,10 @@
 		}
 
 		/**
-		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
-		 * Uses BuildQueryStatment to perform most of the work.
-		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
-		 * @return QDatabaseResultBase the cursor resource instance
-		 */
-		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
-			// Get the query statement
-			try {
-				$strQuery = StateProvince::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-
-			// Perform the query
-			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-		
-			// Return the results cursor
-			$objDbResult->QueryBuilder = $objQueryBuilder;
-			return $objDbResult;
-		}
-
-		/**
 		 * Static Qcodo Query method to query for a count of StateProvince objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -440,7 +393,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this StateProvince::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param QDatabaseRowBase $objDbRow
+		 * @param DatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -534,7 +487,7 @@
 
 		/**
 		 * Instantiate an array of StateProvinces from a Database Result
-		 * @param QDatabaseResultBase $objDbResult
+		 * @param DatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return StateProvince[]
@@ -567,32 +520,6 @@
 			return $objToReturn;
 		}
 
-		/**
-		 * Instantiate a single StateProvince object from a query cursor (e.g. a DB ResultSet).
-		 * Cursor is automatically moved to the "next row" of the result set.
-		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
-		 * @param QDatabaseResultBase $objDbResult cursor resource
-		 * @return StateProvince next row resulting from the query
-		 */
-		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
-			// If blank resultset, then return empty result
-			if (!$objDbResult) return null;
-
-			// If empty resultset, then return empty result
-			$objDbRow = $objDbResult->GetNextRow();
-			if (!$objDbRow) return null;
-
-			// We need the Column Aliases
-			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
-			if (!$strColumnAliasArray) $strColumnAliasArray = array();
-
-			// Pull Expansions (if applicable)
-			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
-
-			// Load up the return result with a row and return it
-			return StateProvince::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
-		}
-
 
 
 
@@ -606,10 +533,9 @@
 		 * @param integer $intStateProvinceId
 		 * @return StateProvince
 		*/
-		public static function LoadByStateProvinceId($intStateProvinceId, $objOptionalClauses = null) {
+		public static function LoadByStateProvinceId($intStateProvinceId) {
 			return StateProvince::QuerySingle(
 				QQ::Equal(QQN::StateProvince()->StateProvinceId, $intStateProvinceId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -625,8 +551,7 @@
 			try {
 				return StateProvince::QueryArray(
 					QQ::Equal(QQN::StateProvince()->CountryId, $intCountryId),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -639,11 +564,10 @@
 		 * @param integer $intCountryId
 		 * @return int
 		*/
-		public static function CountByCountryId($intCountryId, $objOptionalClauses = null) {
+		public static function CountByCountryId($intCountryId) {
 			// Call StateProvince::QueryCount to perform the CountByCountryId query
 			return StateProvince::QueryCount(
 				QQ::Equal(QQN::StateProvince()->CountryId, $intCountryId)
-			, $objOptionalClauses
 			);
 		}
 
@@ -656,9 +580,9 @@
 
 
 
-		//////////////////////////////////////
-		// SAVE, DELETE, RELOAD and JOURNALING
-		//////////////////////////////////////
+		//////////////////////////
+		// SAVE, DELETE AND RELOAD
+		//////////////////////////
 
 		/**
 		 * Save this StateProvince
@@ -689,10 +613,6 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intStateProvinceId = $objDatabase->InsertId('state_province', 'state_province_id');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
-
 				} else {
 					// Perform an UPDATE query
 
@@ -709,9 +629,6 @@
 						WHERE
 							`state_province_id` = ' . $objDatabase->SqlVariable($this->intStateProvinceId) . '
 					');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -745,9 +662,6 @@
 					`state_province`
 				WHERE
 					`state_province_id` = ' . $objDatabase->SqlVariable($this->intStateProvinceId) . '');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -794,60 +708,6 @@
 			$this->strShortDescription = $objReloaded->strShortDescription;
 			$this->strAbbreviation = $objReloaded->strAbbreviation;
 		}
-
-		/**
-		 * Journals the current object into the Log database.
-		 * Used internally as a helper method.
-		 * @param string $strJournalCommand
-		 */
-		public function Journal($strJournalCommand) {
-			$objDatabase = StateProvince::GetDatabase()->JournalingDatabase;
-
-			$objDatabase->NonQuery('
-				INSERT INTO `state_province` (
-					`state_province_id`,
-					`country_id`,
-					`short_description`,
-					`abbreviation`,
-					__sys_login_id,
-					__sys_action,
-					__sys_date
-				) VALUES (
-					' . $objDatabase->SqlVariable($this->intStateProvinceId) . ',
-					' . $objDatabase->SqlVariable($this->intCountryId) . ',
-					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
-					' . $objDatabase->SqlVariable($this->strAbbreviation) . ',
-					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
-					' . $objDatabase->SqlVariable($strJournalCommand) . ',
-					NOW()
-				);
-			');
-		}
-
-		/**
-		 * Gets the historical journal for an object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @param integer intStateProvinceId
-		 * @return StateProvince[]
-		 */
-		public static function GetJournalForId($intStateProvinceId) {
-			$objDatabase = StateProvince::GetDatabase()->JournalingDatabase;
-
-			$objResult = $objDatabase->Query('SELECT * FROM state_province WHERE state_province_id = ' .
-				$objDatabase->SqlVariable($intStateProvinceId) . ' ORDER BY __sys_date');
-
-			return StateProvince::InstantiateDbResult($objResult);
-		}
-
-		/**
-		 * Gets the historical journal for this object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @return StateProvince[]
-		 */
-		public function GetJournal() {
-			return StateProvince::GetJournalForId($this->intStateProvinceId);
-		}
-
 
 
 
@@ -1099,12 +959,6 @@
 				WHERE
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->StateProvinceId = $this->intStateProvinceId;
-				$objAddress->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1131,12 +985,6 @@
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
 					`state_province_id` = ' . $objDatabase->SqlVariable($this->intStateProvinceId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->StateProvinceId = null;
-				$objAddress->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1149,14 +997,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = StateProvince::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Address::LoadArrayByStateProvinceId($this->intStateProvinceId) as $objAddress) {
-					$objAddress->StateProvinceId = null;
-					$objAddress->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1191,11 +1031,6 @@
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
 					`state_province_id` = ' . $objDatabase->SqlVariable($this->intStateProvinceId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -1208,13 +1043,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = StateProvince::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Address::LoadArrayByStateProvinceId($this->intStateProvinceId) as $objAddress) {
-					$objAddress->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1404,14 +1232,6 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
-	/**
-	 * @property-read QQNode $StateProvinceId
-	 * @property-read QQNode $CountryId
-	 * @property-read QQNodeCountry $Country
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $Abbreviation
-	 * @property-read QQReverseReferenceNodeAddress $Address
-	 */
 	class QQNodeStateProvince extends QQNode {
 		protected $strTableName = 'state_province';
 		protected $strPrimaryKey = 'state_province_id';
@@ -1443,16 +1263,7 @@
 			}
 		}
 	}
-	
-	/**
-	 * @property-read QQNode $StateProvinceId
-	 * @property-read QQNode $CountryId
-	 * @property-read QQNodeCountry $Country
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $Abbreviation
-	 * @property-read QQReverseReferenceNodeAddress $Address
-	 * @property-read QQNode $_PrimaryKeyNode
-	 */
+
 	class QQReverseReferenceNodeStateProvince extends QQReverseReferenceNode {
 		protected $strTableName = 'state_province';
 		protected $strPrimaryKey = 'state_province_id';

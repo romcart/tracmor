@@ -28,63 +28,19 @@
 
 	class EntityQtypeCustomFieldMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var EntityQtypeCustomField objEntityQtypeCustomField
-		 * @access protected
-		 */
 		protected $objEntityQtypeCustomField;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of EntityQtypeCustomField's individual data fields
-        /**
-         * @var QLabel lblEntityQtypeCustomFieldId;
-         * @access protected
-         */
 		protected $lblEntityQtypeCustomFieldId;
-
-        /**
-         * @var QListBox lstEntityQtype;
-         * @access protected
-         */
 		protected $lstEntityQtype;
-
-        /**
-         * @var QListBox lstCustomField;
-         * @access protected
-         */
 		protected $lstCustomField;
 
-
 		// Controls that allow the viewing of EntityQtypeCustomField's individual data fields
-        /**
-         * @var QLabel lblEntityQtypeId
-         * @access protected
-         */
 		protected $lblEntityQtypeId;
-
-        /**
-         * @var QLabel lblCustomFieldId
-         * @access protected
-         */
 		protected $lblCustomFieldId;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -207,8 +163,8 @@
 			$this->lstEntityQtype = new QListBox($this->objParentObject, $strControlId);
 			$this->lstEntityQtype->Name = QApplication::Translate('Entity Qtype');
 			$this->lstEntityQtype->Required = true;
-
-			$this->lstEntityQtype->AddItems(EntityQtype::$NameArray, $this->objEntityQtypeCustomField->EntityQtypeId);
+			foreach (EntityQtype::$NameArray as $intId => $strValue)
+				$this->lstEntityQtype->AddItem(new QListItem($strValue, $intId, $this->objEntityQtypeCustomField->EntityQtypeId == $intId));
 			return $this->lstEntityQtype;
 		}
 
@@ -228,30 +184,21 @@
 		/**
 		 * Create and setup QListBox lstCustomField
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCustomField_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCustomField_Create($strControlId = null) {
 			$this->lstCustomField = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCustomField->Name = QApplication::Translate('Custom Field');
 			$this->lstCustomField->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstCustomField->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCustomFieldCursor = CustomField::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCustomField = CustomField::InstantiateCursor($objCustomFieldCursor)) {
+			$objCustomFieldArray = CustomField::LoadAll();
+			if ($objCustomFieldArray) foreach ($objCustomFieldArray as $objCustomField) {
 				$objListItem = new QListItem($objCustomField->__toString(), $objCustomField->CustomFieldId);
 				if (($this->objEntityQtypeCustomField->CustomField) && ($this->objEntityQtypeCustomField->CustomField->CustomFieldId == $objCustomField->CustomFieldId))
 					$objListItem->Selected = true;
 				$this->lstCustomField->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCustomField;
 		}
 

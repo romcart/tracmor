@@ -28,63 +28,19 @@
 
 	class AdminSettingMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var AdminSetting objAdminSetting
-		 * @access protected
-		 */
 		protected $objAdminSetting;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of AdminSetting's individual data fields
-        /**
-         * @var QLabel lblSettingId;
-         * @access protected
-         */
 		protected $lblSettingId;
-
-        /**
-         * @var QTextBox txtShortDescription;
-         * @access protected
-         */
 		protected $txtShortDescription;
-
-        /**
-         * @var QTextBox txtValue;
-         * @access protected
-         */
 		protected $txtValue;
 
-
 		// Controls that allow the viewing of AdminSetting's individual data fields
-        /**
-         * @var QLabel lblShortDescription
-         * @access protected
-         */
 		protected $lblShortDescription;
-
-        /**
-         * @var QLabel lblValue
-         * @access protected
-         */
 		protected $lblValue;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 

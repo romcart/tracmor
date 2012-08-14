@@ -24,45 +24,16 @@
 
 	class ManufacturerCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var ManufacturerCustomFieldHelper objManufacturerCustomFieldHelper
-		 * @access protected
-		 */
 		protected $objManufacturerCustomFieldHelper;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of ManufacturerCustomFieldHelper's individual data fields
-        /**
-         * @var QListBox lstManufacturer;
-         * @access protected
-         */
 		protected $lstManufacturer;
 
-
 		// Controls that allow the viewing of ManufacturerCustomFieldHelper's individual data fields
-        /**
-         * @var QLabel lblManufacturerId
-         * @access protected
-         */
 		protected $lblManufacturerId;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -164,30 +135,21 @@
 		/**
 		 * Create and setup QListBox lstManufacturer
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstManufacturer_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstManufacturer_Create($strControlId = null) {
 			$this->lstManufacturer = new QListBox($this->objParentObject, $strControlId);
 			$this->lstManufacturer->Name = QApplication::Translate('Manufacturer');
 			$this->lstManufacturer->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstManufacturer->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objManufacturerCursor = Manufacturer::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objManufacturer = Manufacturer::InstantiateCursor($objManufacturerCursor)) {
+			$objManufacturerArray = Manufacturer::LoadAll();
+			if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
 				$objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
 				if (($this->objManufacturerCustomFieldHelper->Manufacturer) && ($this->objManufacturerCustomFieldHelper->Manufacturer->ManufacturerId == $objManufacturer->ManufacturerId))
 					$objListItem->Selected = true;
 				$this->lstManufacturer->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstManufacturer;
 		}
 
