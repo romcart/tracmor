@@ -16,6 +16,8 @@
 	 * @package My Application
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $InventoryModelId the value for intInventoryModelId (PK)
+	 * @property string $Cfv2 the value for strCfv2 
+	 * @property string $Cfv4 the value for strCfv4 
 	 * @property InventoryModel $InventoryModel the value for the InventoryModel object referenced by intInventoryModelId (PK)
 	 * @property boolean $__Restored whether or not this object was restored from the database (as opposed to created new)
 	 */
@@ -39,6 +41,22 @@
 		 * @var integer __intInventoryModelId;
 		 */
 		protected $__intInventoryModelId;
+
+		/**
+		 * Protected member variable that maps to the database column inventory_model_custom_field_helper.cfv_2
+		 * @var string strCfv2
+		 */
+		protected $strCfv2;
+		const Cfv2Default = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column inventory_model_custom_field_helper.cfv_4
+		 * @var string strCfv4
+		 */
+		protected $strCfv4;
+		const Cfv4Default = null;
+
 
 		/**
 		 * Protected array of virtual attributes for this object (e.g. extra/other calculated and/or non-object bound
@@ -136,7 +154,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -198,7 +216,7 @@
 		 * Static Qcodo Query method to query for a single InventoryModelCustomFieldHelper object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return InventoryModelCustomFieldHelper the queried object
 		 */
@@ -211,38 +229,16 @@
 				throw $objExc;
 			}
 
-			// Perform the Query
+			// Perform the Query, Get the First Row, and Instantiate a new InventoryModelCustomFieldHelper object
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-
-			// Instantiate a new InventoryModelCustomFieldHelper object and return it
-
-			// Do we have to expand anything?
-			if ($objQueryBuilder->ExpandAsArrayNodes) {
-				$objToReturn = array();
-				while ($objDbRow = $objDbResult->GetNextRow()) {
-					$objItem = InventoryModelCustomFieldHelper::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
-					if ($objItem) $objToReturn[] = $objItem;
-				}
-
-				if (count($objToReturn)) {
-					// Since we only want the object to return, lets return the object and not the array.
-					return $objToReturn[0];
-				} else {
-					return null;
-				}
-			} else {
-				// No expands just return the first row
-				$objDbRow = $objDbResult->GetNextRow();
-				if (is_null($objDbRow)) return null;
-				return InventoryModelCustomFieldHelper::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
-			}
+			return InventoryModelCustomFieldHelper::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of InventoryModelCustomFieldHelper objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return InventoryModelCustomFieldHelper[] the queried objects as an array
 		 */
@@ -261,35 +257,10 @@
 		}
 
 		/**
-		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
-		 * Uses BuildQueryStatment to perform most of the work.
-		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
-		 * @return QDatabaseResultBase the cursor resource instance
-		 */
-		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
-			// Get the query statement
-			try {
-				$strQuery = InventoryModelCustomFieldHelper::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-
-			// Perform the query
-			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-		
-			// Return the results cursor
-			$objDbResult->QueryBuilder = $objQueryBuilder;
-			return $objDbResult;
-		}
-
-		/**
 		 * Static Qcodo Query method to query for a count of InventoryModelCustomFieldHelper objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -383,6 +354,8 @@
 			}
 
 			$objBuilder->AddSelectItem($strTableName, 'inventory_model_id', $strAliasPrefix . 'inventory_model_id');
+			$objBuilder->AddSelectItem($strTableName, 'cfv_2', $strAliasPrefix . 'cfv_2');
+			$objBuilder->AddSelectItem($strTableName, 'cfv_4', $strAliasPrefix . 'cfv_4');
 		}
 
 
@@ -397,7 +370,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this InventoryModelCustomFieldHelper::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param QDatabaseRowBase $objDbRow
+		 * @param DatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -417,6 +390,10 @@
 			$strAliasName = array_key_exists($strAliasPrefix . 'inventory_model_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'inventory_model_id'] : $strAliasPrefix . 'inventory_model_id';
 			$objToReturn->intInventoryModelId = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$objToReturn->__intInventoryModelId = $objDbRow->GetColumn($strAliasName, 'Integer');
+			$strAliasName = array_key_exists($strAliasPrefix . 'cfv_2', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'cfv_2'] : $strAliasPrefix . 'cfv_2';
+			$objToReturn->strCfv2 = $objDbRow->GetColumn($strAliasName, 'Blob');
+			$strAliasName = array_key_exists($strAliasPrefix . 'cfv_4', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'cfv_4'] : $strAliasPrefix . 'cfv_4';
+			$objToReturn->strCfv4 = $objDbRow->GetColumn($strAliasName, 'Blob');
 
 			// Instantiate Virtual Attributes
 			foreach ($objDbRow->GetColumnNameArray() as $strColumnName => $mixValue) {
@@ -444,7 +421,7 @@
 
 		/**
 		 * Instantiate an array of InventoryModelCustomFieldHelpers from a Database Result
-		 * @param QDatabaseResultBase $objDbResult
+		 * @param DatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return InventoryModelCustomFieldHelper[]
@@ -477,32 +454,6 @@
 			return $objToReturn;
 		}
 
-		/**
-		 * Instantiate a single InventoryModelCustomFieldHelper object from a query cursor (e.g. a DB ResultSet).
-		 * Cursor is automatically moved to the "next row" of the result set.
-		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
-		 * @param QDatabaseResultBase $objDbResult cursor resource
-		 * @return InventoryModelCustomFieldHelper next row resulting from the query
-		 */
-		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
-			// If blank resultset, then return empty result
-			if (!$objDbResult) return null;
-
-			// If empty resultset, then return empty result
-			$objDbRow = $objDbResult->GetNextRow();
-			if (!$objDbRow) return null;
-
-			// We need the Column Aliases
-			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
-			if (!$strColumnAliasArray) $strColumnAliasArray = array();
-
-			// Pull Expansions (if applicable)
-			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
-
-			// Load up the return result with a row and return it
-			return InventoryModelCustomFieldHelper::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
-		}
-
 
 
 
@@ -516,10 +467,9 @@
 		 * @param integer $intInventoryModelId
 		 * @return InventoryModelCustomFieldHelper
 		*/
-		public static function LoadByInventoryModelId($intInventoryModelId, $objOptionalClauses = null) {
+		public static function LoadByInventoryModelId($intInventoryModelId) {
 			return InventoryModelCustomFieldHelper::QuerySingle(
 				QQ::Equal(QQN::InventoryModelCustomFieldHelper()->InventoryModelId, $intInventoryModelId)
-			, $objOptionalClauses
 			);
 		}
 
@@ -532,9 +482,9 @@
 
 
 
-		//////////////////////////////////////
-		// SAVE, DELETE, RELOAD and JOURNALING
-		//////////////////////////////////////
+		//////////////////////////
+		// SAVE, DELETE AND RELOAD
+		//////////////////////////
 
 		/**
 		 * Save this InventoryModelCustomFieldHelper
@@ -553,16 +503,16 @@
 					// Perform an INSERT query
 					$objDatabase->NonQuery('
 						INSERT INTO `inventory_model_custom_field_helper` (
-							`inventory_model_id`
+							`inventory_model_id`,
+							`cfv_2`,
+							`cfv_4`
 						) VALUES (
-							' . $objDatabase->SqlVariable($this->intInventoryModelId) . '
+							' . $objDatabase->SqlVariable($this->intInventoryModelId) . ',
+							' . $objDatabase->SqlVariable($this->strCfv2) . ',
+							' . $objDatabase->SqlVariable($this->strCfv4) . '
 						)
 					');
 
-
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
 
 				} else {
 					// Perform an UPDATE query
@@ -574,13 +524,12 @@
 						UPDATE
 							`inventory_model_custom_field_helper`
 						SET
-							`inventory_model_id` = ' . $objDatabase->SqlVariable($this->intInventoryModelId) . '
+							`inventory_model_id` = ' . $objDatabase->SqlVariable($this->intInventoryModelId) . ',
+							`cfv_2` = ' . $objDatabase->SqlVariable($this->strCfv2) . ',
+							`cfv_4` = ' . $objDatabase->SqlVariable($this->strCfv4) . '
 						WHERE
 							`inventory_model_id` = ' . $objDatabase->SqlVariable($this->__intInventoryModelId) . '
 					');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -615,9 +564,6 @@
 					`inventory_model_custom_field_helper`
 				WHERE
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($this->intInventoryModelId) . '');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -662,55 +608,9 @@
 			// Update $this's local variables to match
 			$this->InventoryModelId = $objReloaded->InventoryModelId;
 			$this->__intInventoryModelId = $this->intInventoryModelId;
+			$this->strCfv2 = $objReloaded->strCfv2;
+			$this->strCfv4 = $objReloaded->strCfv4;
 		}
-
-		/**
-		 * Journals the current object into the Log database.
-		 * Used internally as a helper method.
-		 * @param string $strJournalCommand
-		 */
-		public function Journal($strJournalCommand) {
-			$objDatabase = InventoryModelCustomFieldHelper::GetDatabase()->JournalingDatabase;
-
-			$objDatabase->NonQuery('
-				INSERT INTO `inventory_model_custom_field_helper` (
-					`inventory_model_id`,
-					__sys_login_id,
-					__sys_action,
-					__sys_date
-				) VALUES (
-					' . $objDatabase->SqlVariable($this->intInventoryModelId) . ',
-					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
-					' . $objDatabase->SqlVariable($strJournalCommand) . ',
-					NOW()
-				);
-			');
-		}
-
-		/**
-		 * Gets the historical journal for an object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @param integer intInventoryModelId
-		 * @return InventoryModelCustomFieldHelper[]
-		 */
-		public static function GetJournalForId($intInventoryModelId) {
-			$objDatabase = InventoryModelCustomFieldHelper::GetDatabase()->JournalingDatabase;
-
-			$objResult = $objDatabase->Query('SELECT * FROM inventory_model_custom_field_helper WHERE inventory_model_id = ' .
-				$objDatabase->SqlVariable($intInventoryModelId) . ' ORDER BY __sys_date');
-
-			return InventoryModelCustomFieldHelper::InstantiateDbResult($objResult);
-		}
-
-		/**
-		 * Gets the historical journal for this object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @return InventoryModelCustomFieldHelper[]
-		 */
-		public function GetJournal() {
-			return InventoryModelCustomFieldHelper::GetJournalForId($this->intInventoryModelId);
-		}
-
 
 
 
@@ -734,6 +634,16 @@
 					// Gets the value for intInventoryModelId (PK)
 					// @return integer
 					return $this->intInventoryModelId;
+
+				case 'Cfv2':
+					// Gets the value for strCfv2 
+					// @return string
+					return $this->strCfv2;
+
+				case 'Cfv4':
+					// Gets the value for strCfv4 
+					// @return string
+					return $this->strCfv4;
 
 
 				///////////////////
@@ -791,6 +701,28 @@
 					try {
 						$this->objInventoryModel = null;
 						return ($this->intInventoryModelId = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Cfv2':
+					// Sets the value for strCfv2 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strCfv2 = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'Cfv4':
+					// Sets the value for strCfv4 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strCfv4 = QType::Cast($mixValue, QType::String));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -868,6 +800,8 @@
 		public static function GetSoapComplexTypeXml() {
 			$strToReturn = '<complexType name="InventoryModelCustomFieldHelper"><sequence>';
 			$strToReturn .= '<element name="InventoryModel" type="xsd1:InventoryModel"/>';
+			$strToReturn .= '<element name="Cfv2" type="xsd:string"/>';
+			$strToReturn .= '<element name="Cfv4" type="xsd:string"/>';
 			$strToReturn .= '<element name="__blnRestored" type="xsd:boolean"/>';
 			$strToReturn .= '</sequence></complexType>';
 			return $strToReturn;
@@ -894,6 +828,10 @@
 			if ((property_exists($objSoapObject, 'InventoryModel')) &&
 				($objSoapObject->InventoryModel))
 				$objToReturn->InventoryModel = InventoryModel::GetObjectFromSoapObject($objSoapObject->InventoryModel);
+			if (property_exists($objSoapObject, 'Cfv2'))
+				$objToReturn->strCfv2 = $objSoapObject->Cfv2;
+			if (property_exists($objSoapObject, 'Cfv4'))
+				$objToReturn->strCfv4 = $objSoapObject->Cfv4;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
@@ -987,6 +925,8 @@
 				$objQueryExpansion->AddFromItem(sprintf('LEFT JOIN `inventory_model_custom_field_helper` AS `%s__%s` ON `%s`.`%s` = `%s__%s`.`inventory_model_id`', $strParentAlias, $strAlias, $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`inventory_model_id` AS `%s__%s__inventory_model_id`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`cfv_2` AS `%s__%s__cfv_2`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`cfv_4` AS `%s__%s__cfv_4`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 
 				$strParentAlias = $strParentAlias . '__' . $strAlias;
 			}
@@ -1024,10 +964,6 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
-	/**
-	 * @property-read QQNode $InventoryModelId
-	 * @property-read QQNodeInventoryModel $InventoryModel
-	 */
 	class QQNodeInventoryModelCustomFieldHelper extends QQNode {
 		protected $strTableName = 'inventory_model_custom_field_helper';
 		protected $strPrimaryKey = 'inventory_model_id';
@@ -1038,6 +974,10 @@
 					return new QQNode('inventory_model_id', 'InventoryModelId', 'integer', $this);
 				case 'InventoryModel':
 					return new QQNodeInventoryModel('inventory_model_id', 'InventoryModel', 'integer', $this);
+				case 'Cfv2':
+					return new QQNode('cfv_2', 'Cfv2', 'string', $this);
+				case 'Cfv4':
+					return new QQNode('cfv_4', 'Cfv4', 'string', $this);
 
 				case '_PrimaryKeyNode':
 					return new QQNodeInventoryModel('inventory_model_id', 'InventoryModelId', 'integer', $this);
@@ -1051,12 +991,7 @@
 			}
 		}
 	}
-	
-	/**
-	 * @property-read QQNode $InventoryModelId
-	 * @property-read QQNodeInventoryModel $InventoryModel
-	 * @property-read QQNodeInventoryModel $_PrimaryKeyNode
-	 */
+
 	class QQReverseReferenceNodeInventoryModelCustomFieldHelper extends QQReverseReferenceNode {
 		protected $strTableName = 'inventory_model_custom_field_helper';
 		protected $strPrimaryKey = 'inventory_model_id';
@@ -1067,6 +1002,10 @@
 					return new QQNode('inventory_model_id', 'InventoryModelId', 'integer', $this);
 				case 'InventoryModel':
 					return new QQNodeInventoryModel('inventory_model_id', 'InventoryModel', 'integer', $this);
+				case 'Cfv2':
+					return new QQNode('cfv_2', 'Cfv2', 'string', $this);
+				case 'Cfv4':
+					return new QQNode('cfv_4', 'Cfv4', 'string', $this);
 
 				case '_PrimaryKeyNode':
 					return new QQNodeInventoryModel('inventory_model_id', 'InventoryModelId', 'integer', $this);

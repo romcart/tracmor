@@ -495,12 +495,13 @@ INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
 	(20,'check_out_to_contacts',NULL),
 	(21,'due_date_required',NULL),
 	(22,'reason_required',NULL),
-	(23,'default_check_out_period','24');
+	(23,'default_check_out_period','24'),
+	(24,'depreciation_flag','1');
 
 INSERT INTO `shortcut` (`module_id`, `authorization_id`, `transaction_type_id`, `short_description`, `link`, `image_path`, `entity_qtype_id`, `create_flag`) VALUES
-        (2,2,NULL,'Create Model','../assets/asset_model_edit.php','asset_model_create.png',4,1),
-        (2,1,NULL,'Models','../assets/asset_model_list.php','asset_model.png',4,0),
-        (2,2,NULL,'Import Models','../assets/asset_model_import.php','asset_model_import.png',4,1),
+        (2,2,NULL,'Create Asset Model','../assets/asset_model_edit.php','asset_model_create.png',4,1),
+        (2,1,NULL,'Asset Models','../assets/asset_model_list.php','asset_model.png',4,0),
+        (2,2,NULL,'Import Asset Models','../assets/asset_model_import.php','asset_model_import.png',4,1),
         (2,2,NULL,'Create Asset','../assets/asset_edit.php','asset_create.png',1,1),
         (2,1,NULL,'Assets','../assets/asset_list.php','asset.png',1,0),
         (2,2,NULL,'Import Assets','../assets/asset_import.php','asset_import.png',1,1),
@@ -529,4 +530,9 @@ INSERT INTO `shortcut` (`module_id`, `authorization_id`, `transaction_type_id`, 
         (2,2,10,'Archive Assets','../assets/asset_edit.php?intTransactionTypeId=10','asset_archive.png',1,0),
         (2,2,11,'Unarchive Assets','../assets/asset_edit.php?intTransactionTypeId=11','asset_unarchive.png',1,0);
 
+INSERT INTO `depreciation_method_qtype` (`depreciation_method_qtype_id`, `short_description`) VALUES (1, 'Straight Line');
+
+INSERT INTO `depreciation_class` (`depreciation_class_id`, `depreciation_method_qtype_id`, `short_description`) VALUES (1, 1, 'Straight Line Depreciation');
+
 SET FOREIGN_KEY_CHECKS = 1;
+

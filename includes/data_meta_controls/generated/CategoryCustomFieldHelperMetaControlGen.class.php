@@ -24,45 +24,16 @@
 
 	class CategoryCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var CategoryCustomFieldHelper objCategoryCustomFieldHelper
-		 * @access protected
-		 */
 		protected $objCategoryCustomFieldHelper;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of CategoryCustomFieldHelper's individual data fields
-        /**
-         * @var QListBox lstCategory;
-         * @access protected
-         */
 		protected $lstCategory;
 
-
 		// Controls that allow the viewing of CategoryCustomFieldHelper's individual data fields
-        /**
-         * @var QLabel lblCategoryId
-         * @access protected
-         */
 		protected $lblCategoryId;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -164,30 +135,21 @@
 		/**
 		 * Create and setup QListBox lstCategory
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCategory_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCategory_Create($strControlId = null) {
 			$this->lstCategory = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCategory->Name = QApplication::Translate('Category');
 			$this->lstCategory->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstCategory->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCategoryCursor = Category::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCategory = Category::InstantiateCursor($objCategoryCursor)) {
+			$objCategoryArray = Category::LoadAll();
+			if ($objCategoryArray) foreach ($objCategoryArray as $objCategory) {
 				$objListItem = new QListItem($objCategory->__toString(), $objCategory->CategoryId);
 				if (($this->objCategoryCustomFieldHelper->Category) && ($this->objCategoryCustomFieldHelper->Category->CategoryId == $objCategory->CategoryId))
 					$objListItem->Selected = true;
 				$this->lstCategory->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCategory;
 		}
 

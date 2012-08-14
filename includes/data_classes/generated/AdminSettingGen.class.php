@@ -137,7 +137,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -199,7 +199,7 @@
 		 * Static Qcodo Query method to query for a single AdminSetting object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return AdminSetting the queried object
 		 */
@@ -212,38 +212,16 @@
 				throw $objExc;
 			}
 
-			// Perform the Query
+			// Perform the Query, Get the First Row, and Instantiate a new AdminSetting object
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-
-			// Instantiate a new AdminSetting object and return it
-
-			// Do we have to expand anything?
-			if ($objQueryBuilder->ExpandAsArrayNodes) {
-				$objToReturn = array();
-				while ($objDbRow = $objDbResult->GetNextRow()) {
-					$objItem = AdminSetting::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
-					if ($objItem) $objToReturn[] = $objItem;
-				}
-
-				if (count($objToReturn)) {
-					// Since we only want the object to return, lets return the object and not the array.
-					return $objToReturn[0];
-				} else {
-					return null;
-				}
-			} else {
-				// No expands just return the first row
-				$objDbRow = $objDbResult->GetNextRow();
-				if (is_null($objDbRow)) return null;
-				return AdminSetting::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
-			}
+			return AdminSetting::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of AdminSetting objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return AdminSetting[] the queried objects as an array
 		 */
@@ -262,35 +240,10 @@
 		}
 
 		/**
-		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
-		 * Uses BuildQueryStatment to perform most of the work.
-		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
-		 * @return QDatabaseResultBase the cursor resource instance
-		 */
-		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
-			// Get the query statement
-			try {
-				$strQuery = AdminSetting::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-
-			// Perform the query
-			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-		
-			// Return the results cursor
-			$objDbResult->QueryBuilder = $objQueryBuilder;
-			return $objDbResult;
-		}
-
-		/**
 		 * Static Qcodo Query method to query for a count of AdminSetting objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -400,7 +353,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this AdminSetting::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param QDatabaseRowBase $objDbRow
+		 * @param DatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -444,7 +397,7 @@
 
 		/**
 		 * Instantiate an array of AdminSettings from a Database Result
-		 * @param QDatabaseResultBase $objDbResult
+		 * @param DatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return AdminSetting[]
@@ -477,32 +430,6 @@
 			return $objToReturn;
 		}
 
-		/**
-		 * Instantiate a single AdminSetting object from a query cursor (e.g. a DB ResultSet).
-		 * Cursor is automatically moved to the "next row" of the result set.
-		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
-		 * @param QDatabaseResultBase $objDbResult cursor resource
-		 * @return AdminSetting next row resulting from the query
-		 */
-		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
-			// If blank resultset, then return empty result
-			if (!$objDbResult) return null;
-
-			// If empty resultset, then return empty result
-			$objDbRow = $objDbResult->GetNextRow();
-			if (!$objDbRow) return null;
-
-			// We need the Column Aliases
-			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
-			if (!$strColumnAliasArray) $strColumnAliasArray = array();
-
-			// Pull Expansions (if applicable)
-			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
-
-			// Load up the return result with a row and return it
-			return AdminSetting::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
-		}
-
 
 
 
@@ -516,10 +443,9 @@
 		 * @param integer $intSettingId
 		 * @return AdminSetting
 		*/
-		public static function LoadBySettingId($intSettingId, $objOptionalClauses = null) {
+		public static function LoadBySettingId($intSettingId) {
 			return AdminSetting::QuerySingle(
 				QQ::Equal(QQN::AdminSetting()->SettingId, $intSettingId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -529,10 +455,9 @@
 		 * @param string $strShortDescription
 		 * @return AdminSetting
 		*/
-		public static function LoadByShortDescription($strShortDescription, $objOptionalClauses = null) {
+		public static function LoadByShortDescription($strShortDescription) {
 			return AdminSetting::QuerySingle(
 				QQ::Equal(QQN::AdminSetting()->ShortDescription, $strShortDescription)
-			, $objOptionalClauses
 			);
 		}
 
@@ -545,9 +470,9 @@
 
 
 
-		//////////////////////////////////////
-		// SAVE, DELETE, RELOAD and JOURNALING
-		//////////////////////////////////////
+		//////////////////////////
+		// SAVE, DELETE AND RELOAD
+		//////////////////////////
 
 		/**
 		 * Save this AdminSetting
@@ -576,10 +501,6 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intSettingId = $objDatabase->InsertId('admin_setting', 'setting_id');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
-
 				} else {
 					// Perform an UPDATE query
 
@@ -595,9 +516,6 @@
 						WHERE
 							`setting_id` = ' . $objDatabase->SqlVariable($this->intSettingId) . '
 					');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -631,9 +549,6 @@
 					`admin_setting`
 				WHERE
 					`setting_id` = ' . $objDatabase->SqlVariable($this->intSettingId) . '');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -679,58 +594,6 @@
 			$this->strShortDescription = $objReloaded->strShortDescription;
 			$this->strValue = $objReloaded->strValue;
 		}
-
-		/**
-		 * Journals the current object into the Log database.
-		 * Used internally as a helper method.
-		 * @param string $strJournalCommand
-		 */
-		public function Journal($strJournalCommand) {
-			$objDatabase = AdminSetting::GetDatabase()->JournalingDatabase;
-
-			$objDatabase->NonQuery('
-				INSERT INTO `admin_setting` (
-					`setting_id`,
-					`short_description`,
-					`value`,
-					__sys_login_id,
-					__sys_action,
-					__sys_date
-				) VALUES (
-					' . $objDatabase->SqlVariable($this->intSettingId) . ',
-					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
-					' . $objDatabase->SqlVariable($this->strValue) . ',
-					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
-					' . $objDatabase->SqlVariable($strJournalCommand) . ',
-					NOW()
-				);
-			');
-		}
-
-		/**
-		 * Gets the historical journal for an object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @param integer intSettingId
-		 * @return AdminSetting[]
-		 */
-		public static function GetJournalForId($intSettingId) {
-			$objDatabase = AdminSetting::GetDatabase()->JournalingDatabase;
-
-			$objResult = $objDatabase->Query('SELECT * FROM admin_setting WHERE setting_id = ' .
-				$objDatabase->SqlVariable($intSettingId) . ' ORDER BY __sys_date');
-
-			return AdminSetting::InstantiateDbResult($objResult);
-		}
-
-		/**
-		 * Gets the historical journal for this object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @return AdminSetting[]
-		 */
-		public function GetJournal() {
-			return AdminSetting::GetJournalForId($this->intSettingId);
-		}
-
 
 
 
@@ -1015,11 +878,6 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
-	/**
-	 * @property-read QQNode $SettingId
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $Value
-	 */
 	class QQNodeAdminSetting extends QQNode {
 		protected $strTableName = 'admin_setting';
 		protected $strPrimaryKey = 'setting_id';
@@ -1045,13 +903,7 @@
 			}
 		}
 	}
-	
-	/**
-	 * @property-read QQNode $SettingId
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $Value
-	 * @property-read QQNode $_PrimaryKeyNode
-	 */
+
 	class QQReverseReferenceNodeAdminSetting extends QQReverseReferenceNode {
 		protected $strTableName = 'admin_setting';
 		protected $strPrimaryKey = 'setting_id';

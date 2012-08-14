@@ -40,129 +40,30 @@
 
 	class AssetTransactionCheckoutMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var AssetTransactionCheckout objAssetTransactionCheckout
-		 * @access protected
-		 */
 		protected $objAssetTransactionCheckout;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of AssetTransactionCheckout's individual data fields
-        /**
-         * @var QLabel lblAssetTransactionCheckoutId;
-         * @access protected
-         */
 		protected $lblAssetTransactionCheckoutId;
-
-        /**
-         * @var QListBox lstAssetTransaction;
-         * @access protected
-         */
 		protected $lstAssetTransaction;
-
-        /**
-         * @var QListBox lstToContact;
-         * @access protected
-         */
 		protected $lstToContact;
-
-        /**
-         * @var QListBox lstToUser;
-         * @access protected
-         */
 		protected $lstToUser;
-
-        /**
-         * @var QDateTimePicker calDueDate;
-         * @access protected
-         */
 		protected $calDueDate;
-
-        /**
-         * @var QListBox lstCreatedByObject;
-         * @access protected
-         */
 		protected $lstCreatedByObject;
-
-        /**
-         * @var QDateTimePicker calCreationDate;
-         * @access protected
-         */
 		protected $calCreationDate;
-
-        /**
-         * @var QListBox lstModifiedByObject;
-         * @access protected
-         */
 		protected $lstModifiedByObject;
-
-        /**
-         * @var QLabel lblModifiedDate;
-         * @access protected
-         */
 		protected $lblModifiedDate;
 
-
 		// Controls that allow the viewing of AssetTransactionCheckout's individual data fields
-        /**
-         * @var QLabel lblAssetTransactionId
-         * @access protected
-         */
 		protected $lblAssetTransactionId;
-
-        /**
-         * @var QLabel lblToContactId
-         * @access protected
-         */
 		protected $lblToContactId;
-
-        /**
-         * @var QLabel lblToUserId
-         * @access protected
-         */
 		protected $lblToUserId;
-
-        /**
-         * @var QLabel lblDueDate
-         * @access protected
-         */
 		protected $lblDueDate;
-
-        /**
-         * @var QLabel lblCreatedBy
-         * @access protected
-         */
 		protected $lblCreatedBy;
-
-        /**
-         * @var QLabel lblCreationDate
-         * @access protected
-         */
 		protected $lblCreationDate;
-
-        /**
-         * @var QLabel lblModifiedBy
-         * @access protected
-         */
 		protected $lblModifiedBy;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -279,30 +180,21 @@
 		/**
 		 * Create and setup QListBox lstAssetTransaction
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAssetTransaction_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstAssetTransaction_Create($strControlId = null) {
 			$this->lstAssetTransaction = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAssetTransaction->Name = QApplication::Translate('Asset Transaction');
 			$this->lstAssetTransaction->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstAssetTransaction->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objAssetTransactionCursor = AssetTransaction::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objAssetTransaction = AssetTransaction::InstantiateCursor($objAssetTransactionCursor)) {
+			$objAssetTransactionArray = AssetTransaction::LoadAll();
+			if ($objAssetTransactionArray) foreach ($objAssetTransactionArray as $objAssetTransaction) {
 				$objListItem = new QListItem($objAssetTransaction->__toString(), $objAssetTransaction->AssetTransactionId);
 				if (($this->objAssetTransactionCheckout->AssetTransaction) && ($this->objAssetTransactionCheckout->AssetTransaction->AssetTransactionId == $objAssetTransaction->AssetTransactionId))
 					$objListItem->Selected = true;
 				$this->lstAssetTransaction->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstAssetTransaction;
 		}
 
@@ -322,28 +214,19 @@
 		/**
 		 * Create and setup QListBox lstToContact
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstToContact_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstToContact_Create($strControlId = null) {
 			$this->lstToContact = new QListBox($this->objParentObject, $strControlId);
 			$this->lstToContact->Name = QApplication::Translate('To Contact');
 			$this->lstToContact->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objToContactCursor = Contact::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objToContact = Contact::InstantiateCursor($objToContactCursor)) {
+			$objToContactArray = Contact::LoadAll();
+			if ($objToContactArray) foreach ($objToContactArray as $objToContact) {
 				$objListItem = new QListItem($objToContact->__toString(), $objToContact->ContactId);
 				if (($this->objAssetTransactionCheckout->ToContact) && ($this->objAssetTransactionCheckout->ToContact->ContactId == $objToContact->ContactId))
 					$objListItem->Selected = true;
 				$this->lstToContact->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstToContact;
 		}
 
@@ -362,28 +245,19 @@
 		/**
 		 * Create and setup QListBox lstToUser
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstToUser_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstToUser_Create($strControlId = null) {
 			$this->lstToUser = new QListBox($this->objParentObject, $strControlId);
 			$this->lstToUser->Name = QApplication::Translate('To User');
 			$this->lstToUser->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objToUserCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objToUser = UserAccount::InstantiateCursor($objToUserCursor)) {
+			$objToUserArray = UserAccount::LoadAll();
+			if ($objToUserArray) foreach ($objToUserArray as $objToUser) {
 				$objListItem = new QListItem($objToUser->__toString(), $objToUser->UserAccountId);
 				if (($this->objAssetTransactionCheckout->ToUser) && ($this->objAssetTransactionCheckout->ToUser->UserAccountId == $objToUser->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstToUser->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstToUser;
 		}
 
@@ -431,28 +305,19 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCreatedByObject_Create($strControlId = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
+			$objCreatedByObjectArray = UserAccount::LoadAll();
+			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objAssetTransactionCheckout->CreatedByObject) && ($this->objAssetTransactionCheckout->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 
@@ -500,28 +365,19 @@
 		/**
 		 * Create and setup QListBox lstModifiedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModifiedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstModifiedByObject_Create($strControlId = null) {
 			$this->lstModifiedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModifiedByObject->Name = QApplication::Translate('Modified By Object');
 			$this->lstModifiedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objModifiedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objModifiedByObject = UserAccount::InstantiateCursor($objModifiedByObjectCursor)) {
+			$objModifiedByObjectArray = UserAccount::LoadAll();
+			if ($objModifiedByObjectArray) foreach ($objModifiedByObjectArray as $objModifiedByObject) {
 				$objListItem = new QListItem($objModifiedByObject->__toString(), $objModifiedByObject->UserAccountId);
 				if (($this->objAssetTransactionCheckout->ModifiedByObject) && ($this->objAssetTransactionCheckout->ModifiedByObject->UserAccountId == $objModifiedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstModifiedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstModifiedByObject;
 		}
 

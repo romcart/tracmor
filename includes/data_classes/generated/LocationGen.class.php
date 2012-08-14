@@ -348,7 +348,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -410,7 +410,7 @@
 		 * Static Qcodo Query method to query for a single Location object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Location the queried object
 		 */
@@ -423,38 +423,16 @@
 				throw $objExc;
 			}
 
-			// Perform the Query
+			// Perform the Query, Get the First Row, and Instantiate a new Location object
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-
-			// Instantiate a new Location object and return it
-
-			// Do we have to expand anything?
-			if ($objQueryBuilder->ExpandAsArrayNodes) {
-				$objToReturn = array();
-				while ($objDbRow = $objDbResult->GetNextRow()) {
-					$objItem = Location::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
-					if ($objItem) $objToReturn[] = $objItem;
-				}
-
-				if (count($objToReturn)) {
-					// Since we only want the object to return, lets return the object and not the array.
-					return $objToReturn[0];
-				} else {
-					return null;
-				}
-			} else {
-				// No expands just return the first row
-				$objDbRow = $objDbResult->GetNextRow();
-				if (is_null($objDbRow)) return null;
-				return Location::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
-			}
+			return Location::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Location objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Location[] the queried objects as an array
 		 */
@@ -473,35 +451,10 @@
 		}
 
 		/**
-		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
-		 * Uses BuildQueryStatment to perform most of the work.
-		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
-		 * @return QDatabaseResultBase the cursor resource instance
-		 */
-		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
-			// Get the query statement
-			try {
-				$strQuery = Location::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-
-			// Perform the query
-			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-		
-			// Return the results cursor
-			$objDbResult->QueryBuilder = $objQueryBuilder;
-			return $objDbResult;
-		}
-
-		/**
 		 * Static Qcodo Query method to query for a count of Location objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -618,7 +571,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Location::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param QDatabaseRowBase $objDbRow
+		 * @param DatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -874,7 +827,7 @@
 
 		/**
 		 * Instantiate an array of Locations from a Database Result
-		 * @param QDatabaseResultBase $objDbResult
+		 * @param DatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Location[]
@@ -907,32 +860,6 @@
 			return $objToReturn;
 		}
 
-		/**
-		 * Instantiate a single Location object from a query cursor (e.g. a DB ResultSet).
-		 * Cursor is automatically moved to the "next row" of the result set.
-		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
-		 * @param QDatabaseResultBase $objDbResult cursor resource
-		 * @return Location next row resulting from the query
-		 */
-		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
-			// If blank resultset, then return empty result
-			if (!$objDbResult) return null;
-
-			// If empty resultset, then return empty result
-			$objDbRow = $objDbResult->GetNextRow();
-			if (!$objDbRow) return null;
-
-			// We need the Column Aliases
-			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
-			if (!$strColumnAliasArray) $strColumnAliasArray = array();
-
-			// Pull Expansions (if applicable)
-			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
-
-			// Load up the return result with a row and return it
-			return Location::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
-		}
-
 
 
 
@@ -946,10 +873,9 @@
 		 * @param integer $intLocationId
 		 * @return Location
 		*/
-		public static function LoadByLocationId($intLocationId, $objOptionalClauses = null) {
+		public static function LoadByLocationId($intLocationId) {
 			return Location::QuerySingle(
 				QQ::Equal(QQN::Location()->LocationId, $intLocationId)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -959,10 +885,9 @@
 		 * @param string $strShortDescription
 		 * @return Location
 		*/
-		public static function LoadByShortDescription($strShortDescription, $objOptionalClauses = null) {
+		public static function LoadByShortDescription($strShortDescription) {
 			return Location::QuerySingle(
 				QQ::Equal(QQN::Location()->ShortDescription, $strShortDescription)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -978,8 +903,7 @@
 			try {
 				return Location::QueryArray(
 					QQ::Equal(QQN::Location()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -992,11 +916,10 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
+		public static function CountByCreatedBy($intCreatedBy) {
 			// Call Location::QueryCount to perform the CountByCreatedBy query
 			return Location::QueryCount(
 				QQ::Equal(QQN::Location()->CreatedBy, $intCreatedBy)
-			, $objOptionalClauses
 			);
 		}
 			
@@ -1012,8 +935,7 @@
 			try {
 				return Location::QueryArray(
 					QQ::Equal(QQN::Location()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses
-					);
+					$objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1026,11 +948,10 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
+		public static function CountByModifiedBy($intModifiedBy) {
 			// Call Location::QueryCount to perform the CountByModifiedBy query
 			return Location::QueryCount(
 				QQ::Equal(QQN::Location()->ModifiedBy, $intModifiedBy)
-			, $objOptionalClauses
 			);
 		}
 
@@ -1043,9 +964,9 @@
 
 
 
-		//////////////////////////////////////
-		// SAVE, DELETE, RELOAD and JOURNALING
-		//////////////////////////////////////
+		//////////////////////////
+		// SAVE, DELETE AND RELOAD
+		//////////////////////////
 
 		/**
 		 * Save this Location
@@ -1086,10 +1007,6 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intLocationId = $objDatabase->InsertId('location', 'location_id');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
-
 				} else {
 					// Perform an UPDATE query
 
@@ -1126,9 +1043,6 @@
 						WHERE
 							`location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 					');
-
-					// Journaling
-					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -1174,9 +1088,6 @@
 					`location`
 				WHERE
 					`location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -1229,70 +1140,6 @@
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
 		}
-
-		/**
-		 * Journals the current object into the Log database.
-		 * Used internally as a helper method.
-		 * @param string $strJournalCommand
-		 */
-		public function Journal($strJournalCommand) {
-			$objDatabase = Location::GetDatabase()->JournalingDatabase;
-
-			$objDatabase->NonQuery('
-				INSERT INTO `location` (
-					`location_id`,
-					`short_description`,
-					`long_description`,
-					`enabled_flag`,
-					`asset_flag`,
-					`inventory_flag`,
-					`created_by`,
-					`creation_date`,
-					`modified_by`,
-					__sys_login_id,
-					__sys_action,
-					__sys_date
-				) VALUES (
-					' . $objDatabase->SqlVariable($this->intLocationId) . ',
-					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
-					' . $objDatabase->SqlVariable($this->strLongDescription) . ',
-					' . $objDatabase->SqlVariable($this->blnEnabledFlag) . ',
-					' . $objDatabase->SqlVariable($this->blnAssetFlag) . ',
-					' . $objDatabase->SqlVariable($this->blnInventoryFlag) . ',
-					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
-					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
-					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
-					' . $objDatabase->SqlVariable($strJournalCommand) . ',
-					NOW()
-				);
-			');
-		}
-
-		/**
-		 * Gets the historical journal for an object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @param integer intLocationId
-		 * @return Location[]
-		 */
-		public static function GetJournalForId($intLocationId) {
-			$objDatabase = Location::GetDatabase()->JournalingDatabase;
-
-			$objResult = $objDatabase->Query('SELECT * FROM location WHERE location_id = ' .
-				$objDatabase->SqlVariable($intLocationId) . ' ORDER BY __sys_date');
-
-			return Location::InstantiateDbResult($objResult);
-		}
-
-		/**
-		 * Gets the historical journal for this object from the log database.
-		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
-		 * @return Location[]
-		 */
-		public function GetJournal() {
-			return Location::GetJournalForId($this->intLocationId);
-		}
-
 
 
 
@@ -1744,12 +1591,6 @@
 				WHERE
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAsset->LocationId = $this->intLocationId;
-				$objAsset->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1776,12 +1617,6 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAsset->LocationId = null;
-				$objAsset->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1794,14 +1629,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Asset::LoadArrayByLocationId($this->intLocationId) as $objAsset) {
-					$objAsset->LocationId = null;
-					$objAsset->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1836,11 +1663,6 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAsset->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -1853,13 +1675,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Asset::LoadArrayByLocationId($this->intLocationId) as $objAsset) {
-					$objAsset->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1926,12 +1741,6 @@
 				WHERE
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAssetTransaction->SourceLocationId = $this->intLocationId;
-				$objAssetTransaction->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1958,12 +1767,6 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`source_location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAssetTransaction->SourceLocationId = null;
-				$objAssetTransaction->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -1976,14 +1779,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (AssetTransaction::LoadArrayBySourceLocationId($this->intLocationId) as $objAssetTransaction) {
-					$objAssetTransaction->SourceLocationId = null;
-					$objAssetTransaction->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2018,11 +1813,6 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`source_location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAssetTransaction->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -2035,13 +1825,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (AssetTransaction::LoadArrayBySourceLocationId($this->intLocationId) as $objAssetTransaction) {
-					$objAssetTransaction->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2108,12 +1891,6 @@
 				WHERE
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAssetTransaction->DestinationLocationId = $this->intLocationId;
-				$objAssetTransaction->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2140,12 +1917,6 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`destination_location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAssetTransaction->DestinationLocationId = null;
-				$objAssetTransaction->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2158,14 +1929,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (AssetTransaction::LoadArrayByDestinationLocationId($this->intLocationId) as $objAssetTransaction) {
-					$objAssetTransaction->DestinationLocationId = null;
-					$objAssetTransaction->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2200,11 +1963,6 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`destination_location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAssetTransaction->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -2217,13 +1975,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (AssetTransaction::LoadArrayByDestinationLocationId($this->intLocationId) as $objAssetTransaction) {
-					$objAssetTransaction->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2290,12 +2041,6 @@
 				WHERE
 					`audit_scan_id` = ' . $objDatabase->SqlVariable($objAuditScan->AuditScanId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAuditScan->LocationId = $this->intLocationId;
-				$objAuditScan->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2322,12 +2067,6 @@
 					`audit_scan_id` = ' . $objDatabase->SqlVariable($objAuditScan->AuditScanId) . ' AND
 					`location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAuditScan->LocationId = null;
-				$objAuditScan->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2340,14 +2079,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (AuditScan::LoadArrayByLocationId($this->intLocationId) as $objAuditScan) {
-					$objAuditScan->LocationId = null;
-					$objAuditScan->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2382,11 +2113,6 @@
 					`audit_scan_id` = ' . $objDatabase->SqlVariable($objAuditScan->AuditScanId) . ' AND
 					`location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAuditScan->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -2399,13 +2125,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (AuditScan::LoadArrayByLocationId($this->intLocationId) as $objAuditScan) {
-					$objAuditScan->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2472,12 +2191,6 @@
 				WHERE
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryLocation->LocationId = $this->intLocationId;
-				$objInventoryLocation->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2504,12 +2217,6 @@
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
 					`location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryLocation->LocationId = null;
-				$objInventoryLocation->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2522,14 +2229,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryLocation::LoadArrayByLocationId($this->intLocationId) as $objInventoryLocation) {
-					$objInventoryLocation->LocationId = null;
-					$objInventoryLocation->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2564,11 +2263,6 @@
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
 					`location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryLocation->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -2581,13 +2275,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryLocation::LoadArrayByLocationId($this->intLocationId) as $objInventoryLocation) {
-					$objInventoryLocation->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2654,12 +2341,6 @@
 				WHERE
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->SourceLocationId = $this->intLocationId;
-				$objInventoryTransaction->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2686,12 +2367,6 @@
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`source_location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->SourceLocationId = null;
-				$objInventoryTransaction->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2704,14 +2379,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryTransaction::LoadArrayBySourceLocationId($this->intLocationId) as $objInventoryTransaction) {
-					$objInventoryTransaction->SourceLocationId = null;
-					$objInventoryTransaction->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2746,11 +2413,6 @@
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`source_location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -2763,13 +2425,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryTransaction::LoadArrayBySourceLocationId($this->intLocationId) as $objInventoryTransaction) {
-					$objInventoryTransaction->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2836,12 +2491,6 @@
 				WHERE
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . '
 			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->DestinationLocationId = $this->intLocationId;
-				$objInventoryTransaction->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2868,12 +2517,6 @@
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`destination_location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->DestinationLocationId = null;
-				$objInventoryTransaction->Journal('UPDATE');
-			}
 		}
 
 		/**
@@ -2886,14 +2529,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryTransaction::LoadArrayByDestinationLocationId($this->intLocationId) as $objInventoryTransaction) {
-					$objInventoryTransaction->DestinationLocationId = null;
-					$objInventoryTransaction->Journal('UPDATE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2928,11 +2563,6 @@
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`destination_location_id` = ' . $objDatabase->SqlVariable($this->intLocationId) . '
 			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->Journal('DELETE');
-			}
 		}
 
 		/**
@@ -2945,13 +2575,6 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Location::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryTransaction::LoadArrayByDestinationLocationId($this->intLocationId) as $objInventoryTransaction) {
-					$objInventoryTransaction->Journal('DELETE');
-				}
-			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -3182,27 +2805,6 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
-	/**
-	 * @property-read QQNode $LocationId
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $LongDescription
-	 * @property-read QQNode $EnabledFlag
-	 * @property-read QQNode $AssetFlag
-	 * @property-read QQNode $InventoryFlag
-	 * @property-read QQNode $CreatedBy
-	 * @property-read QQNodeUserAccount $CreatedByObject
-	 * @property-read QQNode $CreationDate
-	 * @property-read QQNode $ModifiedBy
-	 * @property-read QQNodeUserAccount $ModifiedByObject
-	 * @property-read QQNode $ModifiedDate
-	 * @property-read QQReverseReferenceNodeAsset $Asset
-	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsSource
-	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsDestination
-	 * @property-read QQReverseReferenceNodeAuditScan $AuditScan
-	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocation
-	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsSource
-	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsDestination
-	 */
 	class QQNodeLocation extends QQNode {
 		protected $strTableName = 'location';
 		protected $strPrimaryKey = 'location_id';
@@ -3260,29 +2862,7 @@
 			}
 		}
 	}
-	
-	/**
-	 * @property-read QQNode $LocationId
-	 * @property-read QQNode $ShortDescription
-	 * @property-read QQNode $LongDescription
-	 * @property-read QQNode $EnabledFlag
-	 * @property-read QQNode $AssetFlag
-	 * @property-read QQNode $InventoryFlag
-	 * @property-read QQNode $CreatedBy
-	 * @property-read QQNodeUserAccount $CreatedByObject
-	 * @property-read QQNode $CreationDate
-	 * @property-read QQNode $ModifiedBy
-	 * @property-read QQNodeUserAccount $ModifiedByObject
-	 * @property-read QQNode $ModifiedDate
-	 * @property-read QQReverseReferenceNodeAsset $Asset
-	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsSource
-	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsDestination
-	 * @property-read QQReverseReferenceNodeAuditScan $AuditScan
-	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocation
-	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsSource
-	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsDestination
-	 * @property-read QQNode $_PrimaryKeyNode
-	 */
+
 	class QQReverseReferenceNodeLocation extends QQReverseReferenceNode {
 		protected $strTableName = 'location';
 		protected $strPrimaryKey = 'location_id';

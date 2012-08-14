@@ -19,16 +19,14 @@
 	class ManufacturerCustomFieldHelperDataGridGen extends QDataGrid {
 		/**
 		 * Standard DataGrid constructor which also pre-configures the DataBinder
-		 * to its own BindAllRows method (which can obviousy be switched to something else).
-		 *
-		 * Also pre-configures UseAjax to true.
+		 * to its own SimpleDataBinder.  Also pre-configures UseAjax to true.
 		 *
 		 * @param mixed $objParentObject either a QPanel or QForm which would be this DataGrid's parent
 		 * @param string $strControlId optional explicitly-defined ControlId for this DataGrid
 		 */
 		public function __construct($objParentObject, $strControlId = null) {
 			parent::__construct($objParentObject, $strControlId);
-			$this->SetDataBinder('BindAllRows', $this);
+			$this->SetDataBinder('MetaDataBinder', $this);
 			$this->UseAjax = true;
 		}
 
@@ -196,9 +194,8 @@
 					throw new QCallerException('Unable to pass arguments with this intArgumentType: ' . $intArgumentType);
 			}
 
-			$strHtml = '<a href="' . $strLinkUrl . '">' . QApplication::Translate($strLinkHtml) . '</a>';
-			$colEditColumn = new QDataGridColumn(QApplication::Translate($strColumnTitle), $strHtml, 'HtmlEntities=False');
-
+			$strHtml = '<a href="' . $strLinkUrl . '">' . $strLinkHtml . '</a>';
+			$colEditColumn = new QDataGridColumn($strColumnTitle, $strHtml, 'HtmlEntities=False');
 			$this->AddColumn($colEditColumn);
 			return $colEditColumn;
 		}
@@ -212,8 +209,8 @@
 		 * @param string $strColumnTitle the HTML of the link text
 		 */
 		public function MetaAddEditProxyColumn(QControlProxy $pxyControl, $strLinkHtml = 'Edit', $strColumnTitle = 'Edit') {
-			$strHtml = '<a href="#" <?= $_FORM->GetControl("' . $pxyControl->ControlId . '")->RenderAsEvents($_ITEM->ManufacturerId, false); ?>>' . QApplication::Translate($strLinkHtml) . '</a>';
-			$colEditColumn = new QDataGridColumn(QApplication::Translate($strColumnTitle), $strHtml, 'HtmlEntities=False');
+			$strHtml = '<a href="#" <?= $_FORM->GetControl("' . $pxyControl->ControlId . '")->RenderAsEvents($_ITEM->ManufacturerId, false); ?>>' . $strLinkHtml . '</a>';
+			$colEditColumn = new QDataGridColumn($strColumnTitle, $strHtml, 'HtmlEntities=False');
 			$this->AddColumn($colEditColumn);
 			return $colEditColumn;
 		}
@@ -223,47 +220,30 @@
 		 * Default / simple DataBinder for this Meta DataGrid.  This can easily be overridden
 		 * by calling SetDataBinder() on this DataGrid with another DataBinder of your choice.
 		 *
-		 * @param QPaginatedControl $objPaginatedControl the QDataGrid object being bound, which will essentially be the same as $this
-		 * @return void
-		 */
-		public function BindAllRows(QPaginatedControl $objPaginatedControl) {
-			// Use MetaDataBinder to Bind QQ::All() to this datagrid
-			// Don't pass in any additional / optional clauses
-			$this->MetaDataBinder(QQ::All(), null);
-		}
-
-
-		/**
-		 * Main utility method to aid with data binding.  It is used by the default BindAllRows() databinder but
-		 * could and should be used by any custom databind methods that would be used for instances of this
-		 * MetaDataGrid, by simply passing in a custom QQCondition and/or QQClause. 
-		 *
 		 * If a paginator is set on this DataBinder, it will use it.  If not, then no pagination will be used.
 		 * It will also perform any sorting (if applicable).
-		 *
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query		 
-		 * @return void
 		 */
-		public function MetaDataBinder(QQCondition $objCondition = null, $objOptionalClauses = null) {
-			// Setup input parameters to default values if none passed in
-			if (!$objCondition) $objCondition = QQ::All();
-			$objClauses = ($objOptionalClauses) ? $objOptionalClauses : array();
+		public function MetaDataBinder() {
+			// Remember!  We need to first set the TotalItemCount, which will affect the calcuation of LimitClause below
+			if ($this->Paginator) {
+				$this->TotalItemCount = ManufacturerCustomFieldHelper::CountAll();
+			}
 
-			// We need to first set the TotalItemCount, which will affect the calcuation of LimitClause below
-			if ($this->Paginator) $this->TotalItemCount = ManufacturerCustomFieldHelper::QueryCount($objCondition, $objClauses);
+			// Setup the $objClauses Array
+			$objClauses = array();
 
 			// If a column is selected to be sorted, and if that column has a OrderByClause set on it, then let's add
 			// the OrderByClause to the $objClauses array
-			if ($objClause = $this->OrderByClause) array_push($objClauses, $objClause);
+			if ($objClause = $this->OrderByClause)
+				array_push($objClauses, $objClause);
 
 			// Add the LimitClause information, as well
-			if ($objClause = $this->LimitClause) array_push($objClauses, $objClause);
+			if ($objClause = $this->LimitClause)
+				array_push($objClauses, $objClause);
 
 			// Set the DataSource to be a Query result from ManufacturerCustomFieldHelper, given the clauses above
-			$this->DataSource = ManufacturerCustomFieldHelper::QueryArray($objCondition, $objClauses);
+			$this->DataSource = ManufacturerCustomFieldHelper::LoadAll($objClauses);
 		}
-
 
 
 		/**

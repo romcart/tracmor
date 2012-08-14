@@ -24,45 +24,16 @@
 
 	class ShipmentCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var ShipmentCustomFieldHelper objShipmentCustomFieldHelper
-		 * @access protected
-		 */
 		protected $objShipmentCustomFieldHelper;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of ShipmentCustomFieldHelper's individual data fields
-        /**
-         * @var QListBox lstShipment;
-         * @access protected
-         */
 		protected $lstShipment;
 
-
 		// Controls that allow the viewing of ShipmentCustomFieldHelper's individual data fields
-        /**
-         * @var QLabel lblShipmentId
-         * @access protected
-         */
 		protected $lblShipmentId;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -164,30 +135,21 @@
 		/**
 		 * Create and setup QListBox lstShipment
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstShipment_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstShipment_Create($strControlId = null) {
 			$this->lstShipment = new QListBox($this->objParentObject, $strControlId);
 			$this->lstShipment->Name = QApplication::Translate('Shipment');
 			$this->lstShipment->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstShipment->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objShipmentCursor = Shipment::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objShipment = Shipment::InstantiateCursor($objShipmentCursor)) {
+			$objShipmentArray = Shipment::LoadAll();
+			if ($objShipmentArray) foreach ($objShipmentArray as $objShipment) {
 				$objListItem = new QListItem($objShipment->__toString(), $objShipment->ShipmentId);
 				if (($this->objShipmentCustomFieldHelper->Shipment) && ($this->objShipmentCustomFieldHelper->Shipment->ShipmentId == $objShipment->ShipmentId))
 					$objListItem->Selected = true;
 				$this->lstShipment->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstShipment;
 		}
 

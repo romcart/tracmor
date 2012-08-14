@@ -701,55 +701,55 @@ ENGINE = INNODB;
 
 CREATE TABLE asset_custom_field_helper (
   asset_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( asset_id), 
+  	PRIMARY KEY ( asset_id),
   	INDEX asset_custom_field_helper_fkindex1 ( asset_id ))
 ENGINE = INNODB;
 
 CREATE TABLE inventory_model_custom_field_helper (
   inventory_model_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( inventory_model_id), 
+  	PRIMARY KEY ( inventory_model_id),
   	INDEX inventory_model_custom_field_helper_fkindex1 ( inventory_model_id ))
 ENGINE = INNODB;
 
 CREATE TABLE asset_model_custom_field_helper (
   asset_model_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( asset_model_id), 
+  	PRIMARY KEY ( asset_model_id),
   	INDEX asset_model_custom_field_helper_fkindex1 ( asset_model_id ))
 ENGINE = INNODB;
 
 CREATE TABLE manufacturer_custom_field_helper (
   manufacturer_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( manufacturer_id), 
+  	PRIMARY KEY ( manufacturer_id),
   	INDEX manufacturer_custom_field_helper_fkindex1 ( manufacturer_id ))
 ENGINE = INNODB;
 
 CREATE TABLE category_custom_field_helper (
   category_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( category_id), 
+  	PRIMARY KEY ( category_id),
   	INDEX category_custom_field_helper_fkindex1 ( category_id ))
 ENGINE = INNODB;
 
 CREATE TABLE company_custom_field_helper (
   company_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( company_id), 
+  	PRIMARY KEY ( company_id),
   	INDEX company_custom_field_helper_fkindex1 ( company_id ))
 ENGINE = INNODB;
 
 CREATE TABLE contact_custom_field_helper (
   contact_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( contact_id), 
+  	PRIMARY KEY ( contact_id),
   	INDEX contact_custom_field_helper_fkindex1 ( contact_id ))
 ENGINE = INNODB;
 
 CREATE TABLE shipment_custom_field_helper (
   shipment_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( shipment_id), 
+  	PRIMARY KEY ( shipment_id),
   	INDEX shipment_custom_field_helper_fkindex1 ( shipment_id ))
 ENGINE = INNODB;
 
 CREATE TABLE receipt_custom_field_helper (
   receipt_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( receipt_id), 
+  	PRIMARY KEY ( receipt_id),
   	INDEX receipt_custom_field_helper_fkindex1 ( receipt_id ))
 ENGINE = INNODB;
 
@@ -777,7 +777,7 @@ ALTER TABLE asset
   )
 ON Delete NO ACTION ON Update NO ACTION;
 
-ALTER TABLE asset 
+ALTER TABLE asset
 	ADD CONSTRAINT FOREIGN KEY ( `parent_asset_id` ) REFERENCES `asset` ( `asset_id` )
 ON Delete NO ACTION ON Update NO ACTION;
 
@@ -1262,8 +1262,8 @@ ALTER TABLE role_module_authorization
 ON Delete NO ACTION ON Update NO ACTION;
 
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		created_by
 	) references user_account (
 		user_account_id
@@ -1271,26 +1271,26 @@ alter table role_transaction_type_authorization
 	ON Delete NO ACTION ON Update NO ACTION;
 
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		modified_by
 	) references user_account (
 		user_account_id
 	)
 	ON Delete NO ACTION ON Update NO ACTION;
-	
+
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		authorization_level_id
 	) references authorization_level (
 		authorization_level_id
 	)
 	ON Delete NO ACTION ON Update NO ACTION;
-	
+
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		transaction_type_id
 	) references transaction_type (
 		transaction_type_id
@@ -1298,8 +1298,8 @@ alter table role_transaction_type_authorization
 	ON Delete NO ACTION ON Update NO ACTION;
 
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		role_id
 	) references role (
 		role_id
@@ -1331,8 +1331,8 @@ ALTER TABLE shortcut
 ON Delete NO ACTION ON Update NO ACTION;
 
 alter table shortcut
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		transaction_type_id
 	) references transaction_type (
 		transaction_type_id

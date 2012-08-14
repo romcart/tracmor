@@ -48,181 +48,42 @@
 
 	class InventoryModelMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var InventoryModel objInventoryModel
-		 * @access protected
-		 */
 		protected $objInventoryModel;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of InventoryModel's individual data fields
-        /**
-         * @var QLabel lblInventoryModelId;
-         * @access protected
-         */
 		protected $lblInventoryModelId;
-
-        /**
-         * @var QListBox lstCategory;
-         * @access protected
-         */
 		protected $lstCategory;
-
-        /**
-         * @var QListBox lstManufacturer;
-         * @access protected
-         */
 		protected $lstManufacturer;
-
-        /**
-         * @var QTextBox txtInventoryModelCode;
-         * @access protected
-         */
 		protected $txtInventoryModelCode;
-
-        /**
-         * @var QTextBox txtShortDescription;
-         * @access protected
-         */
 		protected $txtShortDescription;
-
-        /**
-         * @var QTextBox txtLongDescription;
-         * @access protected
-         */
 		protected $txtLongDescription;
-
-        /**
-         * @var QTextBox txtImagePath;
-         * @access protected
-         */
 		protected $txtImagePath;
-
-        /**
-         * @var QFloatTextBox txtPrice;
-         * @access protected
-         */
 		protected $txtPrice;
-
-        /**
-         * @var QListBox lstCreatedByObject;
-         * @access protected
-         */
 		protected $lstCreatedByObject;
-
-        /**
-         * @var QDateTimePicker calCreationDate;
-         * @access protected
-         */
 		protected $calCreationDate;
-
-        /**
-         * @var QListBox lstModifiedByObject;
-         * @access protected
-         */
 		protected $lstModifiedByObject;
-
-        /**
-         * @var QLabel lblModifiedDate;
-         * @access protected
-         */
 		protected $lblModifiedDate;
 
-
 		// Controls that allow the viewing of InventoryModel's individual data fields
-        /**
-         * @var QLabel lblCategoryId
-         * @access protected
-         */
 		protected $lblCategoryId;
-
-        /**
-         * @var QLabel lblManufacturerId
-         * @access protected
-         */
 		protected $lblManufacturerId;
-
-        /**
-         * @var QLabel lblInventoryModelCode
-         * @access protected
-         */
 		protected $lblInventoryModelCode;
-
-        /**
-         * @var QLabel lblShortDescription
-         * @access protected
-         */
 		protected $lblShortDescription;
-
-        /**
-         * @var QLabel lblLongDescription
-         * @access protected
-         */
 		protected $lblLongDescription;
-
-        /**
-         * @var QLabel lblImagePath
-         * @access protected
-         */
 		protected $lblImagePath;
-
-        /**
-         * @var QLabel lblPrice
-         * @access protected
-         */
 		protected $lblPrice;
-
-        /**
-         * @var QLabel lblCreatedBy
-         * @access protected
-         */
 		protected $lblCreatedBy;
-
-        /**
-         * @var QLabel lblCreationDate
-         * @access protected
-         */
 		protected $lblCreationDate;
-
-        /**
-         * @var QLabel lblModifiedBy
-         * @access protected
-         */
 		protected $lblModifiedBy;
 
-
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
-        /**
-         * @var QListBox lstInventoryModelCustomFieldHelper
-         * @access protected
-         */
 		protected $lstInventoryModelCustomFieldHelper;
 
-
 		// QLabel Controls (if applicable) to view Unique ReverseReferences and ManyToMany References
-        /**
-         * @var QLabel lblInventoryModelCustomFieldHelper
-         * @access protected
-         */
 		protected $lblInventoryModelCustomFieldHelper;
-
 
 
 		/**
@@ -335,28 +196,19 @@
 		/**
 		 * Create and setup QListBox lstCategory
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCategory_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCategory_Create($strControlId = null) {
 			$this->lstCategory = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCategory->Name = QApplication::Translate('Category');
 			$this->lstCategory->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCategoryCursor = Category::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCategory = Category::InstantiateCursor($objCategoryCursor)) {
+			$objCategoryArray = Category::LoadAll();
+			if ($objCategoryArray) foreach ($objCategoryArray as $objCategory) {
 				$objListItem = new QListItem($objCategory->__toString(), $objCategory->CategoryId);
 				if (($this->objInventoryModel->Category) && ($this->objInventoryModel->Category->CategoryId == $objCategory->CategoryId))
 					$objListItem->Selected = true;
 				$this->lstCategory->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCategory;
 		}
 
@@ -375,28 +227,19 @@
 		/**
 		 * Create and setup QListBox lstManufacturer
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstManufacturer_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstManufacturer_Create($strControlId = null) {
 			$this->lstManufacturer = new QListBox($this->objParentObject, $strControlId);
 			$this->lstManufacturer->Name = QApplication::Translate('Manufacturer');
 			$this->lstManufacturer->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objManufacturerCursor = Manufacturer::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objManufacturer = Manufacturer::InstantiateCursor($objManufacturerCursor)) {
+			$objManufacturerArray = Manufacturer::LoadAll();
+			if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
 				$objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
 				if (($this->objInventoryModel->Manufacturer) && ($this->objInventoryModel->Manufacturer->ManufacturerId == $objManufacturer->ManufacturerId))
 					$objListItem->Selected = true;
 				$this->lstManufacturer->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstManufacturer;
 		}
 
@@ -545,28 +388,19 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCreatedByObject_Create($strControlId = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
+			$objCreatedByObjectArray = UserAccount::LoadAll();
+			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objInventoryModel->CreatedByObject) && ($this->objInventoryModel->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 
@@ -614,28 +448,19 @@
 		/**
 		 * Create and setup QListBox lstModifiedByObject
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModifiedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstModifiedByObject_Create($strControlId = null) {
 			$this->lstModifiedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModifiedByObject->Name = QApplication::Translate('Modified By Object');
 			$this->lstModifiedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objModifiedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objModifiedByObject = UserAccount::InstantiateCursor($objModifiedByObjectCursor)) {
+			$objModifiedByObjectArray = UserAccount::LoadAll();
+			if ($objModifiedByObjectArray) foreach ($objModifiedByObjectArray as $objModifiedByObject) {
 				$objListItem = new QListItem($objModifiedByObject->__toString(), $objModifiedByObject->UserAccountId);
 				if (($this->objInventoryModel->ModifiedByObject) && ($this->objInventoryModel->ModifiedByObject->UserAccountId == $objModifiedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstModifiedByObject->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstModifiedByObject;
 		}
 
@@ -669,32 +494,22 @@
 		/**
 		 * Create and setup QListBox lstInventoryModelCustomFieldHelper
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstInventoryModelCustomFieldHelper_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstInventoryModelCustomFieldHelper_Create($strControlId = null) {
 			$this->lstInventoryModelCustomFieldHelper = new QListBox($this->objParentObject, $strControlId);
 			$this->lstInventoryModelCustomFieldHelper->Name = QApplication::Translate('Inventory Model Custom Field Helper');
 			$this->lstInventoryModelCustomFieldHelper->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objInventoryModelCustomFieldHelperCursor = InventoryModelCustomFieldHelper::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objInventoryModelCustomFieldHelper = InventoryModelCustomFieldHelper::InstantiateCursor($objInventoryModelCustomFieldHelperCursor)) {
+			$objInventoryModelCustomFieldHelperArray = InventoryModelCustomFieldHelper::LoadAll();
+			if ($objInventoryModelCustomFieldHelperArray) foreach ($objInventoryModelCustomFieldHelperArray as $objInventoryModelCustomFieldHelper) {
 				$objListItem = new QListItem($objInventoryModelCustomFieldHelper->__toString(), $objInventoryModelCustomFieldHelper->InventoryModelId);
 				if ($objInventoryModelCustomFieldHelper->InventoryModelId == $this->objInventoryModel->InventoryModelId)
 					$objListItem->Selected = true;
 				$this->lstInventoryModelCustomFieldHelper->AddItem($objListItem);
 			}
-
 			// Because InventoryModelCustomFieldHelper's InventoryModelCustomFieldHelper is not null, if a value is already selected, it cannot be changed.
 			if ($this->lstInventoryModelCustomFieldHelper->SelectedValue)
 				$this->lstInventoryModelCustomFieldHelper->Enabled = false;
-
-			// Return the QListBox
 			return $this->lstInventoryModelCustomFieldHelper;
 		}
 

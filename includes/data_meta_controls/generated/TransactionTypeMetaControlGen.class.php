@@ -30,75 +30,21 @@
 
 	class TransactionTypeMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var TransactionType objTransactionType
-		 * @access protected
-		 */
 		protected $objTransactionType;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of TransactionType's individual data fields
-        /**
-         * @var QLabel lblTransactionTypeId;
-         * @access protected
-         */
 		protected $lblTransactionTypeId;
-
-        /**
-         * @var QTextBox txtShortDescription;
-         * @access protected
-         */
 		protected $txtShortDescription;
-
-        /**
-         * @var QCheckBox chkAssetFlag;
-         * @access protected
-         */
 		protected $chkAssetFlag;
-
-        /**
-         * @var QCheckBox chkInventoryFlag;
-         * @access protected
-         */
 		protected $chkInventoryFlag;
 
-
 		// Controls that allow the viewing of TransactionType's individual data fields
-        /**
-         * @var QLabel lblShortDescription
-         * @access protected
-         */
 		protected $lblShortDescription;
-
-        /**
-         * @var QLabel lblAssetFlag
-         * @access protected
-         */
 		protected $lblAssetFlag;
-
-        /**
-         * @var QLabel lblInventoryFlag
-         * @access protected
-         */
 		protected $lblInventoryFlag;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 

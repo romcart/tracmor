@@ -1,4 +1,11 @@
 <?php 
+	// ClassPaths for the Version class
+		QApplicationBase::$ClassFile['version'] = __DATA_CLASSES__ . '/Version.class.php';
+		QApplicationBase::$ClassFile['qqnodeversion'] = __DATA_CLASSES__ . '/Version.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodeversion'] = __DATA_CLASSES__ . '/Version.class.php';
+		QApplicationBase::$ClassFile['versionmetacontrol'] = __DATA_META_CONTROLS__ . '/VersionMetaControl.class.php';
+		QApplicationBase::$ClassFile['versiondatagrid'] = __DATA_META_CONTROLS__ . '/VersionDataGrid.class.php';
+
 	// ClassPaths for the Address class
 		QApplicationBase::$ClassFile['address'] = __DATA_CLASSES__ . '/Address.class.php';
 		QApplicationBase::$ClassFile['qqnodeaddress'] = __DATA_CLASSES__ . '/Address.class.php';
@@ -187,6 +194,13 @@
 		QApplicationBase::$ClassFile['qqreversereferencenodedatagridcolumnpreference'] = __DATA_CLASSES__ . '/DatagridColumnPreference.class.php';
 		QApplicationBase::$ClassFile['datagridcolumnpreferencemetacontrol'] = __DATA_META_CONTROLS__ . '/DatagridColumnPreferenceMetaControl.class.php';
 		QApplicationBase::$ClassFile['datagridcolumnpreferencedatagrid'] = __DATA_META_CONTROLS__ . '/DatagridColumnPreferenceDataGrid.class.php';
+
+	// ClassPaths for the DepreciationClass class
+		QApplicationBase::$ClassFile['depreciationclass'] = __DATA_CLASSES__ . '/DepreciationClass.class.php';
+		QApplicationBase::$ClassFile['qqnodedepreciationclass'] = __DATA_CLASSES__ . '/DepreciationClass.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodedepreciationclass'] = __DATA_CLASSES__ . '/DepreciationClass.class.php';
+		QApplicationBase::$ClassFile['depreciationclassmetacontrol'] = __DATA_META_CONTROLS__ . '/DepreciationClassMetaControl.class.php';
+		QApplicationBase::$ClassFile['depreciationclassdatagrid'] = __DATA_META_CONTROLS__ . '/DepreciationClassDataGrid.class.php';
 
 	// ClassPaths for the EntityQtypeCustomField class
 		QApplicationBase::$ClassFile['entityqtypecustomfield'] = __DATA_CLASSES__ . '/EntityQtypeCustomField.class.php';

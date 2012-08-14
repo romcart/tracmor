@@ -26,51 +26,17 @@
 
 	class AuthorizationLevelMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var AuthorizationLevel objAuthorizationLevel
-		 * @access protected
-		 */
 		protected $objAuthorizationLevel;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of AuthorizationLevel's individual data fields
-        /**
-         * @var QLabel lblAuthorizationLevelId;
-         * @access protected
-         */
 		protected $lblAuthorizationLevelId;
-
-        /**
-         * @var QTextBox txtShortDescription;
-         * @access protected
-         */
 		protected $txtShortDescription;
 
-
 		// Controls that allow the viewing of AuthorizationLevel's individual data fields
-        /**
-         * @var QLabel lblShortDescription
-         * @access protected
-         */
 		protected $lblShortDescription;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 

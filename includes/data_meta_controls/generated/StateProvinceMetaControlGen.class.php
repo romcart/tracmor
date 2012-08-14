@@ -30,75 +30,21 @@
 
 	class StateProvinceMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var StateProvince objStateProvince
-		 * @access protected
-		 */
 		protected $objStateProvince;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of StateProvince's individual data fields
-        /**
-         * @var QLabel lblStateProvinceId;
-         * @access protected
-         */
 		protected $lblStateProvinceId;
-
-        /**
-         * @var QListBox lstCountry;
-         * @access protected
-         */
 		protected $lstCountry;
-
-        /**
-         * @var QTextBox txtShortDescription;
-         * @access protected
-         */
 		protected $txtShortDescription;
-
-        /**
-         * @var QTextBox txtAbbreviation;
-         * @access protected
-         */
 		protected $txtAbbreviation;
 
-
 		// Controls that allow the viewing of StateProvince's individual data fields
-        /**
-         * @var QLabel lblCountryId
-         * @access protected
-         */
 		protected $lblCountryId;
-
-        /**
-         * @var QLabel lblShortDescription
-         * @access protected
-         */
 		protected $lblShortDescription;
-
-        /**
-         * @var QLabel lblAbbreviation
-         * @access protected
-         */
 		protected $lblAbbreviation;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -215,28 +161,19 @@
 		/**
 		 * Create and setup QListBox lstCountry
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCountry_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstCountry_Create($strControlId = null) {
 			$this->lstCountry = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCountry->Name = QApplication::Translate('Country');
 			$this->lstCountry->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objCountryCursor = Country::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objCountry = Country::InstantiateCursor($objCountryCursor)) {
+			$objCountryArray = Country::LoadAll();
+			if ($objCountryArray) foreach ($objCountryArray as $objCountry) {
 				$objListItem = new QListItem($objCountry->__toString(), $objCountry->CountryId);
 				if (($this->objStateProvince->Country) && ($this->objStateProvince->Country->CountryId == $objCountry->CountryId))
 					$objListItem->Selected = true;
 				$this->lstCountry->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstCountry;
 		}
 

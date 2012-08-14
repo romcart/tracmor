@@ -24,45 +24,16 @@
 
 	class AddressCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var AddressCustomFieldHelper objAddressCustomFieldHelper
-		 * @access protected
-		 */
 		protected $objAddressCustomFieldHelper;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of AddressCustomFieldHelper's individual data fields
-        /**
-         * @var QListBox lstAddress;
-         * @access protected
-         */
 		protected $lstAddress;
 
-
 		// Controls that allow the viewing of AddressCustomFieldHelper's individual data fields
-        /**
-         * @var QLabel lblAddressId
-         * @access protected
-         */
 		protected $lblAddressId;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -164,30 +135,21 @@
 		/**
 		 * Create and setup QListBox lstAddress
 		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAddress_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+		public function lstAddress_Create($strControlId = null) {
 			$this->lstAddress = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAddress->Name = QApplication::Translate('Address');
 			$this->lstAddress->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstAddress->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objAddressCursor = Address::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objAddress = Address::InstantiateCursor($objAddressCursor)) {
+			$objAddressArray = Address::LoadAll();
+			if ($objAddressArray) foreach ($objAddressArray as $objAddress) {
 				$objListItem = new QListItem($objAddress->__toString(), $objAddress->AddressId);
 				if (($this->objAddressCustomFieldHelper->Address) && ($this->objAddressCustomFieldHelper->Address->AddressId == $objAddress->AddressId))
 					$objListItem->Selected = true;
 				$this->lstAddress->AddItem($objListItem);
 			}
-
-			// Return the QListBox
 			return $this->lstAddress;
 		}
 

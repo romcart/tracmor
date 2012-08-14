@@ -26,51 +26,17 @@
 
 	class AuthorizationMetaControlGen extends QBaseClass {
 		// General Variables
-		/**
-		 * @var Authorization objAuthorization
-		 * @access protected
-		 */
 		protected $objAuthorization;
-
-		/**
-		 * @var QForm|QControl objParentObject
-		 * @access protected
-		 */
 		protected $objParentObject;
-
-		/**
-		 * @var string  strTitleVerb
-		 * @access protected
-		 */
 		protected $strTitleVerb;
-
-		/**
-		 * @var boolean blnEditMode
-		 * @access protected
-		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Authorization's individual data fields
-        /**
-         * @var QLabel lblAuthorizationId;
-         * @access protected
-         */
 		protected $lblAuthorizationId;
-
-        /**
-         * @var QTextBox txtShortDescription;
-         * @access protected
-         */
 		protected $txtShortDescription;
 
-
 		// Controls that allow the viewing of Authorization's individual data fields
-        /**
-         * @var QLabel lblShortDescription
-         * @access protected
-         */
 		protected $lblShortDescription;
-
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
