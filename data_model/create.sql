@@ -1,4 +1,6 @@
-CREATE TABLE `_version` (`version` VARCHAR(50)) ENGINE = INNODB;
+CREATE TABLE `_version` (
+`version` VARCHAR(50),
+PRIMARY KEY ( `version`)) ENGINE = INNODB;
 
 CREATE TABLE category (
   category_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -59,11 +61,13 @@ CREATE TABLE asset_model (
   creation_date     DATETIME   NULL   DEFAULT NULL,
   modified_by       INTEGER UNSIGNED   NULL,
   modified_date     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
+  default_depreciation_class_id INTEGER UNSIGNED   NOT NULL,
     PRIMARY KEY ( asset_model_id ),
     INDEX asset_model_fkindex1 ( category_id ),
     INDEX asset_model_fkindex2 ( manufacturer_id ),
     INDEX asset_model_fkindex3 ( created_by ),
-    INDEX asset_model_fkindex4 ( modified_by ))
+    INDEX asset_model_fkindex4 ( modified_by ),
+    INDEX asset_model_fkindex5 ( default_depreciation_class_id ))
 ENGINE = INNODB;
 
 CREATE TABLE `asset` (
@@ -81,12 +85,17 @@ CREATE TABLE `asset` (
   `creation_date`    DATETIME   NULL   DEFAULT NULL,
   `modified_by`      INTEGER UNSIGNED   NULL,
   `modified_date`    TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
+  `depreciation_flag` BIT   NOT NULL   DEFAULT 0,
+  `depreciation_class_id` INTEGER UNSIGNED   NULL,
+  `purchase_date`    DATETIME  DEFAULT NULL,
+  `purchase_cost`    FLOAT DEFAULT NULL,
     PRIMARY KEY ( `asset_id` ),
     INDEX asset_fkindex1 ( `asset_model_id` ),
     INDEX asset_fkindex2 ( `location_id` ),
     INDEX asset_fkindex3 ( `created_by` ),
     INDEX asset_fkindex4 ( `modified_by` ),
     INDEX asset_fkindex5 ( `parent_asset_id` ),
+    INDEX asset_fkindex6 ( `depreciation_class_id` ),
     INDEX `parent_asset_id_linked` ( `parent_asset_id` , `linked_flag` ),
     UNIQUE (asset_code ))
 ENGINE = INNODB;
@@ -188,7 +197,7 @@ CREATE TABLE user_account (
   first_name           VARCHAR(50)   NOT NULL,
   last_name            VARCHAR(50)   NOT NULL,
   username             VARCHAR(30)   NOT NULL,
-  password_hash        VARCHAR(60)   NOT NULL,
+  password_hash        VARCHAR(40)   NOT NULL,
   email_address        VARCHAR(50)   NULL,
   active_flag          BIT   NOT NULL   COMMENT 'User account enabled/disabled',
   admin_flag           BIT   NOT NULL   COMMENT 'Designates user as normal or administrator',
@@ -230,7 +239,7 @@ CREATE TABLE custom_field (
   short_description             VARCHAR(255)   NOT NULL,
   active_flag                   BIT   NULL,
   required_flag                 BIT   NULL,
-  all_asset_models_flag         BIT   NULL,
+  all_asset_models_flag         BIT   NULL  DEFAULT 1,
   searchable_flag               BIT   NULL,
   created_by                    INTEGER UNSIGNED   NULL,
   creation_date                 DATETIME   NULL,
@@ -753,6 +762,32 @@ CREATE TABLE receipt_custom_field_helper (
   	INDEX receipt_custom_field_helper_fkindex1 ( receipt_id ))
 ENGINE = INNODB;
 
+CREATE TABLE  depreciation_class(
+   depreciation_class_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+   depreciation_method_qtype_id INTEGER UNSIGNED NOT NULL,
+   short_description VARCHAR(255)   NOT NULL,
+   life INTEGER UNSIGNED   NULL,
+   PRIMARY KEY (depreciation_class_id),
+   INDEX depreciation_class_fkindex1 ( depreciation_class_id ),
+   UNIQUE (depreciation_method_qtype_id),
+   UNIQUE (short_description),
+   INDEX depreciation_class_fkindex2 ( depreciation_method_qtype_id )
+)
+ENGINE = INNODB;
+
+CREATE TABLE depreciation_method_qtype(
+  depreciation_method_qtype_id  INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  short_description  VARCHAR(255)   NOT NULL,
+  PRIMARY KEY (depreciation_method_qtype_id),
+  INDEX depreciation_method_qtype_fkindex1 (depreciation_method_qtype_id))
+ENGINE = INNODB;
+
+ALTER TABLE depreciation_class
+  ADD CONSTRAINT FOREIGN KEY(depreciation_method_qtype_id) references depreciation_method_qtype (
+    depreciation_method_qtype_id
+  )
+ON Delete NO ACTION ON Update NO ACTION;
+
 ALTER TABLE asset_model
   ADD CONSTRAINT FOREIGN KEY( category_id) references category (
     category_id
@@ -762,6 +797,12 @@ ON Delete NO ACTION ON Update NO ACTION;
 ALTER TABLE asset_model
   ADD CONSTRAINT FOREIGN KEY( manufacturer_id) references manufacturer (
     manufacturer_id
+  )
+ON Delete NO ACTION ON Update NO ACTION;
+
+ALTER TABLE asset_model
+  ADD CONSTRAINT FOREIGN KEY(default_depreciation_class_id) references depreciation_class (
+    depreciation_class_id
   )
 ON Delete NO ACTION ON Update NO ACTION;
 
@@ -775,6 +816,10 @@ ALTER TABLE asset
   ADD CONSTRAINT FOREIGN KEY( location_id) references location (
     location_id
   )
+ON Delete NO ACTION ON Update NO ACTION;
+
+ALTER TABLE asset
+	ADD CONSTRAINT FOREIGN KEY ( depreciation_class_id ) REFERENCES depreciation_class ( depreciation_class_id )
 ON Delete NO ACTION ON Update NO ACTION;
 
 ALTER TABLE asset

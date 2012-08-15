@@ -182,7 +182,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -244,7 +244,7 @@
 		 * Static Qcodo Query method to query for a single DepreciationClass object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return DepreciationClass the queried object
 		 */
@@ -257,16 +257,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new DepreciationClass object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return DepreciationClass::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new DepreciationClass object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = DepreciationClass::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return DepreciationClass::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of DepreciationClass objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return DepreciationClass[] the queried objects as an array
 		 */
@@ -285,10 +307,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = DepreciationClass::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of DepreciationClass objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -399,7 +446,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this DepreciationClass::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -511,7 +558,7 @@
 
 		/**
 		 * Instantiate an array of DepreciationClasses from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return DepreciationClass[]
@@ -544,6 +591,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single DepreciationClass object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return DepreciationClass next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return DepreciationClass::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -557,9 +630,10 @@
 		 * @param integer $intDepreciationClassId
 		 * @return DepreciationClass
 		*/
-		public static function LoadByDepreciationClassId($intDepreciationClassId) {
+		public static function LoadByDepreciationClassId($intDepreciationClassId, $objOptionalClauses = null) {
 			return DepreciationClass::QuerySingle(
 				QQ::Equal(QQN::DepreciationClass()->DepreciationClassId, $intDepreciationClassId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -569,9 +643,10 @@
 		 * @param integer $intDepreciationMethodQtypeId
 		 * @return DepreciationClass
 		*/
-		public static function LoadByDepreciationMethodQtypeId($intDepreciationMethodQtypeId) {
+		public static function LoadByDepreciationMethodQtypeId($intDepreciationMethodQtypeId, $objOptionalClauses = null) {
 			return DepreciationClass::QuerySingle(
 				QQ::Equal(QQN::DepreciationClass()->DepreciationMethodQtypeId, $intDepreciationMethodQtypeId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -581,9 +656,10 @@
 		 * @param string $strShortDescription
 		 * @return DepreciationClass
 		*/
-		public static function LoadByShortDescription($strShortDescription) {
+		public static function LoadByShortDescription($strShortDescription, $objOptionalClauses = null) {
 			return DepreciationClass::QuerySingle(
 				QQ::Equal(QQN::DepreciationClass()->ShortDescription, $strShortDescription)
+			, $objOptionalClauses
 			);
 		}
 
@@ -596,9 +672,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this DepreciationClass
@@ -629,6 +705,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intDepreciationClassId = $objDatabase->InsertId('depreciation_class', 'depreciation_class_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -645,6 +725,9 @@
 						WHERE
 							`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -678,6 +761,9 @@
 					`depreciation_class`
 				WHERE
 					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -724,6 +810,60 @@
 			$this->strShortDescription = $objReloaded->strShortDescription;
 			$this->intLife = $objReloaded->intLife;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = DepreciationClass::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `depreciation_class` (
+					`depreciation_class_id`,
+					`depreciation_method_qtype_id`,
+					`short_description`,
+					`life`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intDepreciationClassId) . ',
+					' . $objDatabase->SqlVariable($this->intDepreciationMethodQtypeId) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . $objDatabase->SqlVariable($this->intLife) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intDepreciationClassId
+		 * @return DepreciationClass[]
+		 */
+		public static function GetJournalForId($intDepreciationClassId) {
+			$objDatabase = DepreciationClass::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM depreciation_class WHERE depreciation_class_id = ' .
+				$objDatabase->SqlVariable($intDepreciationClassId) . ' ORDER BY __sys_date');
+
+			return DepreciationClass::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return DepreciationClass[]
+		 */
+		public function GetJournal() {
+			return DepreciationClass::GetJournalForId($this->intDepreciationClassId);
+		}
+
 
 
 
@@ -944,6 +1084,12 @@
 				WHERE
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->DepreciationClassId = $this->intDepreciationClassId;
+				$objAsset->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -970,6 +1116,12 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->DepreciationClassId = null;
+				$objAsset->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -982,6 +1134,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Asset::LoadArrayByDepreciationClassId($this->intDepreciationClassId) as $objAsset) {
+					$objAsset->DepreciationClassId = null;
+					$objAsset->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1016,6 +1176,11 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1028,6 +1193,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Asset::LoadArrayByDepreciationClassId($this->intDepreciationClassId) as $objAsset) {
+					$objAsset->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1094,6 +1266,12 @@
 				WHERE
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->DefaultDepreciationClassId = $this->intDepreciationClassId;
+				$objAssetModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1120,6 +1298,12 @@
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
 					`default_depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->DefaultDepreciationClassId = null;
+				$objAssetModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1132,6 +1316,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByDefaultDepreciationClassId($this->intDepreciationClassId) as $objAssetModel) {
+					$objAssetModel->DefaultDepreciationClassId = null;
+					$objAssetModel->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1166,6 +1358,11 @@
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
 					`default_depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1178,6 +1375,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByDefaultDepreciationClassId($this->intDepreciationClassId) as $objAssetModel) {
+					$objAssetModel->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1352,6 +1556,14 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $DepreciationClassId
+	 * @property-read QQNode $DepreciationMethodQtypeId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $Life
+	 * @property-read QQReverseReferenceNodeAsset $Asset
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsDefault
+	 */
 	class QQNodeDepreciationClass extends QQNode {
 		protected $strTableName = 'depreciation_class';
 		protected $strPrimaryKey = 'depreciation_class_id';
@@ -1383,7 +1595,16 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $DepreciationClassId
+	 * @property-read QQNode $DepreciationMethodQtypeId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $Life
+	 * @property-read QQReverseReferenceNodeAsset $Asset
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsDefault
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeDepreciationClass extends QQReverseReferenceNode {
 		protected $strTableName = 'depreciation_class';
 		protected $strPrimaryKey = 'depreciation_class_id';
