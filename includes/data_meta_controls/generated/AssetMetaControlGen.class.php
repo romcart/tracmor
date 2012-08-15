@@ -60,54 +60,253 @@
 
 	class AssetMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var Asset objAsset
+		 * @access protected
+		 */
 		protected $objAsset;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Asset's individual data fields
+        /**
+         * @var QLabel lblAssetId;
+         * @access protected
+         */
 		protected $lblAssetId;
+
+        /**
+         * @var QListBox lstParentAsset;
+         * @access protected
+         */
 		protected $lstParentAsset;
+
+        /**
+         * @var QListBox lstAssetModel;
+         * @access protected
+         */
 		protected $lstAssetModel;
+
+        /**
+         * @var QListBox lstLocation;
+         * @access protected
+         */
 		protected $lstLocation;
+
+        /**
+         * @var QTextBox txtAssetCode;
+         * @access protected
+         */
 		protected $txtAssetCode;
+
+        /**
+         * @var QTextBox txtImagePath;
+         * @access protected
+         */
 		protected $txtImagePath;
+
+        /**
+         * @var QCheckBox chkCheckedOutFlag;
+         * @access protected
+         */
 		protected $chkCheckedOutFlag;
+
+        /**
+         * @var QCheckBox chkReservedFlag;
+         * @access protected
+         */
 		protected $chkReservedFlag;
+
+        /**
+         * @var QCheckBox chkLinkedFlag;
+         * @access protected
+         */
 		protected $chkLinkedFlag;
+
+        /**
+         * @var QCheckBox chkArchivedFlag;
+         * @access protected
+         */
 		protected $chkArchivedFlag;
+
+        /**
+         * @var QListBox lstCreatedByObject;
+         * @access protected
+         */
 		protected $lstCreatedByObject;
+
+        /**
+         * @var QDateTimePicker calCreationDate;
+         * @access protected
+         */
 		protected $calCreationDate;
+
+        /**
+         * @var QListBox lstModifiedByObject;
+         * @access protected
+         */
 		protected $lstModifiedByObject;
+
+        /**
+         * @var QLabel lblModifiedDate;
+         * @access protected
+         */
 		protected $lblModifiedDate;
+
+        /**
+         * @var QCheckBox chkDepreciationFlag;
+         * @access protected
+         */
 		protected $chkDepreciationFlag;
+
+        /**
+         * @var QListBox lstDepreciationClass;
+         * @access protected
+         */
 		protected $lstDepreciationClass;
+
+        /**
+         * @var QDateTimePicker calPurchaseDate;
+         * @access protected
+         */
 		protected $calPurchaseDate;
+
+        /**
+         * @var QFloatTextBox txtPurchaseCost;
+         * @access protected
+         */
 		protected $txtPurchaseCost;
 
+
 		// Controls that allow the viewing of Asset's individual data fields
+        /**
+         * @var QLabel lblParentAssetId
+         * @access protected
+         */
 		protected $lblParentAssetId;
+
+        /**
+         * @var QLabel lblAssetModelId
+         * @access protected
+         */
 		protected $lblAssetModelId;
+
+        /**
+         * @var QLabel lblLocationId
+         * @access protected
+         */
 		protected $lblLocationId;
+
+        /**
+         * @var QLabel lblAssetCode
+         * @access protected
+         */
 		protected $lblAssetCode;
+
+        /**
+         * @var QLabel lblImagePath
+         * @access protected
+         */
 		protected $lblImagePath;
+
+        /**
+         * @var QLabel lblCheckedOutFlag
+         * @access protected
+         */
 		protected $lblCheckedOutFlag;
+
+        /**
+         * @var QLabel lblReservedFlag
+         * @access protected
+         */
 		protected $lblReservedFlag;
+
+        /**
+         * @var QLabel lblLinkedFlag
+         * @access protected
+         */
 		protected $lblLinkedFlag;
+
+        /**
+         * @var QLabel lblArchivedFlag
+         * @access protected
+         */
 		protected $lblArchivedFlag;
+
+        /**
+         * @var QLabel lblCreatedBy
+         * @access protected
+         */
 		protected $lblCreatedBy;
+
+        /**
+         * @var QLabel lblCreationDate
+         * @access protected
+         */
 		protected $lblCreationDate;
+
+        /**
+         * @var QLabel lblModifiedBy
+         * @access protected
+         */
 		protected $lblModifiedBy;
+
+        /**
+         * @var QLabel lblDepreciationFlag
+         * @access protected
+         */
 		protected $lblDepreciationFlag;
+
+        /**
+         * @var QLabel lblDepreciationClassId
+         * @access protected
+         */
 		protected $lblDepreciationClassId;
+
+        /**
+         * @var QLabel lblPurchaseDate
+         * @access protected
+         */
 		protected $lblPurchaseDate;
+
+        /**
+         * @var QLabel lblPurchaseCost
+         * @access protected
+         */
 		protected $lblPurchaseCost;
 
+
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
+        /**
+         * @var QListBox lstAssetCustomFieldHelper
+         * @access protected
+         */
 		protected $lstAssetCustomFieldHelper;
 
+
 		// QLabel Controls (if applicable) to view Unique ReverseReferences and ManyToMany References
+        /**
+         * @var QLabel lblAssetCustomFieldHelper
+         * @access protected
+         */
 		protected $lblAssetCustomFieldHelper;
+
 
 
 		/**
@@ -220,19 +419,28 @@
 		/**
 		 * Create and setup QListBox lstParentAsset
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstParentAsset_Create($strControlId = null) {
+		public function lstParentAsset_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstParentAsset = new QListBox($this->objParentObject, $strControlId);
 			$this->lstParentAsset->Name = QApplication::Translate('Parent Asset');
 			$this->lstParentAsset->AddItem(QApplication::Translate('- Select One -'), null);
-			$objParentAssetArray = Asset::LoadAll();
-			if ($objParentAssetArray) foreach ($objParentAssetArray as $objParentAsset) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objParentAssetCursor = Asset::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objParentAsset = Asset::InstantiateCursor($objParentAssetCursor)) {
 				$objListItem = new QListItem($objParentAsset->__toString(), $objParentAsset->AssetId);
 				if (($this->objAsset->ParentAsset) && ($this->objAsset->ParentAsset->AssetId == $objParentAsset->AssetId))
 					$objListItem->Selected = true;
 				$this->lstParentAsset->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstParentAsset;
 		}
 
@@ -251,21 +459,30 @@
 		/**
 		 * Create and setup QListBox lstAssetModel
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAssetModel_Create($strControlId = null) {
+		public function lstAssetModel_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstAssetModel = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAssetModel->Name = QApplication::Translate('Asset Model');
 			$this->lstAssetModel->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstAssetModel->AddItem(QApplication::Translate('- Select One -'), null);
-			$objAssetModelArray = AssetModel::LoadAll();
-			if ($objAssetModelArray) foreach ($objAssetModelArray as $objAssetModel) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objAssetModelCursor = AssetModel::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objAssetModel = AssetModel::InstantiateCursor($objAssetModelCursor)) {
 				$objListItem = new QListItem($objAssetModel->__toString(), $objAssetModel->AssetModelId);
 				if (($this->objAsset->AssetModel) && ($this->objAsset->AssetModel->AssetModelId == $objAssetModel->AssetModelId))
 					$objListItem->Selected = true;
 				$this->lstAssetModel->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstAssetModel;
 		}
 
@@ -285,19 +502,28 @@
 		/**
 		 * Create and setup QListBox lstLocation
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstLocation_Create($strControlId = null) {
+		public function lstLocation_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstLocation = new QListBox($this->objParentObject, $strControlId);
 			$this->lstLocation->Name = QApplication::Translate('Location');
 			$this->lstLocation->AddItem(QApplication::Translate('- Select One -'), null);
-			$objLocationArray = Location::LoadAll();
-			if ($objLocationArray) foreach ($objLocationArray as $objLocation) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objLocationCursor = Location::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objLocation = Location::InstantiateCursor($objLocationCursor)) {
 				$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
 				if (($this->objAsset->Location) && ($this->objAsset->Location->LocationId == $objLocation->LocationId))
 					$objListItem->Selected = true;
 				$this->lstLocation->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstLocation;
 		}
 
@@ -464,19 +690,28 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null) {
+		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-			$objCreatedByObjectArray = UserAccount::LoadAll();
-			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objAsset->CreatedByObject) && ($this->objAsset->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 
@@ -524,19 +759,28 @@
 		/**
 		 * Create and setup QListBox lstModifiedByObject
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModifiedByObject_Create($strControlId = null) {
+		public function lstModifiedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstModifiedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModifiedByObject->Name = QApplication::Translate('Modified By Object');
 			$this->lstModifiedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-			$objModifiedByObjectArray = UserAccount::LoadAll();
-			if ($objModifiedByObjectArray) foreach ($objModifiedByObjectArray as $objModifiedByObject) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objModifiedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objModifiedByObject = UserAccount::InstantiateCursor($objModifiedByObjectCursor)) {
 				$objListItem = new QListItem($objModifiedByObject->__toString(), $objModifiedByObject->UserAccountId);
 				if (($this->objAsset->ModifiedByObject) && ($this->objAsset->ModifiedByObject->UserAccountId == $objModifiedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstModifiedByObject->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstModifiedByObject;
 		}
 
@@ -594,19 +838,28 @@
 		/**
 		 * Create and setup QListBox lstDepreciationClass
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstDepreciationClass_Create($strControlId = null) {
+		public function lstDepreciationClass_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstDepreciationClass = new QListBox($this->objParentObject, $strControlId);
 			$this->lstDepreciationClass->Name = QApplication::Translate('Depreciation Class');
 			$this->lstDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
-			$objDepreciationClassArray = DepreciationClass::LoadAll();
-			if ($objDepreciationClassArray) foreach ($objDepreciationClassArray as $objDepreciationClass) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objDepreciationClassCursor = DepreciationClass::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objDepreciationClass = DepreciationClass::InstantiateCursor($objDepreciationClassCursor)) {
 				$objListItem = new QListItem($objDepreciationClass->__toString(), $objDepreciationClass->DepreciationClassId);
 				if (($this->objAsset->DepreciationClass) && ($this->objAsset->DepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
 					$objListItem->Selected = true;
 				$this->lstDepreciationClass->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstDepreciationClass;
 		}
 
@@ -680,22 +933,32 @@
 		/**
 		 * Create and setup QListBox lstAssetCustomFieldHelper
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAssetCustomFieldHelper_Create($strControlId = null) {
+		public function lstAssetCustomFieldHelper_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstAssetCustomFieldHelper = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAssetCustomFieldHelper->Name = QApplication::Translate('Asset Custom Field Helper');
 			$this->lstAssetCustomFieldHelper->AddItem(QApplication::Translate('- Select One -'), null);
-			$objAssetCustomFieldHelperArray = AssetCustomFieldHelper::LoadAll();
-			if ($objAssetCustomFieldHelperArray) foreach ($objAssetCustomFieldHelperArray as $objAssetCustomFieldHelper) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objAssetCustomFieldHelperCursor = AssetCustomFieldHelper::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objAssetCustomFieldHelper = AssetCustomFieldHelper::InstantiateCursor($objAssetCustomFieldHelperCursor)) {
 				$objListItem = new QListItem($objAssetCustomFieldHelper->__toString(), $objAssetCustomFieldHelper->AssetId);
 				if ($objAssetCustomFieldHelper->AssetId == $this->objAsset->AssetId)
 					$objListItem->Selected = true;
 				$this->lstAssetCustomFieldHelper->AddItem($objListItem);
 			}
+
 			// Because AssetCustomFieldHelper's AssetCustomFieldHelper is not null, if a value is already selected, it cannot be changed.
 			if ($this->lstAssetCustomFieldHelper->SelectedValue)
 				$this->lstAssetCustomFieldHelper->Enabled = false;
+
+			// Return the QListBox
 			return $this->lstAssetCustomFieldHelper;
 		}
 

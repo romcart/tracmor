@@ -412,7 +412,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -474,7 +474,7 @@
 		 * Static Qcodo Query method to query for a single Asset object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Asset the queried object
 		 */
@@ -487,16 +487,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Asset object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Asset::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Asset object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Asset::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Asset::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Asset objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Asset[] the queried objects as an array
 		 */
@@ -515,10 +537,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Asset::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Asset objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -643,7 +690,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Asset::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -855,7 +902,7 @@
 
 		/**
 		 * Instantiate an array of Assets from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Asset[]
@@ -888,6 +935,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Asset object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Asset next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Asset::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -901,9 +974,10 @@
 		 * @param integer $intAssetId
 		 * @return Asset
 		*/
-		public static function LoadByAssetId($intAssetId) {
+		public static function LoadByAssetId($intAssetId, $objOptionalClauses = null) {
 			return Asset::QuerySingle(
 				QQ::Equal(QQN::Asset()->AssetId, $intAssetId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -913,9 +987,10 @@
 		 * @param string $strAssetCode
 		 * @return Asset
 		*/
-		public static function LoadByAssetCode($strAssetCode) {
+		public static function LoadByAssetCode($strAssetCode, $objOptionalClauses = null) {
 			return Asset::QuerySingle(
 				QQ::Equal(QQN::Asset()->AssetCode, $strAssetCode)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -931,7 +1006,8 @@
 			try {
 				return Asset::QueryArray(
 					QQ::Equal(QQN::Asset()->AssetModelId, $intAssetModelId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -944,10 +1020,11 @@
 		 * @param integer $intAssetModelId
 		 * @return int
 		*/
-		public static function CountByAssetModelId($intAssetModelId) {
+		public static function CountByAssetModelId($intAssetModelId, $objOptionalClauses = null) {
 			// Call Asset::QueryCount to perform the CountByAssetModelId query
 			return Asset::QueryCount(
 				QQ::Equal(QQN::Asset()->AssetModelId, $intAssetModelId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -963,7 +1040,8 @@
 			try {
 				return Asset::QueryArray(
 					QQ::Equal(QQN::Asset()->LocationId, $intLocationId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -976,10 +1054,11 @@
 		 * @param integer $intLocationId
 		 * @return int
 		*/
-		public static function CountByLocationId($intLocationId) {
+		public static function CountByLocationId($intLocationId, $objOptionalClauses = null) {
 			// Call Asset::QueryCount to perform the CountByLocationId query
 			return Asset::QueryCount(
 				QQ::Equal(QQN::Asset()->LocationId, $intLocationId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -995,7 +1074,8 @@
 			try {
 				return Asset::QueryArray(
 					QQ::Equal(QQN::Asset()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1008,10 +1088,11 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy) {
+		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
 			// Call Asset::QueryCount to perform the CountByCreatedBy query
 			return Asset::QueryCount(
 				QQ::Equal(QQN::Asset()->CreatedBy, $intCreatedBy)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1027,7 +1108,8 @@
 			try {
 				return Asset::QueryArray(
 					QQ::Equal(QQN::Asset()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1040,10 +1122,11 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy) {
+		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
 			// Call Asset::QueryCount to perform the CountByModifiedBy query
 			return Asset::QueryCount(
 				QQ::Equal(QQN::Asset()->ModifiedBy, $intModifiedBy)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1059,7 +1142,8 @@
 			try {
 				return Asset::QueryArray(
 					QQ::Equal(QQN::Asset()->ParentAssetId, $intParentAssetId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1072,10 +1156,11 @@
 		 * @param integer $intParentAssetId
 		 * @return int
 		*/
-		public static function CountByParentAssetId($intParentAssetId) {
+		public static function CountByParentAssetId($intParentAssetId, $objOptionalClauses = null) {
 			// Call Asset::QueryCount to perform the CountByParentAssetId query
 			return Asset::QueryCount(
 				QQ::Equal(QQN::Asset()->ParentAssetId, $intParentAssetId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1091,7 +1176,8 @@
 			try {
 				return Asset::QueryArray(
 					QQ::Equal(QQN::Asset()->DepreciationClassId, $intDepreciationClassId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1104,10 +1190,11 @@
 		 * @param integer $intDepreciationClassId
 		 * @return int
 		*/
-		public static function CountByDepreciationClassId($intDepreciationClassId) {
+		public static function CountByDepreciationClassId($intDepreciationClassId, $objOptionalClauses = null) {
 			// Call Asset::QueryCount to perform the CountByDepreciationClassId query
 			return Asset::QueryCount(
 				QQ::Equal(QQN::Asset()->DepreciationClassId, $intDepreciationClassId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1127,7 +1214,8 @@
 					QQ::Equal(QQN::Asset()->ParentAssetId, $intParentAssetId),
 					QQ::Equal(QQN::Asset()->LinkedFlag, $blnLinkedFlag)
 					),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1141,13 +1229,14 @@
 		 * @param boolean $blnLinkedFlag
 		 * @return int
 		*/
-		public static function CountByParentAssetIdLinkedFlag($intParentAssetId, $blnLinkedFlag) {
+		public static function CountByParentAssetIdLinkedFlag($intParentAssetId, $blnLinkedFlag, $objOptionalClauses = null) {
 			// Call Asset::QueryCount to perform the CountByParentAssetIdLinkedFlag query
 			return Asset::QueryCount(
 				QQ::AndCondition(
 				QQ::Equal(QQN::Asset()->ParentAssetId, $intParentAssetId),
 				QQ::Equal(QQN::Asset()->LinkedFlag, $blnLinkedFlag)
 				)
+			, $objOptionalClauses
 			);
 		}
 
@@ -1160,9 +1249,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this Asset
@@ -1219,6 +1308,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intAssetId = $objDatabase->InsertId('asset', 'asset_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -1263,6 +1356,9 @@
 						WHERE
 							`asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 		
@@ -1337,6 +1433,9 @@
 					`asset`
 				WHERE
 					`asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -1397,6 +1496,86 @@
 			$this->dttPurchaseDate = $objReloaded->dttPurchaseDate;
 			$this->fltPurchaseCost = $objReloaded->fltPurchaseCost;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = Asset::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `asset` (
+					`asset_id`,
+					`parent_asset_id`,
+					`asset_model_id`,
+					`location_id`,
+					`asset_code`,
+					`image_path`,
+					`checked_out_flag`,
+					`reserved_flag`,
+					`linked_flag`,
+					`archived_flag`,
+					`created_by`,
+					`creation_date`,
+					`modified_by`,
+					`depreciation_flag`,
+					`depreciation_class_id`,
+					`purchase_date`,
+					`purchase_cost`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intAssetId) . ',
+					' . $objDatabase->SqlVariable($this->intParentAssetId) . ',
+					' . $objDatabase->SqlVariable($this->intAssetModelId) . ',
+					' . $objDatabase->SqlVariable($this->intLocationId) . ',
+					' . $objDatabase->SqlVariable($this->strAssetCode) . ',
+					' . $objDatabase->SqlVariable($this->strImagePath) . ',
+					' . $objDatabase->SqlVariable($this->blnCheckedOutFlag) . ',
+					' . $objDatabase->SqlVariable($this->blnReservedFlag) . ',
+					' . $objDatabase->SqlVariable($this->blnLinkedFlag) . ',
+					' . $objDatabase->SqlVariable($this->blnArchivedFlag) . ',
+					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
+					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
+					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . $objDatabase->SqlVariable($this->blnDepreciationFlag) . ',
+					' . $objDatabase->SqlVariable($this->intDepreciationClassId) . ',
+					' . $objDatabase->SqlVariable($this->dttPurchaseDate) . ',
+					' . $objDatabase->SqlVariable($this->fltPurchaseCost) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intAssetId
+		 * @return Asset[]
+		 */
+		public static function GetJournalForId($intAssetId) {
+			$objDatabase = Asset::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM asset WHERE asset_id = ' .
+				$objDatabase->SqlVariable($intAssetId) . ' ORDER BY __sys_date');
+
+			return Asset::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return Asset[]
+		 */
+		public function GetJournal() {
+			return Asset::GetJournalForId($this->intAssetId);
+		}
+
 
 
 
@@ -2155,6 +2334,12 @@
 				WHERE
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->ParentAssetId = $this->intAssetId;
+				$objAsset->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2181,6 +2366,12 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`parent_asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->ParentAssetId = null;
+				$objAsset->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2193,6 +2384,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Asset::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Asset::LoadArrayByParentAssetId($this->intAssetId) as $objAsset) {
+					$objAsset->ParentAssetId = null;
+					$objAsset->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2227,6 +2426,11 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`parent_asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -2239,6 +2443,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Asset::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Asset::LoadArrayByParentAssetId($this->intAssetId) as $objAsset) {
+					$objAsset->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2305,6 +2516,12 @@
 				WHERE
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->AssetId = $this->intAssetId;
+				$objAssetTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2331,6 +2548,12 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->AssetId = null;
+				$objAssetTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2343,6 +2566,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Asset::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransaction::LoadArrayByAssetId($this->intAssetId) as $objAssetTransaction) {
+					$objAssetTransaction->AssetId = null;
+					$objAssetTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2377,6 +2608,11 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -2389,6 +2625,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Asset::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransaction::LoadArrayByAssetId($this->intAssetId) as $objAssetTransaction) {
+					$objAssetTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2455,6 +2698,12 @@
 				WHERE
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->NewAssetId = $this->intAssetId;
+				$objAssetTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2481,6 +2730,12 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`new_asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->NewAssetId = null;
+				$objAssetTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2493,6 +2748,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Asset::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransaction::LoadArrayByNewAssetId($this->intAssetId) as $objAssetTransaction) {
+					$objAssetTransaction->NewAssetId = null;
+					$objAssetTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2527,6 +2790,11 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`new_asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -2539,6 +2807,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Asset::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransaction::LoadArrayByNewAssetId($this->intAssetId) as $objAssetTransaction) {
+					$objAssetTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2863,6 +3138,36 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $AssetId
+	 * @property-read QQNode $ParentAssetId
+	 * @property-read QQNodeAsset $ParentAsset
+	 * @property-read QQNode $AssetModelId
+	 * @property-read QQNodeAssetModel $AssetModel
+	 * @property-read QQNode $LocationId
+	 * @property-read QQNodeLocation $Location
+	 * @property-read QQNode $AssetCode
+	 * @property-read QQNode $ImagePath
+	 * @property-read QQNode $CheckedOutFlag
+	 * @property-read QQNode $ReservedFlag
+	 * @property-read QQNode $LinkedFlag
+	 * @property-read QQNode $ArchivedFlag
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQNode $DepreciationFlag
+	 * @property-read QQNode $DepreciationClassId
+	 * @property-read QQNodeDepreciationClass $DepreciationClass
+	 * @property-read QQNode $PurchaseDate
+	 * @property-read QQNode $PurchaseCost
+	 * @property-read QQReverseReferenceNodeAsset $ChildAsset
+	 * @property-read QQReverseReferenceNodeAssetCustomFieldHelper $AssetCustomFieldHelper
+	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransaction
+	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsNew
+	 */
 	class QQNodeAsset extends QQNode {
 		protected $strTableName = 'asset';
 		protected $strPrimaryKey = 'asset_id';
@@ -2938,7 +3243,38 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $AssetId
+	 * @property-read QQNode $ParentAssetId
+	 * @property-read QQNodeAsset $ParentAsset
+	 * @property-read QQNode $AssetModelId
+	 * @property-read QQNodeAssetModel $AssetModel
+	 * @property-read QQNode $LocationId
+	 * @property-read QQNodeLocation $Location
+	 * @property-read QQNode $AssetCode
+	 * @property-read QQNode $ImagePath
+	 * @property-read QQNode $CheckedOutFlag
+	 * @property-read QQNode $ReservedFlag
+	 * @property-read QQNode $LinkedFlag
+	 * @property-read QQNode $ArchivedFlag
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQNode $DepreciationFlag
+	 * @property-read QQNode $DepreciationClassId
+	 * @property-read QQNodeDepreciationClass $DepreciationClass
+	 * @property-read QQNode $PurchaseDate
+	 * @property-read QQNode $PurchaseCost
+	 * @property-read QQReverseReferenceNodeAsset $ChildAsset
+	 * @property-read QQReverseReferenceNodeAssetCustomFieldHelper $AssetCustomFieldHelper
+	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransaction
+	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsNew
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeAsset extends QQReverseReferenceNode {
 		protected $strTableName = 'asset';
 		protected $strPrimaryKey = 'asset_id';
