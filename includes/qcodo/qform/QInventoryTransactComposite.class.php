@@ -513,15 +513,9 @@ class QInventoryTransactComposite extends QControl {
 
 						// Remove the inventory quantity from the source for moves and take outs
 						if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
-							$intResultingQuantity = $objInventoryLocation->GetVirtualAttribute('actual_quantity') - $objInventoryLocation->intTransactionQuantity;
 							//$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
-							if ($intResultingQuantity>0){
-								$objInventoryLocation->Quantity = $intResultingQuantity;
-								$objInventoryLocation->Save();
-							}
-							else{
-								$objInventoryLocation->Delete();
-							}
+							$objInventoryLocation->Quantity = $objInventoryLocation->GetVirtualAttribute('actual_quantity') - $objInventoryLocation->intTransactionQuantity;
+						    $objInventoryLocation->Save();
 						}
 
 						// Add the new quantity where it belongs for moves and restocks
