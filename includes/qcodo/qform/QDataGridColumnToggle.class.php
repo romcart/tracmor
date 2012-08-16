@@ -222,7 +222,7 @@
 	          if ($objColumn->HtmlEntities)
 	            $strHtml = QApplication::HtmlEntities($strHtml);
 	          
-	          $strHtml = str_replace('"', "&quot;", $strHtml);
+	          $strHtml = str_replace('"', '""', $strHtml);
 	          //$strHtml = $this->StripControls($strHtml);
 	          $strHtml = strip_tags($strHtml);
 	          $strHtml = trim($strHtml);
