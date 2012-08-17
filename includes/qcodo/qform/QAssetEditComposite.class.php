@@ -46,6 +46,7 @@ class QAssetEditComposite extends QControl {
 	protected $lblIconParentAssetCode;
 	public $lblShipmentReceipt;
 	public $lblLockedToParent;
+	public $lblAssetDepreciation;
 
 
 	// Inputs
@@ -56,6 +57,7 @@ class QAssetEditComposite extends QControl {
 	protected $lstLocation;
 	protected $lstCreatedByObject;
 	protected $lstModifiedByObject;
+	public  $chkAssetDepreciation;
 
 	// Buttons
 	protected $btnSave;
