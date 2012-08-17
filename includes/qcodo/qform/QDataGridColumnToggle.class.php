@@ -219,9 +219,9 @@
           		continue;
           	}
 	          
-	          if ($objColumn->HtmlEntities)
-	            $strHtml = QApplication::HtmlEntities($strHtml);
-	          
+	         // if ($objColumn->HtmlEntities)
+	         //   $strHtml = QApplication::HtmlEntities($strHtml);
+			  $strHtml = htmlspecialchars_decode($strHtml);
 	          $strHtml = str_replace('"', '""', $strHtml);
 	          //$strHtml = $this->StripControls($strHtml);
 	          $strHtml = strip_tags($strHtml);

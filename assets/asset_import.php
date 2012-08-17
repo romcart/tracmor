@@ -905,7 +905,7 @@
                         $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW())", $strAssetCode, $intLocationId, $intAssetModelId, ($intParentAssetId) ? $intParentAssetId : "NULL", ($blnLinked) ? "1" : "0", $_SESSION['intUserAccountId']);
                         $objNewAssetArray[] = $strAssetCode;
                         if (isset($strCFVArray) && count($strCFVArray)) {
-                          $strAssetCFVArray[] = implode(', ', $strCFVArray);
+                          $strAssetCFVArray[] = str_replace('""','"',implode(', ', $strCFVArray));
                          /*if ($j == 2) {
                           	echo "strAssetCFVArray: ";
                           	print_r($strAssetCFVArray);
@@ -980,7 +980,7 @@
                       $blnCheckCFVError = true;
                     }
                     if (!$blnCheckCFVError) {
-                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", implode(", ", $strUpdateFieldArray), $objAsset->AssetId);
+                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strUpdateFieldArray), $objAsset->AssetId));
                       if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objAsset->AssetId] = $strCFVArray;
                       }
@@ -1003,7 +1003,7 @@
                       }
 
                       if (isset($strCFVArray) && count($strCFVArray)) {
-                        $strCFVQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemId);
+                        $strCFVQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strCFVArray)), $intItemId);
                       }
                       else {
                         $strCFVQuery = false;
@@ -1031,7 +1031,7 @@
                   //var_dump($this->strAssetValuesArray);
                   //exit();
 
-                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $this->strAssetValuesArray)));
+                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
                   $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
                   	$strAssetIdArray = array();
@@ -1053,9 +1053,9 @@
                       $strCFVNameArray[] = sprintf("`cfv_%s`", $objCustomField->CustomFieldId);
                     }
                     if (count($strAssetCFVArray) > 0 && count($strCFVNameArray) > 0)  {
-                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", implode(", ", $strCFVNameArray), implode(", ", $strCFVArray));
+                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", str_replace('""','"',implode(", ", $strCFVNameArray)), str_replace('""','"',implode(", ", $strCFVArray)));
                     } else {
-                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES %s", implode(", ", $strAssetIdArray));
+                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES %s", str_replace('""','"',implode(", ", $strAssetIdArray)));
                     }
                     $objDatabase->NonQuery($strQuery);
                     $theAsset = Asset::Load($intInsertId);
@@ -1081,7 +1081,7 @@
                         $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                       }
                       if (isset($strCFVArray) && count($strCFVArray)) {
-                        $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
+                        $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strCFVArray)), $intItemKey);
                         $objDatabase->NonQuery($strQuery);
                         // insert nulls where not allowed
                         $theAsset = Asset::Load($intItemKey);
@@ -1510,7 +1510,7 @@
 	          {
 	            $arrForQuery[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
 	          }
-	          return sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $arrForQuery), $intCustomFieldId);
+	          return sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $arrForQuery)), $intCustomFieldId);
         	}
         }
         else{
