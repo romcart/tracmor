@@ -32,23 +32,87 @@
 
 	class DatagridColumnPreferenceMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var DatagridColumnPreference objDatagridColumnPreference
+		 * @access protected
+		 */
 		protected $objDatagridColumnPreference;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of DatagridColumnPreference's individual data fields
+        /**
+         * @var QLabel lblDatagridColumnPreferenceId;
+         * @access protected
+         */
 		protected $lblDatagridColumnPreferenceId;
+
+        /**
+         * @var QListBox lstDatagrid;
+         * @access protected
+         */
 		protected $lstDatagrid;
+
+        /**
+         * @var QTextBox txtColumnName;
+         * @access protected
+         */
 		protected $txtColumnName;
+
+        /**
+         * @var QListBox lstUserAccount;
+         * @access protected
+         */
 		protected $lstUserAccount;
+
+        /**
+         * @var QCheckBox chkDisplayFlag;
+         * @access protected
+         */
 		protected $chkDisplayFlag;
 
+
 		// Controls that allow the viewing of DatagridColumnPreference's individual data fields
+        /**
+         * @var QLabel lblDatagridId
+         * @access protected
+         */
 		protected $lblDatagridId;
+
+        /**
+         * @var QLabel lblColumnName
+         * @access protected
+         */
 		protected $lblColumnName;
+
+        /**
+         * @var QLabel lblUserAccountId
+         * @access protected
+         */
 		protected $lblUserAccountId;
+
+        /**
+         * @var QLabel lblDisplayFlag
+         * @access protected
+         */
 		protected $lblDisplayFlag;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -165,21 +229,30 @@
 		/**
 		 * Create and setup QListBox lstDatagrid
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstDatagrid_Create($strControlId = null) {
+		public function lstDatagrid_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstDatagrid = new QListBox($this->objParentObject, $strControlId);
 			$this->lstDatagrid->Name = QApplication::Translate('Datagrid');
 			$this->lstDatagrid->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstDatagrid->AddItem(QApplication::Translate('- Select One -'), null);
-			$objDatagridArray = Datagrid::LoadAll();
-			if ($objDatagridArray) foreach ($objDatagridArray as $objDatagrid) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objDatagridCursor = Datagrid::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objDatagrid = Datagrid::InstantiateCursor($objDatagridCursor)) {
 				$objListItem = new QListItem($objDatagrid->__toString(), $objDatagrid->DatagridId);
 				if (($this->objDatagridColumnPreference->Datagrid) && ($this->objDatagridColumnPreference->Datagrid->DatagridId == $objDatagrid->DatagridId))
 					$objListItem->Selected = true;
 				$this->lstDatagrid->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstDatagrid;
 		}
 
@@ -226,21 +299,30 @@
 		/**
 		 * Create and setup QListBox lstUserAccount
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstUserAccount_Create($strControlId = null) {
+		public function lstUserAccount_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstUserAccount = new QListBox($this->objParentObject, $strControlId);
 			$this->lstUserAccount->Name = QApplication::Translate('User Account');
 			$this->lstUserAccount->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstUserAccount->AddItem(QApplication::Translate('- Select One -'), null);
-			$objUserAccountArray = UserAccount::LoadAll();
-			if ($objUserAccountArray) foreach ($objUserAccountArray as $objUserAccount) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objUserAccountCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objUserAccount = UserAccount::InstantiateCursor($objUserAccountCursor)) {
 				$objListItem = new QListItem($objUserAccount->__toString(), $objUserAccount->UserAccountId);
 				if (($this->objDatagridColumnPreference->UserAccount) && ($this->objDatagridColumnPreference->UserAccount->UserAccountId == $objUserAccount->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstUserAccount->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstUserAccount;
 		}
 

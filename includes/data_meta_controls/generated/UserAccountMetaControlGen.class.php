@@ -52,42 +52,201 @@
 
 	class UserAccountMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var UserAccount objUserAccount
+		 * @access protected
+		 */
 		protected $objUserAccount;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of UserAccount's individual data fields
+        /**
+         * @var QLabel lblUserAccountId;
+         * @access protected
+         */
 		protected $lblUserAccountId;
+
+        /**
+         * @var QTextBox txtFirstName;
+         * @access protected
+         */
 		protected $txtFirstName;
+
+        /**
+         * @var QTextBox txtLastName;
+         * @access protected
+         */
 		protected $txtLastName;
+
+        /**
+         * @var QTextBox txtUsername;
+         * @access protected
+         */
 		protected $txtUsername;
+
+        /**
+         * @var QTextBox txtPasswordHash;
+         * @access protected
+         */
 		protected $txtPasswordHash;
+
+        /**
+         * @var QTextBox txtEmailAddress;
+         * @access protected
+         */
 		protected $txtEmailAddress;
+
+        /**
+         * @var QCheckBox chkActiveFlag;
+         * @access protected
+         */
 		protected $chkActiveFlag;
+
+        /**
+         * @var QCheckBox chkAdminFlag;
+         * @access protected
+         */
 		protected $chkAdminFlag;
+
+        /**
+         * @var QCheckBox chkPortableAccessFlag;
+         * @access protected
+         */
 		protected $chkPortableAccessFlag;
+
+        /**
+         * @var QIntegerTextBox txtPortableUserPin;
+         * @access protected
+         */
 		protected $txtPortableUserPin;
+
+        /**
+         * @var QListBox lstRole;
+         * @access protected
+         */
 		protected $lstRole;
+
+        /**
+         * @var QListBox lstCreatedByObject;
+         * @access protected
+         */
 		protected $lstCreatedByObject;
+
+        /**
+         * @var QDateTimePicker calCreationDate;
+         * @access protected
+         */
 		protected $calCreationDate;
+
+        /**
+         * @var QListBox lstModifiedByObject;
+         * @access protected
+         */
 		protected $lstModifiedByObject;
+
+        /**
+         * @var QLabel lblModifiedDate;
+         * @access protected
+         */
 		protected $lblModifiedDate;
 
+
 		// Controls that allow the viewing of UserAccount's individual data fields
+        /**
+         * @var QLabel lblFirstName
+         * @access protected
+         */
 		protected $lblFirstName;
+
+        /**
+         * @var QLabel lblLastName
+         * @access protected
+         */
 		protected $lblLastName;
+
+        /**
+         * @var QLabel lblUsername
+         * @access protected
+         */
 		protected $lblUsername;
+
+        /**
+         * @var QLabel lblPasswordHash
+         * @access protected
+         */
 		protected $lblPasswordHash;
+
+        /**
+         * @var QLabel lblEmailAddress
+         * @access protected
+         */
 		protected $lblEmailAddress;
+
+        /**
+         * @var QLabel lblActiveFlag
+         * @access protected
+         */
 		protected $lblActiveFlag;
+
+        /**
+         * @var QLabel lblAdminFlag
+         * @access protected
+         */
 		protected $lblAdminFlag;
+
+        /**
+         * @var QLabel lblPortableAccessFlag
+         * @access protected
+         */
 		protected $lblPortableAccessFlag;
+
+        /**
+         * @var QLabel lblPortableUserPin
+         * @access protected
+         */
 		protected $lblPortableUserPin;
+
+        /**
+         * @var QLabel lblRoleId
+         * @access protected
+         */
 		protected $lblRoleId;
+
+        /**
+         * @var QLabel lblCreatedBy
+         * @access protected
+         */
 		protected $lblCreatedBy;
+
+        /**
+         * @var QLabel lblCreationDate
+         * @access protected
+         */
 		protected $lblCreationDate;
+
+        /**
+         * @var QLabel lblModifiedBy
+         * @access protected
+         */
 		protected $lblModifiedBy;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -435,21 +594,30 @@
 		/**
 		 * Create and setup QListBox lstRole
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstRole_Create($strControlId = null) {
+		public function lstRole_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstRole = new QListBox($this->objParentObject, $strControlId);
 			$this->lstRole->Name = QApplication::Translate('Role');
 			$this->lstRole->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstRole->AddItem(QApplication::Translate('- Select One -'), null);
-			$objRoleArray = Role::LoadAll();
-			if ($objRoleArray) foreach ($objRoleArray as $objRole) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objRoleCursor = Role::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objRole = Role::InstantiateCursor($objRoleCursor)) {
 				$objListItem = new QListItem($objRole->__toString(), $objRole->RoleId);
 				if (($this->objUserAccount->Role) && ($this->objUserAccount->Role->RoleId == $objRole->RoleId))
 					$objListItem->Selected = true;
 				$this->lstRole->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstRole;
 		}
 
@@ -469,19 +637,28 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null) {
+		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-			$objCreatedByObjectArray = UserAccount::LoadAll();
-			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objUserAccount->CreatedByObject) && ($this->objUserAccount->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 
@@ -529,19 +706,28 @@
 		/**
 		 * Create and setup QListBox lstModifiedByObject
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModifiedByObject_Create($strControlId = null) {
+		public function lstModifiedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstModifiedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModifiedByObject->Name = QApplication::Translate('Modified By Object');
 			$this->lstModifiedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-			$objModifiedByObjectArray = UserAccount::LoadAll();
-			if ($objModifiedByObjectArray) foreach ($objModifiedByObjectArray as $objModifiedByObject) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objModifiedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objModifiedByObject = UserAccount::InstantiateCursor($objModifiedByObjectCursor)) {
 				$objListItem = new QListItem($objModifiedByObject->__toString(), $objModifiedByObject->UserAccountId);
 				if (($this->objUserAccount->ModifiedByObject) && ($this->objUserAccount->ModifiedByObject->UserAccountId == $objModifiedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstModifiedByObject->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstModifiedByObject;
 		}
 

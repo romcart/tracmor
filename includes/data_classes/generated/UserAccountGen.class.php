@@ -1326,7 +1326,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -1388,7 +1388,7 @@
 		 * Static Qcodo Query method to query for a single UserAccount object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return UserAccount the queried object
 		 */
@@ -1401,16 +1401,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new UserAccount object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return UserAccount::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new UserAccount object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = UserAccount::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return UserAccount::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of UserAccount objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return UserAccount[] the queried objects as an array
 		 */
@@ -1429,10 +1451,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = UserAccount::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of UserAccount objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -1554,7 +1601,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this UserAccount::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -3050,7 +3097,7 @@
 
 		/**
 		 * Instantiate an array of UserAccounts from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return UserAccount[]
@@ -3083,6 +3130,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single UserAccount object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return UserAccount next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return UserAccount::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -3096,9 +3169,10 @@
 		 * @param integer $intUserAccountId
 		 * @return UserAccount
 		*/
-		public static function LoadByUserAccountId($intUserAccountId) {
+		public static function LoadByUserAccountId($intUserAccountId, $objOptionalClauses = null) {
 			return UserAccount::QuerySingle(
 				QQ::Equal(QQN::UserAccount()->UserAccountId, $intUserAccountId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -3108,9 +3182,10 @@
 		 * @param string $strUsername
 		 * @return UserAccount
 		*/
-		public static function LoadByUsername($strUsername) {
+		public static function LoadByUsername($strUsername, $objOptionalClauses = null) {
 			return UserAccount::QuerySingle(
 				QQ::Equal(QQN::UserAccount()->Username, $strUsername)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -3126,7 +3201,8 @@
 			try {
 				return UserAccount::QueryArray(
 					QQ::Equal(QQN::UserAccount()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -3139,10 +3215,11 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy) {
+		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
 			// Call UserAccount::QueryCount to perform the CountByCreatedBy query
 			return UserAccount::QueryCount(
 				QQ::Equal(QQN::UserAccount()->CreatedBy, $intCreatedBy)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -3158,7 +3235,8 @@
 			try {
 				return UserAccount::QueryArray(
 					QQ::Equal(QQN::UserAccount()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -3171,10 +3249,11 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy) {
+		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
 			// Call UserAccount::QueryCount to perform the CountByModifiedBy query
 			return UserAccount::QueryCount(
 				QQ::Equal(QQN::UserAccount()->ModifiedBy, $intModifiedBy)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -3190,7 +3269,8 @@
 			try {
 				return UserAccount::QueryArray(
 					QQ::Equal(QQN::UserAccount()->RoleId, $intRoleId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -3203,10 +3283,11 @@
 		 * @param integer $intRoleId
 		 * @return int
 		*/
-		public static function CountByRoleId($intRoleId) {
+		public static function CountByRoleId($intRoleId, $objOptionalClauses = null) {
 			// Call UserAccount::QueryCount to perform the CountByRoleId query
 			return UserAccount::QueryCount(
 				QQ::Equal(QQN::UserAccount()->RoleId, $intRoleId)
+			, $objOptionalClauses
 			);
 		}
 
@@ -3219,9 +3300,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this UserAccount
@@ -3272,6 +3353,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intUserAccountId = $objDatabase->InsertId('user_account', 'user_account_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -3313,6 +3398,9 @@
 						WHERE
 							`user_account_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -3358,6 +3446,9 @@
 					`user_account`
 				WHERE
 					`user_account_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -3415,6 +3506,80 @@
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = UserAccount::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `user_account` (
+					`user_account_id`,
+					`first_name`,
+					`last_name`,
+					`username`,
+					`password_hash`,
+					`email_address`,
+					`active_flag`,
+					`admin_flag`,
+					`portable_access_flag`,
+					`portable_user_pin`,
+					`role_id`,
+					`created_by`,
+					`creation_date`,
+					`modified_by`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intUserAccountId) . ',
+					' . $objDatabase->SqlVariable($this->strFirstName) . ',
+					' . $objDatabase->SqlVariable($this->strLastName) . ',
+					' . $objDatabase->SqlVariable($this->strUsername) . ',
+					' . $objDatabase->SqlVariable($this->strPasswordHash) . ',
+					' . $objDatabase->SqlVariable($this->strEmailAddress) . ',
+					' . $objDatabase->SqlVariable($this->blnActiveFlag) . ',
+					' . $objDatabase->SqlVariable($this->blnAdminFlag) . ',
+					' . $objDatabase->SqlVariable($this->blnPortableAccessFlag) . ',
+					' . $objDatabase->SqlVariable($this->intPortableUserPin) . ',
+					' . $objDatabase->SqlVariable($this->intRoleId) . ',
+					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
+					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
+					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intUserAccountId
+		 * @return UserAccount[]
+		 */
+		public static function GetJournalForId($intUserAccountId) {
+			$objDatabase = UserAccount::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM user_account WHERE user_account_id = ' .
+				$objDatabase->SqlVariable($intUserAccountId) . ' ORDER BY __sys_date');
+
+			return UserAccount::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return UserAccount[]
+		 */
+		public function GetJournal() {
+			return UserAccount::GetJournalForId($this->intUserAccountId);
+		}
+
 
 
 
@@ -4601,6 +4766,12 @@
 				WHERE
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAddress->CreatedBy = $this->intUserAccountId;
+				$objAddress->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -4627,6 +4798,12 @@
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAddress->CreatedBy = null;
+				$objAddress->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -4639,6 +4816,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Address::LoadArrayByCreatedBy($this->intUserAccountId) as $objAddress) {
+					$objAddress->CreatedBy = null;
+					$objAddress->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -4673,6 +4858,11 @@
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAddress->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -4685,6 +4875,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Address::LoadArrayByCreatedBy($this->intUserAccountId) as $objAddress) {
+					$objAddress->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -4751,6 +4948,12 @@
 				WHERE
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAddress->ModifiedBy = $this->intUserAccountId;
+				$objAddress->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -4777,6 +4980,12 @@
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAddress->ModifiedBy = null;
+				$objAddress->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -4789,6 +4998,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Address::LoadArrayByModifiedBy($this->intUserAccountId) as $objAddress) {
+					$objAddress->ModifiedBy = null;
+					$objAddress->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -4823,6 +5040,11 @@
 					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAddress->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -4835,6 +5057,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Address::LoadArrayByModifiedBy($this->intUserAccountId) as $objAddress) {
+					$objAddress->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -4901,6 +5130,12 @@
 				WHERE
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->ModifiedBy = $this->intUserAccountId;
+				$objAsset->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -4927,6 +5162,12 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->ModifiedBy = null;
+				$objAsset->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -4939,6 +5180,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Asset::LoadArrayByModifiedBy($this->intUserAccountId) as $objAsset) {
+					$objAsset->ModifiedBy = null;
+					$objAsset->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -4973,6 +5222,11 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -4985,6 +5239,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Asset::LoadArrayByModifiedBy($this->intUserAccountId) as $objAsset) {
+					$objAsset->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5051,6 +5312,12 @@
 				WHERE
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->CreatedBy = $this->intUserAccountId;
+				$objAsset->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5077,6 +5344,12 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->CreatedBy = null;
+				$objAsset->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5089,6 +5362,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Asset::LoadArrayByCreatedBy($this->intUserAccountId) as $objAsset) {
+					$objAsset->CreatedBy = null;
+					$objAsset->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5123,6 +5404,11 @@
 					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAsset->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -5135,6 +5421,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Asset::LoadArrayByCreatedBy($this->intUserAccountId) as $objAsset) {
+					$objAsset->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5201,6 +5494,12 @@
 				WHERE
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->ModifiedBy = $this->intUserAccountId;
+				$objAssetModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5227,6 +5526,12 @@
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->ModifiedBy = null;
+				$objAssetModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5239,6 +5544,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetModel) {
+					$objAssetModel->ModifiedBy = null;
+					$objAssetModel->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5273,6 +5586,11 @@
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -5285,6 +5603,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetModel) {
+					$objAssetModel->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5351,6 +5676,12 @@
 				WHERE
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->CreatedBy = $this->intUserAccountId;
+				$objAssetModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5377,6 +5708,12 @@
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->CreatedBy = null;
+				$objAssetModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5389,6 +5726,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByCreatedBy($this->intUserAccountId) as $objAssetModel) {
+					$objAssetModel->CreatedBy = null;
+					$objAssetModel->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5423,6 +5768,11 @@
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -5435,6 +5785,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByCreatedBy($this->intUserAccountId) as $objAssetModel) {
+					$objAssetModel->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5501,6 +5858,12 @@
 				WHERE
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->CreatedBy = $this->intUserAccountId;
+				$objAssetTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5527,6 +5890,12 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->CreatedBy = null;
+				$objAssetTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5539,6 +5908,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransaction::LoadArrayByCreatedBy($this->intUserAccountId) as $objAssetTransaction) {
+					$objAssetTransaction->CreatedBy = null;
+					$objAssetTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5573,6 +5950,11 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -5585,6 +5967,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransaction::LoadArrayByCreatedBy($this->intUserAccountId) as $objAssetTransaction) {
+					$objAssetTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5651,6 +6040,12 @@
 				WHERE
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->ModifiedBy = $this->intUserAccountId;
+				$objAssetTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5677,6 +6072,12 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->ModifiedBy = null;
+				$objAssetTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5689,6 +6090,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetTransaction) {
+					$objAssetTransaction->ModifiedBy = null;
+					$objAssetTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5723,6 +6132,11 @@
 					`asset_transaction_id` = ' . $objDatabase->SqlVariable($objAssetTransaction->AssetTransactionId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -5735,6 +6149,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetTransaction) {
+					$objAssetTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5801,6 +6222,12 @@
 				WHERE
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->ToUserId = $this->intUserAccountId;
+				$objAssetTransactionCheckout->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5827,6 +6254,12 @@
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . ' AND
 					`to_user_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->ToUserId = null;
+				$objAssetTransactionCheckout->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5839,6 +6272,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransactionCheckout::LoadArrayByToUserId($this->intUserAccountId) as $objAssetTransactionCheckout) {
+					$objAssetTransactionCheckout->ToUserId = null;
+					$objAssetTransactionCheckout->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5873,6 +6314,11 @@
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . ' AND
 					`to_user_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -5885,6 +6331,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransactionCheckout::LoadArrayByToUserId($this->intUserAccountId) as $objAssetTransactionCheckout) {
+					$objAssetTransactionCheckout->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -5951,6 +6404,12 @@
 				WHERE
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->CreatedBy = $this->intUserAccountId;
+				$objAssetTransactionCheckout->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5977,6 +6436,12 @@
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->CreatedBy = null;
+				$objAssetTransactionCheckout->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -5989,6 +6454,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransactionCheckout::LoadArrayByCreatedBy($this->intUserAccountId) as $objAssetTransactionCheckout) {
+					$objAssetTransactionCheckout->CreatedBy = null;
+					$objAssetTransactionCheckout->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6023,6 +6496,11 @@
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -6035,6 +6513,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransactionCheckout::LoadArrayByCreatedBy($this->intUserAccountId) as $objAssetTransactionCheckout) {
+					$objAssetTransactionCheckout->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6101,6 +6586,12 @@
 				WHERE
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->ModifiedBy = $this->intUserAccountId;
+				$objAssetTransactionCheckout->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6127,6 +6618,12 @@
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->ModifiedBy = null;
+				$objAssetTransactionCheckout->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6139,6 +6636,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransactionCheckout::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetTransactionCheckout) {
+					$objAssetTransactionCheckout->ModifiedBy = null;
+					$objAssetTransactionCheckout->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6173,6 +6678,11 @@
 					`asset_transaction_checkout_id` = ' . $objDatabase->SqlVariable($objAssetTransactionCheckout->AssetTransactionCheckoutId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetTransactionCheckout->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -6185,6 +6695,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetTransactionCheckout::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetTransactionCheckout) {
+					$objAssetTransactionCheckout->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6251,6 +6768,12 @@
 				WHERE
 					`attachment_id` = ' . $objDatabase->SqlVariable($objAttachment->AttachmentId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAttachment->CreatedBy = $this->intUserAccountId;
+				$objAttachment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6277,6 +6800,12 @@
 					`attachment_id` = ' . $objDatabase->SqlVariable($objAttachment->AttachmentId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAttachment->CreatedBy = null;
+				$objAttachment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6289,6 +6818,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Attachment::LoadArrayByCreatedBy($this->intUserAccountId) as $objAttachment) {
+					$objAttachment->CreatedBy = null;
+					$objAttachment->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6323,6 +6860,11 @@
 					`attachment_id` = ' . $objDatabase->SqlVariable($objAttachment->AttachmentId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAttachment->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -6335,6 +6877,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Attachment::LoadArrayByCreatedBy($this->intUserAccountId) as $objAttachment) {
+					$objAttachment->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6401,6 +6950,12 @@
 				WHERE
 					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAudit->ModifiedBy = $this->intUserAccountId;
+				$objAudit->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6427,6 +6982,12 @@
 					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAudit->ModifiedBy = null;
+				$objAudit->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6439,6 +7000,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Audit::LoadArrayByModifiedBy($this->intUserAccountId) as $objAudit) {
+					$objAudit->ModifiedBy = null;
+					$objAudit->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6473,6 +7042,11 @@
 					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAudit->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -6485,6 +7059,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Audit::LoadArrayByModifiedBy($this->intUserAccountId) as $objAudit) {
+					$objAudit->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6551,6 +7132,12 @@
 				WHERE
 					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAudit->CreatedBy = $this->intUserAccountId;
+				$objAudit->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6577,6 +7164,12 @@
 					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAudit->CreatedBy = null;
+				$objAudit->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6589,6 +7182,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Audit::LoadArrayByCreatedBy($this->intUserAccountId) as $objAudit) {
+					$objAudit->CreatedBy = null;
+					$objAudit->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6623,6 +7224,11 @@
 					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAudit->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -6635,6 +7241,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Audit::LoadArrayByCreatedBy($this->intUserAccountId) as $objAudit) {
+					$objAudit->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6701,6 +7314,12 @@
 				WHERE
 					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCategory->ModifiedBy = $this->intUserAccountId;
+				$objCategory->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6727,6 +7346,12 @@
 					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCategory->ModifiedBy = null;
+				$objCategory->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6739,6 +7364,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Category::LoadArrayByModifiedBy($this->intUserAccountId) as $objCategory) {
+					$objCategory->ModifiedBy = null;
+					$objCategory->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6773,6 +7406,11 @@
 					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCategory->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -6785,6 +7423,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Category::LoadArrayByModifiedBy($this->intUserAccountId) as $objCategory) {
+					$objCategory->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6851,6 +7496,12 @@
 				WHERE
 					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCategory->CreatedBy = $this->intUserAccountId;
+				$objCategory->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6877,6 +7528,12 @@
 					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCategory->CreatedBy = null;
+				$objCategory->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -6889,6 +7546,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Category::LoadArrayByCreatedBy($this->intUserAccountId) as $objCategory) {
+					$objCategory->CreatedBy = null;
+					$objCategory->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -6923,6 +7588,11 @@
 					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCategory->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -6935,6 +7605,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Category::LoadArrayByCreatedBy($this->intUserAccountId) as $objCategory) {
+					$objCategory->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7001,6 +7678,12 @@
 				WHERE
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->ModifiedBy = $this->intUserAccountId;
+				$objCompany->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7027,6 +7710,12 @@
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->ModifiedBy = null;
+				$objCompany->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7039,6 +7728,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Company::LoadArrayByModifiedBy($this->intUserAccountId) as $objCompany) {
+					$objCompany->ModifiedBy = null;
+					$objCompany->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7073,6 +7770,11 @@
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -7085,6 +7787,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Company::LoadArrayByModifiedBy($this->intUserAccountId) as $objCompany) {
+					$objCompany->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7151,6 +7860,12 @@
 				WHERE
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->CreatedBy = $this->intUserAccountId;
+				$objCompany->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7177,6 +7892,12 @@
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->CreatedBy = null;
+				$objCompany->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7189,6 +7910,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Company::LoadArrayByCreatedBy($this->intUserAccountId) as $objCompany) {
+					$objCompany->CreatedBy = null;
+					$objCompany->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7223,6 +7952,11 @@
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -7235,6 +7969,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Company::LoadArrayByCreatedBy($this->intUserAccountId) as $objCompany) {
+					$objCompany->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7301,6 +8042,12 @@
 				WHERE
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->ModifiedBy = $this->intUserAccountId;
+				$objContact->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7327,6 +8074,12 @@
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->ModifiedBy = null;
+				$objContact->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7339,6 +8092,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Contact::LoadArrayByModifiedBy($this->intUserAccountId) as $objContact) {
+					$objContact->ModifiedBy = null;
+					$objContact->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7373,6 +8134,11 @@
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -7385,6 +8151,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Contact::LoadArrayByModifiedBy($this->intUserAccountId) as $objContact) {
+					$objContact->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7451,6 +8224,12 @@
 				WHERE
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->CreatedBy = $this->intUserAccountId;
+				$objContact->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7477,6 +8256,12 @@
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->CreatedBy = null;
+				$objContact->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7489,6 +8274,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Contact::LoadArrayByCreatedBy($this->intUserAccountId) as $objContact) {
+					$objContact->CreatedBy = null;
+					$objContact->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7523,6 +8316,11 @@
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -7535,6 +8333,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Contact::LoadArrayByCreatedBy($this->intUserAccountId) as $objContact) {
+					$objContact->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7601,6 +8406,12 @@
 				WHERE
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomField->ModifiedBy = $this->intUserAccountId;
+				$objCustomField->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7627,6 +8438,12 @@
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomField->ModifiedBy = null;
+				$objCustomField->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7639,6 +8456,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (CustomField::LoadArrayByModifiedBy($this->intUserAccountId) as $objCustomField) {
+					$objCustomField->ModifiedBy = null;
+					$objCustomField->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7673,6 +8498,11 @@
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomField->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -7685,6 +8515,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (CustomField::LoadArrayByModifiedBy($this->intUserAccountId) as $objCustomField) {
+					$objCustomField->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7751,6 +8588,12 @@
 				WHERE
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomField->CreatedBy = $this->intUserAccountId;
+				$objCustomField->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7777,6 +8620,12 @@
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomField->CreatedBy = null;
+				$objCustomField->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7789,6 +8638,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (CustomField::LoadArrayByCreatedBy($this->intUserAccountId) as $objCustomField) {
+					$objCustomField->CreatedBy = null;
+					$objCustomField->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7823,6 +8680,11 @@
 					`custom_field_id` = ' . $objDatabase->SqlVariable($objCustomField->CustomFieldId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomField->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -7835,6 +8697,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (CustomField::LoadArrayByCreatedBy($this->intUserAccountId) as $objCustomField) {
+					$objCustomField->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7901,6 +8770,12 @@
 				WHERE
 					`custom_field_value_id` = ' . $objDatabase->SqlVariable($objCustomFieldValue->CustomFieldValueId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomFieldValue->CreatedBy = $this->intUserAccountId;
+				$objCustomFieldValue->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7927,6 +8802,12 @@
 					`custom_field_value_id` = ' . $objDatabase->SqlVariable($objCustomFieldValue->CustomFieldValueId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomFieldValue->CreatedBy = null;
+				$objCustomFieldValue->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -7939,6 +8820,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (CustomFieldValue::LoadArrayByCreatedBy($this->intUserAccountId) as $objCustomFieldValue) {
+					$objCustomFieldValue->CreatedBy = null;
+					$objCustomFieldValue->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -7973,6 +8862,11 @@
 					`custom_field_value_id` = ' . $objDatabase->SqlVariable($objCustomFieldValue->CustomFieldValueId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomFieldValue->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -7985,6 +8879,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (CustomFieldValue::LoadArrayByCreatedBy($this->intUserAccountId) as $objCustomFieldValue) {
+					$objCustomFieldValue->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8051,6 +8952,12 @@
 				WHERE
 					`custom_field_value_id` = ' . $objDatabase->SqlVariable($objCustomFieldValue->CustomFieldValueId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomFieldValue->ModifiedBy = $this->intUserAccountId;
+				$objCustomFieldValue->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8077,6 +8984,12 @@
 					`custom_field_value_id` = ' . $objDatabase->SqlVariable($objCustomFieldValue->CustomFieldValueId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomFieldValue->ModifiedBy = null;
+				$objCustomFieldValue->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8089,6 +9002,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (CustomFieldValue::LoadArrayByModifiedBy($this->intUserAccountId) as $objCustomFieldValue) {
+					$objCustomFieldValue->ModifiedBy = null;
+					$objCustomFieldValue->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8123,6 +9044,11 @@
 					`custom_field_value_id` = ' . $objDatabase->SqlVariable($objCustomFieldValue->CustomFieldValueId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCustomFieldValue->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -8135,6 +9061,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (CustomFieldValue::LoadArrayByModifiedBy($this->intUserAccountId) as $objCustomFieldValue) {
+					$objCustomFieldValue->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8201,6 +9134,12 @@
 				WHERE
 					`datagrid_column_preference_id` = ' . $objDatabase->SqlVariable($objDatagridColumnPreference->DatagridColumnPreferenceId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objDatagridColumnPreference->UserAccountId = $this->intUserAccountId;
+				$objDatagridColumnPreference->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8227,6 +9166,12 @@
 					`datagrid_column_preference_id` = ' . $objDatabase->SqlVariable($objDatagridColumnPreference->DatagridColumnPreferenceId) . ' AND
 					`user_account_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objDatagridColumnPreference->UserAccountId = null;
+				$objDatagridColumnPreference->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8239,6 +9184,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (DatagridColumnPreference::LoadArrayByUserAccountId($this->intUserAccountId) as $objDatagridColumnPreference) {
+					$objDatagridColumnPreference->UserAccountId = null;
+					$objDatagridColumnPreference->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8273,6 +9226,11 @@
 					`datagrid_column_preference_id` = ' . $objDatabase->SqlVariable($objDatagridColumnPreference->DatagridColumnPreferenceId) . ' AND
 					`user_account_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objDatagridColumnPreference->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -8285,6 +9243,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (DatagridColumnPreference::LoadArrayByUserAccountId($this->intUserAccountId) as $objDatagridColumnPreference) {
+					$objDatagridColumnPreference->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8351,6 +9316,12 @@
 				WHERE
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->CreatedBy = $this->intUserAccountId;
+				$objInventoryLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8377,6 +9348,12 @@
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->CreatedBy = null;
+				$objInventoryLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8389,6 +9366,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryLocation::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryLocation) {
+					$objInventoryLocation->CreatedBy = null;
+					$objInventoryLocation->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8423,6 +9408,11 @@
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -8435,6 +9425,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryLocation::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryLocation) {
+					$objInventoryLocation->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8501,6 +9498,12 @@
 				WHERE
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->ModifiedBy = $this->intUserAccountId;
+				$objInventoryLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8527,6 +9530,12 @@
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->ModifiedBy = null;
+				$objInventoryLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8539,6 +9548,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryLocation::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryLocation) {
+					$objInventoryLocation->ModifiedBy = null;
+					$objInventoryLocation->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8573,6 +9590,11 @@
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -8585,6 +9607,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryLocation::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryLocation) {
+					$objInventoryLocation->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8651,6 +9680,12 @@
 				WHERE
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->ModifiedBy = $this->intUserAccountId;
+				$objInventoryModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8677,6 +9712,12 @@
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->ModifiedBy = null;
+				$objInventoryModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8689,6 +9730,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryModel) {
+					$objInventoryModel->ModifiedBy = null;
+					$objInventoryModel->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8723,6 +9772,11 @@
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -8735,6 +9789,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryModel) {
+					$objInventoryModel->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8801,6 +9862,12 @@
 				WHERE
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->CreatedBy = $this->intUserAccountId;
+				$objInventoryModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8827,6 +9894,12 @@
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->CreatedBy = null;
+				$objInventoryModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8839,6 +9912,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryModel::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryModel) {
+					$objInventoryModel->CreatedBy = null;
+					$objInventoryModel->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8873,6 +9954,11 @@
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -8885,6 +9971,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryModel::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryModel) {
+					$objInventoryModel->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -8951,6 +10044,12 @@
 				WHERE
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryTransaction->ModifiedBy = $this->intUserAccountId;
+				$objInventoryTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8977,6 +10076,12 @@
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryTransaction->ModifiedBy = null;
+				$objInventoryTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -8989,6 +10094,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryTransaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryTransaction) {
+					$objInventoryTransaction->ModifiedBy = null;
+					$objInventoryTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9023,6 +10136,11 @@
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -9035,6 +10153,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryTransaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryTransaction) {
+					$objInventoryTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9101,6 +10226,12 @@
 				WHERE
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryTransaction->CreatedBy = $this->intUserAccountId;
+				$objInventoryTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9127,6 +10258,12 @@
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryTransaction->CreatedBy = null;
+				$objInventoryTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9139,6 +10276,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryTransaction::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryTransaction) {
+					$objInventoryTransaction->CreatedBy = null;
+					$objInventoryTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9173,6 +10318,11 @@
 					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -9185,6 +10335,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryTransaction::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryTransaction) {
+					$objInventoryTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9251,6 +10408,12 @@
 				WHERE
 					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objLocation->ModifiedBy = $this->intUserAccountId;
+				$objLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9277,6 +10440,12 @@
 					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objLocation->ModifiedBy = null;
+				$objLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9289,6 +10458,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Location::LoadArrayByModifiedBy($this->intUserAccountId) as $objLocation) {
+					$objLocation->ModifiedBy = null;
+					$objLocation->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9323,6 +10500,11 @@
 					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objLocation->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -9335,6 +10517,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Location::LoadArrayByModifiedBy($this->intUserAccountId) as $objLocation) {
+					$objLocation->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9401,6 +10590,12 @@
 				WHERE
 					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objLocation->CreatedBy = $this->intUserAccountId;
+				$objLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9427,6 +10622,12 @@
 					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objLocation->CreatedBy = null;
+				$objLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9439,6 +10640,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Location::LoadArrayByCreatedBy($this->intUserAccountId) as $objLocation) {
+					$objLocation->CreatedBy = null;
+					$objLocation->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9473,6 +10682,11 @@
 					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objLocation->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -9485,6 +10699,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Location::LoadArrayByCreatedBy($this->intUserAccountId) as $objLocation) {
+					$objLocation->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9551,6 +10772,12 @@
 				WHERE
 					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objManufacturer->ModifiedBy = $this->intUserAccountId;
+				$objManufacturer->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9577,6 +10804,12 @@
 					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objManufacturer->ModifiedBy = null;
+				$objManufacturer->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9589,6 +10822,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Manufacturer::LoadArrayByModifiedBy($this->intUserAccountId) as $objManufacturer) {
+					$objManufacturer->ModifiedBy = null;
+					$objManufacturer->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9623,6 +10864,11 @@
 					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objManufacturer->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -9635,6 +10881,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Manufacturer::LoadArrayByModifiedBy($this->intUserAccountId) as $objManufacturer) {
+					$objManufacturer->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9701,6 +10954,12 @@
 				WHERE
 					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objManufacturer->CreatedBy = $this->intUserAccountId;
+				$objManufacturer->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9727,6 +10986,12 @@
 					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objManufacturer->CreatedBy = null;
+				$objManufacturer->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9739,6 +11004,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Manufacturer::LoadArrayByCreatedBy($this->intUserAccountId) as $objManufacturer) {
+					$objManufacturer->CreatedBy = null;
+					$objManufacturer->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9773,6 +11046,11 @@
 					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objManufacturer->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -9785,6 +11063,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Manufacturer::LoadArrayByCreatedBy($this->intUserAccountId) as $objManufacturer) {
+					$objManufacturer->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9851,6 +11136,12 @@
 				WHERE
 					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->ModifiedBy = $this->intUserAccountId;
+				$objNotification->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9877,6 +11168,12 @@
 					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->ModifiedBy = null;
+				$objNotification->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -9889,6 +11186,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Notification::LoadArrayByModifiedBy($this->intUserAccountId) as $objNotification) {
+					$objNotification->ModifiedBy = null;
+					$objNotification->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -9923,6 +11228,11 @@
 					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -9935,6 +11245,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Notification::LoadArrayByModifiedBy($this->intUserAccountId) as $objNotification) {
+					$objNotification->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10001,6 +11318,12 @@
 				WHERE
 					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->CreatedBy = $this->intUserAccountId;
+				$objNotification->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10027,6 +11350,12 @@
 					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->CreatedBy = null;
+				$objNotification->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10039,6 +11368,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Notification::LoadArrayByCreatedBy($this->intUserAccountId) as $objNotification) {
+					$objNotification->CreatedBy = null;
+					$objNotification->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10073,6 +11410,11 @@
 					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -10085,6 +11427,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Notification::LoadArrayByCreatedBy($this->intUserAccountId) as $objNotification) {
+					$objNotification->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10151,6 +11500,12 @@
 				WHERE
 					`notification_user_account_id` = ' . $objDatabase->SqlVariable($objNotificationUserAccount->NotificationUserAccountId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objNotificationUserAccount->UserAccountId = $this->intUserAccountId;
+				$objNotificationUserAccount->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10177,6 +11532,12 @@
 					`notification_user_account_id` = ' . $objDatabase->SqlVariable($objNotificationUserAccount->NotificationUserAccountId) . ' AND
 					`user_account_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objNotificationUserAccount->UserAccountId = null;
+				$objNotificationUserAccount->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10189,6 +11550,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (NotificationUserAccount::LoadArrayByUserAccountId($this->intUserAccountId) as $objNotificationUserAccount) {
+					$objNotificationUserAccount->UserAccountId = null;
+					$objNotificationUserAccount->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10223,6 +11592,11 @@
 					`notification_user_account_id` = ' . $objDatabase->SqlVariable($objNotificationUserAccount->NotificationUserAccountId) . ' AND
 					`user_account_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objNotificationUserAccount->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -10235,6 +11609,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (NotificationUserAccount::LoadArrayByUserAccountId($this->intUserAccountId) as $objNotificationUserAccount) {
+					$objNotificationUserAccount->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10301,6 +11682,12 @@
 				WHERE
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->CreatedBy = $this->intUserAccountId;
+				$objReceipt->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10327,6 +11714,12 @@
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->CreatedBy = null;
+				$objReceipt->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10339,6 +11732,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Receipt::LoadArrayByCreatedBy($this->intUserAccountId) as $objReceipt) {
+					$objReceipt->CreatedBy = null;
+					$objReceipt->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10373,6 +11774,11 @@
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -10385,6 +11791,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Receipt::LoadArrayByCreatedBy($this->intUserAccountId) as $objReceipt) {
+					$objReceipt->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10451,6 +11864,12 @@
 				WHERE
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->ModifiedBy = $this->intUserAccountId;
+				$objReceipt->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10477,6 +11896,12 @@
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->ModifiedBy = null;
+				$objReceipt->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10489,6 +11914,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Receipt::LoadArrayByModifiedBy($this->intUserAccountId) as $objReceipt) {
+					$objReceipt->ModifiedBy = null;
+					$objReceipt->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10523,6 +11956,11 @@
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -10535,6 +11973,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Receipt::LoadArrayByModifiedBy($this->intUserAccountId) as $objReceipt) {
+					$objReceipt->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10601,6 +12046,12 @@
 				WHERE
 					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRole->ModifiedBy = $this->intUserAccountId;
+				$objRole->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10627,6 +12078,12 @@
 					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRole->ModifiedBy = null;
+				$objRole->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10639,6 +12096,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Role::LoadArrayByModifiedBy($this->intUserAccountId) as $objRole) {
+					$objRole->ModifiedBy = null;
+					$objRole->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10673,6 +12138,11 @@
 					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRole->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -10685,6 +12155,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Role::LoadArrayByModifiedBy($this->intUserAccountId) as $objRole) {
+					$objRole->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10751,6 +12228,12 @@
 				WHERE
 					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRole->CreatedBy = $this->intUserAccountId;
+				$objRole->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10777,6 +12260,12 @@
 					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRole->CreatedBy = null;
+				$objRole->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10789,6 +12278,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Role::LoadArrayByCreatedBy($this->intUserAccountId) as $objRole) {
+					$objRole->CreatedBy = null;
+					$objRole->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10823,6 +12320,11 @@
 					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRole->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -10835,6 +12337,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Role::LoadArrayByCreatedBy($this->intUserAccountId) as $objRole) {
+					$objRole->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10901,6 +12410,12 @@
 				WHERE
 					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = $this->intUserAccountId;
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10927,6 +12442,12 @@
 					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = null;
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -10939,6 +12460,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeBuiltInAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeBuiltInAuthorization) {
+					$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = null;
+					$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -10973,6 +12502,11 @@
 					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -10985,6 +12519,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeBuiltInAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeBuiltInAuthorization) {
+					$objRoleEntityQtypeBuiltInAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11051,6 +12592,12 @@
 				WHERE
 					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeBuiltInAuthorization->CreatedBy = $this->intUserAccountId;
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11077,6 +12624,12 @@
 					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeBuiltInAuthorization->CreatedBy = null;
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11089,6 +12642,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeBuiltInAuthorization::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleEntityQtypeBuiltInAuthorization) {
+					$objRoleEntityQtypeBuiltInAuthorization->CreatedBy = null;
+					$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11123,6 +12684,11 @@
 					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -11135,6 +12701,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeBuiltInAuthorization::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleEntityQtypeBuiltInAuthorization) {
+					$objRoleEntityQtypeBuiltInAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11201,6 +12774,12 @@
 				WHERE
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = $this->intUserAccountId;
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11227,6 +12806,12 @@
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = null;
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11239,6 +12824,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeCustomFieldAuthorization) {
+					$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = null;
+					$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11273,6 +12866,11 @@
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -11285,6 +12883,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeCustomFieldAuthorization) {
+					$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11351,6 +12956,12 @@
 				WHERE
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->CreatedBy = $this->intUserAccountId;
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11377,6 +12988,12 @@
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->CreatedBy = null;
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11389,6 +13006,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleEntityQtypeCustomFieldAuthorization) {
+					$objRoleEntityQtypeCustomFieldAuthorization->CreatedBy = null;
+					$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11423,6 +13048,11 @@
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -11435,6 +13065,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleEntityQtypeCustomFieldAuthorization) {
+					$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11501,6 +13138,12 @@
 				WHERE
 					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModule->ModifiedBy = $this->intUserAccountId;
+				$objRoleModule->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11527,6 +13170,12 @@
 					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModule->ModifiedBy = null;
+				$objRoleModule->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11539,6 +13188,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModule::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModule) {
+					$objRoleModule->ModifiedBy = null;
+					$objRoleModule->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11573,6 +13230,11 @@
 					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModule->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -11585,6 +13247,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModule::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModule) {
+					$objRoleModule->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11651,6 +13320,12 @@
 				WHERE
 					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModule->CreatedBy = $this->intUserAccountId;
+				$objRoleModule->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11677,6 +13352,12 @@
 					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModule->CreatedBy = null;
+				$objRoleModule->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11689,6 +13370,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModule::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleModule) {
+					$objRoleModule->CreatedBy = null;
+					$objRoleModule->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11723,6 +13412,11 @@
 					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModule->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -11735,6 +13429,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModule::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleModule) {
+					$objRoleModule->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11801,6 +13502,12 @@
 				WHERE
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->ModifiedBy = $this->intUserAccountId;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11827,6 +13534,12 @@
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->ModifiedBy = null;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11839,6 +13552,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->ModifiedBy = null;
+					$objRoleModuleAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11873,6 +13594,11 @@
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -11885,6 +13611,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -11951,6 +13684,12 @@
 				WHERE
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->CreatedBy = $this->intUserAccountId;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11977,6 +13716,12 @@
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->CreatedBy = null;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -11989,6 +13734,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->CreatedBy = null;
+					$objRoleModuleAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12023,6 +13776,11 @@
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -12035,6 +13793,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12101,6 +13866,12 @@
 				WHERE
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->CreatedBy = $this->intUserAccountId;
+				$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12127,6 +13898,12 @@
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->CreatedBy = null;
+				$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12139,6 +13916,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleTransactionTypeAuthorization::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleTransactionTypeAuthorization) {
+					$objRoleTransactionTypeAuthorization->CreatedBy = null;
+					$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12173,6 +13958,11 @@
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -12185,6 +13975,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleTransactionTypeAuthorization::LoadArrayByCreatedBy($this->intUserAccountId) as $objRoleTransactionTypeAuthorization) {
+					$objRoleTransactionTypeAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12251,6 +14048,12 @@
 				WHERE
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->ModifiedBy = $this->intUserAccountId;
+				$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12277,6 +14080,12 @@
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->ModifiedBy = null;
+				$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12289,6 +14098,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleTransactionTypeAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleTransactionTypeAuthorization) {
+					$objRoleTransactionTypeAuthorization->ModifiedBy = null;
+					$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12323,6 +14140,11 @@
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -12335,6 +14157,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleTransactionTypeAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleTransactionTypeAuthorization) {
+					$objRoleTransactionTypeAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12401,6 +14230,12 @@
 				WHERE
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->CreatedBy = $this->intUserAccountId;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12427,6 +14262,12 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->CreatedBy = null;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12439,6 +14280,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByCreatedBy($this->intUserAccountId) as $objShipment) {
+					$objShipment->CreatedBy = null;
+					$objShipment->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12473,6 +14322,11 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -12485,6 +14339,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByCreatedBy($this->intUserAccountId) as $objShipment) {
+					$objShipment->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12551,6 +14412,12 @@
 				WHERE
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->ModifiedBy = $this->intUserAccountId;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12577,6 +14444,12 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->ModifiedBy = null;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12589,6 +14462,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByModifiedBy($this->intUserAccountId) as $objShipment) {
+					$objShipment->ModifiedBy = null;
+					$objShipment->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12623,6 +14504,11 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -12635,6 +14521,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByModifiedBy($this->intUserAccountId) as $objShipment) {
+					$objShipment->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12701,6 +14594,12 @@
 				WHERE
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->CreatedBy = $this->intUserAccountId;
+				$objTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12727,6 +14626,12 @@
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->CreatedBy = null;
+				$objTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12739,6 +14644,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Transaction::LoadArrayByCreatedBy($this->intUserAccountId) as $objTransaction) {
+					$objTransaction->CreatedBy = null;
+					$objTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12773,6 +14686,11 @@
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -12785,6 +14703,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Transaction::LoadArrayByCreatedBy($this->intUserAccountId) as $objTransaction) {
+					$objTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12851,6 +14776,12 @@
 				WHERE
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->ModifiedBy = $this->intUserAccountId;
+				$objTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12877,6 +14808,12 @@
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->ModifiedBy = null;
+				$objTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -12889,6 +14826,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Transaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objTransaction) {
+					$objTransaction->ModifiedBy = null;
+					$objTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -12923,6 +14868,11 @@
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -12935,6 +14885,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Transaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objTransaction) {
+					$objTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -13001,6 +14958,12 @@
 				WHERE
 					`user_account_id` = ' . $objDatabase->SqlVariable($objUserAccount->UserAccountId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objUserAccount->CreatedBy = $this->intUserAccountId;
+				$objUserAccount->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -13027,6 +14990,12 @@
 					`user_account_id` = ' . $objDatabase->SqlVariable($objUserAccount->UserAccountId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objUserAccount->CreatedBy = null;
+				$objUserAccount->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -13039,6 +15008,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (UserAccount::LoadArrayByCreatedBy($this->intUserAccountId) as $objUserAccount) {
+					$objUserAccount->CreatedBy = null;
+					$objUserAccount->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -13073,6 +15050,11 @@
 					`user_account_id` = ' . $objDatabase->SqlVariable($objUserAccount->UserAccountId) . ' AND
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objUserAccount->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -13085,6 +15067,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (UserAccount::LoadArrayByCreatedBy($this->intUserAccountId) as $objUserAccount) {
+					$objUserAccount->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -13151,6 +15140,12 @@
 				WHERE
 					`user_account_id` = ' . $objDatabase->SqlVariable($objUserAccount->UserAccountId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objUserAccount->ModifiedBy = $this->intUserAccountId;
+				$objUserAccount->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -13177,6 +15172,12 @@
 					`user_account_id` = ' . $objDatabase->SqlVariable($objUserAccount->UserAccountId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objUserAccount->ModifiedBy = null;
+				$objUserAccount->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -13189,6 +15190,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (UserAccount::LoadArrayByModifiedBy($this->intUserAccountId) as $objUserAccount) {
+					$objUserAccount->ModifiedBy = null;
+					$objUserAccount->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -13223,6 +15232,11 @@
 					`user_account_id` = ' . $objDatabase->SqlVariable($objUserAccount->UserAccountId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objUserAccount->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -13235,6 +15249,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (UserAccount::LoadArrayByModifiedBy($this->intUserAccountId) as $objUserAccount) {
+					$objUserAccount->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -13500,6 +15521,84 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $UserAccountId
+	 * @property-read QQNode $FirstName
+	 * @property-read QQNode $LastName
+	 * @property-read QQNode $Username
+	 * @property-read QQNode $PasswordHash
+	 * @property-read QQNode $EmailAddress
+	 * @property-read QQNode $ActiveFlag
+	 * @property-read QQNode $AdminFlag
+	 * @property-read QQNode $PortableAccessFlag
+	 * @property-read QQNode $PortableUserPin
+	 * @property-read QQNode $RoleId
+	 * @property-read QQNodeRole $Role
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeAddress $AddressAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAddress $AddressAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAsset $AssetAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAsset $AssetAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsToUser
+	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAttachment $AttachmentAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAudit $AuditAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAudit $AuditAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCategory $CategoryAsModifiedBy
+	 * @property-read QQReverseReferenceNodeCategory $CategoryAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCompany $CompanyAsModifiedBy
+	 * @property-read QQReverseReferenceNodeCompany $CompanyAsCreatedBy
+	 * @property-read QQReverseReferenceNodeContact $ContactAsModifiedBy
+	 * @property-read QQReverseReferenceNodeContact $ContactAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCustomField $CustomFieldAsModifiedBy
+	 * @property-read QQReverseReferenceNodeCustomField $CustomFieldAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCustomFieldValue $CustomFieldValueAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCustomFieldValue $CustomFieldValueAsModifiedBy
+	 * @property-read QQReverseReferenceNodeDatagridColumnPreference $DatagridColumnPreference
+	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsCreatedBy
+	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsCreatedBy
+	 * @property-read QQReverseReferenceNodeLocation $LocationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeLocation $LocationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsModifiedBy
+	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsCreatedBy
+	 * @property-read QQReverseReferenceNodeNotification $NotificationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeNotification $NotificationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeNotificationUserAccount $NotificationUserAccount
+	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsCreatedBy
+	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRole $RoleAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRole $RoleAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsCreatedBy
+	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsModifiedBy
+	 * @property-read QQReverseReferenceNodeTransaction $TransactionAsCreatedBy
+	 * @property-read QQReverseReferenceNodeTransaction $TransactionAsModifiedBy
+	 * @property-read QQReverseReferenceNodeUserAccount $UserAccountAsCreatedBy
+	 * @property-read QQReverseReferenceNodeUserAccount $UserAccountAsModifiedBy
+	 */
 	class QQNodeUserAccount extends QQNode {
 		protected $strTableName = 'user_account';
 		protected $strPrimaryKey = 'user_account_id';
@@ -13671,7 +15770,86 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $UserAccountId
+	 * @property-read QQNode $FirstName
+	 * @property-read QQNode $LastName
+	 * @property-read QQNode $Username
+	 * @property-read QQNode $PasswordHash
+	 * @property-read QQNode $EmailAddress
+	 * @property-read QQNode $ActiveFlag
+	 * @property-read QQNode $AdminFlag
+	 * @property-read QQNode $PortableAccessFlag
+	 * @property-read QQNode $PortableUserPin
+	 * @property-read QQNode $RoleId
+	 * @property-read QQNodeRole $Role
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeAddress $AddressAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAddress $AddressAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAsset $AssetAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAsset $AssetAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsToUser
+	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAttachment $AttachmentAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAudit $AuditAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAudit $AuditAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCategory $CategoryAsModifiedBy
+	 * @property-read QQReverseReferenceNodeCategory $CategoryAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCompany $CompanyAsModifiedBy
+	 * @property-read QQReverseReferenceNodeCompany $CompanyAsCreatedBy
+	 * @property-read QQReverseReferenceNodeContact $ContactAsModifiedBy
+	 * @property-read QQReverseReferenceNodeContact $ContactAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCustomField $CustomFieldAsModifiedBy
+	 * @property-read QQReverseReferenceNodeCustomField $CustomFieldAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCustomFieldValue $CustomFieldValueAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCustomFieldValue $CustomFieldValueAsModifiedBy
+	 * @property-read QQReverseReferenceNodeDatagridColumnPreference $DatagridColumnPreference
+	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsCreatedBy
+	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsCreatedBy
+	 * @property-read QQReverseReferenceNodeLocation $LocationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeLocation $LocationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsModifiedBy
+	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsCreatedBy
+	 * @property-read QQReverseReferenceNodeNotification $NotificationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeNotification $NotificationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeNotificationUserAccount $NotificationUserAccount
+	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsCreatedBy
+	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRole $RoleAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRole $RoleAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsCreatedBy
+	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsModifiedBy
+	 * @property-read QQReverseReferenceNodeTransaction $TransactionAsCreatedBy
+	 * @property-read QQReverseReferenceNodeTransaction $TransactionAsModifiedBy
+	 * @property-read QQReverseReferenceNodeUserAccount $UserAccountAsCreatedBy
+	 * @property-read QQReverseReferenceNodeUserAccount $UserAccountAsModifiedBy
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeUserAccount extends QQReverseReferenceNode {
 		protected $strTableName = 'user_account';
 		protected $strPrimaryKey = 'user_account_id';

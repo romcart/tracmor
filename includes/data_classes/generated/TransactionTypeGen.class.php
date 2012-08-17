@@ -200,7 +200,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -262,7 +262,7 @@
 		 * Static Qcodo Query method to query for a single TransactionType object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return TransactionType the queried object
 		 */
@@ -275,16 +275,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new TransactionType object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return TransactionType::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new TransactionType object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = TransactionType::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return TransactionType::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of TransactionType objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return TransactionType[] the queried objects as an array
 		 */
@@ -303,10 +325,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = TransactionType::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of TransactionType objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -417,7 +464,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this TransactionType::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -553,7 +600,7 @@
 
 		/**
 		 * Instantiate an array of TransactionTypes from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return TransactionType[]
@@ -586,6 +633,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single TransactionType object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return TransactionType next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return TransactionType::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -599,9 +672,10 @@
 		 * @param integer $intTransactionTypeId
 		 * @return TransactionType
 		*/
-		public static function LoadByTransactionTypeId($intTransactionTypeId) {
+		public static function LoadByTransactionTypeId($intTransactionTypeId, $objOptionalClauses = null) {
 			return TransactionType::QuerySingle(
 				QQ::Equal(QQN::TransactionType()->TransactionTypeId, $intTransactionTypeId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -611,9 +685,10 @@
 		 * @param string $strShortDescription
 		 * @return TransactionType
 		*/
-		public static function LoadByShortDescription($strShortDescription) {
+		public static function LoadByShortDescription($strShortDescription, $objOptionalClauses = null) {
 			return TransactionType::QuerySingle(
 				QQ::Equal(QQN::TransactionType()->ShortDescription, $strShortDescription)
+			, $objOptionalClauses
 			);
 		}
 
@@ -626,9 +701,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this TransactionType
@@ -659,6 +734,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intTransactionTypeId = $objDatabase->InsertId('transaction_type', 'transaction_type_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -675,6 +754,9 @@
 						WHERE
 							`transaction_type_id` = ' . $objDatabase->SqlVariable($this->intTransactionTypeId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -708,6 +790,9 @@
 					`transaction_type`
 				WHERE
 					`transaction_type_id` = ' . $objDatabase->SqlVariable($this->intTransactionTypeId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -754,6 +839,60 @@
 			$this->blnAssetFlag = $objReloaded->blnAssetFlag;
 			$this->blnInventoryFlag = $objReloaded->blnInventoryFlag;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = TransactionType::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `transaction_type` (
+					`transaction_type_id`,
+					`short_description`,
+					`asset_flag`,
+					`inventory_flag`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intTransactionTypeId) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . $objDatabase->SqlVariable($this->blnAssetFlag) . ',
+					' . $objDatabase->SqlVariable($this->blnInventoryFlag) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intTransactionTypeId
+		 * @return TransactionType[]
+		 */
+		public static function GetJournalForId($intTransactionTypeId) {
+			$objDatabase = TransactionType::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM transaction_type WHERE transaction_type_id = ' .
+				$objDatabase->SqlVariable($intTransactionTypeId) . ' ORDER BY __sys_date');
+
+			return TransactionType::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return TransactionType[]
+		 */
+		public function GetJournal() {
+			return TransactionType::GetJournalForId($this->intTransactionTypeId);
+		}
+
 
 
 
@@ -986,6 +1125,12 @@
 				WHERE
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->TransactionTypeId = $this->intTransactionTypeId;
+				$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1012,6 +1157,12 @@
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . ' AND
 					`transaction_type_id` = ' . $objDatabase->SqlVariable($this->intTransactionTypeId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->TransactionTypeId = null;
+				$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1024,6 +1175,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = TransactionType::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleTransactionTypeAuthorization::LoadArrayByTransactionTypeId($this->intTransactionTypeId) as $objRoleTransactionTypeAuthorization) {
+					$objRoleTransactionTypeAuthorization->TransactionTypeId = null;
+					$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1058,6 +1217,11 @@
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . ' AND
 					`transaction_type_id` = ' . $objDatabase->SqlVariable($this->intTransactionTypeId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1070,6 +1234,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = TransactionType::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleTransactionTypeAuthorization::LoadArrayByTransactionTypeId($this->intTransactionTypeId) as $objRoleTransactionTypeAuthorization) {
+					$objRoleTransactionTypeAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1136,6 +1307,12 @@
 				WHERE
 					`shortcut_id` = ' . $objDatabase->SqlVariable($objShortcut->ShortcutId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objShortcut->TransactionTypeId = $this->intTransactionTypeId;
+				$objShortcut->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1162,6 +1339,12 @@
 					`shortcut_id` = ' . $objDatabase->SqlVariable($objShortcut->ShortcutId) . ' AND
 					`transaction_type_id` = ' . $objDatabase->SqlVariable($this->intTransactionTypeId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShortcut->TransactionTypeId = null;
+				$objShortcut->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1174,6 +1357,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = TransactionType::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shortcut::LoadArrayByTransactionTypeId($this->intTransactionTypeId) as $objShortcut) {
+					$objShortcut->TransactionTypeId = null;
+					$objShortcut->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1208,6 +1399,11 @@
 					`shortcut_id` = ' . $objDatabase->SqlVariable($objShortcut->ShortcutId) . ' AND
 					`transaction_type_id` = ' . $objDatabase->SqlVariable($this->intTransactionTypeId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShortcut->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1220,6 +1416,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = TransactionType::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shortcut::LoadArrayByTransactionTypeId($this->intTransactionTypeId) as $objShortcut) {
+					$objShortcut->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1286,6 +1489,12 @@
 				WHERE
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->TransactionTypeId = $this->intTransactionTypeId;
+				$objTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1312,6 +1521,12 @@
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . ' AND
 					`transaction_type_id` = ' . $objDatabase->SqlVariable($this->intTransactionTypeId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->TransactionTypeId = null;
+				$objTransaction->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1324,6 +1539,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = TransactionType::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Transaction::LoadArrayByTransactionTypeId($this->intTransactionTypeId) as $objTransaction) {
+					$objTransaction->TransactionTypeId = null;
+					$objTransaction->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1358,6 +1581,11 @@
 					`transaction_id` = ' . $objDatabase->SqlVariable($objTransaction->TransactionId) . ' AND
 					`transaction_type_id` = ' . $objDatabase->SqlVariable($this->intTransactionTypeId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objTransaction->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1370,6 +1598,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = TransactionType::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Transaction::LoadArrayByTransactionTypeId($this->intTransactionTypeId) as $objTransaction) {
+					$objTransaction->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1544,6 +1779,15 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $TransactionTypeId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $AssetFlag
+	 * @property-read QQNode $InventoryFlag
+	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorization
+	 * @property-read QQReverseReferenceNodeShortcut $Shortcut
+	 * @property-read QQReverseReferenceNodeTransaction $Transaction
+	 */
 	class QQNodeTransactionType extends QQNode {
 		protected $strTableName = 'transaction_type';
 		protected $strPrimaryKey = 'transaction_type_id';
@@ -1577,7 +1821,17 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $TransactionTypeId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $AssetFlag
+	 * @property-read QQNode $InventoryFlag
+	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorization
+	 * @property-read QQReverseReferenceNodeShortcut $Shortcut
+	 * @property-read QQReverseReferenceNodeTransaction $Transaction
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeTransactionType extends QQReverseReferenceNode {
 		protected $strTableName = 'transaction_type';
 		protected $strPrimaryKey = 'transaction_type_id';

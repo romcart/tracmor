@@ -146,7 +146,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -208,7 +208,7 @@
 		 * Static Qcodo Query method to query for a single Datagrid object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Datagrid the queried object
 		 */
@@ -221,16 +221,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Datagrid object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Datagrid::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Datagrid object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Datagrid::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Datagrid::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Datagrid objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Datagrid[] the queried objects as an array
 		 */
@@ -249,10 +271,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Datagrid::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Datagrid objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -361,7 +408,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Datagrid::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -445,7 +492,7 @@
 
 		/**
 		 * Instantiate an array of Datagrids from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Datagrid[]
@@ -478,6 +525,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Datagrid object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Datagrid next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Datagrid::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -491,9 +564,10 @@
 		 * @param integer $intDatagridId
 		 * @return Datagrid
 		*/
-		public static function LoadByDatagridId($intDatagridId) {
+		public static function LoadByDatagridId($intDatagridId, $objOptionalClauses = null) {
 			return Datagrid::QuerySingle(
 				QQ::Equal(QQN::Datagrid()->DatagridId, $intDatagridId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -503,9 +577,10 @@
 		 * @param string $strShortDescription
 		 * @return Datagrid
 		*/
-		public static function LoadByShortDescription($strShortDescription) {
+		public static function LoadByShortDescription($strShortDescription, $objOptionalClauses = null) {
 			return Datagrid::QuerySingle(
 				QQ::Equal(QQN::Datagrid()->ShortDescription, $strShortDescription)
+			, $objOptionalClauses
 			);
 		}
 
@@ -518,9 +593,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this Datagrid
@@ -547,6 +622,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intDatagridId = $objDatabase->InsertId('datagrid', 'datagrid_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -561,6 +640,9 @@
 						WHERE
 							`datagrid_id` = ' . $objDatabase->SqlVariable($this->intDatagridId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -594,6 +676,9 @@
 					`datagrid`
 				WHERE
 					`datagrid_id` = ' . $objDatabase->SqlVariable($this->intDatagridId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -638,6 +723,56 @@
 			// Update $this's local variables to match
 			$this->strShortDescription = $objReloaded->strShortDescription;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = Datagrid::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `datagrid` (
+					`datagrid_id`,
+					`short_description`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intDatagridId) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intDatagridId
+		 * @return Datagrid[]
+		 */
+		public static function GetJournalForId($intDatagridId) {
+			$objDatabase = Datagrid::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM datagrid WHERE datagrid_id = ' .
+				$objDatabase->SqlVariable($intDatagridId) . ' ORDER BY __sys_date');
+
+			return Datagrid::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return Datagrid[]
+		 */
+		public function GetJournal() {
+			return Datagrid::GetJournalForId($this->intDatagridId);
+		}
+
 
 
 
@@ -814,6 +949,12 @@
 				WHERE
 					`datagrid_column_preference_id` = ' . $objDatabase->SqlVariable($objDatagridColumnPreference->DatagridColumnPreferenceId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objDatagridColumnPreference->DatagridId = $this->intDatagridId;
+				$objDatagridColumnPreference->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -840,6 +981,12 @@
 					`datagrid_column_preference_id` = ' . $objDatabase->SqlVariable($objDatagridColumnPreference->DatagridColumnPreferenceId) . ' AND
 					`datagrid_id` = ' . $objDatabase->SqlVariable($this->intDatagridId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objDatagridColumnPreference->DatagridId = null;
+				$objDatagridColumnPreference->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -852,6 +999,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Datagrid::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (DatagridColumnPreference::LoadArrayByDatagridId($this->intDatagridId) as $objDatagridColumnPreference) {
+					$objDatagridColumnPreference->DatagridId = null;
+					$objDatagridColumnPreference->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -886,6 +1041,11 @@
 					`datagrid_column_preference_id` = ' . $objDatabase->SqlVariable($objDatagridColumnPreference->DatagridColumnPreferenceId) . ' AND
 					`datagrid_id` = ' . $objDatabase->SqlVariable($this->intDatagridId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objDatagridColumnPreference->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -898,6 +1058,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Datagrid::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (DatagridColumnPreference::LoadArrayByDatagridId($this->intDatagridId) as $objDatagridColumnPreference) {
+					$objDatagridColumnPreference->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1064,6 +1231,11 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $DatagridId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQReverseReferenceNodeDatagridColumnPreference $DatagridColumnPreference
+	 */
 	class QQNodeDatagrid extends QQNode {
 		protected $strTableName = 'datagrid';
 		protected $strPrimaryKey = 'datagrid_id';
@@ -1089,7 +1261,13 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $DatagridId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQReverseReferenceNodeDatagridColumnPreference $DatagridColumnPreference
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeDatagrid extends QQReverseReferenceNode {
 		protected $strTableName = 'datagrid';
 		protected $strPrimaryKey = 'datagrid_id';

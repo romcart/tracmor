@@ -24,16 +24,45 @@
 
 	class ReceiptCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var ReceiptCustomFieldHelper objReceiptCustomFieldHelper
+		 * @access protected
+		 */
 		protected $objReceiptCustomFieldHelper;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of ReceiptCustomFieldHelper's individual data fields
+        /**
+         * @var QListBox lstReceipt;
+         * @access protected
+         */
 		protected $lstReceipt;
 
+
 		// Controls that allow the viewing of ReceiptCustomFieldHelper's individual data fields
+        /**
+         * @var QLabel lblReceiptId
+         * @access protected
+         */
 		protected $lblReceiptId;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -135,21 +164,30 @@
 		/**
 		 * Create and setup QListBox lstReceipt
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstReceipt_Create($strControlId = null) {
+		public function lstReceipt_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstReceipt = new QListBox($this->objParentObject, $strControlId);
 			$this->lstReceipt->Name = QApplication::Translate('Receipt');
 			$this->lstReceipt->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstReceipt->AddItem(QApplication::Translate('- Select One -'), null);
-			$objReceiptArray = Receipt::LoadAll();
-			if ($objReceiptArray) foreach ($objReceiptArray as $objReceipt) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objReceiptCursor = Receipt::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objReceipt = Receipt::InstantiateCursor($objReceiptCursor)) {
 				$objListItem = new QListItem($objReceipt->__toString(), $objReceipt->ReceiptId);
 				if (($this->objReceiptCustomFieldHelper->Receipt) && ($this->objReceiptCustomFieldHelper->Receipt->ReceiptId == $objReceipt->ReceiptId))
 					$objListItem->Selected = true;
 				$this->lstReceipt->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstReceipt;
 		}
 

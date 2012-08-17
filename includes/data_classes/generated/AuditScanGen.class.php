@@ -185,7 +185,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -247,7 +247,7 @@
 		 * Static Qcodo Query method to query for a single AuditScan object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return AuditScan the queried object
 		 */
@@ -260,16 +260,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new AuditScan object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return AuditScan::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new AuditScan object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = AuditScan::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return AuditScan::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of AuditScan objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return AuditScan[] the queried objects as an array
 		 */
@@ -288,10 +310,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = AuditScan::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of AuditScan objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -404,7 +451,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this AuditScan::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -466,7 +513,7 @@
 
 		/**
 		 * Instantiate an array of AuditScans from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return AuditScan[]
@@ -499,6 +546,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single AuditScan object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return AuditScan next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return AuditScan::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -512,9 +585,10 @@
 		 * @param integer $intAuditScanId
 		 * @return AuditScan
 		*/
-		public static function LoadByAuditScanId($intAuditScanId) {
+		public static function LoadByAuditScanId($intAuditScanId, $objOptionalClauses = null) {
 			return AuditScan::QuerySingle(
 				QQ::Equal(QQN::AuditScan()->AuditScanId, $intAuditScanId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -530,7 +604,8 @@
 			try {
 				return AuditScan::QueryArray(
 					QQ::Equal(QQN::AuditScan()->AuditId, $intAuditId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -543,10 +618,11 @@
 		 * @param integer $intAuditId
 		 * @return int
 		*/
-		public static function CountByAuditId($intAuditId) {
+		public static function CountByAuditId($intAuditId, $objOptionalClauses = null) {
 			// Call AuditScan::QueryCount to perform the CountByAuditId query
 			return AuditScan::QueryCount(
 				QQ::Equal(QQN::AuditScan()->AuditId, $intAuditId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -562,7 +638,8 @@
 			try {
 				return AuditScan::QueryArray(
 					QQ::Equal(QQN::AuditScan()->LocationId, $intLocationId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -575,10 +652,11 @@
 		 * @param integer $intLocationId
 		 * @return int
 		*/
-		public static function CountByLocationId($intLocationId) {
+		public static function CountByLocationId($intLocationId, $objOptionalClauses = null) {
 			// Call AuditScan::QueryCount to perform the CountByLocationId query
 			return AuditScan::QueryCount(
 				QQ::Equal(QQN::AuditScan()->LocationId, $intLocationId)
+			, $objOptionalClauses
 			);
 		}
 
@@ -591,9 +669,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this AuditScan
@@ -628,6 +706,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intAuditScanId = $objDatabase->InsertId('audit_scan', 'audit_scan_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -646,6 +728,9 @@
 						WHERE
 							`audit_scan_id` = ' . $objDatabase->SqlVariable($this->intAuditScanId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -679,6 +764,9 @@
 					`audit_scan`
 				WHERE
 					`audit_scan_id` = ' . $objDatabase->SqlVariable($this->intAuditScanId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -727,6 +815,64 @@
 			$this->intCount = $objReloaded->intCount;
 			$this->intSystemCount = $objReloaded->intSystemCount;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = AuditScan::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `audit_scan` (
+					`audit_scan_id`,
+					`audit_id`,
+					`location_id`,
+					`entity_id`,
+					`COUNT`,
+					`system_count`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intAuditScanId) . ',
+					' . $objDatabase->SqlVariable($this->intAuditId) . ',
+					' . $objDatabase->SqlVariable($this->intLocationId) . ',
+					' . $objDatabase->SqlVariable($this->intEntityId) . ',
+					' . $objDatabase->SqlVariable($this->intCount) . ',
+					' . $objDatabase->SqlVariable($this->intSystemCount) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intAuditScanId
+		 * @return AuditScan[]
+		 */
+		public static function GetJournalForId($intAuditScanId) {
+			$objDatabase = AuditScan::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM audit_scan WHERE audit_scan_id = ' .
+				$objDatabase->SqlVariable($intAuditScanId) . ' ORDER BY __sys_date');
+
+			return AuditScan::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return AuditScan[]
+		 */
+		public function GetJournal() {
+			return AuditScan::GetJournalForId($this->intAuditScanId);
+		}
+
 
 
 
@@ -1187,6 +1333,16 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $AuditScanId
+	 * @property-read QQNode $AuditId
+	 * @property-read QQNodeAudit $Audit
+	 * @property-read QQNode $LocationId
+	 * @property-read QQNodeLocation $Location
+	 * @property-read QQNode $EntityId
+	 * @property-read QQNode $Count
+	 * @property-read QQNode $SystemCount
+	 */
 	class QQNodeAuditScan extends QQNode {
 		protected $strTableName = 'audit_scan';
 		protected $strPrimaryKey = 'audit_scan_id';
@@ -1222,7 +1378,18 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $AuditScanId
+	 * @property-read QQNode $AuditId
+	 * @property-read QQNodeAudit $Audit
+	 * @property-read QQNode $LocationId
+	 * @property-read QQNodeLocation $Location
+	 * @property-read QQNode $EntityId
+	 * @property-read QQNode $Count
+	 * @property-read QQNode $SystemCount
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeAuditScan extends QQReverseReferenceNode {
 		protected $strTableName = 'audit_scan';
 		protected $strPrimaryKey = 'audit_scan_id';

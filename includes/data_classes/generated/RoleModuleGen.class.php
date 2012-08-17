@@ -243,7 +243,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -305,7 +305,7 @@
 		 * Static Qcodo Query method to query for a single RoleModule object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return RoleModule the queried object
 		 */
@@ -318,16 +318,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new RoleModule object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return RoleModule::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new RoleModule object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = RoleModule::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return RoleModule::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of RoleModule objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return RoleModule[] the queried objects as an array
 		 */
@@ -346,10 +368,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = RoleModule::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of RoleModule objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -464,7 +511,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this RoleModule::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -584,7 +631,7 @@
 
 		/**
 		 * Instantiate an array of RoleModules from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return RoleModule[]
@@ -617,6 +664,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single RoleModule object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return RoleModule next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return RoleModule::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -630,9 +703,10 @@
 		 * @param integer $intRoleModuleId
 		 * @return RoleModule
 		*/
-		public static function LoadByRoleModuleId($intRoleModuleId) {
+		public static function LoadByRoleModuleId($intRoleModuleId, $objOptionalClauses = null) {
 			return RoleModule::QuerySingle(
 				QQ::Equal(QQN::RoleModule()->RoleModuleId, $intRoleModuleId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -648,7 +722,8 @@
 			try {
 				return RoleModule::QueryArray(
 					QQ::Equal(QQN::RoleModule()->RoleId, $intRoleId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -661,10 +736,11 @@
 		 * @param integer $intRoleId
 		 * @return int
 		*/
-		public static function CountByRoleId($intRoleId) {
+		public static function CountByRoleId($intRoleId, $objOptionalClauses = null) {
 			// Call RoleModule::QueryCount to perform the CountByRoleId query
 			return RoleModule::QueryCount(
 				QQ::Equal(QQN::RoleModule()->RoleId, $intRoleId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -680,7 +756,8 @@
 			try {
 				return RoleModule::QueryArray(
 					QQ::Equal(QQN::RoleModule()->ModuleId, $intModuleId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -693,10 +770,11 @@
 		 * @param integer $intModuleId
 		 * @return int
 		*/
-		public static function CountByModuleId($intModuleId) {
+		public static function CountByModuleId($intModuleId, $objOptionalClauses = null) {
 			// Call RoleModule::QueryCount to perform the CountByModuleId query
 			return RoleModule::QueryCount(
 				QQ::Equal(QQN::RoleModule()->ModuleId, $intModuleId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -712,7 +790,8 @@
 			try {
 				return RoleModule::QueryArray(
 					QQ::Equal(QQN::RoleModule()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -725,10 +804,11 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy) {
+		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
 			// Call RoleModule::QueryCount to perform the CountByCreatedBy query
 			return RoleModule::QueryCount(
 				QQ::Equal(QQN::RoleModule()->CreatedBy, $intCreatedBy)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -744,7 +824,8 @@
 			try {
 				return RoleModule::QueryArray(
 					QQ::Equal(QQN::RoleModule()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -757,10 +838,11 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy) {
+		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
 			// Call RoleModule::QueryCount to perform the CountByModifiedBy query
 			return RoleModule::QueryCount(
 				QQ::Equal(QQN::RoleModule()->ModifiedBy, $intModifiedBy)
+			, $objOptionalClauses
 			);
 		}
 
@@ -773,9 +855,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this RoleModule
@@ -812,6 +894,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intRoleModuleId = $objDatabase->InsertId('role_module', 'role_module_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -846,6 +932,9 @@
 						WHERE
 							`role_module_id` = ' . $objDatabase->SqlVariable($this->intRoleModuleId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -891,6 +980,9 @@
 					`role_module`
 				WHERE
 					`role_module_id` = ' . $objDatabase->SqlVariable($this->intRoleModuleId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -941,6 +1033,66 @@
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = RoleModule::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `role_module` (
+					`role_module_id`,
+					`role_id`,
+					`module_id`,
+					`access_flag`,
+					`created_by`,
+					`creation_date`,
+					`modified_by`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intRoleModuleId) . ',
+					' . $objDatabase->SqlVariable($this->intRoleId) . ',
+					' . $objDatabase->SqlVariable($this->intModuleId) . ',
+					' . $objDatabase->SqlVariable($this->blnAccessFlag) . ',
+					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
+					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
+					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intRoleModuleId
+		 * @return RoleModule[]
+		 */
+		public static function GetJournalForId($intRoleModuleId) {
+			$objDatabase = RoleModule::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM role_module WHERE role_module_id = ' .
+				$objDatabase->SqlVariable($intRoleModuleId) . ' ORDER BY __sys_date');
+
+			return RoleModule::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return RoleModule[]
+		 */
+		public function GetJournal() {
+			return RoleModule::GetJournalForId($this->intRoleModuleId);
+		}
+
 
 
 
@@ -1374,6 +1526,12 @@
 				WHERE
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->RoleModuleId = $this->intRoleModuleId;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1400,6 +1558,12 @@
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
 					`role_module_id` = ' . $objDatabase->SqlVariable($this->intRoleModuleId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->RoleModuleId = null;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1412,6 +1576,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = RoleModule::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByRoleModuleId($this->intRoleModuleId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->RoleModuleId = null;
+					$objRoleModuleAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1446,6 +1618,11 @@
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
 					`role_module_id` = ' . $objDatabase->SqlVariable($this->intRoleModuleId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1458,6 +1635,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = RoleModule::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByRoleModuleId($this->intRoleModuleId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1710,6 +1894,21 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $RoleModuleId
+	 * @property-read QQNode $RoleId
+	 * @property-read QQNodeRole $Role
+	 * @property-read QQNode $ModuleId
+	 * @property-read QQNodeModule $Module
+	 * @property-read QQNode $AccessFlag
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorization
+	 */
 	class QQNodeRoleModule extends QQNode {
 		protected $strTableName = 'role_module';
 		protected $strPrimaryKey = 'role_module_id';
@@ -1755,7 +1954,23 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $RoleModuleId
+	 * @property-read QQNode $RoleId
+	 * @property-read QQNodeRole $Role
+	 * @property-read QQNode $ModuleId
+	 * @property-read QQNodeModule $Module
+	 * @property-read QQNode $AccessFlag
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorization
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeRoleModule extends QQReverseReferenceNode {
 		protected $strTableName = 'role_module';
 		protected $strPrimaryKey = 'role_module_id';

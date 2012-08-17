@@ -26,17 +26,51 @@
 
 	class ModuleMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var Module objModule
+		 * @access protected
+		 */
 		protected $objModule;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Module's individual data fields
+        /**
+         * @var QLabel lblModuleId;
+         * @access protected
+         */
 		protected $lblModuleId;
+
+        /**
+         * @var QTextBox txtShortDescription;
+         * @access protected
+         */
 		protected $txtShortDescription;
 
+
 		// Controls that allow the viewing of Module's individual data fields
+        /**
+         * @var QLabel lblShortDescription
+         * @access protected
+         */
 		protected $lblShortDescription;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 

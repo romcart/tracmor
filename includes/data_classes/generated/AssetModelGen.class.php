@@ -26,12 +26,12 @@
 	 * @property QDateTime $CreationDate the value for dttCreationDate 
 	 * @property integer $ModifiedBy the value for intModifiedBy 
 	 * @property string $ModifiedDate the value for strModifiedDate (Read-Only Timestamp)
-	 * @property integer $DefaultDepreciationClassId the value for intDefaultDepreciationClassId (Not Null)
+	 * @property integer $DefaultDepreciationClassId the value for intDefaultDepreciationClassId 
 	 * @property Category $Category the value for the Category object referenced by intCategoryId 
 	 * @property Manufacturer $Manufacturer the value for the Manufacturer object referenced by intManufacturerId 
 	 * @property UserAccount $CreatedByObject the value for the UserAccount object referenced by intCreatedBy 
 	 * @property UserAccount $ModifiedByObject the value for the UserAccount object referenced by intModifiedBy 
-	 * @property DepreciationClass $DefaultDepreciationClass the value for the DepreciationClass object referenced by intDefaultDepreciationClassId (Not Null)
+	 * @property DepreciationClass $DefaultDepreciationClass the value for the DepreciationClass object referenced by intDefaultDepreciationClassId 
 	 * @property AssetModelCustomFieldHelper $AssetModelCustomFieldHelper the value for the AssetModelCustomFieldHelper object that uniquely references this AssetModel
 	 * @property Asset $_Asset the value for the private _objAsset (Read-Only) if set due to an expansion on the asset.asset_model_id reverse relationship
 	 * @property Asset[] $_AssetArray the value for the private _objAssetArray (Read-Only) if set due to an ExpandAsArray on the asset.asset_model_id reverse relationship
@@ -1396,7 +1396,7 @@
 					return $this->strModifiedDate;
 
 				case 'DefaultDepreciationClassId':
-					// Gets the value for intDefaultDepreciationClassId (Not Null)
+					// Gets the value for intDefaultDepreciationClassId 
 					// @return integer
 					return $this->intDefaultDepreciationClassId;
 
@@ -1453,7 +1453,7 @@
 					}
 
 				case 'DefaultDepreciationClass':
-					// Gets the value for the DepreciationClass object referenced by intDefaultDepreciationClassId (Not Null)
+					// Gets the value for the DepreciationClass object referenced by intDefaultDepreciationClassId 
 					// @return DepreciationClass
 					try {
 						if ((!$this->objDefaultDepreciationClass) && (!is_null($this->intDefaultDepreciationClassId)))
@@ -1643,7 +1643,7 @@
 					}
 
 				case 'DefaultDepreciationClassId':
-					// Sets the value for intDefaultDepreciationClassId (Not Null)
+					// Sets the value for intDefaultDepreciationClassId 
 					// @param integer $mixValue
 					// @return integer
 					try {
@@ -1779,7 +1779,7 @@
 					break;
 
 				case 'DefaultDepreciationClass':
-					// Sets the value for the DepreciationClass object referenced by intDefaultDepreciationClassId (Not Null)
+					// Sets the value for the DepreciationClass object referenced by intDefaultDepreciationClassId 
 					// @param DepreciationClass $mixValue
 					// @return DepreciationClass
 					if (is_null($mixValue)) {

@@ -164,7 +164,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -226,7 +226,7 @@
 		 * Static Qcodo Query method to query for a single AuthorizationLevel object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return AuthorizationLevel the queried object
 		 */
@@ -239,16 +239,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new AuthorizationLevel object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return AuthorizationLevel::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new AuthorizationLevel object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = AuthorizationLevel::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return AuthorizationLevel::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of AuthorizationLevel objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return AuthorizationLevel[] the queried objects as an array
 		 */
@@ -267,10 +289,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = AuthorizationLevel::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of AuthorizationLevel objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -379,7 +426,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this AuthorizationLevel::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -487,7 +534,7 @@
 
 		/**
 		 * Instantiate an array of AuthorizationLevels from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return AuthorizationLevel[]
@@ -520,6 +567,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single AuthorizationLevel object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return AuthorizationLevel next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return AuthorizationLevel::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -533,9 +606,10 @@
 		 * @param integer $intAuthorizationLevelId
 		 * @return AuthorizationLevel
 		*/
-		public static function LoadByAuthorizationLevelId($intAuthorizationLevelId) {
+		public static function LoadByAuthorizationLevelId($intAuthorizationLevelId, $objOptionalClauses = null) {
 			return AuthorizationLevel::QuerySingle(
 				QQ::Equal(QQN::AuthorizationLevel()->AuthorizationLevelId, $intAuthorizationLevelId)
+			, $objOptionalClauses
 			);
 		}
 
@@ -548,9 +622,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this AuthorizationLevel
@@ -577,6 +651,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intAuthorizationLevelId = $objDatabase->InsertId('authorization_level', 'authorization_level_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -591,6 +669,9 @@
 						WHERE
 							`authorization_level_id` = ' . $objDatabase->SqlVariable($this->intAuthorizationLevelId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -624,6 +705,9 @@
 					`authorization_level`
 				WHERE
 					`authorization_level_id` = ' . $objDatabase->SqlVariable($this->intAuthorizationLevelId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -668,6 +752,56 @@
 			// Update $this's local variables to match
 			$this->strShortDescription = $objReloaded->strShortDescription;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = AuthorizationLevel::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `authorization_level` (
+					`authorization_level_id`,
+					`short_description`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intAuthorizationLevelId) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intAuthorizationLevelId
+		 * @return AuthorizationLevel[]
+		 */
+		public static function GetJournalForId($intAuthorizationLevelId) {
+			$objDatabase = AuthorizationLevel::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM authorization_level WHERE authorization_level_id = ' .
+				$objDatabase->SqlVariable($intAuthorizationLevelId) . ' ORDER BY __sys_date');
+
+			return AuthorizationLevel::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return AuthorizationLevel[]
+		 */
+		public function GetJournal() {
+			return AuthorizationLevel::GetJournalForId($this->intAuthorizationLevelId);
+		}
+
 
 
 
@@ -856,6 +990,12 @@
 				WHERE
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->AuthorizationLevelId = $this->intAuthorizationLevelId;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -882,6 +1022,12 @@
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
 					`authorization_level_id` = ' . $objDatabase->SqlVariable($this->intAuthorizationLevelId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->AuthorizationLevelId = null;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -894,6 +1040,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = AuthorizationLevel::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByAuthorizationLevelId($this->intAuthorizationLevelId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->AuthorizationLevelId = null;
+					$objRoleModuleAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -928,6 +1082,11 @@
 					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
 					`authorization_level_id` = ' . $objDatabase->SqlVariable($this->intAuthorizationLevelId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -940,6 +1099,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = AuthorizationLevel::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByAuthorizationLevelId($this->intAuthorizationLevelId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1006,6 +1172,12 @@
 				WHERE
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->AuthorizationLevelId = $this->intAuthorizationLevelId;
+				$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1032,6 +1204,12 @@
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . ' AND
 					`authorization_level_id` = ' . $objDatabase->SqlVariable($this->intAuthorizationLevelId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->AuthorizationLevelId = null;
+				$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1044,6 +1222,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = AuthorizationLevel::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleTransactionTypeAuthorization::LoadArrayByAuthorizationLevelId($this->intAuthorizationLevelId) as $objRoleTransactionTypeAuthorization) {
+					$objRoleTransactionTypeAuthorization->AuthorizationLevelId = null;
+					$objRoleTransactionTypeAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1078,6 +1264,11 @@
 					`role_transaction_type_authorization_id` = ' . $objDatabase->SqlVariable($objRoleTransactionTypeAuthorization->RoleTransactionTypeAuthorizationId) . ' AND
 					`authorization_level_id` = ' . $objDatabase->SqlVariable($this->intAuthorizationLevelId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleTransactionTypeAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1090,6 +1281,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = AuthorizationLevel::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleTransactionTypeAuthorization::LoadArrayByAuthorizationLevelId($this->intAuthorizationLevelId) as $objRoleTransactionTypeAuthorization) {
+					$objRoleTransactionTypeAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1256,6 +1454,12 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $AuthorizationLevelId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorization
+	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorization
+	 */
 	class QQNodeAuthorizationLevel extends QQNode {
 		protected $strTableName = 'authorization_level';
 		protected $strPrimaryKey = 'authorization_level_id';
@@ -1283,7 +1487,14 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $AuthorizationLevelId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorization
+	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorization
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeAuthorizationLevel extends QQReverseReferenceNode {
 		protected $strTableName = 'authorization_level';
 		protected $strPrimaryKey = 'authorization_level_id';

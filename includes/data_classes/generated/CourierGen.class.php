@@ -155,7 +155,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -217,7 +217,7 @@
 		 * Static Qcodo Query method to query for a single Courier object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Courier the queried object
 		 */
@@ -230,16 +230,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Courier object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Courier::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Courier object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Courier::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Courier::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Courier objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Courier[] the queried objects as an array
 		 */
@@ -258,10 +280,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Courier::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Courier objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -371,7 +418,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Courier::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -457,7 +504,7 @@
 
 		/**
 		 * Instantiate an array of Couriers from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Courier[]
@@ -490,6 +537,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Courier object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Courier next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Courier::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -503,9 +576,10 @@
 		 * @param integer $intCourierId
 		 * @return Courier
 		*/
-		public static function LoadByCourierId($intCourierId) {
+		public static function LoadByCourierId($intCourierId, $objOptionalClauses = null) {
 			return Courier::QuerySingle(
 				QQ::Equal(QQN::Courier()->CourierId, $intCourierId)
+			, $objOptionalClauses
 			);
 		}
 
@@ -518,9 +592,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this Courier
@@ -549,6 +623,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intCourierId = $objDatabase->InsertId('courier', 'courier_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -564,6 +642,9 @@
 						WHERE
 							`courier_id` = ' . $objDatabase->SqlVariable($this->intCourierId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -597,6 +678,9 @@
 					`courier`
 				WHERE
 					`courier_id` = ' . $objDatabase->SqlVariable($this->intCourierId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -642,6 +726,58 @@
 			$this->strShortDescription = $objReloaded->strShortDescription;
 			$this->blnActiveFlag = $objReloaded->blnActiveFlag;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = Courier::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `courier` (
+					`courier_id`,
+					`short_description`,
+					`active_flag`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intCourierId) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . $objDatabase->SqlVariable($this->blnActiveFlag) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intCourierId
+		 * @return Courier[]
+		 */
+		public static function GetJournalForId($intCourierId) {
+			$objDatabase = Courier::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM courier WHERE courier_id = ' .
+				$objDatabase->SqlVariable($intCourierId) . ' ORDER BY __sys_date');
+
+			return Courier::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return Courier[]
+		 */
+		public function GetJournal() {
+			return Courier::GetJournalForId($this->intCourierId);
+		}
+
 
 
 
@@ -834,6 +970,12 @@
 				WHERE
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->CourierId = $this->intCourierId;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -860,6 +1002,12 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`courier_id` = ' . $objDatabase->SqlVariable($this->intCourierId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->CourierId = null;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -872,6 +1020,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Courier::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByCourierId($this->intCourierId) as $objShipment) {
+					$objShipment->CourierId = null;
+					$objShipment->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -906,6 +1062,11 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`courier_id` = ' . $objDatabase->SqlVariable($this->intCourierId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -918,6 +1079,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Courier::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByCourierId($this->intCourierId) as $objShipment) {
+					$objShipment->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1088,6 +1256,12 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $CourierId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $ActiveFlag
+	 * @property-read QQReverseReferenceNodeShipment $Shipment
+	 */
 	class QQNodeCourier extends QQNode {
 		protected $strTableName = 'courier';
 		protected $strPrimaryKey = 'courier_id';
@@ -1115,7 +1289,14 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $CourierId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $ActiveFlag
+	 * @property-read QQReverseReferenceNodeShipment $Shipment
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeCourier extends QQReverseReferenceNode {
 		protected $strTableName = 'courier';
 		protected $strPrimaryKey = 'courier_id';

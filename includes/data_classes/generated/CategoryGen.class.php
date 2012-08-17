@@ -278,7 +278,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -340,7 +340,7 @@
 		 * Static Qcodo Query method to query for a single Category object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Category the queried object
 		 */
@@ -353,16 +353,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Category object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Category::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Category object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Category::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Category::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Category objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Category[] the queried objects as an array
 		 */
@@ -381,10 +403,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Category::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Category objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -501,7 +548,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Category::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -649,7 +696,7 @@
 
 		/**
 		 * Instantiate an array of Categories from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Category[]
@@ -682,6 +729,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Category object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Category next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Category::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -695,9 +768,10 @@
 		 * @param integer $intCategoryId
 		 * @return Category
 		*/
-		public static function LoadByCategoryId($intCategoryId) {
+		public static function LoadByCategoryId($intCategoryId, $objOptionalClauses = null) {
 			return Category::QuerySingle(
 				QQ::Equal(QQN::Category()->CategoryId, $intCategoryId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -713,7 +787,8 @@
 			try {
 				return Category::QueryArray(
 					QQ::Equal(QQN::Category()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -726,10 +801,11 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy) {
+		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
 			// Call Category::QueryCount to perform the CountByCreatedBy query
 			return Category::QueryCount(
 				QQ::Equal(QQN::Category()->CreatedBy, $intCreatedBy)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -745,7 +821,8 @@
 			try {
 				return Category::QueryArray(
 					QQ::Equal(QQN::Category()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -758,10 +835,11 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy) {
+		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
 			// Call Category::QueryCount to perform the CountByModifiedBy query
 			return Category::QueryCount(
 				QQ::Equal(QQN::Category()->ModifiedBy, $intModifiedBy)
+			, $objOptionalClauses
 			);
 		}
 
@@ -774,9 +852,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this Category
@@ -817,6 +895,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intCategoryId = $objDatabase->InsertId('category', 'category_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -853,6 +935,9 @@
 						WHERE
 							`category_id` = ' . $objDatabase->SqlVariable($this->intCategoryId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 		
@@ -927,6 +1012,9 @@
 					`category`
 				WHERE
 					`category_id` = ' . $objDatabase->SqlVariable($this->intCategoryId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -979,6 +1067,70 @@
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = Category::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `category` (
+					`category_id`,
+					`short_description`,
+					`long_description`,
+					`image_path`,
+					`asset_flag`,
+					`inventory_flag`,
+					`created_by`,
+					`creation_date`,
+					`modified_by`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intCategoryId) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . $objDatabase->SqlVariable($this->strLongDescription) . ',
+					' . $objDatabase->SqlVariable($this->strImagePath) . ',
+					' . $objDatabase->SqlVariable($this->blnAssetFlag) . ',
+					' . $objDatabase->SqlVariable($this->blnInventoryFlag) . ',
+					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
+					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
+					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intCategoryId
+		 * @return Category[]
+		 */
+		public static function GetJournalForId($intCategoryId) {
+			$objDatabase = Category::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM category WHERE category_id = ' .
+				$objDatabase->SqlVariable($intCategoryId) . ' ORDER BY __sys_date');
+
+			return Category::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return Category[]
+		 */
+		public function GetJournal() {
+			return Category::GetJournalForId($this->intCategoryId);
+		}
+
 
 
 
@@ -1425,6 +1577,12 @@
 				WHERE
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->CategoryId = $this->intCategoryId;
+				$objAssetModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1451,6 +1609,12 @@
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
 					`category_id` = ' . $objDatabase->SqlVariable($this->intCategoryId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->CategoryId = null;
+				$objAssetModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1463,6 +1627,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Category::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByCategoryId($this->intCategoryId) as $objAssetModel) {
+					$objAssetModel->CategoryId = null;
+					$objAssetModel->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1497,6 +1669,11 @@
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
 					`category_id` = ' . $objDatabase->SqlVariable($this->intCategoryId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1509,6 +1686,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Category::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByCategoryId($this->intCategoryId) as $objAssetModel) {
+					$objAssetModel->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1575,6 +1759,12 @@
 				WHERE
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->CategoryId = $this->intCategoryId;
+				$objInventoryModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1601,6 +1791,12 @@
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
 					`category_id` = ' . $objDatabase->SqlVariable($this->intCategoryId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->CategoryId = null;
+				$objInventoryModel->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1613,6 +1809,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Category::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryModel::LoadArrayByCategoryId($this->intCategoryId) as $objInventoryModel) {
+					$objInventoryModel->CategoryId = null;
+					$objInventoryModel->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1647,6 +1851,11 @@
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
 					`category_id` = ' . $objDatabase->SqlVariable($this->intCategoryId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryModel->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1659,6 +1868,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Category::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryModel::LoadArrayByCategoryId($this->intCategoryId) as $objInventoryModel) {
+					$objInventoryModel->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1889,6 +2105,23 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $CategoryId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $LongDescription
+	 * @property-read QQNode $ImagePath
+	 * @property-read QQNode $AssetFlag
+	 * @property-read QQNode $InventoryFlag
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModel
+	 * @property-read QQReverseReferenceNodeCategoryCustomFieldHelper $CategoryCustomFieldHelper
+	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModel
+	 */
 	class QQNodeCategory extends QQNode {
 		protected $strTableName = 'category';
 		protected $strPrimaryKey = 'category_id';
@@ -1938,7 +2171,25 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $CategoryId
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $LongDescription
+	 * @property-read QQNode $ImagePath
+	 * @property-read QQNode $AssetFlag
+	 * @property-read QQNode $InventoryFlag
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModel
+	 * @property-read QQReverseReferenceNodeCategoryCustomFieldHelper $CategoryCustomFieldHelper
+	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModel
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeCategory extends QQReverseReferenceNode {
 		protected $strTableName = 'category';
 		protected $strPrimaryKey = 'category_id';

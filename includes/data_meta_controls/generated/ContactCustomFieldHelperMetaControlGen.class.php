@@ -24,16 +24,45 @@
 
 	class ContactCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var ContactCustomFieldHelper objContactCustomFieldHelper
+		 * @access protected
+		 */
 		protected $objContactCustomFieldHelper;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of ContactCustomFieldHelper's individual data fields
+        /**
+         * @var QListBox lstContact;
+         * @access protected
+         */
 		protected $lstContact;
 
+
 		// Controls that allow the viewing of ContactCustomFieldHelper's individual data fields
+        /**
+         * @var QLabel lblContactId
+         * @access protected
+         */
 		protected $lblContactId;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -135,21 +164,30 @@
 		/**
 		 * Create and setup QListBox lstContact
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstContact_Create($strControlId = null) {
+		public function lstContact_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstContact = new QListBox($this->objParentObject, $strControlId);
 			$this->lstContact->Name = QApplication::Translate('Contact');
 			$this->lstContact->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstContact->AddItem(QApplication::Translate('- Select One -'), null);
-			$objContactArray = Contact::LoadAll();
-			if ($objContactArray) foreach ($objContactArray as $objContact) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objContactCursor = Contact::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objContact = Contact::InstantiateCursor($objContactCursor)) {
 				$objListItem = new QListItem($objContact->__toString(), $objContact->ContactId);
 				if (($this->objContactCustomFieldHelper->Contact) && ($this->objContactCustomFieldHelper->Contact->ContactId == $objContact->ContactId))
 					$objListItem->Selected = true;
 				$this->lstContact->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstContact;
 		}
 

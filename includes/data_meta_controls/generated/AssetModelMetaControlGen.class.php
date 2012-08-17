@@ -648,9 +648,7 @@
 		public function lstDefaultDepreciationClass_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstDefaultDepreciationClass = new QListBox($this->objParentObject, $strControlId);
 			$this->lstDefaultDepreciationClass->Name = QApplication::Translate('Default Depreciation Class');
-			$this->lstDefaultDepreciationClass->Required = true;
-			if (!$this->blnEditMode)
-				$this->lstDefaultDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
+			$this->lstDefaultDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
 
 			// Setup and perform the Query
 			if (is_null($objCondition)) $objCondition = QQ::All();
@@ -677,7 +675,6 @@
 			$this->lblDefaultDepreciationClassId = new QLabel($this->objParentObject, $strControlId);
 			$this->lblDefaultDepreciationClassId->Name = QApplication::Translate('Default Depreciation Class');
 			$this->lblDefaultDepreciationClassId->Text = ($this->objAssetModel->DefaultDepreciationClass) ? $this->objAssetModel->DefaultDepreciationClass->__toString() : null;
-			$this->lblDefaultDepreciationClassId->Required = true;
 			return $this->lblDefaultDepreciationClassId;
 		}
 
@@ -809,8 +806,7 @@
 
 			if ($this->lstDefaultDepreciationClass) {
 					$this->lstDefaultDepreciationClass->RemoveAllItems();
-				if (!$this->blnEditMode)
-					$this->lstDefaultDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
+				$this->lstDefaultDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
 				$objDefaultDepreciationClassArray = DepreciationClass::LoadAll();
 				if ($objDefaultDepreciationClassArray) foreach ($objDefaultDepreciationClassArray as $objDefaultDepreciationClass) {
 					$objListItem = new QListItem($objDefaultDepreciationClass->__toString(), $objDefaultDepreciationClass->DepreciationClassId);

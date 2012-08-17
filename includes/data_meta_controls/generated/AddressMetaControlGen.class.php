@@ -50,44 +50,193 @@
 
 	class AddressMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var Address objAddress
+		 * @access protected
+		 */
 		protected $objAddress;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Address's individual data fields
+        /**
+         * @var QLabel lblAddressId;
+         * @access protected
+         */
 		protected $lblAddressId;
+
+        /**
+         * @var QListBox lstCompany;
+         * @access protected
+         */
 		protected $lstCompany;
+
+        /**
+         * @var QTextBox txtShortDescription;
+         * @access protected
+         */
 		protected $txtShortDescription;
+
+        /**
+         * @var QListBox lstCountry;
+         * @access protected
+         */
 		protected $lstCountry;
+
+        /**
+         * @var QTextBox txtAddress1;
+         * @access protected
+         */
 		protected $txtAddress1;
+
+        /**
+         * @var QTextBox txtAddress2;
+         * @access protected
+         */
 		protected $txtAddress2;
+
+        /**
+         * @var QTextBox txtCity;
+         * @access protected
+         */
 		protected $txtCity;
+
+        /**
+         * @var QListBox lstStateProvince;
+         * @access protected
+         */
 		protected $lstStateProvince;
+
+        /**
+         * @var QTextBox txtPostalCode;
+         * @access protected
+         */
 		protected $txtPostalCode;
+
+        /**
+         * @var QListBox lstCreatedByObject;
+         * @access protected
+         */
 		protected $lstCreatedByObject;
+
+        /**
+         * @var QDateTimePicker calCreationDate;
+         * @access protected
+         */
 		protected $calCreationDate;
+
+        /**
+         * @var QListBox lstModifiedByObject;
+         * @access protected
+         */
 		protected $lstModifiedByObject;
+
+        /**
+         * @var QLabel lblModifiedDate;
+         * @access protected
+         */
 		protected $lblModifiedDate;
 
+
 		// Controls that allow the viewing of Address's individual data fields
+        /**
+         * @var QLabel lblCompanyId
+         * @access protected
+         */
 		protected $lblCompanyId;
+
+        /**
+         * @var QLabel lblShortDescription
+         * @access protected
+         */
 		protected $lblShortDescription;
+
+        /**
+         * @var QLabel lblCountryId
+         * @access protected
+         */
 		protected $lblCountryId;
+
+        /**
+         * @var QLabel lblAddress1
+         * @access protected
+         */
 		protected $lblAddress1;
+
+        /**
+         * @var QLabel lblAddress2
+         * @access protected
+         */
 		protected $lblAddress2;
+
+        /**
+         * @var QLabel lblCity
+         * @access protected
+         */
 		protected $lblCity;
+
+        /**
+         * @var QLabel lblStateProvinceId
+         * @access protected
+         */
 		protected $lblStateProvinceId;
+
+        /**
+         * @var QLabel lblPostalCode
+         * @access protected
+         */
 		protected $lblPostalCode;
+
+        /**
+         * @var QLabel lblCreatedBy
+         * @access protected
+         */
 		protected $lblCreatedBy;
+
+        /**
+         * @var QLabel lblCreationDate
+         * @access protected
+         */
 		protected $lblCreationDate;
+
+        /**
+         * @var QLabel lblModifiedBy
+         * @access protected
+         */
 		protected $lblModifiedBy;
 
+
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
+        /**
+         * @var QListBox lstAddressCustomFieldHelper
+         * @access protected
+         */
 		protected $lstAddressCustomFieldHelper;
 
+
 		// QLabel Controls (if applicable) to view Unique ReverseReferences and ManyToMany References
+        /**
+         * @var QLabel lblAddressCustomFieldHelper
+         * @access protected
+         */
 		protected $lblAddressCustomFieldHelper;
+
 
 
 		/**
@@ -200,21 +349,30 @@
 		/**
 		 * Create and setup QListBox lstCompany
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCompany_Create($strControlId = null) {
+		public function lstCompany_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstCompany = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCompany->Name = QApplication::Translate('Company');
 			$this->lstCompany->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstCompany->AddItem(QApplication::Translate('- Select One -'), null);
-			$objCompanyArray = Company::LoadAll();
-			if ($objCompanyArray) foreach ($objCompanyArray as $objCompany) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objCompanyCursor = Company::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objCompany = Company::InstantiateCursor($objCompanyCursor)) {
 				$objListItem = new QListItem($objCompany->__toString(), $objCompany->CompanyId);
 				if (($this->objAddress->Company) && ($this->objAddress->Company->CompanyId == $objCompany->CompanyId))
 					$objListItem->Selected = true;
 				$this->lstCompany->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstCompany;
 		}
 
@@ -261,21 +419,30 @@
 		/**
 		 * Create and setup QListBox lstCountry
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCountry_Create($strControlId = null) {
+		public function lstCountry_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstCountry = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCountry->Name = QApplication::Translate('Country');
 			$this->lstCountry->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstCountry->AddItem(QApplication::Translate('- Select One -'), null);
-			$objCountryArray = Country::LoadAll();
-			if ($objCountryArray) foreach ($objCountryArray as $objCountry) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objCountryCursor = Country::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objCountry = Country::InstantiateCursor($objCountryCursor)) {
 				$objListItem = new QListItem($objCountry->__toString(), $objCountry->CountryId);
 				if (($this->objAddress->Country) && ($this->objAddress->Country->CountryId == $objCountry->CountryId))
 					$objListItem->Selected = true;
 				$this->lstCountry->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstCountry;
 		}
 
@@ -374,19 +541,28 @@
 		/**
 		 * Create and setup QListBox lstStateProvince
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstStateProvince_Create($strControlId = null) {
+		public function lstStateProvince_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstStateProvince = new QListBox($this->objParentObject, $strControlId);
 			$this->lstStateProvince->Name = QApplication::Translate('State Province');
 			$this->lstStateProvince->AddItem(QApplication::Translate('- Select One -'), null);
-			$objStateProvinceArray = StateProvince::LoadAll();
-			if ($objStateProvinceArray) foreach ($objStateProvinceArray as $objStateProvince) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objStateProvinceCursor = StateProvince::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objStateProvince = StateProvince::InstantiateCursor($objStateProvinceCursor)) {
 				$objListItem = new QListItem($objStateProvince->__toString(), $objStateProvince->StateProvinceId);
 				if (($this->objAddress->StateProvince) && ($this->objAddress->StateProvince->StateProvinceId == $objStateProvince->StateProvinceId))
 					$objListItem->Selected = true;
 				$this->lstStateProvince->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstStateProvince;
 		}
 
@@ -432,19 +608,28 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null) {
+		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-			$objCreatedByObjectArray = UserAccount::LoadAll();
-			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objAddress->CreatedByObject) && ($this->objAddress->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 
@@ -492,19 +677,28 @@
 		/**
 		 * Create and setup QListBox lstModifiedByObject
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModifiedByObject_Create($strControlId = null) {
+		public function lstModifiedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstModifiedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModifiedByObject->Name = QApplication::Translate('Modified By Object');
 			$this->lstModifiedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-			$objModifiedByObjectArray = UserAccount::LoadAll();
-			if ($objModifiedByObjectArray) foreach ($objModifiedByObjectArray as $objModifiedByObject) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objModifiedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objModifiedByObject = UserAccount::InstantiateCursor($objModifiedByObjectCursor)) {
 				$objListItem = new QListItem($objModifiedByObject->__toString(), $objModifiedByObject->UserAccountId);
 				if (($this->objAddress->ModifiedByObject) && ($this->objAddress->ModifiedByObject->UserAccountId == $objModifiedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstModifiedByObject->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstModifiedByObject;
 		}
 
@@ -538,22 +732,32 @@
 		/**
 		 * Create and setup QListBox lstAddressCustomFieldHelper
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAddressCustomFieldHelper_Create($strControlId = null) {
+		public function lstAddressCustomFieldHelper_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstAddressCustomFieldHelper = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAddressCustomFieldHelper->Name = QApplication::Translate('Address Custom Field Helper');
 			$this->lstAddressCustomFieldHelper->AddItem(QApplication::Translate('- Select One -'), null);
-			$objAddressCustomFieldHelperArray = AddressCustomFieldHelper::LoadAll();
-			if ($objAddressCustomFieldHelperArray) foreach ($objAddressCustomFieldHelperArray as $objAddressCustomFieldHelper) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objAddressCustomFieldHelperCursor = AddressCustomFieldHelper::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objAddressCustomFieldHelper = AddressCustomFieldHelper::InstantiateCursor($objAddressCustomFieldHelperCursor)) {
 				$objListItem = new QListItem($objAddressCustomFieldHelper->__toString(), $objAddressCustomFieldHelper->AddressId);
 				if ($objAddressCustomFieldHelper->AddressId == $this->objAddress->AddressId)
 					$objListItem->Selected = true;
 				$this->lstAddressCustomFieldHelper->AddItem($objListItem);
 			}
+
 			// Because AddressCustomFieldHelper's AddressCustomFieldHelper is not null, if a value is already selected, it cannot be changed.
 			if ($this->lstAddressCustomFieldHelper->SelectedValue)
 				$this->lstAddressCustomFieldHelper->Enabled = false;
+
+			// Return the QListBox
 			return $this->lstAddressCustomFieldHelper;
 		}
 
