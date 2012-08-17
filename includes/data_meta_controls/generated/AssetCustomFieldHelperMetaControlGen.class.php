@@ -18,30 +18,51 @@
 	 * property-read AssetCustomFieldHelper $AssetCustomFieldHelper the actual AssetCustomFieldHelper data class being edited
 	 * property QListBox $AssetIdControl
 	 * property-read QLabel $AssetIdLabel
-	 * property QTextBox $Cfv1Control
-	 * property-read QLabel $Cfv1Label
-	 * property QTextBox $Cfv3Control
-	 * property-read QLabel $Cfv3Label
 	 * property-read string $TitleVerb a verb indicating whether or not this is being edited or created
 	 * property-read boolean $EditMode a boolean indicating whether or not this is being edited or created
 	 */
 
 	class AssetCustomFieldHelperMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var AssetCustomFieldHelper objAssetCustomFieldHelper
+		 * @access protected
+		 */
 		protected $objAssetCustomFieldHelper;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of AssetCustomFieldHelper's individual data fields
+        /**
+         * @var QListBox lstAsset;
+         * @access protected
+         */
 		protected $lstAsset;
-		protected $txtCfv1;
-		protected $txtCfv3;
+
 
 		// Controls that allow the viewing of AssetCustomFieldHelper's individual data fields
+        /**
+         * @var QLabel lblAssetId
+         * @access protected
+         */
 		protected $lblAssetId;
-		protected $lblCfv1;
-		protected $lblCfv3;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -143,21 +164,30 @@
 		/**
 		 * Create and setup QListBox lstAsset
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstAsset_Create($strControlId = null) {
+		public function lstAsset_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstAsset = new QListBox($this->objParentObject, $strControlId);
 			$this->lstAsset->Name = QApplication::Translate('Asset');
 			$this->lstAsset->Required = true;
 			if (!$this->blnEditMode)
 				$this->lstAsset->AddItem(QApplication::Translate('- Select One -'), null);
-			$objAssetArray = Asset::LoadAll();
-			if ($objAssetArray) foreach ($objAssetArray as $objAsset) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objAssetCursor = Asset::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objAsset = Asset::InstantiateCursor($objAssetCursor)) {
 				$objListItem = new QListItem($objAsset->__toString(), $objAsset->AssetId);
 				if (($this->objAssetCustomFieldHelper->Asset) && ($this->objAssetCustomFieldHelper->Asset->AssetId == $objAsset->AssetId))
 					$objListItem->Selected = true;
 				$this->lstAsset->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstAsset;
 		}
 
@@ -172,56 +202,6 @@
 			$this->lblAssetId->Text = ($this->objAssetCustomFieldHelper->Asset) ? $this->objAssetCustomFieldHelper->Asset->__toString() : null;
 			$this->lblAssetId->Required = true;
 			return $this->lblAssetId;
-		}
-
-		/**
-		 * Create and setup QTextBox txtCfv1
-		 * @param string $strControlId optional ControlId to use
-		 * @return QTextBox
-		 */
-		public function txtCfv1_Create($strControlId = null) {
-			$this->txtCfv1 = new QTextBox($this->objParentObject, $strControlId);
-			$this->txtCfv1->Name = QApplication::Translate('Cfv 1');
-			$this->txtCfv1->Text = $this->objAssetCustomFieldHelper->Cfv1;
-			$this->txtCfv1->TextMode = QTextMode::MultiLine;
-			return $this->txtCfv1;
-		}
-
-		/**
-		 * Create and setup QLabel lblCfv1
-		 * @param string $strControlId optional ControlId to use
-		 * @return QLabel
-		 */
-		public function lblCfv1_Create($strControlId = null) {
-			$this->lblCfv1 = new QLabel($this->objParentObject, $strControlId);
-			$this->lblCfv1->Name = QApplication::Translate('Cfv 1');
-			$this->lblCfv1->Text = $this->objAssetCustomFieldHelper->Cfv1;
-			return $this->lblCfv1;
-		}
-
-		/**
-		 * Create and setup QTextBox txtCfv3
-		 * @param string $strControlId optional ControlId to use
-		 * @return QTextBox
-		 */
-		public function txtCfv3_Create($strControlId = null) {
-			$this->txtCfv3 = new QTextBox($this->objParentObject, $strControlId);
-			$this->txtCfv3->Name = QApplication::Translate('Cfv 3');
-			$this->txtCfv3->Text = $this->objAssetCustomFieldHelper->Cfv3;
-			$this->txtCfv3->TextMode = QTextMode::MultiLine;
-			return $this->txtCfv3;
-		}
-
-		/**
-		 * Create and setup QLabel lblCfv3
-		 * @param string $strControlId optional ControlId to use
-		 * @return QLabel
-		 */
-		public function lblCfv3_Create($strControlId = null) {
-			$this->lblCfv3 = new QLabel($this->objParentObject, $strControlId);
-			$this->lblCfv3->Name = QApplication::Translate('Cfv 3');
-			$this->lblCfv3->Text = $this->objAssetCustomFieldHelper->Cfv3;
-			return $this->lblCfv3;
 		}
 
 
@@ -249,12 +229,6 @@
 			}
 			if ($this->lblAssetId) $this->lblAssetId->Text = ($this->objAssetCustomFieldHelper->Asset) ? $this->objAssetCustomFieldHelper->Asset->__toString() : null;
 
-			if ($this->txtCfv1) $this->txtCfv1->Text = $this->objAssetCustomFieldHelper->Cfv1;
-			if ($this->lblCfv1) $this->lblCfv1->Text = $this->objAssetCustomFieldHelper->Cfv1;
-
-			if ($this->txtCfv3) $this->txtCfv3->Text = $this->objAssetCustomFieldHelper->Cfv3;
-			if ($this->lblCfv3) $this->lblCfv3->Text = $this->objAssetCustomFieldHelper->Cfv3;
-
 		}
 
 
@@ -279,8 +253,6 @@
 			try {
 				// Update any fields for controls that have been created
 				if ($this->lstAsset) $this->objAssetCustomFieldHelper->AssetId = $this->lstAsset->SelectedValue;
-				if ($this->txtCfv1) $this->objAssetCustomFieldHelper->Cfv1 = $this->txtCfv1->Text;
-				if ($this->txtCfv3) $this->objAssetCustomFieldHelper->Cfv3 = $this->txtCfv3->Text;
 
 				// Update any UniqueReverseReferences (if any) for controls that have been created for it
 
@@ -329,18 +301,6 @@
 				case 'AssetIdLabel':
 					if (!$this->lblAssetId) return $this->lblAssetId_Create();
 					return $this->lblAssetId;
-				case 'Cfv1Control':
-					if (!$this->txtCfv1) return $this->txtCfv1_Create();
-					return $this->txtCfv1;
-				case 'Cfv1Label':
-					if (!$this->lblCfv1) return $this->lblCfv1_Create();
-					return $this->lblCfv1;
-				case 'Cfv3Control':
-					if (!$this->txtCfv3) return $this->txtCfv3_Create();
-					return $this->txtCfv3;
-				case 'Cfv3Label':
-					if (!$this->lblCfv3) return $this->lblCfv3_Create();
-					return $this->lblCfv3;
 				default:
 					try {
 						return parent::__get($strName);
@@ -365,10 +325,6 @@
 					// Controls that point to AssetCustomFieldHelper fields
 					case 'AssetIdControl':
 						return ($this->lstAsset = QType::Cast($mixValue, 'QControl'));
-					case 'Cfv1Control':
-						return ($this->txtCfv1 = QType::Cast($mixValue, 'QControl'));
-					case 'Cfv3Control':
-						return ($this->txtCfv3 = QType::Cast($mixValue, 'QControl'));
 					default:
 						return parent::__set($strName, $mixValue);
 				}

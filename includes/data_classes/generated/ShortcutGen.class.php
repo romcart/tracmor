@@ -226,7 +226,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -288,7 +288,7 @@
 		 * Static Qcodo Query method to query for a single Shortcut object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Shortcut the queried object
 		 */
@@ -301,16 +301,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Shortcut object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Shortcut::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Shortcut object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Shortcut::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Shortcut::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Shortcut objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Shortcut[] the queried objects as an array
 		 */
@@ -329,10 +351,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Shortcut::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Shortcut objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -448,7 +495,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Shortcut::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -522,7 +569,7 @@
 
 		/**
 		 * Instantiate an array of Shortcuts from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Shortcut[]
@@ -555,6 +602,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Shortcut object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Shortcut next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Shortcut::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -568,9 +641,10 @@
 		 * @param integer $intShortcutId
 		 * @return Shortcut
 		*/
-		public static function LoadByShortcutId($intShortcutId) {
+		public static function LoadByShortcutId($intShortcutId, $objOptionalClauses = null) {
 			return Shortcut::QuerySingle(
 				QQ::Equal(QQN::Shortcut()->ShortcutId, $intShortcutId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -586,7 +660,8 @@
 			try {
 				return Shortcut::QueryArray(
 					QQ::Equal(QQN::Shortcut()->ModuleId, $intModuleId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -599,10 +674,11 @@
 		 * @param integer $intModuleId
 		 * @return int
 		*/
-		public static function CountByModuleId($intModuleId) {
+		public static function CountByModuleId($intModuleId, $objOptionalClauses = null) {
 			// Call Shortcut::QueryCount to perform the CountByModuleId query
 			return Shortcut::QueryCount(
 				QQ::Equal(QQN::Shortcut()->ModuleId, $intModuleId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -618,7 +694,8 @@
 			try {
 				return Shortcut::QueryArray(
 					QQ::Equal(QQN::Shortcut()->AuthorizationId, $intAuthorizationId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -631,10 +708,11 @@
 		 * @param integer $intAuthorizationId
 		 * @return int
 		*/
-		public static function CountByAuthorizationId($intAuthorizationId) {
+		public static function CountByAuthorizationId($intAuthorizationId, $objOptionalClauses = null) {
 			// Call Shortcut::QueryCount to perform the CountByAuthorizationId query
 			return Shortcut::QueryCount(
 				QQ::Equal(QQN::Shortcut()->AuthorizationId, $intAuthorizationId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -650,7 +728,8 @@
 			try {
 				return Shortcut::QueryArray(
 					QQ::Equal(QQN::Shortcut()->TransactionTypeId, $intTransactionTypeId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -663,10 +742,11 @@
 		 * @param integer $intTransactionTypeId
 		 * @return int
 		*/
-		public static function CountByTransactionTypeId($intTransactionTypeId) {
+		public static function CountByTransactionTypeId($intTransactionTypeId, $objOptionalClauses = null) {
 			// Call Shortcut::QueryCount to perform the CountByTransactionTypeId query
 			return Shortcut::QueryCount(
 				QQ::Equal(QQN::Shortcut()->TransactionTypeId, $intTransactionTypeId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -682,7 +762,8 @@
 			try {
 				return Shortcut::QueryArray(
 					QQ::Equal(QQN::Shortcut()->EntityQtypeId, $intEntityQtypeId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -695,10 +776,11 @@
 		 * @param integer $intEntityQtypeId
 		 * @return int
 		*/
-		public static function CountByEntityQtypeId($intEntityQtypeId) {
+		public static function CountByEntityQtypeId($intEntityQtypeId, $objOptionalClauses = null) {
 			// Call Shortcut::QueryCount to perform the CountByEntityQtypeId query
 			return Shortcut::QueryCount(
 				QQ::Equal(QQN::Shortcut()->EntityQtypeId, $intEntityQtypeId)
+			, $objOptionalClauses
 			);
 		}
 
@@ -711,9 +793,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this Shortcut
@@ -754,6 +836,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intShortcutId = $objDatabase->InsertId('shortcut', 'shortcut_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -775,6 +861,9 @@
 						WHERE
 							`shortcut_id` = ' . $objDatabase->SqlVariable($this->intShortcutId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -808,6 +897,9 @@
 					`shortcut`
 				WHERE
 					`shortcut_id` = ' . $objDatabase->SqlVariable($this->intShortcutId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -859,6 +951,70 @@
 			$this->EntityQtypeId = $objReloaded->EntityQtypeId;
 			$this->blnCreateFlag = $objReloaded->blnCreateFlag;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = Shortcut::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `shortcut` (
+					`shortcut_id`,
+					`module_id`,
+					`authorization_id`,
+					`transaction_type_id`,
+					`short_description`,
+					`link`,
+					`image_path`,
+					`entity_qtype_id`,
+					`create_flag`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intShortcutId) . ',
+					' . $objDatabase->SqlVariable($this->intModuleId) . ',
+					' . $objDatabase->SqlVariable($this->intAuthorizationId) . ',
+					' . $objDatabase->SqlVariable($this->intTransactionTypeId) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . $objDatabase->SqlVariable($this->strLink) . ',
+					' . $objDatabase->SqlVariable($this->strImagePath) . ',
+					' . $objDatabase->SqlVariable($this->intEntityQtypeId) . ',
+					' . $objDatabase->SqlVariable($this->blnCreateFlag) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intShortcutId
+		 * @return Shortcut[]
+		 */
+		public static function GetJournalForId($intShortcutId) {
+			$objDatabase = Shortcut::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM shortcut WHERE shortcut_id = ' .
+				$objDatabase->SqlVariable($intShortcutId) . ' ORDER BY __sys_date');
+
+			return Shortcut::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return Shortcut[]
+		 */
+		public function GetJournal() {
+			return Shortcut::GetJournalForId($this->intShortcutId);
+		}
+
 
 
 
@@ -1437,6 +1593,20 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $ShortcutId
+	 * @property-read QQNode $ModuleId
+	 * @property-read QQNodeModule $Module
+	 * @property-read QQNode $AuthorizationId
+	 * @property-read QQNodeAuthorization $Authorization
+	 * @property-read QQNode $TransactionTypeId
+	 * @property-read QQNodeTransactionType $TransactionType
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $Link
+	 * @property-read QQNode $ImagePath
+	 * @property-read QQNode $EntityQtypeId
+	 * @property-read QQNode $CreateFlag
+	 */
 	class QQNodeShortcut extends QQNode {
 		protected $strTableName = 'shortcut';
 		protected $strPrimaryKey = 'shortcut_id';
@@ -1480,7 +1650,22 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $ShortcutId
+	 * @property-read QQNode $ModuleId
+	 * @property-read QQNodeModule $Module
+	 * @property-read QQNode $AuthorizationId
+	 * @property-read QQNodeAuthorization $Authorization
+	 * @property-read QQNode $TransactionTypeId
+	 * @property-read QQNodeTransactionType $TransactionType
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $Link
+	 * @property-read QQNode $ImagePath
+	 * @property-read QQNode $EntityQtypeId
+	 * @property-read QQNode $CreateFlag
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeShortcut extends QQReverseReferenceNode {
 		protected $strTableName = 'shortcut';
 		protected $strPrimaryKey = 'shortcut_id';

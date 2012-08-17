@@ -26,17 +26,51 @@
 
 	class DatagridMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var Datagrid objDatagrid
+		 * @access protected
+		 */
 		protected $objDatagrid;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Datagrid's individual data fields
+        /**
+         * @var QLabel lblDatagridId;
+         * @access protected
+         */
 		protected $lblDatagridId;
+
+        /**
+         * @var QTextBox txtShortDescription;
+         * @access protected
+         */
 		protected $txtShortDescription;
 
+
 		// Controls that allow the viewing of Datagrid's individual data fields
+        /**
+         * @var QLabel lblShortDescription
+         * @access protected
+         */
 		protected $lblShortDescription;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 

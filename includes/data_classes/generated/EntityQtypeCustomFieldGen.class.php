@@ -165,7 +165,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -227,7 +227,7 @@
 		 * Static Qcodo Query method to query for a single EntityQtypeCustomField object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return EntityQtypeCustomField the queried object
 		 */
@@ -240,16 +240,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new EntityQtypeCustomField object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return EntityQtypeCustomField::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new EntityQtypeCustomField object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = EntityQtypeCustomField::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return EntityQtypeCustomField::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of EntityQtypeCustomField objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return EntityQtypeCustomField[] the queried objects as an array
 		 */
@@ -268,10 +290,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = EntityQtypeCustomField::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of EntityQtypeCustomField objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -381,7 +428,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this EntityQtypeCustomField::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -473,7 +520,7 @@
 
 		/**
 		 * Instantiate an array of EntityQtypeCustomFields from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return EntityQtypeCustomField[]
@@ -506,6 +553,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single EntityQtypeCustomField object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return EntityQtypeCustomField next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return EntityQtypeCustomField::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -519,9 +592,10 @@
 		 * @param integer $intEntityQtypeCustomFieldId
 		 * @return EntityQtypeCustomField
 		*/
-		public static function LoadByEntityQtypeCustomFieldId($intEntityQtypeCustomFieldId) {
+		public static function LoadByEntityQtypeCustomFieldId($intEntityQtypeCustomFieldId, $objOptionalClauses = null) {
 			return EntityQtypeCustomField::QuerySingle(
 				QQ::Equal(QQN::EntityQtypeCustomField()->EntityQtypeCustomFieldId, $intEntityQtypeCustomFieldId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -537,7 +611,8 @@
 			try {
 				return EntityQtypeCustomField::QueryArray(
 					QQ::Equal(QQN::EntityQtypeCustomField()->EntityQtypeId, $intEntityQtypeId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -550,10 +625,11 @@
 		 * @param integer $intEntityQtypeId
 		 * @return int
 		*/
-		public static function CountByEntityQtypeId($intEntityQtypeId) {
+		public static function CountByEntityQtypeId($intEntityQtypeId, $objOptionalClauses = null) {
 			// Call EntityQtypeCustomField::QueryCount to perform the CountByEntityQtypeId query
 			return EntityQtypeCustomField::QueryCount(
 				QQ::Equal(QQN::EntityQtypeCustomField()->EntityQtypeId, $intEntityQtypeId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -569,7 +645,8 @@
 			try {
 				return EntityQtypeCustomField::QueryArray(
 					QQ::Equal(QQN::EntityQtypeCustomField()->CustomFieldId, $intCustomFieldId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -582,10 +659,11 @@
 		 * @param integer $intCustomFieldId
 		 * @return int
 		*/
-		public static function CountByCustomFieldId($intCustomFieldId) {
+		public static function CountByCustomFieldId($intCustomFieldId, $objOptionalClauses = null) {
 			// Call EntityQtypeCustomField::QueryCount to perform the CountByCustomFieldId query
 			return EntityQtypeCustomField::QueryCount(
 				QQ::Equal(QQN::EntityQtypeCustomField()->CustomFieldId, $intCustomFieldId)
+			, $objOptionalClauses
 			);
 		}
 
@@ -598,9 +676,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this EntityQtypeCustomField
@@ -629,6 +707,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intEntityQtypeCustomFieldId = $objDatabase->InsertId('entity_qtype_custom_field', 'entity_qtype_custom_field_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -644,6 +726,9 @@
 						WHERE
 							`entity_qtype_custom_field_id` = ' . $objDatabase->SqlVariable($this->intEntityQtypeCustomFieldId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 			} catch (QCallerException $objExc) {
@@ -677,6 +762,9 @@
 					`entity_qtype_custom_field`
 				WHERE
 					`entity_qtype_custom_field_id` = ' . $objDatabase->SqlVariable($this->intEntityQtypeCustomFieldId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -722,6 +810,58 @@
 			$this->EntityQtypeId = $objReloaded->EntityQtypeId;
 			$this->CustomFieldId = $objReloaded->CustomFieldId;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = EntityQtypeCustomField::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `entity_qtype_custom_field` (
+					`entity_qtype_custom_field_id`,
+					`entity_qtype_id`,
+					`custom_field_id`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intEntityQtypeCustomFieldId) . ',
+					' . $objDatabase->SqlVariable($this->intEntityQtypeId) . ',
+					' . $objDatabase->SqlVariable($this->intCustomFieldId) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intEntityQtypeCustomFieldId
+		 * @return EntityQtypeCustomField[]
+		 */
+		public static function GetJournalForId($intEntityQtypeCustomFieldId) {
+			$objDatabase = EntityQtypeCustomField::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM entity_qtype_custom_field WHERE entity_qtype_custom_field_id = ' .
+				$objDatabase->SqlVariable($intEntityQtypeCustomFieldId) . ' ORDER BY __sys_date');
+
+			return EntityQtypeCustomField::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return EntityQtypeCustomField[]
+		 */
+		public function GetJournal() {
+			return EntityQtypeCustomField::GetJournalForId($this->intEntityQtypeCustomFieldId);
+		}
+
 
 
 
@@ -957,6 +1097,12 @@
 				WHERE
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->EntityQtypeCustomFieldId = $this->intEntityQtypeCustomFieldId;
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -983,6 +1129,12 @@
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
 					`entity_qtype_custom_field_id` = ' . $objDatabase->SqlVariable($this->intEntityQtypeCustomFieldId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->EntityQtypeCustomFieldId = null;
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -995,6 +1147,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = EntityQtypeCustomField::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByEntityQtypeCustomFieldId($this->intEntityQtypeCustomFieldId) as $objRoleEntityQtypeCustomFieldAuthorization) {
+					$objRoleEntityQtypeCustomFieldAuthorization->EntityQtypeCustomFieldId = null;
+					$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1029,6 +1189,11 @@
 					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
 					`entity_qtype_custom_field_id` = ' . $objDatabase->SqlVariable($this->intEntityQtypeCustomFieldId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1041,6 +1206,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = EntityQtypeCustomField::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByEntityQtypeCustomFieldId($this->intEntityQtypeCustomFieldId) as $objRoleEntityQtypeCustomFieldAuthorization) {
+					$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1226,6 +1398,13 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $EntityQtypeCustomFieldId
+	 * @property-read QQNode $EntityQtypeId
+	 * @property-read QQNode $CustomFieldId
+	 * @property-read QQNodeCustomField $CustomField
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorization
+	 */
 	class QQNodeEntityQtypeCustomField extends QQNode {
 		protected $strTableName = 'entity_qtype_custom_field';
 		protected $strPrimaryKey = 'entity_qtype_custom_field_id';
@@ -1255,7 +1434,15 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $EntityQtypeCustomFieldId
+	 * @property-read QQNode $EntityQtypeId
+	 * @property-read QQNode $CustomFieldId
+	 * @property-read QQNodeCustomField $CustomField
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorization
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeEntityQtypeCustomField extends QQReverseReferenceNode {
 		protected $strTableName = 'entity_qtype_custom_field';
 		protected $strPrimaryKey = 'entity_qtype_custom_field_id';

@@ -61,7 +61,7 @@ CREATE TABLE asset_model (
   creation_date     DATETIME   NULL   DEFAULT NULL,
   modified_by       INTEGER UNSIGNED   NULL,
   modified_date     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
-  default_depreciation_class_id INTEGER UNSIGNED   NOT NULL,
+  default_depreciation_class_id INTEGER UNSIGNED NULL,
     PRIMARY KEY ( asset_model_id ),
     INDEX asset_model_fkindex1 ( category_id ),
     INDEX asset_model_fkindex2 ( manufacturer_id ),

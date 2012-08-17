@@ -46,36 +46,165 @@
 
 	class CustomFieldMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var CustomField objCustomField
+		 * @access protected
+		 */
 		protected $objCustomField;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of CustomField's individual data fields
+        /**
+         * @var QLabel lblCustomFieldId;
+         * @access protected
+         */
 		protected $lblCustomFieldId;
+
+        /**
+         * @var QListBox lstCustomFieldQtype;
+         * @access protected
+         */
 		protected $lstCustomFieldQtype;
+
+        /**
+         * @var QListBox lstDefaultCustomFieldValue;
+         * @access protected
+         */
 		protected $lstDefaultCustomFieldValue;
+
+        /**
+         * @var QTextBox txtShortDescription;
+         * @access protected
+         */
 		protected $txtShortDescription;
+
+        /**
+         * @var QCheckBox chkActiveFlag;
+         * @access protected
+         */
 		protected $chkActiveFlag;
+
+        /**
+         * @var QCheckBox chkRequiredFlag;
+         * @access protected
+         */
 		protected $chkRequiredFlag;
+
+        /**
+         * @var QCheckBox chkAllAssetModelsFlag;
+         * @access protected
+         */
 		protected $chkAllAssetModelsFlag;
+
+        /**
+         * @var QCheckBox chkSearchableFlag;
+         * @access protected
+         */
 		protected $chkSearchableFlag;
+
+        /**
+         * @var QListBox lstCreatedByObject;
+         * @access protected
+         */
 		protected $lstCreatedByObject;
+
+        /**
+         * @var QDateTimePicker calCreationDate;
+         * @access protected
+         */
 		protected $calCreationDate;
+
+        /**
+         * @var QListBox lstModifiedByObject;
+         * @access protected
+         */
 		protected $lstModifiedByObject;
+
+        /**
+         * @var QLabel lblModifiedDate;
+         * @access protected
+         */
 		protected $lblModifiedDate;
 
+
 		// Controls that allow the viewing of CustomField's individual data fields
+        /**
+         * @var QLabel lblCustomFieldQtypeId
+         * @access protected
+         */
 		protected $lblCustomFieldQtypeId;
+
+        /**
+         * @var QLabel lblDefaultCustomFieldValueId
+         * @access protected
+         */
 		protected $lblDefaultCustomFieldValueId;
+
+        /**
+         * @var QLabel lblShortDescription
+         * @access protected
+         */
 		protected $lblShortDescription;
+
+        /**
+         * @var QLabel lblActiveFlag
+         * @access protected
+         */
 		protected $lblActiveFlag;
+
+        /**
+         * @var QLabel lblRequiredFlag
+         * @access protected
+         */
 		protected $lblRequiredFlag;
+
+        /**
+         * @var QLabel lblAllAssetModelsFlag
+         * @access protected
+         */
 		protected $lblAllAssetModelsFlag;
+
+        /**
+         * @var QLabel lblSearchableFlag
+         * @access protected
+         */
 		protected $lblSearchableFlag;
+
+        /**
+         * @var QLabel lblCreatedBy
+         * @access protected
+         */
 		protected $lblCreatedBy;
+
+        /**
+         * @var QLabel lblCreationDate
+         * @access protected
+         */
 		protected $lblCreationDate;
+
+        /**
+         * @var QLabel lblModifiedBy
+         * @access protected
+         */
 		protected $lblModifiedBy;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 
@@ -198,8 +327,8 @@
 			$this->lstCustomFieldQtype = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCustomFieldQtype->Name = QApplication::Translate('Custom Field Qtype');
 			$this->lstCustomFieldQtype->Required = true;
-			foreach (CustomFieldQtype::$NameArray as $intId => $strValue)
-				$this->lstCustomFieldQtype->AddItem(new QListItem($strValue, $intId, $this->objCustomField->CustomFieldQtypeId == $intId));
+
+			$this->lstCustomFieldQtype->AddItems(CustomFieldQtype::$NameArray, $this->objCustomField->CustomFieldQtypeId);
 			return $this->lstCustomFieldQtype;
 		}
 
@@ -219,19 +348,28 @@
 		/**
 		 * Create and setup QListBox lstDefaultCustomFieldValue
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstDefaultCustomFieldValue_Create($strControlId = null) {
+		public function lstDefaultCustomFieldValue_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstDefaultCustomFieldValue = new QListBox($this->objParentObject, $strControlId);
 			$this->lstDefaultCustomFieldValue->Name = QApplication::Translate('Default Custom Field Value');
 			$this->lstDefaultCustomFieldValue->AddItem(QApplication::Translate('- Select One -'), null);
-			$objDefaultCustomFieldValueArray = CustomFieldValue::LoadAll();
-			if ($objDefaultCustomFieldValueArray) foreach ($objDefaultCustomFieldValueArray as $objDefaultCustomFieldValue) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objDefaultCustomFieldValueCursor = CustomFieldValue::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objDefaultCustomFieldValue = CustomFieldValue::InstantiateCursor($objDefaultCustomFieldValueCursor)) {
 				$objListItem = new QListItem($objDefaultCustomFieldValue->__toString(), $objDefaultCustomFieldValue->CustomFieldValueId);
 				if (($this->objCustomField->DefaultCustomFieldValue) && ($this->objCustomField->DefaultCustomFieldValue->CustomFieldValueId == $objDefaultCustomFieldValue->CustomFieldValueId))
 					$objListItem->Selected = true;
 				$this->lstDefaultCustomFieldValue->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstDefaultCustomFieldValue;
 		}
 
@@ -373,19 +511,28 @@
 		/**
 		 * Create and setup QListBox lstCreatedByObject
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstCreatedByObject_Create($strControlId = null) {
+		public function lstCreatedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstCreatedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstCreatedByObject->Name = QApplication::Translate('Created By Object');
 			$this->lstCreatedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-			$objCreatedByObjectArray = UserAccount::LoadAll();
-			if ($objCreatedByObjectArray) foreach ($objCreatedByObjectArray as $objCreatedByObject) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objCreatedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objCreatedByObject = UserAccount::InstantiateCursor($objCreatedByObjectCursor)) {
 				$objListItem = new QListItem($objCreatedByObject->__toString(), $objCreatedByObject->UserAccountId);
 				if (($this->objCustomField->CreatedByObject) && ($this->objCustomField->CreatedByObject->UserAccountId == $objCreatedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstCreatedByObject->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstCreatedByObject;
 		}
 
@@ -433,19 +580,28 @@
 		/**
 		 * Create and setup QListBox lstModifiedByObject
 		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
 		 * @return QListBox
 		 */
-		public function lstModifiedByObject_Create($strControlId = null) {
+		public function lstModifiedByObject_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
 			$this->lstModifiedByObject = new QListBox($this->objParentObject, $strControlId);
 			$this->lstModifiedByObject->Name = QApplication::Translate('Modified By Object');
 			$this->lstModifiedByObject->AddItem(QApplication::Translate('- Select One -'), null);
-			$objModifiedByObjectArray = UserAccount::LoadAll();
-			if ($objModifiedByObjectArray) foreach ($objModifiedByObjectArray as $objModifiedByObject) {
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objModifiedByObjectCursor = UserAccount::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objModifiedByObject = UserAccount::InstantiateCursor($objModifiedByObjectCursor)) {
 				$objListItem = new QListItem($objModifiedByObject->__toString(), $objModifiedByObject->UserAccountId);
 				if (($this->objCustomField->ModifiedByObject) && ($this->objCustomField->ModifiedByObject->UserAccountId == $objModifiedByObject->UserAccountId))
 					$objListItem->Selected = true;
 				$this->lstModifiedByObject->AddItem($objListItem);
 			}
+
+			// Return the QListBox
 			return $this->lstModifiedByObject;
 		}
 

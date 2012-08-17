@@ -301,7 +301,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -363,7 +363,7 @@
 		 * Static Qcodo Query method to query for a single InventoryModel object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return InventoryModel the queried object
 		 */
@@ -376,16 +376,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new InventoryModel object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return InventoryModel::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new InventoryModel object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = InventoryModel::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return InventoryModel::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of InventoryModel objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return InventoryModel[] the queried objects as an array
 		 */
@@ -404,10 +426,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = InventoryModel::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of InventoryModel objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -526,7 +573,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this InventoryModel::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -666,7 +713,7 @@
 
 		/**
 		 * Instantiate an array of InventoryModels from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return InventoryModel[]
@@ -699,6 +746,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single InventoryModel object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return InventoryModel next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return InventoryModel::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -712,9 +785,10 @@
 		 * @param integer $intInventoryModelId
 		 * @return InventoryModel
 		*/
-		public static function LoadByInventoryModelId($intInventoryModelId) {
+		public static function LoadByInventoryModelId($intInventoryModelId, $objOptionalClauses = null) {
 			return InventoryModel::QuerySingle(
 				QQ::Equal(QQN::InventoryModel()->InventoryModelId, $intInventoryModelId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -724,9 +798,10 @@
 		 * @param string $strInventoryModelCode
 		 * @return InventoryModel
 		*/
-		public static function LoadByInventoryModelCode($strInventoryModelCode) {
+		public static function LoadByInventoryModelCode($strInventoryModelCode, $objOptionalClauses = null) {
 			return InventoryModel::QuerySingle(
 				QQ::Equal(QQN::InventoryModel()->InventoryModelCode, $strInventoryModelCode)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -742,7 +817,8 @@
 			try {
 				return InventoryModel::QueryArray(
 					QQ::Equal(QQN::InventoryModel()->CategoryId, $intCategoryId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -755,10 +831,11 @@
 		 * @param integer $intCategoryId
 		 * @return int
 		*/
-		public static function CountByCategoryId($intCategoryId) {
+		public static function CountByCategoryId($intCategoryId, $objOptionalClauses = null) {
 			// Call InventoryModel::QueryCount to perform the CountByCategoryId query
 			return InventoryModel::QueryCount(
 				QQ::Equal(QQN::InventoryModel()->CategoryId, $intCategoryId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -774,7 +851,8 @@
 			try {
 				return InventoryModel::QueryArray(
 					QQ::Equal(QQN::InventoryModel()->ManufacturerId, $intManufacturerId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -787,10 +865,11 @@
 		 * @param integer $intManufacturerId
 		 * @return int
 		*/
-		public static function CountByManufacturerId($intManufacturerId) {
+		public static function CountByManufacturerId($intManufacturerId, $objOptionalClauses = null) {
 			// Call InventoryModel::QueryCount to perform the CountByManufacturerId query
 			return InventoryModel::QueryCount(
 				QQ::Equal(QQN::InventoryModel()->ManufacturerId, $intManufacturerId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -806,7 +885,8 @@
 			try {
 				return InventoryModel::QueryArray(
 					QQ::Equal(QQN::InventoryModel()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -819,10 +899,11 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy) {
+		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
 			// Call InventoryModel::QueryCount to perform the CountByCreatedBy query
 			return InventoryModel::QueryCount(
 				QQ::Equal(QQN::InventoryModel()->CreatedBy, $intCreatedBy)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -838,7 +919,8 @@
 			try {
 				return InventoryModel::QueryArray(
 					QQ::Equal(QQN::InventoryModel()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -851,10 +933,11 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy) {
+		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
 			// Call InventoryModel::QueryCount to perform the CountByModifiedBy query
 			return InventoryModel::QueryCount(
 				QQ::Equal(QQN::InventoryModel()->ModifiedBy, $intModifiedBy)
+			, $objOptionalClauses
 			);
 		}
 
@@ -867,9 +950,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this InventoryModel
@@ -914,6 +997,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intInventoryModelId = $objDatabase->InsertId('inventory_model', 'inventory_model_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -952,6 +1039,9 @@
 						WHERE
 							`inventory_model_id` = ' . $objDatabase->SqlVariable($this->intInventoryModelId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 		
@@ -1026,6 +1116,9 @@
 					`inventory_model`
 				WHERE
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($this->intInventoryModelId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -1080,6 +1173,74 @@
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = InventoryModel::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `inventory_model` (
+					`inventory_model_id`,
+					`category_id`,
+					`manufacturer_id`,
+					`inventory_model_code`,
+					`short_description`,
+					`long_description`,
+					`image_path`,
+					`price`,
+					`created_by`,
+					`creation_date`,
+					`modified_by`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intInventoryModelId) . ',
+					' . $objDatabase->SqlVariable($this->intCategoryId) . ',
+					' . $objDatabase->SqlVariable($this->intManufacturerId) . ',
+					' . $objDatabase->SqlVariable($this->strInventoryModelCode) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . $objDatabase->SqlVariable($this->strLongDescription) . ',
+					' . $objDatabase->SqlVariable($this->strImagePath) . ',
+					' . $objDatabase->SqlVariable($this->fltPrice) . ',
+					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
+					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
+					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intInventoryModelId
+		 * @return InventoryModel[]
+		 */
+		public static function GetJournalForId($intInventoryModelId) {
+			$objDatabase = InventoryModel::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM inventory_model WHERE inventory_model_id = ' .
+				$objDatabase->SqlVariable($intInventoryModelId) . ' ORDER BY __sys_date');
+
+			return InventoryModel::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return InventoryModel[]
+		 */
+		public function GetJournal() {
+			return InventoryModel::GetJournalForId($this->intInventoryModelId);
+		}
+
 
 
 
@@ -1632,6 +1793,12 @@
 				WHERE
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->InventoryModelId = $this->intInventoryModelId;
+				$objInventoryLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1658,6 +1825,12 @@
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($this->intInventoryModelId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->InventoryModelId = null;
+				$objInventoryLocation->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1670,6 +1843,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = InventoryModel::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryLocation::LoadArrayByInventoryModelId($this->intInventoryModelId) as $objInventoryLocation) {
+					$objInventoryLocation->InventoryModelId = null;
+					$objInventoryLocation->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1704,6 +1885,11 @@
 					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
 					`inventory_model_id` = ' . $objDatabase->SqlVariable($this->intInventoryModelId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objInventoryLocation->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -1716,6 +1902,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = InventoryModel::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (InventoryLocation::LoadArrayByInventoryModelId($this->intInventoryModelId) as $objInventoryLocation) {
+					$objInventoryLocation->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -1984,6 +2177,26 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $InventoryModelId
+	 * @property-read QQNode $CategoryId
+	 * @property-read QQNodeCategory $Category
+	 * @property-read QQNode $ManufacturerId
+	 * @property-read QQNodeManufacturer $Manufacturer
+	 * @property-read QQNode $InventoryModelCode
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $LongDescription
+	 * @property-read QQNode $ImagePath
+	 * @property-read QQNode $Price
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocation
+	 * @property-read QQReverseReferenceNodeInventoryModelCustomFieldHelper $InventoryModelCustomFieldHelper
+	 */
 	class QQNodeInventoryModel extends QQNode {
 		protected $strTableName = 'inventory_model';
 		protected $strPrimaryKey = 'inventory_model_id';
@@ -2039,7 +2252,28 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $InventoryModelId
+	 * @property-read QQNode $CategoryId
+	 * @property-read QQNodeCategory $Category
+	 * @property-read QQNode $ManufacturerId
+	 * @property-read QQNodeManufacturer $Manufacturer
+	 * @property-read QQNode $InventoryModelCode
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $LongDescription
+	 * @property-read QQNode $ImagePath
+	 * @property-read QQNode $Price
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocation
+	 * @property-read QQReverseReferenceNodeInventoryModelCustomFieldHelper $InventoryModelCustomFieldHelper
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeInventoryModel extends QQReverseReferenceNode {
 		protected $strTableName = 'inventory_model';
 		protected $strPrimaryKey = 'inventory_model_id';

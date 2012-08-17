@@ -32,23 +32,87 @@
 
 	class CountryMetaControlGen extends QBaseClass {
 		// General Variables
+		/**
+		 * @var Country objCountry
+		 * @access protected
+		 */
 		protected $objCountry;
+
+		/**
+		 * @var QForm|QControl objParentObject
+		 * @access protected
+		 */
 		protected $objParentObject;
+
+		/**
+		 * @var string  strTitleVerb
+		 * @access protected
+		 */
 		protected $strTitleVerb;
+
+		/**
+		 * @var boolean blnEditMode
+		 * @access protected
+		 */
 		protected $blnEditMode;
 
 		// Controls that allow the editing of Country's individual data fields
+        /**
+         * @var QLabel lblCountryId;
+         * @access protected
+         */
 		protected $lblCountryId;
+
+        /**
+         * @var QTextBox txtShortDescription;
+         * @access protected
+         */
 		protected $txtShortDescription;
+
+        /**
+         * @var QTextBox txtAbbreviation;
+         * @access protected
+         */
 		protected $txtAbbreviation;
+
+        /**
+         * @var QCheckBox chkStateFlag;
+         * @access protected
+         */
 		protected $chkStateFlag;
+
+        /**
+         * @var QCheckBox chkProvinceFlag;
+         * @access protected
+         */
 		protected $chkProvinceFlag;
 
+
 		// Controls that allow the viewing of Country's individual data fields
+        /**
+         * @var QLabel lblShortDescription
+         * @access protected
+         */
 		protected $lblShortDescription;
+
+        /**
+         * @var QLabel lblAbbreviation
+         * @access protected
+         */
 		protected $lblAbbreviation;
+
+        /**
+         * @var QLabel lblStateFlag
+         * @access protected
+         */
 		protected $lblStateFlag;
+
+        /**
+         * @var QLabel lblProvinceFlag
+         * @access protected
+         */
 		protected $lblProvinceFlag;
+
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
 

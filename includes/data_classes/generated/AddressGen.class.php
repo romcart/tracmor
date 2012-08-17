@@ -395,7 +395,7 @@
 		 * on load methods.
 		 * @param QQueryBuilder &$objQueryBuilder the QueryBuilder object that will be created
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause object or array of QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with (sending in null will skip the PrepareStatement step)
 		 * @param boolean $blnCountOnly only select a rowcount
 		 * @return string the query statement
@@ -457,7 +457,7 @@
 		 * Static Qcodo Query method to query for a single Address object.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Address the queried object
 		 */
@@ -470,16 +470,38 @@
 				throw $objExc;
 			}
 
-			// Perform the Query, Get the First Row, and Instantiate a new Address object
+			// Perform the Query
 			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
-			return Address::InstantiateDbRow($objDbResult->GetNextRow(), null, null, null, $objQueryBuilder->ColumnAliasArray);
+
+			// Instantiate a new Address object and return it
+
+			// Do we have to expand anything?
+			if ($objQueryBuilder->ExpandAsArrayNodes) {
+				$objToReturn = array();
+				while ($objDbRow = $objDbResult->GetNextRow()) {
+					$objItem = Address::InstantiateDbRow($objDbRow, null, $objQueryBuilder->ExpandAsArrayNodes, $objToReturn, $objQueryBuilder->ColumnAliasArray);
+					if ($objItem) $objToReturn[] = $objItem;
+				}
+
+				if (count($objToReturn)) {
+					// Since we only want the object to return, lets return the object and not the array.
+					return $objToReturn[0];
+				} else {
+					return null;
+				}
+			} else {
+				// No expands just return the first row
+				$objDbRow = $objDbResult->GetNextRow();
+				if (is_null($objDbRow)) return null;
+				return Address::InstantiateDbRow($objDbRow, null, null, null, $objQueryBuilder->ColumnAliasArray);
+			}
 		}
 
 		/**
 		 * Static Qcodo Query method to query for an array of Address objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return Address[] the queried objects as an array
 		 */
@@ -498,10 +520,35 @@
 		}
 
 		/**
+		 * Static Qcodo query method to issue a query and get a cursor to progressively fetch its results.
+		 * Uses BuildQueryStatment to perform most of the work.
+		 * @param QQCondition $objConditions any conditions on the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
+		 * @return QDatabaseResultBase the cursor resource instance
+		 */
+		public static function QueryCursor(QQCondition $objConditions, $objOptionalClauses = null, $mixParameterArray = null) {
+			// Get the query statement
+			try {
+				$strQuery = Address::BuildQueryStatement($objQueryBuilder, $objConditions, $objOptionalClauses, $mixParameterArray, false);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+
+			// Perform the query
+			$objDbResult = $objQueryBuilder->Database->Query($strQuery);
+		
+			// Return the results cursor
+			$objDbResult->QueryBuilder = $objQueryBuilder;
+			return $objDbResult;
+		}
+
+		/**
 		 * Static Qcodo Query method to query for a count of Address objects.
 		 * Uses BuildQueryStatment to perform most of the work.
 		 * @param QQCondition $objConditions any conditions on the query, itself
-		 * @param QQClause[] $objOptionalClausees additional optional QQClause objects for this query
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @param mixed[] $mixParameterArray a array of name-value pairs to perform PrepareStatement with
 		 * @return integer the count of queried objects as an integer
 		 */
@@ -621,7 +668,7 @@
 		 * Takes in an optional strAliasPrefix, used in case another Object::InstantiateDbRow
 		 * is calling this Address::InstantiateDbRow in order to perform
 		 * early binding on referenced objects.
-		 * @param DatabaseRowBase $objDbRow
+		 * @param QDatabaseRowBase $objDbRow
 		 * @param string $strAliasPrefix
 		 * @param string $strExpandAsArrayNodes
 		 * @param QBaseClass $objPreviousItem
@@ -865,7 +912,7 @@
 
 		/**
 		 * Instantiate an array of Addresses from a Database Result
-		 * @param DatabaseResultBase $objDbResult
+		 * @param QDatabaseResultBase $objDbResult
 		 * @param string $strExpandAsArrayNodes
 		 * @param string[] $strColumnAliasArray
 		 * @return Address[]
@@ -898,6 +945,32 @@
 			return $objToReturn;
 		}
 
+		/**
+		 * Instantiate a single Address object from a query cursor (e.g. a DB ResultSet).
+		 * Cursor is automatically moved to the "next row" of the result set.
+		 * Will return NULL if no cursor or if the cursor has no more rows in the resultset.
+		 * @param QDatabaseResultBase $objDbResult cursor resource
+		 * @return Address next row resulting from the query
+		 */
+		public static function InstantiateCursor(QDatabaseResultBase $objDbResult) {
+			// If blank resultset, then return empty result
+			if (!$objDbResult) return null;
+
+			// If empty resultset, then return empty result
+			$objDbRow = $objDbResult->GetNextRow();
+			if (!$objDbRow) return null;
+
+			// We need the Column Aliases
+			$strColumnAliasArray = $objDbResult->QueryBuilder->ColumnAliasArray;
+			if (!$strColumnAliasArray) $strColumnAliasArray = array();
+
+			// Pull Expansions (if applicable)
+			$strExpandAsArrayNodes = $objDbResult->QueryBuilder->ExpandAsArrayNodes;
+
+			// Load up the return result with a row and return it
+			return Address::InstantiateDbRow($objDbRow, null, $strExpandAsArrayNodes, null, $strColumnAliasArray);
+		}
+
 
 
 
@@ -911,9 +984,10 @@
 		 * @param integer $intAddressId
 		 * @return Address
 		*/
-		public static function LoadByAddressId($intAddressId) {
+		public static function LoadByAddressId($intAddressId, $objOptionalClauses = null) {
 			return Address::QuerySingle(
 				QQ::Equal(QQN::Address()->AddressId, $intAddressId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -929,7 +1003,8 @@
 			try {
 				return Address::QueryArray(
 					QQ::Equal(QQN::Address()->CompanyId, $intCompanyId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -942,10 +1017,11 @@
 		 * @param integer $intCompanyId
 		 * @return int
 		*/
-		public static function CountByCompanyId($intCompanyId) {
+		public static function CountByCompanyId($intCompanyId, $objOptionalClauses = null) {
 			// Call Address::QueryCount to perform the CountByCompanyId query
 			return Address::QueryCount(
 				QQ::Equal(QQN::Address()->CompanyId, $intCompanyId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -961,7 +1037,8 @@
 			try {
 				return Address::QueryArray(
 					QQ::Equal(QQN::Address()->CountryId, $intCountryId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -974,10 +1051,11 @@
 		 * @param integer $intCountryId
 		 * @return int
 		*/
-		public static function CountByCountryId($intCountryId) {
+		public static function CountByCountryId($intCountryId, $objOptionalClauses = null) {
 			// Call Address::QueryCount to perform the CountByCountryId query
 			return Address::QueryCount(
 				QQ::Equal(QQN::Address()->CountryId, $intCountryId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -993,7 +1071,8 @@
 			try {
 				return Address::QueryArray(
 					QQ::Equal(QQN::Address()->StateProvinceId, $intStateProvinceId),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1006,10 +1085,11 @@
 		 * @param integer $intStateProvinceId
 		 * @return int
 		*/
-		public static function CountByStateProvinceId($intStateProvinceId) {
+		public static function CountByStateProvinceId($intStateProvinceId, $objOptionalClauses = null) {
 			// Call Address::QueryCount to perform the CountByStateProvinceId query
 			return Address::QueryCount(
 				QQ::Equal(QQN::Address()->StateProvinceId, $intStateProvinceId)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1025,7 +1105,8 @@
 			try {
 				return Address::QueryArray(
 					QQ::Equal(QQN::Address()->ModifiedBy, $intModifiedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1038,10 +1119,11 @@
 		 * @param integer $intModifiedBy
 		 * @return int
 		*/
-		public static function CountByModifiedBy($intModifiedBy) {
+		public static function CountByModifiedBy($intModifiedBy, $objOptionalClauses = null) {
 			// Call Address::QueryCount to perform the CountByModifiedBy query
 			return Address::QueryCount(
 				QQ::Equal(QQN::Address()->ModifiedBy, $intModifiedBy)
+			, $objOptionalClauses
 			);
 		}
 			
@@ -1057,7 +1139,8 @@
 			try {
 				return Address::QueryArray(
 					QQ::Equal(QQN::Address()->CreatedBy, $intCreatedBy),
-					$objOptionalClauses);
+					$objOptionalClauses
+					);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1070,10 +1153,11 @@
 		 * @param integer $intCreatedBy
 		 * @return int
 		*/
-		public static function CountByCreatedBy($intCreatedBy) {
+		public static function CountByCreatedBy($intCreatedBy, $objOptionalClauses = null) {
 			// Call Address::QueryCount to perform the CountByCreatedBy query
 			return Address::QueryCount(
 				QQ::Equal(QQN::Address()->CreatedBy, $intCreatedBy)
+			, $objOptionalClauses
 			);
 		}
 
@@ -1086,9 +1170,9 @@
 
 
 
-		//////////////////////////
-		// SAVE, DELETE AND RELOAD
-		//////////////////////////
+		//////////////////////////////////////
+		// SAVE, DELETE, RELOAD and JOURNALING
+		//////////////////////////////////////
 
 		/**
 		 * Save this Address
@@ -1135,6 +1219,10 @@
 
 					// Update Identity column and return its value
 					$mixToReturn = $this->intAddressId = $objDatabase->InsertId('address', 'address_id');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('INSERT');
+
 				} else {
 					// Perform an UPDATE query
 
@@ -1174,6 +1262,9 @@
 						WHERE
 							`address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 					');
+
+					// Journaling
+					if ($objDatabase->JournalingDatabase) $this->Journal('UPDATE');
 				}
 
 		
@@ -1248,6 +1339,9 @@
 					`address`
 				WHERE
 					`address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) $this->Journal('DELETE');
 		}
 
 		/**
@@ -1303,6 +1397,76 @@
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
 		}
+
+		/**
+		 * Journals the current object into the Log database.
+		 * Used internally as a helper method.
+		 * @param string $strJournalCommand
+		 */
+		public function Journal($strJournalCommand) {
+			$objDatabase = Address::GetDatabase()->JournalingDatabase;
+
+			$objDatabase->NonQuery('
+				INSERT INTO `address` (
+					`address_id`,
+					`company_id`,
+					`short_description`,
+					`country_id`,
+					`address_1`,
+					`address_2`,
+					`city`,
+					`state_province_id`,
+					`postal_code`,
+					`created_by`,
+					`creation_date`,
+					`modified_by`,
+					__sys_login_id,
+					__sys_action,
+					__sys_date
+				) VALUES (
+					' . $objDatabase->SqlVariable($this->intAddressId) . ',
+					' . $objDatabase->SqlVariable($this->intCompanyId) . ',
+					' . $objDatabase->SqlVariable($this->strShortDescription) . ',
+					' . $objDatabase->SqlVariable($this->intCountryId) . ',
+					' . $objDatabase->SqlVariable($this->strAddress1) . ',
+					' . $objDatabase->SqlVariable($this->strAddress2) . ',
+					' . $objDatabase->SqlVariable($this->strCity) . ',
+					' . $objDatabase->SqlVariable($this->intStateProvinceId) . ',
+					' . $objDatabase->SqlVariable($this->strPostalCode) . ',
+					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
+					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
+					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
+					' . $objDatabase->SqlVariable($strJournalCommand) . ',
+					NOW()
+				);
+			');
+		}
+
+		/**
+		 * Gets the historical journal for an object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @param integer intAddressId
+		 * @return Address[]
+		 */
+		public static function GetJournalForId($intAddressId) {
+			$objDatabase = Address::GetDatabase()->JournalingDatabase;
+
+			$objResult = $objDatabase->Query('SELECT * FROM address WHERE address_id = ' .
+				$objDatabase->SqlVariable($intAddressId) . ' ORDER BY __sys_date');
+
+			return Address::InstantiateDbResult($objResult);
+		}
+
+		/**
+		 * Gets the historical journal for this object from the log database.
+		 * Objects will have VirtualAttributes available to lookup login, date, and action information from the journal object.
+		 * @return Address[]
+		 */
+		public function GetJournal() {
+			return Address::GetJournalForId($this->intAddressId);
+		}
+
 
 
 
@@ -1962,6 +2126,12 @@
 				WHERE
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->AddressId = $this->intAddressId;
+				$objCompany->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -1988,6 +2158,12 @@
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
 					`address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->AddressId = null;
+				$objCompany->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2000,6 +2176,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Company::LoadArrayByAddressId($this->intAddressId) as $objCompany) {
+					$objCompany->AddressId = null;
+					$objCompany->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2034,6 +2218,11 @@
 					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
 					`address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -2046,6 +2235,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Company::LoadArrayByAddressId($this->intAddressId) as $objCompany) {
+					$objCompany->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2112,6 +2308,12 @@
 				WHERE
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->AddressId = $this->intAddressId;
+				$objContact->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2138,6 +2340,12 @@
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . ' AND
 					`address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->AddressId = null;
+				$objContact->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2150,6 +2358,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Contact::LoadArrayByAddressId($this->intAddressId) as $objContact) {
+					$objContact->AddressId = null;
+					$objContact->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2184,6 +2400,11 @@
 					`contact_id` = ' . $objDatabase->SqlVariable($objContact->ContactId) . ' AND
 					`address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objContact->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -2196,6 +2417,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Contact::LoadArrayByAddressId($this->intAddressId) as $objContact) {
+					$objContact->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2262,6 +2490,12 @@
 				WHERE
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->ToAddressId = $this->intAddressId;
+				$objReceipt->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2288,6 +2522,12 @@
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . ' AND
 					`to_address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->ToAddressId = null;
+				$objReceipt->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2300,6 +2540,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Receipt::LoadArrayByToAddressId($this->intAddressId) as $objReceipt) {
+					$objReceipt->ToAddressId = null;
+					$objReceipt->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2334,6 +2582,11 @@
 					`receipt_id` = ' . $objDatabase->SqlVariable($objReceipt->ReceiptId) . ' AND
 					`to_address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objReceipt->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -2346,6 +2599,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Receipt::LoadArrayByToAddressId($this->intAddressId) as $objReceipt) {
+					$objReceipt->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2412,6 +2672,12 @@
 				WHERE
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->FromAddressId = $this->intAddressId;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2438,6 +2704,12 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`from_address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->FromAddressId = null;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2450,6 +2722,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByFromAddressId($this->intAddressId) as $objShipment) {
+					$objShipment->FromAddressId = null;
+					$objShipment->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2484,6 +2764,11 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`from_address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -2496,6 +2781,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByFromAddressId($this->intAddressId) as $objShipment) {
+					$objShipment->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2562,6 +2854,12 @@
 				WHERE
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . '
 			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->ToAddressId = $this->intAddressId;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2588,6 +2886,12 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`to_address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->ToAddressId = null;
+				$objShipment->Journal('UPDATE');
+			}
 		}
 
 		/**
@@ -2600,6 +2904,14 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByToAddressId($this->intAddressId) as $objShipment) {
+					$objShipment->ToAddressId = null;
+					$objShipment->Journal('UPDATE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2634,6 +2946,11 @@
 					`shipment_id` = ' . $objDatabase->SqlVariable($objShipment->ShipmentId) . ' AND
 					`to_address_id` = ' . $objDatabase->SqlVariable($this->intAddressId) . '
 			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objShipment->Journal('DELETE');
+			}
 		}
 
 		/**
@@ -2646,6 +2963,13 @@
 
 			// Get the Database Object for this Class
 			$objDatabase = Address::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Shipment::LoadArrayByToAddressId($this->intAddressId) as $objShipment) {
+					$objShipment->Journal('DELETE');
+				}
+			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
@@ -2933,6 +3257,32 @@
 	// ADDITIONAL CLASSES for QCODO QUERY
 	/////////////////////////////////////
 
+	/**
+	 * @property-read QQNode $AddressId
+	 * @property-read QQNode $CompanyId
+	 * @property-read QQNodeCompany $Company
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $CountryId
+	 * @property-read QQNodeCountry $Country
+	 * @property-read QQNode $Address1
+	 * @property-read QQNode $Address2
+	 * @property-read QQNode $City
+	 * @property-read QQNode $StateProvinceId
+	 * @property-read QQNodeStateProvince $StateProvince
+	 * @property-read QQNode $PostalCode
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeAddressCustomFieldHelper $AddressCustomFieldHelper
+	 * @property-read QQReverseReferenceNodeCompany $Company
+	 * @property-read QQReverseReferenceNodeContact $Contact
+	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsTo
+	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsFrom
+	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsTo
+	 */
 	class QQNodeAddress extends QQNode {
 		protected $strTableName = 'address';
 		protected $strPrimaryKey = 'address_id';
@@ -3000,7 +3350,34 @@
 			}
 		}
 	}
-
+	
+	/**
+	 * @property-read QQNode $AddressId
+	 * @property-read QQNode $CompanyId
+	 * @property-read QQNodeCompany $Company
+	 * @property-read QQNode $ShortDescription
+	 * @property-read QQNode $CountryId
+	 * @property-read QQNodeCountry $Country
+	 * @property-read QQNode $Address1
+	 * @property-read QQNode $Address2
+	 * @property-read QQNode $City
+	 * @property-read QQNode $StateProvinceId
+	 * @property-read QQNodeStateProvince $StateProvince
+	 * @property-read QQNode $PostalCode
+	 * @property-read QQNode $CreatedBy
+	 * @property-read QQNodeUserAccount $CreatedByObject
+	 * @property-read QQNode $CreationDate
+	 * @property-read QQNode $ModifiedBy
+	 * @property-read QQNodeUserAccount $ModifiedByObject
+	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQReverseReferenceNodeAddressCustomFieldHelper $AddressCustomFieldHelper
+	 * @property-read QQReverseReferenceNodeCompany $Company
+	 * @property-read QQReverseReferenceNodeContact $Contact
+	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsTo
+	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsFrom
+	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsTo
+	 * @property-read QQNode $_PrimaryKeyNode
+	 */
 	class QQReverseReferenceNodeAddress extends QQReverseReferenceNode {
 		protected $strTableName = 'address';
 		protected $strPrimaryKey = 'address_id';
