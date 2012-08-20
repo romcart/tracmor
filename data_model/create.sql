@@ -85,7 +85,7 @@ CREATE TABLE `asset` (
   `creation_date`    DATETIME   NULL   DEFAULT NULL,
   `modified_by`      INTEGER UNSIGNED   NULL,
   `modified_date`    TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
-  `depreciation_flag` BIT   NOT NULL   DEFAULT 0,
+  `depreciation_flag` BIT(1) DEFAULT NULL,
   `depreciation_class_id` INTEGER UNSIGNED   NULL,
   `purchase_date`    DATETIME  DEFAULT NULL,
   `purchase_cost`    FLOAT DEFAULT NULL,

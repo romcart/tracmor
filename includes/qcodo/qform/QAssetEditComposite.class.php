@@ -46,7 +46,8 @@ class QAssetEditComposite extends QControl {
 	protected $lblIconParentAssetCode;
 	public $lblShipmentReceipt;
 	public $lblLockedToParent;
-	public $lblAssetDepreciation;
+	public $lblPurchaseDate;
+	public $lblPurchaseCost;
 
 
 	// Inputs
@@ -57,7 +58,9 @@ class QAssetEditComposite extends QControl {
 	protected $lstLocation;
 	protected $lstCreatedByObject;
 	protected $lstModifiedByObject;
-	public  $chkAssetDepreciation;
+	public $chkAssetDepreciation;
+	public $txtPurchaseCost;
+	public $calPurchaseDate;
 
 	// Buttons
 	protected $btnSave;
@@ -83,6 +86,9 @@ class QAssetEditComposite extends QControl {
     // Custom Field Objects
 	// protected $objCustomFieldArray;
 	public $arrCustomFields;
+
+	protected $dttNow;
+	protected $dttFiveDaysFromNow;
 
 	// Set true if the Built-in Fields have to be rendered
 	public $blnViewBuiltInFields;
@@ -182,6 +188,23 @@ class QAssetEditComposite extends QControl {
 		else {
 			$this->lstLocation_Create();
 			$this->displayInputs();
+		}// if asset depreciation enabled in application display Asset Depreciation checkBox
+		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->lblPurchaseDate_Create();
+			$this->calPurchaseDate_Create();
+			$this->lblPurchaseCost_Create();
+			$this->txtPurchaseCost_Create();
+			$this->chkAssetDepreciation_Create();
+			$this->txtPurchaseCost->Display = false;
+			$this->calPurchaseDate->Display = false;
+			if(!$this->blnEditMode){
+				$this->chkAssetDepreciation->Enabled = true;
+				$this->lblPurchaseCost->Display = false;
+				$this->lblPurchaseDate->Display = false;
+			}
+			else{
+				$this->chkAssetDepreciation->Enabled = false;
+			}
 		}
 	}
 
@@ -807,6 +830,93 @@ class QAssetEditComposite extends QControl {
     $objStyle->CssClass = 'dtg_header';
 	}
 
+	// Create Asset Depreciation checkBox
+	protected function chkAssetDepreciation_Create(){
+		$this->chkAssetDepreciation = new QCheckBox($this);
+		$this->chkAssetDepreciation->Name = 'Asset Depreciation';
+		$this->chkAssetDepreciation->AddAction(new QClickEvent(), new QAjaxControlAction($this,'chkAssetDepreciation_Click')); /*
+		/*if ($this->blnEditMode
+			&& $this->objAsset->DepreciationFlag){
+			$this->chkAssetDepreciation->Checked = true;
+		}
+		else{
+			$this->chkAssetDepreciation->Checked = false;
+			$this->hideAssetDepreciationFields();
+		}
+		if($this->blnEditMode){
+			$this->chkAssetDepreciation->Enabled = false;
+		}*/
+	}
+
+	// Create Purchase Label
+	protected function lblPurchaseDate_Create(){
+		$this->lblPurchaseDate = new QLabel($this);
+		$this->lblPurchaseDate->Name = 'Purchase Date';
+		$this->lblPurchaseDate->HtmlEntities = false;
+	}
+
+	// Create and Setup calPurchaseDate
+	protected function calPurchaseDate_Create() {
+		$this->calPurchaseDate = new QDateTimePickerExt($this);
+		$this->calPurchaseDate->Name =  'Purchase Date';  //QApplication::Translate('Purchase Date');
+		$this->calPurchaseDate->DateTimePickerType = QDateTimePickerType::Date;
+		if ($this->blnEditMode) {
+			$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
+		}
+		elseif (!$this->blnEditMode) {
+			$this->calPurchaseDate->DateTime = new QDateTime(QDateTime::Now);
+		}
+		$this->calPurchaseDate->Required = true;
+
+		$this->dttNow = new QDateTime(QDateTime::Now);
+		// $this->calPurchaseDate->MinimumYear = $this->dttNow->Year;
+		// $this->calPurchaseDate->MinimumMonth = $this->dttNow->Month;
+		// $this->calPurchaseDate->MinimumDay = $this->dttNow->Day;
+		// 5 Days: 432000
+		// 6 Days: 518400
+		// 7 Days: 604800
+		// 10 Days: 864000
+		// 200 Days: 17280000
+
+		$intDayOfWeek = date('w', time());
+		// Sunday - just add five days
+		if ($intDayOfWeek == 0) {
+			$this->dttFiveDaysFromNow = QDateTime::FromTimestamp($this->dttNow->Timestamp + 432000); // new QDateTime($this->dttNow->Timestamp + 432000);
+		}
+		// Monday - Friday, add seven days
+		elseif ($intDayOfWeek > 0 && $intDayOfWeek < 6) {
+			$this->dttFiveDaysFromNow = QDateTime::FromTimestamp($this->dttNow->Timestamp + 604800); //new QDateTime($this->dttNow->Timestamp + 604800);
+		}
+		// Saturday - add six days
+		elseif ($intDayOfWeek == 6) {
+			$this->dttFiveDaysFromNow = QDateTime::FromTimestamp($this->dttNow->Timestamp + 518400); //new QDateTime($this->dttNow->Timestamp + 518400);
+		}
+		$this->calPurchaseDate->MaximumYear = $this->dttFiveDaysFromNow->Year;
+		$this->calPurchaseDate->MaximumMonth = $this->dttFiveDaysFromNow->Month;
+		$this->calPurchaseDate->MaximumDay = $this->dttFiveDaysFromNow->Day;
+
+		//$this->calPurchaseDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
+		//QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->calPurchaseDate->ControlId));
+
+		//$this->calPurchaseDate->TabIndex=10;
+	}
+
+	// Create Purchase Cost Label
+	protected function lblPurchaseCost_Create(){
+		$this->lblPurchaseCost = new QLabel($this);
+		$this->lblPurchaseCost->Name = 'Purchase Cost';
+		$this->lblPurchaseDate->HtmlEntities = false;
+	}
+
+	// Create Purchase Cost Input
+	protected function txtPurchaseCost_Create(){
+		$this->txtPurchaseCost = new QTextBox($this);
+		$this->txtPurchaseCost->Name =  'Purchase Cost';
+		if ($this->blnEditMode){
+			$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
+		}
+	}
+
 	// Asset Model List Selection Action
 	// Display the AssetModelCode for the given AssetModel once it is chosen
 	public function lstAssetModel_Select($strFormId, $strControlId, $strParameter) {
@@ -897,6 +1007,30 @@ class QAssetEditComposite extends QControl {
 					if ($intAssetLimit && Asset::CountActive() >= $intAssetLimit) {
 						$blnError = true;
 						$this->txtAssetCode->Warning = "Your asset limit has been reached.";
+					}
+				}
+
+//				 Check Depreciation fields
+				if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+					if($this->chkAssetDepreciation->Checked){
+						if(!ctype_digit($this->txtPurchaseCost->Text) || $this->txtPurchaseCost->Text <= 0){
+							$blnError = true;
+							$this->txtPurchaseCost->Warning = "Purchase Cost must be a numeric value";
+						}
+						elseif(AssetModel::Load($this->lstAssetModel->SelectedValue)->DefaultDepreciationClassId!=null){
+							//print $this->calPurchaseDate->DateTime ."||". $this->txtPurchaseCost->Text."|";exit;
+							$this->objAsset->DepreciationFlag = true;
+							$this->objAsset->PurchaseDate  = $this->calPurchaseDate->DateTime;
+							$this->objAsset->PurchaseCost = $this->txtPurchaseCost->Text;
+							$this->objAsset->DepreciationClassId = AssetModel::Load($this->lstAssetModel
+								                                                         ->SelectedValue)
+								                                             ->DefaultDepreciationClassId;
+
+						}
+						else{
+							$blnError = true;
+							$this->chkAssetDepreciation->Warning = "Chosen Model isn't assigned to any Depreciation Class";
+						}
 					}
 				}
 
@@ -1609,6 +1743,25 @@ class QAssetEditComposite extends QControl {
   		  }
 		  }
 		}
+
+
+	public function chkAssetDepreciation_Click(){
+        if($this->chkAssetDepreciation->Checked){
+		   $this->showAssetDepreciationFields();
+	    }
+		else{
+			$this->hideAssetDepreciationFields();
+		}
+	}
+	protected function hideAssetDepreciationFields(){
+		$this->calPurchaseDate->Display = false;
+		$this->txtPurchaseCost->Display = false;
+	}
+
+	protected function showAssetDepreciationFields(){
+		$this->calPurchaseDate->Display = true;
+		$this->txtPurchaseCost->Display = true;
+	}
 
   // And our public getter/setters
   public function __get($strName) {

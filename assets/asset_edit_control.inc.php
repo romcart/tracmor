@@ -135,9 +135,19 @@
 					</td>
 				</tr>
 			</table>
+			<?php
+			if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+				$this->chkAssetDepreciation->RenderWithName();
+				$this->lblPurchaseCost->RenderWithName();
+			 	$this->txtPurchaseCost->RenderWithName();
+				$this->lblPurchaseDate->RenderWithName();
+				$this->calPurchaseDate->RenderWithName();
+			}
+			?>
 		</td>
 	</tr>
 </table>
+
 <?php
 $this->pnlAttachments->Render();
 ?>
