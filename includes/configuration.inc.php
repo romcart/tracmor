@@ -16,7 +16,7 @@
 		case 'test':
 		case 'stage':
 		case 'prod':
-			define ('__DOCROOT__', '/var/www/tracmor');
+			define ('__DOCROOT__', '/home/userlen/projects/tracmor_dd.com');
 			define ('__VIRTUAL_DIRECTORY__', '');
 			define ('__SUBDIRECTORY__', '');
 
@@ -24,9 +24,9 @@
 				'adapter' => 'MySqli5',
 				'server' => 'localhost',
 				'port' => null,
-				'database' => 'tracmor',
-				'username' => '',
-				'password' => '',
+				'database' => 'tracmor_dm',
+				'username' => 'root',
+				'password' => 'root',
 				'profiling' => false)));
 			break;
 

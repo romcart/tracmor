@@ -204,7 +204,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblDefaultDepreciationClass->Name = 'Depreciation Class';
 
 		if($this->blnEditMode){
-			if($this->objAssetModel->DefaultDepreciationClass == 0){
+			if($this->objAssetModel->DefaultDepreciationClassId == null){
 			$this->lblDefaultDepreciationClass->Text = '';
 			}
 			else{
@@ -580,6 +580,10 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->objAssetModel->AssetModelCode = $this->txtAssetModelCode->Text;
 		$this->objAssetModel->ShortDescription = $this->txtShortDescription->Text;
 		$this->objAssetModel->LongDescription = $this->txtLongDescription->Text;
+		// Display Depreciation field if enabled
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->objAssetModel->DefaultDepreciationClassId = $this->lstDefaultDepreciationClass->SelectedValue;
+		}
 		// $this->objAssetModel->ImagePath = $this->txtImagePath->Text;
 	}
 

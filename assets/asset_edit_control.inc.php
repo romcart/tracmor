@@ -63,7 +63,6 @@
 				$arrAssetFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));
 		}
 	}
-
 	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . $this->lblIconParentAssetCode->Render(false) . $this->chkLockToParent->RenderWithError(false) . $this->lblLockedToParent->Render(false));
 
 	// Display Metadata fields in Edit mode only
@@ -127,9 +126,19 @@
 					</td>
 				</tr>
 			</table>
+			<?php
+			if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+				$this->chkAssetDepreciation->RenderWithName();
+				$this->lblPurchaseCost->RenderWithName();
+			 	$this->txtPurchaseCost->RenderWithName();
+				$this->lblPurchaseDate->RenderWithName();
+				$this->calPurchaseDate->RenderWithName();
+			}
+			?>
 		</td>
 	</tr>
 </table>
+
 <?php
 $this->pnlAttachments->Render();
 ?>
