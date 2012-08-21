@@ -232,6 +232,16 @@
 			// We have to cast these to string because the admin_settings value column is TEXT, and checkboxes give boolean values
 			QApplication::$TracmorSettings->PortablePinRequired = (string) $this->chkPortablePinRequired->Checked;
 			//QApplication::$TracmorSettings->StrictCheckinPolicy = (string) $this->chkStrictCheckinPolicy->Checked;
+			if(QApplication::$TracmorSettings->DepreciationFlag=='1'&& $this->chkAssetDepreciation->Checked==false){
+				$objDatabase = QApplication::$Database[1];
+				$strQuery = 'UPDATE `asset` SET `depreciation_flag`=null,
+				                                `depreciation_class_id`=null,
+				                                `purchase_date` = null,
+				                                `purchase_cost` = null WHERE asset_id>0';
+				$objDatabase->NonQuery($strQuery);
+				$strQuery = 'UPDATE `asset_model` SET `default_depreciation_class_id`=null WHERE `asset_model_id`>0';
+				$objDatabase->NonQuery($strQuery);
+			}
 			QApplication::$TracmorSettings->DepreciationFlag = (string) $this->chkAssetDepreciation->Checked;
 			// Show saved notification
 			$this->pnlSaveNotification->Display = true;
