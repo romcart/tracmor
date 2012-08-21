@@ -462,7 +462,7 @@
 				$arrSearchSql['strAuthorizationSql'], $arrAttachmentSql['strGroupBy'],
 				$strOrderBy, $strLimitSuffix);
 
-			$objDbResult = $objDatabase->Query($strQuery);
+			$objDbResult = $objDatabase->Query($strQuery); //print($arrSearchSql['strLocationSql']."|||".$strQuery);exit;
 
 			return InventoryModel::InstantiateDbResult($objDbResult);
 		}
@@ -534,7 +534,7 @@
 				$intLocationId = QApplication::$Database[1]->SqlVariable($intLocationId, true);
 				$arrSearchSql['strLocationsFromSql'] = ", inventory_location";
 				$arrSearchSql['strLocationSql'] = "AND `inventory_model` . `inventory_model_id` = `inventory_location` . `inventory_model_id`";
-				$arrSearchSql['strLocationSql'] = sprintf("\nAND `inventory_location` . `location_id`%s", $intLocationId);
+				$arrSearchSql['strLocationSql'] = sprintf("\nAND `inventory_location` . `location_id`%s AND `inventory_location` . `quantity`>0", $intLocationId);
 			}
 			if ($intInventoryModelId) {
 				$intInventoryModelId = QApplication::$Database[1]->SqlVariable($intInventoryModelId, true);

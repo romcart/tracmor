@@ -254,6 +254,9 @@
 				$objDatabase->NonQuery($strQuery);
 			}
 			else {
+				// The only way to fix not updating field on changing custom fields as it doesn't turns asset table
+				$this->ModifiedBy = null;
+				parent::Save($blnForceInsert, $blnForceUpdate);
 				$this->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
 				parent::Save($blnForceInsert, $blnForceUpdate);
 			}

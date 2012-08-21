@@ -37,7 +37,7 @@
 	 */
 	class InventoryLocation extends InventoryLocationGen {
 		
-		protected $intTransactionQuantity;
+		public $intTransactionQuantity;
 		
 		/**
 		 * Default "to string" handler

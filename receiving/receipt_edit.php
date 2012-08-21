@@ -67,7 +67,6 @@
 		protected $lblNewToContact;
 		protected $lblNewToAddress;
 
-
 		// Inputs
 		protected $txtReceiptNumber;
 		protected $txtNote;
@@ -78,7 +77,7 @@
 		protected $lstAssetModel;
 		protected $chkAutoGenerateAssetCode;
 		protected $calDueDate;
-
+		protected $calDateReceived;
 		// Buttons
 		protected $btnEdit;
 		protected $atcAttach;
@@ -175,6 +174,7 @@
 			$this->lstAssetModel_Create();
 			$this->chkAutoGenerateAssetCode_Create();
 			$this->calDueDate_Create();
+			$this->calDateReceived_Create();
 			if (QApplication::$TracmorSettings->CustomReceiptNumbers) {
 				$this->txtReceiptNumber_Create();
 			}
@@ -648,6 +648,29 @@
 			$this->calDueDate->MaximumYear = $this->dttNow->Year + 2;
 			$this->calDueDate->Required = true;
 			$this->calDueDate->TabIndex=6;
+			$this->intNextTabIndex++;
+
+		}
+
+		protected function calDateReceived_Create() {
+			$this->calDateReceived= new QDateTimePicker($this);
+			$this->calDateReceived->Name = QApplication::Translate('Date Recieved');
+			$this->calDateReceived->DateTimePickerType = QDateTimePickerType::Date;
+			if ($this->blnEditMode) {
+				if ($this->objReceipt->ReceivedFlag) {
+					$this->calDateReceived->DateTime = $this->objReceipt->ReceiptDate;
+					$this->calDateReceived->Display = false;
+				}
+				else {
+					$this->calDateReceived->Display = false;
+				}
+			}
+			elseif (!$this->blnEditMode) {
+				$this->calDateReceived->Display = false;
+			}
+			$this->calDateReceived->MaximumYear = $this->dttNow->Year + 2;
+			$this->calDateReceived->Required = false;
+			$this->calDueDate->TabIndex=7;
 			$this->intNextTabIndex++;
 
 		}
@@ -2051,8 +2074,7 @@
 				if(trim($this->txtReceiptNumber->Text)==''){
 					$blnError = true;
 					$this->txtReceiptNumber->Warning = 'Receipt number is a required field.';
-        }
-        elseif ($objReceipt = Receipt::LoadByReceiptNumber($this->txtReceiptNumber->Text)) {
+				} else if ($objReceipt = Receipt::LoadByReceiptNumber($this->txtReceiptNumber->Text)) {
 					if ($objReceipt->ReceiptId != $this->objReceipt->ReceiptId) {
 						$blnError = true;
 						$this->txtReceiptNumber->Warning = 'That is a duplicate receipt number.';
@@ -2347,6 +2369,11 @@
 								$this->objReceipt->ReceiptDate = new QDateTime(QDateTime::Now);
 							}
 						}
+						else {
+							if($this->objReceipt->ReceiptDate!=$this->calDateReceived->DateTime){
+								$this->objReceipt->ReceiptDate=$this->calDateReceived->DateTime;
+							}
+						}
 
 						$this->UpdateReceiptFields();
 						$this->UpdateReceiptLabels();
@@ -2473,6 +2500,7 @@
 			$this->objReceipt->ToContactId = $this->lstToContact->SelectedValue;
 			$this->objReceipt->ToAddressId = $this->lstToAddress->SelectedValue;
 			$this->objReceipt->DueDate = $this->calDueDate->DateTime;
+			$this->objReceipt->ReceiptDate = $this->calDateReceived->DateTime;//!
 			$this->objTransaction->Note = $this->txtNote->Text;
 
 			// Reload the Assets and inventory locations so that they don't trigger an OLE if edit/save adding assets or inventory multiple times
@@ -2500,6 +2528,13 @@
 			}
 			$this->txtNote->Text = $this->objReceipt->Transaction->Note;
 			$this->calDueDate->DateTime = $this->objReceipt->DueDate;
+			$this->calDateReceived->Display=false;
+			$this->lblReceiptDate->Display = true;
+
+				$this->lblReceiptDate->Text = ($this->objReceipt->ReceiptDate) ? $this->objReceipt->ReceiptDate->__toString() : '';
+
+
+
 			$this->arrCustomFields = CustomField::UpdateControls($this->objReceipt->objCustomFieldArray, $this->arrCustomFields);
 		}
 
@@ -2533,6 +2568,7 @@
 			}
 			$this->txtNote->Display = false;
 			$this->calDueDate->Display = false;
+			$this->calDateReceived->Display = false;
 			if ($this->blnEditMode) {
 				$this->dtgAssetTransact->RemoveColumnByName('&nbsp;');
 				$this->dtgInventoryTransact->RemoveColumnByName('&nbsp;');
@@ -2560,6 +2596,7 @@
 			}
 			$this->pnlNote->Display = true;
 			$this->lblDueDate->Display = true;
+			$this->lblReceiptDate->Display = true;
 			$this->btnEdit->Display = true;
 			$this->btnDelete->Display = true;
 			$this->atcAttach->btnUpload->Display = true;
@@ -2627,6 +2664,13 @@
 				$this->btnAddInventory->Display = true;
 	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+			}
+			else{
+			     if($this->blnEditMode){
+					  $this->calDateReceived->DateTime = $this->objReceipt->ReceiptDate;
+					  $this->calDateReceived->Display = true;
+					  $this->lblReceiptDate->Display = false;
+			     }
 			}
 			$this->lblNewFromCompany->Display = true;
 			$this->lblNewFromContact->Display = true;

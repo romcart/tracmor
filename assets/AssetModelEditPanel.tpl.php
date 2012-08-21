@@ -60,4 +60,10 @@
 		}
 	?>
 </table>
-<?php $_CONTROL->chkAssetCustomFields->RenderWithName(); ?>
+<table>
+	<tr>
+		<td><?php $_CONTROL->chkAssetCustomFields->RenderWithName(); ?></td>
+		<td><?php $_CONTROL->chkCustomFieldsForAllModels->Render(); ?></td>
+	</tr>
+</table>
+

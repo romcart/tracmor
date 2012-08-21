@@ -95,6 +95,8 @@
 				       <td><?php $this->chkCheckOut->Render(); ?></td>
 				       <td><?php $this->chkReserve->Render(); ?></td>
 				       <td><?php $this->chkUnreserve->Render(); ?></td>
+						 <td><?php $this->chkArchive->Render(); ?></td>
+						 <td><?php $this->chkUnarchive->Render(); ?></td>
 				     </tr>
 				     <tr>
 				       <td class="item_label">Custom Fields:</span></td>

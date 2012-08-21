@@ -229,7 +229,8 @@ class QAssetEditComposite extends QControl {
 	// Generate tab indexes
 	protected $intNextTabIndex = 1;
 	protected function GetNextTabIndex() {
-		return ++$this->intNextTabIndex;
+		$this->intNextTabIndex = (int)$this->intNextTabIndex + 1;
+		return $this->intNextTabIndex;
 	}
 
 	// Create all Custom Asset Fields
@@ -825,14 +826,18 @@ class QAssetEditComposite extends QControl {
 				if ($objAssetModel->Category) {
 					$this->lblCategory->Text = $objAssetModel->Category->ShortDescription;
 				}
-        if ($objAssetModel->AssetModelId){
-          $this->reloadCustomFields($objAssetModel->AssetModelId);
-        }
-        else{
-          $this->reloadCustomFields('all');
-        }
+				if ($objAssetModel->AssetModelId){
+				  $this->reloadCustomFields($objAssetModel->AssetModelId);
+				}
+				else{
+				  $this->reloadCustomFields('all');
+				}
+				$this->displayInputs();
 			}
 		}
+        $this->lstAssetModel->Focus();
+		$this->lstAssetModel->TabIndex = 1;
+		$this->txtAssetCode->TabIndex = 2;
 	}
 
 	// This is called when the 'new' label is clicked
@@ -848,7 +853,7 @@ class QAssetEditComposite extends QControl {
 
 	// Edit Button Click
 	public function btnEdit_Click($strFormId, $strControlId, $strParameter) {
-
+		$this->reloadCustomFields($this->objAsset->AssetModelId);
 		// Hide labels and display inputs where appropriate
 		$this->displayInputs();
 
@@ -1311,8 +1316,8 @@ class QAssetEditComposite extends QControl {
    		}
     }
     else {
-      $this->lblAssetModelCode->Display = true;
-      $this->lblAssetModel->Display = true;
+        $this->lblAssetModelCode->Display = true;
+        $this->lblAssetModel->Display = true;
    		$this->lblLocation->Display = true;
    		$this->lblParentAssetCode->Display = true;
    		$this->lblAssetModel->Display = false;
@@ -1520,20 +1525,25 @@ class QAssetEditComposite extends QControl {
 
 //Set display logic for the CustomFields
 		protected function UpdateCustomFields(){
-			if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
-				//Set NextTabIndex only if the custom field is show
-				if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
-					$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
-				}
-
-				//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
-				if (!$this->blnEditMode && !$objCustomField['blnEdit']){
-					$objCustomField['lbl']->Display=true;
-					$objCustomField['input']->Display=false;
-					if(($objCustomField['blnRequired'])){
-					  if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+			if($this->arrCustomFields){
+				$this->blnEditMode?$this->intNextTabIndex = 2:$this->intNextTabIndex = 3;
+				foreach ($this->arrCustomFields as $objCustomField) {
+					//Set NextTabIndex only if the custom field is show
+					if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+						$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
+						$this->txtParentAssetCode->TabIndex = $objCustomField['input']->TabIndex + 1;
+						$this->chkLockToParent->TabIndex = $this->txtParentAssetCode->TabIndex + 1;
 					}
-				}
+
+					//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+					if (!$this->blnEditMode && !$objCustomField['blnEdit']){
+						$objCustomField['lbl']->Display=true;
+						$objCustomField['input']->Display=false;
+						if(($objCustomField['blnRequired'])){
+						  if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+						}
+					}
+			    }
 			}
             else {
                 $this->Refresh();
@@ -1545,12 +1555,17 @@ class QAssetEditComposite extends QControl {
           $this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId, false, $intAssetModelId);
 
     		// Create the Custom Field Controls - labels and inputs (text or list) for each
-    		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this, true, true);
-
-    		// Add TabIndex for all txt custom fields
+    		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this, true, true, false);
+	        // Add TabIndex for all txt custom fields
+	        $this->blnEditMode?$this->intNextTabIndex = 2:$this->intNextTabIndex = 3;
     		foreach ($this->arrCustomFields as $arrCustomField) {
     		  if (array_key_exists('input', $arrCustomField))
-    		    $arrCustomField['input']->TabIndex = $this->GetNextTabIndex();
+			  {
+				  $arrCustomField['input']->TabIndex = $this->GetNextTabIndex();
+				  $this->txtParentAssetCode->TabIndex =  $arrCustomField['input']->TabIndex + 1;
+				  $this->chkLockToParent->TabIndex = $this->txtParentAssetCode->TabIndex + 1;
+				  $arrCustomField['lbl']->Display = false;
+			  }
     		}
 
     		//Setup Custom Fields

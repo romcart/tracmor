@@ -515,7 +515,7 @@ class QInventoryTransactComposite extends QControl {
 						if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
 							//$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
 							$objInventoryLocation->Quantity = $objInventoryLocation->GetVirtualAttribute('actual_quantity') - $objInventoryLocation->intTransactionQuantity;
-							$objInventoryLocation->Save();
+						    $objInventoryLocation->Save();
 						}
 
 						// Add the new quantity where it belongs for moves and restocks
