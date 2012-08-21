@@ -313,6 +313,18 @@
 			return $intAssetCode;
 		}
 
+		public function LoadArrayDepreciatedByAssetModelId($intAssetModelId){
+			try {
+				return Asset::QueryArray(QQ::AndCondition(
+					QQ::Equal(QQN::Asset()->AssetModelId, $intAssetModelId),
+					QQ::Equal(QQN::Asset()->DepreciationFlag, 1))
+				);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
 		/**
 		 * Returns an Account object the created the most recent transaction for this asset
 		 *

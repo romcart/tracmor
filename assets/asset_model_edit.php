@@ -533,7 +533,28 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			return;
 		}
 
-        $this->UpdateAssetModelFields();
+		if(QApplication::$TracmorSettings->DepreciationFlag =='1'&& $this->blnEditMode){
+			if($this->objAssetModel->DefaultDepreciationClassId != $this->lstDefaultDepreciationClass->SelectedValue){
+				$arrAssetToChange =	Asset::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
+				if($this->lstDefaultDepreciationClass->SelectedValue == null){
+					foreach($arrAssetToChange as $objAssetToChange){
+						$objAssetToChange->DepreciationFlag = null;
+						$objAssetToChange->DepreciationClass = null;
+						$objAssetToChange->PurchaseCost = null;
+						$objAssetToChange->PurchaseDate= null;
+						$objAssetToChange->Save();
+					}
+				}
+				else{
+					foreach($arrAssetToChange as $objAssetToChange){
+						$objAssetToChange->DepreciationClass = $this->lstDefaultDepreciationClass->SelectedValue;
+						$objAssetToChange->Save();
+					}
+				}
+			}
+		}
+
+    $this->UpdateAssetModelFields();
 		$this->objAssetModel->Save();
         $this->UpdateAssetModelCustomFields();
 		// Assign input values to custom fields
@@ -558,7 +579,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			$this->objAssetModel->Save(false, true);
 		}
 
-    		if ($this->blnEditMode) {
+    	if ($this->blnEditMode) {
 			$this->UpdateLabels();
 			// This was necessary because it was not saving the changes of a second edit/save in a row
 			// Reload all custom fields
