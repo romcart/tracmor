@@ -492,6 +492,27 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			return;
 		}
 
+		if(QApplication::$TracmorSettings->DepreciationFlag =='1'&& $this->blnEditMode){
+			if($this->objAssetModel->DefaultDepreciationClassId != $this->lstDefaultDepreciationClass->SelectedValue){
+				$arrAssetToChange =	Asset::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
+				if($this->lstDefaultDepreciationClass->SelectedValue == null){
+					foreach($arrAssetToChange as $objAssetToChange){
+						$objAssetToChange->DepreciationFlag = null;
+						$objAssetToChange->DepreciationClass = null;
+						$objAssetToChange->PurchaseCost = null;
+						$objAssetToChange->PurchaseDate= null;
+						$objAssetToChange->Save();
+					}
+				}
+				else{
+					foreach($arrAssetToChange as $objAssetToChange){
+						$objAssetToChange->DepreciationClass = $this->lstDefaultDepreciationClass->SelectedValue;
+						$objAssetToChange->Save();
+					}
+				}
+			}
+		}
+
     $this->UpdateAssetModelFields();
 		$this->objAssetModel->Save();
     $this->UpdateAssetModelCustomFields();
@@ -517,7 +538,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			$this->objAssetModel->Save(false, true);
 		}
 
-    		if ($this->blnEditMode) {
+    	if ($this->blnEditMode) {
 			$this->UpdateLabels();
 			// This was necessary because it was not saving the changes of a second edit/save in a row
 			// Reload all custom fields
@@ -699,6 +720,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblManufacturer->Text = $this->lstManufacturer->SelectedName;
 		$this->pnlLongDescription->Text = nl2br($this->txtLongDescription->Text);
 		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath);
+		$this->lblDefaultDepreciationClass->Text = ($this->lstDefaultDepreciationClass->SelectedValue==null)?'':
+		                                            $this->lstDefaultDepreciationClass->SelectedName;
 
 		// Update custom labels
 		if ($this->arrCustomFields) {

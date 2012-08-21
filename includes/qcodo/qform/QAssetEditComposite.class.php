@@ -1,25 +1,25 @@
-<?php
-/*
- * Copyright (c)  2009, Tracmor, LLC
- *
- * This file is part of Tracmor.
- *
- * Tracmor is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Tracmor is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Tracmor; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+	<?php
+	/*
+	 * Copyright (c)  2009, Tracmor, LLC
+	 *
+	 * This file is part of Tracmor.
+	 *
+	 * Tracmor is free software; you can redistribute it and/or modify
+	 * it under the terms of the GNU General Public License as published by
+	 * the Free Software Foundation; either version 2 of the License, or
+	 * (at your option) any later version.
+	 *
+	 * Tracmor is distributed in the hope that it will be useful,
+	 * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	 * GNU General Public License for more details.
+	 *
+	 * You should have received a copy of the GNU General Public License
+	 * along with Tracmor; if not, write to the Free Software
+	 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+	 */
 
-require(__DOCROOT__ . __SUBDIRECTORY__ . '/assets/AssetModelEditPanel.class.php');
+	require(__DOCROOT__ . __SUBDIRECTORY__ . '/assets/AssetModelEditPanel.class.php');
 
 class QAssetEditComposite extends QControl {
 
@@ -833,15 +833,18 @@ class QAssetEditComposite extends QControl {
 	protected function chkAssetDepreciation_Create(){
 		$this->chkAssetDepreciation = new QCheckBox($this);
 		$this->chkAssetDepreciation->Name = 'Asset Depreciation';
-		$this->chkAssetDepreciation->AddAction(new QClickEvent(), new QAjaxControlAction($this,'chkAssetDepreciation_Click')); /*
-		/*if ($this->blnEditMode
+		$this->chkAssetDepreciation->AddAction(new QClickEvent(), new QAjaxControlAction($this,'chkAssetDepreciation_Click'));
+		if ($this->blnEditMode
 			&& $this->objAsset->DepreciationFlag){
 			$this->chkAssetDepreciation->Checked = true;
+			$this->lblPurchaseCost->Text = $this->objAsset->PurchaseCost;
+			$this->lblPurchaseDate->Text = $this->objAsset->PurchaseDate->__toString();
 		}
 		else{
 			$this->chkAssetDepreciation->Checked = false;
-			$this->hideAssetDepreciationFields();
-		}
+			$this->lblPurchaseCost->Display = false;
+			$this->lblPurchaseDate->Display = false;
+		}/*
 		if($this->blnEditMode){
 			$this->chkAssetDepreciation->Enabled = false;
 		}*/
@@ -850,14 +853,14 @@ class QAssetEditComposite extends QControl {
 	// Create Purchase Label
 	protected function lblPurchaseDate_Create(){
 		$this->lblPurchaseDate = new QLabel($this);
-		$this->lblPurchaseDate->Name = 'Purchase Date';
+		$this->lblPurchaseDate->Name = 'Purchase Date: ';
 		$this->lblPurchaseDate->HtmlEntities = false;
 	}
 
 	// Create and Setup calPurchaseDate
 	protected function calPurchaseDate_Create() {
 		$this->calPurchaseDate = new QDateTimePickerExt($this);
-		$this->calPurchaseDate->Name =  'Purchase Date';  //QApplication::Translate('Purchase Date');
+		$this->calPurchaseDate->Name =  'Purchase Date: ';  //QApplication::Translate('Purchase Date');
 		$this->calPurchaseDate->DateTimePickerType = QDateTimePickerType::Date;
 		if ($this->blnEditMode) {
 			$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
@@ -903,14 +906,14 @@ class QAssetEditComposite extends QControl {
 	// Create Purchase Cost Label
 	protected function lblPurchaseCost_Create(){
 		$this->lblPurchaseCost = new QLabel($this);
-		$this->lblPurchaseCost->Name = 'Purchase Cost';
+		$this->lblPurchaseCost->Name = 'Purchase Cost: ';
 		$this->lblPurchaseDate->HtmlEntities = false;
 	}
 
 	// Create Purchase Cost Input
 	protected function txtPurchaseCost_Create(){
 		$this->txtPurchaseCost = new QTextBox($this);
-		$this->txtPurchaseCost->Name =  'Purchase Cost';
+		$this->txtPurchaseCost->Name =  'Purchase Cost: ';
 		if ($this->blnEditMode){
 			$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
 		}
@@ -970,6 +973,16 @@ class QAssetEditComposite extends QControl {
 
 		// Deactivate the transaction buttons
 		$this->disableTransactionButtons();
+
+		// Activate Asset Depreciation inputs for Edit
+		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->chkAssetDepreciation->Enabled = true;
+			if($this->objAsset->DepreciationFlag == 1){
+				$this->lblPurchaseDate->Display = false;
+				$this->lblPurchaseCost->Display = false;
+				$this->showAssetDepreciationFields();
+			}
+		}
 	}
 
 	// Save Button Click Actions
@@ -1152,6 +1165,36 @@ class QAssetEditComposite extends QControl {
 				  $this->chkLockToParent->Checked = false;
 				}
 
+				//				 Check Depreciation fields
+				if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+					if($this->chkAssetDepreciation->Checked){
+						if(!ctype_digit($this->txtPurchaseCost->Text) || $this->txtPurchaseCost->Text <= 0){
+							$blnError = true;
+							$this->txtPurchaseCost->Warning = "Purchase Cost must be a numeric value";
+						}
+						elseif(AssetModel::Load($this->lstAssetModel->SelectedValue)->DefaultDepreciationClassId!=null){
+							//print $this->calPurchaseDate->DateTime ."||". $this->txtPurchaseCost->Text."|";exit;
+							$this->objAsset->DepreciationFlag = true;
+							$this->objAsset->PurchaseDate  = $this->calPurchaseDate->DateTime;
+							$this->objAsset->PurchaseCost = $this->txtPurchaseCost->Text;
+							$this->objAsset->DepreciationClassId = AssetModel::Load($this->lstAssetModel
+								->SelectedValue)
+								->DefaultDepreciationClassId;
+
+						}
+						else{
+							$blnError = true;
+							$this->chkAssetDepreciation->Warning = "Chosen Model isn't assigned to any Depreciation Class";
+						}
+					}
+					else{
+						$this->objAsset->DepreciationFlag = false;
+						$this->objAsset->PurchaseDate  = null;
+						$this->objAsset->PurchaseCost = null;
+						$this->objAsset->DepreciationClassId = null;
+					}
+				}
+
 				if (!$blnError) {
 
 					// Update the values of all fields for an Ajax reload
@@ -1255,6 +1298,15 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel->SelectedValue = $this->objAsset->AssetModelId;
 		$this->lstLocation_Create();
 		$this->lstLocation->SelectedValue = $this->objAsset->LocationId;
+
+		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->chkAssetDepreciation->Enabled = true;
+			if($this->objAsset->DepreciationFlag){
+				$this->showAssetDepreciationFields();
+				$this->lblPurchaseCost->Display = false;
+				$this->lblPurchaseDate->Display = false;
+			}
+		}
 
 		$objAssetToClone = $this->objAsset;
 		// Instantiate new Asset object
@@ -1606,6 +1658,16 @@ class QAssetEditComposite extends QControl {
 		if ($this->arrCustomFields) {
 			CustomField::UpdateLabels($this->arrCustomFields);
 		}
+		if(QApplication::$TracmorSettings->DepreciationFlag == 1){
+			$this->chkAssetDepreciation->Enabled = false;
+			$this->hideAssetDepreciationFields();
+			if($this->objAsset->DepreciationFlag == 1){
+				$this->lblPurchaseCost->Text = $this->objAsset->PurchaseCost;
+				$this->lblPurchaseDate->Text = $this->objAsset->PurchaseDate->__toString();
+				$this->lblPurchaseCost->Display = true;
+				$this->lblPurchaseDate->Display = true;
+			}
+		}
 	}
 
 	// Protected Update Methods
@@ -1744,6 +1806,9 @@ class QAssetEditComposite extends QControl {
 	}
 
 	protected function showAssetDepreciationFields(){
+		if ($this->calPurchaseDate->DateTime == null){
+			$this->calPurchaseDate->DateTime = new QDateTime(QDateTime::Now);
+		}
 		$this->calPurchaseDate->Display = true;
 		$this->txtPurchaseCost->Display = true;
 	}
