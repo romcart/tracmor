@@ -257,6 +257,7 @@ class QInventoryTransactComposite extends QControl {
 	// This button is only displayed for move or take out transactions
 	public function btnLookup_Click($strFormId, $strControlId = null, $strParameter = null) {
 
+		$this->txtNewInventoryModelCode->Warning = '';
 		// Assign the value submitted from the form
 		$strInventoryModelCode = $this->txtNewInventoryModelCode->Text;
 
@@ -317,7 +318,6 @@ class QInventoryTransactComposite extends QControl {
 	public function btnAdd_Click($strFormId, $strControlId, $strParameter) {
 
 		$blnError = false;
-
 		// Assign the values from the user submitted form input
 		$intNewInventoryLocationId = $this->lstSourceLocation->SelectedValue;
 		$intTransactionQuantity = $this->txtQuantity->Text;

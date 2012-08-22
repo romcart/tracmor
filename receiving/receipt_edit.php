@@ -1560,7 +1560,9 @@
 		}
 
 		public function btnAddInventory_Click($strFormId, $strControlId, $strParameter) {
-
+			// Clearing warning on previous attempt
+			$this->txtNewInventoryModelCode->Warning = '';
+			$this->txtQuantity->Warning ='';
 			$blnError = false;
 
 			// Assign the values from the user submitted form input

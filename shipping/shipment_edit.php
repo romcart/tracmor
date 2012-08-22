@@ -1834,7 +1834,8 @@
 
 		// AddAsset Button Click
 		public function btnAddAsset_Click($strFormId, $strControlId, $strParameter) {
-
+			// Clear if warning from previous attempt exists
+			$this->txtNewAssetCode->Warning ='';
 			$strAssetCode = $this->txtNewAssetCode->Text;
 			$blnDuplicate = false;
 			$blnError = false;
@@ -2151,7 +2152,8 @@
 		// Lookup Button Click - looks up an inventory model, loads the inventorylocation listbox
 		// Enables InventoryLocation list and txtQuantity
 		public function btnLookup_Click($strFormId, $strControlId, $strParameter) {
-
+			// Clear if warning from previous attempt exists
+			$this->txtNewInventoryModelCode->Warning ='';
 			// Assign the value submitted from the form
 			$strInventoryModelCode = $this->txtNewInventoryModelCode->Text;
 
