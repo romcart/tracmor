@@ -316,7 +316,8 @@ class QInventoryTransactComposite extends QControl {
 
 	// Add Button Click
 	public function btnAdd_Click($strFormId, $strControlId, $strParameter) {
-
+		// Clear warnings from previous attempt
+		$this->txtNewInventoryModelCode->Warning = '';
 		$blnError = false;
 		// Assign the values from the user submitted form input
 		$intNewInventoryLocationId = $this->lstSourceLocation->SelectedValue;
