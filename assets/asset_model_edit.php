@@ -494,7 +494,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 		if(QApplication::$TracmorSettings->DepreciationFlag =='1'&& $this->blnEditMode){
 			if($this->objAssetModel->DefaultDepreciationClassId != $this->lstDefaultDepreciationClass->SelectedValue){
-				$arrAssetToChange =	Asset::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
+				$arrAssetToChange =	Asset::LoadArrayDepreciatedByAssetModelId($this->objAssetModel->AssetModelId);
 				if($this->lstDefaultDepreciationClass->SelectedValue == null){
 					foreach($arrAssetToChange as $objAssetToChange){
 						$objAssetToChange->DepreciationFlag = null;
@@ -506,7 +506,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 				}
 				else{
 					foreach($arrAssetToChange as $objAssetToChange){
-						$objAssetToChange->DepreciationClass = $this->lstDefaultDepreciationClass->SelectedValue;
+						$objAssetToChange->DepreciationClassId = $this->lstDefaultDepreciationClass->SelectedValue;
 						$objAssetToChange->Save();
 					}
 				}

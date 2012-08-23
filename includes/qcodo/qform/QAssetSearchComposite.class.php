@@ -148,6 +148,17 @@ class QAssetSearchComposite extends QControl {
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Parent Asset Tag', '<?= $_CONTROL->objParentControl->ParentAsset__toString($_ITEM) ?>', 'SortByCommand="asset__parent_asset_id__asset_code ASC"', 'ReverseSortByCommand="asset__parent_asset_id__asset_code DESC"', 'CssClass="dtg_column"', 'Display="false"', 'HtmlEntities="false"'));
     $this->dtgAsset->AddColumn(new QDataGridColumnExt('Check In Due', '<?= $_ITEM->CheckoutDueDate() ?>', 'CssClass="dtg_column"', 'Display="false"', 'HtmlEntities="false"'));
 
+		// Add Asset Model Depreciation class if Enabled within application
+		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->dtgAsset->AddColumn(new QDataGridColumnExt('Depreciation Class',
+				'<?= $_ITEM->DepreciationClass ?>',
+				'SortByCommand="asset__depreciation_class_id__short_description ASC"',
+				'ReverseSortByCommand="asset__depreciation_class_id__short_description DESC"',
+				'CssClass="dtg_column"'));
+			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Cost','<?= $_ITEM->PurchaseCost ?>','CssClass="dtg_column"'));
+			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Date','<?= $_ITEM->PurchaseDate ?>','CssClass="dtg_column"'));
+		}
+
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
     $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, false);
     if ($objCustomFieldArray) {
@@ -281,6 +292,7 @@ class QAssetSearchComposite extends QControl {
     // Expand the Asset object to include the AssetModel, Category, Manufacturer, and Location Objects
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandCategory] = true;
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandManufacturer] = true;
+	$objExpansionMap[Asset::ExpandDepreciationClass] = true;
     $objExpansionMap[Asset::ExpandParentAsset] = true;
     $objExpansionMap[Asset::ExpandLocation] = true;
 		//if ($this->blnSearch || !$this->blnUseAjax) {

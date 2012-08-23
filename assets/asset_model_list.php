@@ -68,6 +68,7 @@
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
 		protected $blnAttachment;
+		protected $intDefaultDepreciationClassId;
 
 		protected function Form_Create() {
 			
@@ -101,7 +102,14 @@
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Category', '<?= $_FORM->dtgAssetModel_Category_Render($_ITEM); ?>', 'SortByCommand="asset_model__category_id__short_description ASC"', 'ReverseSortByCommand="asset_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_FORM->dtgAssetModel_Manufacturer_Render($_ITEM); ?>', 'SortByCommand="asset_model__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="asset_model__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Model Number', '<?= htmlentities(QString::Truncate($_ITEM->AssetModelCode, 200)); ?>', 'FontBold=true', 'SortByCommand="asset_model_code ASC"', 'ReverseSortByCommand="asset_model_code DESC"', 'CssClass="dtg_column"'));
-      
+      // Add Asset Model Depreciation class if Enabled within application
+	  if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+		  $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Depreciation Class',
+			                                                     '<?= $_FORM->dtgAssetModel_Depreciation_Render($_ITEM); ?>',
+			                                                     'SortByCommand="asset_model__default_depreciation_class_id__short_description ASC"',
+			                                                     'ReverseSortByCommand="asset_model__default_depreciation_class_id__short_description DESC"',
+			                                                     'CssClass="dtg_column"'));
+	  }
       // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
       $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::AssetModel, false);
       if ($objCustomFieldArray) {
@@ -156,9 +164,12 @@
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
 			$blnAttachment = $this->blnAttachment;
+			//$intDepreciationClassId = $this->intDefaultDepreciationClassId;
 			
       $objExpansionMap[AssetModel::ExpandCategory] = true;
       $objExpansionMap[AssetModel::ExpandManufacturer] = true;
+	  $objExpansionMap[AssetModel::ExpandDefaultDepreciationClass] = true;
+
       
       // If the search form has been posted
       // if ($intCategoryId || $intManufacturerId || $strDescription || $strAssetModelCode) {
