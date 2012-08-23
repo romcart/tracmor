@@ -5,7 +5,6 @@
 
 require_once('../includes/prepend.inc.php');
 
-QApplication::Authenticate();
 $objDatabase = QApplication::$Database[1];
 
 // Check if this script has already been run
@@ -31,6 +30,16 @@ try {
 	$strQuery = "UPDATE `custom_field_qtype` SET `name` = 'text area' WHERE `custom_field_qtype_id` = 3";
 	$objDatabase->NonQuery($strQuery);
 
+	// Update terminology in Asset module shortcuts
+	$strQuery = "UPDATE `shortcut` SET `short_description`='Models' WHERE `shortcut_id`='2'";
+	$objDatabase->NonQuery($strQuery);
+
+	$strQuery = "UPDATE `shortcut` SET `short_description`='Import Models' WHERE `shortcut_id`='3'";
+	$objDatabase->NonQuery($strQuery);
+
+	$strQuery = "UPDATE `shortcut` SET `short_description`='Create Model' WHERE `shortcut_id`='1'";
+	$objDatabase->NonQuery($strQuery);
+
 	// Change password_hash length to varchar(60)
 	$strQuery = "ALTER TABLE  `user_account` CHANGE  `password_hash`  `password_hash` VARCHAR( 60 ) NOT NULL";
 	$objDatabase->NonQuery($strQuery);
@@ -38,12 +47,12 @@ try {
 	// Update existing SHA1 hashes to PHPass hashes
 	require('../includes/php/PasswordHash.php');
 	$objHasher = new PasswordHash(8, PORTABLE_PASSWORDS);
-	$objUserAccountArray = UserAccount::QueryArray(QQ::All);
+	$objUserAccountArray = UserAccount::QueryArray(QQ::All());
 
 	foreach($objUserAccountArray as $objUserAccount) {
 		$strNewHash = $objHasher->HashPassword($objUserAccount->PasswordHash);
-		$objUserAccount->PasswordHash = $strNewHash;
-		$objUserAccount->Save();
+		$strQuery = sprintf("UPDATE `user_account` SET `password_hash` = '%s' WHERE `user_account_id` = %s", $strNewHash, $objUserAccount->UserAccountId);
+		$objDatabase->NonQuery($strQuery);
 	}
 
 	$objDatabase->TransactionCommit();

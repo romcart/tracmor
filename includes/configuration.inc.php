@@ -27,7 +27,8 @@
 				'database' => 'tracmor',
 				'username' => '',
 				'password' => '',
-				'profiling' => false)));
+				'profiling' => false,
+				'encoding' => 'utf8')));
 			break;
 
 	}
