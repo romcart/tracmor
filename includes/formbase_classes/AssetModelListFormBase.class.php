@@ -106,6 +106,13 @@
 				return null;
 		}
 
+		public function dtgAssetModel_Depreciation_Render(AssetModel $objAssetModel) {
+			if (!is_null($objAssetModel->DefaultDepreciationClass))
+				return $objAssetModel->DefaultDepreciationClass->__toString();
+			else
+				return null;
+		}
+
 		public function dtgAssetModel_CreatedByObject_Render(AssetModel $objAssetModel) {
 			if (!is_null($objAssetModel->CreatedByObject))
 				return $objAssetModel->CreatedByObject->__toString();

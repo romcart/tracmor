@@ -122,6 +122,13 @@
 				return null;
 		}
 
+		public function dtgAsset_Depreciation_Render(Asset $objAsset) {
+			if ($objAsset->DepreciationClassId)
+				return $objAsset->DepreciationClass->__toString();
+			else
+				return null;
+		}
+
 		public function dtgAsset_CreatedByObject_Render(Asset $objAsset) {
 			if (!is_null($objAsset->CreatedByObject))
 				return $objAsset->CreatedByObject->__toString();
@@ -132,6 +139,13 @@
 		public function dtgAsset_CreationDate_Render(Asset $objAsset) {
 			if (!is_null($objAsset->CreationDate))
 				return $objAsset->CreationDate->__toString(QDateTime::FormatDisplayDateTime);
+			else
+				return null;
+		}
+
+		public function dtgAsset_PurchaseDate_Render(Asset $objAsset) {
+			if (!is_null($objAsset->PurchaseDate))
+				return $objAsset->PurchaseDate->__toString(QDateTime::FormatDisplayDateTime);
 			else
 				return null;
 		}
