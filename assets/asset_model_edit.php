@@ -532,10 +532,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		if ($this->blnEditMode) {
 			$this->displayLabels();
 			$this->UpdateAssetModelControls();
-			$this->chkAssetCustomFields->RemoveAllItems();
-			$this->chkAssetCustomFields_Refresh();
-			$this->chkAssetCustomFields->Enabled = false;
-
+			if ($this->chkAssetCustomFields->CountItems()>0){
+				$this->chkAssetCustomFields->RemoveAllItems();
+				$this->chkAssetCustomFields_Refresh();
+				$this->chkAssetCustomFields->Enabled = false;
+			}
 		}
 		else {
 			QApplication::Redirect('asset_model_list.php');

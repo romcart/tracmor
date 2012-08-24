@@ -116,7 +116,7 @@
 		</table>
 <?php
 $this->chkAssetCustomFields->RenderWithName();
-$this->chkCustomFieldsForAllModels->Render();
+$this->chkCustomFieldsForAllModels->RenderWithName();
 ?>
 
 <?php
