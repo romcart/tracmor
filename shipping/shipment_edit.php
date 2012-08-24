@@ -2196,7 +2196,8 @@
 		public function btnAddInventory_Click($strFormId, $strControlId, $strParameter) {
 
 			$blnError = false;
-
+			$this->txtQuantity->Warning = '';
+			$this->txtNewInventoryModelCode->Warning = '';
 			// Assign the values from the user submitted form input
 			$intNewInventoryLocationId = $this->lstSourceLocation->SelectedValue;
 			$intTransactionQuantity = $this->txtQuantity->Text;
