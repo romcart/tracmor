@@ -766,6 +766,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblManufacturer->Text = $this->lstManufacturer->SelectedName;
 		$this->pnlLongDescription->Text = nl2br($this->txtLongDescription->Text);
 		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath);
+		$this->lblDefaultDepreciationClass->Text = ($this->lstDefaultDepreciationClass->SelectedValue==null)?'':
+		                                            $this->lstDefaultDepreciationClass->SelectedName;
 
 		// Update custom labels
 		if ($this->arrCustomFields) {

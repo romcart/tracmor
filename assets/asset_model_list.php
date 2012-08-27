@@ -164,9 +164,12 @@
 			$strDateModifiedLast = $this->strDateModifiedLast;
 			$strDateModified = $this->strDateModified;
 			$blnAttachment = $this->blnAttachment;
+			//$intDepreciationClassId = $this->intDefaultDepreciationClassId;
 			
       $objExpansionMap[AssetModel::ExpandCategory] = true;
       $objExpansionMap[AssetModel::ExpandManufacturer] = true;
+	  $objExpansionMap[AssetModel::ExpandDefaultDepreciationClass] = true;
+
       
       // If the search form has been posted
       // if ($intCategoryId || $intManufacturerId || $strDescription || $strAssetModelCode) {
