@@ -630,7 +630,7 @@
 		      if(count($arrRequiredAllAssetCustomFields)>0){
 			     $strRequiredAllAssetCustomFields = implode(", ",$arrRequiredAllAssetCustomFields) .", ";
 		      }
-          $this->btnNext->Warning = "You must select all required fields (".$strRequiredAllAssetCustomFields." Asset Tag, Asset Model Short Description and Location).";
+          $this->btnNext->Warning = "You must select all required fields (".$strRequiredAllAssetCustomFields. "Asset Tag, Model Short Description and Location).";
           $blnError = true;
         }
 		  }
