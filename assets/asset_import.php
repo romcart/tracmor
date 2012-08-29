@@ -470,6 +470,7 @@
 	    $arrRequiredAllAssetCustomFields = array();
 		foreach($arrAssetCustomFieldOptions as $arrAssetCustomFieldOption){
 		if($arrAssetCustomFieldOption->CustomField->RequiredFlag
+		   && $arrAssetCustomFieldOption->CustomField->ActiveFlag
 		   && $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag){
 		   $arrRequiredAllAssetCustomFields[] = $arrAssetCustomFieldOption->CustomField->ShortDescription;
 		if(!in_array($arrAssetCustomFieldOption->CustomField->ShortDescription,$this->getLstKeys())){
