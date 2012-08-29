@@ -1,7 +1,7 @@
 <table cellpadding="3" cellspacing="0">
 <tr>
 	<td class="role_table_left"></td>
-	<td class="role_table_cell" style="text-align: left;font-weight: bold;"><?php echo EntityQtype::$NameArray[$_CONTROL->intEntityQtypeId]?></td>
+	<td class="role_table_cell" style="text-align: left;font-weight: bold;"><?php echo (EntityQtype::$NameArray[$_CONTROL->intEntityQtypeId]=='AssetModel')?'Model':EntityQtype::$NameArray[$_CONTROL->intEntityQtypeId]; ?></td>
 	<td class="role_table_cell" style="text-align: center;"> <?php $_CONTROL->chkEntityView->Render()?></td>
 	<td class="role_table_cell" style="text-align: center;"><?php $_CONTROL->chkEntityEdit->Render()?></td>
 	<td class="role_table_cell" style="text-align: center;"></td>
