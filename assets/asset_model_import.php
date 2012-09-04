@@ -481,7 +481,7 @@
           if ($strSelectedValue == "asset model short description") {
             $blnAssetModelShortDescription = true;
           }
-          elseif ($strSelectedValue == "asset model code") {
+          elseif ($strSelectedValue == "model number") {
             $blnAssetModelCode = true;
           }
           elseif ($strSelectedValue == "category") {
@@ -652,7 +652,7 @@
               elseif ($value == 'asset model long description') {
                 $intModelLongDescriptionKey = $key;
               }
-              elseif ($value == 'asset model code') {
+              elseif ($value == 'model number') {
                 $intModelCodeKey = $key;
               }
               elseif (substr($value, 0, 6) == 'model_') {
@@ -1155,7 +1155,7 @@
 	    if ($this->lstImportAction->SelectedValue == 2) {
 	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    }
-	    $lstMapHeader->AddItem("Model Number", "Asset Model Code", ($strName == 'asset model code') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Model Number", "Model Number", ($strName == 'model number') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", ($strName == 'asset model short description') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", ($strName == 'asset model long description') ? true : false, $strAssetModelGroup);
 	    $lstMapHeader->AddItem("Category", "Category", ($strName == 'category') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
@@ -1235,7 +1235,7 @@
             $lstDefault->Display = true;
             $dtpDefault->Display = false;
           }
-          elseif ($objControl->SelectedValue == "Asset Code") {
+          elseif ($objControl->SelectedValue == "Asset Tag") {
           	$txtDefault->Display = false;
           	$lstDefault->Display = false;
           	$dtpDefault->Display = false;
