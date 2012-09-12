@@ -180,6 +180,7 @@ class QAssetEditComposite extends QControl {
 		else {
 			$this->lstLocation_Create();
 			$this->displayInputs();
+			$this->lblHeaderAssetCode->Text = 'New Asset';
 		}
 	}
 

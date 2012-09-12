@@ -164,7 +164,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function lblAssetModelHeader_Create() {
 		$this->lblAssetModelHeader = new QLabel($this);
 		$this->lblAssetModelHeader->Name = 'Model';
-		$this->lblAssetModelHeader->Text = $this->objAssetModel->__toString();
+		if(!$this->blnEditMode){
+			$this->lblAssetModelHeader->Text = "New Model";
+		}else{
+			$this->lblAssetModelHeader->Text = $this->objAssetModel->__toString();
+		}
 	}
 
 	// Create the Asset Model Code label
