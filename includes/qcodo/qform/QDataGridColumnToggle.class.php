@@ -195,7 +195,7 @@
         $strToReturn = implode('","', $arrNames);
         $strToReturn = '"' . $strToReturn . '"' . "\r\n";
       }
-      print $strToReturn;
+      print nl2br($strToReturn);
     }
 		
     protected function PrintCSVRow($objObject)
@@ -218,7 +218,7 @@
 	          elseif (substr($objColumn->Name, 0, 3) == '<?=') {
           		continue;
           	}
-	          
+
 	         // if ($objColumn->HtmlEntities)
 	         //   $strHtml = QApplication::HtmlEntities($strHtml);
 			  $strHtml = htmlspecialchars_decode($strHtml);
@@ -235,9 +235,9 @@
       }
       
       $strColumnsHtml = implode('","', $arrColumnText);
-      $strColumnsHtml = '"' . $strColumnsHtml . '"' . "\r\n";
+      $strColumnsHtml = '"' . nl2br($strColumnsHtml) . '"' . "\r\n";
       
-      print $strColumnsHtml;
+      print nl2br($strColumnsHtml);
     }
     
     protected function StripControls($strHtml) {
