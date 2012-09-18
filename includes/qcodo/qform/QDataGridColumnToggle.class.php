@@ -195,7 +195,7 @@
         $strToReturn = implode('","', $arrNames);
         $strToReturn = '"' . $strToReturn . '"' . "\r\n";
       }
-      print nl2br($strToReturn);
+      print $strToReturn;
     }
 		
     protected function PrintCSVRow($objObject)
@@ -235,16 +235,20 @@
       }
       
       $strColumnsHtml = implode('","', $arrColumnText);
-      $strColumnsHtml = '"' . nl2br($strColumnsHtml) . '"' . "\r\n";
-      
-      print nl2br($strColumnsHtml);
+      $strColumnsHtml = '"' . $strColumnsHtml . '"' . "\r\n";
+      print $strColumnsHtml;
     }
-    
+
     protected function StripControls($strHtml) {
-    	
-    	
+
+		$indent = strpos($strHtml,'<span id="c');
+		if($indent>0){
+			$strHtml = substr($strHtml, 0, $indent);//print $indent;
+		}
+		return $strHtml;
+
     }
-		
+
 		/////////////////////////
 		// Public Properties: GET
 		/////////////////////////
