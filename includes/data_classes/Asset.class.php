@@ -725,7 +725,10 @@
 					`asset`.`created_by` AS `created_by`,
 					`asset`.`creation_date` AS `creation_date`,
 					`asset`.`modified_by` AS `modified_by`,
-					`asset`.`modified_date` AS `modified_date`
+					`asset`.`modified_date` AS `modified_date`,
+					`asset`.`depreciation_class_id` AS `depreciation_class_id`,
+					`asset`.`purchase_date` AS `purchase_date`,
+					`asset`.`purchase_cost` AS `purchase_cost`
 					%s
 					%s
 					%s
