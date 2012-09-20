@@ -595,7 +595,7 @@
 					// Create Label for each custom field
 					if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text area') {
 						$arrCustomFields[$i]['lbl'] = new QPanel($objForm);
-						$arrCustomFields[$i]['lbl']->CssClass='scrollBox';
+						if($blnEditMode){$arrCustomFields[$i]['lbl']->CssClass='scrollBox';}
 					}
 					else {
 						$arrCustomFields[$i]['lbl'] = new QLabel($objForm);

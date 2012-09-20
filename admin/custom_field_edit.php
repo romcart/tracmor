@@ -155,7 +155,7 @@
 			$this->lstCustomFieldQtype->AddAction(new QChangeEvent(), new QAjaxAction('lstCustomFieldQtype_Change'));
 			if ($this->blnEditMode) {
 				// Even though sometimes this isn't displayed, it must be created because we use the selected value in some AJAX updates
-				$this->lstCustomFieldQtype->Display = false;
+				$this->lstCustomFieldQtype->Visible = false;
 			}
 		}
 
@@ -164,7 +164,7 @@
 			$this->lblCustomFieldQtype = new QLabel($this);
 			$this->lblCustomFieldQtype->Name = 'Field Type';
 			if (!$this->blnEditMode) {
-				$this->lblCustomFieldQtype->Display = false;
+				$this->lblCustomFieldQtype->Visible = false;
 			}
 			else {
 				$this->lblCustomFieldQtype->Text = ucfirst(CustomFieldQtype::ToString($this->objCustomField->CustomFieldQtypeId));
@@ -244,7 +244,7 @@
 			$this->chkEntityQtype->AddItem($objAddressListItem);
 			$this->chkEntityQtype->AddItem($objShipmentListItem);
 			$this->chkEntityQtype->AddItem($objReceiptListItem);
-      $this->chkEntityQtype->AddAction(new QClickEvent(), new QServerAction('objAssetListItem_Click'));
+      $this->chkEntityQtype->AddAction(new QClickEvent(), new QAjaxAction('objAssetListItem_Click'));
     }
     // Create/Setup the Value textbox
 		protected function txtValue_Create() {
@@ -269,7 +269,7 @@
 				$this->txtDefaultValue->Text = $this->objCustomField->DefaultCustomFieldValue->ShortDescription;
 			}
 			if ($this->blnEditMode && $this->objCustomField->CustomFieldQtypeId == 2) {
-				$this->txtDefaultValue->Display = false;
+				$this->txtDefaultValue->Visible = false;
 			}
 
 			$this->txtDefaultValue->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
@@ -300,10 +300,10 @@
 			}*/
 			// Only display if this is a SELECT custom field (not a text or textarea)
 			if ($this->blnEditMode && $this->objCustomField->CustomFieldQtypeId == 2) {
-				$this->lstDefaultValue->Display = true;
+				$this->lstDefaultValue->Visible = true;
 			}
 			else {
-				$this->lstDefaultValue->Display = false;
+				$this->lstDefaultValue->Visible = false;
 			}
 			$this->lstDefaultValue->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->lstDefaultValue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -362,13 +362,13 @@
 			$this->lblSelectionOption = new QLabel($this);
 			$this->lblSelectionOption->Text = 'Selection Option:';
 			if (!$this->blnEditMode || $this->objCustomField->CustomFieldQtypeId != 2) {
-				$this->lblSelectionOption->Display = false;
+				$this->lblSelectionOption->Visible = false;
 			}
 		}
 
     protected function rblAllAssetModels_Create(){
     parent::rblAllAssetModels_Create();
-    $this->rblAllAssetModels->AddAction(new QClickEvent(), new QServerAction('rblAssetAssetModels_Click'));
+    $this->rblAllAssetModels->AddAction(new QClickEvent(), new QAjaxAction('rblAssetAssetModels_Click'));
     if(!$this->blnAssetEntityType){
       $this->rblAllAssetModels->Visible = false;
     }
@@ -621,8 +621,8 @@
 		protected function lstCustomFieldQtype_Change($strFormId, $strControlId, $strParameter) {
 			// If this is a select custom field
 			if ($this->lstCustomFieldQtype->SelectedValue == 2) {
-				$this->txtDefaultValue->Display = false;
-				$this->lstDefaultValue->Display = true;
+				$this->txtDefaultValue->Visible = false;
+				$this->lstDefaultValue->Visible = true;
 				// If there are selections for the custom field
 				if ($this->lstDefaultValue->ItemCount > 0 && $this->chkRequiredFlag->Checked) {
 					$this->lstDefaultValue->Enabled = true;
@@ -641,8 +641,8 @@
 			}
 			// If the custom field is text or textarea
 			elseif ($this->lstCustomFieldQtype->SelectedValue != 2) {
-				$this->lstDefaultValue->Display = false;
-				$this->txtDefaultValue->Display = true;
+				$this->lstDefaultValue->Visible = false;
+				$this->txtDefaultValue->Visible = true;
 				$this->chkActiveFlag->Enabled = true;
 				$this->chkRequiredFlag->Enabled = true;
 				if ($this->chkRequiredFlag->Checked == true) {
@@ -657,11 +657,11 @@
         $this->rblAllAssetModels->Visible = true;
         $this->blnAssetEntityType = true;
         if($this->rblAllAssetModels->SelectedValue == 2){
-          $this->lblAssetModel->Display = true;
-          $this->lstAddAssetModel->Display = true;
+          $this->lblAssetModel->Visible = true;
+          $this->lstAddAssetModel->Visible = true;
           $this->lblLookup->Visible = true;
-          $this->btnAddAssetModel->Display = true;
-          $this->dtgAssetModels->Display = true;
+          $this->btnAddAssetModel->Visible = true;
+          $this->dtgAssetModels->Visible = true;
           $this->DisplayAssetModels();
         }
       }
@@ -1229,13 +1229,15 @@
     // may be used after $this->objCustomField->Save();
     private function AppendAssetModels(){
       if($this->rblAllAssetModels->SelectedValue == 1){
-        $arrToAdd = AssetModel::LoadAll();
-        foreach ($arrToAdd as $itemToAdd){
+//        $arrToAdd = AssetModel::LoadAll();
+//        foreach ($arrToAdd as $itemToAdd){
           $objAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
-          $objAssetCustomFieldAssetModel->AssetModelId  = $itemToAdd->AssetModelId;
-          $objAssetCustomFieldAssetModel->CustomFieldId = $this->objCustomField->CustomFieldId;
-          $objAssetCustomFieldAssetModel->Save();
-        }
+//          $objAssetCustomFieldAssetModel->AssetModelId  = $itemToAdd->AssetModelId;
+//          $objAssetCustomFieldAssetModel->CustomFieldId = $this->objCustomField->CustomFieldId;
+//          $objAssetCustomFieldAssetModel->Save();
+//        }
+		  $this->DeleteAssetCustomFieldAssetModels();
+		  // $objAssetCustomFieldAssetModel->deleteAllByCustomField($this->objCustomField->CustomFieldId);
       }
       else{
         foreach ($this->arrAssetModels as $itemToAdd){
@@ -1274,14 +1276,15 @@
       }
       // Load All Asset Models to add
       else{
-        $this->arrAssetModels = array();
-        $arrAssetModels = AssetModel::LoadAll();
-        foreach($arrAssetModels as $assetModel){
-          $newAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
-          $newAssetCustomFieldAssetModel->CustomFieldId  = $this->objCustomField->CustomFieldId;
-          $newAssetCustomFieldAssetModel->AssetModelId   = $assetModel->AssetModelId;
-          array_push($this->arrAssetModels,$newAssetCustomFieldAssetModel);
-        }
+//        $this->arrAssetModels = array();
+//        $arrAssetModels = AssetModel::LoadAll();
+//        foreach($arrAssetModels as $assetModel){
+//          $newAssetCustomFieldAssetModel = new AssetCustomFieldAssetModel();
+//          $newAssetCustomFieldAssetModel->CustomFieldId  = $this->objCustomField->CustomFieldId;
+//          $newAssetCustomFieldAssetModel->AssetModelId   = $assetModel->AssetModelId;
+//          array_push($this->arrAssetModels,$newAssetCustomFieldAssetModel);
+//        }
+		$this->DeleteAssetCustomFieldAssetModels();
       }
       // Adding new assigned Model Assets
       $arrCurrentAssetModels = AssetCustomFieldAssetModel::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);

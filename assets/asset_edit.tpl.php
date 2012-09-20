@@ -37,6 +37,7 @@
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
+		<?php if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
 		<?php $this->ctlAssetEdit->Render(); ?>
 		<?php if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) { ?>
         <br class="item_divider" />
@@ -59,7 +60,7 @@
     if ($this->ctlAssetSearchTool) {
     	$this->ctlAssetSearchTool->Render();
     }
-	  if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
+	  ?>
     <br class="item_divider" />
 	<?php $this->RenderEnd() ?>
 	<?php require_once('../includes/footer.inc.php'); ?>

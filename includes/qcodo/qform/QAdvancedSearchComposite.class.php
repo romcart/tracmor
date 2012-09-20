@@ -59,50 +59,53 @@ class QAdvancedSearchComposite extends QControl {
 
 	// We want to override the constructor in order to setup the subcontrols
 	public function __construct($objParentObject, $intEntityQtypeId = null, $strControlId = null) {
-	    // First, call the parent to do most of the basic setup
-	    try {
-	        parent::__construct($objParentObject, $strControlId);
-	    } catch (QCallerException $objExc) {
-	        $objExc->IncrementOffset();
-	        throw $objExc;
-	    }
+		// First, call the parent to do most of the basic setup
+		try {
+			parent::__construct($objParentObject, $strControlId);
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
 
-	    $this->objParentObject = $objParentObject;
-	    $this->intEntityQtypeId = $intEntityQtypeId;
+		$this->objParentObject = $objParentObject;
+		$this->intEntityQtypeId = $intEntityQtypeId;
 
-	    if ($objParentObject instanceof AssetListForm || $objParentObject instanceof QAssetSearchComposite) {
-	    	$this->txtAssetModelCode_Create();
-	    	$this->lstReservedBy_Create();
-	    	$this->lstCheckedOutBy_Create();
-	    	$this->lstCheckedOutToUser_Create();
-        if (QApplication::$TracmorSettings->CheckOutToContacts == "1") {
-	    	  $this->objCompanyArray = Company::LoadAllIntoArray();
-  	      $this->lstToCompany_Create();
-  	    	$this->lstToContact_Create();
-        }
-	    	$this->chkCheckedOutPastDue_Create();
-	    	$this->chkInclude_Create();
-	    	$this->lstModifiedCreated_Create();
-	    }
+		if ($objParentObject instanceof AssetListForm || $objParentObject instanceof QAssetSearchComposite) {
+			$this->txtAssetModelCode_Create();
+			$this->lstReservedBy_Create();
+			$this->lstCheckedOutBy_Create();
+			$this->lstCheckedOutToUser_Create();
+			
+			if (QApplication::$TracmorSettings->CheckOutToContacts == "1") {
+				$this->objCompanyArray = Company::LoadAllIntoArray();
+				$this->lstToCompany_Create();
+				$this->lstToContact_Create();
+			}
 
-	    if ($objParentObject instanceof ShipmentListForm) {
-	    	$this->txtFromCompany_Create();
-	    	$this->txtFromContact_Create();
-	    	$this->txtTrackingNumber_Create();
-	    	$this->lstCourier_Create();
-	    	$this->txtNote_Create();
-	    	$this->dtpShipmentDate_Create();
-	    }
-	    if ($objParentObject instanceof ReceiptListForm) {
-	    	$this->txtNote_Create();
-	    	$this->dtpDueDate_Create();
-	    	$this->dtpReceiptDate_Create();
-	    }
-	  $this->lstDateModified_Create();
-      $this->dtpDateModifiedFirst_Create();
-      $this->dtpDateModifiedLast_Create();
-      $this->chkAttachment_Create();
-      $this->customFields_Create();
+			$this->chkCheckedOutPastDue_Create();
+			$this->chkInclude_Create();
+			$this->lstModifiedCreated_Create();
+		}
+
+		if ($objParentObject instanceof ShipmentListForm) {
+			$this->txtFromCompany_Create();
+			$this->txtFromContact_Create();
+			$this->txtTrackingNumber_Create();
+			$this->lstCourier_Create();
+			$this->txtNote_Create();
+			$this->dtpShipmentDate_Create();
+		}
+		if ($objParentObject instanceof ReceiptListForm) {
+			$this->txtNote_Create();
+			$this->dtpDueDate_Create();
+			$this->dtpReceiptDate_Create();
+		}
+		
+		$this->lstDateModified_Create();
+		$this->dtpDateModifiedFirst_Create();
+		$this->dtpDateModifiedLast_Create();
+		$this->chkAttachment_Create();
+		$this->customFields_Create();
 	}
 
 	public function ParsePostData() {
@@ -154,69 +157,68 @@ class QAdvancedSearchComposite extends QControl {
 		return $strToReturn;
 	}
 
-  protected function txtAssetModelCode_Create() {
-    $this->txtAssetModelCode = new QTextBox($this);
-		$this->txtAssetModelCode->Name = 'Model Number';
-    $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
-    $this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-    // if ($this->objParentObject instanceof AssetListFormBase) {
-    if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
-    	$this->txtAssetModelCode->Visible = true;
-    }
-    else {
-    	$this->txtAssetModelCode->Visible = false;
-    }
-  }
+	protected function txtAssetModelCode_Create() {
+		$this->txtAssetModelCode = new QTextBox($this);
+		$this->txtAssetModelCode->Name = 'Asset Model Code';
+		$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+		$this->txtAssetModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		// if ($this->objParentObject instanceof AssetListFormBase) {
+		if (get_class($this->objParentObject) == 'AssetListForm' || get_class($this->objParentObject) == 'QAssetSearchComposite') {
+			$this->txtAssetModelCode->Visible = true;
+		} else {
+			$this->txtAssetModelCode->Visible = false;
+		}
+	}
 
-  protected function lstReservedBy_Create() {
-  	$this->lstReservedBy = new QListBox($this);
-  	$this->lstReservedBy->Name = 'Reserved By';
-  	$this->lstReservedBy->AddItem('- Select One -', null, true);
-  	$this->lstReservedBy->AddItem('Any', 'any');
-  	$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
-  	if ($objUserAccountArray) {
-  		foreach ($objUserAccountArray as $arrUserAccount) {
-  			$this->lstReservedBy->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
-  		}
-  	}
-  }
+	protected function lstReservedBy_Create() {
+		$this->lstReservedBy = new QListBox($this);
+		$this->lstReservedBy->Name = 'Reserved By';
+		$this->lstReservedBy->AddItem('- Select One -', null, true);
+		$this->lstReservedBy->AddItem('Any', 'any');
+		$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
+		if ($objUserAccountArray) {
+			foreach ($objUserAccountArray as $arrUserAccount) {
+				$this->lstReservedBy->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
+			}
+		}
+	}
 
-  protected function lstCheckedOutBy_Create() {
-  	$this->lstCheckedOutBy = new QListBox($this);
-  	$this->lstCheckedOutBy->Name = 'Checked Out By';
+	protected function lstCheckedOutBy_Create() {
+		$this->lstCheckedOutBy = new QListBox($this);
+		$this->lstCheckedOutBy->Name = 'Checked Out By';
 		$this->lstCheckedOutBy->AddItem('- Select One -', null, true);
-  	$this->lstCheckedOutBy->AddItem('Any', 'any');
-  	$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
-  	if ($objUserAccountArray) {
-  		foreach ($objUserAccountArray as $arrUserAccount) {
-  			$this->lstCheckedOutBy->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
-  		}
-  	}
-  }
+		$this->lstCheckedOutBy->AddItem('Any', 'any');
+		$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
+		if ($objUserAccountArray) {
+			foreach ($objUserAccountArray as $arrUserAccount) {
+				$this->lstCheckedOutBy->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
+			}
+		}
+	}
 
-  protected function lstCheckedOutToUser_Create() {
-  	$this->lstCheckedOutToUser = new QListBox($this);
-  	$this->lstCheckedOutToUser->Name = 'Checked Out To';
+	protected function lstCheckedOutToUser_Create() {
+		$this->lstCheckedOutToUser = new QListBox($this);
+		$this->lstCheckedOutToUser->Name = 'Checked Out To';
 		$this->lstCheckedOutToUser->AddItem('- Select One -', null, true);
-  	$this->lstCheckedOutToUser->AddItem('Any', 'any');
-  	$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
-  	if ($objUserAccountArray) {
-  		foreach ($objUserAccountArray as $arrUserAccount) {
-  			$this->lstCheckedOutToUser->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
-  		}
-  	}
-  }
+		$this->lstCheckedOutToUser->AddItem('Any', 'any');
+		$objUserAccountArray = UserAccount::LoadAllAsCustomArray('username');
+		if ($objUserAccountArray) {
+			foreach ($objUserAccountArray as $arrUserAccount) {
+				$this->lstCheckedOutToUser->AddItem($arrUserAccount['username'], $arrUserAccount['user_account_id']);
+			}
+		}
+	}
 
-  // Create and Setup lstToCompany
+	// Create and Setup lstToCompany
 	protected function lstToCompany_Create() {
 		$this->lstToCompany = new QListBox($this);
 		$this->lstToCompany->Name = "Company: ";
 		$this->lstToCompany->AddItem('- Select One -', null);
 		$objToCompanyArray = $this->objCompanyArray;
-    if ($objToCompanyArray) foreach ($objToCompanyArray as $arrToCompany) {
-      $objListItem = new QListItem($arrToCompany['short_description'], $arrToCompany['company_id']);
-      $this->lstToCompany->AddItem($objListItem);
-    }
+		if ($objToCompanyArray) foreach ($objToCompanyArray as $arrToCompany) {
+			$objListItem = new QListItem($arrToCompany['short_description'], $arrToCompany['company_id']);
+			$this->lstToCompany->AddItem($objListItem);
+		}
 		$this->lstToCompany->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'lstToCompany_Select'));
 	}
 
@@ -257,114 +259,113 @@ class QAdvancedSearchComposite extends QControl {
 			}
 		}
 		else {
-		  //$this->lstToContact->Enabled = false;
-		  $this->lstToContact->RemoveAllItems();
+			//$this->lstToContact->Enabled = false;
+			$this->lstToContact->RemoveAllItems();
 			$this->lstToContact->AddItem('- Select One -', null);
 			$this->lstToContact->AddItem('Any', 'any');
 		}
 	}
 
 	protected function chkCheckedOutPastDue_Create() {
-    $this->chkCheckedOutPastDue = new QCheckBox($this);
-  	$this->chkCheckedOutPastDue->Name = 'Checked Out Past Due';
-  	$this->chkCheckedOutPastDue->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
-  	$this->chkCheckedOutPastDue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->chkCheckedOutPastDue = new QCheckBox($this);
+		$this->chkCheckedOutPastDue->Name = 'Checked Out Past Due';
+		$this->chkCheckedOutPastDue->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+		$this->chkCheckedOutPastDue->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	}
 
-  protected function chkInclude_Create() {
-    $this->chkArchived = new QCheckBox($this);
-  	$this->chkArchived->Name = 'Include Archived';
-  	$this->chkArchived->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
-  	$this->chkArchived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	protected function chkInclude_Create() {
+		$this->chkArchived = new QCheckBox($this);
+		$this->chkArchived->Name = 'Include Archived';
+		$this->chkArchived->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+		$this->chkArchived->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
-  	$this->chkIncludeTBR = new QCheckBox($this);
-  	$this->chkIncludeTBR->Name = 'Include To Be Received';
-  	$this->chkIncludeTBR->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
-  	$this->chkIncludeTBR->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->chkIncludeTBR = new QCheckBox($this);
+		$this->chkIncludeTBR->Name = 'Include To Be Received';
+		$this->chkIncludeTBR->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+		$this->chkIncludeTBR->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 
-  	$this->chkIncludeShipped = new QCheckBox($this);
-  	$this->chkIncludeShipped->Name = 'Include Shipped';
-  	$this->chkIncludeShipped->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
-  	$this->chkIncludeShipped->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  }
+		$this->chkIncludeShipped = new QCheckBox($this);
+		$this->chkIncludeShipped->Name = 'Include Shipped';
+		$this->chkIncludeShipped->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentObject, 'btnSearch_Click'));
+		$this->chkIncludeShipped->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
 
-  protected function txtFromCompany_Create() {
-	$this->txtFromCompany = new QTextBox($this);
-	$this->txtFromCompany->Name = 'Ship FromCompany';
-	$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-	$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	$this->txtFromCompany->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
-  }
+	protected function txtFromCompany_Create() {
+		$this->txtFromCompany = new QTextBox($this);
+		$this->txtFromCompany->Name = 'Ship FromCompany';
+		$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+		$this->txtFromCompany->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtFromCompany->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
+	}
 
-  protected function txtFromContact_Create() {
-	$this->txtFromContact = new QTextBox($this);
-	$this->txtFromContact->Name = 'Ship From Contact';
-	$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-	$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	$this->txtFromContact->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
-  }
+	protected function txtFromContact_Create() {
+		$this->txtFromContact = new QTextBox($this);
+		$this->txtFromContact->Name = 'Ship From Contact';
+		$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+		$this->txtFromContact->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtFromContact->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
+	}
 
-  protected function txtTrackingNumber_Create() {
+	protected function txtTrackingNumber_Create() {
 		$this->txtTrackingNumber = new QTextBox($this);
 		$this->txtTrackingNumber->Name = 'Tracking Number';
 		$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 		$this->txtTrackingNumber->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		$this->txtTrackingNumber->Visible = (get_class($this->objParentObject) == 'ShipmentListForm') ? true : false;
-  }
+	}
 
-  protected function lstCourier_Create() {
-  	$this->lstCourier = new QListBox($this);
-  	$this->lstCourier->Name = 'Courier';
-  	$this->lstCourier->AddItem('- Select One -', null, true);
-  	$objCourierArray = Courier::LoadAll();
-  	if ($objCourierArray) {
-  		foreach ($objCourierArray as $objCourier) {
-  			$this->lstCourier->AddItem($objCourier->__toString(), $objCourier->CourierId);
-  		}
-  	}
-  }
+	protected function lstCourier_Create() {
+		$this->lstCourier = new QListBox($this);
+		$this->lstCourier->Name = 'Courier';
+		$this->lstCourier->AddItem('- Select One -', null, true);
+		$objCourierArray = Courier::LoadAll();
+		if ($objCourierArray) {
+			foreach ($objCourierArray as $objCourier) {
+				$this->lstCourier->AddItem($objCourier->__toString(), $objCourier->CourierId);
+			}
+		}
+	}
 
-  protected function txtNote_Create() {
-  	$this->txtNote = new QTextBox($this);
-  	$this->txtNote->Name = 'Note';
-  	$this->txtNote->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-  	$this->txtNote->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  	$this->txtNote->Visible = (get_class($this->objParentObject) == 'ShipmentListForm' || get_class($this->objParentObject) == 'ReceiptListForm') ? true : false;
-  }
+	protected function txtNote_Create() {
+		$this->txtNote = new QTextBox($this);
+		$this->txtNote->Name = 'Note';
+		$this->txtNote->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+		$this->txtNote->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		$this->txtNote->Visible = (get_class($this->objParentObject) == 'ShipmentListForm' || get_class($this->objParentObject) == 'ReceiptListForm') ? true : false;
+	}
 
-  protected function chkAttachment_Create() {
-  	$this->chkAttachment = new QCheckBox($this);
-  	$this->chkAttachment->Name = 'Attachment(s)';
-  	if ($this->objParentControl) {
-  	  $this->chkAttachment->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentControl, 'btnSearch_Click'));
-  	}
-  	else {
-  	  $this->chkAttachment->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-  	}
-  	$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  }
-
+	protected function chkAttachment_Create() {
+		$this->chkAttachment = new QCheckBox($this);
+		$this->chkAttachment->Name = 'Attachment(s)';
+		if ($this->objParentControl) {
+			$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QServerControlAction($this->objParentControl, 'btnSearch_Click'));
+		} else {
+			$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+		}
+		$this->chkAttachment->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
 
 
-  protected function dtpDateModifiedFirst_Create() {
-  	$this->dtpDateModifiedFirst = new QDateTimePicker($this);
-  	$this->dtpDateModifiedFirst->Name = '';
-  	$this->dtpDateModifiedFirst->DateTime = new QDateTime(QDateTime::Now);
-  	$this->dtpDateModifiedFirst->DateTimePickerType = QDateTimePickerType::Date;
-  	$this->dtpDateModifiedFirst->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-  	$this->dtpDateModifiedFirst->Enabled = false;
-	$this->dtpDateModifiedFirst->MaximumYear = $this->dtpDateModifiedFirst->DateTime->Year;
-  }
 
-  protected function dtpDateModifiedLast_Create() {
-  	$this->dtpDateModifiedLast = new QDateTimePicker($this);
-  	$this->dtpDateModifiedLast->Name = '';
-  	$this->dtpDateModifiedLast->DateTime = new QDateTime(QDateTime::Now);
-  	$this->dtpDateModifiedLast->DateTimePickerType = QDateTimePickerType::Date;
-  	$this->dtpDateModifiedLast->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-  	$this->dtpDateModifiedLast->Enabled = false;
-	$this->dtpDateModifiedLast->MaximumYear = $this->dtpDateModifiedLast->DateTime->Year;
-  }
+	protected function dtpDateModifiedFirst_Create() {
+		$this->dtpDateModifiedFirst = new QDateTimePicker($this);
+		$this->dtpDateModifiedFirst->Name = '';
+		$this->dtpDateModifiedFirst->DateTime = new QDateTime(QDateTime::Now);
+		$this->dtpDateModifiedFirst->DateTimePickerType = QDateTimePickerType::Date;
+		$this->dtpDateModifiedFirst->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+		$this->dtpDateModifiedFirst->Enabled = false;
+		$this->dtpDateModifiedFirst->MaximumYear = $this->dtpDateModifiedFirst->DateTime->Year;
+	}
+
+	protected function dtpDateModifiedLast_Create() {
+		$this->dtpDateModifiedLast = new QDateTimePicker($this);
+		$this->dtpDateModifiedLast->Name = '';
+		$this->dtpDateModifiedLast->DateTime = new QDateTime(QDateTime::Now);
+		$this->dtpDateModifiedLast->DateTimePickerType = QDateTimePickerType::Date;
+		$this->dtpDateModifiedLast->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+		$this->dtpDateModifiedLast->Enabled = false;
+		$this->dtpDateModifiedLast->MaximumYear = $this->dtpDateModifiedLast->DateTime->Year;
+	}
 
 	protected function lstDateModified_Create() {
 		$this->lstDateModified = new QListBox($this);
@@ -377,39 +378,37 @@ class QAdvancedSearchComposite extends QControl {
 	}
 
 	protected function lstModifiedCreated_Create() {
-
 		$this->lstModifiedCreated = new QRadioButtonList($this);
 		$this->lstModifiedCreated->Name = '';
 		$this->lstModifiedCreated->AddItem(new QListItem('Created', 'creation_date', true));
 		$this->lstModifiedCreated->AddItem(new QListItem('Last Modified', 'modified_date'));
-  }
+	}
 
 	protected function dtpShipmentDate_Create() {
-  	$this->dtpShipmentDate = new QDateTimePicker($this);
-  	$this->dtpShipmentDate->Name = '';
-  	$this->dtpShipmentDate->DateTimePickerType = QDateTimePickerType::Date;
-  	$this->dtpShipmentDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-	$this->dtpShipmentDate->MaximumYear = QDateTime::Now()->Year;
-  }
+		$this->dtpShipmentDate = new QDateTimePicker($this);
+		$this->dtpShipmentDate->Name = '';
+		$this->dtpShipmentDate->DateTimePickerType = QDateTimePickerType::Date;
+		$this->dtpShipmentDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+		$this->dtpShipmentDate->MaximumYear = QDateTime::Now()->Year;
+	}
 
-  protected function dtpDueDate_Create() {
-  	$this->dtpDueDate = new QDateTimePicker($this);
-  	$this->dtpDueDate->Name = '';
-  	$this->dtpDueDate->DateTimePickerType = QDateTimePickerType::Date;
-  	$this->dtpDueDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-	$this->dtpDueDate->MaximumYear = QDateTime::Now()->Year;
-  }
+	protected function dtpDueDate_Create() {
+		$this->dtpDueDate = new QDateTimePicker($this);
+		$this->dtpDueDate->Name = '';
+		$this->dtpDueDate->DateTimePickerType = QDateTimePickerType::Date;
+		$this->dtpDueDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+		$this->dtpDueDate->MaximumYear = QDateTime::Now()->Year;
+	}
 
-  protected function dtpReceiptDate_Create() {
-  	$this->dtpReceiptDate = new QDateTimePicker($this);
-  	$this->dtpReceiptDate->Name = '';
-  	$this->dtpReceiptDate->DateTimePickerType = QDateTimePickerType::Date;
-  	$this->dtpReceiptDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
-	$this->dtpReceiptDate->MaximumYear = QDateTime::Now()->Year;
-  }
+	protected function dtpReceiptDate_Create() {
+		$this->dtpReceiptDate = new QDateTimePicker($this);
+		$this->dtpReceiptDate->Name = '';
+		$this->dtpReceiptDate->DateTimePickerType = QDateTimePickerType::Date;
+		$this->dtpReceiptDate->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
+		$this->dtpReceiptDate->MaximumYear = QDateTime::Now()->Year;
+	}
 
 	protected function customFields_Create() {
-
 		// Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
 		$this->objCustomFieldArray = CustomField::LoadObjCustomFieldArray($this->intEntityQtypeId, false, null, true);
 		// Create the Custom Field Controls - labels and inputs (text or list) for each
@@ -421,16 +420,13 @@ class QAdvancedSearchComposite extends QControl {
 		if ($value == null) {
 			$this->dtpDateModifiedFirst->Enabled = false;
 			$this->dtpDateModifiedLast->Enabled = false;
-		}
-		elseif ($value == 'before') {
+		} elseif ($value == 'before') {
 			$this->dtpDateModifiedFirst->Enabled = true;
 			$this->dtpDateModifiedLast->Enabled = false;
-		}
-		elseif ($value == 'after') {
+		} elseif ($value == 'after') {
 			$this->dtpDateModifiedFirst->Enabled = true;
 			$this->dtpDateModifiedLast->Enabled = false;
-		}
-		elseif ($value == 'between') {
+		} elseif ($value == 'between') {
 			$this->dtpDateModifiedFirst->Enabled = true;
 			$this->dtpDateModifiedLast->Enabled = true;
 		}
@@ -441,25 +437,32 @@ class QAdvancedSearchComposite extends QControl {
 			$this->txtAssetModelCode->Text = '';
 			$this->lstCheckedOutBy->SelectedIndex = 0;
 			$this->lstCheckedOutToUser->SelectedIndex = 0;
-			$this->lstToCompany->SelectedIndex = 0;
+			
+			if ($this->lstToContact instanceof QListBox) {
+				$this->lstToCompany->SelectedIndex = 0;
+			}
+			
 			if ($this->lstToContact instanceof QListBox) {
 				$this->lstToContact->RemoveAllItems();
-			//$this->lstToContact->Enabled = false;
-			  $this->lstToContact->AddItem('- Select One -', null);
-			  $this->lstToContact->AddItem('Any', 'any');
+				$this->lstToContact->AddItem('- Select One -', null);
+				$this->lstToContact->AddItem('Any', 'any');
 			}
+
 			$this->lstReservedBy->SelectedIndex = 0;
 			$this->lstModifiedCreated->SelectedIndex = 0;
 			$this->chkCheckedOutPastDue->Checked = false;
 		}
+		
 		if ($this->objParentObject instanceof ShipmentListForm) {
 			$this->txtTrackingNumber->Text = '';
 			$this->lstCourier->SelectedIndex = 0;
 			$this->txtNote->Text = '';
 		}
+		
 		if ($this->objParentObject instanceof ReceiptListForm) {
 			$this->txtNote->Text = '';
 		}
+		
 		$this->lstDateModified->SelectedIndex = 0;
 		$this->dtpDateModifiedFirst->DateTime = new QDateTime(QDateTime::Now);
 		$this->dtpDateModifiedLast->DateTime = new QDateTime(QDateTime::Now);
@@ -467,19 +470,19 @@ class QAdvancedSearchComposite extends QControl {
 		$this->dtpDateModifiedLast->Enabled = false;
 		$this->chkAttachment->Checked = false;
 		$this->chkArchived->Checked = false;
+		
 		foreach ($this->arrCustomFields as $field) {
 			if ($field['input'] instanceof QTextBox) {
 				$field['input']->Text = '';
-			}
-			elseif ($field['input'] instanceof QListBox) {
+			} elseif ($field['input'] instanceof QListBox) {
 				$field['input']->SelectedIndex = null;
 			}
 		}
 	}
 
-  // And our public getter/setters
-  public function __get($strName) {
-	  switch ($strName) {
+	// And our public getter/setters
+	public function __get($strName) {
+		switch ($strName) {
 			case "AssetModelCode": return $this->txtAssetModelCode->Text;
 				break;
 			case "ReservedBy": return $this->lstReservedBy->SelectedValue;
@@ -526,15 +529,15 @@ class QAdvancedSearchComposite extends QControl {
 				break;
 			case "CustomFieldArray": return $this->arrCustomFields;
 				break;
-      default:
-        try {
-            return parent::__get($strName);
-        } catch (QCallerException $objExc) {
-            $objExc->IncrementOffset();
-            throw $objExc;
-        }
-	  }
-  }
+		default:
+			try {
+				return parent::__get($strName);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+	}
 
 	/////////////////////////
 	// Public Properties: SET

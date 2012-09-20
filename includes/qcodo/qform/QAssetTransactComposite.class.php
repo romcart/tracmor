@@ -517,6 +517,7 @@ class QAssetTransactComposite extends QControl {
 			}
 
 			if (!$blnError) {
+			  $this->txtNewAssetCode->Warning = '';
 			  $objNewAsset = Asset::LoadByAssetCodeWithCustomFields($this->txtNewAssetCode->Text);
 				if (!($objNewAsset instanceof Asset)) {
 					$blnError = true;
@@ -671,6 +672,9 @@ class QAssetTransactComposite extends QControl {
 					$this->dtgAssetTransact->Refresh();
 				}
 			}
+			if(!$blnError){
+				$this->txtNewAssetCode->Warning = '';
+			}
 		}
 		else {
 			$this->txtNewAssetCode->Warning = "Please enter an asset code.";
@@ -696,10 +700,11 @@ class QAssetTransactComposite extends QControl {
         }
       }
       $this->txtNewAssetCode->Warning = $lblNewWarning;
+	  $this->UncheckAllItems();
       $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
 		}
 		// Uncheck all items but SelectAll checkbox
-    $this->UncheckAllItems();
+
 	}
 
 	// Save Button Click
@@ -996,11 +1001,11 @@ class QAssetTransactComposite extends QControl {
 
 	// Uncheck all items but SelectAll checkbox
 	public function UncheckAllItems() {
-	  foreach ($this->objParentObject->GetAllControls() as $objControl) {
-      if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
-        $objControl->Checked = false;
-      }
-    }
+		foreach ($this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->objForm->GetAllControls() as $objControl) {
+        	if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+        		$objControl->Checked = false;
+     		}
+    	}
 	}
 
   // And our public getter/setters

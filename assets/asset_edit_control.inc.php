@@ -56,13 +56,21 @@
 			$arrAssetFields[] = array('name' => 'Checked Out To:', 'value' => $this->lblCheckedOutTo->Render(false));
 		}
 
+	// Setting counter for calculating 	txtParentAssetCode and chkLockToParent tabIndexes handling dynamic custom fields number
+	$this->blnEditMode?$parentTabIndex=3:$parentTabIndex=4;
+
 	// Custom Fields
 	if ($this->arrCustomFields) {
 		foreach ($this->arrCustomFields as $field) {
 			if(/*!$this->blnEditMode || */$field['blnView'])
 				$arrAssetFields[] = array('name' => $field['lbl']->Name.':', 'value' => $field['lbl']->Render(false).$field['input']->RenderWithError(false));
+			$parentTabIndex = $field['input']->TabIndex + 1;
 		}
 	}
+
+    $this->txtParentAssetCode->TabIndex = $parentTabIndex;
+    $this->chkLockToParent->TabIndex = $parentTabIndex + 1;
+
 	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . $this->lblIconParentAssetCode->Render(false) . $this->chkLockToParent->RenderWithError(false) . $this->lblLockedToParent->Render(false));
 
 	// Display Metadata fields in Edit mode only
@@ -79,6 +87,7 @@
 		<td class="record_header">
 			<?php
 				$this->btnEdit->Render();
+			    $this->btnSave->TabIndex = 0;
 				$this->btnSave->RenderWithError();
 				echo('&nbsp;');
 				$this->btnCancel->RenderWithError();

@@ -228,7 +228,7 @@ CREATE TABLE custom_field (
   short_description             VARCHAR(255)   NOT NULL,
   active_flag                   BIT   NULL,
   required_flag                 BIT   NULL,
-  all_asset_models_flag         BIT   NULL,
+  all_asset_models_flag         BIT   NULL DEFAULT 1,
   searchable_flag               BIT   NULL,
   created_by                    INTEGER UNSIGNED   NULL,
   creation_date                 DATETIME   NULL,

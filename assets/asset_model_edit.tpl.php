@@ -122,6 +122,7 @@
 		</table>
 <?php
 $this->chkAssetCustomFields->RenderWithName();
+$this->chkCustomFieldsForAllModels->RenderWithName();
 ?>
 
 <?php

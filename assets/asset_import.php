@@ -455,13 +455,30 @@
 		    }
 		  }
 		  elseif ($this->intStep == 2) {
-		    // Step 2 complete
+		      // Step 2 complete
+			  $blnRequiredAllAssetCustomFields = true;
 		    $blnError = false;
         $blnAssetCode = false;
         $blnAssetModelShortDescription = false;
         $blnLocation = false;
         $blnAssetId = false;
-        // Checking errors (Model Short Description, Model Code, Category and Manufacturer must be selected)
+
+		// $array Required Custom Fields for All Asset Models
+		$arrAssetCustomFieldOptions = EntityQtypeCustomField::LoadArrayByEntityQtypeId(
+				  QApplication::Translate(EntityQtype::Asset));
+		// generate error flag and field names which are required for export;
+	    $arrRequiredAllAssetCustomFields = array();
+		foreach($arrAssetCustomFieldOptions as $arrAssetCustomFieldOption){
+		if($arrAssetCustomFieldOption->CustomField->RequiredFlag
+		   && $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag){
+		   $arrRequiredAllAssetCustomFields[] = $arrAssetCustomFieldOption->CustomField->ShortDescription;
+		if(!in_array($arrAssetCustomFieldOption->CustomField->ShortDescription,$this->getLstKeys())){
+			$blnRequiredAllAssetCustomFields = false;
+		};
+
+		}
+		}
+	    // Checking errors (Model Short Description, Model Code, Category and Manufacturer must be selected)
         for ($i=0; $i < count($this->lstMapHeaderArray)-1; $i++) {
           $lstMapHeader = $this->lstMapHeaderArray[$i];
           $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
@@ -506,7 +523,12 @@
           }
         }
         // If all required fields have no errors
-        if (!$blnError && $blnAssetCode && $blnAssetModelShortDescription && $blnLocation && ($this->lstImportAction->SelectedValue != 2 || $blnAssetId)) {
+        if (!$blnError
+		    && $blnRequiredAllAssetCustomFields
+			&& $blnAssetCode
+			&& $blnAssetModelShortDescription
+			&& $blnLocation
+			&& ($this->lstImportAction->SelectedValue != 2 || $blnAssetId)) {
           $this->btnNext->Warning = "";
           // Setup keys for main required fields
           foreach ($this->arrTracmorField as $key => $value) {
@@ -542,9 +564,9 @@
           // Add new ajax actions for button
           $this->btnNext->AddAction(new QClickEvent(), new QAjaxAction('btnNext_Click'));
           $this->btnNext->AddAction(new QClickEvent(), new QToggleEnableAction($this->btnNext));
-    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
-    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
-    			$this->btnNext->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->btnNext->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnNext_Click'));
+			$this->btnNext->AddAction(new QEnterKeyEvent(), new QToggleEnableAction($this->btnNext));
+			$this->btnNext->AddAction(new QEnterKeyEvent(), new QTerminateAction());
           $this->btnNext->Warning = "Please wait...";
           $this->intImportStep = 2;
           $this->intCurrentFile = 0;
@@ -604,7 +626,11 @@
     			$this->btnReturnToAssets->AddAction(new QEnterKeyEvent(), new QTerminateAction());
         }
         else {
-          $this->btnNext->Warning = "You must select all required fields (Asset Tag, Asset Model Short Description and Location).";
+		      $strRequiredAllAssetCustomFields = '';
+		      if(count($arrRequiredAllAssetCustomFields)>0){
+			     $strRequiredAllAssetCustomFields = implode(", ",$arrRequiredAllAssetCustomFields) .", ";
+		      }
+          $this->btnNext->Warning = "You must select all required fields (".$strRequiredAllAssetCustomFields." Asset Code, Asset Model Short Description and Location).";
           $blnError = true;
         }
 		  }
@@ -721,6 +747,30 @@
                   }
                 }
                 $blnError = false;
+				// Skip records with not filled required custom fields
+				 $log = '' ;
+				if($intAssetModelId)  {
+					foreach($intAssetCustomFieldKeyArray as $k => $v){ $log .= 'k'.$k.'='.$v;}
+
+					// Load Specific asset model custom field
+					$arrRequiredSpecificAssetCustomFields = AssetCustomFieldAssetModel::
+						                                    LoadArrayByAssetModelId($intAssetModelId);
+
+					foreach($arrRequiredSpecificAssetCustomFields as $objRequiredCustomField){
+						if($objRequiredCustomField->CustomField->RequiredFlag){
+							$log.= $objRequiredCustomField->CustomField->CustomFieldId;
+						    if(!in_array($objRequiredCustomField->CustomField->CustomFieldId,$intAssetCustomFieldKeyArray)
+							   ||empty($strRowArray[array_search($objRequiredCustomField->CustomField->CustomFieldId,
+								       $intAssetCustomFieldKeyArray)])
+							){
+								$blnError = true;
+							//   $log .= "<h1>".$objRequiredCustomField->CustomField->ShortDescription.$objRequiredCustomField->CustomField->CustomFieldId." is empty</h1>";
+							}
+						}
+					}
+				}
+			 	//print $log; exit;
+				if(!$blnError){
                 if (isset($intParentAssetKey) && isset($strRowArray[$intParentAssetKey])) {
                   $strKeyArray = array_keys($arrAssetId, strtolower(trim($strRowArray[$intParentAssetKey])));
                   if (count($strKeyArray)) {
@@ -745,7 +795,7 @@
                   $intParentAssetId = null;
                   $blnLinked = 0;
                 }
-
+				}
                 /*$strKeyArray = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])));
                 if (count($strKeyArray)) {
                   $intCategoryId = $strKeyArray[0];
@@ -855,7 +905,7 @@
                         $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW())", $strAssetCode, $intLocationId, $intAssetModelId, ($intParentAssetId) ? $intParentAssetId : "NULL", ($blnLinked) ? "1" : "0", $_SESSION['intUserAccountId']);
                         $objNewAssetArray[] = $strAssetCode;
                         if (isset($strCFVArray) && count($strCFVArray)) {
-                          $strAssetCFVArray[] = implode(', ', $strCFVArray);
+                          $strAssetCFVArray[] = str_replace('""','"',implode(', ', $strCFVArray));
                          /*if ($j == 2) {
                           	echo "strAssetCFVArray: ";
                           	print_r($strAssetCFVArray);
@@ -930,7 +980,7 @@
                       $blnCheckCFVError = true;
                     }
                     if (!$blnCheckCFVError) {
-                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", implode(", ", $strUpdateFieldArray), $objAsset->AssetId);
+                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strUpdateFieldArray), $objAsset->AssetId));
                       if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objAsset->AssetId] = $strCFVArray;
                       }
@@ -953,7 +1003,7 @@
                       }
 
                       if (isset($strCFVArray) && count($strCFVArray)) {
-                        $strCFVQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemId);
+                        $strCFVQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strCFVArray)), $intItemId);
                       }
                       else {
                         $strCFVQuery = false;
@@ -981,7 +1031,7 @@
                   //var_dump($this->strAssetValuesArray);
                   //exit();
 
-                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", implode(", ", $this->strAssetValuesArray)));
+                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
                   $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
                   	$strAssetIdArray = array();
@@ -1003,9 +1053,9 @@
                       $strCFVNameArray[] = sprintf("`cfv_%s`", $objCustomField->CustomFieldId);
                     }
                     if (count($strAssetCFVArray) > 0 && count($strCFVNameArray) > 0)  {
-                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", implode(", ", $strCFVNameArray), implode(", ", $strCFVArray));
+                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`, %s) VALUES %s", str_replace('""','"',implode(", ", $strCFVNameArray)), str_replace('""','"',implode(", ", $strCFVArray)));
                     } else {
-                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES %s", implode(", ", $strAssetIdArray));
+                    	$strQuery = sprintf("INSERT INTO `asset_custom_field_helper` (`asset_id`) VALUES %s", str_replace('""','"',implode(", ", $strAssetIdArray)));
                     }
                     $objDatabase->NonQuery($strQuery);
                     $theAsset = Asset::Load($intInsertId);
@@ -1031,7 +1081,7 @@
                         $strCFVArray[] = sprintf("`cfv_%s`=%s", $objCustomField->CustomFieldId, $strUpdatedItemCFVArray[$intItemKey][$objCustomField->CustomFieldId]);
                       }
                       if (isset($strCFVArray) && count($strCFVArray)) {
-                        $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $strCFVArray), $intItemKey);
+                        $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strCFVArray)), $intItemKey);
                         $objDatabase->NonQuery($strQuery);
                         // insert nulls where not allowed
                         $theAsset = Asset::Load($intItemKey);
@@ -1167,8 +1217,15 @@
 	    $lstMapHeader->AddItem("Parent Asset", "Parent Asset", ($strName == 'parent asset') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Locked To Parent", "Locked To Parent", ($strName == 'locked to parent') ? true : false, $strAssetGroup);
 	    foreach ($this->arrAssetCustomField as $objCustomField) {
+			// Add style to Required Fields for All Asset Models
+			if($objCustomField->RequiredFlag&&$objCustomField->AllAssetModelsFlag){
+				$lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup, 'CssClass="redtext"');
+
+			}
+			else{
 	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup);
-	    }
+			}
+			}
 	    /*$lstMapHeader->AddItem("Created By", "Created By", ($strName == 'created by') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Created Date", "Created Date", ($strName == 'created date') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Modified By", "Modified By", ($strName == 'modified by') ? true : false, $strAssetGroup);
@@ -1453,13 +1510,27 @@
 	          {
 	            $arrForQuery[] = sprintf("`cfv_%s`= NULL", $idToBeNull);
 	          }
-	          return sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", implode(", ", $arrForQuery), $intCustomFieldId);
+	          return sprintf("UPDATE `asset_custom_field_helper` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $arrForQuery)), $intCustomFieldId);
         	}
         }
         else{
         	return $arrToClear;
         }
       }
+	public function getLstKeys(){
+		$arrToReturn = array();
+		foreach($this->lstMapHeaderArray as $item){
+			if(get_class($item)=='QListBox'){
+				if(is_numeric(str_replace('asset_','',$item->SelectedValue))){
+					$arrToReturn[] = CustomField::Load(str_replace('asset_','',$item->SelectedValue))->ShortDescription;
+				}
+				else{
+					$arrToReturn[] = $item->SelectedValue;
+				}
+			}
+		}
+		return $arrToReturn;
+	}
 
 	}
 	// Go ahead and run this form object to generate the page
