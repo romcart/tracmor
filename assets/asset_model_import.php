@@ -791,8 +791,9 @@
                     $intManufacturerId = false;
                   }
                 }
+
 				// depreciation
-				/*if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+				if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 				  $strKeyArray = array_keys($intDepreciationClassArray, strtolower(trim($strRowArray[$this->intDepreciationKey])));
 				  if (count($strKeyArray)) {
 					  $intDepreciationId = $strKeyArray[0];
@@ -809,7 +810,7 @@
 				}
 				else{
 					$intDepreciationId = null;
-				}*/
+				}
 				//
                 $objAssetModel = false;
                 if (!$strShortDescription || $intCategoryId === false || $intManufacturerId === false) {
@@ -888,8 +889,9 @@
                       
                       if (!$blnCheckCFVError) {
                         $strAssetModelArray[] = $strAssetModel;
-						   $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s',  NOW())", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId, $_SESSION['intUserAccountId']);
-						  //  $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', %s, NOW())", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId, $intDepreciationId ,$_SESSION['intUserAccountId']);
+
+						 // $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s',  NOW())", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId, $_SESSION['intUserAccountId']);
+						  $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', NOW(), '%s')", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId ,$_SESSION['intUserAccountId'], $intDepreciationId?$intDepreciationId:'NULL');
                         $objNewAssetModelArray[] = $strShortDescription;
                         if (isset($strCFVArray) && count($strCFVArray)) {
                           $strModelCFVArray[] = implode(', ', $strCFVArray);
@@ -975,8 +977,8 @@
                       }
                       $this->objUpdatedItemArray[$objAssetModel->AssetModelId] = sprintf("%s", $objAssetModel->ShortDescription);
                       //$this->arrOldItemArray[$objAssetModel->AssetModelId] = $objAssetModel;
-                      $strItemQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_model_id`='%s'", $objAssetModel->ShortDescription, $objAssetModel->LongDescription, $objAssetModel->ManufacturerId, $objAssetModel->CategoryId, $objAssetModel->AssetModelCode, (!$objAssetModel->ModifiedBy) ? "NULL" : $objAssetModel->ModifiedBy, (!$objAssetModel->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAssetModel->ModifiedDate), $objAssetModel->AssetModelId);
-					//	$strItemQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_class_id`=%s WHERE `asset_model_id`='%s'", $objAssetModel->ShortDescription, $objAssetModel->LongDescription, $objAssetModel->ManufacturerId, $objAssetModel->CategoryId, $objAssetModel->AssetModelCode, (!$objAssetModel->ModifiedBy) ? "NULL" : $objAssetModel->ModifiedBy, (!$objAssetModel->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAssetModel->ModifiedDate), $objAssetModel->AssetModelId, $objAssetModel->DefaultDepretiationClassId);
+                     // $strItemQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_model_id`='%s'", $objAssetModel->ShortDescription, $objAssetModel->LongDescription, $objAssetModel->ManufacturerId, $objAssetModel->CategoryId, $objAssetModel->AssetModelCode, (!$objAssetModel->ModifiedBy) ? "NULL" : $objAssetModel->ModifiedBy, (!$objAssetModel->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAssetModel->ModifiedDate), $objAssetModel->AssetModelId);
+					  	$strItemQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_class_id`=%s WHERE `asset_model_id`='%s'", $objAssetModel->ShortDescription, $objAssetModel->LongDescription, $objAssetModel->ManufacturerId, $objAssetModel->CategoryId, $objAssetModel->AssetModelCode, (!$objAssetModel->ModifiedBy) ? "NULL" : $objAssetModel->ModifiedBy, (!$objAssetModel->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAssetModel->ModifiedDate), $objAssetModel->AssetModelId, $objAssetModel->DefaultDepretiationClassId ? "NULL" :sprintf("'%s'", $objAssetModel->DefaultDepretiationClassId));
                       $strCFVArray = array();
                       foreach ($this->arrModelCustomField as $objCustomField) {
                         $strCFV = $objAssetModel->GetVirtualAttribute($objCustomField->CustomFieldId);
@@ -1008,11 +1010,11 @@
                 if (count($this->strModelValuesArray)) {
                   $objDatabase = AssetModel::GetDatabase();
 
-                  //var_dump($this->strModelValuesArray);
-                  //exit();
+                //	print sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`, `default_depreciation_class_id`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray)));
+				//   exit();
 
-                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray))));
-				  //$objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`, `default_depreciation_class_id`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray))));
+                //  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray))));
+				  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`, `default_depreciation_class_id`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray))));
                   $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
                    // Update for asset custom fields with allAssetModesF Flag
