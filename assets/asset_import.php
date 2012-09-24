@@ -89,6 +89,11 @@
     protected $arrOldItemArray;
     protected $objUpdatedItemArray;
     protected $blnError;
+	// Depreciation variables
+	protected $intDepreciationClassKey;
+	protected $intPurchaseDateKey;
+	protected $intPurchaseCostKey;
+    protected $intDepreciationFlagKey;
 
 		protected function Form_Create() {
 			if (QApplication::QueryString('intDownloadCsv')) {
@@ -677,7 +682,16 @@
                 	$arrAssetCustomField[substr($value, 6)] = $this->arrAssetCustomField[substr($value, 6)];
                 }
               }
-            }
+			  elseif(QApplication::$TracmorSettings->DepreciationFlag == '1' && $value == "depreciate asset"){
+                  $intDepreciationClassKey = $key;
+			  }
+			  elseif(QApplication::$TracmorSettings->DepreciationFlag == '1'&& $value == "purchase cost"){
+				  $intPurchaseCostKey = $key;
+			  }
+			  elseif(QApplication::$TracmorSettings->DepreciationFlag == '1'&& $value == "purchase date"){
+				  $intPurchaseDateKey = $key;
+			  }
+			}
             $intAssetModelArray = array();
             $strItemCFVArray = array();
             $strUpdatedItemCFVArray = array();
@@ -695,6 +709,13 @@
             foreach (Location::LoadAll() as $objLocation) {
               $intLocationArray[$objLocation->LocationId] = strtolower($objLocation->ShortDescription);
             }
+			// Depreciation
+			if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+				$intDepreciationClassArray = array();
+				foreach (DepreciationClass::LoadAll() as $objDepreciationClass){
+					$intDepreciationClassArray[$objDepreciationClass->DepreciationClassId] = strtolower($objDepreciationClass->ShortDescription);
+				}
+			}
 
             $strAssetArray = array();
             // Load all assets
@@ -822,8 +843,58 @@
                     $intManufacturerId = false;
                   }
                 }*/
+
+				// If depreciation is enabled within Application
+				// Any non-empty value sets to 1
+				// If this is checked and no depreciation class short description is not corresponding asset model default depreciation class, this will skip due to error
+				$blnDepreciationError = false;
+				$depreciationFlag = null;
+				$intPurchaseCost = null;
+				$intPurchaseDate = null;
+				if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+					$strKeyArray = array_keys($intDepreciationClassArray, strtolower(trim($strRowArray[$intDepreciationClassKey])));
+					//print($intDepreciationClassKey)."__".$intPurchaseCostKey."__".$intPurchaseDateKey."__".strtolower(trim($strRowArray[$intDepreciationClassKey]))."<br />" ; if(!empty($strRowArray[$intDepreciationClassKey])){exit;}
+					if (count($strKeyArray)) {
+						$intDepreciationClassId = $strKeyArray[0];
+					}
+					else {
+						$strKeyArray = array_keys($intDepreciationClassArray,
+							                      strtolower(trim($this->txtMapDefaultValueArray[$intDepreciationClassKey]->Text)));
+						if (count($strKeyArray)) {
+							$intDepreciationClassId = $strKeyArray[0];
+						}
+						else {
+							$intDepreciationClassId = false;
+						}
+					}
+				    if($intDepreciationClassId>0 && $intAssetModelId>0){
+						if($intDepreciationClassId != AssetModel::Load($intAssetModelId)->DefaultDepreciationClassId){
+							$blnDepreciationError = true;
+						}
+						elseif(isset($intPurchaseCostKey)&&isset($intPurchaseCostKey)){
+							// Check intVal for Purchase cost
+							$intPurchaseCost = (trim($strRowArray[$intPurchaseCostKey])) ? addslashes(trim($strRowArray[$intPurchaseCostKey])) : false;
+                            if(!ctype_digit($intPurchaseCost)){
+								$blnDepreciationError = true;
+							}
+							$strPurchaseDate = (trim($strRowArray[$intPurchaseDateKey])) ? trim($strRowArray[$intPurchaseDateKey]) : false;
+							// Check isDate for Purchase date
+							if(!($dttPurchaseDate = DateTime::createFromFormat('M d Y g:i A', $strPurchaseDate))){
+								$blnDepreciationError = true;
+							} else{
+								 $dttPurchaseDate = $dttPurchaseDate->format('Y-m-d h:i:s');// print $intDepreciationClassId."__".$intPurchaseCost."__".$dttPurchaseDate; exit;
+							};
+
+						}
+						else{
+							$blnDepreciationError = true;
+						}
+
+					}
+				}
+				//
                 $objAsset = false;
-                if (!$strAssetCode || $blnError || $intAssetModelId === false || $intLocationId === false/* || $intCategoryId === false || $intManufacturerId === false*/) {
+                if (!$strAssetCode || $blnError || $intAssetModelId === false || $intLocationId === false || $blnDepreciationError/* || $intCategoryId === false || $intManufacturerId === false*/) {
                   //$blnError = true;
                   //echo sprintf("Desc: %s AssetCode: %s Cat: %s Man: %s<br/>", $strAssetCode, $strLocation, $intCategoryId, $intManufacturerId);
                   $strAssetCode =  null;
@@ -990,6 +1061,7 @@
                       $this->objUpdatedItemArray[$objAsset->AssetId] = sprintf("%s", $objAsset->AssetCode);
                       //$this->arrOldItemArray[$objAsset->AssetId] = $objAsset;
                       $strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate), $objAsset->AssetId);
+					  //	$strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_flag`=%s, `depreciation_class_id`=%s, `purchase_code`=%s, `purchase_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate), $objAsset->AssetId);
                       $strCFVArray = array();
                       foreach ($this->arrAssetCustomField as $objCustomField) {
                         $strCFV = $objAsset->GetVirtualAttribute($objCustomField->CustomFieldId);
@@ -1032,7 +1104,8 @@
                   //exit();
 
                   $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
-                  $intInsertId = $objDatabase->InsertId();
+				//	$objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`, `depreciation_flag`, `depreciation_class_id`, `purchase_cost`, `purchase_date` ) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
+				  $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
                   	$strAssetIdArray = array();
                   	$strCFVArray = array();
@@ -1216,7 +1289,14 @@
 	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Parent Asset", "Parent Asset", ($strName == 'parent asset') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Locked To Parent", "Locked To Parent", ($strName == 'locked to parent') ? true : false, $strAssetGroup);
-	    foreach ($this->arrAssetCustomField as $objCustomField) {
+		// Add Depreciation fields if enabled
+	    if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$lstMapHeader->AddItem("Depreciate Asset", "Depreciate Asset", ($strName == "depreciation class")? true:false,$strAssetGroup);
+			$lstMapHeader->AddItem("Purchase Date", "Purchase Date", ($strName == "purchase date")? true:false,$strAssetGroup);
+			$lstMapHeader->AddItem("Purchase Cost", "Purchase Cost", ($strName == "purchase cost")? true:false,$strAssetGroup);
+	    }
+
+		  foreach ($this->arrAssetCustomField as $objCustomField) {
 			// Add style to Required Fields for All Asset Models
 			if($objCustomField->RequiredFlag&&$objCustomField->AllAssetModelsFlag){
 				$lstMapHeader->AddItem($objCustomField->ShortDescription, "asset_".$objCustomField->CustomFieldId,  ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetGroup, 'CssClass="redtext"');
