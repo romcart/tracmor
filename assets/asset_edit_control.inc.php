@@ -142,6 +142,7 @@
 			 	$this->txtPurchaseCost->RenderWithName();
 				$this->lblPurchaseDate->RenderWithName();
 				$this->calPurchaseDate->RenderWithName();
+				$this->lblBookValue->RenderWithName();
 			}
 			?>
 		</td>

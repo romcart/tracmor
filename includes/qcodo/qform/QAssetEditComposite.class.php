@@ -48,7 +48,7 @@ class QAssetEditComposite extends QControl {
 	public $lblLockedToParent;
 	public $lblPurchaseDate;
 	public $lblPurchaseCost;
-
+	public $lblBookValue;
 
 	// Inputs
 	public $lstAssetModel;
@@ -195,15 +195,20 @@ class QAssetEditComposite extends QControl {
 			$this->lblPurchaseCost_Create();
 			$this->txtPurchaseCost_Create();
 			$this->chkAssetDepreciation_Create();
+			$this->lblBookValue_Create();
 			$this->txtPurchaseCost->Display = false;
 			$this->calPurchaseDate->Display = false;
 			if(!$this->blnEditMode){
 				$this->chkAssetDepreciation->Enabled = true;
 				$this->lblPurchaseCost->Display = false;
 				$this->lblPurchaseDate->Display = false;
+				$this->lblBookValue->Display = false;
 			}
 			else{
 				$this->chkAssetDepreciation->Enabled = false;
+				if(!$this->objAsset->DepreciationFlag){
+					$this->lblBookValue->Display = false;
+				}
 			}
 		}
 	}
@@ -898,6 +903,10 @@ class QAssetEditComposite extends QControl {
 		$this->calPurchaseDate->MaximumMonth = $this->dttFiveDaysFromNow->Month;
 		$this->calPurchaseDate->MaximumDay = $this->dttFiveDaysFromNow->Day;
 
+		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->calPurchaseDate->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'txtPurchaseCost_Change'));
+		}
+
 		//$this->calPurchaseDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
 		//QApplication::ExecuteJavaScript(sprintf("document.getElementById('%s').focus()", $this->calPurchaseDate->ControlId));
 
@@ -915,11 +924,16 @@ class QAssetEditComposite extends QControl {
 	protected function txtPurchaseCost_Create(){
 		$this->txtPurchaseCost = new QTextBox($this);
 		$this->txtPurchaseCost->Name =  'Purchase Cost: ';
+		if(QApplication::$TracmorSettings->DepreciationFlag = '1'){
+			$this->txtPurchaseCost->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'txtPurchaseCost_Change'));
+		}
 		if ($this->blnEditMode){
 			$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
 		}
 	}
-
+	public function txtPurchaseCost_Change($control){
+		$this->lblBookValue_Update();
+	}
 	// Asset Model List Selection Action
 	// Display the AssetModelCode for the given AssetModel once it is chosen
 	public function lstAssetModel_Select($strFormId, $strControlId, $strParameter) {
@@ -953,6 +967,9 @@ class QAssetEditComposite extends QControl {
         $this->lstAssetModel->Focus();
 		$this->lstAssetModel->TabIndex = 1;
 		$this->txtAssetCode->TabIndex = 2;
+		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->lblBookValue_Update();
+		}
 	}
 
 	// This is called when the 'new' label is clicked
@@ -1671,6 +1688,7 @@ class QAssetEditComposite extends QControl {
 				$this->lblPurchaseDate->Text = $this->objAsset->PurchaseDate->__toString();
 				$this->lblPurchaseCost->Display = true;
 				$this->lblPurchaseDate->Display = true;
+				$this->lblBookValue->Display = true;
 			}
 		}
 	}
@@ -1818,6 +1836,7 @@ class QAssetEditComposite extends QControl {
 	protected function hideAssetDepreciationFields(){
 		$this->calPurchaseDate->Display = false;
 		$this->txtPurchaseCost->Display = false;
+		$this->lblBookValue->Display = false;
 	}
 
 	protected function showAssetDepreciationFields(){
@@ -1826,6 +1845,34 @@ class QAssetEditComposite extends QControl {
 		}
 		$this->calPurchaseDate->Display = true;
 		$this->txtPurchaseCost->Display = true;
+		$this->lblBookValue->Display = true;
+	}
+
+	// Book Value functions
+	protected function lblBookValue_Create(){
+		$this->lblBookValue = new QLabel($this);
+		$this->lblBookValue->Name = 'Book Value: ';
+		$this->lblBookValue_Update();
+	}
+
+	protected function lblBookValue_Update(){
+
+		if($objAssetModel = AssetModel::Load($this->lstAssetModel->SelectedValue)){
+			$intDepreciationClassId = $objAssetModel->DefaultDepreciationClassId;
+			if(!empty($intDepreciationClassId)  && DepreciationClass::Load($intDepreciationClassId))
+			$life = DepreciationClass::Load($intDepreciationClassId)->Life;
+		}
+		if(ctype_digit($this->txtPurchaseCost->Text)
+		  && isset($life)
+		  && ($this->calPurchaseDate->DateTime instanceof DateTime)
+		  && QDateTime::Now() > $this->calPurchaseDate->DateTime
+		  ){
+			$interval = QDateTime::Now()->diff($this->calPurchaseDate->DateTime)->m;
+			$this->lblBookValue->Text = (int)($this->txtPurchaseCost->Text) - ((int)($this->txtPurchaseCost->Text) * ($interval/$life));
+		}
+        else{
+			$this->lblBookValue->Text = '...';
+		}
 	}
 
   // And our public getter/setters
