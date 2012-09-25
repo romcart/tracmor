@@ -848,9 +848,10 @@
 				// Any non-empty value sets to 1
 				// If this is checked and no depreciation class short description is not corresponding asset model default depreciation class, this will skip due to error
 				$blnDepreciationError = false;
-				$depreciationFlag = null;
+				$blnDepreciationFlag = null;
+				$intDepreciationClassId = null;
 				$intPurchaseCost = null;
-				$intPurchaseDate = null;
+				$dttPurchaseDate = null;
 				if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
 					$strKeyArray = array_keys($intDepreciationClassArray, strtolower(trim($strRowArray[$intDepreciationClassKey])));
 					//print($intDepreciationClassKey)."__".$intPurchaseCostKey."__".$intPurchaseDateKey."__".strtolower(trim($strRowArray[$intDepreciationClassKey]))."<br />" ; if(!empty($strRowArray[$intDepreciationClassKey])){exit;}
@@ -884,7 +885,7 @@
 							} else{
 								 $dttPurchaseDate = $dttPurchaseDate->format('Y-m-d h:i:s');// print $intDepreciationClassId."__".$intPurchaseCost."__".$dttPurchaseDate; exit;
 							};
-
+							$blnDepreciationFlag = 1;
 						}
 						else{
 							$blnDepreciationError = true;
@@ -973,7 +974,18 @@
 
                       if (!$blnCheckCFVError) {
                         $strAssetArray[] = $strAssetCode;
-                        $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW())", $strAssetCode, $intLocationId, $intAssetModelId, ($intParentAssetId) ? $intParentAssetId : "NULL", ($blnLinked) ? "1" : "0", $_SESSION['intUserAccountId']);
+                        $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW(), %s, %s, %s, '%s')",
+							                                     $strAssetCode,
+							                                     $intLocationId,
+							                                     $intAssetModelId,
+							                                    ($intParentAssetId) ? $intParentAssetId : "NULL",
+							                                    ($blnLinked) ? "1" : "0",
+							                                     $_SESSION['intUserAccountId']
+																,($blnDepreciationFlag)? $blnDepreciationFlag :"NULL",
+						                                        ($intDepreciationClassId)? $intDepreciationClassId: "NULL",
+						                                        ($intPurchaseCost)?$intPurchaseCost:"NULL",
+						                                        ($dttPurchaseDate)?'"'.$dttPurchaseDate.'"':"NULL"
+						                                       );
                         $objNewAssetArray[] = $strAssetCode;
                         if (isset($strCFVArray) && count($strCFVArray)) {
                           $strAssetCFVArray[] = str_replace('""','"',implode(', ', $strCFVArray));
@@ -1004,6 +1016,11 @@
                     $strUpdateFieldArray[] = sprintf("`parent_asset_id`=%s", QApplication::$Database[1]->SqlVariable($intParentAssetId));
                     $strUpdateFieldArray[] = sprintf("`linked_flag`='%s'", ($blnLinked) ? 1 : 0);
                     $strUpdateFieldArray[] = sprintf("`modified_by`='%s'", $_SESSION['intUserAccountId']);
+				  // Depreciation Fields
+					$strUpdateFieldArray[] = sprintf("`depreciation_flag`=%s", ($blnDepreciationFlag)?$blnDepreciationFlag:"NULL");
+					$strUpdateFieldArray[] = sprintf("`depreciation_class_id`=%s", ($intDepreciationClassId)?$intDepreciationClassId:"NULL");
+					$strUpdateFieldArray[] = sprintf("`purchase_cost`=%s", ($intPurchaseCost)?$intPurchaseCost:"NULL");
+					$strUpdateFieldArray[] = sprintf("`purchase_date`=%s", ($dttPurchaseDate)?$dttPurchaseDate:"NULL");
 
                     $blnCheckCFVError = false;
                     foreach ($arrAssetCustomField as $objCustomField) {
@@ -1060,8 +1077,8 @@
                       }
                       $this->objUpdatedItemArray[$objAsset->AssetId] = sprintf("%s", $objAsset->AssetCode);
                       //$this->arrOldItemArray[$objAsset->AssetId] = $objAsset;
-                      $strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate), $objAsset->AssetId);
-					  //	$strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_flag`=%s, `depreciation_class_id`=%s, `purchase_code`=%s, `purchase_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate), $objAsset->AssetId);
+   					  //$strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate), $objAsset->AssetId);
+					  $strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_flag`=%s, `depreciation_class_id`=%s, `purchase_cost`=%s, `purchase_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate),($blnDepreciationFlag)?($blnDepreciationFlag):"NULL",($intDepreciationClassId)?$intDepreciationClassId:"NULL",($intPurchaseCost)? $intPurchaseCost:"NULL",($dttPurchaseDate)?'"'.$dttPurchaseDate.'"':"NULL", $objAsset->AssetId);
                       $strCFVArray = array();
                       foreach ($this->arrAssetCustomField as $objCustomField) {
                         $strCFV = $objAsset->GetVirtualAttribute($objCustomField->CustomFieldId);
@@ -1103,8 +1120,8 @@
                   //var_dump($this->strAssetValuesArray);
                   //exit();
 
-                  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
-				//	$objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`, `depreciation_flag`, `depreciation_class_id`, `purchase_cost`, `purchase_date` ) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
+				  // $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
+				  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`, `depreciation_flag`, `depreciation_class_id`, `purchase_cost`, `purchase_date` ) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
 				  $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
                   	$strAssetIdArray = array();
