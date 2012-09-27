@@ -886,22 +886,8 @@ class QAssetEditComposite extends QControl {
 		// 10 Days: 864000
 		// 200 Days: 17280000
 
-		$intDayOfWeek = date('w', time());
-		// Sunday - just add five days
-		if ($intDayOfWeek == 0) {
-			$this->dttFiveDaysFromNow = QDateTime::FromTimestamp($this->dttNow->Timestamp + 432000); // new QDateTime($this->dttNow->Timestamp + 432000);
-		}
-		// Monday - Friday, add seven days
-		elseif ($intDayOfWeek > 0 && $intDayOfWeek < 6) {
-			$this->dttFiveDaysFromNow = QDateTime::FromTimestamp($this->dttNow->Timestamp + 604800); //new QDateTime($this->dttNow->Timestamp + 604800);
-		}
-		// Saturday - add six days
-		elseif ($intDayOfWeek == 6) {
-			$this->dttFiveDaysFromNow = QDateTime::FromTimestamp($this->dttNow->Timestamp + 518400); //new QDateTime($this->dttNow->Timestamp + 518400);
-		}
-		$this->calPurchaseDate->MaximumYear = $this->dttFiveDaysFromNow->Year;
-		$this->calPurchaseDate->MaximumMonth = $this->dttFiveDaysFromNow->Month;
-		$this->calPurchaseDate->MaximumDay = $this->dttFiveDaysFromNow->Day;
+		$this->calPurchaseDate->MinimumYear = 1900;
+		$this->calPurchaseDate->MaximumYear = 2100;
 
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 			$this->calPurchaseDate->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'txtPurchaseCost_Change'));
