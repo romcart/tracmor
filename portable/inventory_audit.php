@@ -21,7 +21,7 @@ if ($_POST) {
   	$arrLocationInventoryCodeQuantity = array_unique(explode('!',$_POST['result']));
   	foreach ($arrLocationInventoryCodeQuantity as $strLocationInventoryCodeQuantity) {
       if ($strLocationInventoryCodeQuantity) {
-        list($strLocation, $strInventoryCodeQuantity) = split('[:]',$strLocationInventoryCodeQuantity,2);
+        list($strLocation, $strInventoryCodeQuantity) = preg_split('/[:]/',$strLocationInventoryCodeQuantity,2);
         // Location must be exist
       	$objDestinationLocation = Location::LoadByShortDescription($strLocation);
       	if (!$objDestinationLocation) {
@@ -33,7 +33,7 @@ if ($_POST) {
         }
         $arrInventoryCodeQuantity = array_unique(explode('#',$strInventoryCodeQuantity));
         foreach ($arrInventoryCodeQuantity as $strInventoryCodeQuantity) {
-       	  list($strInventoryModelCode, $intQuantity) = split('[|]',$strInventoryCodeQuantity,2);
+       	  list($strInventoryModelCode, $intQuantity) = preg_split('/[|]/',$strInventoryCodeQuantity,2);
         	$blnSourceLocationError = true;
        	  if ($strInventoryModelCode && $intQuantity) {
           	// Begin error checking
@@ -154,7 +154,7 @@ if ($_POST) {
   	  if ($_POST['main_result'] && strstr($_POST['main_result'],$_POST['location'])) {
   	    $arrLocationInventoryQuantity = explode('!',$_POST['main_result']);
         foreach ($arrLocationInventoryQuantity as $strLocationInventoryQuantity) {
-          list($strLocation, $strInventory) = split('[:]',$strLocationInventoryQuantity,2);
+          list($strLocation, $strInventory) = preg_split('/[:]/',$strLocationInventoryQuantity,2);
           if ($strInventory && strstr($strLocation,$_POST['location'])) {
             $blnError = true;
             $strWarning .= $_POST['location']." - That location has already been added.<br />";
@@ -170,7 +170,7 @@ if ($_POST) {
     
     foreach ($arrInventoryCodeQuantity as $strInventoryCodeQuantity) {
       $blnErrorCurrentInventory = false;
-   		list($strInventoryModelCode, $intQuantity) = split('[|]',$strInventoryCodeQuantity,2);
+   		list($strInventoryModelCode, $intQuantity) = preg_split('/[|]/',$strInventoryCodeQuantity,2);
      	if ($strInventoryModelCode && $intQuantity) {
      	  // Begin error checking
         // Load the inventory model object based on the inventory_model_code submitted

@@ -22,7 +22,7 @@ if ($_POST) {
   	// Begin error checking for assets
   	foreach ($arrLocationAssetCode as $strLocationAssetCode) {
   		if ($strLocationAssetCode) {
-  		  list($strLocation, $strAssetCodeArray) = split('[:]',$strLocationAssetCode,2);
+  		  list($strLocation, $strAssetCodeArray) = preg_split('/[:]/',$strLocationAssetCode,2);
   		  // Location must be exist
         $objDestinationLocation = Location::LoadByShortDescription($strLocation);
         if (!$objDestinationLocation) {
@@ -156,7 +156,7 @@ if ($_POST) {
   			  if ($_POST['main_result'] && strstr($_POST['main_result'],$strAssetCode)) {
             $arrLocationAsset = explode('|',$_POST['main_result']);
             foreach ($arrLocationAsset as $strLocationAsset) {
-             	list($strLocation, $strAsset) = split('[:]',$strLocationAsset,2);
+             	list($strLocation, $strAsset) = preg_split('/[:]/',$strLocationAsset,2);
              	if ($strAsset && strstr($strAsset,$strAssetCode)) {
              	  $blnError = true;
              	  $strWarning .= $strAssetCode." - That asset code has already been added.<br />";
@@ -177,7 +177,7 @@ if ($_POST) {
   	  if ($_POST['main_result'] && strstr($_POST['main_result'],$_POST['location'])) {
   	    $arrLocationAsset = explode('|',$_POST['main_result']);
         foreach ($arrLocationAsset as $strLocationAsset) {
-          list($strLocation, $strAsset) = split('[:]',$strLocationAsset,2);
+          list($strLocation, $strAsset) = preg_split('/[:]/',$strLocationAsset,2);
           if ($strAsset && strstr($strLocation,$_POST['location'])) {
             $blnError = true;
             $strWarning .= $_POST['location']." - That location has already been added.<br />";
