@@ -46,7 +46,7 @@
 				  <table width="100%">
 						<tr>
 							<td>
-							 <div class="title"><?php _t('Import Asset Models') ?></div>
+							 <div class="title"><?php _t('Import Models') ?></div>
 							 <?php if (!$this->blnError) { ?>
 					     <?php $this->pnlMain->Render(); ?>
 							 </td>

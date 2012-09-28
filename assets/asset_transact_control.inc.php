@@ -124,7 +124,7 @@ echo($strTransactionHeader);
 	   <td colspan="2"><div class="title"><?php _t($strLabelAssetsTo); //if ($this->intTransactionTypeId == 3) _t("Assets to check out"); ?></div></td>
 	</tr>
   <tr>
-		<td class="record_field_name">Asset Code:</td>
+		<td class="record_field_name">Asset Tag:</td>
 		<td>
 		  <table>
 		    <tr>

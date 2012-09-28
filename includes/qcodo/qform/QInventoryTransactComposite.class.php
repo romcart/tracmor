@@ -280,8 +280,8 @@ class QInventoryTransactComposite extends QControl {
 					$this->lstSourceLocation->Enabled = true;
 					$this->txtQuantity->Enabled = true;
 				}
-                // Exclude restock transaction type as it doesn't contain Source Location parameter
-                elseif($this->intTransactionTypeId != 4) {
+        // Exclude restock transaction type as it doesn't contain Source Location parameter
+				elseif($this->intTransactionTypeId != 4) {
 					$this->txtNewInventoryModelCode->Warning = 'There is no inventory for that inventory code';
 					$this->lstSourceLocation->Enabled = false;
 					$this->txtQuantity->Enabled = false;
@@ -515,7 +515,7 @@ class QInventoryTransactComposite extends QControl {
 						if ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 5) {
 							//$objInventoryLocation->Quantity = $objInventoryLocation->Quantity - $objInventoryLocation->intTransactionQuantity;
 							$objInventoryLocation->Quantity = $objInventoryLocation->GetVirtualAttribute('actual_quantity') - $objInventoryLocation->intTransactionQuantity;
-							$objInventoryLocation->Save();
+						    $objInventoryLocation->Save();
 						}
 
 						// Add the new quantity where it belongs for moves and restocks

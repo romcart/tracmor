@@ -21,3 +21,7 @@ ALTER TABLE asset_custom_field_asset_model
 	custom_field_id
   )
 ON Delete CASCADE ON Update NO ACTION;
+
+UPDATE `shortcut` SET `short_description`='Models' WHERE `shortcut_id`='2';
+UPDATE `shortcut` SET `short_description`='Import Models' WHERE `shortcut_id`='3';
+UPDATE `shortcut` SET `short_description`='Create Model' WHERE `shortcut_id`='1';

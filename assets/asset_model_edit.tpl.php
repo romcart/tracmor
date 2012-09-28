@@ -43,7 +43,7 @@
 			$arrAssetModelFields[] = array('name' => 'Short Description:', 'value' => $this->txtShortDescription->RenderWithError(false) . $this->lblShortDescription->Render(false));
 			$arrAssetModelFields[] = array('name' => 'Category:', 'value' => $this->lblCategory->Render(false) . $this->lstCategory->RenderWithError(false));
 			$arrAssetModelFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false) . $this->lstManufacturer->RenderWithError(false));
-			$arrAssetModelFields[] = array('name' => 'Asset Model Code:', 'value' => $this->lblAssetModelCode->Render(false) . $this->txtAssetModelCode->RenderWithError(false));
+			$arrAssetModelFields[] = array('name' => 'Model Number:', 'value' => $this->lblAssetModelCode->Render(false) . $this->txtAssetModelCode->RenderWithError(false));
 			$arrAssetModelFields[] = array('name' => 'Long Description:', 'value' => $this->pnlLongDescription->Render(false) . $this->txtLongDescription->RenderWithError(false));
 			$arrAssetModelFields[] = array('name' => 'Image:', 'value' => $this->ifcImage->RenderWithError(false) . $this->lblImage->Render(false));
 		// Custom Fields
@@ -62,7 +62,7 @@
 		//}		
 	?>
 		
-		<div class="title">Asset Models: <?php $this->lblAssetModelHeader->Render(); ?></div>
+		<div class="title">Models: <?php $this->lblAssetModelHeader->Render(); ?></div>
 		<table class="datagrid" cellpadding="5" cellspacing="0" border="0" >
 			<tr>
 				<td class="record_header">

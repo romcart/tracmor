@@ -18,7 +18,7 @@ function AddAsset() {
     document.getElementById('asset_code').value = '';
   }
   else {
-    document.getElementById('warning').innerHTML = "Asset Code cannot be empty";
+    document.getElementById('warning').innerHTML = "Asset Tag cannot be empty";
   }
   document.getElementById('asset_code').focus();
 }
@@ -76,14 +76,14 @@ function AddAssetLocation() {
     }
     document.getElementById('warning').innerHTML = "";
     arrayAssetCode[i++] = strAssetCode + "|" + strLocation;
-    document.getElementById('output').innerHTML += "Asset Code: " + strAssetCode + " Location: " + strLocation + "<br/>";
+    document.getElementById('output').innerHTML += "Asset Tag: " + strAssetCode + " Location: " + strLocation + "<br/>";
     document.getElementById('asset_code').value = '';
     document.getElementById('destination_location').value = '';
     document.getElementById('asset_code').focus();
   }
   else {
     if (strAssetCode == '') {
-      document.getElementById('warning').innerHTML = "Asset Code cannot be empty";
+      document.getElementById('warning').innerHTML = "Asset Tag cannot be empty";
       document.getElementById('asset_code').focus();
     }
     else {
@@ -95,7 +95,7 @@ function AddAssetLocation() {
 function AddAssetLocationPost(strAssetCode,strLocation) {
   if (strAssetCode != '' && strLocation != '') {
     arrayAssetCode[i++] = strAssetCode + "|" + strLocation;
-    document.getElementById('output').innerHTML += "Asset Code: " + strAssetCode + " Location: " + strLocation + "<br/>";
+    document.getElementById('output').innerHTML += "Asset Tag: " + strAssetCode + " Location: " + strLocation + "<br/>";
     document.getElementById('asset_code').value = '';
     document.getElementById('destination_location').value = '';
     document.getElementById('asset_code').focus();
@@ -269,7 +269,7 @@ function AddAuditAsset() {
     document.getElementById('asset_code').focus();
   }
   else {
-    document.getElementById('warning').innerHTML = "Asset Code cannot be empty";
+    document.getElementById('warning').innerHTML = "Asset Tag cannot be empty";
     document.getElementById('asset_code').focus();
   }
 }

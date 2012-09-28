@@ -84,7 +84,7 @@
 		// Create and Setup the MinAssetCode Text Field
 		protected function txtMinAssetCode_Create() {
 			$this->txtMinAssetCode = new QTextBox($this);
-			$this->txtMinAssetCode->Name = 'Minimum Asset Code';
+			$this->txtMinAssetCode->Name = 'Minimum Asset Tag';
 			$this->txtMinAssetCode->Text = QApplication::$TracmorSettings->MinAssetCode;
 			$this->txtMinAssetCode->Width = 64;
 		}

@@ -679,7 +679,7 @@
 		// Eventually this field will receive information from the AML
 		protected function txtNewAssetCode_Create() {
 			$this->txtNewAssetCode = new QTextBox($this);
-			$this->txtNewAssetCode->Name = 'Asset Code:';
+			$this->txtNewAssetCode->Name = 'Asset Tag:';
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnAddAsset_Click'));
 			$this->txtNewAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 			$this->txtNewAssetCode->CausesValidation = false;
@@ -717,7 +717,7 @@
 		// Create the Asset Model List for creating new assets
 		protected function lstAssetModel_Create() {
 			$this->lstAssetModel = new QListBox($this);
-			$this->lstAssetModel->Name = 'Asset Model';
+			$this->lstAssetModel->Name = 'Model';
 			$this->lstAssetModel->AddItem('- Select One -', null, true);
 			$this->lstAssetModel->Display = false;
 		}
@@ -895,7 +895,7 @@
 	    $this->dtgAssetTransact->Paginator = $objPaginator;
 	    $this->dtgAssetTransact->ItemsPerPage = 20;
 
-    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Code', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Asset Tag', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetCode, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink("bluelink") ?>', array('Width' => "200", 'OrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetModel->ShortDescription), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetTransaction()->Asset->AssetModel->ShortDescription, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 	    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Status', '<?= $_ITEM->__toStringStatus() ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
 
@@ -1395,17 +1395,17 @@
 					$strAssetCode = $this->txtNewAssetCode->Text;
 					if (!$strAssetCode) {
 						$blnError = true;
-						$this->txtNewAssetCode->Warning = 'You must enter an asset code.';
+						$this->txtNewAssetCode->Warning = 'You must enter an asset tag.';
 					}
 				}
 				// Generate an error if that asset code already exists
 				if ($objDuplicate = Asset::LoadByAssetCode($strAssetCode)) {
 					$blnError = true;
-					$this->txtNewAssetCode->Warning = 'That asset code already exists. Choose another.';
+					$this->txtNewAssetCode->Warning = 'That asset tag already exists. Choose another.';
 				}
 				elseif (!$this->lstAssetModel->SelectedValue) {
 				  $blnError = true;
-					$this->txtNewAssetCode->Warning = 'You must select one asset model.';
+					$this->txtNewAssetCode->Warning = 'You must select one model.';
 				}
 				if (!$blnError) {
 					$objNewAsset = new Asset();
@@ -1453,7 +1453,7 @@
 						$objNewAsset = Asset::LoadByAssetCode($this->txtNewAssetCode->Text);
 						if (!($objNewAsset instanceof Asset)) {
 							$blnError = true;
-							$this->txtNewAssetCode->Warning = "That asset code does not exist.";
+							$this->txtNewAssetCode->Warning = "That asset tag does not exist.";
 						}
 						elseif ($objNewAsset->LinkedFlag) {
 						  $blnError = true;
@@ -1771,7 +1771,7 @@
 							if ($lstLocationAssetReceived && $lstLocationAssetReceived->SelectedValue) {
 							  if ($objAssetTransaction->Asset->LinkedFlag) {
 							    $blnError = true;
-								  $this->dtgAssetTransact->Warning .= sprintf("Asset Code %s is locked to a parent asset.<br />",$objAssetTransaction->Asset->AssetCode);
+								  $this->dtgAssetTransact->Warning .= sprintf("Asset Tag %s is locked to a parent asset.<br />",$objAssetTransaction->Asset->AssetCode);
 							  }
 							  else {
   								// Set the DestinationLocation of the AssetTransaction
@@ -2074,8 +2074,7 @@
 				if(trim($this->txtReceiptNumber->Text)==''){
 					$blnError = true;
 					$this->txtReceiptNumber->Warning = 'Receipt number is a required field.';
-				}
-				elseif ($objReceipt = Receipt::LoadByReceiptNumber($this->txtReceiptNumber->Text)) {
+				} else if ($objReceipt = Receipt::LoadByReceiptNumber($this->txtReceiptNumber->Text)) {
 					if ($objReceipt->ReceiptId != $this->objReceipt->ReceiptId) {
 						$blnError = true;
 						$this->txtReceiptNumber->Warning = 'That is a duplicate receipt number.';

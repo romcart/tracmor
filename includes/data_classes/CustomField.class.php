@@ -593,7 +593,7 @@
 				
 				if ($blnLabels) {
 					// Create Label for each custom field
-					if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'textarea') {
+					if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text area') {
 						$arrCustomFields[$i]['lbl'] = new QPanel($objForm);
 						if($blnEditMode){$arrCustomFields[$i]['lbl']->CssClass='scrollBox';}
 					}
@@ -612,16 +612,16 @@
 				if ($blnInputs) {
 	 				// Create input for each custom field (either text or list)
 	 				// Create text inputs
-	 				if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text' || CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'textarea') {
+	 				if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text' || CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text area') {
 	 					$arrCustomFields[$i]['input'] = new QTextBox($objForm);
 	 					$arrCustomFields[$i]['input']->Name = $objCustomFieldArray[$i]->ShortDescription;
 	 					$arrCustomFields[$i]['input']->Required = false;
 	 					$arrCustomFields[$i]['input']->CausesValidation = true;
-	 					if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'textarea' && !$blnSearch) {
+	 					if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text area' && !$blnSearch) {
 	 						$arrCustomFields[$i]['input']->TextMode = QTextMode::MultiLine;
 	 					}
 	 					// This is so that the browser doesn't form.submit() when the user presses the enter key on a text input
-	 					if (!$blnSearch && CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) != 'textarea') {
+	 					if (!$blnSearch && CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) != 'text area') {
 	 						if ($objForm instanceof QControl) {
 	 							$arrCustomFields[$i]['input']->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($objForm, 'btnSave_Click'));
 	 						}

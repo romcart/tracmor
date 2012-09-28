@@ -154,7 +154,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	// Create the Short Description label (Asset Model Name)
 	protected function lblShortDescription_Create() {
 		$this->lblShortDescription = new QLabel($this);
-		$this->lblShortDescription->Name = 'Asset Model';
+		$this->lblShortDescription->Name = 'Model';
 		if ($this->blnEditMode) {
 			$this->lblShortDescription->Text = $this->objAssetModel->__toString();
 		}
@@ -163,7 +163,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	// Create the Asset Model Header label (Asset Model Name)
 	protected function lblAssetModelHeader_Create() {
 		$this->lblAssetModelHeader = new QLabel($this);
-		$this->lblAssetModelHeader->Name = 'Asset Model';
+		$this->lblAssetModelHeader->Name = 'Model';
 		$this->lblAssetModelHeader->Text = $this->objAssetModel->__toString();
 	}
 
@@ -171,7 +171,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function lblAssetModelCode_Create() {
 		// It is better to use late-binding here because we are only getting one record
 		$this->lblAssetModelCode = new QLabel($this);
-		$this->lblAssetModelCode->Name = 'Asset Model Code';
+		$this->lblAssetModelCode->Name = 'Model Number';
 		if ($this->blnEditMode) {
 			$this->lblAssetModelCode->Text = $this->objAssetModel->AssetModelCode;
 		}
@@ -345,7 +345,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function btnDelete_Create() {
 		$this->btnDelete = new QButton($this);
 		$this->btnDelete->Text = 'Delete';
-		$this->btnDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you SURE you want to DELETE this Asset Model?'));
+		$this->btnDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you SURE you want to DELETE this Model?'));
 		$this->btnDelete->AddAction(new QClickEvent(), new QServerAction('btnDelete_Click'));
 		$this->btnDelete->CausesValidation = false;
 		if (!$this->blnEditMode) {
@@ -479,7 +479,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		}
 
 		if (trim($this->txtAssetModelCode->Text) == "") {
-			$this->txtAssetModelCode->Warning = 'Asset model code is required';
+			$this->txtAssetModelCode->Warning = 'Model number is required';
 			$blnError = true;
 		}
 
@@ -564,7 +564,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		catch (QDatabaseExceptionBase $objExc) {
 			$objDatabase->TransactionRollback();
 			if ($objExc->ErrorNumber == 1451) {
-				$this->btnDelete->Warning = 'This asset model cannot be deleted because it is associated with one or more assets.';
+				$this->btnDelete->Warning = 'This model cannot be deleted because it is associated with one or more assets.';
 			}
 			else {
 				throw new QDatabaseExceptionBase();
@@ -651,7 +651,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 
 
-		// Display Asset Code and Asset Model input for edit mode
+		// Display Asset Tag and Asset Model input for edit mode
 		// new: if the user is authorized to edit the built-in fields.
 		//If the user is not authorized to edit built-in fields, the fields are render as labels.
 		if(!$this->blnEditBuiltInFields){

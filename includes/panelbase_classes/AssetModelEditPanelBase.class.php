@@ -134,7 +134,7 @@
 		// Create and Setup txtAssetModelCode
 		protected function txtAssetModelCode_Create() {
 			$this->txtAssetModelCode = new QTextBox($this);
-			$this->txtAssetModelCode->Name = QApplication::Translate('Asset Model Code');
+			$this->txtAssetModelCode->Name = QApplication::Translate('Model Number');
 			$this->txtAssetModelCode->Text = $this->objAssetModel->AssetModelCode;
 			$this->txtAssetModelCode->MaxLength = AssetModel::AssetModelCodeMaxLength;
 		}

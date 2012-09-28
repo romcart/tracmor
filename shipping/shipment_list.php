@@ -203,7 +203,7 @@
 		
 		protected function txtAssetCode_Create() {
 			$this->txtAssetCode = new QTextBox($this);
-			$this->txtAssetCode->Name = 'Asset Code';
+			$this->txtAssetCode->Name = 'Asset Tag';
 			$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->txtAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}

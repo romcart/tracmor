@@ -20,8 +20,9 @@
  */
 
 	// Include prepend.inc to load Qcodo
-	require('../includes/prepend.inc.php');		/* if you DO NOT have "includes/" in your include_path */
-	// require('prepend.inc');				/* if you DO have "includes/" in your include_path */
+	require('../includes/prepend.inc.php');
+	require('../includes/php/PasswordHash.php');
+	
 	QApplication::Authenticate();
 	// Include the classfile for UserAccountEditFormBase
 	require(__FORMBASE_CLASSES__ . '/UserAccountEditFormBase.class.php');
@@ -292,7 +293,8 @@
 			$this->objUserAccount->LastName = $this->txtLastName->Text;
 			$this->objUserAccount->Username = $this->txtUsername->Text;
 			if ($this->txtPassword->Text) {
-				$this->objUserAccount->PasswordHash = sha1($this->txtPassword->Text);
+				$objHasher = new PasswordHash(8, PORTABLE_PASSWORDS);
+				$this->objUserAccount->PasswordHash = $objHasher->HashPassword(sha1($this->txtPassword->Text));
 			}
 			$this->objUserAccount->EmailAddress = $this->txtEmailAddress->Text;
 			$this->objUserAccount->ActiveFlag = $this->chkActiveFlag->Checked;

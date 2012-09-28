@@ -174,9 +174,11 @@
             $arrAssetCustomFieldOption->EntityQtypeCustomFieldId,
             2
           );
+  		  
   		  if($role instanceof RoleEntityQtypeCustomFieldAuthorization){
 			$role = $role->AuthorizedFlag;
 		  }
+          
           if(!$arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag
             &&$arrAssetCustomFieldOption->CustomField->ActiveFlag
             && (int)$role==1){
