@@ -1290,6 +1290,25 @@ class QAssetEditComposite extends QControl {
 			$this->EnableTransactionButtons();
 			$this->UpdateAssetControls();
 			$this->objParentObject->RefreshChildAssets();
+			// Handle depreciation options view
+			if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+				if($this->objAsset->DepreciationClassId>0){
+					$this->chkAssetDepreciation->Checked = true;
+					// Return original values to recalculate bookvalue
+					$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
+					$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
+					$this->lblBookValue_Update();
+					// Display only labels
+					$this->txtPurchaseCost->Display = false;
+					$this->calPurchaseDate->Display = false;
+					$this->lblPurchaseCost->Display = true;
+					$this->lblPurchaseDate->Display = true;
+				}else{
+					$this->chkAssetDepreciation->Checked = false;
+					$this->hideAssetDepreciationFields();
+				};
+				$this->chkAssetDepreciation->Enabled = false;
+			}
 		}
 		else {
 			QApplication::Redirect('asset_list.php');
