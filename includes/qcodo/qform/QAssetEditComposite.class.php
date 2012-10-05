@@ -1888,7 +1888,8 @@ class QAssetEditComposite extends QControl {
 		  && QDateTime::Now() > $this->calPurchaseDate->DateTime
 		  ){
 			$interval = QDateTime::Now()->diff($this->calPurchaseDate->DateTime)->m;
-			$this->lblBookValue->Text = (int)($this->txtPurchaseCost->Text) - ((int)($this->txtPurchaseCost->Text) * ($interval/$life));
+			$fltBookValue =	(int)($this->txtPurchaseCost->Text) - ((int)($this->txtPurchaseCost->Text) * ($interval/$life));
+			$this->lblBookValue->Text = money_format('%i', $fltBookValue);
 		}
         else{
 			$this->lblBookValue->Text = '...';
