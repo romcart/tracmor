@@ -200,6 +200,7 @@ class QAssetEditComposite extends QControl {
 			$this->calPurchaseDate->Display = false;
 			if(!$this->blnEditMode){
 				$this->chkAssetDepreciation->Enabled = true;
+				$this->chkAssetDepreciation->Display = false;
 				$this->lblPurchaseCost->Display = false;
 				$this->lblPurchaseDate->Display = false;
 				$this->lblBookValue->Display = false;
@@ -865,6 +866,7 @@ class QAssetEditComposite extends QControl {
 
 	// Create and Setup calPurchaseDate
 	protected function calPurchaseDate_Create() {
+
 		$this->calPurchaseDate = new QDateTimePickerExt($this);
 		$this->calPurchaseDate->Name =  'Purchase Date: ';  //QApplication::Translate('Purchase Date');
 		$this->calPurchaseDate->DateTimePickerType = QDateTimePickerType::Date;
@@ -954,7 +956,16 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel->TabIndex = 1;
 		$this->txtAssetCode->TabIndex = 2;
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
-			$this->lblBookValue_Update();
+			$DepreciationClassId = $objAssetModel->DefaultDepreciationClassId;
+			if(!empty($DepreciationClassId)){
+				$this->chkAssetDepreciation->Display = true;
+				$this->showAssetDepreciationFields();
+				$this->lblBookValue_Update();
+			}
+			else{
+				$this->chkAssetDepreciation->Display = false;
+				$this->hideAssetDepreciationFields();
+			}
 		}
 	}
 
@@ -1293,7 +1304,9 @@ class QAssetEditComposite extends QControl {
 			// Handle depreciation options view
 			if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
 				if($this->objAsset->DepreciationClassId>0){
+					$this->chkAssetDepreciation->Display = true;
 					$this->chkAssetDepreciation->Checked = true;
+					$this->Refresh();
 					// Return original values to recalculate bookvalue
 					$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
 					$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
@@ -1842,6 +1855,7 @@ class QAssetEditComposite extends QControl {
 		$this->calPurchaseDate->Display = false;
 		$this->txtPurchaseCost->Display = false;
 		$this->lblBookValue->Display = false;
+		$this->Refresh();
 	}
 
 	protected function showAssetDepreciationFields(){
@@ -1851,6 +1865,7 @@ class QAssetEditComposite extends QControl {
 		$this->calPurchaseDate->Display = true;
 		$this->txtPurchaseCost->Display = true;
 		$this->lblBookValue->Display = true;
+		$this->Refresh();
 	}
 
 	// Book Value functions
