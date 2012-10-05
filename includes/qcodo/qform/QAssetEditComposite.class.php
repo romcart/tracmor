@@ -851,7 +851,15 @@ class QAssetEditComposite extends QControl {
 			$this->chkAssetDepreciation->Checked = false;
 			$this->lblPurchaseCost->Display = false;
 			$this->lblPurchaseDate->Display = false;
-		}/*
+		}
+		if($this->blnEditMode&&!$this->objAsset->AssetModel->DefaultDepreciationClassId)
+		{
+			$this->chkAssetDepreciation->Display = false;
+		}
+		else{
+			$this->chkAssetDepreciation->Display = true;
+		}
+		/*
 		if($this->blnEditMode){
 			$this->chkAssetDepreciation->Enabled = false;
 		}*/
@@ -956,13 +964,18 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel->TabIndex = 1;
 		$this->txtAssetCode->TabIndex = 2;
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
-			$DepreciationClassId = $objAssetModel->DefaultDepreciationClassId;
-			if(!empty($DepreciationClassId)){
+
+			if($this->lstAssetModel->SelectedValue != null &&
+			   $objAssetModel->DefaultDepreciationClassId>0)
+			{
 				$this->chkAssetDepreciation->Display = true;
-				$this->showAssetDepreciationFields();
+				if(!$this->txtPurchaseCost->Display){
+					$this->chkAssetDepreciation->Checked = false;
+				}
 				$this->lblBookValue_Update();
 			}
-			else{
+			else
+			{
 				$this->chkAssetDepreciation->Display = false;
 				$this->hideAssetDepreciationFields();
 			}
@@ -1303,13 +1316,20 @@ class QAssetEditComposite extends QControl {
 			$this->objParentObject->RefreshChildAssets();
 			// Handle depreciation options view
 			if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
-				if($this->objAsset->DepreciationClassId>0){
+				if($this->objAsset->AssetModel->DefaultDepreciationClassId>0){
 					$this->chkAssetDepreciation->Display = true;
+				}
+				else{
+					$this->chkAssetDepreciation->Display = false;
+				}
+				$this->Refresh();
+				if($this->objAsset->DepreciationClassId>0){
 					$this->chkAssetDepreciation->Checked = true;
-					$this->Refresh();
 					// Return original values to recalculate bookvalue
+					$this->lstAssetModel->SelectedValue = $this->objAsset->AssetModelId;
 					$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
 					$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
+					$this->lblBookValue->Display = true;
 					$this->lblBookValue_Update();
 					// Display only labels
 					$this->txtPurchaseCost->Display = false;
