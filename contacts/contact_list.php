@@ -73,6 +73,14 @@
 		protected $strDateModifiedLast;
 		protected $blnAttachment;
 
+		// Mass actions
+		protected $lblWarning;
+		protected $btnEdit;
+		protected $btnDelete;
+		protected $dlgEdit;
+		protected $dlgDelete;
+		protected $dlgSimpleMessage;
+
 		protected function Form_Create() {
 
 			// Create the Header Menu
@@ -88,6 +96,13 @@
 			$this->ctlAdvanced_Create();
 			$this->lblAdvanced_Create();
 			$this->dtgContact_Create();
+
+			// Mass Actions Controls
+			$this->dlgDelete_Create();
+			$this->dlgEdit_Create();
+			$this->btnEdit_Create();
+			$this->btnDelete_Create();
+			$this->lblWarning_Create();
 		}
 
 		protected function dtgContact_Bind() {
@@ -188,16 +203,69 @@
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	  }
 
-	  // Create the 'Advanced Search' Label
-	  protected function lblAdvanced_Create() {
-	  	$this->lblAdvanced = new QLabel($this);
+	// Create Mass Edit Button
+	protected function btnEdit_Create(){
+		$this->btnEdit = new QButton($this);
+		$this->btnEdit->Name = 'edit';
+		$this->btnEdit->Text = 'Edit';
+		$this->btnEdit->AddAction(new QClickEvent(), new QAjaxAction('btnEdit_Click'));
+		$this->btnEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnEdit_Click'));
+		$this->btnEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
+
+	// Create Dialog box Edit
+    protected function dlgEdit_Create(){
+		$this->dlgEdit = new QDialogBox($this);
+		$this->dlgEdit->Text = "Are you sure you want to edit these objects?";
+		$this->dlgEdit->AutoRenderChildren = true;
+		$this->dlgEdit->Width = '440px';
+		$this->dlgEdit->Overflow = QOverflow::Auto;
+		$this->dlgEdit->Padding = '10px';
+		$this->dlgEdit->Display = false;
+		$this->dlgEdit->BackColor = '#FFFFFF';
+		$this->dlgEdit->MatteClickable = false;
+		$this->dlgEdit->CssClass = "modal_dialog";
+	}
+	// Create Dialog box delete
+	protected function dlgDelete_Create(){
+		$this->dlgDelete = new QDialogBox($this);
+		$this->dlgDelete->AutoRenderChildren = true;
+		$this->dlgDelete->Width = '440px';
+		$this->dlgDelete->Overflow = QOverflow::Auto;
+		$this->dlgDelete->Padding = '10px';
+		$this->dlgDelete->Display = false;
+		$this->dlgDelete->BackColor = '#FFFFFF';
+		$this->dlgDelete->MatteClickable = false;
+		$this->dlgDelete->CssClass = "modal_dialog";
+		$this->dlgDelete->Text = "Are you sure you want to delete these objects?";
+	}
+	//
+	protected function lblWarning_Create(){
+		$this->lblWarning = new QLabel($this);
+		$this->lblWarning->Text = "";
+		$this->lblWarning->CssClass = "warning";
+	}
+
+	// Create Mass Delete Button
+	protected function btnDelete_Create(){
+		$this->btnDelete = new QButton($this);
+		$this->btnDelete->Name = 'delete';
+		$this->btnDelete->Text = 'Delete';
+		$this->btnDelete->AddAction(new QClickEvent(), new QAjaxAction('btnDelete_Click'));
+		$this->btnDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnDelete_Click'));
+		$this->btnDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
+
+	// Create Mass Delete Button
+	protected function lblAdvanced_Create() {
+		$this->lblAdvanced = new QLabel($this);
 	  	$this->lblAdvanced->Name = 'Advanced';
 	  	$this->lblAdvanced->Text = 'Advanced Search';
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
 	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
-	  }
+	}
 
 	  // Create the Advanced Search Composite Control
   	protected function ctlAdvanced_Create() {
@@ -226,6 +294,8 @@
       $objPaginator = new QPaginator($this->dtgContact);
       $this->dtgContact->Paginator = $objPaginator;
       $this->dtgContact->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
+	// Add Check boxes
+	$this->dtgContact->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ContactId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
 
       $this->dtgContact->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->ContactId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Contact()->ContactId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Contact()->ContactId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
       $this->dtgContact->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
@@ -294,6 +364,34 @@
 	  	$this->blnSearch = false;
   	}
 
+	protected function btnEdit_Click(){
+		$items = $this->dtgContact->getSelected('ContactId');
+	// Show modal to Edit Company, Desc
+		if(count($items)>0){
+			$this->lblWarning->Text = "";
+		}else{
+			$this->lblWarning->Text = "You haven't chosen any Contact to Edit" ;
+		}
+
+	}
+
+	protected function btnDelete_Click($strFormId, $strControlId, $strParameter){
+		$items = $this->dtgContact->getSelected('ContactId');
+	// Show confirm "Are you sure you want to {delete/edit} these objects?"
+		if(count($items)>0){
+		$this->lblWarning->Text = "";
+			if (!$this->dlgDelete->Display) {
+				//$confirmation->RenderScript($this);
+				$this->dlgDelete->ShowDialogBox();
+				// Show the dialog box
+			//	print_r(get_class_methods(get_class($this->dlgDelete)));exit;//$this->dlgDelete->ShowDialogBox() ;
+			}
+		}
+		else{
+		$this->lblWarning->Text = "You haven't chosen any Contact to Delete" ;
+		}
+	}
+public function CloseDeleteContactPanel(){}
   	// Display or hide the Advanced Search Composite Control
 	  protected function lblAdvanced_Click() {
 	  	if ($this->blnAdvanced) {

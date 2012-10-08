@@ -72,6 +72,9 @@
 
 		<?php $this->dtgContact->Render() ?>
 		<br />
+			<?php $this->btnEdit->Render();$this->btnDelete->Render();$this->lblWarning->Render();?>
+			<?php $this->dlgEdit->Render(); ?>
+			<?php $this->dlgDelete->Render(); ?>
 
-	<?php $this->RenderEnd() ?>		
+	<?php $this->RenderEnd() ?>
 	<?php 	require_once('../includes/footer.inc.php'); ?>
