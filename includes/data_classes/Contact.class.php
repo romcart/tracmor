@@ -415,5 +415,23 @@
 
 			return $arrSearchSql;
 	  }
+
+		/**
+		 * Delete all selected records
+		 *
+		 * @param arr $intAssetId
+		 */
+		public static function DeleteSelected($arrContactId) {
+			$strQuery = sprintf("
+				DELETE
+				FROM
+				  `contact`
+				WHERE
+				  `contact`.`contact_id` IN(%s)",
+				implode(",",$arrContactId));
+
+			$objDatabase = QApplication::$Database[1];
+			$objDatabase->NonQuery($strQuery);
+		}
 	}
 ?>

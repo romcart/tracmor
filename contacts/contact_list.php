@@ -79,7 +79,10 @@
 		protected $btnDelete;
 		protected $dlgEdit;
 		protected $dlgDelete;
+		protected $btnConfirm;
+		protected $btnCancel;
 		protected $dlgSimpleMessage;
+		protected $arrToDelete = array();
 
 		protected function Form_Create() {
 
@@ -100,6 +103,8 @@
 			// Mass Actions Controls
 			$this->dlgDelete_Create();
 			$this->dlgEdit_Create();
+			$this->btnConfirm_Create();
+			$this->btnCancel_Create();
 			$this->btnEdit_Create();
 			$this->btnDelete_Create();
 			$this->lblWarning_Create();
@@ -208,6 +213,8 @@
 		$this->btnEdit = new QButton($this);
 		$this->btnEdit->Name = 'edit';
 		$this->btnEdit->Text = 'Edit';
+		$this->btnEdit->AddAction(new QClickEvent(),
+			                      new QConfirmAction("Are you sure you want to edit these objects?"));
 		$this->btnEdit->AddAction(new QClickEvent(), new QAjaxAction('btnEdit_Click'));
 		$this->btnEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnEdit_Click'));
 		$this->btnEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -237,7 +244,6 @@
 		$this->dlgDelete->BackColor = '#FFFFFF';
 		$this->dlgDelete->MatteClickable = false;
 		$this->dlgDelete->CssClass = "modal_dialog";
-		$this->dlgDelete->Text = "Are you sure you want to delete these objects?";
 	}
 	//
 	protected function lblWarning_Create(){
@@ -246,11 +252,26 @@
 		$this->lblWarning->CssClass = "warning";
 	}
 
+	protected function btnConfirm_Create(){
+		$this->btnConfirm = new QButton($this->dlgDelete);
+		$this->btnConfirm->Text = "Confirm";
+		$this->btnConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnConfirm_Click'));
+		$this->btnConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnConfirm_Click'));
+	}
+
+	protected function btnCancel_Create(){
+		$this->btnCancel = new QButton($this->dlgDelete);
+		$this->btnCancel->Text = "Cancel";
+		$this->btnCancel->AddAction(new QClickEvent(), new QAjaxAction('btnCancel_Click'));
+		$this->btnCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnCancel_Click'));
+	}
 	// Create Mass Delete Button
 	protected function btnDelete_Create(){
 		$this->btnDelete = new QButton($this);
 		$this->btnDelete->Name = 'delete';
 		$this->btnDelete->Text = 'Delete';
+		$this->btnDelete->AddAction(new QClickEvent(),
+			                        new QConfirmAction("Are you sure you want to delete these objects?"));
 		$this->btnDelete->AddAction(new QClickEvent(), new QAjaxAction('btnDelete_Click'));
 		$this->btnDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnDelete_Click'));
 		$this->btnDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -377,13 +398,34 @@
 
 	protected function btnDelete_Click($strFormId, $strControlId, $strParameter){
 		$items = $this->dtgContact->getSelected('ContactId');
-	// Show confirm "Are you sure you want to {delete/edit} these objects?"
+	    // Show confirm "Are you sure you want to {delete/edit} these objects?"
 		if(count($items)>0){
 		$this->lblWarning->Text = "";
 			if (!$this->dlgDelete->Display) {
-				//$confirmation->RenderScript($this);
-				$this->dlgDelete->ShowDialogBox();
-				// Show the dialog box
+				$arrToBeSkipped = array();
+				foreach ($items as $item){
+					// Check if any Shipments or Receipts include selected contact
+                    if(Shipment::hasContact($item)||Receipt::hasContact($item)){
+						// append $item to  be skipped
+						$arrToBeSkipped[] = $item;
+					}
+					else{
+                        $this->arrToDelete[] = $item;
+					}
+				}
+				if(count($arrToBeSkipped)>0){
+					// Show dialog box "There are {number} {entity_type}s that are not able to be deleted. Would you like to continue the deletion process, skipping these items?"
+					$this->dlgDelete->Text =sprintf("There are %s contacts that are not able to be deleted.Would you like to continue the deletion process, skipping these items?<br />",implode(",",$arrToBeSkipped));
+					$this->dlgDelete->ShowDialogBox();
+				}
+				else{
+					if (count($this->arrToDelete)>0){
+						Contact::DeleteSelected($this->arrToDelete);
+						$this->arrToDelete = array();
+						QApplication::Redirect('');
+					}
+				}
+
 			//	print_r(get_class_methods(get_class($this->dlgDelete)));exit;//$this->dlgDelete->ShowDialogBox() ;
 			}
 		}
@@ -391,7 +433,18 @@
 		$this->lblWarning->Text = "You haven't chosen any Contact to Delete" ;
 		}
 	}
-public function CloseDeleteContactPanel(){}
+    public function btnCancel_Click($strFormId, $strControlId, $strParameter){
+		$this->dlgDelete->HideDialogBox();
+	}
+
+	public function btnConfirm_Click($strFormId, $strControlId, $strParameter){
+		if (count($this->arrToDelete)>0){
+			Contact::DeleteSelected($this->arrToDelete);
+			$this->arrToDelete = array();
+		}
+		$this->dlgDelete->HideDialogBox();
+		QApplication::Redirect('');
+	}
   	// Display or hide the Advanced Search Composite Control
 	  protected function lblAdvanced_Click() {
 	  	if ($this->blnAdvanced) {
