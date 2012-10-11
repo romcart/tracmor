@@ -694,10 +694,11 @@
 	public static function hasContact($intContactId){
 		try {
 			$intReceipts = Receipt::QueryCount(
-				QQ::OrCondition(
-					QQ::Equal(QQN::Receipt()->FromContactId, $intContactId),
-					QQ::Equal(QQN::Receipt()->ToContactId, $intContactId)
-				));
+				//QQ::OrCondition(
+					QQ::Equal(QQN::Receipt()->FromContactId, $intContactId)
+					//,QQ::Equal(QQN::Receipt()->ToContactId, $intContactId)
+		//		)
+		);
 
 			return $intReceipts>0?true:false;
 

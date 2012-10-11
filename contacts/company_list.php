@@ -75,6 +75,17 @@
 		protected $strDateModifiedLast;
 		protected $blnAttachment;
 
+		// Mass Action controls
+		protected $dlgMassDelete;
+		protected $dlgMassEdit;
+		protected $btnMassDelete;
+		protected $btnMassEdit;
+		protected $btnMassDeleteConfirm;
+		protected $btnMassDeleteCancel;
+		protected $lblMassActionError;
+
+		protected $arrToDelete = array();
+
 		protected function Form_Create() {
 
 			// Create the Header Menu
@@ -91,6 +102,14 @@
 			$this->ctlAdvanced_Create();
 			$this->lblAdvanced_Create();
 			$this->dtgCompany_Create();
+
+			// Mass Action
+			$this->btnMassDelete_Create();
+			//$this->btnMassEdit_Create();
+			$this->lblMassActionError_Create();
+			$this->dlgDelete_Create();
+			$this->btnMassDeleteConfirm_Create();
+			$this->btnMassDeleteCancel_Create();
 		}
 
 		protected function dtgCompany_Bind() {
@@ -239,7 +258,10 @@
       $this->dtgCompany->Paginator = $objPaginator;
       $this->dtgCompany->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 
-      $this->dtgCompany->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->CompanyId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+      // Add Checkbox Column
+	  $this->dtgCompany->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->CompanyId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+
+	  $this->dtgCompany->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->CompanyId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('Company Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgCompany->AddColumn(new QDataGridColumnExt('City', '<?= $_ITEM->__toStringCity() ?>', 'Width=200', 'SortByCommand="company__address_id__city ASC"', 'ReverseSortByCommand="company__address_id__city DESC"', 'CssClass="dtg_column"'));
@@ -373,6 +395,130 @@
 				}
 			}
 	  }
+
+
+		/**
+		 * Mass Action Methods
+		 *
+		 */
+
+		protected function btnMassDelete_Create(){
+			$this->btnMassDelete = new QButton($this);
+			$this->btnMassDelete->Name = 'Delete';
+			$this->btnMassDelete->Text = 'Delete';
+			$this->btnMassDelete->AddAction(new QClickEvent(),
+				                            new QConfirmAction("Are you sure you want to delete these objects?"));
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function btnMassEdit_Create(){
+			$this->btnMassEdit = new QButton($this);
+			$this->btnMassEdit->Name = 'Edit';
+			$this->btnMassEdit->Text = 'Edit';
+			$this->btnMassEdit->AddAction(new QClickEvent(),
+				                          new QConfirmAction("Are you sure you want to edit these objects?"));
+			$this->btnMassEdit->AddAction(new QClickEvent(), new QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function lblMassActionError_Create(){
+			$this->lblMassActionError = new QLabel($this);
+			$this->lblMassActionError->Text = '';
+			$this->lblMassActionError->CssClass = "warning";
+		}
+
+		protected function dlgEdit_Create(){
+			$this->dlgMassEdit = new QDialogBox($this);
+			$this->dlgMassEdit->AutoRenderChildren = true;
+			$this->dlgMassEdit->Width = '440px';
+			$this->dlgMassEdit->Overflow = QOverflow::Auto;
+			$this->dlgMassEdit->Padding = '10px';
+			$this->dlgMassEdit->Display = false;
+			$this->dlgMassEdit->BackColor = '#FFFFFF';
+			$this->dlgMassEdit->MatteClickable = false;
+			$this->dlgMassEdit->CssClass = "modal_dialog";
+		}
+
+		protected function dlgDelete_Create(){
+			$this->dlgMassDelete = new QDialogBox($this);
+			$this->dlgMassDelete->AutoRenderChildren = true;
+			$this->dlgMassDelete->Width = '440px';
+			$this->dlgMassDelete->Overflow = QOverflow::Auto;
+			$this->dlgMassDelete->Padding = '10px';
+			$this->dlgMassDelete->Display = false;
+			$this->dlgMassDelete->BackColor = '#FFFFFF';
+			$this->dlgMassDelete->MatteClickable = false;
+			$this->dlgMassDelete->CssClass = "modal_dialog";
+		}
+
+		protected function btnMassDeleteConfirm_Create(){
+			$this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
+			$this->btnMassDeleteConfirm->Text = "Confirm";
+			$this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+			$this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+			$this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function btnMassDeleteCancel_Create(){
+			$this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
+			$this->btnMassDeleteCancel->Text = "Cancel";
+			$this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+			$this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+			$this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function btnMassDelete_Click($strFormId, $strControlId, $strParameter){
+			$items = $this->dtgCompany->getSelected('CompanyId');
+			// Show confirm "Are you sure you want to {delete/edit} these objects?"
+			if(count($items)>0){
+				$this->lblMassActionError->Text = "";
+				if (!$this->dlgMassDelete->Display) {
+					$arrToBeSkipped = array();
+					foreach ($items as $item){
+						// Check if any Shipments or Receipts include selected contact
+						if(Shipment::hasCompany($item)/*||Receipt::hasCompany($item)*/){
+							// append $item to  be skipped
+							$arrToBeSkipped[] = $item;
+						}
+						else{
+							$this->arrToDelete[] = $item;
+						}
+					}
+					if(count($arrToBeSkipped)>0){
+						// Show dialog box "There are {number} {entity_type}s that are not able to be deleted. Would you like to continue the deletion process, skipping these items?"
+						$this->dlgMassDelete->Text =sprintf("There are %s companies that are not able to be deleted. Would you like to continue the deletion process, skipping these items?<br />",implode(",",$arrToBeSkipped));
+						$this->dlgMassDelete->ShowDialogBox();
+					}
+					else{
+						if (count($this->arrToDelete)>0){
+							foreach ($this->arrToDelete as $intCompanyId){
+								Company::Load($intCompanyId)->Delete();
+							}
+							$this->arrToDelete = array();
+							QApplication::Redirect('');
+						}
+					}
+
+					//	print_r(get_class_methods(get_class($this->dlgDelete)));exit;//$this->dlgDelete->ShowDialogBox() ;
+				}
+			}
+			else{
+				$this->lblMassActionError->Text = "You haven't chosen any Contact to Delete" ;
+			}
+		}
+
+		protected function btnMassEdit_Click(){
+
+		}
+		protected function btnMassDeleteConfirm_Click(){
+
+		}
+		protected function btnMassDeleteCancel_Click(){
+			$this->dlgMassDelete->HideDialogBox();
+		}
 	}
 
 	// Go ahead and run this form object to generate the page and event handlers, using

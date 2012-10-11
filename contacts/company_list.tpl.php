@@ -77,6 +77,11 @@
 
 		<?php $this->dtgCompany->Render() ?>
 		<br />
+		<?php //$this->dlgMassEdit->Render() ?>
+		<?php // $this->btnMassEdit->Render() ?>
+		<?php $this->dlgMassDelete->Render() ?>
+		<?php $this->btnMassDelete->Render() ?>
+		<?php $this->lblMassActionError->Render() ?>
 
-	<?php $this->RenderEnd() ?>		
+			<?php $this->RenderEnd() ?>
 	<?php 	require_once('../includes/footer.inc.php'); ?>
