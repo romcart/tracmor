@@ -88,7 +88,7 @@ CREATE TABLE `asset` (
   `depreciation_flag` BIT(1) DEFAULT NULL,
   `depreciation_class_id` INTEGER UNSIGNED   NULL,
   `purchase_date`    DATETIME  DEFAULT NULL,
-  `purchase_cost`    FLOAT DEFAULT NULL,
+  `purchase_cost`    DECIMAL(10,2) DEFAULT NULL,
     PRIMARY KEY ( `asset_id` ),
     INDEX asset_fkindex1 ( `asset_model_id` ),
     INDEX asset_fkindex2 ( `location_id` ),

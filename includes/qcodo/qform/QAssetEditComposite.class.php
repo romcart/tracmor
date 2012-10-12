@@ -844,7 +844,7 @@ class QAssetEditComposite extends QControl {
 		if ($this->blnEditMode
 			&& $this->objAsset->DepreciationFlag){
 			$this->chkAssetDepreciation->Checked = true;
-			$this->lblPurchaseCost->Text = $this->objAsset->PurchaseCost;
+			$this->lblPurchaseCost->Text = money_format('%i',$this->objAsset->PurchaseCost);
 			$this->lblPurchaseDate->Text = $this->objAsset->PurchaseDate->__toString();
 		}
 		else{
@@ -924,7 +924,7 @@ class QAssetEditComposite extends QControl {
 			$this->txtPurchaseCost->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'txtPurchaseCost_Change'));
 		}
 		if ($this->blnEditMode){
-			$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
+			$this->txtPurchaseCost->Text = money_format('%i',$this->objAsset->PurchaseCost);
 		}
 	}
 	public function txtPurchaseCost_Change($control){
@@ -1053,15 +1053,15 @@ class QAssetEditComposite extends QControl {
 //				 Check Depreciation fields
 				if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 					if($this->chkAssetDepreciation->Checked){
-						if(!ctype_digit($this->txtPurchaseCost->Text) || $this->txtPurchaseCost->Text <= 0){
+						if(!preg_match("/\b\d{1,3}(?:,?\d{3})*(?:\.\d{2})?\b/",$this->txtPurchaseCost->Text) || $this->txtPurchaseCost->Text <= 0){
 							$blnError = true;
-							$this->txtPurchaseCost->Warning = "Purchase Cost must be a numeric value";
+							$this->txtPurchaseCost->Warning = "Purchase Cost value isn't valid";
 						}
 						elseif(AssetModel::Load($this->lstAssetModel->SelectedValue)->DefaultDepreciationClassId!=null){
 							//print $this->calPurchaseDate->DateTime ."||". $this->txtPurchaseCost->Text."|";exit;
 							$this->objAsset->DepreciationFlag = true;
 							$this->objAsset->PurchaseDate  = $this->calPurchaseDate->DateTime;
-							$this->objAsset->PurchaseCost = $this->txtPurchaseCost->Text;
+							$this->objAsset->PurchaseCost = str_replace(',','',$this->txtPurchaseCost->Text);
 							$this->objAsset->DepreciationClassId = AssetModel::Load($this->lstAssetModel
 								                                                         ->SelectedValue)
 								                                             ->DefaultDepreciationClassId;
@@ -1200,15 +1200,15 @@ class QAssetEditComposite extends QControl {
 				//				 Check Depreciation fields
 				if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 					if($this->chkAssetDepreciation->Checked){
-						if(!ctype_digit($this->txtPurchaseCost->Text) || $this->txtPurchaseCost->Text <= 0){
+						if(!preg_match("/\b\d{1,3}(?:,?\d{3})*(?:\.\d{2})?\b/",$this->txtPurchaseCost->Text) || $this->txtPurchaseCost->Text <= 0){
 							$blnError = true;
-							$this->txtPurchaseCost->Warning = "Purchase Cost must be a numeric value";
+							$this->txtPurchaseCost->Warning = "Purchase Cost isn't valid";
 						}
 						elseif(AssetModel::Load($this->lstAssetModel->SelectedValue)->DefaultDepreciationClassId!=null){
 							//print $this->calPurchaseDate->DateTime ."||". $this->txtPurchaseCost->Text."|";exit;
 							$this->objAsset->DepreciationFlag = true;
 							$this->objAsset->PurchaseDate  = $this->calPurchaseDate->DateTime;
-							$this->objAsset->PurchaseCost = $this->txtPurchaseCost->Text;
+							$this->objAsset->PurchaseCost = str_replace(',','',$this->txtPurchaseCost->Text);
 							$this->objAsset->DepreciationClassId = AssetModel::Load($this->lstAssetModel
 								->SelectedValue)
 								->DefaultDepreciationClassId;
@@ -1327,7 +1327,7 @@ class QAssetEditComposite extends QControl {
 					$this->chkAssetDepreciation->Checked = true;
 					// Return original values to recalculate bookvalue
 					$this->lstAssetModel->SelectedValue = $this->objAsset->AssetModelId;
-					$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
+					$this->txtPurchaseCost->Text = money_format('%i',$this->objAsset->PurchaseCost);
 					$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
 					$this->lblBookValue->Display = true;
 					$this->lblBookValue_Update();
@@ -1722,7 +1722,7 @@ class QAssetEditComposite extends QControl {
 			$this->chkAssetDepreciation->Enabled = false;
 			$this->hideAssetDepreciationFields();
 			if($this->objAsset->DepreciationFlag == 1){
-				$this->lblPurchaseCost->Text = $this->objAsset->PurchaseCost;
+				$this->lblPurchaseCost->Text = money_format('%i',$this->objAsset->PurchaseCost);
 				$this->lblPurchaseDate->Text = $this->objAsset->PurchaseDate->__toString();
 				$this->lblPurchaseCost->Display = true;
 				$this->lblPurchaseDate->Display = true;
@@ -1902,13 +1902,13 @@ class QAssetEditComposite extends QControl {
 			if(!empty($intDepreciationClassId)  && DepreciationClass::Load($intDepreciationClassId))
 			$life = DepreciationClass::Load($intDepreciationClassId)->Life;
 		}
-		if(ctype_digit($this->txtPurchaseCost->Text)
+		if(is_numeric($this->txtPurchaseCost->Text)
 		  && isset($life)
 		  && ($this->calPurchaseDate->DateTime instanceof DateTime)
 		  && QDateTime::Now() > $this->calPurchaseDate->DateTime
 		  ){
 			$interval = QDateTime::Now()->diff($this->calPurchaseDate->DateTime)->m;
-			$fltBookValue =	(int)($this->txtPurchaseCost->Text) - ((int)($this->txtPurchaseCost->Text) * ($interval/$life));
+			$fltBookValue =	$this->txtPurchaseCost->Text - ($this->txtPurchaseCost->Text * ($interval/$life));
 			$this->lblBookValue->Text = money_format('%i', $fltBookValue);
 		}
         else{

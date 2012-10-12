@@ -875,7 +875,7 @@
 						elseif(isset($intPurchaseCostKey)&&isset($intPurchaseCostKey)){
 							// Check intVal for Purchase cost
 							$intPurchaseCost = (trim($strRowArray[$intPurchaseCostKey])) ? addslashes(trim($strRowArray[$intPurchaseCostKey])) : false;
-                            if(!ctype_digit($intPurchaseCost)){
+                            if(!is_numeric($intPurchaseCost)){
 								$blnDepreciationError = true;
 							}
 							$strPurchaseDate = (trim($strRowArray[$intPurchaseDateKey])) ? trim($strRowArray[$intPurchaseDateKey]) : false;
