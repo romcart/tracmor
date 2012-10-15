@@ -77,8 +77,8 @@
 
 		<?php $this->dtgCompany->Render() ?>
 		<br />
-		<?php //$this->dlgMassEdit->Render() ?>
-		<?php // $this->btnMassEdit->Render() ?>
+		<?php $this->dlgMassEdit->Render() ?>
+		<?php $this->btnMassEdit->Render() ?>
 		<?php $this->dlgMassDelete->Render() ?>
 		<?php $this->btnMassDelete->Render() ?>
 		<?php $this->lblMassActionError->Render() ?>

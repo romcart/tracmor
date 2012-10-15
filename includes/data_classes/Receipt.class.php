@@ -719,7 +719,7 @@
 			$intReceipts = Receipt::QueryCount(
 				QQ::OrCondition(
 					QQ::Equal(QQN::Receipt()->FromCompanyId, $intCompanyId),
-					QQ::Equal(QQN::Receipt()->ToCompanyId, $intCompanyId)
+					QQ::Equal(QQN::Receipt()->ToContact->CompanyId, $intCompanyId)
 				));
 
 			return $intReceipts>0?true:false;

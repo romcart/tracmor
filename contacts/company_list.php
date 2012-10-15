@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(4);
 	require_once(__FORMBASE_CLASSES__ . '/CompanyListFormBase.class.php');
-
+	require('../contacts/CompanyMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the Company class.  It extends from the code-generated
@@ -105,9 +105,10 @@
 
 			// Mass Action
 			$this->btnMassDelete_Create();
-			//$this->btnMassEdit_Create();
+			$this->btnMassEdit_Create();
 			$this->lblMassActionError_Create();
 			$this->dlgDelete_Create();
+			$this->dlgMassEdit_Create();
 			$this->btnMassDeleteConfirm_Create();
 			$this->btnMassDeleteCancel_Create();
 		}
@@ -430,7 +431,7 @@
 			$this->lblMassActionError->CssClass = "warning";
 		}
 
-		protected function dlgEdit_Create(){
+		protected function dlgMassEdit_Create(){
 			$this->dlgMassEdit = new QDialogBox($this);
 			$this->dlgMassEdit->AutoRenderChildren = true;
 			$this->dlgMassEdit->Width = '440px';
@@ -506,12 +507,29 @@
 				}
 			}
 			else{
-				$this->lblMassActionError->Text = "You haven't chosen any Contact to Delete" ;
+				$this->lblMassActionError->Text = "You haven't chosen any Company to Delete" ;
 			}
 		}
 
 		protected function btnMassEdit_Click(){
+			$this->lblMassActionError->Text = "";
+			$items = $this->dtgCompany->getSelected('CompanyId');
+			if(count($items)>0){
+				if (!$this->dlgMassEdit->Display) {
 
+					// Create the panel, assigning it to the Dialog Box
+					$pnlCompanyEdit = new CompanyMassEditPanel($this->dlgMassEdit, 'dlgMassEdit_Close', $items);
+					// Show the dialog box
+					$this->dlgMassEdit->ShowDialogBox();
+				}
+			}
+			else{
+				$this->lblMassActionError->Text = "You haven't chosen any Company to Edit" ;
+			}
+		}
+
+		public function dlgMassEdit_Close(){
+			$this->dlgMassEdit->HideDialogBox();
 		}
 		protected function btnMassDeleteConfirm_Click(){
 
