@@ -483,7 +483,7 @@
         for ($i=0; $i < count($this->lstMapHeaderArray)-1; $i++) {
           $lstMapHeader = $this->lstMapHeaderArray[$i];
           $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
-          if ($strSelectedValue == "asset model") {
+          if ($strSelectedValue == "model") {
             $blnAssetModelShortDescription = true;
           }
           elseif ($strSelectedValue == "asset tag") {
@@ -660,7 +660,7 @@
               if ($value == 'asset tag') {
                 $intAssetCodeKey = $key;
               }
-              elseif ($value == 'asset model') {
+              elseif ($value == 'model') {
                 $intAssetModelDescriptionKey = $key;
               }
               elseif ($value == 'location') {
@@ -1213,7 +1213,7 @@
 	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    }
 	    $lstMapHeader->AddItem("Asset Tag", "Asset Tag", ($strName == 'asset tag') ? true : false, $strAssetGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Model", "Asset Model", ($strName == 'asset model') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Model", "Model", ($strName == 'model') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Parent Asset", "Parent Asset", ($strName == 'parent asset') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Locked To Parent", "Locked To Parent", ($strName == 'locked to parent') ? true : false, $strAssetGroup);
