@@ -81,3 +81,15 @@
 
 			<?php $this->RenderEnd() ?>
 	<?php 	require_once('../includes/footer.inc.php'); ?>
+
+			<script type="text/javascript">
+				function enableInput(element) {
+					var input = document.getElementById(element.id.replace('chk_',''));
+					if(element.checked){
+						input.disabled = false;
+					}
+					else{
+						input.disabled = true;
+					}
+				}
+			</script>
