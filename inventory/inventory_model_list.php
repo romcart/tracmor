@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(3);
 	require_once(__FORMBASE_CLASSES__ . '/InventoryModelListFormBase.class.php');
-
+    require('../inventory/InventoryMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the InventoryModel class.  It extends from the code-generated
@@ -38,7 +38,15 @@
 	 * 
 	 */
 	class InventoryModelListForm extends InventoryModelListFormBase {
-		
+
+	/**
+	 * @var  QLabel $lblWarning
+	 * @var  QDialogBox $dlgMassEdit
+	 * @var  QDialogBox $dlgMassDelete
+	 * @var  QButton $btnMassDelete
+	 * @var  QButton $btnMassEdit
+	 * @var  QInventorySearchComposite $ctlSearchMenu
+	 */
 		// Header Tabs
 		protected $ctlHeaderMenu;
 		
@@ -46,8 +54,16 @@
 		protected $ctlShortcutMenu;
 
 		// Search Menu
-		protected $ctlSearchMenu;	
-		
+		protected $ctlSearchMenu;
+
+		// Mass Actions controls
+
+        protected $lblWarning;
+		protected $dlgMassEdit;
+		protected $dlgMassDelete;
+		protected $btnMassEdit;
+		protected $btnMassDelete;
+
 		/*// Basic Inputs
 		protected $lstCategory;
 		protected $lstManufacturer;
@@ -152,6 +168,11 @@
       $this->ctlAdvanced_Create();
       $this->lblAdvanced_Create();
       */
+	  $this->lblWarning_Create();
+	  $this->dlgMassEdit_Create();
+	  $this->dlgMassDelete_Create();
+	  $this->btnMassDelete_Create();
+	  $this->btnMassEdit_Create();
   	}
   	
 		/*protected function dtgInventoryModel_Bind() {
@@ -363,8 +384,89 @@
 				}
 			}
 	  }
-	  */	   	
+	  */
+
+		// Mass Actions controls creating/handling functions
+		protected function dlgMassDelete_Create(){
+			$this->dlgMassDelete = new QDialogBox($this);
+			$this->dlgMassDelete->AutoRenderChildren = true;
+			$this->dlgMassDelete->Width = '440px';
+			$this->dlgMassDelete->Overflow = QOverflow::Auto;
+			$this->dlgMassDelete->Padding = '10px';
+			$this->dlgMassDelete->Display = false;
+			$this->dlgMassDelete->BackColor = '#FFFFFF';
+			$this->dlgMassDelete->MatteClickable = false;
+			$this->dlgMassDelete->CssClass = "modal_dialog";
+		}
+
+		protected function dlgMassEdit_Create(){
+			$this->dlgMassEdit = new QDialogBox($this);
+			$this->dlgMassEdit->AutoRenderChildren = true;
+			$this->dlgMassEdit->Width = '440px';
+			$this->dlgMassEdit->Overflow = QOverflow::Auto;
+			$this->dlgMassEdit->Padding = '10px';
+			$this->dlgMassEdit->Display = false;
+			$this->dlgMassEdit->BackColor = '#FFFFFF';
+			$this->dlgMassEdit->MatteClickable = false;
+			$this->dlgMassEdit->CssClass = "modal_dialog";
+		}
+
+		protected function btnMassDelete_Create(){
+			$this->btnMassDelete = new QButton($this);
+			$this->btnMassDelete->Name = "delete";
+			$this->btnMassDelete->Text = "Delete";
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to delete these items?'));
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function btnMassEdit_Create(){
+			$this->btnMassEdit = new QButton($this);
+			$this->btnMassEdit->Text = "edit";
+			$this->btnMassEdit->Text = "Edit";
+			$this->btnMassEdit->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
+			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function lblWarning_Create(){
+			$this->lblWarning = new QLabel($this);
+			$this->lblWarning->Text = "";
+			$this->lblWarning->CssClass = "warning";
+		}
+
+		protected function btnMassDelete_Click(){
+
+			$items = $this->ctlSearchMenu->dtgInventoryModel->getSelected('InventoryModelId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+				// TODO perform validate/delete
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Inventory to Edit" ;
+			}
+		}
+
+		protected function btnMassEdit_Click(){
+			$items = $this->ctlSearchMenu->dtgInventoryModel->getSelected('InventoryModelId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+//				$pnlInventoryMassEditPanel = new InventoryMassEditPanel($this->dlgMassEdit,
+//					                                                    'pnlInventoryMassEditPanelCancel_Click',
+//				                                                        $items);
+				$this->dlgMassEdit->ShowDialogBox();
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Inventory to Edit" ;
+			}
+		}
+
+		public function pnlInventoryMassEditPanelCancel_Click(){
+			// TODO uncheck selected in DataGrid
+			$this->dlgMassEdit->HideDialogBox();
+		}
 	}
+
 
 	// Go ahead and run this form object to generate the page and event handlers, using
 	// generated/inventory_model_edit.php.inc as the included HTML template file
