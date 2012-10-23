@@ -118,6 +118,14 @@ function getWidth(obj) {
 	return strWidth;
 }
 
-
+function enableInput(element) {
+    var input = document.getElementById(element.id.replace('chk_',''));
+    if(element.checked){
+        input.disabled = false;
+    }
+    else{
+        input.disabled = true;
+    }
+}
 
 
