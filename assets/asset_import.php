@@ -981,7 +981,7 @@
                       $blnCheckCFVError = true;
                     }
                     if (!$blnCheckCFVError) {
-                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strUpdateFieldArray), $objAsset->AssetId));
+                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strUpdateFieldArray)), $objAsset->AssetId);
                       if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objAsset->AssetId] = $strCFVArray;
                       }
