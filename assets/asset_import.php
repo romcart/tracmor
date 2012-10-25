@@ -1087,7 +1087,9 @@
                         // insert nulls where not allowed
                         $theAsset = Asset::Load($intItemKey);
                         $strQuery = $this->substactNotAllowedFields($theAsset->AssetModelId,$theAsset->AssetId);
-                        $objDatabase->NonQuery($strQuery);
+                        if($strQuery){
+						  $objDatabase->NonQuery($strQuery);
+						}
                       }
                     }
                 }
