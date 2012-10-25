@@ -444,7 +444,7 @@
 				$this->lblWarning->Text = "";
 				// TODO perform validate/delete
 			}else{
-				$this->lblWarning->Text = "You haven't chosen any Inventory to Edit" ;
+				$this->lblWarning->Text = "You haven't chosen any Inventory to Delete" ;
 			}
 		}
 

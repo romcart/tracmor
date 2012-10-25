@@ -4,7 +4,7 @@
  *
  */
 ?>
-<div class="title"> Company Mass Edit - <?php echo count($_CONTROL->arrInventoryToEdit) ;?> records
+<div class="title"> Inventory Mass Edit - <?php echo count($_CONTROL->arrInventoryToEdit) ;?> records
 </div>
 <hr />
 Select fields to be updated and provide new values.

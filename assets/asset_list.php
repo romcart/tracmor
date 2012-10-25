@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(2);
 	require_once(__FORMBASE_CLASSES__ . '/AssetListFormBase.class.php');
-
+//    require('../assets/AssetMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the Asset class.  It extends from the code-generated
@@ -38,6 +38,14 @@
 	 * 
 	 */
 	class AssetListForm extends AssetListFormBase {
+		/**
+		 * @var  QLabel     $lblWarning
+		 * @var  QDialogBox $dlgMassEdit
+		 * @var  QDialogBox $dlgMassDelete
+		 * @var  QButton    $btnMassDelete
+		 * @var  QButton    $btnMassEdit
+		 *
+		 */
 
 		// Header Tabs
 		protected $ctlHeaderMenu;
@@ -85,7 +93,14 @@
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
 		protected $blnAttachment;*/
-		
+
+		protected $lblWarning;
+		protected $dlgMassEdit;
+		protected $dlgMassDelete;
+		protected $btnMassEdit;
+		protected $btnMassDelete;
+
+
 		protected function Form_Create() {
 			
 			$this->ctlHeaderMenu_Create();
@@ -167,6 +182,12 @@
 				$this->lblAssetModelId->Text = QApplication::QueryString('intAssetModelId');
 				$this->blnSearch = true;
 			}*/
+			// Mass Actions controls create
+			$this->lblWarning_Create();
+			$this->dlgMassEdit_Create();
+			$this->dlgMassDelete_Create();
+			$this->btnMassDelete_Create();
+			$this->btnMassEdit_Create();
   	}
   	
 		/*protected function dtgAsset_Bind() {
@@ -457,6 +478,76 @@
 				}
 			}
 	  }*/
+		// Mass Actions controls creating/handling functions
+		protected function dlgMassDelete_Create(){
+			$this->dlgMassDelete = new QDialogBox($this);
+			$this->dlgMassDelete->AutoRenderChildren = true;
+			$this->dlgMassDelete->Width = '440px';
+			$this->dlgMassDelete->Overflow = QOverflow::Auto;
+			$this->dlgMassDelete->Padding = '10px';
+			$this->dlgMassDelete->Display = false;
+			$this->dlgMassDelete->BackColor = '#FFFFFF';
+			$this->dlgMassDelete->MatteClickable = false;
+			$this->dlgMassDelete->CssClass = "modal_dialog";
+		}
+
+		protected function dlgMassEdit_Create(){
+			$this->dlgMassEdit = new QDialogBox($this);
+			$this->dlgMassEdit->AutoRenderChildren = true;
+			$this->dlgMassEdit->Width = '440px';
+			$this->dlgMassEdit->Overflow = QOverflow::Auto;
+			$this->dlgMassEdit->Padding = '10px';
+			$this->dlgMassEdit->Display = false;
+			$this->dlgMassEdit->BackColor = '#FFFFFF';
+			$this->dlgMassEdit->MatteClickable = false;
+			$this->dlgMassEdit->CssClass = "modal_dialog";
+		}
+
+		protected function btnMassDelete_Create(){
+			$this->btnMassDelete = new QButton($this);
+			$this->btnMassDelete->Name = "delete";
+			$this->btnMassDelete->Text = "Delete";
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to delete these items?'));
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function btnMassEdit_Create(){
+			$this->btnMassEdit = new QButton($this);
+			$this->btnMassEdit->Text = "edit";
+			$this->btnMassEdit->Text = "Edit";
+			$this->btnMassEdit->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
+			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function lblWarning_Create(){
+			$this->lblWarning = new QLabel($this);
+			$this->lblWarning->Text = "";
+			$this->lblWarning->CssClass = "warning";
+		}
+
+		protected function btnMassDelete_Click(){
+			$items = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+				// TODO perform validate/delete
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Asset to Delete" ;
+			}
+		}
+
+		protected function btnMassEdit_Click(){
+			$items = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+				$this->dlgMassEdit->ShowDialogBox();
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Asset to Edit" ;
+			}
+		}
 	}  
 
 	// Go ahead and run this form object to generate the page and event handlers, using

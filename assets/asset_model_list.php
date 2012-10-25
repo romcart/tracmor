@@ -326,7 +326,7 @@
 			  $this->lblWarning->Text = "";
 			  // TODO perform validate/delete
 		  }else{
-			  $this->lblWarning->Text = "You haven't chosen any Model to Edit" ;
+			  $this->lblWarning->Text = "You haven't chosen any Model to Delete" ;
 		  }
 	  }
 
