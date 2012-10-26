@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(2);
 	require_once(__FORMBASE_CLASSES__ . '/AssetListFormBase.class.php');
-//    require('../assets/AssetMassEditPanel.class.php');
+    require('../assets/AssetMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the Asset class.  It extends from the code-generated
@@ -543,10 +543,15 @@
 			$items = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
+				$pnlAssetMassEdit = new AssetMassEditPanel($this->dlgMassEdit,'pnlAssetMassEditCancel_Click',$items);
 				$this->dlgMassEdit->ShowDialogBox();
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Asset to Edit" ;
 			}
+		}
+
+		public function pnlAssetMassEditCancel_Click(){
+			$this->dlgMassEdit->HideDialogBox();
 		}
 	}  
 
