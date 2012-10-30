@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(5);
 	require_once(__FORMBASE_CLASSES__ . '/ShipmentListFormBase.class.php');
-
+    require('../shipping/shipmentMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the Shipment class.  It extends from the code-generated
@@ -104,6 +104,7 @@
 		protected $dlgMassDelete;
 		protected $btnMassEdit;
 		protected $btnMassDelete;
+		protected $pnlShipmentMassEdit;
 
 		protected function Form_Create() {
 			
@@ -506,10 +507,18 @@
 			$items = $this->dtgShipment->getSelected('ShipmentId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
+				if(!($this->pnlShipmentMassEdit instanceof ShipmentMassEditPanel)){
+					$this->pnlShipmentMassEdit = new ShipmentMassEditPanel($this->dlgMassEdit,
+						                                                   'pnlShipmentMassEdit_Close',
+					                                                       $items);
+				}
 				$this->dlgMassEdit->ShowDialogBox();
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Shipment to Edit" ;
 			}
+		}
+		public function pnlShipmentMassEdit_Close(){
+			$this->dlgMassEdit->HideDialogBox();
 		}
 	}
 
