@@ -25,6 +25,7 @@ class ShipmentMassEditPanel extends QPanel {
 
 	// Inputs for can be Edited
 	// public $txtLongDescription;
+    protected $objCompanyArray;
 
 	public $arrShipmentToEdit = array();
 //	public $arrFields = array();
@@ -57,6 +58,8 @@ class ShipmentMassEditPanel extends QPanel {
 			$objExc->IncrementOffset();
 			throw $objExc;
 		}
+		$this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
+
 		$this->arrShipmentToEdit = $arrayShipmentId;
 
 		$this->chkShipDate_Create();
@@ -65,23 +68,29 @@ class ShipmentMassEditPanel extends QPanel {
 		$this->chkFromCompany_Create();
 		$this->chkNote_Create();
 
-//		$this->calShipDate_Create();
-//		$this->lstCourier_Create();
-//		$this->lstToCompany_Create();
+		$this->calShipDate_Create();
+		$this->lstCourier_Create();
+		$this->lstToCompany_Create();
+		$this->lstToContact_Create();
+		$this->lstToAddress_Create();
 		$this->lstFromCompany_Create();
 		$this->lstFromContact_Create();
 		$this->lstFromAddress_Create();
-//		$this->txtNote_Create();
-//
+		$this->txtNote_Create();
+
 		$this->btnApply_Create();
 		$this->btnCancel_Create();
-//
-//		// Disable inputs
-//		$this->calShipDate->Enabled = false;
-//		$this->lstToCompany->Enabled = false;
-//		$this->lstFromCompany->Enabled = false;
-//		$this->lstCourier->Enabled = false;
-//		$this->txtNote->Enabled = false;
+
+		// Disable inputs
+		$this->calShipDate->Enabled = false;
+		$this->lstToCompany->Enabled = false;
+		$this->lstToContact->Enabled = false;
+		$this->lstToAddress->Enabled = false;
+		$this->lstFromCompany->Enabled = false;
+		$this->lstFromAddress->Enabled = false;
+		$this->lstFromContact->Enabled = false;
+		$this->lstCourier->Enabled = false;
+		$this->txtNote->Enabled = false;
 	}
 
 	// Create the Note Input
@@ -131,13 +140,11 @@ class ShipmentMassEditPanel extends QPanel {
 	protected function lstFromCompany_Create() {
 		$this->lstFromCompany = new QListBox($this);
 		$this->lstFromCompany->Name = QApplication::Translate('From Company');
-		$this->lstFromCompany->Required = true;
 		$this->lstFromCompany->AddItem('- Select One -', null);
-//		$objManufacturerArray = Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription)));
-//		if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
-//			$objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
-//			$this->lstManufacturer->AddItem($objListItem);
-//		}
+		if ($this->objCompanyArray) foreach ($this->objCompanyArray as $objToCompany) {
+			$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
+			$this->lstFromCompany->AddItem($objListItem);
+		}
 		$this->lstFromCompany->strControlId = 'from_company';
 	}
 
@@ -146,7 +153,8 @@ class ShipmentMassEditPanel extends QPanel {
 		$this->chkFromCompany->Name = 'from_company';
 		$this->chkFromCompany->strControlId = 'chk_from_company';
 		$this->chkFromCompany->Checked = false;
-		$this->chkFromCompany->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+		$this->chkFromCompany->AddAction(new QClickEvent(),
+			                             new QJavaScriptAction("enableInput(this,['from_contact','from_address'])"));
 
 	}
 
@@ -154,15 +162,21 @@ class ShipmentMassEditPanel extends QPanel {
 	protected function lstToCompany_Create() {
 		$this->lstToCompany = new QListBox($this);
 		$this->lstToCompany->Name = QApplication::Translate('To Company');
+		$this->lstToCompany->AddItem('- Select One -', null);
+		if ($this->objCompanyArray) foreach ($this->objCompanyArray as $objToCompany) {
+			$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
+			$this->lstToCompany->AddItem($objListItem);
+		}
 		$this->lstToCompany->strControlId = 'to_company';
 	}
 
 	public function chkToCompany_Create(){
 		$this->chkToCompany = new QCheckBox($this);
-		$this->chkToCompany->Name = 'long_description';
-		$this->chkToCompany->strControlId = 'chk_long_description';
+		$this->chkToCompany->Name = 'to_company';
+		$this->chkToCompany->strControlId = 'chk_to_company';
 		$this->chkToCompany->Checked = false;
-		$this->chkToCompany->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+		$this->chkToCompany->AddAction(new QClickEvent(),
+			                           new QJavaScriptAction("enableInput(this,['to_contact','to_address'])"));
 	}
 
 	// To Contact, To Address inputs
@@ -197,23 +211,24 @@ class ShipmentMassEditPanel extends QPanel {
 		$this->calShipDate->DateTimePickerType = QDateTimePickerType::Date;
 		$this->calShipDate->DateTime = new QDateTime(QDateTime::Now);
 		$dttNow = new QDateTime(QDateTime::Now);
-		$intDayOfWeek = date('w', time());
-		// Sunday - just add five days
-		if ($intDayOfWeek == 0) {
-			$dttFiveDaysFromNow = QDateTime::FromTimestamp($dttNow->Timestamp + 432000);
-		}// Monday - Friday, add seven days
-		elseif ($intDayOfWeek > 0 && $intDayOfWeek < 6) {
-			$dttFiveDaysFromNow = QDateTime::FromTimestamp($dttNow->Timestamp + 604800);
-		}
-		// Saturday - add six days
-		elseif ($intDayOfWeek == 6) {
-			$dttFiveDaysFromNow = QDateTime::FromTimestamp($dttNow->Timestamp + 518400);
-		$this->calShipDate->MaximumYear = $dttFiveDaysFromNow->Year;
-		$this->calShipDate->MaximumMonth = $dttFiveDaysFromNow->Month;
-		$this->calShipDate->MaximumDay = $dttFiveDaysFromNow->Day;
-		$this->chkShipDate->strControlId = 'ship_date';
-		$this->calShipDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
-	    }
+//		$intDayOfWeek = date('w', time());
+//		// Sunday - just add five days
+//		if ($intDayOfWeek == 0) {
+//			$dttFiveDaysFromNow = QDateTime::FromTimestamp($dttNow->Timestamp + 432000);
+//		}// Monday - Friday, add seven days
+//		elseif ($intDayOfWeek > 0 && $intDayOfWeek < 6) {
+//			$dttFiveDaysFromNow = QDateTime::FromTimestamp($dttNow->Timestamp + 604800);
+//		}
+//		// Saturday - add six days
+//		elseif ($intDayOfWeek == 6) {
+//			$dttFiveDaysFromNow = QDateTime::FromTimestamp($dttNow->Timestamp + 518400);
+//		$this->calShipDate->MaximumYear = $dttFiveDaysFromNow->Year;
+//		$this->calShipDate->MaximumMonth = $dttFiveDaysFromNow->Month;
+//		$this->calShipDate->MaximumDay = $dttFiveDaysFromNow->Day;
+//		$this->chkShipDate->strControlId = 'ship_date';
+//		$this->calShipDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
+//	    }
+		$this->calShipDate->MaximumYear = $dttNow->Year + 30;
 	}
 	//
 	public function chkShipDate_Create(){
@@ -221,7 +236,7 @@ class ShipmentMassEditPanel extends QPanel {
 		$this->chkShipDate->Name = 'ship_date';
 		$this->chkShipDate->strControlId = 'chk_ship_date';
 		$this->chkShipDate->Checked = false;
-		$this->chkShipDate->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+		$this->chkShipDate->AddAction(new QClickEvent(), new QJavaScriptAction('enableCalInput(this)'));
 	}
 
 	public function btnApply_Create(){
