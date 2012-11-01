@@ -168,6 +168,7 @@ class ShipmentMassEditPanel extends QPanel {
 			$this->lstToCompany->AddItem($objListItem);
 		}
 		$this->lstToCompany->strControlId = 'to_company';
+
 	}
 
 	public function chkToCompany_Create(){
@@ -229,6 +230,7 @@ class ShipmentMassEditPanel extends QPanel {
 //		$this->calShipDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
 //	    }
 		$this->calShipDate->MaximumYear = $dttNow->Year + 30;
+		$this->calShipDate->strControlId = 'ship_date';
 	}
 	//
 	public function chkShipDate_Create(){
@@ -276,6 +278,14 @@ class ShipmentMassEditPanel extends QPanel {
 		//$this->ParentControl->RemoveChildControls(true);
 		//$this->CloseSelf(true);
 		$this->ParentControl->HideDialogBox();
+	}
+
+	public function lstToCompany_Select(){
+
+	}
+
+	public function lstFromCompany_Select(){
+
 	}
 }
 ?>

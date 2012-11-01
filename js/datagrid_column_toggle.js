@@ -129,4 +129,12 @@ function enableInput(element,dependent_elements) {
     }
 }
 
-
+function enableCalInput(element){
+    var id_root = element.id.replace('chk_','');
+    var day = document.getElementById(id_root + "_lstDay");
+    var month = document.getElementById(id_root + "_lstMonth");
+    var year = document.getElementById(id_root + "_lstYear");
+    day.disabled = !(day.disabled);
+    month.disabled = !(month.disabled);
+    year.disabled = !(year.disabled);
+}
