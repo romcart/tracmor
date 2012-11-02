@@ -1062,10 +1062,6 @@ class QAssetEditComposite extends QControl {
 							$this->objAsset->DepreciationFlag = true;
 							$this->objAsset->PurchaseDate  = $this->calPurchaseDate->DateTime;
 							$this->objAsset->PurchaseCost = str_replace(',','',$this->txtPurchaseCost->Text);
-							$this->objAsset->DepreciationClassId = AssetModel::Load($this->lstAssetModel
-								                                                         ->SelectedValue)
-								                                             ->DefaultDepreciationClassId;
-
 						}
 						else{
 							$blnError = true;
@@ -1209,10 +1205,6 @@ class QAssetEditComposite extends QControl {
 							$this->objAsset->DepreciationFlag = true;
 							$this->objAsset->PurchaseDate  = $this->calPurchaseDate->DateTime;
 							$this->objAsset->PurchaseCost = str_replace(',','',$this->txtPurchaseCost->Text);
-							$this->objAsset->DepreciationClassId = AssetModel::Load($this->lstAssetModel
-								->SelectedValue)
-								->DefaultDepreciationClassId;
-
 						}
 						else{
 							$blnError = true;
@@ -1223,7 +1215,6 @@ class QAssetEditComposite extends QControl {
 						$this->objAsset->DepreciationFlag = false;
 						$this->objAsset->PurchaseDate  = null;
 						$this->objAsset->PurchaseCost = null;
-						$this->objAsset->DepreciationClassId = null;
 					}
 				}
 
@@ -1323,7 +1314,7 @@ class QAssetEditComposite extends QControl {
 					$this->chkAssetDepreciation->Display = false;
 				}
 				$this->Refresh();
-				if($this->objAsset->DepreciationClassId>0){
+				if($this->objAsset->DepreciationFlag>0){
 					$this->chkAssetDepreciation->Checked = true;
 					// Return original values to recalculate bookvalue
 					$this->lstAssetModel->SelectedValue = $this->objAsset->AssetModelId;

@@ -539,15 +539,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 				if($this->lstDefaultDepreciationClass->SelectedValue == null){
 					foreach($arrAssetToChange as $objAssetToChange){
 						$objAssetToChange->DepreciationFlag = null;
-						$objAssetToChange->DepreciationClass = null;
 						$objAssetToChange->PurchaseCost = null;
 						$objAssetToChange->PurchaseDate= null;
-						$objAssetToChange->Save();
-					}
-				}
-				else{
-					foreach($arrAssetToChange as $objAssetToChange){
-						$objAssetToChange->DepreciationClassId = $this->lstDefaultDepreciationClass->SelectedValue;
 						$objAssetToChange->Save();
 					}
 				}

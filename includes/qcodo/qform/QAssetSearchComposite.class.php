@@ -151,9 +151,9 @@ class QAssetSearchComposite extends QControl {
 		// Add Asset Model Depreciation class if Enabled within application
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 			$this->dtgAsset->AddColumn(new QDataGridColumnExt('Depreciation Class',
-				'<?= $_ITEM->DepreciationClass ?>',
-				'SortByCommand="asset__depreciation_class_id__short_description ASC"',
-				'ReverseSortByCommand="asset__depreciation_class_id__short_description DESC"',
+				'<?= $_ITEM->getActiveDepreciationClass() ?>',
+				'SortByCommand="asset__asset_model_id__default_depreciation_class_id__short_description ASC"',
+				'ReverseSortByCommand="asset__asset_model_id__default_depreciation_class_id__short_description DESC"',
 				'CssClass="dtg_column"'));
 			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Cost','<?= $_ITEM->PurchaseCost ?>','CssClass="dtg_column"'));
 			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Date','<?= $_ITEM->PurchaseDate ?>','CssClass="dtg_column"'));
@@ -292,7 +292,7 @@ class QAssetSearchComposite extends QControl {
     // Expand the Asset object to include the AssetModel, Category, Manufacturer, and Location Objects
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandCategory] = true;
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandManufacturer] = true;
-	$objExpansionMap[Asset::ExpandDepreciationClass] = true;
+	$objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandDefaultDepreciationClass] = true;
     $objExpansionMap[Asset::ExpandParentAsset] = true;
     $objExpansionMap[Asset::ExpandLocation] = true;
 		//if ($this->blnSearch || !$this->blnUseAjax) {

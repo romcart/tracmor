@@ -1018,7 +1018,6 @@
                     $strUpdateFieldArray[] = sprintf("`modified_by`='%s'", $_SESSION['intUserAccountId']);
 				  // Depreciation Fields
 					$strUpdateFieldArray[] = sprintf("`depreciation_flag`=%s", ($blnDepreciationFlag)?$blnDepreciationFlag:"NULL");
-					$strUpdateFieldArray[] = sprintf("`depreciation_class_id`=%s", ($intDepreciationClassId)?$intDepreciationClassId:"NULL");
 					$strUpdateFieldArray[] = sprintf("`purchase_cost`=%s", ($intPurchaseCost)?$intPurchaseCost:"NULL");
 					$strUpdateFieldArray[] = sprintf("`purchase_date`=%s", ($dttPurchaseDate)?$dttPurchaseDate:"NULL");
 
@@ -1078,7 +1077,7 @@
                       $this->objUpdatedItemArray[$objAsset->AssetId] = sprintf("%s", $objAsset->AssetCode);
                       //$this->arrOldItemArray[$objAsset->AssetId] = $objAsset;
    					  //$strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate), $objAsset->AssetId);
-					  $strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_flag`=%s, `depreciation_class_id`=%s, `purchase_cost`=%s, `purchase_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate),($blnDepreciationFlag)?($blnDepreciationFlag):"NULL",($intDepreciationClassId)?$intDepreciationClassId:"NULL",($intPurchaseCost)? $intPurchaseCost:"NULL",($dttPurchaseDate)?'"'.$dttPurchaseDate.'"':"NULL", $objAsset->AssetId);
+					  $strItemQuery = sprintf("UPDATE `asset` SET `asset_code`='%s', `asset_model_id`='%s', `parent_asset_id`=%s, `linked_flag`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_flag`=%s, `purchase_cost`=%s, `purchase_date`=%s WHERE `asset_id`='%s'", $objAsset->AssetCode, $objAsset->AssetModelId, (!$objAsset->ParentAssetId) ? "NULL" : $objAsset->ParentAssetId, $objAsset->LinkedFlag, (!$objAsset->ModifiedBy) ? "NULL" : $objAsset->ModifiedBy, (!$objAsset->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAsset->ModifiedDate),($blnDepreciationFlag)?($blnDepreciationFlag):"NULL",($intPurchaseCost)? $intPurchaseCost:"NULL",($dttPurchaseDate)?'"'.$dttPurchaseDate.'"':"NULL", $objAsset->AssetId);
                       $strCFVArray = array();
                       foreach ($this->arrAssetCustomField as $objCustomField) {
                         $strCFV = $objAsset->GetVirtualAttribute($objCustomField->CustomFieldId);
@@ -1121,7 +1120,7 @@
                   //exit();
 
 				  // $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
-				  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`, `depreciation_flag`, `depreciation_class_id`, `purchase_cost`, `purchase_date` ) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
+				  $objDatabase->NonQuery(sprintf("INSERT INTO `asset` (`asset_code`, `location_id`, `asset_model_id`, `parent_asset_id`, `linked_flag`, `created_by`, `creation_date`, `depreciation_flag`, `purchase_cost`, `purchase_date` ) VALUES %s;", str_replace('""','"',implode(", ", $this->strAssetValuesArray))));
 				  $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
                   	$strAssetIdArray = array();

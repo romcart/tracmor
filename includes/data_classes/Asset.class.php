@@ -56,6 +56,15 @@
 			// return sprintf('Asset Object %s - %s',  $this->intAssetId,  $this->intAssetModelId);
 			return $this->AssetModel->ShortDescription;
 		}
+		/**
+		* @return depreciation class if assigned;
+		*/
+		public function getActiveDepreciationClass() {
+			 if($this->DepreciationFlag)
+			 {
+				 return $this->AssetModel->DefaultDepreciationClass;
+			 }
+		}
 
 		/**
 		 * Returns the HTML needed for the asset list datagrid to show reserved and checked out by icons, with hovertips with the username.
@@ -729,7 +738,7 @@
 					`asset`.`creation_date` AS `creation_date`,
 					`asset`.`modified_by` AS `modified_by`,
 					`asset`.`modified_date` AS `modified_date`,
-					`asset`.`depreciation_class_id` AS `depreciation_class_id`,
+					`asset`.`depreciation_flag` AS `depreciation_flag`,
 					`asset`.`purchase_date` AS `purchase_date`,
 					`asset`.`purchase_cost` AS `purchase_cost`
 					%s
