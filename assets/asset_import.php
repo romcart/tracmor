@@ -869,7 +869,7 @@
 						}
 					}
 				    if($intDepreciationClassId>0 && $intAssetModelId>0){
-						if($intDepreciationClassId != AssetModel::Load($intAssetModelId)->DefaultDepreciationClassId){
+						if($intDepreciationClassId != AssetModel::Load($intAssetModelId)->DepreciationClassId){
 							$blnDepreciationError = true;
 						}
 						elseif(isset($intPurchaseCostKey)&&isset($intPurchaseCostKey)){

@@ -46,8 +46,6 @@
 	 * property-read QLabel $ModifiedDateLabel
 	 * property QCheckBox $DepreciationFlagControl
 	 * property-read QLabel $DepreciationFlagLabel
-	 * property QListBox $DepreciationClassIdControl
-	 * property-read QLabel $DepreciationClassIdLabel
 	 * property QDateTimePicker $PurchaseDateControl
 	 * property-read QLabel $PurchaseDateLabel
 	 * property QFloatTextBox $PurchaseCostControl
@@ -176,12 +174,6 @@
 		protected $chkDepreciationFlag;
 
         /**
-         * @var QListBox lstDepreciationClass;
-         * @access protected
-         */
-		protected $lstDepreciationClass;
-
-        /**
          * @var QDateTimePicker calPurchaseDate;
          * @access protected
          */
@@ -272,12 +264,6 @@
          * @access protected
          */
 		protected $lblDepreciationFlag;
-
-        /**
-         * @var QLabel lblDepreciationClassId
-         * @access protected
-         */
-		protected $lblDepreciationClassId;
 
         /**
          * @var QLabel lblPurchaseDate
@@ -836,46 +822,6 @@
 		}
 
 		/**
-		 * Create and setup QListBox lstDepreciationClass
-		 * @param string $strControlId optional ControlId to use
-		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
-		 * @return QListBox
-		 */
-		public function lstDepreciationClass_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
-			$this->lstDepreciationClass = new QListBox($this->objParentObject, $strControlId);
-			$this->lstDepreciationClass->Name = QApplication::Translate('Depreciation Class');
-			$this->lstDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
-
-			// Setup and perform the Query
-			if (is_null($objCondition)) $objCondition = QQ::All();
-			$objDepreciationClassCursor = DepreciationClass::QueryCursor($objCondition, $objOptionalClauses);
-
-			// Iterate through the Cursor
-			while ($objDepreciationClass = DepreciationClass::InstantiateCursor($objDepreciationClassCursor)) {
-				$objListItem = new QListItem($objDepreciationClass->__toString(), $objDepreciationClass->DepreciationClassId);
-				if (($this->objAsset->DepreciationClass) && ($this->objAsset->DepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
-					$objListItem->Selected = true;
-				$this->lstDepreciationClass->AddItem($objListItem);
-			}
-
-			// Return the QListBox
-			return $this->lstDepreciationClass;
-		}
-
-		/**
-		 * Create and setup QLabel lblDepreciationClassId
-		 * @param string $strControlId optional ControlId to use
-		 * @return QLabel
-		 */
-		public function lblDepreciationClassId_Create($strControlId = null) {
-			$this->lblDepreciationClassId = new QLabel($this->objParentObject, $strControlId);
-			$this->lblDepreciationClassId->Name = QApplication::Translate('Depreciation Class');
-			$this->lblDepreciationClassId->Text = ($this->objAsset->DepreciationClass) ? $this->objAsset->DepreciationClass->__toString() : null;
-			return $this->lblDepreciationClassId;
-		}
-
-		/**
 		 * Create and setup QDateTimePicker calPurchaseDate
 		 * @param string $strControlId optional ControlId to use
 		 * @return QDateTimePicker
@@ -1079,19 +1025,6 @@
 			if ($this->chkDepreciationFlag) $this->chkDepreciationFlag->Checked = $this->objAsset->DepreciationFlag;
 			if ($this->lblDepreciationFlag) $this->lblDepreciationFlag->Text = ($this->objAsset->DepreciationFlag) ? QApplication::Translate('Yes') : QApplication::Translate('No');
 
-			if ($this->lstDepreciationClass) {
-					$this->lstDepreciationClass->RemoveAllItems();
-				$this->lstDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
-				$objDepreciationClassArray = DepreciationClass::LoadAll();
-				if ($objDepreciationClassArray) foreach ($objDepreciationClassArray as $objDepreciationClass) {
-					$objListItem = new QListItem($objDepreciationClass->__toString(), $objDepreciationClass->DepreciationClassId);
-					if (($this->objAsset->DepreciationClass) && ($this->objAsset->DepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
-						$objListItem->Selected = true;
-					$this->lstDepreciationClass->AddItem($objListItem);
-				}
-			}
-			if ($this->lblDepreciationClassId) $this->lblDepreciationClassId->Text = ($this->objAsset->DepreciationClass) ? $this->objAsset->DepreciationClass->__toString() : null;
-
 			if ($this->calPurchaseDate) $this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
 			if ($this->lblPurchaseDate) $this->lblPurchaseDate->Text = sprintf($this->objAsset->PurchaseDate) ? $this->objAsset->__toString($this->strPurchaseDateDateTimeFormat) : null;
 
@@ -1152,7 +1085,6 @@
 				if ($this->calCreationDate) $this->objAsset->CreationDate = $this->calCreationDate->DateTime;
 				if ($this->lstModifiedByObject) $this->objAsset->ModifiedBy = $this->lstModifiedByObject->SelectedValue;
 				if ($this->chkDepreciationFlag) $this->objAsset->DepreciationFlag = $this->chkDepreciationFlag->Checked;
-				if ($this->lstDepreciationClass) $this->objAsset->DepreciationClassId = $this->lstDepreciationClass->SelectedValue;
 				if ($this->calPurchaseDate) $this->objAsset->PurchaseDate = $this->calPurchaseDate->DateTime;
 				if ($this->txtPurchaseCost) $this->objAsset->PurchaseCost = $this->txtPurchaseCost->Text;
 
@@ -1288,12 +1220,6 @@
 				case 'DepreciationFlagLabel':
 					if (!$this->lblDepreciationFlag) return $this->lblDepreciationFlag_Create();
 					return $this->lblDepreciationFlag;
-				case 'DepreciationClassIdControl':
-					if (!$this->lstDepreciationClass) return $this->lstDepreciationClass_Create();
-					return $this->lstDepreciationClass;
-				case 'DepreciationClassIdLabel':
-					if (!$this->lblDepreciationClassId) return $this->lblDepreciationClassId_Create();
-					return $this->lblDepreciationClassId;
 				case 'PurchaseDateControl':
 					if (!$this->calPurchaseDate) return $this->calPurchaseDate_Create();
 					return $this->calPurchaseDate;
@@ -1364,8 +1290,6 @@
 						return ($this->lblModifiedDate = QType::Cast($mixValue, 'QControl'));
 					case 'DepreciationFlagControl':
 						return ($this->chkDepreciationFlag = QType::Cast($mixValue, 'QControl'));
-					case 'DepreciationClassIdControl':
-						return ($this->lstDepreciationClass = QType::Cast($mixValue, 'QControl'));
 					case 'PurchaseDateControl':
 						return ($this->calPurchaseDate = QType::Cast($mixValue, 'QControl'));
 					case 'PurchaseCostControl':

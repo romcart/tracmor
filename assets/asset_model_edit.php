@@ -49,13 +49,13 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected $lblAssetModelCode;
 	protected $lblCategory;
 	protected $lblManufacturer;
-	protected $lblDefaultDepreciationClass;
+	protected $lblDepreciationClass;
 	protected $btnEdit;
 	protected $ifcImage;
 	protected $lblImage;
 	protected $pnlLongDescription;
 
-	protected $lstDefaultDepreciationClass;
+	protected $lstDepreciationClass;
 
 	protected $atcAttach;
 	protected $pnlAttachments;
@@ -105,8 +105,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 
 		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
-			$this->lblDefaultDepreciationClass_Create();
-			$this->lstDefaultDepreciationClass_Create();
+			$this->lblDepreciationClass_Create();
+			$this->lstDepreciationClass_Create();
 		}
 
 		// Set a variable which defines whether the built-in fields must be rendered or not.
@@ -205,16 +205,16 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	}
 
 	// Create the Depreciation Class Label
-	protected function lblDefaultDepreciationClass_Create(){
-		$this->lblDefaultDepreciationClass = new QLabel($this);
-		$this->lblDefaultDepreciationClass->Name = 'Depreciation Class';
+	protected function lblDepreciationClass_Create(){
+		$this->lblDepreciationClass = new QLabel($this);
+		$this->lblDepreciationClass->Name = 'Depreciation Class';
 
 		if($this->blnEditMode){
-			if($this->objAssetModel->DefaultDepreciationClassId == null){
-			$this->lblDefaultDepreciationClass->Text = '';
+			if($this->objAssetModel->DepreciationClassId == null){
+			$this->lblDepreciationClass->Text = '';
 			}
 			else{
-			$this->lblDefaultDepreciationClass->Text = $this->objAssetModel->DefaultDepreciationClass->ShortDescription;
+			$this->lblDepreciationClass->Text = $this->objAssetModel->DepreciationClass->ShortDescription;
 			}
 		}
 
@@ -339,19 +339,19 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 	// Create Depreciation Class select
 
-	protected function lstDefaultDepreciationClass_Create(){
-		$this->lstDefaultDepreciationClass = new QListBox($this);
-		$this->lstDefaultDepreciationClass->Name = QApplication::Translate('Depreciation Class');
+	protected function lstDepreciationClass_Create(){
+		$this->lstDepreciationClass = new QListBox($this);
+		$this->lstDepreciationClass->Name = QApplication::Translate('Depreciation Class');
 		//if (!$this->blnEditMode)
-			$this->lstDefaultDepreciationClass->AddItem('- Select One -', null);
+			$this->lstDepreciationClass->AddItem('- Select One -', null);
 		$objDepreciationClassArray = DepreciationClass::LoadAll();
 
 		if (is_array($objDepreciationClassArray)) {
 			foreach ($objDepreciationClassArray as $objDepreciationClass) {
 				$objListItem = new QListItem($objDepreciationClass->ShortDescription, $objDepreciationClass->DepreciationClassId);
-				if (($this->objAssetModel->DefaultDepreciationClass) && ($this->objAssetModel->DefaultDepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
+				if (($this->objAssetModel->DepreciationClass) && ($this->objAssetModel->DepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
 					$objListItem->Selected = true;
-				$this->lstDefaultDepreciationClass->AddItem($objListItem);
+				$this->lstDepreciationClass->AddItem($objListItem);
 			}
 		}
 	}
@@ -534,9 +534,9 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		}
 
 		if(QApplication::$TracmorSettings->DepreciationFlag =='1'&& $this->blnEditMode){
-			if($this->objAssetModel->DefaultDepreciationClassId != $this->lstDefaultDepreciationClass->SelectedValue){
+			if($this->objAssetModel->DepreciationClassId != $this->lstDepreciationClass->SelectedValue){
 				$arrAssetToChange =	Asset::LoadArrayDepreciatedByAssetModelId($this->objAssetModel->AssetModelId);
-				if($this->lstDefaultDepreciationClass->SelectedValue == null){
+				if($this->lstDepreciationClass->SelectedValue == null){
 					foreach($arrAssetToChange as $objAssetToChange){
 						$objAssetToChange->DepreciationFlag = null;
 						$objAssetToChange->PurchaseCost = null;
@@ -642,7 +642,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->objAssetModel->LongDescription = $this->txtLongDescription->Text;
 		// Display Depreciation field if enabled
 		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
-			$this->objAssetModel->DefaultDepreciationClassId = $this->lstDefaultDepreciationClass->SelectedValue;
+			$this->objAssetModel->DepreciationClassId = $this->lstDepreciationClass->SelectedValue;
 		}
 		// $this->objAssetModel->ImagePath = $this->txtImagePath->Text;
 	}
@@ -685,8 +685,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 		// Display Depreciation label if option enabled
 		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
-			$this->lblDefaultDepreciationClass->Display = true;
-			$this->lstDefaultDepreciationClass->Display = false;
+			$this->lblDepreciationClass->Display = true;
+			$this->lstDepreciationClass->Display = false;
 		}
 
 		// Display Edit and Delete buttons
@@ -722,8 +722,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 
 		// Display Depreciation field if enabled
 		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
-			$this->lblDefaultDepreciationClass->Display = false;
-			$this->lstDefaultDepreciationClass->Display = true;
+			$this->lblDepreciationClass->Display = false;
+			$this->lstDepreciationClass->Display = true;
 		}
 
 		// Display Asset Tag and Asset Model input for edit mode
@@ -759,8 +759,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblManufacturer->Text = $this->lstManufacturer->SelectedName;
 		$this->pnlLongDescription->Text = nl2br($this->txtLongDescription->Text);
 		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath);
-		$this->lblDefaultDepreciationClass->Text = ($this->lstDefaultDepreciationClass->SelectedValue==null)?'':
-		                                            $this->lstDefaultDepreciationClass->SelectedName;
+		$this->lblDepreciationClass->Text = ($this->lstDepreciationClass->SelectedValue==null)?'':
+		                                            $this->lstDepreciationClass->SelectedName;
 
 		// Update custom labels
 		if ($this->arrCustomFields) {

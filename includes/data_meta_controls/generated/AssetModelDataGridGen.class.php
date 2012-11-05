@@ -308,8 +308,8 @@
 				case 'ModifiedBy': return QQN::AssetModel()->ModifiedBy;
 				case 'ModifiedByObject': return QQN::AssetModel()->ModifiedByObject;
 				case 'ModifiedDate': return QQN::AssetModel()->ModifiedDate;
-				case 'DefaultDepreciationClassId': return QQN::AssetModel()->DefaultDepreciationClassId;
-				case 'DefaultDepreciationClass': return QQN::AssetModel()->DefaultDepreciationClass;
+				case 'DepreciationClassId': return QQN::AssetModel()->DepreciationClassId;
+				case 'DepreciationClass': return QQN::AssetModel()->DepreciationClass;
 				case 'AssetModelCustomFieldHelper': return QQN::AssetModel()->AssetModelCustomFieldHelper;
 
 				default: throw new QCallerException('Simple Property not found in AssetModelDataGrid content: ' . $mixContent);

@@ -61,13 +61,13 @@ CREATE TABLE asset_model (
   creation_date     DATETIME   NULL   DEFAULT NULL,
   modified_by       INTEGER UNSIGNED   NULL,
   modified_date     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
-  default_depreciation_class_id INTEGER UNSIGNED NULL,
+  `depreciation_class_id` INTEGER UNSIGNED   NULL,
     PRIMARY KEY ( asset_model_id ),
     INDEX asset_model_fkindex1 ( category_id ),
     INDEX asset_model_fkindex2 ( manufacturer_id ),
     INDEX asset_model_fkindex3 ( created_by ),
     INDEX asset_model_fkindex4 ( modified_by ),
-    INDEX asset_model_fkindex5 ( default_depreciation_class_id ))
+    INDEX asset_model_fkindex5 ( depreciation_class_id ))
 ENGINE = INNODB;
 
 CREATE TABLE `asset` (
@@ -86,7 +86,6 @@ CREATE TABLE `asset` (
   `modified_by`      INTEGER UNSIGNED   NULL,
   `modified_date`    TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
   `depreciation_flag` BIT(1) DEFAULT NULL,
-  `depreciation_class_id` INTEGER UNSIGNED   NULL,
   `purchase_date`    DATETIME  DEFAULT NULL,
   `purchase_cost`    DECIMAL(10,2) DEFAULT NULL,
     PRIMARY KEY ( `asset_id` ),
@@ -95,7 +94,6 @@ CREATE TABLE `asset` (
     INDEX asset_fkindex3 ( `created_by` ),
     INDEX asset_fkindex4 ( `modified_by` ),
     INDEX asset_fkindex5 ( `parent_asset_id` ),
-    INDEX asset_fkindex6 ( `depreciation_class_id` ),
     INDEX `parent_asset_id_linked` ( `parent_asset_id` , `linked_flag` ),
     UNIQUE (asset_code ))
 ENGINE = INNODB;
@@ -801,7 +799,7 @@ ALTER TABLE asset_model
 ON Delete NO ACTION ON Update NO ACTION;
 
 ALTER TABLE asset_model
-  ADD CONSTRAINT FOREIGN KEY(default_depreciation_class_id) references depreciation_class (
+  ADD CONSTRAINT FOREIGN KEY(depreciation_class_id) references depreciation_class (
     depreciation_class_id
   )
 ON Delete NO ACTION ON Update NO ACTION;
@@ -816,10 +814,6 @@ ALTER TABLE asset
   ADD CONSTRAINT FOREIGN KEY( location_id) references location (
     location_id
   )
-ON Delete NO ACTION ON Update NO ACTION;
-
-ALTER TABLE asset
-	ADD CONSTRAINT FOREIGN KEY ( depreciation_class_id ) REFERENCES depreciation_class ( depreciation_class_id )
 ON Delete NO ACTION ON Update NO ACTION;
 
 ALTER TABLE asset

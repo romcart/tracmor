@@ -914,7 +914,7 @@
                     $strUpdateFieldArray[] = sprintf("`category_id`='%s'", $intCategoryId);
                     $strUpdateFieldArray[] = sprintf("`short_description`='%s'", $strShortDescription);
                     $strUpdateFieldArray[] = sprintf("`asset_model_code`='%s'", $strAssetModelCode);
-					//$strUpdateFieldArray[] = sprintf("`default_depreciation_class_id = %s`", $intDepreciationId);
+					//$strUpdateFieldArray[] = sprintf("`depreciation_class_id = %s`", $intDepreciationId);
                     $strModelLongDescription = "";
                     if (isset($intModelLongDescription)) {
                       if (trim($strRowArray[$intModelLongDescriptionKey]))
@@ -1010,11 +1010,11 @@
                 if (count($this->strModelValuesArray)) {
                   $objDatabase = AssetModel::GetDatabase();
 
-                //	print sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`, `default_depreciation_class_id`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray)));
+                //	print sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`, `depreciation_class_id`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray)));
 				//   exit();
 
                 //  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray))));
-				  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`, `default_depreciation_class_id`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray))));
+				  $objDatabase->NonQuery(sprintf("INSERT INTO `asset_model` (`short_description`, `long_description`, `asset_model_code`, `category_id`, `manufacturer_id`, `created_by`, `creation_date`, `depreciation_class_id`) VALUES %s;", str_replace('""','"', implode(", ", $this->strModelValuesArray))));
                   $intInsertId = $objDatabase->InsertId();
                   if ($intInsertId) {
                    // Update for asset custom fields with allAssetModesF Flag

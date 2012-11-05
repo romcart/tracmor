@@ -107,8 +107,8 @@
 		}
 
 		public function dtgAssetModel_Depreciation_Render(AssetModel $objAssetModel) {
-			if (!is_null($objAssetModel->DefaultDepreciationClass))
-				return $objAssetModel->DefaultDepreciationClass->__toString();
+			if (!is_null($objAssetModel->DepreciationClass))
+				return $objAssetModel->DepreciationClass->__toString();
 			else
 				return null;
 		}

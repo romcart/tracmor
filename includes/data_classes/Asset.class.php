@@ -62,7 +62,7 @@
 		public function getActiveDepreciationClass() {
 			 if($this->DepreciationFlag)
 			 {
-				 return $this->AssetModel->DefaultDepreciationClass;
+				 return $this->AssetModel->DepreciationClass;
 			 }
 		}
 

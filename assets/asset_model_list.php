@@ -68,7 +68,7 @@
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
 		protected $blnAttachment;
-		protected $intDefaultDepreciationClassId;
+		protected $intDepreciationClassId;
 
 		protected function Form_Create() {
 			
@@ -106,8 +106,8 @@
  	  if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 		   $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Depreciation Class',
 			                                                      '<?= $_FORM->dtgAssetModel_Depreciation_Render($_ITEM); ?>',
-					                                              'SortByCommand="asset_model__default_depreciation_class_id__short_description ASC"',
-				                                                  'ReverseSortByCommand="asset_model__default_depreciation_class_id__short_description DESC"',
+					                                              'SortByCommand="asset_model__depreciation_class_id__short_description ASC"',
+				                                                  'ReverseSortByCommand="asset_model__depreciation_class_id__short_description DESC"',
 	                                                              'CssClass="dtg_column"'));
 	  }
       // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
@@ -167,7 +167,8 @@
 			
             $objExpansionMap[AssetModel::ExpandCategory] = true;
             $objExpansionMap[AssetModel::ExpandManufacturer] = true;
-			$objExpansionMap[AssetModel::ExpandDefaultDepreciationClass] = true;
+			// set if depreciation in application
+			$objExpansionMap[AssetModel::ExpandDepreciationClass] = true;
 
       // If the search form has been posted
       // if ($intCategoryId || $intManufacturerId || $strDescription || $strAssetModelCode) {

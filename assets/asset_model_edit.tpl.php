@@ -56,8 +56,8 @@
 		}
 			if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 				$arrAssetModelFields[] = array('name' => 'Depreciation Class:',
-					                           'value'=>  $this->lblDefaultDepreciationClass->Render(false)
-												          . $this->lstDefaultDepreciationClass->RenderWithError(false)
+					                           'value'=>  $this->lblDepreciationClass->Render(false)
+												          . $this->lstDepreciationClass->RenderWithError(false)
 				);
 			}
 		

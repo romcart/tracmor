@@ -313,8 +313,6 @@
 				case 'ModifiedByObject': return QQN::Asset()->ModifiedByObject;
 				case 'ModifiedDate': return QQN::Asset()->ModifiedDate;
 				case 'DepreciationFlag': return QQN::Asset()->DepreciationFlag;
-				case 'DepreciationClassId': return QQN::Asset()->DepreciationClassId;
-				case 'DepreciationClass': return QQN::Asset()->DepreciationClass;
 				case 'PurchaseDate': return QQN::Asset()->PurchaseDate;
 				case 'PurchaseCost': return QQN::Asset()->PurchaseCost;
 				case 'AssetCustomFieldHelper': return QQN::Asset()->AssetCustomFieldHelper;

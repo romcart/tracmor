@@ -19,10 +19,8 @@
 	 * @property integer $DepreciationMethodQtypeId the value for intDepreciationMethodQtypeId (Unique)
 	 * @property string $ShortDescription the value for strShortDescription (Unique)
 	 * @property integer $Life the value for intLife 
-	 * @property Asset $_Asset the value for the private _objAsset (Read-Only) if set due to an expansion on the asset.depreciation_class_id reverse relationship
-	 * @property Asset[] $_AssetArray the value for the private _objAssetArray (Read-Only) if set due to an ExpandAsArray on the asset.depreciation_class_id reverse relationship
-	 * @property AssetModel $_AssetModelAsDefault the value for the private _objAssetModelAsDefault (Read-Only) if set due to an expansion on the asset_model.default_depreciation_class_id reverse relationship
-	 * @property AssetModel[] $_AssetModelAsDefaultArray the value for the private _objAssetModelAsDefaultArray (Read-Only) if set due to an ExpandAsArray on the asset_model.default_depreciation_class_id reverse relationship
+	 * @property AssetModel $_AssetModel the value for the private _objAssetModel (Read-Only) if set due to an expansion on the asset_model.depreciation_class_id reverse relationship
+	 * @property AssetModel[] $_AssetModelArray the value for the private _objAssetModelArray (Read-Only) if set due to an ExpandAsArray on the asset_model.depreciation_class_id reverse relationship
 	 * @property boolean $__Restored whether or not this object was restored from the database (as opposed to created new)
 	 */
 	class DepreciationClassGen extends QBaseClass {
@@ -65,36 +63,20 @@
 
 
 		/**
-		 * Private member variable that stores a reference to a single Asset object
-		 * (of type Asset), if this DepreciationClass object was restored with
-		 * an expansion on the asset association table.
-		 * @var Asset _objAsset;
-		 */
-		private $_objAsset;
-
-		/**
-		 * Private member variable that stores a reference to an array of Asset objects
-		 * (of type Asset[]), if this DepreciationClass object was restored with
-		 * an ExpandAsArray on the asset association table.
-		 * @var Asset[] _objAssetArray;
-		 */
-		private $_objAssetArray = array();
-
-		/**
-		 * Private member variable that stores a reference to a single AssetModelAsDefault object
+		 * Private member variable that stores a reference to a single AssetModel object
 		 * (of type AssetModel), if this DepreciationClass object was restored with
 		 * an expansion on the asset_model association table.
-		 * @var AssetModel _objAssetModelAsDefault;
+		 * @var AssetModel _objAssetModel;
 		 */
-		private $_objAssetModelAsDefault;
+		private $_objAssetModel;
 
 		/**
-		 * Private member variable that stores a reference to an array of AssetModelAsDefault objects
+		 * Private member variable that stores a reference to an array of AssetModel objects
 		 * (of type AssetModel[]), if this DepreciationClass object was restored with
 		 * an ExpandAsArray on the asset_model association table.
-		 * @var AssetModel[] _objAssetModelAsDefaultArray;
+		 * @var AssetModel[] _objAssetModelArray;
 		 */
-		private $_objAssetModelAsDefaultArray = array();
+		private $_objAssetModelArray = array();
 
 		/**
 		 * Protected array of virtual attributes for this object (e.g. extra/other calculated and/or non-object bound
@@ -470,31 +452,17 @@
 					$strAliasPrefix = 'depreciation_class__';
 
 
-				$strAlias = $strAliasPrefix . 'asset__asset_id';
+				$strAlias = $strAliasPrefix . 'assetmodel__asset_model_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objAssetArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objAssetArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'asset__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objAssetModelArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objAssetModelArray[$intPreviousChildItemCount - 1];
+						$objChildItem = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodel__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objAssetArray[] = $objChildItem;
+							$objPreviousItem->_objAssetModelArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objAssetArray[] = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'asset__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-					$blnExpandedViaArray = true;
-				}
-
-				$strAlias = $strAliasPrefix . 'assetmodelasdefault__asset_model_id';
-				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
-					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objAssetModelAsDefaultArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objAssetModelAsDefaultArray[$intPreviousChildItemCount - 1];
-						$objChildItem = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasdefault__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
-						if ($objChildItem)
-							$objPreviousItem->_objAssetModelAsDefaultArray[] = $objChildItem;
-					} else
-						$objPreviousItem->_objAssetModelAsDefaultArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasdefault__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objAssetModelArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodel__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -533,24 +501,14 @@
 
 
 
-			// Check for Asset Virtual Binding
-			$strAlias = $strAliasPrefix . 'asset__asset_id';
+			// Check for AssetModel Virtual Binding
+			$strAlias = $strAliasPrefix . 'assetmodel__asset_model_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objAssetArray[] = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'asset__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objAssetModelArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodel__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objAsset = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'asset__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-			}
-
-			// Check for AssetModelAsDefault Virtual Binding
-			$strAlias = $strAliasPrefix . 'assetmodelasdefault__asset_model_id';
-			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-			if (!is_null($objDbRow->GetColumn($strAliasName))) {
-				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objAssetModelAsDefaultArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasdefault__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-				else
-					$objToReturn->_objAssetModelAsDefault = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasdefault__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objAssetModel = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodel__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			return $objToReturn;
@@ -913,29 +871,17 @@
 				// (If restored via a "Many-to" expansion)
 				////////////////////////////
 
-				case '_Asset':
-					// Gets the value for the private _objAsset (Read-Only)
-					// if set due to an expansion on the asset.depreciation_class_id reverse relationship
-					// @return Asset
-					return $this->_objAsset;
-
-				case '_AssetArray':
-					// Gets the value for the private _objAssetArray (Read-Only)
-					// if set due to an ExpandAsArray on the asset.depreciation_class_id reverse relationship
-					// @return Asset[]
-					return (array) $this->_objAssetArray;
-
-				case '_AssetModelAsDefault':
-					// Gets the value for the private _objAssetModelAsDefault (Read-Only)
-					// if set due to an expansion on the asset_model.default_depreciation_class_id reverse relationship
+				case '_AssetModel':
+					// Gets the value for the private _objAssetModel (Read-Only)
+					// if set due to an expansion on the asset_model.depreciation_class_id reverse relationship
 					// @return AssetModel
-					return $this->_objAssetModelAsDefault;
+					return $this->_objAssetModel;
 
-				case '_AssetModelAsDefaultArray':
-					// Gets the value for the private _objAssetModelAsDefaultArray (Read-Only)
-					// if set due to an ExpandAsArray on the asset_model.default_depreciation_class_id reverse relationship
+				case '_AssetModelArray':
+					// Gets the value for the private _objAssetModelArray (Read-Only)
+					// if set due to an ExpandAsArray on the asset_model.depreciation_class_id reverse relationship
 					// @return AssetModel[]
-					return (array) $this->_objAssetModelAsDefaultArray;
+					return (array) $this->_objAssetModelArray;
 
 
 				case '__Restored':
@@ -1030,202 +976,20 @@
 
 			
 		
-		// Related Objects' Methods for Asset
+		// Related Objects' Methods for AssetModel
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated Assets as an array of Asset objects
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Asset[]
-		*/ 
-		public function GetAssetArray($objOptionalClauses = null) {
-			if ((is_null($this->intDepreciationClassId)))
-				return array();
-
-			try {
-				return Asset::LoadArrayByDepreciationClassId($this->intDepreciationClassId, $objOptionalClauses);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-		}
-
-		/**
-		 * Counts all associated Assets
-		 * @return int
-		*/ 
-		public function CountAssets() {
-			if ((is_null($this->intDepreciationClassId)))
-				return 0;
-
-			return Asset::CountByDepreciationClassId($this->intDepreciationClassId);
-		}
-
-		/**
-		 * Associates a Asset
-		 * @param Asset $objAsset
-		 * @return void
-		*/ 
-		public function AssociateAsset(Asset $objAsset) {
-			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAsset on this unsaved DepreciationClass.');
-			if ((is_null($objAsset->AssetId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAsset on this DepreciationClass with an unsaved Asset.');
-
-			// Get the Database Object for this Class
-			$objDatabase = DepreciationClass::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`asset`
-				SET
-					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
-				WHERE
-					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . '
-			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAsset->DepreciationClassId = $this->intDepreciationClassId;
-				$objAsset->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates a Asset
-		 * @param Asset $objAsset
-		 * @return void
-		*/ 
-		public function UnassociateAsset(Asset $objAsset) {
-			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAsset on this unsaved DepreciationClass.');
-			if ((is_null($objAsset->AssetId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAsset on this DepreciationClass with an unsaved Asset.');
-
-			// Get the Database Object for this Class
-			$objDatabase = DepreciationClass::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`asset`
-				SET
-					`depreciation_class_id` = null
-				WHERE
-					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
-					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAsset->DepreciationClassId = null;
-				$objAsset->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates all Assets
-		 * @return void
-		*/ 
-		public function UnassociateAllAssets() {
-			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAsset on this unsaved DepreciationClass.');
-
-			// Get the Database Object for this Class
-			$objDatabase = DepreciationClass::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Asset::LoadArrayByDepreciationClassId($this->intDepreciationClassId) as $objAsset) {
-					$objAsset->DepreciationClassId = null;
-					$objAsset->Journal('UPDATE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`asset`
-				SET
-					`depreciation_class_id` = null
-				WHERE
-					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
-			');
-		}
-
-		/**
-		 * Deletes an associated Asset
-		 * @param Asset $objAsset
-		 * @return void
-		*/ 
-		public function DeleteAssociatedAsset(Asset $objAsset) {
-			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAsset on this unsaved DepreciationClass.');
-			if ((is_null($objAsset->AssetId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAsset on this DepreciationClass with an unsaved Asset.');
-
-			// Get the Database Object for this Class
-			$objDatabase = DepreciationClass::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`asset`
-				WHERE
-					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
-					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAsset->Journal('DELETE');
-			}
-		}
-
-		/**
-		 * Deletes all associated Assets
-		 * @return void
-		*/ 
-		public function DeleteAllAssets() {
-			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAsset on this unsaved DepreciationClass.');
-
-			// Get the Database Object for this Class
-			$objDatabase = DepreciationClass::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Asset::LoadArrayByDepreciationClassId($this->intDepreciationClassId) as $objAsset) {
-					$objAsset->Journal('DELETE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`asset`
-				WHERE
-					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
-			');
-		}
-
-			
-		
-		// Related Objects' Methods for AssetModelAsDefault
-		//-------------------------------------------------------------------
-
-		/**
-		 * Gets all associated AssetModelsAsDefault as an array of AssetModel objects
+		 * Gets all associated AssetModels as an array of AssetModel objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
 		 * @return AssetModel[]
 		*/ 
-		public function GetAssetModelAsDefaultArray($objOptionalClauses = null) {
+		public function GetAssetModelArray($objOptionalClauses = null) {
 			if ((is_null($this->intDepreciationClassId)))
 				return array();
 
 			try {
-				return AssetModel::LoadArrayByDefaultDepreciationClassId($this->intDepreciationClassId, $objOptionalClauses);
+				return AssetModel::LoadArrayByDepreciationClassId($this->intDepreciationClassId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -1233,26 +997,26 @@
 		}
 
 		/**
-		 * Counts all associated AssetModelsAsDefault
+		 * Counts all associated AssetModels
 		 * @return int
 		*/ 
-		public function CountAssetModelsAsDefault() {
+		public function CountAssetModels() {
 			if ((is_null($this->intDepreciationClassId)))
 				return 0;
 
-			return AssetModel::CountByDefaultDepreciationClassId($this->intDepreciationClassId);
+			return AssetModel::CountByDepreciationClassId($this->intDepreciationClassId);
 		}
 
 		/**
-		 * Associates a AssetModelAsDefault
+		 * Associates a AssetModel
 		 * @param AssetModel $objAssetModel
 		 * @return void
 		*/ 
-		public function AssociateAssetModelAsDefault(AssetModel $objAssetModel) {
+		public function AssociateAssetModel(AssetModel $objAssetModel) {
 			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetModelAsDefault on this unsaved DepreciationClass.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetModel on this unsaved DepreciationClass.');
 			if ((is_null($objAssetModel->AssetModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetModelAsDefault on this DepreciationClass with an unsaved AssetModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetModel on this DepreciationClass with an unsaved AssetModel.');
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
@@ -1262,28 +1026,28 @@
 				UPDATE
 					`asset_model`
 				SET
-					`default_depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
+					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 				WHERE
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objAssetModel->DefaultDepreciationClassId = $this->intDepreciationClassId;
+				$objAssetModel->DepreciationClassId = $this->intDepreciationClassId;
 				$objAssetModel->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a AssetModelAsDefault
+		 * Unassociates a AssetModel
 		 * @param AssetModel $objAssetModel
 		 * @return void
 		*/ 
-		public function UnassociateAssetModelAsDefault(AssetModel $objAssetModel) {
+		public function UnassociateAssetModel(AssetModel $objAssetModel) {
 			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsDefault on this unsaved DepreciationClass.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModel on this unsaved DepreciationClass.');
 			if ((is_null($objAssetModel->AssetModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsDefault on this DepreciationClass with an unsaved AssetModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModel on this DepreciationClass with an unsaved AssetModel.');
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
@@ -1293,34 +1057,34 @@
 				UPDATE
 					`asset_model`
 				SET
-					`default_depreciation_class_id` = null
+					`depreciation_class_id` = null
 				WHERE
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
-					`default_depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
+					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objAssetModel->DefaultDepreciationClassId = null;
+				$objAssetModel->DepreciationClassId = null;
 				$objAssetModel->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all AssetModelsAsDefault
+		 * Unassociates all AssetModels
 		 * @return void
 		*/ 
-		public function UnassociateAllAssetModelsAsDefault() {
+		public function UnassociateAllAssetModels() {
 			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsDefault on this unsaved DepreciationClass.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModel on this unsaved DepreciationClass.');
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (AssetModel::LoadArrayByDefaultDepreciationClassId($this->intDepreciationClassId) as $objAssetModel) {
-					$objAssetModel->DefaultDepreciationClassId = null;
+				foreach (AssetModel::LoadArrayByDepreciationClassId($this->intDepreciationClassId) as $objAssetModel) {
+					$objAssetModel->DepreciationClassId = null;
 					$objAssetModel->Journal('UPDATE');
 				}
 			}
@@ -1330,22 +1094,22 @@
 				UPDATE
 					`asset_model`
 				SET
-					`default_depreciation_class_id` = null
+					`depreciation_class_id` = null
 				WHERE
-					`default_depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
+					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 			');
 		}
 
 		/**
-		 * Deletes an associated AssetModelAsDefault
+		 * Deletes an associated AssetModel
 		 * @param AssetModel $objAssetModel
 		 * @return void
 		*/ 
-		public function DeleteAssociatedAssetModelAsDefault(AssetModel $objAssetModel) {
+		public function DeleteAssociatedAssetModel(AssetModel $objAssetModel) {
 			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsDefault on this unsaved DepreciationClass.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModel on this unsaved DepreciationClass.');
 			if ((is_null($objAssetModel->AssetModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsDefault on this DepreciationClass with an unsaved AssetModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModel on this DepreciationClass with an unsaved AssetModel.');
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
@@ -1356,7 +1120,7 @@
 					`asset_model`
 				WHERE
 					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
-					`default_depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
+					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 			');
 
 			// Journaling
@@ -1366,19 +1130,19 @@
 		}
 
 		/**
-		 * Deletes all associated AssetModelsAsDefault
+		 * Deletes all associated AssetModels
 		 * @return void
 		*/ 
-		public function DeleteAllAssetModelsAsDefault() {
+		public function DeleteAllAssetModels() {
 			if ((is_null($this->intDepreciationClassId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsDefault on this unsaved DepreciationClass.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModel on this unsaved DepreciationClass.');
 
 			// Get the Database Object for this Class
 			$objDatabase = DepreciationClass::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (AssetModel::LoadArrayByDefaultDepreciationClassId($this->intDepreciationClassId) as $objAssetModel) {
+				foreach (AssetModel::LoadArrayByDepreciationClassId($this->intDepreciationClassId) as $objAssetModel) {
 					$objAssetModel->Journal('DELETE');
 				}
 			}
@@ -1388,7 +1152,7 @@
 				DELETE FROM
 					`asset_model`
 				WHERE
-					`default_depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
+					`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 			');
 		}
 
@@ -1561,8 +1325,7 @@
 	 * @property-read QQNode $DepreciationMethodQtypeId
 	 * @property-read QQNode $ShortDescription
 	 * @property-read QQNode $Life
-	 * @property-read QQReverseReferenceNodeAsset $Asset
-	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsDefault
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModel
 	 */
 	class QQNodeDepreciationClass extends QQNode {
 		protected $strTableName = 'depreciation_class';
@@ -1578,10 +1341,8 @@
 					return new QQNode('short_description', 'ShortDescription', 'string', $this);
 				case 'Life':
 					return new QQNode('life', 'Life', 'integer', $this);
-				case 'Asset':
-					return new QQReverseReferenceNodeAsset($this, 'asset', 'reverse_reference', 'depreciation_class_id');
-				case 'AssetModelAsDefault':
-					return new QQReverseReferenceNodeAssetModel($this, 'assetmodelasdefault', 'reverse_reference', 'default_depreciation_class_id');
+				case 'AssetModel':
+					return new QQReverseReferenceNodeAssetModel($this, 'assetmodel', 'reverse_reference', 'depreciation_class_id');
 
 				case '_PrimaryKeyNode':
 					return new QQNode('depreciation_class_id', 'DepreciationClassId', 'integer', $this);
@@ -1601,8 +1362,7 @@
 	 * @property-read QQNode $DepreciationMethodQtypeId
 	 * @property-read QQNode $ShortDescription
 	 * @property-read QQNode $Life
-	 * @property-read QQReverseReferenceNodeAsset $Asset
-	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsDefault
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModel
 	 * @property-read QQNode $_PrimaryKeyNode
 	 */
 	class QQReverseReferenceNodeDepreciationClass extends QQReverseReferenceNode {
@@ -1619,10 +1379,8 @@
 					return new QQNode('short_description', 'ShortDescription', 'string', $this);
 				case 'Life':
 					return new QQNode('life', 'Life', 'integer', $this);
-				case 'Asset':
-					return new QQReverseReferenceNodeAsset($this, 'asset', 'reverse_reference', 'depreciation_class_id');
-				case 'AssetModelAsDefault':
-					return new QQReverseReferenceNodeAssetModel($this, 'assetmodelasdefault', 'reverse_reference', 'default_depreciation_class_id');
+				case 'AssetModel':
+					return new QQReverseReferenceNodeAssetModel($this, 'assetmodel', 'reverse_reference', 'depreciation_class_id');
 
 				case '_PrimaryKeyNode':
 					return new QQNode('depreciation_class_id', 'DepreciationClassId', 'integer', $this);
