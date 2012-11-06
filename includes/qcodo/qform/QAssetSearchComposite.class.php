@@ -292,7 +292,7 @@ class QAssetSearchComposite extends QControl {
     // Expand the Asset object to include the AssetModel, Category, Manufacturer, and Location Objects
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandCategory] = true;
     $objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandManufacturer] = true;
-	$objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandDefaultDepreciationClass] = true;
+	$objExpansionMap[Asset::ExpandAssetModel][AssetModel::ExpandDepreciationClass] = true;
     $objExpansionMap[Asset::ExpandParentAsset] = true;
     $objExpansionMap[Asset::ExpandLocation] = true;
 		//if ($this->blnSearch || !$this->blnUseAjax) {

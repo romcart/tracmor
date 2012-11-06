@@ -852,7 +852,7 @@ class QAssetEditComposite extends QControl {
 			$this->lblPurchaseCost->Display = false;
 			$this->lblPurchaseDate->Display = false;
 		}
-		if($this->blnEditMode&&!$this->objAsset->AssetModel->DefaultDepreciationClassId)
+		if($this->blnEditMode&&!$this->objAsset->AssetModel->DepreciationClassId)
 		{
 			$this->chkAssetDepreciation->Display = false;
 		}
@@ -966,7 +966,7 @@ class QAssetEditComposite extends QControl {
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 
 			if($this->lstAssetModel->SelectedValue != null &&
-			   $objAssetModel->DefaultDepreciationClassId>0)
+			   $objAssetModel->DepreciationClassId>0)
 			{
 				$this->chkAssetDepreciation->Display = true;
 				if(!$this->txtPurchaseCost->Display){
@@ -1057,7 +1057,7 @@ class QAssetEditComposite extends QControl {
 							$blnError = true;
 							$this->txtPurchaseCost->Warning = "Purchase Cost value isn't valid";
 						}
-						elseif(AssetModel::Load($this->lstAssetModel->SelectedValue)->DefaultDepreciationClassId!=null){
+						elseif(AssetModel::Load($this->lstAssetModel->SelectedValue)->DepreciationClassId!=null){
 							//print $this->calPurchaseDate->DateTime ."||". $this->txtPurchaseCost->Text."|";exit;
 							$this->objAsset->DepreciationFlag = true;
 							$this->objAsset->PurchaseDate  = $this->calPurchaseDate->DateTime;
@@ -1200,7 +1200,7 @@ class QAssetEditComposite extends QControl {
 							$blnError = true;
 							$this->txtPurchaseCost->Warning = "Purchase Cost isn't valid";
 						}
-						elseif(AssetModel::Load($this->lstAssetModel->SelectedValue)->DefaultDepreciationClassId!=null){
+						elseif(AssetModel::Load($this->lstAssetModel->SelectedValue)->DepreciationClassId!=null){
 							//print $this->calPurchaseDate->DateTime ."||". $this->txtPurchaseCost->Text."|";exit;
 							$this->objAsset->DepreciationFlag = true;
 							$this->objAsset->PurchaseDate  = $this->calPurchaseDate->DateTime;
@@ -1307,7 +1307,7 @@ class QAssetEditComposite extends QControl {
 			$this->objParentObject->RefreshChildAssets();
 			// Handle depreciation options view
 			if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
-				if($this->objAsset->AssetModel->DefaultDepreciationClassId>0){
+				if($this->objAsset->AssetModel->DepreciationClassId>0){
 					$this->chkAssetDepreciation->Display = true;
 				}
 				else{
@@ -1889,7 +1889,7 @@ class QAssetEditComposite extends QControl {
 	protected function lblBookValue_Update(){
 
 		if($objAssetModel = AssetModel::Load($this->lstAssetModel->SelectedValue)){
-			$intDepreciationClassId = $objAssetModel->DefaultDepreciationClassId;
+			$intDepreciationClassId = $objAssetModel->DepreciationClassId;
 			if(!empty($intDepreciationClassId)  && DepreciationClass::Load($intDepreciationClassId))
 			$life = DepreciationClass::Load($intDepreciationClassId)->Life;
 		}

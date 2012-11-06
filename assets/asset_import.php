@@ -974,7 +974,7 @@
 
                       if (!$blnCheckCFVError) {
                         $strAssetArray[] = $strAssetCode;
-                        $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW(), %s, %s, %s, '%s')",
+                        $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW(), %s, %s, '%s')",
 							                                     $strAssetCode,
 							                                     $intLocationId,
 							                                     $intAssetModelId,
@@ -982,7 +982,6 @@
 							                                    ($blnLinked) ? "1" : "0",
 							                                     $_SESSION['intUserAccountId']
 																,($blnDepreciationFlag)? $blnDepreciationFlag :"NULL",
-						                                        ($intDepreciationClassId)? $intDepreciationClassId: "NULL",
 						                                        ($intPurchaseCost)?$intPurchaseCost:"NULL",
 						                                        ($dttPurchaseDate)?'"'.$dttPurchaseDate.'"':"NULL"
 						                                       );

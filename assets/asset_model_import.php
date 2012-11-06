@@ -534,7 +534,7 @@
             elseif ($value == 'manufacturer') {
               $this->intManufacturerKey = $key;
             }
-			elseif(QApplication::$TracmorSettings->DepreciationFlag == '1' && $value == 'default depreciation class'){
+			elseif(QApplication::$TracmorSettings->DepreciationFlag == '1' && $value == 'depreciation class'){
 			  $this->intDepreciationKey= $key;
 			}
             elseif ($this->lstImportAction->SelectedValue == 2 && $value == 'id') {
@@ -978,7 +978,7 @@
                       $this->objUpdatedItemArray[$objAssetModel->AssetModelId] = sprintf("%s", $objAssetModel->ShortDescription);
                       //$this->arrOldItemArray[$objAssetModel->AssetModelId] = $objAssetModel;
                      // $strItemQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s WHERE `asset_model_id`='%s'", $objAssetModel->ShortDescription, $objAssetModel->LongDescription, $objAssetModel->ManufacturerId, $objAssetModel->CategoryId, $objAssetModel->AssetModelCode, (!$objAssetModel->ModifiedBy) ? "NULL" : $objAssetModel->ModifiedBy, (!$objAssetModel->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAssetModel->ModifiedDate), $objAssetModel->AssetModelId);
-					  	$strItemQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_class_id`=%s WHERE `asset_model_id`='%s'", $objAssetModel->ShortDescription, $objAssetModel->LongDescription, $objAssetModel->ManufacturerId, $objAssetModel->CategoryId, $objAssetModel->AssetModelCode, (!$objAssetModel->ModifiedBy) ? "NULL" : $objAssetModel->ModifiedBy, (!$objAssetModel->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAssetModel->ModifiedDate), $objAssetModel->DefaultDepretiationClassId ? sprintf("'%s'", $objAssetModel->DefaultDepretiationClassId):"NULL", $objAssetModel->AssetModelId);
+					  	$strItemQuery = sprintf("UPDATE `asset_model` SET `short_description`='%s', `long_description`='%s', `manufacturer_id`='%s', `category_id`='%s', `asset_model_code`='%s', `modified_by`=%s, `modified_date`=%s, `depreciation_class_id`=%s WHERE `asset_model_id`='%s'", $objAssetModel->ShortDescription, $objAssetModel->LongDescription, $objAssetModel->ManufacturerId, $objAssetModel->CategoryId, $objAssetModel->AssetModelCode, (!$objAssetModel->ModifiedBy) ? "NULL" : $objAssetModel->ModifiedBy, (!$objAssetModel->ModifiedBy) ? "NULL" : sprintf("'%s'", $objAssetModel->ModifiedDate), $objAssetModel->DepreciationClassId ? sprintf("'%s'", $objAssetModel->DepreciationClassId):"NULL", $objAssetModel->AssetModelId);
                       $strCFVArray = array();
                       foreach ($this->arrModelCustomField as $objCustomField) {
                         $strCFV = $objAssetModel->GetVirtualAttribute($objCustomField->CustomFieldId);
@@ -1198,7 +1198,7 @@
 	    $lstMapHeader->AddItem("Category", "Category", ($strName == 'category') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Manufacturer", "Manufacturer", ($strName == 'manufacturer') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
-			$lstMapHeader->AddItem("Default Depreciation Class", "Default Depreciation Class", ($strName == 'default depreciation class') ? true : false, $strAssetModelGroup);
+			$lstMapHeader->AddItem("Depreciation Class", "Depreciation Class", ($strName == 'depreciation class') ? true : false, $strAssetModelGroup);
 		}
 		  foreach ($this->arrModelCustomField as $objCustomField) {
 	      $lstMapHeader->AddItem($objCustomField->ShortDescription, "model_".$objCustomField->CustomFieldId, ($strName == strtolower($objCustomField->ShortDescription)) ? true : false, $strAssetModelGroup);
