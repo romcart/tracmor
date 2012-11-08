@@ -6,23 +6,18 @@ require_once('../includes/prepend.inc.php');
 
 $objDatabase = QApplication::$Database[1];
 
-// Check if this script has already been run
-$objDbResult = $objDatabase->Query("SHOW TABLES LIKE '_version'");
-if (count($objDbResult->FetchArray())) {
-echo('This script has already been run! Exiting...');
-exit;
-}
-
 // Put the following in a transaction and rollback if there are any problems
 try {
 $objDatabase->TransactionBegin();
 
-// Create _version table
-$strQuery = "CREATE TABLE IF NOT EXISTS `_version` (`version` VARCHAR(50)) ENGINE = INNODB";
+// Make _version updateable
+$strQuery = "ALTER TABLE `_version` CHANGE COLUMN `version` `version` VARCHAR(50) NOT NULL
+, ADD PRIMARY KEY (`version`) ;";
 $objDatabase->NonQuery($strQuery);
+//
 
 // Set version to 0.4.0
-$strQuery = "INSERT INTO `_version` (`version`) VALUES ('0.4.1')";
+$strQuery = "UPDATE `_version` SET `version`='0.4.1' WHERE `version` <>'0.4.1';";
 $objDatabase->NonQuery($strQuery);
 
 // Change default value for custom_field all_asset_model_flag
@@ -81,6 +76,12 @@ ALTER TABLE asset_model
 ON Delete NO ACTION ON Update NO ACTION;
 ";
 $objDatabase->NonQuery($strQuery);
+
+// Add admin_settings
+$strQuery = "INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
+	(24,'depreciation_flag','1');";
+$objDatabase->NonQuery($strQuery);
+
 $objDatabase->TransactionCommit();
 echo('Update successful!');
 
