@@ -63,7 +63,9 @@ CREATE TABLE depreciation_method_qtype(
   depreciation_method_qtype_id  INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   short_description  VARCHAR(255)   NOT NULL,
   PRIMARY KEY (depreciation_method_qtype_id),
-  INDEX depreciation_method_qtype_fkindex1 (depreciation_method_qtype_id))
+  INDEX depreciation_method_qtype_fkindex1 (depreciation_method_qtype_id),
+  INDEX `short_description_UNIQUE` (`short_description` ASC),
+  UNIQUE (short_description))
 ENGINE = INNODB;";
 $objDatabase->NonQuery($strQuery);
 
