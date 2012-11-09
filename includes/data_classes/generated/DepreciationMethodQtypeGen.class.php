@@ -18,15 +18,19 @@
 	 * @subpackage GeneratedDataObjects
 	 */
 	abstract class DepreciationMethodQtypeGen extends QBaseClass {
+		const StraightLine = 1;
 
-		const MaxId = 0;
+		const MaxId = 1;
 
-		public static $NameArray = array();
+		public static $NameArray = array(
+			1 => 'Straight Line');
 
-		public static $TokenArray = array();
+		public static $TokenArray = array(
+			1 => 'StraightLine');
 
 		public static function ToString($intDepreciationMethodQtypeId) {
 			switch ($intDepreciationMethodQtypeId) {
+				case 1: return 'Straight Line';
 				default:
 					throw new QCallerException(sprintf('Invalid intDepreciationMethodQtypeId: %s', $intDepreciationMethodQtypeId));
 			}
@@ -34,6 +38,7 @@
 
 		public static function ToToken($intDepreciationMethodQtypeId) {
 			switch ($intDepreciationMethodQtypeId) {
+				case 1: return 'StraightLine';
 				default:
 					throw new QCallerException(sprintf('Invalid intDepreciationMethodQtypeId: %s', $intDepreciationMethodQtypeId));
 			}
