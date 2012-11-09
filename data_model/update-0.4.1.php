@@ -27,9 +27,9 @@ $objDatabase->NonQuery($strQuery);
 
 // Change asset_model table
 $strQuery =
-"ALTER TABLE `asset_model` ADD COLUMN `depreciation_class_id` INT NULL;
- ALTER TABLE `asset_model` ADD INDEX `depreciation_class_id` (`depreciation_class_id` ASC) ;
-";
+"ALTER TABLE `asset_model` ADD COLUMN `depreciation_class_id` INTEGER UNSIGNED NULL;";
+$objDatabase->NonQuery($strQuery);
+$strQuery ="ALTER TABLE `asset_model` ADD INDEX `asset_model_fkindex5` ( depreciation_class_id )";
 $objDatabase->NonQuery($strQuery);
 
 // Change asset table
@@ -54,32 +54,56 @@ $strQuery =
    UNIQUE (short_description),
    INDEX depreciation_class_fkindex2 ( depreciation_method_qtype_id )
 )
-ENGINE = INNODB;
+ENGINE = INNODB;";
+$objDatabase->NonQuery($strQuery);
 
+// Create Depreciation method qtype table
+$strQuery="
 CREATE TABLE depreciation_method_qtype(
   depreciation_method_qtype_id  INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   short_description  VARCHAR(255)   NOT NULL,
   PRIMARY KEY (depreciation_method_qtype_id),
   INDEX depreciation_method_qtype_fkindex1 (depreciation_method_qtype_id))
-ENGINE = INNODB;
+ENGINE = INNODB;";
+$objDatabase->NonQuery($strQuery);
 
-ALTER TABLE depreciation_class
+// Add foreign key to Depreciation class table
+$strQuery =
+"ALTER TABLE depreciation_class
   ADD CONSTRAINT FOREIGN KEY(depreciation_method_qtype_id) references depreciation_method_qtype (
     depreciation_method_qtype_id
   )
-ON Delete NO ACTION ON Update NO ACTION;
+ON Delete NO ACTION ON Update NO ACTION;";
+$objDatabase->NonQuery($strQuery);
 
-ALTER TABLE asset_model
-  ADD CONSTRAINT FOREIGN KEY(depreciation_class_id) references depreciation_class (
-    depreciation_class_id
-  )
+// Add foreign key to Asset Model table
+$strQuery = "ALTER TABLE `asset_model`
+  ADD CONSTRAINT FOREIGN KEY(depreciation_class_id) references `depreciation_class` (`depreciation_class_id`)
 ON Delete NO ACTION ON Update NO ACTION;
 ";
+$objDatabase->NonQuery($strQuery);
+
+/**
+ *  INSERTIONS
+ */
+
+// Unset foreign keys
+$strQuery="SET FOREIGN_KEY_CHECKS = 0;";
 $objDatabase->NonQuery($strQuery);
 
 // Add admin_settings
 $strQuery = "INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
 	(24,'depreciation_flag','1');";
+$objDatabase->NonQuery($strQuery);
+
+// Insert date for default depreciation class
+$strQuery = "INSERT INTO `depreciation_method_qtype` (`depreciation_method_qtype_id`, `short_description`) VALUES (1, 'Straight Line');";
+$objDatabase->NonQuery($strQuery);
+$strQuery = "INSERT INTO `depreciation_class` (`depreciation_class_id`, `depreciation_method_qtype_id`, `short_description`,`life`) VALUES (1, 1, 'Straight Line Depreciation',60);";
+$objDatabase->NonQuery($strQuery);
+
+// Setup foreign keys check	again;
+$strQuery = "SET FOREIGN_KEY_CHECKS = 1;";
 $objDatabase->NonQuery($strQuery);
 
 $objDatabase->TransactionCommit();
