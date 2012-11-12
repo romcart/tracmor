@@ -22,7 +22,9 @@
 	require(__DOCROOT__ . __SUBDIRECTORY__ . '/assets/AssetModelEditPanel.class.php');
 
 class QAssetEditComposite extends QControl {
-
+    /**
+	 * @var Asset $objAsset
+	 */
 	public $objAsset;
 	public $strTitleVerb;
 	public $blnEditMode;
@@ -878,12 +880,14 @@ class QAssetEditComposite extends QControl {
 		$this->calPurchaseDate = new QDateTimePickerExt($this);
 		$this->calPurchaseDate->Name =  'Purchase Date: ';  //QApplication::Translate('Purchase Date');
 		$this->calPurchaseDate->DateTimePickerType = QDateTimePickerType::Date;
-		if ($this->blnEditMode) {
-			$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
+		if ($this->blnEditMode && $this->objAsset->DepreciationFlag && $this->objAsset->PurchaseDate) {
+			$dateToSetup = $this->objAsset->PurchaseDate;
 		}
-		elseif (!$this->blnEditMode) {
-			$this->calPurchaseDate->DateTime = new QDateTime(QDateTime::Now);
+		else {
+			$dateToSetup = new QDateTime(QDateTime::Now);
 		}
+
+		$this->calPurchaseDate->DateTime = $dateToSetup;
 		$this->calPurchaseDate->Required = true;
 
 		$this->dttNow = new QDateTime(QDateTime::Now);
@@ -896,8 +900,9 @@ class QAssetEditComposite extends QControl {
 		// 10 Days: 864000
 		// 200 Days: 17280000
 
-		$this->calPurchaseDate->MinimumYear = 1900;
-		$this->calPurchaseDate->MaximumYear = 2100;
+		$this->calPurchaseDate->MinimumYear = $dateToSetup->Year < ($this->dttNow->Year-5) ?
+			  $dateToSetup->Year : ($this->dttNow->Year-5);
+		$this->calPurchaseDate->MaximumYear = $this->dttNow->Year;
 
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 			$this->calPurchaseDate->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'txtPurchaseCost_Change'));
@@ -1898,8 +1903,11 @@ class QAssetEditComposite extends QControl {
 		  && ($this->calPurchaseDate->DateTime instanceof DateTime)
 		  && QDateTime::Now() > $this->calPurchaseDate->DateTime
 		  ){
-			$interval = QDateTime::Now()->diff($this->calPurchaseDate->DateTime)->m;
+			$interval = QDateTime::Now()->diff($this->calPurchaseDate->DateTime);
+			$interval = $interval->y*12 + $interval->m;
 			$fltBookValue =	$this->txtPurchaseCost->Text - ($this->txtPurchaseCost->Text * ($interval/$life));
+			// prevent negative results
+			$fltBookValue = $fltBookValue < 0 ?  0 : $fltBookValue;
 			$this->lblBookValue->Text = money_format('%i', $fltBookValue);
 		}
         else{
