@@ -902,7 +902,7 @@ class QAssetEditComposite extends QControl {
 
 		$this->calPurchaseDate->MinimumYear = $dateToSetup->Year < ($this->dttNow->Year-5) ?
 			  $dateToSetup->Year : ($this->dttNow->Year-5);
-		$this->calPurchaseDate->MaximumYear = $this->dttNow->Year;
+		$this->calPurchaseDate->MaximumYear = $this->dttNow->Year+1;
 
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 			$this->calPurchaseDate->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'txtPurchaseCost_Change'));
