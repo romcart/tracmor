@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(6);
 	require_once(__FORMBASE_CLASSES__ . '/ReceiptListFormBase.class.php');
-
+    require('../receiving/ReceiptMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the Receipt class.  It extends from the code-generated
@@ -101,6 +101,7 @@
 		protected $dlgMassDelete;
 		protected $btnMassEdit;
 		protected $btnMassDelete;
+        protected $pnlReceiptMassEdit;
 
 		protected function Form_Create() {
 			
@@ -498,13 +499,22 @@
 			$items = $this->dtgReceipt->getSelected('ReceiptId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
+                if(!($this->pnlReceiptMassEdit instanceof ReceiptMassEditPanel)){
+                    $this->pnlReceiptMassEdit = new ReceiptMassEditPanel($this->dlgMassEdit,
+                        'pnlReceiptMassEdit_Close',
+                        $items);
+                }
 				$this->dlgMassEdit->ShowDialogBox();
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Receipt to Edit" ;
 			}
 		}
 
+        public function pnlReceiptMassEdit_Close(){
+            $this->dlgMassEdit->HideDialogBox();
+        }
 	}
+
 
 	// Go ahead and run this form object to generate the page and event handlers, using
 	// generated/receipt_edit.php.inc as the included HTML template file
