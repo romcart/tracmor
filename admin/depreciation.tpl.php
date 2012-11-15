@@ -33,45 +33,22 @@
 	include('shortcut_menu.inc.php');
 ?>
 <!-- End Shortcut Menu -->
+
 		</td>
 		<td>
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
-		<div class="title">Administration Settings</div>
+		<div class="title"><?php _t('Depreciation'); ?></div>
 		<div style="padding:5px"><?php $this->pnlSaveNotification->Render(); ?></div>
-		<table class="datagrid" cellpadding="5" cellspacing="0">
-			<tr>
-				<td class="record_header">
-					<?php
-						$this->btnSave->Render();
-						echo('&nbsp;');
-					?>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<table>
-						<tr>
-							<td class="record_field_name">Company Logo: </td>
-							<td class="record_field_edit"><?php $this->flaCompanyLogo->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Search Results Per Page: </td>
-							<td class="record_field_edit"><?php $this->txtSearchResultsPerPage->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Minimum Asset Tag: </td>
-							<td class="record_field_edit"><?php $this->txtMinAssetCode->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Portable Pin Required: </td>
-							<td class="record_field_edit"><?php $this->chkPortablePinRequired->RenderWithError(); ?></td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
+		Enable Asset Depreciation: <?php $this->chkAssetDepreciation->Render(); ?>
+		<br class="item_divider" />
+		<br class="item_divider" />
+		<div class="title"><?php _t('Depreciation Classes'); ?></div>
+		<br class="item_divider" />
+		<?php $this->btnNew->Render(); ?>
+		<br class="item_divider" />
+		<?php $this->dtgDepreciationClass->Render() ?>
 
-<?php $this->RenderEnd() ?>
-<?php require_once('../includes/footer.inc.php'); ?>
+	<?php $this->RenderEnd(); ?>
+	<?php require_once('../includes/footer.inc.php'); ?>

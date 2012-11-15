@@ -35,7 +35,7 @@ $objDatabase->NonQuery($strQuery);
 // Change asset table
 $strQuery = "
   ALTER TABLE `asset` ADD COLUMN `depreciation_flag` BIT(1) DEFAULT NULL,
-					  ADD COLUMN `purchase_date`    DATETIME  DEFAULT NULL,
+					  ADD COLUMN `purchase_date`    DATE  DEFAULT NULL,
 					  ADD COLUMN `purchase_cost`    DECIMAL(10,2) DEFAULT NULL;
 ";
 $objDatabase->NonQuery($strQuery);
@@ -50,7 +50,6 @@ $strQuery =
    life INTEGER UNSIGNED   NULL,
    PRIMARY KEY (depreciation_class_id),
    INDEX depreciation_class_fkindex1 ( depreciation_class_id ),
-   UNIQUE (depreciation_method_qtype_id),
    UNIQUE (short_description),
    INDEX depreciation_class_fkindex2 ( depreciation_method_qtype_id )
 )
@@ -98,10 +97,8 @@ $strQuery = "INSERT INTO `admin_setting` (`setting_id`,`short_description`,`valu
 	(24,'depreciation_flag','1');";
 $objDatabase->NonQuery($strQuery);
 
-// Insert date for default depreciation class
+// Insert straight line depreciation method
 $strQuery = "INSERT INTO `depreciation_method_qtype` (`depreciation_method_qtype_id`, `short_description`) VALUES (1, 'Straight Line');";
-$objDatabase->NonQuery($strQuery);
-$strQuery = "INSERT INTO `depreciation_class` (`depreciation_class_id`, `depreciation_method_qtype_id`, `short_description`,`life`) VALUES (1, 1, 'Straight Line Depreciation',60);";
 $objDatabase->NonQuery($strQuery);
 
 // Setup foreign keys check	again;

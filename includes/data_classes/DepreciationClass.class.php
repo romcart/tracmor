@@ -28,6 +28,9 @@
 			return $this->ShortDescription;
 		}
 
+		public function __toStringWithLink() {
+			return sprintf('<a href="depreciation_class_edit.php?intDepreciationClassId=%s">%s</a>', $this->intDepreciationClassId, $this->__toString());
+		}
 
 		// Override or Create New Load/Count methods
 		// (For obvious reasons, these methods are commented out...

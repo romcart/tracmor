@@ -86,7 +86,7 @@ CREATE TABLE `asset` (
   `modified_by`      INTEGER UNSIGNED   NULL,
   `modified_date`    TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
   `depreciation_flag` BIT(1) DEFAULT NULL,
-  `purchase_date`    DATETIME  DEFAULT NULL,
+  `purchase_date`    DATE  DEFAULT NULL,
   `purchase_cost`    DECIMAL(10,2) DEFAULT NULL,
     PRIMARY KEY ( `asset_id` ),
     INDEX asset_fkindex1 ( `asset_model_id` ),
@@ -767,7 +767,6 @@ CREATE TABLE  depreciation_class(
    life INTEGER UNSIGNED   NULL,
    PRIMARY KEY (depreciation_class_id),
    INDEX depreciation_class_fkindex1 ( depreciation_class_id ),
-   UNIQUE (depreciation_method_qtype_id),
    UNIQUE (short_description),
    INDEX depreciation_class_fkindex2 ( depreciation_method_qtype_id )
 )

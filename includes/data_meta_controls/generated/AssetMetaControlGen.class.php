@@ -830,7 +830,7 @@
 			$this->calPurchaseDate = new QDateTimePicker($this->objParentObject, $strControlId);
 			$this->calPurchaseDate->Name = QApplication::Translate('Purchase Date');
 			$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
-			$this->calPurchaseDate->DateTimePickerType = QDateTimePickerType::DateTime;
+			$this->calPurchaseDate->DateTimePickerType = QDateTimePickerType::Date;
 			return $this->calPurchaseDate;
 		}
 

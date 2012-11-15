@@ -1,14 +1,14 @@
 <?php
 /*
- * Copyright (c)  2009, Tracmor, LLC
+ * Copyright (c)  2009, Tracmor, LLC 
  *
- * This file is part of Tracmor.
+ * This file is part of Tracmor.  
  *
  * Tracmor is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
+ * (at your option) any later version. 
+ *	
  * Tracmor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,29 +23,32 @@
 	$this->RenderBegin();
 ?>
 <!-- Begin Header Menu -->
-<?php
+<?php 
 	$this->ctlHeaderMenu->Render();
 ?>
-<!-- End Header Menu -->
+<!-- End Header Menu -->  	
 
 <!-- Begin Shortcut Menu -->
 <?php
 	include('shortcut_menu.inc.php');
 ?>
 <!-- End Shortcut Menu -->
+
 		</td>
 		<td>
 			<img src="../images/empty.gif" width="10">
 		</td>
 		<td width="100%" valign="top">
-		<div class="title">Administration Settings</div>
-		<div style="padding:5px"><?php $this->pnlSaveNotification->Render(); ?></div>
-		<table class="datagrid" cellpadding="5" cellspacing="0">
+		<div class="title">Depreciation Classes: <?php $this->lblHeaderDepreciationClass->Render(); ?></div>
+		<table class="datagrid" cellpadding="5" cellspacing="0" border="0">
 			<tr>
 				<td class="record_header">
-					<?php
+					<?php 
 						$this->btnSave->Render();
 						echo('&nbsp;');
+						$this->btnDelete->Render();
+						echo('&nbsp;');
+						$this->btnCancel->RenderWithError();
 					?>
 				</td>
 			</tr>
@@ -53,25 +56,21 @@
 				<td>
 					<table>
 						<tr>
-							<td class="record_field_name">Company Logo: </td>
-							<td class="record_field_edit"><?php $this->flaCompanyLogo->RenderWithError(); ?></td>
+							<td class="record_field_name">Depreciation Class Name: </td>
+							<td class="record_field_edit"><?php $this->txtShortDescription->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Search Results Per Page: </td>
-							<td class="record_field_edit"><?php $this->txtSearchResultsPerPage->RenderWithError(); ?></td>
+							<td class="record_field_name">Depreciation Method: </td>
+							<td class="record_field_edit"><?php $this->lstDepreciationMethod->RenderWithError(); ?></td>
 						</tr>
 						<tr>
-							<td class="record_field_name">Minimum Asset Tag: </td>
-							<td class="record_field_edit"><?php $this->txtMinAssetCode->RenderWithError(); ?></td>
-						</tr>
-						<tr>
-							<td class="record_field_name">Portable Pin Required: </td>
-							<td class="record_field_edit"><?php $this->chkPortablePinRequired->RenderWithError(); ?></td>
+							<td class="record_field_name">Life: </td>
+							<td class="record_field_edit"><?php $this->txtLife->RenderWithError(); ?><span style="vertical-align:middle;"> months</span></td>
 						</tr>
 					</table>
 				</td>
 			</tr>
 		</table>
-
-<?php $this->RenderEnd() ?>
-<?php require_once('../includes/footer.inc.php'); ?>
+		<br class="item_divider" />
+	<?php $this->RenderEnd() ?>
+	<?php require_once('../includes/footer.inc.php'); ?>

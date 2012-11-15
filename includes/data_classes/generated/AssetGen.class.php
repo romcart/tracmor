@@ -777,7 +777,7 @@
 			$strAliasName = array_key_exists($strAliasPrefix . 'depreciation_flag', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'depreciation_flag'] : $strAliasPrefix . 'depreciation_flag';
 			$objToReturn->blnDepreciationFlag = $objDbRow->GetColumn($strAliasName, 'Bit');
 			$strAliasName = array_key_exists($strAliasPrefix . 'purchase_date', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'purchase_date'] : $strAliasPrefix . 'purchase_date';
-			$objToReturn->dttPurchaseDate = $objDbRow->GetColumn($strAliasName, 'DateTime');
+			$objToReturn->dttPurchaseDate = $objDbRow->GetColumn($strAliasName, 'Date');
 			$strAliasName = array_key_exists($strAliasPrefix . 'purchase_cost', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'purchase_cost'] : $strAliasPrefix . 'purchase_cost';
 			$objToReturn->fltPurchaseCost = $objDbRow->GetColumn($strAliasName, 'Float');
 

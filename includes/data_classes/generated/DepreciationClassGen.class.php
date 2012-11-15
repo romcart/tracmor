@@ -16,7 +16,7 @@
 	 * @package My Application
 	 * @subpackage GeneratedDataObjects
 	 * @property integer $DepreciationClassId the value for intDepreciationClassId (Read-Only PK)
-	 * @property integer $DepreciationMethodQtypeId the value for intDepreciationMethodQtypeId (Unique)
+	 * @property integer $DepreciationMethodQtypeId the value for intDepreciationMethodQtypeId (Not Null)
 	 * @property string $ShortDescription the value for strShortDescription (Unique)
 	 * @property integer $Life the value for intLife 
 	 * @property AssetModel $_AssetModel the value for the private _objAssetModel (Read-Only) if set due to an expansion on the asset_model.depreciation_class_id reverse relationship
@@ -597,19 +597,6 @@
 			
 		/**
 		 * Load a single DepreciationClass object,
-		 * by DepreciationMethodQtypeId Index(es)
-		 * @param integer $intDepreciationMethodQtypeId
-		 * @return DepreciationClass
-		*/
-		public static function LoadByDepreciationMethodQtypeId($intDepreciationMethodQtypeId, $objOptionalClauses = null) {
-			return DepreciationClass::QuerySingle(
-				QQ::Equal(QQN::DepreciationClass()->DepreciationMethodQtypeId, $intDepreciationMethodQtypeId)
-			, $objOptionalClauses
-			);
-		}
-			
-		/**
-		 * Load a single DepreciationClass object,
 		 * by ShortDescription Index(es)
 		 * @param string $strShortDescription
 		 * @return DepreciationClass
@@ -617,6 +604,40 @@
 		public static function LoadByShortDescription($strShortDescription, $objOptionalClauses = null) {
 			return DepreciationClass::QuerySingle(
 				QQ::Equal(QQN::DepreciationClass()->ShortDescription, $strShortDescription)
+			, $objOptionalClauses
+			);
+		}
+			
+		/**
+		 * Load an array of DepreciationClass objects,
+		 * by DepreciationMethodQtypeId Index(es)
+		 * @param integer $intDepreciationMethodQtypeId
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return DepreciationClass[]
+		*/
+		public static function LoadArrayByDepreciationMethodQtypeId($intDepreciationMethodQtypeId, $objOptionalClauses = null) {
+			// Call DepreciationClass::QueryArray to perform the LoadArrayByDepreciationMethodQtypeId query
+			try {
+				return DepreciationClass::QueryArray(
+					QQ::Equal(QQN::DepreciationClass()->DepreciationMethodQtypeId, $intDepreciationMethodQtypeId),
+					$objOptionalClauses
+					);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Count DepreciationClasses
+		 * by DepreciationMethodQtypeId Index(es)
+		 * @param integer $intDepreciationMethodQtypeId
+		 * @return int
+		*/
+		public static function CountByDepreciationMethodQtypeId($intDepreciationMethodQtypeId, $objOptionalClauses = null) {
+			// Call DepreciationClass::QueryCount to perform the CountByDepreciationMethodQtypeId query
+			return DepreciationClass::QueryCount(
+				QQ::Equal(QQN::DepreciationClass()->DepreciationMethodQtypeId, $intDepreciationMethodQtypeId)
 			, $objOptionalClauses
 			);
 		}
@@ -847,7 +868,7 @@
 					return $this->intDepreciationClassId;
 
 				case 'DepreciationMethodQtypeId':
-					// Gets the value for intDepreciationMethodQtypeId (Unique)
+					// Gets the value for intDepreciationMethodQtypeId (Not Null)
 					// @return integer
 					return $this->intDepreciationMethodQtypeId;
 
@@ -911,7 +932,7 @@
 				// Member Variables
 				///////////////////
 				case 'DepreciationMethodQtypeId':
-					// Sets the value for intDepreciationMethodQtypeId (Unique)
+					// Sets the value for intDepreciationMethodQtypeId (Not Null)
 					// @param integer $mixValue
 					// @return integer
 					try {

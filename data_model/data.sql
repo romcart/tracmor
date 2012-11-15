@@ -532,7 +532,4 @@ INSERT INTO `shortcut` (`module_id`, `authorization_id`, `transaction_type_id`, 
 
 INSERT INTO `depreciation_method_qtype` (`depreciation_method_qtype_id`, `short_description`) VALUES (1, 'Straight Line');
 
-INSERT INTO `depreciation_class` (`depreciation_class_id`, `depreciation_method_qtype_id`, `short_description`,`life`) VALUES (1, 1, 'Straight Line Depreciation',60);
-
 SET FOREIGN_KEY_CHECKS = 1;
-
