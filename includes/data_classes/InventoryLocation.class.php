@@ -151,12 +151,13 @@
 		 * @param array $objExpansionMap map of referenced columns to be immediately expanded via early-binding
 		 * @return InventoryLocation[]
 		*/
-		public static function LoadArrayByInventoryModelIdLocations($intInventoryModelId, $strOrderBy = null, $strLimit = null, $objExpansionMap = null) {
+		public static function LoadArrayByInventoryModelIdLocations($intInventoryModelId, $strOrderBy = null, $strLimit = null, $objExpansionMap = null, $blnQuantity = false) {
 			// Call to ArrayQueryHelper to Get Database Object and Get SQL Clauses
 			InventoryLocation::ArrayQueryHelper($strOrderBy, $strLimit, $strLimitPrefix, $strLimitSuffix, $strExpandSelect, $strExpandFrom, $objExpansionMap, $objDatabase);
 
 			// Properly Escape All Input Parameters using Database->SqlVariable()
 			$intInventoryModelId = $objDatabase->SqlVariable($intInventoryModelId, true);
+			$quantityCondition = ($blnQuantity)? ' AND `inventory_location`.`quantity`>0 ':'';
 			
 			// This query subtracts any inventory that is pending shipment. That is inventory that has been added to a shipment but the shipment hasn't been included.
 			// This pending inventory is the sum of the quantites in InventoryTransaction where the SourceLocation is anything greated than 5 (a custom location) and the Destination IS NULL (incomplete transaction)
@@ -181,8 +182,9 @@
 					`inventory_location`.`inventory_model_id` %s
 					AND `inventory_location`.`location_id` > 5
 				%s
+				%s
 				%s', $strLimitPrefix, $strExpandSelect, $strExpandFrom,
-				$intInventoryModelId,
+				$intInventoryModelId, $quantityCondition,
 				$strOrderBy, $strLimitSuffix);
 				
 			// Perform the Query and Instantiate the Result

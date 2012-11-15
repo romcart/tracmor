@@ -190,7 +190,10 @@ class QAssetEditComposite extends QControl {
 		else {
 			$this->lstLocation_Create();
 			$this->displayInputs();
-		}// if asset depreciation enabled in application display Asset Depreciation checkBox
+			$this->lblHeaderAssetCode->Text = 'New Asset';
+		}
+
+		// if asset depreciation enabled in application display Asset Depreciation checkBox
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 			$this->lblPurchaseDate_Create();
 			$this->calPurchaseDate_Create();

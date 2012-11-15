@@ -475,6 +475,7 @@
 	    $arrRequiredAllAssetCustomFields = array();
 		foreach($arrAssetCustomFieldOptions as $arrAssetCustomFieldOption){
 		if($arrAssetCustomFieldOption->CustomField->RequiredFlag
+		   && $arrAssetCustomFieldOption->CustomField->ActiveFlag
 		   && $arrAssetCustomFieldOption->CustomField->AllAssetModelsFlag){
 		   $arrRequiredAllAssetCustomFields[] = $arrAssetCustomFieldOption->CustomField->ShortDescription;
 		if(!in_array($arrAssetCustomFieldOption->CustomField->ShortDescription,$this->getLstKeys())){
@@ -487,10 +488,10 @@
         for ($i=0; $i < count($this->lstMapHeaderArray)-1; $i++) {
           $lstMapHeader = $this->lstMapHeaderArray[$i];
           $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
-          if ($strSelectedValue == "asset model") {
+          if ($strSelectedValue == "model") {
             $blnAssetModelShortDescription = true;
           }
-          elseif ($strSelectedValue == "asset code") {
+          elseif ($strSelectedValue == "asset tag") {
             $blnAssetCode = true;
           }
           elseif ($strSelectedValue == "location") {
@@ -635,7 +636,7 @@
 		      if(count($arrRequiredAllAssetCustomFields)>0){
 			     $strRequiredAllAssetCustomFields = implode(", ",$arrRequiredAllAssetCustomFields) .", ";
 		      }
-          $this->btnNext->Warning = "You must select all required fields (".$strRequiredAllAssetCustomFields." Asset Code, Asset Model Short Description and Location).";
+          $this->btnNext->Warning = "You must select all required fields (".$strRequiredAllAssetCustomFields. "Asset Tag, Model Short Description and Location).";
           $blnError = true;
         }
 		  }
@@ -661,10 +662,10 @@
             $arrAssetCustomField = array();
             // Setup keys
             foreach ($this->arrTracmorField as $key => $value) {
-              if ($value == 'asset code') {
+              if ($value == 'asset tag') {
                 $intAssetCodeKey = $key;
               }
-              elseif ($value == 'asset model') {
+              elseif ($value == 'model') {
                 $intAssetModelDescriptionKey = $key;
               }
               elseif ($value == 'location') {
@@ -1066,7 +1067,7 @@
                       $blnCheckCFVError = true;
                     }
                     if (!$blnCheckCFVError) {
-                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strUpdateFieldArray), $objAsset->AssetId));
+                      $strUpdatedValuesArray[] = sprintf("UPDATE `asset` SET %s WHERE `asset_id`='%s'", str_replace('""','"',implode(", ", $strUpdateFieldArray)), $objAsset->AssetId);
                       if (isset($strCFVArray) && count($strCFVArray)) {
                         $strUpdatedItemCFVArray[$objAsset->AssetId] = $strCFVArray;
                       }
@@ -1174,7 +1175,9 @@
                         // insert nulls where not allowed
                         $theAsset = Asset::Load($intItemKey);
                         $strQuery = $this->substactNotAllowedFields($theAsset->AssetModelId,$theAsset->AssetId);
-                        $objDatabase->NonQuery($strQuery);
+                        if($strQuery){
+						  $objDatabase->NonQuery($strQuery);
+						}
                       }
                     }
                 }
@@ -1299,8 +1302,8 @@
 	    if ($this->lstImportAction->SelectedValue == 2) {
 	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    }
-	    $lstMapHeader->AddItem("Asset Tag", "Asset Code", ($strName == 'asset code') ? true : false, $strAssetGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Model", "Asset Model", ($strName == 'asset model') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Asset Tag", "Asset Tag", ($strName == 'asset tag') ? true : false, $strAssetGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Model", "Model", ($strName == 'model') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Location", "Location", ($strName == 'location') ? true : false, $strAssetGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Parent Asset", "Parent Asset", ($strName == 'parent asset') ? true : false, $strAssetGroup);
 	    $lstMapHeader->AddItem("Locked To Parent", "Locked To Parent", ($strName == 'locked to parent') ? true : false, $strAssetGroup);
@@ -1397,7 +1400,7 @@
             $lstDefault->Display = true;
             $dtpDefault->Display = false;
           }
-          elseif ($objControl->SelectedValue == "Asset Code") {
+          elseif ($objControl->SelectedValue == "Asset Tag") {
           	$txtDefault->Display = false;
           	$lstDefault->Display = false;
           	$dtpDefault->Display = false;

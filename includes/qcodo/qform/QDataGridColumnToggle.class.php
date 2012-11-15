@@ -218,7 +218,7 @@
 	          elseif (substr($objColumn->Name, 0, 3) == '<?=') {
           		continue;
           	}
-	          
+
 	         // if ($objColumn->HtmlEntities)
 	         //   $strHtml = QApplication::HtmlEntities($strHtml);
 			  $strHtml = htmlspecialchars_decode($strHtml);
@@ -236,15 +236,19 @@
       
       $strColumnsHtml = implode('","', $arrColumnText);
       $strColumnsHtml = '"' . $strColumnsHtml . '"' . "\r\n";
-      
       print $strColumnsHtml;
     }
-    
+
     protected function StripControls($strHtml) {
-    	
-    	
+
+		$indent = strpos($strHtml,'<span id="c');
+		if($indent>0){
+			$strHtml = substr($strHtml, 0, $indent);//print $indent;
+		}
+		return $strHtml;
+
     }
-		
+
 		/////////////////////////
 		// Public Properties: GET
 		/////////////////////////

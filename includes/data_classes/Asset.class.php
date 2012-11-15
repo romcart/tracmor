@@ -159,7 +159,8 @@
 		public function LoadByAssetCodeWithCustomFields($strAssetCode) {
 			Asset::QueryHelper($objDatabase);
 			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
-
+			// escape Asset Tag
+			$strAssetCode = QApplication::$Database[1]->SqlVariable($strAssetCode, false);
 			// Setup the SQL Query
 			$strQuery = sprintf("
 				SELECT 
@@ -168,12 +169,12 @@
 				FROM 
 					`asset` 
 					%s
-				WHERE `asset`.`asset_code` = '%s'
+				WHERE `asset`.`asset_code` = %s
 			", 
 			$arrCustomFieldSql['strSelect'],
 			$arrCustomFieldSql['strFrom'],
 			$strAssetCode);
-			
+
 			// Perform the Query and Instantiate the Result
 			$objDbResult = $objDatabase->Query($strQuery);
 			$arrAssets = Asset::InstantiateDbResult($objDbResult);

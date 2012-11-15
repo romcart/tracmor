@@ -93,7 +93,7 @@
 				else {
 					$this->ctlInventoryEdit->dtgInventoryQuantities->ShowHeader = true;
 					// $this->ctlInventoryEdit->dtgInventoryQuantities->DataSource = InventoryLocation::LoadArrayByInventoryModelId($this->ctlInventoryEdit->objInventoryModel->InventoryModelId, $this->ctlInventoryEdit->dtgInventoryQuantities->SortInfo, $this->ctlInventoryEdit->dtgInventoryQuantities->LimitInfo, $objExpansionMap);
-					$this->ctlInventoryEdit->dtgInventoryQuantities->DataSource = InventoryLocation::LoadArrayByInventoryModelIdLocations($this->ctlInventoryEdit->objInventoryModel->InventoryModelId, $this->ctlInventoryEdit->dtgInventoryQuantities->SortInfo, $this->ctlInventoryEdit->dtgInventoryQuantities->LimitInfo, $objExpansionMap);
+					$this->ctlInventoryEdit->dtgInventoryQuantities->DataSource = InventoryLocation::LoadArrayByInventoryModelIdLocations($this->ctlInventoryEdit->objInventoryModel->InventoryModelId, $this->ctlInventoryEdit->dtgInventoryQuantities->SortInfo, $this->ctlInventoryEdit->dtgInventoryQuantities->LimitInfo, $objExpansionMap, true);
 				}
 				$objExpansionMap = null;
 

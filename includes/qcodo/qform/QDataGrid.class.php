@@ -274,9 +274,11 @@
 		public function ParseColumnCsv($objColumn, $objObject, $blnExportCsv = false) {
 			if ($blnExportCsv) {
 				$this->blnExportCsv = $blnExportCsv;
+				return $this->ParseColumnText($objColumn, $objObject);
 			}
-			
-			return $this->ParseColumnHtml($objColumn, $objObject);
+			else{
+				return $this->ParseColumnHtml($objColumn, $objObject);
+			}
 		}
 		
 		// Used upon rendering to find backticks and perform PHP eval's
@@ -326,6 +328,52 @@
 				$intPosition = $intStartPosition + strlen($strEvaledToken);
 			}
 
+			return $strHtml;
+		}
+
+		// Ignores controls with hovertips on csv export
+
+		protected function ParseColumnText($objColumn, $objObject) {
+			$_ITEM = $objObject;
+			$_FORM = $this->objForm;
+			$_CONTROL = $this;
+			$_COLUMN = $objColumn;
+
+			$strHtml = $objColumn->Html;
+			$intPosition = 0;
+
+			while (($intStartPosition = strpos($strHtml, '<?=', $intPosition)) !== false) {
+				$intEndPosition = strpos($strHtml, '?>', $intStartPosition);
+				if ($intEndPosition === false)
+					return $strHtml;
+				$strToken = substr($strHtml, $intStartPosition + 3, ($intEndPosition - $intStartPosition) - 3);
+				$strToken = trim($strToken);
+
+				if ($strToken&&!strpos($strToken,'ToStringHoverTips($_CONTROL)')>0) {
+					// Because Eval doesn't utilize exception management, we need to provide the QErrorHandler with additional
+					// information in case soething goes wrong
+					QErrorHandler::$AdditionalMessage = sprintf("Incorrectly formatted DataGridColumn HTML in %s '%s': %s", get_class($this), $this->strControlId, $strHtml);
+
+					try {
+						$strEvaledToken = eval(sprintf('return %s;', $strToken));
+					} catch (QCallerException $objExc) {
+						$objExc->DecrementOffset();
+						throw $objExc;
+					}
+
+					// Clear additional information from error handler
+					QErrorHandler::$AdditionalMessage = null;
+				} else {
+					$strEvaledToken = '';
+				}
+
+				$strHtml = sprintf("%s%s%s",
+					substr($strHtml, 0, $intStartPosition),
+					$strEvaledToken,
+					substr($strHtml, $intEndPosition + 2));
+
+				$intPosition = $intStartPosition + strlen($strEvaledToken);
+			}
 			return $strHtml;
 		}
 		
@@ -414,7 +462,8 @@
 	  	
 	  	return $intObjectIdArray;
 	  }
-		
+
+
 		/////////////////////////
 		// Public Properties: GET
 		/////////////////////////

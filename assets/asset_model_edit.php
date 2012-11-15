@@ -173,7 +173,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected function lblAssetModelHeader_Create() {
 		$this->lblAssetModelHeader = new QLabel($this);
 		$this->lblAssetModelHeader->Name = 'Model';
-		$this->lblAssetModelHeader->Text = $this->objAssetModel->__toString();
+		if(!$this->blnEditMode){
+			$this->lblAssetModelHeader->Text = "New Model";
+		}else{
+			$this->lblAssetModelHeader->Text = $this->objAssetModel->__toString();
+		}
 	}
 
 	// Create the Asset Model Code label
@@ -842,7 +846,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
       else{
         $currentAssetCustomFields = AssetCustomFieldAssetModel::LoadArrayByAssetModelId($this->objAssetModel->AssetModelId);
         foreach($currentAssetCustomFields as $currentAssetCustomField){
-          if (!(in_array($currentAssetCustomField->CustomField->CustomFieldId,$arrAssetCustomFieldsToAdd))){
+          if (!$currentAssetCustomField->CustomField->AllAssetModelsFlag &&
+			  !(in_array($currentAssetCustomField->CustomField->CustomFieldId,$arrAssetCustomFieldsToAdd))){
 			// If blnEditMode some Assets for this Model can be already assigned and them values
 			// for this custom field must be set to null
 			$arrAssetsAssignedToModel = new Asset;

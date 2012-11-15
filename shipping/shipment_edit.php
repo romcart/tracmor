@@ -2312,14 +2312,14 @@
 			if($this->objAssetTransactionArray){
 				foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 					if ($objAssetTransaction->Asset instanceof Asset) {
-						$arrAssetTransactions = AssetTransaction::LoadArrayByAssetId($objAssetTransaction->Asset->AssetId);
+						$arrAssetTransactions = AssetTransaction::LoadArrayByAssetId($objAssetTransaction->Asset->AssetId,
+						                                                             array(QQ::OrderBy(QQN::AssetTransaction()->CreationDate,false)));
 						if (count($arrAssetTransactions)>0){
-							foreach ($arrAssetTransactions as $chkObjAssetTransaction){
-								$transaction = Transaction::load($chkObjAssetTransaction->TransactionId);
-								if($transaction->TransactionTypeId == 6 && $transaction->Shipment->ShippedFlag){
-									$blnError = true;
-									$this->btnCompleteShipment->Warning = $objAssetTransaction->Asset->__toStringWithLink() . ' already shipped.';
-								}
+							$intLastTransactionId = $arrAssetTransactions[0]->TransactionId;
+							$transaction = Transaction::load($intLastTransactionId);
+							if($transaction->TransactionTypeId == 6 && $transaction->Shipment->ShippedFlag){
+								$blnError = true;
+								$this->btnCompleteShipment->Warning = $objAssetTransaction->Asset->__toStringWithLink() . ' already shipped.';
 							}
 						}
 					}
