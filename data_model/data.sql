@@ -527,6 +527,7 @@ INSERT INTO `shortcut` (`module_id`, `authorization_id`, `transaction_type_id`, 
         (7,1,NULL,'Asset Audit Reports','../reports/asset_audit_list.php','receipt.png',1,0),
         (7,1,NULL,'Inventory Audit Reports','../reports/inventory_audit_list.php','receipt.png',2,0),
         (7,1,NULL,'Asset Transaction Report','../reports/asset_transaction_report.php','asset.png',1,0),
+        (7,1,NULL,'Depreciation Report','../reports/depreciation_report.php','depreciation.png',1,0),
         (2,2,10,'Archive Assets','../assets/asset_edit.php?intTransactionTypeId=10','asset_archive.png',1,0),
         (2,2,11,'Unarchive Assets','../assets/asset_edit.php?intTransactionTypeId=11','asset_unarchive.png',1,0);
 

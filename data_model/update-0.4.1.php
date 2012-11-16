@@ -101,6 +101,19 @@ $objDatabase->NonQuery($strQuery);
 $strQuery = "INSERT INTO `depreciation_method_qtype` (`depreciation_method_qtype_id`, `short_description`) VALUES (1, 'Straight Line');";
 $objDatabase->NonQuery($strQuery);
 
+// Insert menu item for Depreciation Report
+$strQuery = "INSERT INTO `shortcut` (`module_id`,
+                                     `authorization_id`,
+                                     `transaction_type_id`,
+                                     `short_description`,
+                                     `link`,
+                                     `image_path`,
+                                     `entity_qtype_id`,
+                                     `create_flag`
+                                     )
+                    VALUES (7,1,NULL,'Depreciation Report','../reports/depreciation_report.php','depreciation.png',1,0)";
+$objDatabase->NonQuery($strQuery);
+
 // Setup foreign keys check	again;
 $strQuery = "SET FOREIGN_KEY_CHECKS = 1;";
 $objDatabase->NonQuery($strQuery);
