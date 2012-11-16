@@ -58,7 +58,7 @@ try {
 	$objDatabase->TransactionCommit();
 	echo('Update successful!');
 
-} catch (QMySqlDatabaseException $objExc) {
+} catch (Exception $objExc) {
 	// Something went wrong
 	$objDatabase->TransactionRollback();
 	echo('Update failed!');
