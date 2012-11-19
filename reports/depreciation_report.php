@@ -56,6 +56,9 @@ class DepreciationListForm extends QForm {
     protected $strDateModifiedFirst;
     protected $strDateModifiedLast;
 
+    // Data repeater
+    protected $dtrDepreciation;
+
     protected function Form_Create() {
 
         $this->ctlHeaderMenu_Create();
@@ -156,11 +159,33 @@ class DepreciationListForm extends QForm {
 
     protected function btnClear_Click() {
         // Reload the page fresh.
-        QApplication::Redirect('asset_transaction_report.php');
+        QApplication::Redirect('depreciation_report.php');
     }
 
     protected function btnGenerate_Click() {
+        $Dates = array('start' => $this->dtpEndDateFirst->DateTime,
+                       'finish'=> $this->dtpEndDateLast->DateTime);
+        if(Asset::CountByEndDate($Dates)>0){
+            if($this->lstGenerateOptions->SelectedValue == "csv"){
 
+            }
+            elseif($this->lstGenerateOptions->SelectedValue == "print"){
+                $this->dtrDepreciation = new QDataRepeater($this);
+                $this->dtrDepreciation->Paginator = new QPaginator($this);
+                $this->dtrDepreciation->ItemsPerPage = 20000;
+                $this->dtrDepreciation->Template = 'dtr_depreciation.tpl.php';
+                $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
+            }
+            else{
+                $this->dtrDepreciation = new QDataRepeater($this);
+                $this->dtrDepreciation->Paginator = new QPaginator($this);
+                $this->dtrDepreciation->ItemsPerPage = 6;
+                $this->dtrDepreciation->PaginatorAlternate = new QPaginator($this);
+                $this->dtrDepreciation->UseAjax = true;
+                $this->dtrDepreciation->Template = 'dtr_depreciation.tpl.php';
+                $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
+            }
+        }
     }
 
     public function lstEndDate_Select() {
@@ -181,6 +206,16 @@ class DepreciationListForm extends QForm {
             $this->dtpEndDateFirst->Enabled = true;
             $this->dtpEndDateLast->Enabled = true;
         }
+    }
+
+    protected function dtrDepreciation_Bind(){
+        $Dates = array('start' => $this->dtpEndDateFirst->DateTime,
+                       'finish'=> $this->dtpEndDateLast->DateTime);
+
+        $this->dtrDepreciation->TotalItemCount = Asset::CountByEndDate($Dates);
+        $this->dtrDepreciation->DataSource     = Asset::LoadByEndDate($Dates,
+                                                                      $this->dtrDepreciation->LimitClause,
+                                                                      $this->lstSortByDate->SelectedValue);
     }
 }
 

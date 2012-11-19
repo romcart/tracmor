@@ -416,6 +416,49 @@
 			return $Location;
 		}
 
+
+        public function LoadByEndDate(array $Dates,$objOptionalClauses,$orderBy = null){
+            $objCondition = QQ::AndCondition(
+                QQ::Equal(QQN::Asset()->DepreciationFlag, 1)//,
+           //     QQ::LessOrEqual('('. QQN::Asset()->PurchaseDate . ' + INTERVAL ' . QQN::Asset()->AssetModel->DepreciationClass->Life . 'MONTHS)', $Dates['finish']),
+           //     QQ::GreaterOrEqual('(' .QQN::Asset()->PurchaseDate . ' + INTERVAL ' . QQN::Asset()->AssetModel->DepreciationClass->Life. 'MONTHS)', $Dates['start'])
+            )
+            ;
+            $objClauses = array();
+            $objExpansionClause = QQ::Expand(QQN::Asset()->AssetModel->ShortDescription);
+//            $objOrderByClause = QQ::OrderBy(QQN::Asset()->PurchaseDate, false);
+//            $objLimitClause = QQ::LimitInfo(1, 0);
+              array_push($objClauses, $objExpansionClause);
+//            array_push($objClauses, $objOrderByClause);
+              array_push($objClauses,$objOptionalClauses);
+              //$objClauses = $objOptionalClauses;
+
+
+            try {
+                return Asset::QueryArray($objCondition,$objClauses);
+            } catch (QCallerException $objExc) {
+                $objExc->IncrementOffset();
+                throw $objExc;
+            }
+        }
+
+        public function CountByEndDate(){
+            $objCondition = //QQ::AndCondition(
+                QQ::Equal(QQN::Asset()->DepreciationFlag, 1)//,
+            //  QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6)
+            //)
+            ;
+            $objClauses = array();
+//            $objExpansionClause = QQ::Expand(QQN::Asset()->AssetModel->DepreciationClass);
+//            $objOrderByClause = QQ::OrderBy(QQN::Asset()->PurchaseDate, false);
+//            $objLimitClause = QQ::LimitInfo(1, 0);
+//            array_push($objClauses, $objExpansionClause);
+//            array_push($objClauses, $objOrderByClause);
+//            array_push($objClauses, $objLimitClause);
+
+            return Asset::QueryCount($objCondition,$objClauses);
+        }
+
 		/**
 		 * Returns due date of the asset that have been checked out
 		 * else nothing

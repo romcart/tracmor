@@ -18,10 +18,13 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
+/**
+ *  @var DepreciationListForm $this
+ */
 include('../includes/header.inc.php');
 $this->RenderBegin();
 ?>
+<?php if($this->blnPrint != true):   ?>
 <!-- Begin Header Menu -->
 <?php
 $this->ctlHeaderMenu->Render();
@@ -33,6 +36,7 @@ $this->ctlHeaderMenu->Render();
 $this->ctlShortcutMenu->Render();
 ?>
 <!-- End Shortcut Menu -->
+<?php endif; ?>
 </td>
 <td>
     <img src="../images/empty.gif" width="10">
@@ -58,6 +62,15 @@ $this->ctlShortcutMenu->Render();
         </tr>
     </table>
     <?php $this->lblReport->RenderWithError(); ?>
-    <br />
+    <?php if($this->dtrDepreciation instanceof QDataRepeater):?>
+
+    <?php    $this->dtrDepreciation->Paginator->Render(); ?>
+    <br/>
+    <?php     $this->dtrDepreciation->Render();?>
+    <br/>
+    <?php     $this->dtrDepreciation->PaginatorAlternate->Render();?>
+    <br/>
+    <?php endif;?>
+
     <?php  $this->RenderEnd() ?>
 <?php 	require_once('../includes/footer.inc.php'); ?>
