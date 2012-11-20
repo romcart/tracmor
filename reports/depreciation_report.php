@@ -21,6 +21,7 @@
 
 require_once('../includes/prepend.inc.php');
 QApplication::Authenticate(7);
+require_once('reportDataRepeater.php');
 class DepreciationListForm extends QForm {
 
     // Header Tabs
@@ -163,18 +164,38 @@ class DepreciationListForm extends QForm {
     }
 
     protected function btnGenerate_Click() {
-        $Dates = array('start' => $this->dtpEndDateFirst->DateTime,
-                       'finish'=> $this->dtpEndDateLast->DateTime);
-        if(Asset::CountByEndDate($Dates)>0){
-            if($this->lstGenerateOptions->SelectedValue == "csv"){
+        $sort_condition = '';
+        $dates_condition = $this->getDateCondition();
 
+        if(Asset::CountByEndDate($dates_condition)>0){
+            if($this->lstGenerateOptions->SelectedValue == "csv"){
+                ob_end_clean();
+                header("Content-type: text/csv");
+                header("Content-Disposition: attachment; filename=Depreciation_Report.csv");
+                header("Pragma: no-cache");
+                header("Expires: 0");
+                $dataSource = Asset::LoadByEndDate($Dates);
+                echo '"Asset ID","Asset Code","Model Name","Purchase Date"'."\n";
+                foreach($dataSource as $record){
+                    $arrColumnText = array( $this->prepare($record->AssetId),
+                                            $this->prepare($record->AssetCode),
+                                            $this->prepare($record->AssetModel->ShortDescription),
+                                            $this->prepare($record->PurchaseDate));
+                    $strColumnsHtml = implode('","', $arrColumnText);
+                    $strColumnsHtml = '"' . $strColumnsHtml . '"' . "\r\n";
+                    print $strColumnsHtml;
+                }
+                exit;
             }
             elseif($this->lstGenerateOptions->SelectedValue == "print"){
-                $this->dtrDepreciation = new QDataRepeater($this);
+                $this->dtrDepreciation = new reportDataRepeater($this);
                 $this->dtrDepreciation->Paginator = new QPaginator($this);
                 $this->dtrDepreciation->ItemsPerPage = 20000;
                 $this->dtrDepreciation->Template = 'dtr_depreciation.tpl.php';
                 $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
+                print $this->dtrDepreciation->GetReportHtml();
+                QApplication::ExecuteJavaScript("reportWindow=window;newWindow = window.open('../reports/depreciation_report.php');reportWindow.focus;");
+                exit;
             }
             else{
                 $this->dtrDepreciation = new QDataRepeater($this);
@@ -184,6 +205,7 @@ class DepreciationListForm extends QForm {
                 $this->dtrDepreciation->UseAjax = true;
                 $this->dtrDepreciation->Template = 'dtr_depreciation.tpl.php';
                 $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
+
             }
         }
     }
@@ -209,13 +231,44 @@ class DepreciationListForm extends QForm {
     }
 
     protected function dtrDepreciation_Bind(){
-        $Dates = array('start' => $this->dtpEndDateFirst->DateTime,
-                       'finish'=> $this->dtpEndDateLast->DateTime);
 
-        $this->dtrDepreciation->TotalItemCount = Asset::CountByEndDate($Dates);
-        $this->dtrDepreciation->DataSource     = Asset::LoadByEndDate($Dates,
-                                                                      $this->dtrDepreciation->LimitClause,
-                                                                      $this->lstSortByDate->SelectedValue);
+        $this->dtrDepreciation->TotalItemCount = Asset::CountByEndDate($this->getDateCondition());
+        $this->dtrDepreciation->DataSource     = Asset::LoadByEndDate($this->getDateCondition(),
+                                                                      $this->lstSortByDate->SelectedValue,
+                                                                      $this->dtrDepreciation->LimitClause
+                                                                      );
+    }
+
+    public function prepare($strHtml){
+        $strHtml = htmlspecialchars_decode($strHtml);
+        $strHtml = str_replace('"', '""', $strHtml);
+        //$strHtml = $this->StripControls($strHtml);
+        $strHtml = strip_tags($strHtml);
+        $strHtml = trim($strHtml);
+            return $strHtml;
+    }
+
+    protected function getDateCondition(){
+        $dates_condition = '';
+        if ($this->lstEndDate->SelectedValue == 'between'){
+            $dates_condition = " HAVING(`end_date` >= STR_TO_DATE("
+                . $this->dtpEndDateFirst->DateTime->format('m-d-Y g:i:s')
+                . ", '%Y-%m-%d %H:%i:%s')
+                                AND `end_date` <= STR_TO_DATE("
+                . $this->dtpEndDateLast->DateTime->format('m-d-Y g:i:s')
+                . ", '%Y-%m-%d %H:%i:%s') ";
+        }
+        elseif($this->lstEndDate->SelectedValue == 'before'){
+            $dates_condition = " HAVING(`end_date` <= STR_TO_DATE("
+                . $this->dtpEndDateLast->DateTime->format('m-d-Y g:i:s')
+                . ", '%Y-%m-%d %H:%i:%s') ";
+        }
+        elseif($this->lstEndDate->SelectedValue == 'after'){
+            $dates_condition = " HAVING(`end_date` >= STR_TO_DATE("
+                . $this->dtpEndDateFirst->DateTime->format('m-d-Y g:i:s')
+                . ", '%Y-%m-%d %H:%i:%s')";
+        }
+        return $dates_condition;
     }
 }
 

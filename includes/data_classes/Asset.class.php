@@ -56,6 +56,17 @@
 			// return sprintf('Asset Object %s - %s',  $this->intAssetId,  $this->intAssetModelId);
 			return $this->AssetModel->ShortDescription;
 		}
+
+        public function getEndDate(){
+            if($this->DepreciationFlag){
+                $strToReturn = clone $this->PurchaseDate;
+                return $strToReturn->AddMonths($this->AssetModel->DepreciationClass->Life);
+            }
+            else{
+                return null;
+            }
+        }
+
 		/**
 		* @return depreciation class if assigned;
 		*/
@@ -416,47 +427,52 @@
 			return $Location;
 		}
 
-
-        public function LoadByEndDate(array $Dates,$objOptionalClauses,$orderBy = null){
-            $objCondition = QQ::AndCondition(
-                QQ::Equal(QQN::Asset()->DepreciationFlag, 1)//,
-           //     QQ::LessOrEqual('('. QQN::Asset()->PurchaseDate . ' + INTERVAL ' . QQN::Asset()->AssetModel->DepreciationClass->Life . 'MONTHS)', $Dates['finish']),
-           //     QQ::GreaterOrEqual('(' .QQN::Asset()->PurchaseDate . ' + INTERVAL ' . QQN::Asset()->AssetModel->DepreciationClass->Life. 'MONTHS)', $Dates['start'])
-            )
-            ;
-            $objClauses = array();
-            $objExpansionClause = QQ::Expand(QQN::Asset()->AssetModel->ShortDescription);
-//            $objOrderByClause = QQ::OrderBy(QQN::Asset()->PurchaseDate, false);
-//            $objLimitClause = QQ::LimitInfo(1, 0);
-              array_push($objClauses, $objExpansionClause);
-//            array_push($objClauses, $objOrderByClause);
-              array_push($objClauses,$objOptionalClauses);
-              //$objClauses = $objOptionalClauses;
-
-
-            try {
-                return Asset::QueryArray($objCondition,$objClauses);
-            } catch (QCallerException $objExc) {
-                $objExc->IncrementOffset();
-                throw $objExc;
-            }
+       public function LoadByEndDate($dates_condition,$sort_condition = null, $limit_condition = null){
+            $strQuery =sprintf( " SELECT `asset`.`asset_id`   AS `asset_id`,
+				              	 `asset`.`asset_code` AS `asset_code`,
+				                 `asset`.`depreciation_flag` AS `depreciation_flag`,
+					             `asset`.`purchase_date` AS `purchase_date`,
+					             `asset`.`purchase_cost` AS `purchase_cost`,
+					             `asset`.`asset_model_id`,
+					             `asset_model`.`short_description` AS `model_name`,
+					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_day`
+                                  FROM `asset` AS `asset`
+                                  LEFT JOIN `asset_model` AS `asset_model`
+                                  ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
+                                  LEFT JOIN `depreciation_class` AS `depreciation_class`
+                                  ON `depreciation_class`.`depreciation_class_id`=`asset_model`.`depreciation_class_id`
+                                  WHERE `depreciation_flag` = 1
+                                  %s
+					           ", $dates_condition);
+            $objDatabase = Asset::GetDatabase();
+            $objDbResult = $objDatabase->Query($strQuery);
+            return Asset::InstantiateDbResult($objDbResult);
         }
 
-        public function CountByEndDate(){
-            $objCondition = //QQ::AndCondition(
-                QQ::Equal(QQN::Asset()->DepreciationFlag, 1)//,
-            //  QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6)
-            //)
-            ;
-            $objClauses = array();
-//            $objExpansionClause = QQ::Expand(QQN::Asset()->AssetModel->DepreciationClass);
-//            $objOrderByClause = QQ::OrderBy(QQN::Asset()->PurchaseDate, false);
-//            $objLimitClause = QQ::LimitInfo(1, 0);
-//            array_push($objClauses, $objExpansionClause);
-//            array_push($objClauses, $objOrderByClause);
-//            array_push($objClauses, $objLimitClause);
 
-            return Asset::QueryCount($objCondition,$objClauses);
+
+        public function CountByEndDate($dates_condition){
+            $strQuery =sprintf( " SELECT
+                                 COUNT(DISTINCT `asset`.`asset_id`) AS `row_count`,
+                                 `asset`.`asset_id`   AS `asset_id`,
+				                 `asset`.`depreciation_flag` AS `depreciation_flag`,
+					             `asset`.`purchase_date` AS `purchase_date`,
+					             `asset`.`asset_model_id`,
+					             `asset_model`.`short_description` AS `model_name`,
+					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_day`
+                                  FROM `asset` AS `asset`
+                                  LEFT JOIN `asset_model` AS `asset_model`
+                                  ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
+                                  LEFT JOIN `depreciation_class` AS `depreciation_class`
+                                  ON `depreciation_class`.`depreciation_class_id`=`asset_model`.`depreciation_class_id`
+                                  WHERE `depreciation_flag` = 1
+                                  %s
+					           ", $dates_condition);
+
+            $objDatabase = Asset::GetDatabase();
+            $objDbResult = $objDatabase->Query($strQuery);
+            $strDbRow = $objDbResult->FetchRow();
+            return QType::Cast($strDbRow[0], QType::Integer);
         }
 
 		/**

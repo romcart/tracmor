@@ -1,6 +1,7 @@
 <div class="description">
-    <b>Asset #<?php _p($_ITEM->AssetId); ?></b><br/>
-    Asset Code: <b><?php _p($_ITEM->AssetCode); ?></b><br/>
+    <b>Asset #<?php _p($_ITEM->getEndDate());
+        ?></b><br/>
+    Asset Code: <b><?php  _p($_ITEM->AssetCode); ?></b><br/>
     Asset Model Name: <?php  _p($_ITEM->AssetModel->ShortDescription); ?><br/>
     Purchase Cost: <b><?php  _p($_ITEM->PurchaseCost); ?></b><br/>
     Purchase Date: <b><?php  _p($_ITEM->PurchaseDate); ?></b><br/>

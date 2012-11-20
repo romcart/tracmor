@@ -24,7 +24,6 @@
 include('../includes/header.inc.php');
 $this->RenderBegin();
 ?>
-<?php if($this->blnPrint != true):   ?>
 <!-- Begin Header Menu -->
 <?php
 $this->ctlHeaderMenu->Render();
@@ -36,7 +35,6 @@ $this->ctlHeaderMenu->Render();
 $this->ctlShortcutMenu->Render();
 ?>
 <!-- End Shortcut Menu -->
-<?php endif; ?>
 </td>
 <td>
     <img src="../images/empty.gif" width="10">
