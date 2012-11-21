@@ -435,7 +435,33 @@
 					             `asset`.`purchase_cost` AS `purchase_cost`,
 					             `asset`.`asset_model_id`,
 					             `asset_model`.`short_description` AS `model_name`,
-					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_day`
+					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_date`
+                                  FROM `asset` AS `asset`
+                                  LEFT JOIN `asset_model` AS `asset_model`
+                                  ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
+                                  LEFT JOIN `depreciation_class` AS `depreciation_class`
+                                  ON `depreciation_class`.`depreciation_class_id`=`asset_model`.`depreciation_class_id`
+                                  WHERE `depreciation_flag` = 1
+                                  %s%s
+					           ", $dates_condition, $sort_condition);
+            $objDatabase = Asset::GetDatabase();
+            $objDbResult = $objDatabase->Query($strQuery);
+            return Asset::InstantiateDbResult($objDbResult);
+        }
+
+        public function getTotalsByEndDate($dates_condition){
+            $strQuery =sprintf( " SELECT
+                                 `asset`.`asset_id`   AS `asset_id`,
+				                 `asset`.`depreciation_flag` AS `depreciation_flag`,
+					             `asset`.`purchase_date` AS `purchase_date`,
+					             `asset`.`asset_model_id`,
+					             `asset_model`.`short_description` AS `model_name`,
+					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_date`,
+					              SUM(DISTINCT (`asset`.`purchase_cost` *
+					                           (PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(`asset`.`purchase_date`, '%Y%m')))/
+					                            `depreciation_class`.`life`)) as `total_current_depreciation`,
+					              SUM(DISTINCT `asset`.`purchase_cost`) AS `total_purchase_cost`,
+                                  (`total_puchase_cost` - `total_current_depretiation`)
                                   FROM `asset` AS `asset`
                                   LEFT JOIN `asset_model` AS `asset_model`
                                   ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
@@ -446,10 +472,9 @@
 					           ", $dates_condition);
             $objDatabase = Asset::GetDatabase();
             $objDbResult = $objDatabase->Query($strQuery);
-            return Asset::InstantiateDbResult($objDbResult);
+            $strDbRow = $objDbResult->FetchRow();
+            return $strDbRow; //QType::Cast($strDbRow[0], QType::Integer);
         }
-
-
 
         public function CountByEndDate($dates_condition){
             $strQuery =sprintf( " SELECT
@@ -459,7 +484,7 @@
 					             `asset`.`purchase_date` AS `purchase_date`,
 					             `asset`.`asset_model_id`,
 					             `asset_model`.`short_description` AS `model_name`,
-					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_day`
+					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_date`
                                   FROM `asset` AS `asset`
                                   LEFT JOIN `asset_model` AS `asset_model`
                                   ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
@@ -468,7 +493,6 @@
                                   WHERE `depreciation_flag` = 1
                                   %s
 					           ", $dates_condition);
-
             $objDatabase = Asset::GetDatabase();
             $objDbResult = $objDatabase->Query($strQuery);
             $strDbRow = $objDbResult->FetchRow();

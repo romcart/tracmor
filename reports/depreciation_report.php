@@ -164,7 +164,6 @@ class DepreciationListForm extends QForm {
     }
 
     protected function btnGenerate_Click() {
-        $sort_condition = '';
         $dates_condition = $this->getDateCondition();
 
         if(Asset::CountByEndDate($dates_condition)>0){
@@ -174,7 +173,7 @@ class DepreciationListForm extends QForm {
                 header("Content-Disposition: attachment; filename=Depreciation_Report.csv");
                 header("Pragma: no-cache");
                 header("Expires: 0");
-                $dataSource = Asset::LoadByEndDate($Dates);
+                $dataSource = Asset::LoadByEndDate($this->getDateCondition(), $this->getSortCondition());
                 echo '"Asset ID","Asset Code","Model Name","Purchase Date"'."\n";
                 foreach($dataSource as $record){
                     $arrColumnText = array( $this->prepare($record->AssetId),
@@ -205,7 +204,6 @@ class DepreciationListForm extends QForm {
                 $this->dtrDepreciation->UseAjax = true;
                 $this->dtrDepreciation->Template = 'dtr_depreciation.tpl.php';
                 $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
-
             }
         }
     }
@@ -231,11 +229,9 @@ class DepreciationListForm extends QForm {
     }
 
     protected function dtrDepreciation_Bind(){
-
         $this->dtrDepreciation->TotalItemCount = Asset::CountByEndDate($this->getDateCondition());
         $this->dtrDepreciation->DataSource     = Asset::LoadByEndDate($this->getDateCondition(),
-                                                                      $this->lstSortByDate->SelectedValue,
-                                                                      $this->dtrDepreciation->LimitClause
+                                                                      $this->getSortCondition()
                                                                       );
     }
 
@@ -248,25 +244,29 @@ class DepreciationListForm extends QForm {
             return $strHtml;
     }
 
+    protected function getSortCondition(){
+        return " ORDER BY `end_date` " . $this->lstSortByDate->SelectedValue;
+    }
+
     protected function getDateCondition(){
         $dates_condition = '';
         if ($this->lstEndDate->SelectedValue == 'between'){
-            $dates_condition = " HAVING(`end_date` >= STR_TO_DATE("
-                . $this->dtpEndDateFirst->DateTime->format('m-d-Y g:i:s')
-                . ", '%Y-%m-%d %H:%i:%s')
-                                AND `end_date` <= STR_TO_DATE("
-                . $this->dtpEndDateLast->DateTime->format('m-d-Y g:i:s')
-                . ", '%Y-%m-%d %H:%i:%s') ";
+            $dates_condition = " HAVING(`end_date` >= STR_TO_DATE('"
+                . $this->dtpEndDateFirst->DateTime->format('Y-m-d g:i:s')
+                . "', '%Y-%m-%d %H:%i:%s')
+                                AND `end_date` <= STR_TO_DATE('"
+                . $this->dtpEndDateLast->DateTime->format('Y-m-d g:i:s')
+                . "', '%Y-%m-%d %H:%i:%s'))";
         }
         elseif($this->lstEndDate->SelectedValue == 'before'){
-            $dates_condition = " HAVING(`end_date` <= STR_TO_DATE("
-                . $this->dtpEndDateLast->DateTime->format('m-d-Y g:i:s')
-                . ", '%Y-%m-%d %H:%i:%s') ";
+            $dates_condition = " HAVING(`end_date` <= STR_TO_DATE('"
+                . $this->dtpEndDateFirst->DateTime->format('Y-m-d g:i:s')
+                . "', '%Y-%m-%d %H:%i:%s'))";
         }
         elseif($this->lstEndDate->SelectedValue == 'after'){
-            $dates_condition = " HAVING(`end_date` >= STR_TO_DATE("
-                . $this->dtpEndDateFirst->DateTime->format('m-d-Y g:i:s')
-                . ", '%Y-%m-%d %H:%i:%s')";
+            $dates_condition = " HAVING(`end_date` >= STR_TO_DATE('"
+                . $this->dtpEndDateFirst->DateTime->format('Y-m-d g:i:s')
+                . "', '%Y-%m-%d %H:%i:%s'))";
         }
         return $dates_condition;
     }
