@@ -151,12 +151,12 @@ class QAssetSearchComposite extends QControl {
 		// Add Asset Model Depreciation class if Enabled within application
 		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 			$this->dtgAsset->AddColumn(new QDataGridColumnExt('Depreciation Class',
-				'<?= $_ITEM->getActiveDepreciationClass() ?>',
-				'SortByCommand="asset__asset_model_id__default_depreciation_class_id__short_description ASC"',
-				'ReverseSortByCommand="asset__asset_model_id__default_depreciation_class_id__short_description DESC"',
+				'<?= $_ITEM->AssetModel->DepreciationClass ?>',
+				'SortByCommand="asset__asset_model_id__depreciation_class_id__short_description ASC"',
+				'ReverseSortByCommand="asset__asset_model_id__depreciation_class_id__short_description DESC"',
 				'CssClass="dtg_column"'));
-			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Cost','<?= $_ITEM->PurchaseCost ?>','CssClass="dtg_column"'));
-			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Date','<?= $_ITEM->PurchaseDate ?>','CssClass="dtg_column"'));
+			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Cost','<?= $_ITEM->PurchaseCost ?>','SortByCommand="purchase_cost ASC"','ReverseSortByCommand="purchase_cost DESC"', 'CssClass="dtg_column"'));
+			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Date','<?= $_ITEM->PurchaseDate ?>','SortByCommand="purchase_date ASC"','ReverseSortByCommand="purchase_date DESC"', 'CssClass="dtg_column"'));
 		}
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
