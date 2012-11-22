@@ -59,6 +59,7 @@ class DepreciationListForm extends QForm {
 
     // Data repeater
     protected $dtrDepreciation;
+    public    $totals;
 
     protected function Form_Create() {
 
@@ -167,6 +168,7 @@ class DepreciationListForm extends QForm {
         $dates_condition = $this->getDateCondition();
 
         if(Asset::CountByEndDate($dates_condition)>0){
+            $this->totals = Asset::getTotalsByEndDate($dates_condition);
             if($this->lstGenerateOptions->SelectedValue == "csv"){
                 ob_end_clean();
                 header("Content-type: text/csv");
@@ -191,18 +193,25 @@ class DepreciationListForm extends QForm {
                 $this->dtrDepreciation->Paginator = new QPaginator($this);
                 $this->dtrDepreciation->ItemsPerPage = 20000;
                 $this->dtrDepreciation->Template = 'dtr_depreciation.tpl.php';
+                $this->dtrDepreciation->setSummary(array('Total Depreciation'  => $this->totals[1],
+                                                         'Total Purchase Cost' => $this->totals[2],
+                                                         'Total Book Value'    => ($this->totals[2]-$this->totals[1])));
                 $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
+                print $this->getTitle();
                 print $this->dtrDepreciation->GetReportHtml();
                 QApplication::ExecuteJavaScript("reportWindow=window;newWindow = window.open('../reports/depreciation_report.php');reportWindow.focus;");
                 exit;
             }
             else{
-                $this->dtrDepreciation = new QDataRepeater($this);
+                $this->dtrDepreciation = new reportDataRepeater($this);
                 $this->dtrDepreciation->Paginator = new QPaginator($this);
                 $this->dtrDepreciation->ItemsPerPage = 6;
                 $this->dtrDepreciation->PaginatorAlternate = new QPaginator($this);
                 $this->dtrDepreciation->UseAjax = true;
                 $this->dtrDepreciation->Template = 'dtr_depreciation.tpl.php';
+                $this->dtrDepreciation->setSummary(array('Total Depreciation'  => $this->totals[1],
+                    'Total Purchase Cost' => $this->totals[2],
+                    'Total Book Value'    => ($this->totals[2]-$this->totals[1])));
                 $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
             }
         }
@@ -269,6 +278,28 @@ class DepreciationListForm extends QForm {
                 . "', '%Y-%m-%d %H:%i:%s'))";
         }
         return $dates_condition;
+    }
+
+    protected function getTitle(){
+        $title = '<div class="title">&nbsp Depreciation Report ';
+        $dates = ' for assets with End Date ' . $this->lstEndDate->SelectedValue . ' ';
+        $titleClose = '</div>';
+        if ($this->lstEndDate->SelectedValue == 'between'){
+            $dates .= $this->dtpEndDateFirst->DateTime//->format('Y-m-d g:i:s')
+                . " AND "
+                . $this->dtpEndDateLast->DateTime;//->format('Y-m-d g:i:s')
+            $title .= $dates;
+        }
+        elseif($this->lstEndDate->SelectedValue == 'before'){
+            $title .= $this->dtpEndDateFirst->DateTime;//->format('Y-m-d g:i:s');
+            $title .= $dates;
+        }
+        elseif($this->lstEndDate->SelectedValue == 'after'){
+            $dates .= $this->dtpEndDateFirst->DateTime;//->format('Y-m-d g:i:s')
+            $title .= $dates;
+        }
+        $title.= $titleClose;
+        return $title;
     }
 }
 

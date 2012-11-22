@@ -62,12 +62,10 @@ $this->ctlShortcutMenu->Render();
     <?php $this->lblReport->RenderWithError(); ?>
     <?php if($this->dtrDepreciation instanceof QDataRepeater):?>
 
-    <?php    $this->dtrDepreciation->Paginator->Render(); ?>
-    <br/>
     <?php     $this->dtrDepreciation->Render();?>
-    <br/>
-    <?php     $this->dtrDepreciation->PaginatorAlternate->Render();?>
-    <br/>
+<!--        <p>Total Purchase Cost:--><?php // echo ($this->totals[2]); ?><!--</p>-->
+<!--        <p>Total Depreciation: --><?php // echo ($this->totals[1]); ?><!--</p>-->
+<!--        <p>Total Book Value:   --><?php // echo ($this->totals[2] - $this->totals[1]); ?><!--</p>-->
     <?php endif;?>
 
     <?php  $this->RenderEnd() ?>
