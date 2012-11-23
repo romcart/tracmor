@@ -67,6 +67,24 @@
             }
         }
 
+        public function getBookValue(){
+            $fltBookValue =	$this->PurchaseCost - $this->getCurrentDepreciation();
+            return $fltBookValue;
+        }
+
+        public function getCurrentDepreciation(){
+
+            if (QDateTime::Now() < $this->PurchaseDate){
+                return 0;
+            } else {
+                $interval = QDateTime::Now()->diff($this->PurchaseDate);
+                $interval = $interval->y*12 + $interval->m;
+                $currentDepreciation = $this->PurchaseCost * ($interval/$this->AssetModel->DepreciationClass->Life);
+                $currentDepreciation = $currentDepreciation > $this->PurchaseCost ? $this->PurchaseCost : $currentDepreciation;
+                return $currentDepreciation;
+            }
+        }
+
 		/**
 		* @return depreciation class if assigned;
 		*/
@@ -452,13 +470,13 @@
         public function getTotalsByEndDate($dates_condition){
             $strQuery = " SELECT
                           DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_date`,
-                          SUM(DISTINCT
-                          (IF(PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(`asset`.`purchase_date`, '%Y%m'))
-                          <`depreciation_class`.`life`,
+                          SUM(IF(NOW()>`asset`.`purchase_date` ,
+                              IF(PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(`asset`.`purchase_date`, '%Y%m'))
+                                                                                         <`depreciation_class`.`life`,
                           `asset`.`purchase_cost` * (PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'),
                                                                  DATE_FORMAT(`asset`.`purchase_date`, '%Y%m')))/
-                          `depreciation_class`.`life`, `asset`.`purchase_cost`))) AS `total_current_depreciation`,
-                          SUM(DISTINCT `asset`.`purchase_cost`) AS `total_purchase_cost`
+                          `depreciation_class`.`life`, `asset`.`purchase_cost`),0)) AS `total_current_depreciation`,
+                          SUM( `asset`.`purchase_cost`) AS `total_purchase_cost`
                           FROM `asset` AS `asset`
                           LEFT JOIN `asset_model` AS `asset_model`
                           ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`

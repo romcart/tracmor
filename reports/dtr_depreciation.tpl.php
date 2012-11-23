@@ -35,16 +35,17 @@ else
     $interval = QDateTime::Now()->diff($_ITEM->PurchaseDate);
     $interval = $interval->y*12 + $interval->m;
     $fltBookValue =	$_ITEM->PurchaseCost - ($_ITEM->PurchaseCost * ($interval/$_ITEM->AssetModel->DepreciationClass->Life));
+    $fltBookValue = $fltBookValue < 0 ? 0 : $fltBookValue;
     ?>
-    <td><?php _p($_ITEM->PurchaseCost - $fltBookValue) ?>
+    <td><?php _p($_ITEM->getCurrentDepreciation()) ?>
     </td>
-    <td><?php _p($fltBookValue) ?></td>
+    <td><?php _p($_ITEM->getBookValue()) ?></td>
 </tr>
 
 <?php
 if($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1){
-    _p("</tbody><tfoot>",false);
+    _p("<tr><td colspan=6 >",false);
     _p($_CONTROL->getSummaryHtml(),false);
-    _p("</tfoot></table>",false);
+    _p("</td></tr></tbody></table>",false);
 }
 ?>

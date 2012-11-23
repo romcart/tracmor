@@ -114,7 +114,7 @@ class DepreciationListForm extends QForm {
         $this->dtpEndDateFirst->DateTimePickerType = QDateTimePickerType::Date;
         $this->dtpEndDateFirst->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
         $this->dtpEndDateFirst->Enabled = false;
-        $this->dtpEndDateFirst->MaximumYear = $this->dtpEndDateFirst->DateTime->Year;
+        $this->dtpEndDateFirst->MaximumYear = $this->dtpEndDateFirst->DateTime->Year + 10;
     }
 
     protected function dtpEndDateLast_Create() {
@@ -124,7 +124,7 @@ class DepreciationListForm extends QForm {
         $this->dtpEndDateLast->DateTimePickerType = QDateTimePickerType::Date;
         $this->dtpEndDateLast->DateTimePickerFormat = QDateTimePickerFormat::MonthDayYear;
         $this->dtpEndDateLast->Enabled = false;
-        $this->dtpEndDateLast->MaximumYear = $this->dtpEndDateLast->DateTime->Year;
+        $this->dtpEndDateLast->MaximumYear = $this->dtpEndDateLast->DateTime->Year + 10;
     }
 
     protected function lstEndDate_Create() {
@@ -170,22 +170,31 @@ class DepreciationListForm extends QForm {
         if(Asset::CountByEndDate($dates_condition)>0){
             $this->totals = Asset::getTotalsByEndDate($dates_condition);
             if($this->lstGenerateOptions->SelectedValue == "csv"){
+                $dataSource = Asset::LoadByEndDate($this->getDateCondition(), $this->getSortCondition());
                 ob_end_clean();
                 header("Content-type: text/csv");
                 header("Content-Disposition: attachment; filename=Depreciation_Report.csv");
                 header("Pragma: no-cache");
                 header("Expires: 0");
-                $dataSource = Asset::LoadByEndDate($this->getDateCondition(), $this->getSortCondition());
-                echo '"Asset ID","Asset Code","Model Name","Purchase Date"'."\n";
+                print '"Asset ID","Asset Code","Model Name","Purchase Date","Purchase Cost","Current Depreciation","Book Value"'."\r\n";
                 foreach($dataSource as $record){
                     $arrColumnText = array( $this->prepare($record->AssetId),
                                             $this->prepare($record->AssetCode),
                                             $this->prepare($record->AssetModel->ShortDescription),
-                                            $this->prepare($record->PurchaseDate));
+                                            $this->prepare($record->PurchaseDate),
+                                            $this->prepare($record->PurchaseCost),
+                                            $this->prepare($record->getCurrentDepreciation()),
+                                            $this->prepare($record->getBookValue()));
                     $strColumnsHtml = implode('","', $arrColumnText);
                     $strColumnsHtml = '"' . $strColumnsHtml . '"' . "\r\n";
                     print $strColumnsHtml;
                 }
+                print '"Total Depreciation:' . $this->totals[1] . '"' . "\r\n";
+                print '"Total Purchase Cost:' . $this->totals[2] . '"' . "\r\n";
+                print '"Total Book Value:' . ($this->totals[2]-$this->totals[1]) . '"' . "\r\n";
+                ob_get_contents();
+                @ob_flush();
+                flush();
                 exit;
             }
             elseif($this->lstGenerateOptions->SelectedValue == "print"){
