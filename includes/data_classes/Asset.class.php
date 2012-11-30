@@ -352,7 +352,7 @@
 			return $intAssetCode;
 		}
 
-		public function LoadArrayDepreciatedByAssetModelId($intAssetModelId){
+		public static function LoadArrayDepreciatedByAssetModelId($intAssetModelId){
 			try {
 				return Asset::QueryArray(QQ::AndCondition(
 					QQ::Equal(QQN::Asset()->AssetModelId, $intAssetModelId),
