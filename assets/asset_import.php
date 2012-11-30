@@ -902,9 +902,9 @@
                       }
 
                       if (!$blnCheckCFVError) {
-                        $strAssetArray[] = $strAssetCode;
+                        $strAssetArray[] = stripslashes($strAssetCode);
                         $this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW())", $strAssetCode, $intLocationId, $intAssetModelId, ($intParentAssetId) ? $intParentAssetId : "NULL", ($blnLinked) ? "1" : "0", $_SESSION['intUserAccountId']);
-                        $objNewAssetArray[] = $strAssetCode;
+                        $objNewAssetArray[] = stripslashes($strAssetCode);
                         if (isset($strCFVArray) && count($strCFVArray)) {
                           $strAssetCFVArray[] = str_replace('""','"',implode(', ', $strCFVArray));
                          /*if ($j == 2) {
