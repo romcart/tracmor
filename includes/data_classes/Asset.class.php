@@ -490,7 +490,7 @@
             return $strDbRow; //QType::Cast($strDbRow[0], QType::Integer);
         }
 
-        public function CountByEndDate($dates_condition){
+        public static function CountByEndDate($dates_condition){
             $strQuery =sprintf( " SELECT
                                  COUNT(DISTINCT `asset`.`asset_id`) AS `row_count`,
                                  `asset`.`asset_id`   AS `asset_id`,
