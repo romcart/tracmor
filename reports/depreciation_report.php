@@ -183,15 +183,19 @@ class DepreciationListForm extends QForm {
                                             $this->prepare($record->AssetModel->ShortDescription),
                                             $this->prepare($record->PurchaseDate),
                                             $this->prepare($record->PurchaseCost),
-                                            $this->prepare($record->getCurrentDepreciation()),
-                                            $this->prepare($record->getBookValue()));
+                                            $this->prepare($record->getBookValue()),
+                                            $this->prepare($record->getCurrentDepreciation()));
                     $strColumnsHtml = implode('","', $arrColumnText);
                     $strColumnsHtml = '"' . $strColumnsHtml . '"' . "\r\n";
                     print $strColumnsHtml;
                 }
-                print '"Total Depreciation:' . $this->totals[1] . '"' . "\r\n";
-                print '"Total Purchase Cost:' . $this->totals[2] . '"' . "\r\n";
-                print '"Total Book Value:' . ($this->totals[2]-$this->totals[1]) . '"' . "\r\n";
+                print '"","","","Total:","'
+                    . round($this->totals[2],2)
+                    . '","'
+                    . round(($this->totals[2]-$this->totals[1]),2)
+                    .'","'.round($this->totals[1],2)
+                    .'"'
+                    ."\r\n";
                 ob_get_contents();
                 @ob_flush();
                 flush();
