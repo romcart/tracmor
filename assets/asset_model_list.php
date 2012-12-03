@@ -76,6 +76,10 @@
 		protected $lblWarning;
 		protected $dlgMassEdit;
 		protected $dlgMassDelete;
+        protected $btnMassDeleteConfirm;
+        protected $btnMassDeleteCancel;
+
+        protected $arrToDelete = array();
 
 		protected function Form_Create() {
 			
@@ -153,8 +157,11 @@
 
 	  // Mass Actions controls create
 	  $this->lblWarning_Create();
-	  $this->dlgMassEdit_Create();
-	  $this->dlgMassDelete_Create();
+
+      $this->dlgMassDelete_Create();
+      $this->btnMassDeleteCancel_Create();
+      $this->btnMassDeleteConfirm_Create();
+      $this->dlgMassEdit_Create();
 	  $this->btnMassDelete_Create();
 	  $this->btnMassEdit_Create();
 
@@ -320,11 +327,60 @@
 		  $this->lblWarning->CssClass = "warning";
 	  }
 
+      protected function btnMassDeleteCancel_Create(){
+          $this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
+          $this->btnMassDeleteCancel->Text = "Cancel";
+          $this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+          $this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+      }
+
+      protected function btnMassDeleteConfirm_Create(){
+          $this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
+          $this->btnMassDeleteConfirm->Text = "Confirm";
+          $this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+          $this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+      }
+
+      protected function btnMassDeleteConfirm_Click(){
+          if (count($this->arrToDelete)>0){
+              AssetModel::DeleteSelected($this->arrToDelete);
+              $this->arrToDelete = array();
+          }
+          $this->dlgMassDelete->HideDialogBox();
+          QApplication::Redirect('');
+      }
+
+      protected function btnMassDeleteCancel_Click(){
+          $this->dlgMassDelete->HideDialogBox();
+          QApplication::Redirect('');
+      }
+
 	  protected function btnMassDelete_Click(){
 		  $items = $this->dtgAssetModel->getSelected('AssetModelId');
 		  if(count($items)>0){
 			  $this->lblWarning->Text = "";
-			  // TODO perform validate/delete
+              $arrToSkip = array();
+              // Separating items able to be deleted
+              foreach ($items as $item){
+                  $arrAssetAssigned = Asset::LoadArrayByAssetModelId($item);
+                  if(!$arrAssetAssigned || count($arrAssetAssigned) <= 0 ){
+                      $this->arrToDelete[] = $item;
+                  }
+                  else{
+                      $arrToSkip[] = $item;
+                  }
+              }
+              if (count($arrToSkip)>0){
+                  $this->dlgMassDelete->Text =sprintf("There are %s Models that are not able to be deleted. Would you like to continue the deletion process, skipping these items?<br />",implode(",",$arrToSkip));
+                  $this->dlgMassDelete->ShowDialogBox();
+              }
+              else{
+                  if (count($this->arrToDelete)>0){
+                      AssetModel::DeleteSelected($this->arrToDelete);
+                      $this->arrToDelete = array();
+                      QApplication::Redirect('');
+                  }
+              }
 		  }else{
 			  $this->lblWarning->Text = "You haven't chosen any Model to Delete" ;
 		  }
