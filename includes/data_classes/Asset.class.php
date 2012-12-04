@@ -445,7 +445,7 @@
 			return $Location;
 		}
 
-       public function LoadByEndDate($dates_condition,$sort_condition = null, $limit_condition = null){
+       public static function LoadByEndDate($dates_condition,$sort_condition = null, $limit_condition = null){
             $strQuery =sprintf( " SELECT `asset`.`asset_id`   AS `asset_id`,
 				              	 `asset`.`asset_code` AS `asset_code`,
 				                 `asset`.`depreciation_flag` AS `depreciation_flag`,
@@ -467,25 +467,25 @@
             return Asset::InstantiateDbResult($objDbResult);
         }
 
-        public function getTotalsByEndDate($dates_condition){
+        public static function getTotalsByEndDate($dates_condition){
             $strQuery = " SELECT
-                          DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_date`,
-                          SUM(IF(NOW()>`asset`.`purchase_date` ,
+                          SUM(IF(NOW()>`asset`.`purchase_date` AND ".$dates_condition.",
                               IF(PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(`asset`.`purchase_date`, '%Y%m'))
                                                                                          <`depreciation_class`.`life`,
                           `asset`.`purchase_cost` * (PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'),
                                                                  DATE_FORMAT(`asset`.`purchase_date`, '%Y%m')))/
                           `depreciation_class`.`life`, `asset`.`purchase_cost`),0)) AS `total_current_depreciation`,
-                          SUM( `asset`.`purchase_cost`) AS `total_purchase_cost`
+                          SUM(IF(".$dates_condition.",`asset`.`purchase_cost`,0)) AS `total_purchase_cost`
                           FROM `asset` AS `asset`
                           LEFT JOIN `asset_model` AS `asset_model`
                           ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
                           LEFT JOIN `depreciation_class` AS `depreciation_class`
                           ON `depreciation_class`.`depreciation_class_id`=`asset_model`.`depreciation_class_id`
-                          WHERE `depreciation_flag` = 1
-                                 ". $dates_condition;
+                          WHERE `depreciation_flag` = 1 ";
+
             $objDatabase = Asset::GetDatabase();
             $objDbResult = $objDatabase->Query($strQuery);
+            //print $strQuery;exit;
             $strDbRow = $objDbResult->FetchRow();
             return $strDbRow; //QType::Cast($strDbRow[0], QType::Integer);
         }
