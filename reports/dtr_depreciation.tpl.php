@@ -46,13 +46,17 @@ else
 </tr>
 
 <?php
+
 if($_CONTROL->CurrentItemIndex == count($_CONTROL->DataSource) - 1){
-    _p("<tr><td></td><td></td><td><b>Total:</b></td><td>",false);
-    _p(round($_CONTROL->getSummary()['Total Purchase Cost'],2),false);
-    _p("</td><td>",false);
-    _p(round($_CONTROL->getSummary()['Total Book Value'],2),false);
-    _p("</td><td>",false);
-    _p(round($_CONTROL->getSummary()['Total Depreciation'],2),false);
-    _p("</td></tr></tbody></table>",false);
+    if(is_array($_CONTROL->getSummary())){
+        $summary = $_CONTROL->getSummary();
+        _p("<tr><td></td><td></td><td><b>Total:</b></td><td>",false);
+        _p(round($summary['Total Purchase Cost'],2),false);
+        _p("</td><td>",false);
+        _p(round($summary['Total Book Value'],2),false);
+        _p("</td><td>",false);
+        _p(round($summary['Total Depreciation'],2),false);
+        _p("</td></tr></tbody></table>",false);
+    }
 }
 ?>
