@@ -69,7 +69,7 @@
 
         public function getBookValue(){
             $fltBookValue =	$this->PurchaseCost - $this->getCurrentDepreciation();
-            return $fltBookValue;
+            return round($fltBookValue,2);
         }
 
         public function getCurrentDepreciation(){
@@ -81,7 +81,7 @@
                 $interval = $interval->y*12 + $interval->m;
                 $currentDepreciation = $this->PurchaseCost * ($interval/$this->AssetModel->DepreciationClass->Life);
                 $currentDepreciation = $currentDepreciation > $this->PurchaseCost ? $this->PurchaseCost : $currentDepreciation;
-                return $currentDepreciation;
+                return round($currentDepreciation,2);
             }
         }
 

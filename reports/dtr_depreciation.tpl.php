@@ -37,7 +37,7 @@ else
     $interval = QDateTime::Now()->diff($_ITEM->PurchaseDate);
     $interval = $interval->y*12 + $interval->m;
     $fltBookValue =	$_ITEM->PurchaseCost - ($_ITEM->PurchaseCost * ($interval/$_ITEM->AssetModel->DepreciationClass->Life));
-    $fltBookValue = $fltBookValue < 0 ? 0 : $fltBookValue;
+    $fltBookValue = $fltBookValue < 0 ? 0 : round($fltBookValue,2);
     ?>
     <td><?php _p($_ITEM->getBookValue()) ?></td>
     <td><?php _p($_ITEM->getCurrentDepreciation()) ?>
