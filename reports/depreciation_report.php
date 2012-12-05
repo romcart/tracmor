@@ -165,9 +165,7 @@ class DepreciationListForm extends QForm {
     }
 
     protected function btnGenerate_Click() {
-        $dates_condition = $this->getDateCondition();
-
-        if(Asset::CountByEndDate($dates_condition)>0){
+//        if(Asset::CountByEndDate($this->getDateCondition())>0){
             $this->totals = Asset::getTotalsByEndDate($this->getTotalsDateCondition());
             if($this->lstGenerateOptions->SelectedValue == "csv"){
                 $dataSource = Asset::LoadByEndDate($this->getDateCondition(), $this->getSortCondition());
@@ -206,9 +204,9 @@ class DepreciationListForm extends QForm {
                 $this->dtrDepreciation->Paginator = new QPaginator($this);
                 $this->dtrDepreciation->ItemsPerPage = 20000;
                 $this->dtrDepreciation->Template = 'dtr_depreciation.tpl.php';
-                $this->dtrDepreciation->setSummary(array('Total Depreciation'  => $this->totals[1],
-                                                         'Total Purchase Cost' => $this->totals[2],
-                                                         'Total Book Value'    => ($this->totals[2]-$this->totals[1])));
+                $this->dtrDepreciation->setSummary(array('Total Depreciation'  => $this->totals[0],
+                                                         'Total Purchase Cost' => $this->totals[1],
+                                                         'Total Book Value'    => ($this->totals[1]-$this->totals[0])));
                 $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
                 print $this->getTitle();
                 print $this->dtrDepreciation->GetReportHtml();
@@ -227,7 +225,7 @@ class DepreciationListForm extends QForm {
                     'Total Book Value'    => ($this->totals[1]-$this->totals[0])));
                 $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
             }
-        }
+//        }
     }
 
     public function lstEndDate_Select() {
@@ -296,7 +294,7 @@ class DepreciationListForm extends QForm {
     protected function getTotalsDateCondition(){
         $dates_condition = '1=1';
         if ($this->lstEndDate->SelectedValue == 'between'){
-            $dates_condition = "DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) >= STR_TO_DATE('"
+            $dates_condition = " DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) >= STR_TO_DATE('"
                 . $this->dtpEndDateFirst->DateTime->format('Y-m-d g:i:s')
                 . "', '%Y-%m-%d %H:%i:%s')
                                 AND DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) <= STR_TO_DATE('"

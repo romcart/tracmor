@@ -485,14 +485,14 @@
 
             $objDatabase = Asset::GetDatabase();
             $objDbResult = $objDatabase->Query($strQuery);
-            //print $strQuery;exit;
+            //print $strQuery; exit;
             $strDbRow = $objDbResult->FetchRow();
             return $strDbRow; //QType::Cast($strDbRow[0], QType::Integer);
         }
 
         public static function CountByEndDate($dates_condition){
             $strQuery =sprintf( " SELECT
-                                 COUNT(DISTINCT `asset`.`asset_id`) AS `row_count`,
+                                 COUNT(`asset`.`asset_id`) AS `row_count`,
                                  `asset`.`asset_id`   AS `asset_id`,
 				                 `asset`.`depreciation_flag` AS `depreciation_flag`,
 					             `asset`.`purchase_date` AS `purchase_date`,
