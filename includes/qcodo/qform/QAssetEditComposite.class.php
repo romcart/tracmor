@@ -1717,8 +1717,8 @@ class QAssetEditComposite extends QControl {
 		if ($this->arrCustomFields) {
 			CustomField::UpdateLabels($this->arrCustomFields);
 		}
-		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
-            if ($this->chkAssetDepreciation instanceof QCheckBox)
+		if(QApplication::$TracmorSettings->DepreciationFlag == '1'
+           && $this->chkAssetDepreciation instanceof QCheckBox){
 			$this->chkAssetDepreciation->Enabled = false;
 			$this->hideAssetDepreciationFields();
 			if($this->objAsset->DepreciationFlag == 1){
