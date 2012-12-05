@@ -325,7 +325,7 @@ class DepreciationListForm extends QForm {
             $title .= $dates;
         }
         elseif($this->lstEndDate->SelectedValue == 'before'){
-            $title .= $this->dtpEndDateFirst->DateTime;//->format('Y-m-d g:i:s');
+            $dates .= $this->dtpEndDateFirst->DateTime;//->format('Y-m-d g:i:s');
             $title .= $dates;
         }
         elseif($this->lstEndDate->SelectedValue == 'after'){
