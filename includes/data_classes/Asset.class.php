@@ -68,15 +68,21 @@
         }
 
         public function getBookValue(){
+            if (!$this->DepreciationFlag){
+                return null;
+            }
+            else{
             $fltBookValue =	$this->PurchaseCost - $this->getCurrentDepreciation();
             return round($fltBookValue,2);
+            }
         }
 
         public function getCurrentDepreciation(){
 
-            if (QDateTime::Now() < $this->PurchaseDate){
+            if(QDateTime::Now() < $this->PurchaseDate){
                 return 0;
-            } else {
+            }
+            else {
                 $interval = QDateTime::Now()->diff($this->PurchaseDate);
                 $interval = $interval->y*12 + $interval->m;
                 $currentDepreciation = $this->PurchaseCost * ($interval/$this->AssetModel->DepreciationClass->Life);
