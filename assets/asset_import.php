@@ -94,6 +94,7 @@
 	protected $intPurchaseDateKey;
 	protected $intPurchaseCostKey;
     protected $intDepreciationFlagKey;
+    protected $intDepreciationClassArray = array();
 
 		protected function Form_Create() {
 			if (QApplication::QueryString('intDownloadCsv')) {
@@ -684,13 +685,13 @@
                 }
               }
 			  elseif(QApplication::$TracmorSettings->DepreciationFlag == '1' && $value == "depreciate asset"){
-                  $intDepreciationClassKey = $key;
+                  $this->intDepreciationClassKey = $key;
 			  }
 			  elseif(QApplication::$TracmorSettings->DepreciationFlag == '1'&& $value == "purchase cost"){
-				  $intPurchaseCostKey = $key;
+				  $this->intPurchaseCostKey = $key;
 			  }
 			  elseif(QApplication::$TracmorSettings->DepreciationFlag == '1'&& $value == "purchase date"){
-				  $intPurchaseDateKey = $key;
+				  $this->intPurchaseDateKey = $key;
 			  }
 			}
             $intAssetModelArray = array();
@@ -712,9 +713,8 @@
             }
 			// Depreciation
 			if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
-				$intDepreciationClassArray = array();
 				foreach (DepreciationClass::LoadAll() as $objDepreciationClass){
-					$intDepreciationClassArray[$objDepreciationClass->DepreciationClassId] = strtolower($objDepreciationClass->ShortDescription);
+					$this->intDepreciationClassArray[$objDepreciationClass->DepreciationClassId] = strtolower($objDepreciationClass->ShortDescription);
 				}
 			}
 
@@ -853,15 +853,17 @@
 				$intDepreciationClassId = null;
 				$intPurchaseCost = null;
 				$dttPurchaseDate = null;
-				if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
-					$strKeyArray = array_keys($intDepreciationClassArray, strtolower(trim($strRowArray[$intDepreciationClassKey])));
-					//print($intDepreciationClassKey)."__".$intPurchaseCostKey."__".$intPurchaseDateKey."__".strtolower(trim($strRowArray[$intDepreciationClassKey]))."<br />" ; if(!empty($strRowArray[$intDepreciationClassKey])){exit;}
-					if (count($strKeyArray)) {
+				if (QApplication::$TracmorSettings->DepreciationFlag == '1'
+                   && $this->intDepreciationClassKey){
+                    // print($this->intDepreciationClassKey)."__".$this->intPurchaseCostKey."__".$this->intPurchaseDateKey."__".strtolower(trim($strRowArray[$this->intDepreciationClassKey]))."<br />" ; if(!empty($strRowArray[$this->intDepreciationClassKey])){exit;}
+                    $strKeyArray = array_keys($this->intDepreciationClassArray, strtolower(trim($strRowArray[$this->intDepreciationClassKey])));
+
+					if (count($strKeyArray)>0) {
 						$intDepreciationClassId = $strKeyArray[0];
 					}
 					else {
-						$strKeyArray = array_keys($intDepreciationClassArray,
-							                      strtolower(trim($this->txtMapDefaultValueArray[$intDepreciationClassKey]->Text)));
+						$strKeyArray = array_keys($this->intDepreciationClassArray,
+							                      strtolower(trim($this->txtMapDefaultValueArray[$this->intDepreciationClassKey]->Text)));
 						if (count($strKeyArray)) {
 							$intDepreciationClassId = $strKeyArray[0];
 						}
@@ -869,17 +871,18 @@
 							$intDepreciationClassId = false;
 						}
 					}
+
 				    if($intDepreciationClassId>0 && $intAssetModelId>0){
 						if($intDepreciationClassId != AssetModel::Load($intAssetModelId)->DepreciationClassId){
 							$blnDepreciationError = true;
 						}
-						elseif(isset($intPurchaseCostKey)&&isset($intPurchaseCostKey)){
+						elseif(isset($this->intPurchaseCostKey)&&isset($this->intPurchaseCostKey)){
 							// Check intVal for Purchase cost
-							$intPurchaseCost = (trim($strRowArray[$intPurchaseCostKey])) ? addslashes(trim($strRowArray[$intPurchaseCostKey])) : false;
+							$intPurchaseCost = (trim($strRowArray[$this->intPurchaseCostKey])) ? addslashes(trim($strRowArray[$this->intPurchaseCostKey])) : false;
                             if(!is_numeric($intPurchaseCost)){
 								$blnDepreciationError = true;
 							}
-							$strPurchaseDate = (trim($strRowArray[$intPurchaseDateKey])) ? trim($strRowArray[$intPurchaseDateKey]) : false;
+							$strPurchaseDate = (trim($strRowArray[$this->intPurchaseDateKey])) ? trim($strRowArray[$this->intPurchaseDateKey]) : false;
 							// Check isDate for Purchase date
 							if(!($dttPurchaseDate = DateTime::createFromFormat('M d Y g:i A', $strPurchaseDate))){
 								$blnDepreciationError = true;
