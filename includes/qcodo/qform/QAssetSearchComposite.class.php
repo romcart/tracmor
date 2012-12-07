@@ -157,7 +157,7 @@ class QAssetSearchComposite extends QControl {
 				'CssClass="dtg_column"'));
 			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Cost','<?= $_ITEM->PurchaseCost ?>','SortByCommand="purchase_cost ASC"','ReverseSortByCommand="purchase_cost DESC"', 'CssClass="dtg_column"'));
 			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Date','<?= $_ITEM->PurchaseDate ?>','SortByCommand="purchase_date ASC"','ReverseSortByCommand="purchase_date DESC"', 'CssClass="dtg_column"'));
-            $this->dtgAsset->addColumn(new QDataGridColumnExt('Book Value','<?= $_ITEM->getBookValue() ?>', 'CssClass="dtg_column"', 'Display="false"'));
+            $this->dtgAsset->addColumn(new QDataGridColumnExt('Book Value','<?= $_ITEM->getBookValue() ?>', 'CssClass="dtg_column"'));
         }
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
