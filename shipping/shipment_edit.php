@@ -190,6 +190,10 @@
 			// Shipping Labels
 			$this->lblShipmentNumber_Create();
 			$this->lblHeaderShipment_Create();
+
+            $this->lblNewToCompany_Create();
+            $this->lblNewToContact_Create();
+            $this->lblNewToAddress_Create();
 			// $this->lblHeaderCompleteShipment_Create();
 			$this->lblShipDate_Create();
 			$this->lblFromCompany_Create();
@@ -215,11 +219,9 @@
 			$this->lstFromAddress_Create();
 			$this->lblNewFromAddress_Create();
 			$this->lstToCompany_Create();
-			$this->lblNewToCompany_Create();
+
 			$this->lstToContact_Create();
-			$this->lblNewToContact_Create();
 			$this->lstToAddress_Create();
-			$this->lblNewToAddress_Create();
 			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
 				$this->txtShipmentNumber_Create();
 			}
@@ -671,7 +673,8 @@
 			$this->lblNewToCompany->ToolTip = "New Company";
 			$this->lblNewToCompany->CssClass = "add_icon";
 			$this->lblNewToCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewToCompany_Click'));
-			$this->lblNewToCompany->ActionParameter = $this->lstToCompany->ControlId;
+			$this->lblNewToCompany->ActionParameter = ($this->lstToCompany instanceof QListBox)?
+                                                      $this->lstToCompany->ControlId:null;
 		}
 
 		protected function lblNewToContact_Create() {
@@ -680,7 +683,8 @@
 			$this->lblNewToContact->Text = '<img src="../images/add.png">';
 			$this->lblNewToContact->ToolTip = "New Contact";
 			$this->lblNewToContact->CssClass = "add_icon";
-			$this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
+			$this->lblNewToContact->ActionParameter = ($this->lstToContact instanceof QListBox)?
+                                                       $this->lstToContact->ControlId : null;
 			$this->lblNewToContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewToContact_Click'));
 		}
 
@@ -691,7 +695,8 @@
 			$this->lblNewToAddress->ToolTip = "New Address";
 			$this->lblNewToAddress->CssClass = "add_icon";
 			$this->lblNewToAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewToAddress_Click'));
-			$this->lblNewToAddress->ActionParameter = $this->lstToAddress->ControlId;
+			$this->lblNewToAddress->ActionParameter = ($this->lstToAddress instanceof QListBox)?
+                                                       $this->lstToAddress->ControlId : null;
 		}
 
 		// Create and Setup pnlNote
