@@ -1133,12 +1133,15 @@ class QAssetEditComposite extends QControl {
 					$this->objParentObject->RefreshChildAssets();
 				}
 			}
-
 			// Assign input values to custom fields
-			if ($this->arrCustomFields && !$blnError) {
+			if (is_array($this->arrCustomFields)&& count($this->arrCustomFields)>0 && !$blnError) {
 
 				// Save the values from all of the custom field controls to save the asset
-				CustomField::SaveControls($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this->arrCustomFields, $this->objAsset->AssetId, 1);
+				CustomField::SaveControls($this->objAsset->objCustomFieldArray,
+                                          $this->blnEditMode,
+                                          $this->arrCustomFields,
+                                          $this->objAsset->AssetId,
+                                          1);
 			}
 
 			if ($this->blnEditMode) {
