@@ -147,7 +147,7 @@
 			return $strToReturn;
 		}
 		
-		public function LoadByAssetCodeWithCustomFields($strAssetCode) {
+		public static function LoadByAssetCodeWithCustomFields($strAssetCode) {
 			Asset::QueryHelper($objDatabase);
 			$arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
 			// escape Asset Tag
