@@ -483,8 +483,6 @@ class AssetImportForm extends QForm
                     if (!in_array($arrAssetCustomFieldOption->CustomField->ShortDescription, $this->getLstKeys())) {
                         $blnRequiredAllAssetCustomFields = false;
                     }
-                    ;
-
                 }
             }
             // Checking errors (Model Short Description, Model Code, Category and Manufacturer must be selected)
@@ -1099,7 +1097,6 @@ class AssetImportForm extends QForm
 
                     $this->blnImportEnd = true;
                     $this->btnNext->Warning = "";
-
 
                     $this->lblImportResults->Display = true;
                     if (count($this->objNewAssetArray)) {
