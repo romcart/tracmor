@@ -1158,12 +1158,15 @@
                      }
                    }
                   $chosenAssetModels =  implode(",", $chosenAssetModels);
-                  $objDatabase = CustomField::GetDatabase();
-                  $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `asset_id` IN ($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
-                  $objDatabase->NonQuery($strQuery);
-                  $strQuery = sprintf("UPDATE %s SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId);
-                  $objDatabase->NonQuery($strQuery);
-                 }
+                  //  Check if Model has any Assets need to be updated with new custom field and update them
+                        if($chosenAssetModels){
+                            $objDatabase = CustomField::GetDatabase();
+                            $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `asset_id` IN ($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
+                            $objDatabase->NonQuery($strQuery);
+                            $strQuery = sprintf("UPDATE %s SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId);
+                            $objDatabase->NonQuery($strQuery);
+                        }
+                        }
     				  }
     				}
           }
