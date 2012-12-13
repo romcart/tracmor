@@ -759,7 +759,7 @@ class AssetImportForm extends QForm
                                                 $intAssetCustomFieldKeyArray)])
                                         ) {
                                             $blnError = true;
-                                            $this->intImportStep++;
+                                            $this->intImportStep = 3;
                                             //   $log .= "<h1>".$objRequiredCustomField->CustomField->ShortDescription.$objRequiredCustomField->CustomField->CustomFieldId." is empty</h1>";
                                         }
                                     }
