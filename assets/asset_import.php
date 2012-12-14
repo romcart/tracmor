@@ -754,7 +754,7 @@ class AssetImportForm extends QForm
                                 foreach ($arrRequiredSpecificAssetCustomFields as $objRequiredCustomField) {
                                     if ($objRequiredCustomField->CustomField->RequiredFlag) {
                                         $log .= $objRequiredCustomField->CustomField->CustomFieldId;
-                                        if (!in_array($objRequiredCustomField->CustomField->CustomFieldId, $intAssetCustomFieldKeyArray)
+                                        if (!array_key_exists($objRequiredCustomField->CustomField->CustomFieldId, $intAssetCustomFieldKeyArray)
                                             || empty($strRowArray[array_search($objRequiredCustomField->CustomField->CustomFieldId,
                                                 $intAssetCustomFieldKeyArray)])
                                         ) {
