@@ -929,9 +929,11 @@
                      }
                    }
                    $chosenAssetModels =  implode(",", $chosenAssetModels);
-                   $objDatabase = CustomField::GetDatabase();
-                   $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $this->objCustomField->CustomFieldId);
-                   $objDatabase->NonQuery($strQuery);
+                     if($chosenAssetModels){
+                       $objDatabase = CustomField::GetDatabase();
+                       $strQuery = sprintf("UPDATE `asset_custom_field_helper` SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $this->objCustomField->CustomFieldId);
+                       $objDatabase->NonQuery($strQuery);
+                     }
                  }
                }
 
