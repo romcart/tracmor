@@ -660,7 +660,7 @@ class QAssetTransactComposite extends QControl {
 					$this->objAssetArray[] = $objNewAsset;
 					$this->txtNewAssetCode->Text = null;
 					// Load all linked assets
-					$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetId($objNewAsset->AssetId);
+					$objLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetIdWithNoCustomFields($objNewAsset->AssetId);
 					if ($objLinkedAssetArray) {
 					  $strAssetCodeArray = array();
 					  foreach ($objLinkedAssetArray as $objLinkedAsset) {
@@ -669,6 +669,7 @@ class QAssetTransactComposite extends QControl {
 					  }
 					  $this->txtNewAssetCode->Warning = sprintf("The following asset(s) have been added to the transaction because they are locked to asset (%s):<br />%s", $objNewAsset->AssetCode, implode('<br />', $strAssetCodeArray));
 					}
+                    unset($objLinkedAssetArray);
 					$this->dtgAssetTransact->Refresh();
 				}
 			}
@@ -691,13 +692,25 @@ class QAssetTransactComposite extends QControl {
     }
     else {
       $lblNewWarning = "";
+      if(count($intSelectedAssetId)>100){
+
+          $currentLimit = ini_get('max_execution_time');
+          set_time_limit(0);
+          $this->ctlAssetSearchTool->lblWarning->Text = "This may take several minutes.";
+        }
+
       foreach (Asset::QueryArray(QQ::In(QQN::Asset()->AssetId, $intSelectedAssetId)) as $objAsset) {
         $this->txtNewAssetCode->Text = $objAsset->AssetCode;
-        $this->btnAdd_Click($this, null, null);
+
+          $this->btnAdd_Click($this, null, null);
         if ($this->txtNewAssetCode->Warning) {
           $lblNewWarning .= sprintf("<br />%s - %s", $objAsset->AssetCode, $this->txtNewAssetCode->Warning);
           $this->txtNewAssetCode->Warning = "";
         }
+      }
+      if(count($intSelectedAssetId)>100){
+        set_time_limit($currentLimit);
+        $this->ctlAssetSearchTool->lblWarning->Text = "";
       }
       $this->txtNewAssetCode->Warning = $lblNewWarning;
 	  $this->UncheckAllItems();

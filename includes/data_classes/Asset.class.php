@@ -1046,6 +1046,45 @@
 			}
 		}
 
+        public function LoadChildLinkedArrayByParentAssetIdWithNoCustomFields($intParentAssetId) {
+            $objLinkedAssetArray = array();
+
+            Asset::QueryHelper($objDatabase);
+            $arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
+
+            // Setup the SQL Query
+            $strQuery = sprintf("
+				SELECT
+					`asset`.*
+				FROM
+					`asset`
+				WHERE `asset`.`parent_asset_id` = %s
+				AND `asset`.`linked_flag` = 1
+			",
+            $intParentAssetId);
+
+            // Perform the Query and Instantiate the Result
+            $objDbResult = $objDatabase->Query($strQuery);
+
+            $objChildAssetArray = Asset::InstantiateDbResult($objDbResult);
+
+            if ($objChildAssetArray && count($objChildAssetArray)) {
+                foreach ($objChildAssetArray as $objLinkedAsset) {
+                    $objLinkedAssetArray[] = $objLinkedAsset;
+                    $objNewLinkedAssetArray = Asset::LoadChildLinkedArrayByParentAssetIdWithNoCustomFields($objLinkedAsset->AssetId);
+
+                    if ($objNewLinkedAssetArray) {
+                        foreach ($objNewLinkedAssetArray as $objLinkedAsset2) {
+                            $objLinkedAssetArray[] = $objLinkedAsset2;
+                        }
+                    }
+                }
+                return $objLinkedAssetArray;
+            } else {
+                return false;
+            }
+        }
+
 		/**
 		 * Set the child's parent_asset_code to NULL by Parent Asset Code
 		 *
