@@ -533,7 +533,27 @@
 			$items = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
-				// TODO perform validate/delete
+				// TODO perform validate
+                foreach($items as $item){
+                    try {
+                        // Get an instance of the database
+                        $objDatabase = QApplication::$Database[1];
+                        // Begin a MySQL Transaction to be either committed or rolled back
+                        $objDatabase->TransactionBegin();
+                        // ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
+                        Asset::ResetParentAssetIdToNullByAssetId($item);
+                        // Delete any audit scans of this asset
+                        Asset::DeleteAuditScanByAssetId($item);
+                        // Delete the asset
+                        Asset::LoadByAssetId($item)->Delete();
+                        $objDatabase->TransactionCommit();
+                    }
+                    catch (QMySqliDatabaseException $objExc) {
+                        // Rollback the transaction
+                        $objDatabase->TransactionRollback();
+                        throw new QDatabaseException();
+                    }
+                }
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Asset to Delete" ;
 			}

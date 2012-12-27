@@ -442,7 +442,29 @@
 			$items = $this->ctlSearchMenu->dtgInventoryModel->getSelected('InventoryModelId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
-				// TODO perform validate/delete
+				// TODO perform validate
+                foreach($items as $item){
+                    try {
+                        // Get an instance of the database
+                        $objDatabase = QApplication::$Database[1];
+                        // Begin a MySQL Transaction to be either committed or rolled back
+                        $objDatabase->TransactionBegin();
+                        InventoryModel::Load($item)->Delete();
+                        $objDatabase->TransactionCommit();
+                    }
+                    catch (QDatabaseExceptionBase $objExc) {
+                        // Roll back the transaction from the database
+                        $objDatabase->TransactionRollback();
+                        if ($objExc->ErrorNumber == 1451) {
+                            $this->lblWarning->Text .= 'Inventory model '
+                                                       . $item
+                                                       .'cannot be deleted because it is associated with one or more transactions.';
+                        }
+                        else {
+                            throw new QDatabaseExceptionBase();
+                        }
+                    }
+                }
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Inventory to Delete" ;
 			}
