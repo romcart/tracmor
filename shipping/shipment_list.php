@@ -497,7 +497,17 @@
 			$items = $this->dtgShipment->getSelected('ShipmentId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
-				// TODO perform validate/delete
+				//Perform validate/delete
+                foreach($items as $item){
+                    $shipmentToDelete = Shipment::Load($item);
+                    if ($shipmentToDelete instanceof Shipment && !($shipmentToDelete->ShippedFlag)){
+                        $objTransaction = Transaction::Load($shipmentToDelete->TransactionId);
+                        $objTransaction->Delete();
+                    }
+                    else {
+                        $this->lblWarning->Text .= "Shipment ".$shipmentToDelete->ShipmentNumber. " already shipped and can't be deleted."  ;
+                    }
+                }
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Shipment to Delete" ;
 			}

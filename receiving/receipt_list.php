@@ -489,7 +489,57 @@
 			$items = $this->dtgReceipt->getSelected('ReceiptId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
-				// TODO perform validate/delete
+				// Perform validate/delete
+                foreach($items as $item){
+                    $receiptToDelete = Receipt::Load($item);
+                    $objAssetTransactionArray     = AssetTransaction::LoadArrayByTransactionId($receiptToDelete->TransactionId);
+                    $objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($receiptToDelete->TransactionId);
+                    $blnError = false;
+                    if ($objAssetTransactionArray) {
+                        foreach ($objAssetTransactionArray as $objAssetTransaction) {
+                            if ($objAssetTransaction->blnReturnReceivedStatus()) {
+                                $blnError = true;
+                                $this->lblWarning->Text .= 'All Assets and Inventory must be Pending to delete receipt ' .$receiptToDelete->ReceiptNumber.'.';
+                            }
+                        }
+                    }
+
+                    if ($objInventoryTransactionArray) {
+                        foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
+                            if ($objInventoryTransaction->blnReturnReceivedStatus()) {
+                                $blnError = true;
+                                $this->lblWarning->Text .= 'All Assets and Inventory must be Pending to delete this receipt ' .$receiptToDelete->ReceiptNumber.'.';
+                            }
+                        }
+                    }
+
+
+                    if (!$blnError) {
+
+                        // Take out the inventory from the TBR InventoryLocation
+                        if ($objInventoryTransactionArray) {
+                            foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
+                                $objInventoryTransaction->InventoryLocation->Quantity -= $objInventoryTransaction->Quantity;
+                                $objInventoryTransaction->InventoryLocation->Save();
+                            }
+                        }
+
+                        // Delete any assets that were created while scheduling this receipt
+                        if ($objAssetTransactionArray) {
+                            foreach ($objAssetTransactionArray as $objAssetTransaction) {
+                                if ($objAssetTransaction->NewAssetFlag) {
+                                    $objAssetTransaction->Asset->Delete();
+                                }
+                            }
+                        }
+
+                        // Load the Transaction
+                        $objTransaction = Transaction::Load($receiptToDelete->TransactionId);
+                        // Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
+                        $objTransaction->Delete();
+                    }
+                }
+
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Receipt to Delete" ;
 			}
