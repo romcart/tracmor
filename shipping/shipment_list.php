@@ -105,6 +105,10 @@
 		protected $btnMassEdit;
 		protected $btnMassDelete;
 		protected $pnlShipmentMassEdit;
+        protected $btnMassDeleteConfirm;
+        protected $btnMassDeleteCancel;
+
+        protected $arrToDelete = array();
 
 		protected function Form_Create() {
 			
@@ -130,8 +134,11 @@
 			$this->lblWarning_Create();
 			$this->dlgMassEdit_Create();
 			$this->dlgMassDelete_Create();
+            $this->btnMassDeleteCancel_Create();
+            $this->btnMassDeleteConfirm_Create();
 			$this->btnMassDelete_Create();
 			$this->btnMassEdit_Create();
+
 		}
 		
 		//protected function Form_Exit() {
@@ -497,15 +504,29 @@
 			$items = $this->dtgShipment->getSelected('ShipmentId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
-				//Perform validate/delete
-                foreach($items as $item){
+                $arrToSkip = array();
+                // Separating items able to be deleted
+                foreach ($items as $item){
                     $shipmentToDelete = Shipment::Load($item);
                     if ($shipmentToDelete instanceof Shipment && !($shipmentToDelete->ShippedFlag)){
-                        $objTransaction = Transaction::Load($shipmentToDelete->TransactionId);
-                        $objTransaction->Delete();
+                        $this->arrToDelete[] = $shipmentToDelete; // objects stored in array!
                     }
-                    else {
-                        $this->lblWarning->Text .= "Shipment ".$shipmentToDelete->ShipmentNumber. " already shipped and can't be deleted."  ;
+                    else{
+                        $arrToSkip[] = $shipmentToDelete->ShipmentNumber;
+                    }
+                }
+                if (count($arrToSkip)>0){
+                    $this->dlgMassDelete->Text =sprintf("There are %s Shipments that are not able to be deleted. Would you like to continue the deletion process, skipping these items?<br />",implode(",",$arrToSkip));
+                    $this->dlgMassDelete->ShowDialogBox();
+                }
+                else{
+                    if (count($this->arrToDelete)>0){
+                        foreach($this->arrToDelete as $shipment){
+                            $objTransaction = Transaction::Load($shipment->TransactionId);
+                            $objTransaction->Delete();
+                        }
+                        $this->arrToDelete = array();
+                        QApplication::Redirect('');
                     }
                 }
 			}else{
@@ -530,7 +551,39 @@
 		public function pnlShipmentMassEdit_Close(){
 			$this->dlgMassEdit->HideDialogBox();
 		}
+
+        protected function btnMassDeleteCancel_Create(){
+            $this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
+            $this->btnMassDeleteCancel->Text = "Cancel";
+            $this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+            $this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+        }
+
+        protected function btnMassDeleteConfirm_Create(){
+            $this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
+            $this->btnMassDeleteConfirm->Text = "Confirm";
+            $this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+            $this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+        }
+
+        protected function btnMassDeleteConfirm_Click(){
+            if (count($this->arrToDelete)>0){
+                foreach($this->arrToDelete as $shipment){
+                    $objTransaction = Transaction::Load($shipment->TransactionId);
+                    $objTransaction->Delete();
+                }
+                $this->arrToDelete = array();
+            }
+            $this->dlgMassDelete->HideDialogBox();
+            QApplication::Redirect('');
+        }
+
+        protected function btnMassDeleteCancel_Click(){
+            $this->dlgMassDelete->HideDialogBox();
+            QApplication::Redirect('');
+        }
 	}
+
 
 
 

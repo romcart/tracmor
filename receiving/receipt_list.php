@@ -102,6 +102,10 @@
 		protected $btnMassEdit;
 		protected $btnMassDelete;
         protected $pnlReceiptMassEdit;
+        protected $btnMassDeleteConfirm;
+        protected $btnMassDeleteCancel;
+
+        protected $arrToDelete = array();
 
 		protected function Form_Create() {
 			
@@ -127,7 +131,10 @@
 			$this->dlgMassEdit_Create();
 			$this->dlgMassDelete_Create();
 			$this->btnMassDelete_Create();
+            $this->btnMassDeleteCancel_Create();
+            $this->btnMassDeleteConfirm_Create();
 			$this->btnMassEdit_Create();
+
 		}
 		
 		protected function dtgReceipt_Bind() {
@@ -489,8 +496,9 @@
 			$items = $this->dtgReceipt->getSelected('ReceiptId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
-				// Perform validate/delete
-                foreach($items as $item){
+                $arrToSkip = array();
+                // Separating items able to be deleted
+                foreach ($items as $item){
                     $receiptToDelete = Receipt::Load($item);
                     $objAssetTransactionArray     = AssetTransaction::LoadArrayByTransactionId($receiptToDelete->TransactionId);
                     $objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($receiptToDelete->TransactionId);
@@ -499,7 +507,6 @@
                         foreach ($objAssetTransactionArray as $objAssetTransaction) {
                             if ($objAssetTransaction->blnReturnReceivedStatus()) {
                                 $blnError = true;
-                                $this->lblWarning->Text .= 'All Assets and Inventory must be Pending to delete receipt ' .$receiptToDelete->ReceiptNumber.'.';
                             }
                         }
                     }
@@ -508,38 +515,30 @@
                         foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
                             if ($objInventoryTransaction->blnReturnReceivedStatus()) {
                                 $blnError = true;
-                                $this->lblWarning->Text .= 'All Assets and Inventory must be Pending to delete this receipt ' .$receiptToDelete->ReceiptNumber.'.';
                             }
                         }
                     }
 
-
-                    if (!$blnError) {
-
-                        // Take out the inventory from the TBR InventoryLocation
-                        if ($objInventoryTransactionArray) {
-                            foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
-                                $objInventoryTransaction->InventoryLocation->Quantity -= $objInventoryTransaction->Quantity;
-                                $objInventoryTransaction->InventoryLocation->Save();
-                            }
-                        }
-
-                        // Delete any assets that were created while scheduling this receipt
-                        if ($objAssetTransactionArray) {
-                            foreach ($objAssetTransactionArray as $objAssetTransaction) {
-                                if ($objAssetTransaction->NewAssetFlag) {
-                                    $objAssetTransaction->Asset->Delete();
-                                }
-                            }
-                        }
-
-                        // Load the Transaction
-                        $objTransaction = Transaction::Load($receiptToDelete->TransactionId);
-                        // Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
-                        $objTransaction->Delete();
+                    if ($blnError){
+                        $arrToSkip[] = $receiptToDelete->ReceiptNumber;
+                    }
+                    else{
+                        $this->arrToDelete[] = $receiptToDelete; // objects stored in array!
                     }
                 }
-
+                if (count($arrToSkip)>0){
+                    $this->dlgMassDelete->Text =sprintf("There are %s Receipts that are not able to be deleted. Would you like to continue the deletion process, skipping these items?<br />",implode(",",$arrToSkip));
+                    $this->dlgMassDelete->ShowDialogBox();
+                }
+                else{
+                    if (count($this->arrToDelete)>0){
+                        foreach($this->arrToDelete as $receipt){
+                            $this->receiptDelete($receipt);
+                        }
+                        $this->arrToDelete = array();
+                        QApplication::Redirect('');
+                    }
+                }
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Receipt to Delete" ;
 			}
@@ -563,7 +562,64 @@
         public function pnlReceiptMassEdit_Close(){
             $this->dlgMassEdit->HideDialogBox();
         }
+
+        protected function btnMassDeleteCancel_Create(){
+            $this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
+            $this->btnMassDeleteCancel->Text = "Cancel";
+            $this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+            $this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+        }
+
+        protected function btnMassDeleteConfirm_Create(){
+            $this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
+            $this->btnMassDeleteConfirm->Text = "Confirm";
+            $this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+            $this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+        }
+
+        protected function btnMassDeleteConfirm_Click(){
+            if (count($this->arrToDelete)>0){
+                foreach($this->arrToDelete as $receipt){
+                    $this->receiptDelete($receipt);
+                }
+                $this->arrToDelete = array();
+            }
+            $this->dlgMassDelete->HideDialogBox();
+            QApplication::Redirect('');
+        }
+
+        protected function btnMassDeleteCancel_Click(){
+            $this->dlgMassDelete->HideDialogBox();
+            QApplication::Redirect('');
+        }
+
+        public function receiptDelete(Receipt $receipt){
+            $objAssetTransactionArray     = AssetTransaction::LoadArrayByTransactionId($receipt->TransactionId);
+            $objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($receipt->TransactionId);
+            // Take out the inventory from the TBR InventoryLocation
+            if ($objInventoryTransactionArray) {
+                foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
+                    $objInventoryTransaction->InventoryLocation->Quantity -= $objInventoryTransaction->Quantity;
+                    $objInventoryTransaction->InventoryLocation->Save();
+                }
+            }
+
+            // Delete any assets that were created while scheduling this receipt
+            if ($objAssetTransactionArray) {
+                foreach ($objAssetTransactionArray as $objAssetTransaction) {
+                    if ($objAssetTransaction->NewAssetFlag) {
+                        $objAssetTransaction->Asset->Delete();
+                    }
+                }
+            }
+
+            // Load the Transaction
+            $objTransaction = Transaction::Load($receipt->TransactionId);
+            // Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
+            $objTransaction->Delete();
+        }
 	}
+
 
 
 	// Go ahead and run this form object to generate the page and event handlers, using
