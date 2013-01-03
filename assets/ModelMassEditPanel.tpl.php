@@ -32,8 +32,25 @@ Select fields to be updated and provide new values.
 	<tr>
 		<td><?php $_CONTROL->chkImage->Render();            ?></td>
 	    <td><?php echo $_CONTROL->txtImagePath->Name;       ?></td>
-		<td><?php $_CONTROL->txtImagePath->Render();        ?></td>
+		<td><?php $_CONTROL->ifcImage->Render();        ?></td>
 	</tr>
+    <?php
+    // Custom Fields
+    if ($_CONTROL->arrCustomFields) {
+        foreach ($_CONTROL->arrCustomFields as $field) {
+            if($field['blnView']){
+                echo (count($_CONTROL->arrCheckboxes));
+               ?>
+                <tr>
+                    <td><?php $_CONTROL->arrCheckboxes[$field['input']->ControlId]->Render(); ?></td>
+                    <td><?php echo $field['input']->Name; ?>
+                    <td><?php echo $field['input']->RenderWithError(false); ?></td>
+                </tr><?php
+            }
+        }
+
+    }
+    ?>
 </table>
 <br />
 <?php $_CONTROL->btnCancel->Render(); ?><?php $_CONTROL->btnApply->Render(); ?>

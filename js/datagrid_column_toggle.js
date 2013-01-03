@@ -119,7 +119,7 @@ function getWidth(obj) {
 }
 
 function enableInput(element,dependent_elements) {
-    var input = document.getElementById(element.id.replace('chk_',''));
+    var input = document.getElementById(element.id.replace('chk',''));
         input.disabled = !(input.disabled);
     if( Object.prototype.toString.call(dependent_elements ) === '[object Array]' ) {
         for (var i = 0; i<dependent_elements.length; i++){
