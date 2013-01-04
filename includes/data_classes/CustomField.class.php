@@ -613,7 +613,7 @@
 	 				// Create input for each custom field (either text or list)
 	 				// Create text inputs
 	 				if (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text' || CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'text area') {
-	 					$arrCustomFields[$i]['input'] = new QTextBox($objForm,"cf".$objCustomFieldArray[$i]->CustomFieldId);
+	 					$arrCustomFields[$i]['input'] = new QTextBox($objForm, $blnSearch ? "scf".$objCustomFieldArray[$i]->CustomFieldId: "cf".$objCustomFieldArray[$i]->CustomFieldId);
 	 					$arrCustomFields[$i]['input']->Name = $objCustomFieldArray[$i]->ShortDescription;
 	 					$arrCustomFields[$i]['input']->Required = false;
 	 					$arrCustomFields[$i]['input']->CausesValidation = true;
@@ -650,7 +650,7 @@
 	 				// Create list inputs
 	 				elseif (CustomFieldQtype::ToString($objCustomFieldArray[$i]->CustomFieldQtypeId) == 'select') {
 	 					
-						$arrCustomFields[$i]['input'] = new QListBox($objForm, "cf".$objCustomFieldArray[$i]->CustomFieldId);
+						$arrCustomFields[$i]['input'] = new QListBox($objForm , $blnSearch ? "scf".$objCustomFieldArray[$i]->CustomFieldId: "cf".$objCustomFieldArray[$i]->CustomFieldId);
 						$arrCustomFields[$i]['input']->Name = $objCustomFieldArray[$i]->ShortDescription;
             			$arrCustomFields[$i]['input']->Required = false;
 

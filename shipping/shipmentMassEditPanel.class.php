@@ -28,6 +28,8 @@ class ShipmentMassEditPanel extends QPanel {
     protected $objCompanyArray;
 
 	public $arrShipmentToEdit = array();
+    public $arrCheckboxes = array();
+    public $arrCustomFields;
 //	public $arrFields = array();
 //
 	public $chkFromCompany;
@@ -91,28 +93,40 @@ class ShipmentMassEditPanel extends QPanel {
 		$this->lstFromContact->Enabled = false;
 		$this->lstCourier->Enabled = false;
 		$this->txtNote->Enabled = false;
-	}
+
+        // Load Custom Fields
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Shipment, false);
+        if($objCustomFieldArray){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Enabled = false;
+                $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
+                $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+                $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+            }
+        }
+
+    }
 
 	// Create the Note Input
 	protected function txtNote_Create() {
-		$this->txtNote = new QTextBox($this);
+		$this->txtNote = new QTextBox($this, 'Note');
 		$this->txtNote->Name = QApplication::Translate('Note');
 		$this->txtNote->TextMode = QTextMode::MultiLine;
 		$this->txtNote->Height=80;
-		$this->txtNote->strControlId = 'note';
 	}
 
 	public function chkNote_Create(){
-		$this->chkNote = new QCheckBox($this);
+		$this->chkNote = new QCheckBox($this,'chkNote');
 		$this->chkNote->Name = 'note';
-		$this->chkNote->strControlId = 'chk_note';
 		$this->chkNote->Checked = false;
 		$this->chkNote->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 	}
 
 	// Create the Courier Input
 	protected function lstCourier_Create() {
-		$this->lstCourier = new QListBox($this);
+		$this->lstCourier = new QListBox($this,'Courier');
 		$this->lstCourier->Name = QApplication::Translate('Courier');
 		$this->lstCourier->Required = true;
 		$this->lstCourier->AddItem('- Select One -', null);
@@ -124,13 +138,11 @@ class ShipmentMassEditPanel extends QPanel {
 			}
 		}
 		$this->lstCourier->AddItem('Other', null);
-		$this->lstCourier->strControlId = 'courier';
 	}
 
 	public function chkCourier_Create(){
-		$this->chkCourier = new QCheckBox($this);
+		$this->chkCourier = new QCheckBox($this,'chkCourier');
 		$this->chkCourier->Name = 'courier';
-		$this->chkCourier->strControlId = 'chk_courier';
 		$this->chkCourier->Checked = false;
 		$this->chkCourier->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 
@@ -138,20 +150,18 @@ class ShipmentMassEditPanel extends QPanel {
 
 	// Create and Setup lstFromCompany
 	protected function lstFromCompany_Create() {
-		$this->lstFromCompany = new QListBox($this);
+		$this->lstFromCompany = new QListBox($this,'FromCompany');
 		$this->lstFromCompany->Name = QApplication::Translate('From Company');
 		$this->lstFromCompany->AddItem('- Select One -', null);
 		if ($this->objCompanyArray) foreach ($this->objCompanyArray as $objToCompany) {
 			$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
 			$this->lstFromCompany->AddItem($objListItem);
 		}
-		$this->lstFromCompany->strControlId = 'from_company';
 	}
 
 	public function chkFromCompany_Create(){
-		$this->chkFromCompany = new QCheckBox($this);
+		$this->chkFromCompany = new QCheckBox($this,'chkFromCompany');
 		$this->chkFromCompany->Name = 'from_company';
-		$this->chkFromCompany->strControlId = 'chk_from_company';
 		$this->chkFromCompany->Checked = false;
 		$this->chkFromCompany->AddAction(new QClickEvent(),
 			                             new QJavaScriptAction("enableInput(this,['from_contact','from_address'])"));
@@ -160,21 +170,18 @@ class ShipmentMassEditPanel extends QPanel {
 
 	// Create and Setup txtLongDescription
 	protected function lstToCompany_Create() {
-		$this->lstToCompany = new QListBox($this);
+		$this->lstToCompany = new QListBox($this,'ToCompany');
 		$this->lstToCompany->Name = QApplication::Translate('To Company');
 		$this->lstToCompany->AddItem('- Select One -', null);
 		if ($this->objCompanyArray) foreach ($this->objCompanyArray as $objToCompany) {
 			$objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
 			$this->lstToCompany->AddItem($objListItem);
 		}
-		$this->lstToCompany->strControlId = 'to_company';
-
 	}
 
 	public function chkToCompany_Create(){
-		$this->chkToCompany = new QCheckBox($this);
+		$this->chkToCompany = new QCheckBox($this,'chkToCompany');
 		$this->chkToCompany->Name = 'to_company';
-		$this->chkToCompany->strControlId = 'chk_to_company';
 		$this->chkToCompany->Checked = false;
 		$this->chkToCompany->AddAction(new QClickEvent(),
 			                           new QJavaScriptAction("enableInput(this,['to_contact','to_address'])"));

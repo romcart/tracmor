@@ -26,6 +26,9 @@ class ReceiptMassEditPanel extends QPanel {
     protected $objCompanyArray;
 
     public $arrReceiptToEdit = array();
+    public $arrCheckboxes = array();
+    public $arrCustomFields;
+
 //	public $arrFields = array();
 //
     public $chkFromCompany;
@@ -89,41 +92,50 @@ class ReceiptMassEditPanel extends QPanel {
         $this->lstFromAddress->Enabled = false;
         $this->lstFromContact->Enabled = false;
         $this->txtNote->Enabled = false;
+
+        // Load Custom Fields
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(11, false);
+        if($objCustomFieldArray){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Enabled = false;
+                $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
+                $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+                $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+            }
+        }
     }
 
     // Create the Note Input
     protected function txtNote_Create() {
-        $this->txtNote = new QTextBox($this);
+        $this->txtNote = new QTextBox($this, 'Note');
         $this->txtNote->Name = QApplication::Translate('Note');
         $this->txtNote->TextMode = QTextMode::MultiLine;
         $this->txtNote->Height=80;
-        $this->txtNote->strControlId = 'note';
     }
 
     public function chkNote_Create(){
-        $this->chkNote = new QCheckBox($this);
+        $this->chkNote = new QCheckBox($this,'chkNote');
         $this->chkNote->Name = 'note';
-        $this->chkNote->strControlId = 'chk_note';
         $this->chkNote->Checked = false;
         $this->chkNote->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
     }
 
     // Create and Setup lstFromCompany
     protected function lstFromCompany_Create() {
-        $this->lstFromCompany = new QListBox($this);
+        $this->lstFromCompany = new QListBox($this,'FromCompany');
         $this->lstFromCompany->Name = QApplication::Translate('From Company');
         $this->lstFromCompany->AddItem('- Select One -', null);
         if ($this->objCompanyArray) foreach ($this->objCompanyArray as $objToCompany) {
             $objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
             $this->lstFromCompany->AddItem($objListItem);
         }
-        $this->lstFromCompany->strControlId = 'from_company';
     }
 
     public function chkFromCompany_Create(){
-        $this->chkFromCompany = new QCheckBox($this);
+        $this->chkFromCompany = new QCheckBox($this,'chkFromCompany');
         $this->chkFromCompany->Name = 'from_company';
-        $this->chkFromCompany->strControlId = 'chk_from_company';
         $this->chkFromCompany->Checked = false;
         $this->chkFromCompany->AddAction(new QClickEvent(),
             new QJavaScriptAction("enableInput(this,['from_contact','from_address'])"));
@@ -132,21 +144,18 @@ class ReceiptMassEditPanel extends QPanel {
 
     // Create and Setup lstToCompany
     protected function lstToCompany_Create() {
-        $this->lstToCompany = new QListBox($this);
+        $this->lstToCompany = new QListBox($this,'ToCompany');
         $this->lstToCompany->Name = QApplication::Translate('To Company');
         $this->lstToCompany->AddItem('- Select One -', null);
         if ($this->objCompanyArray) foreach ($this->objCompanyArray as $objToCompany) {
             $objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
             $this->lstToCompany->AddItem($objListItem);
         }
-        $this->lstToCompany->strControlId = 'to_company';
-
     }
 
     public function chkToCompany_Create(){
-        $this->chkToCompany = new QCheckBox($this);
+        $this->chkToCompany = new QCheckBox($this,'chkToCompany');
         $this->chkToCompany->Name = 'to_company';
-        $this->chkToCompany->strControlId = 'chk_to_company';
         $this->chkToCompany->Checked = false;
         $this->chkToCompany->AddAction(new QClickEvent(),
             new QJavaScriptAction("enableInput(this,['to_contact','to_address'])"));
@@ -154,27 +163,23 @@ class ReceiptMassEditPanel extends QPanel {
 
     // To Contact, To Address inputs
     public function lstToContact_Create(){
-        $this->lstToContact = new QListBox($this);
+        $this->lstToContact = new QListBox($this,'ToContact');
         $this->lstToContact->Name = 'To Contact';
-        $this->lstToContact->strControlId = 'to_contact';
     }
 
     public function lstToAddress_Create(){
-        $this->lstToAddress = new QListBox($this);
+        $this->lstToAddress = new QListBox($this,'ToAddress');
         $this->lstToAddress->Name = 'To Address';
-        $this->lstToAddress->strControlId = 'to_address';
     }
     // From Contact, To Address inputs
     public function lstFromContact_Create(){
-        $this->lstFromContact = new QListBox($this);
+        $this->lstFromContact = new QListBox($this,'FromContact');
         $this->lstFromContact->Name = 'From Contact';
-        $this->lstFromContact->strControlId = 'from_contact';
     }
 
     public function lstFromAddress_Create(){
-        $this->lstFromAddress = new QListBox($this);
+        $this->lstFromAddress = new QListBox($this,'FromAddress');
         $this->lstFromAddress->Name = 'From Address';
-        $this->lstFromAddress->strControlId = 'from_address';
     }
 
     // Date Due Inputs

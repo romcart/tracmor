@@ -29,6 +29,22 @@ Select fields to be updated and provide new values.
 		<td><?php echo $_CONTROL->txtLongDescription->Name; ?></td>
 		<td><?php $_CONTROL->txtLongDescription->Render()   ?></td>
 	</tr>
+    <?php
+    // Custom Fields
+    if ($_CONTROL->arrCustomFields) {
+        foreach ($_CONTROL->arrCustomFields as $field) {
+            if($field['blnView']){
+                ?>
+                <tr>
+                    <td><?php $_CONTROL->arrCheckboxes[$field['input']->ControlId]->Render(); ?></td>
+                    <td><?php echo $field['input']->Name; ?>
+                    <td><?php echo $field['input']->RenderWithError(false); ?></td>
+                </tr><?php
+            }
+        }
+
+    }
+    ?>
 </table>
 <br />
 <?php $_CONTROL->btnCancel->Render(); ?><?php $_CONTROL->btnApply->Render(); ?>

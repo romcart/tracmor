@@ -1,5 +1,4 @@
 <?php
-// Include the classfile for InventoryEditPanel
 
 class InventoryMassEditPanel extends QPanel {
 
@@ -18,12 +17,12 @@ class InventoryMassEditPanel extends QPanel {
 	// Specify the Location of the Template (feel free to modify) for this Panel
 	protected $strTemplate = '../inventory/InventoryMassEditPanel.tpl.php';
 
-	// Inputs for can be Edited
-	// public $txtLongDescription;
-
+    public $objInventoryModel;
 	public $arrInventoryToEdit = array();
-//	public $arrFields = array();
-//
+	// public $arrFields = array();
+    public $arrCustomFields;
+    public $arrCheckboxes = array();
+
 	public $chkShortDescription;
 	public $chkCategory;
 	public $chkManufacturer;
@@ -67,26 +66,36 @@ class InventoryMassEditPanel extends QPanel {
 		$this->txtShortDescription->Enabled = false;
 		$this->txtLongDescription->Enabled = false;
 
-	}
+        // Load Custom Fields
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, false);
+        if($objCustomFieldArray){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Enabled = false;
+                $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
+                $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+                $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+            }
+        }
+    }
 
 	// Create the Short Description Input
 	protected function txtShortDescription_Create() {
-		$this->txtShortDescription = new QTextBox($this);
-		$this->txtShortDescription->Name = 'Inventory Model';
-		$this->txtShortDescription->strControlId = 'short_description';
+		$this->txtShortDescription = new QTextBox($this, 'ShortDescription');
+		$this->txtShortDescription->Name = 'Short Description';
 	}
 
 	public function chkShortDescription_Create(){
-		$this->chkShortDescription = new QCheckBox($this);
-		$this->chkShortDescription->Name = 'short_description';
-		$this->chkShortDescription->strControlId = 'chk_short_description';
+		$this->chkShortDescription = new QCheckBox($this, 'chkShortDescription');
+		$this->chkShortDescription->Name = 'Short Description';
 		$this->chkShortDescription->Checked = false;
 		$this->chkShortDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 	}
 
 	// Create the Category Input
 	protected function lstCategory_Create() {
-		$this->lstCategory = new QListBox($this);
+		$this->lstCategory = new QListBox($this, 'Category');
 		$this->lstCategory->Name = QApplication::Translate('Category');
 		$this->lstCategory->AddItem('- Select One -', null);
 		$objCategoryArray = Category::LoadAllWithFlags(false, true, 'short_description');
@@ -94,20 +103,18 @@ class InventoryMassEditPanel extends QPanel {
 			$objListItem = new QListItem($objCategory->__toString(), $objCategory->CategoryId);
 			$this->lstCategory->AddItem($objListItem);
 		}
-		$this->lstCategory->strControlId = 'category';
 	}
 
 	public function chkCategory_Create(){
-		$this->chkCategory = new QCheckBox($this);
+		$this->chkCategory = new QCheckBox($this, 'chkCategory');
 		$this->chkCategory->Name = 'category';
-		$this->chkCategory->strControlId = 'chk_category';
 		$this->chkCategory->Checked = false;
 		$this->chkCategory->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 
 	}
 	// Create and Setup lstManufacturer
 	protected function lstManufacturer_Create() {
-		$this->lstManufacturer = new QListBox($this);
+		$this->lstManufacturer = new QListBox($this, 'Manufacturer');
 		$this->lstManufacturer->Name = QApplication::Translate('Manufacturer');
 		$this->lstManufacturer->Required = true;
 		$this->lstManufacturer->AddItem('- Select One -', null);
@@ -116,30 +123,25 @@ class InventoryMassEditPanel extends QPanel {
 			$objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
 			$this->lstManufacturer->AddItem($objListItem);
 		}
-		$this->lstManufacturer->strControlId = 'manufacturer';
 	}
 
 	public function chkManufacturer_Create(){
-		$this->chkManufacturer = new QCheckBox($this);
+		$this->chkManufacturer = new QCheckBox($this, 'chkManufacturer');
 		$this->chkManufacturer->Name = 'manufacturer';
-		$this->chkManufacturer->strControlId = 'chk_manufacturer';
 		$this->chkManufacturer->Checked = false;
 		$this->chkManufacturer->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-
 	}
 
 	// Create and Setup txtLongDescription
 	protected function txtLongDescription_Create() {
-		$this->txtLongDescription = new QTextBox($this);
+		$this->txtLongDescription = new QTextBox($this, 'LongDescription');
 		$this->txtLongDescription->Name = QApplication::Translate('Long Description');
 		$this->txtLongDescription->TextMode = QTextMode::MultiLine;
-		$this->txtLongDescription->strControlId = 'long_description';
 	}
 
 	public function chkLongDescription_Create(){
-		$this->chkLongDescription = new QCheckBox($this);
+		$this->chkLongDescription = new QCheckBox($this, 'chkLongDescription');
 		$this->chkLongDescription->Name = 'long_description';
-		$this->chkLongDescription->strControlId = 'chk_long_description';
 		$this->chkLongDescription->Checked = false;
 		$this->chkLongDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 	}

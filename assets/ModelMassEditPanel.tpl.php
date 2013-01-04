@@ -39,7 +39,6 @@ Select fields to be updated and provide new values.
     if ($_CONTROL->arrCustomFields) {
         foreach ($_CONTROL->arrCustomFields as $field) {
             if($field['blnView']){
-                echo (count($_CONTROL->arrCheckboxes));
                ?>
                 <tr>
                     <td><?php $_CONTROL->arrCheckboxes[$field['input']->ControlId]->Render(); ?></td>
