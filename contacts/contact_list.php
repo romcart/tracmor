@@ -21,7 +21,8 @@
 
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(4);
-	require_once(__FORMBASE_CLASSES__ . '/ContactListFormBase.class.php');
+    require_once(__FORMBASE_CLASSES__ . '/ContactListFormBase.class.php');
+	require_once('ContactMassEditPanel.class.php');
 
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
@@ -77,16 +78,14 @@
 		protected $lblWarning;
 		protected $btnEdit;
 		protected $btnDelete;
-		protected $dlgEdit;
+		protected $dlgMassEdit;
 		protected $dlgDelete;
 		protected $btnConfirm;
 		protected $btnCancel;
 		protected $dlgSimpleMessage;
-		protected $lstCompany;
-		protected $txtDescription;
-		protected $btnEditConfirm;
-		protected $btnEditCancel;
-	//	protected $pnlContactEdit;
+	//	protected $btnEditConfirm;
+	//	protected $btnEditCancel;
+		protected $pnlContactEdit;
 		protected $arrToDelete = array();
 
 		protected function Form_Create() {
@@ -107,15 +106,12 @@
 
 			// Mass Actions Controls
 			$this->dlgDelete_Create();
-			$this->dlgEdit_Create();
+			$this->dlgMassEdit_Create();
 			$this->btnCancel_Create();
 			$this->btnConfirm_Create();
-			$this->btnEditConfirm_Create();
-			$this->btnEditCancel_Create();
-			$this->lstCompany_Create();
-			$this->txtDescription_Create();
+	//		$this->btnEditConfirm_Create();
+	//		$this->btnEditCancel_Create();
 
-		//	$this->pnlContactEdit_Create();
 			$this->btnEdit_Create();
 			$this->btnDelete_Create();
 			$this->lblWarning_Create();
@@ -231,48 +227,17 @@
 		$this->btnEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 	}
 
-	protected function btnEditConfirm_Create(){
-		$this->btnEditConfirm = new QButton($this->dlgEdit);
-		$this->btnEditConfirm->Text = 'Confirm';
-		$this->btnEditConfirm->AddAction(new QClickEvent(),new QAjaxAction('btnEditConfirm_Click'));
-		$this->btnEditConfirm->AddAction(new QEnterKeyEvent(),new QAjaxAction('btnEditConfirm_Click'));
-		$this->btnEditConfirm->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	}
-	protected function btnEditCancel_Create(){
-		$this->btnEditCancel = new QButton($this->dlgEdit);
-		$this->btnEditCancel->Text = 'Cancel';
-		$this->btnEditCancel->AddAction(new QClickEvent(), new QAjaxAction('btnEditCancel_Click'));
-		$this->btnEditCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnEditCancel_Click'));
-		$this->btnEditCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	}
-	protected function lstCompany_Create(){
-        $this->lstCompany = new QListBox($this->dlgEdit);
-		$this->lstCompany->Name = 'Company';
-		$this->lstCompany->AddItem('- Select One -', null);
-		$objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
-		if ($objCompanyArray) foreach ($objCompanyArray as $objCompany) {
-			$objListItem = new QListItem($objCompany->__toString(), $objCompany->CompanyId);
-			if ((QApplication::$TracmorSettings->CompanyId) && (QApplication::$TracmorSettings->CompanyId == $objCompany->CompanyId))
-				$objListItem->Selected = true;
-			$this->lstCompany->AddItem($objListItem);
-		}
-	}
-	protected function txtDescription_Create(){
-		$this->txtDescription = new QTextBox($this->dlgEdit);
-		$this->txtDescription->Name = 'Description';
-		$this->txtDescription->Warning = '';
-	}
 	// Create Dialog box Edit
-    protected function dlgEdit_Create(){
-		$this->dlgEdit = new QDialogBox($this);
-		$this->dlgEdit->AutoRenderChildren = true;
-		$this->dlgEdit->Width = '440px';
-		$this->dlgEdit->Overflow = QOverflow::Auto;
-		$this->dlgEdit->Padding = '10px';
-		$this->dlgEdit->Display = false;
-		$this->dlgEdit->BackColor = '#FFFFFF';
-		$this->dlgEdit->MatteClickable = false;
-		$this->dlgEdit->CssClass = "modal_dialog";
+    protected function dlgMassEdit_Create(){
+		$this->dlgMassEdit = new QDialogBox($this);
+		$this->dlgMassEdit->AutoRenderChildren = true;
+		$this->dlgMassEdit->Width = '440px';
+		$this->dlgMassEdit->Overflow = QOverflow::Auto;
+		$this->dlgMassEdit->Padding = '10px';
+		$this->dlgMassEdit->Display = false;
+		$this->dlgMassEdit->BackColor = '#FFFFFF';
+		$this->dlgMassEdit->MatteClickable = false;
+		$this->dlgMassEdit->CssClass = "modal_dialog";
 	}
 	// Create Dialog box delete
 	protected function dlgDelete_Create(){
@@ -426,19 +391,27 @@
 	  	$this->blnSearch = false;
   	}
 
-	protected function btnEdit_Click(){
-		$items = $this->dtgContact->getSelected('ContactId');
-	// Show modal to Edit Company, Desc
-		if(count($items)>0){
-			$this->lblWarning->Text = "";
-			//$this->txtDescription = new QTextBox($this->dlgEdit);
-			//$pnlContactEdit = new QTextBox($this->dlgEdit);
-			$this->dlgEdit->ShowDialogBox();
-		}else{
-			$this->lblWarning->Text = "You haven't chosen any Contact to Edit" ;
-		}
+    protected function btnEdit_Click(){
+        $this->lblWarning->Text = "";
+        $items = $this->dtgContact->getSelected('ContactId');
+        if(count($items)>0){
+            if (!$this->dlgMassEdit->Display) {
+                // Create the panel, assigning it to the Dialog Box
+                if (!$this->pnlContactEdit instanceof ContactMassEditPanel){
+                    $this->pnlContactEdit = new ContactMassEditPanel($this->dlgMassEdit, 'dlgMassEdit_Close', $items);
+                }
+                // Show the dialog box
+                $this->dlgMassEdit->ShowDialogBox();
+            }
+        }
+        else{
+            $this->lblWarning->Text = "You haven't chosen any Company to Edit" ;
+        }
+    }
 
-	}
+    public function dlgMassEdit_Close(){
+        $this->dlgMassEdit->HideDialogBox();
+    }
 
 	protected function btnDelete_Click($strFormId, $strControlId, $strParameter){
 		$items = $this->dtgContact->getSelected('ContactId');
@@ -489,24 +462,24 @@
 		$this->dlgDelete->HideDialogBox();
 		QApplication::Redirect('');
 	}
-	public function btnEditConfirm_Click(){
-		$items = $this->dtgContact->getSelected('ContactId');
-		$params = array();
-			$params['description'] = $this->txtDescription->Text;
-			$params['company_id'] = $this->lstCompany->SelectedValue;
-		if(count($params)==0){
-			//"No fields filled to changed";
-		}
-		else{
-			Contact::UpdateSelected($items,$params);
-			$this->dlgEdit->HideDialogBox();
-			QApplication::Redirect('');
-		}
-	}
-	public function btnEditCancel_Click(){
-		//$this->dtgContact->getColumn(0)->getControls();
-		$this->dlgEdit->HideDialogBox();
-	}
+//	public function btnEditConfirm_Click(){
+//		$items = $this->dtgContact->getSelected('ContactId');
+//		$params = array();
+//			$params['description'] = $this->txtDescription->Text;
+//			$params['company_id'] = $this->lstCompany->SelectedValue;
+//		if(count($params)==0){
+//			//"No fields filled to changed";
+//		}
+//		else{
+//			Contact::UpdateSelected($items,$params);
+//			$this->dlgMassEdit->HideDialogBox();
+//			QApplication::Redirect('');
+//		}
+//	}
+//	public function btnEditCancel_Click(){
+//		//$this->dtgContact->getColumn(0)->getControls();
+//		$this->dlgMassEdit->HideDialogBox();
+//	}
   	// Display or hide the Advanced Search Composite Control
 	  protected function lblAdvanced_Click() {
 	  	if ($this->blnAdvanced) {
@@ -544,6 +517,9 @@
 				}
 			}
 	  }
+        public function btnMassEditCancel_Click(){
+            $this->dlgMassEdit->HideDialogBox();
+        }
 	}
 	ContactListForm::Run('ContactListForm', __DOCROOT__ . __SUBDIRECTORY__ . '/contacts/contact_list.tpl.php');
 ?>

@@ -21,7 +21,7 @@
 ?>
 
 <?php
-// Include the classfile for CompanyEditPanelBase
+// Include the classfile for ContactEditPanelBase
 require(__PANELBASE_CLASSES__ . '/ContactEditPanelBase.class.php');
 
 class ContactMassEditPanel extends ContactEditPanelBase {
@@ -32,14 +32,17 @@ class ContactMassEditPanel extends ContactEditPanelBase {
 
    // Primary Address inputs for new company
 
-   public $chkCompany;
-   public $chkDescription;
-   public $lstCompany;
-   public $txtDescription;
+    public $chkCompany;
+    public $lstCompany;
+    public $chkDescription;
+    public $txtDescription;
+    public $btnMassEditApply;
+    public $btnMassEditCancel;
 
-   public $arrCustomFields;
+    public $arrCustomFields;
+    public $arrCheckboxes;
 
-   public $arrContactToEdit = array();
+    public $arrContactToEdit = array();
 
     public function __construct($objParentObject, $strClosePanelMethod, $arrayContactId) {
 
@@ -49,35 +52,41 @@ class ContactMassEditPanel extends ContactEditPanelBase {
             $objExc->IncrementOffset();
             throw $objExc;
         }
-        $this->arrCustomFields = CustomField::LoadObjCustomFieldArray(8, true);
+        // Load Custom Fields
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(8, false);
+        if($objCustomFieldArray){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
 
-        if ($this->objContact->objCustomFieldArray) {
-            // Create the Custom Field Controls - labels and inputs (text or list) for each
-            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->arrCustomFields, true, $this, true, true);
-
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Enabled = false;
+                $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
+                $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+                $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+            }
         }
+
         $this->arrContactToEdit = $arrayContactId;
         $this->chkCompany_Create();
         $this->chkDescription_Create();
         $this->txtDescription_Create();
         $this->lstCompany_Create();
         $this->strOverflow = QOverflow::Auto;
+        $this->btnMassEditApply_Create();
+        $this->btnMassEditCancel_Create();
         //$this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
     }
 
     // Create checkbox for Company
     protected function chkCompany_Create(){
-        $this->chkCompany = new QCheckBox($this);
+       $this->chkCompany = new QCheckBox($this, 'chkCompany');
         $this->chkCompany->Name = 'company';
-        $this->chkCompany->strControlId = 'chk_company';
         $this->chkCompany->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
     }
 
     // Create checkbox for Description
     protected function chkDescription_Create(){
-        $this->chkDescription = new QCheckBox($this);
+        $this->chkDescription = new QCheckBox($this,'chkDescription');
         $this->chkDescription->Name = 'description';
-        $this->chkDescription->strControlId = 'chk_description';
         $this->chkDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
     }
 
@@ -85,14 +94,15 @@ class ContactMassEditPanel extends ContactEditPanelBase {
     protected function txtDescription_Create() {
         $this->txtDescription = new QTextBox($this);
         $this->txtDescription->Name = 'Description';
-        $this->txtDescription->strControlId = 'description';
+        $this->txtDescription->strControlId = 'Description';
         $this->txtDescription->Warning = '';
+        $this->txtDescription->Enabled = false;
     }
 
     protected function lstCompany_Create(){
     $this->lstCompany = new QListBox($this);
     $this->lstCompany->Name = 'Company';
-    $this->txtDescription->strControlId = 'company';
+    $this->lstCompany->strControlId = 'Company';
     $this->lstCompany->AddItem('- Select One -', null);
     $objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
     if ($objCompanyArray) foreach ($objCompanyArray as $objCompany) {
@@ -101,10 +111,11 @@ class ContactMassEditPanel extends ContactEditPanelBase {
             $objListItem->Selected = true;
         $this->lstCompany->AddItem($objListItem);
     }
+    $this->lstCompany->Enabled = false;
 }
 
     // Save Button Click Actions
-    public function btnSave_Click($strFormId, $strControlId, $strParameter) {
+    public function btnMassEditApply_Click($strFormId, $strControlId, $strParameter) {
 
 //        $strQuery = sprintf("
 //				UPDATE `company`
@@ -117,15 +128,30 @@ class ContactMassEditPanel extends ContactEditPanelBase {
 //        $objDatabase->NonQuery($strQuery);
 //
 //
-        $this->ParentControl->RemoveChildControls(true);
-        $this->CloseSelf(true);
-        QApplication::Redirect('');
+//        $this->ParentControl->RemoveChildControls(true);
+//        $this->CloseSelf(true);
+//        QApplication::Redirect('');
+    }
+
+    protected function btnMassEditApply_Create(){
+        $this->btnMassEditApply = new QButton($this);
+        $this->btnMassEditApply->Text = 'Apply';
+        $this->btnMassEditApply->AddAction(new QClickEvent(),new QAjaxAction('btnMassEditApply_Click'));
+        $this->btnMassEditApply->AddAction(new QEnterKeyEvent(),new QAjaxAction('btnMassEditApply_Click'));
+        $this->btnMassEditApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+    }
+
+    protected function btnMassEditCancel_Create(){
+        $this->btnMassEditCancel = new QButton($this);
+        $this->btnMassEditCancel->Text = 'Cancel';
+        $this->btnMassEditCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassEditCancel_Click'));
+        $this->btnMassEditCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEditCancel_Click'));
+        $this->btnMassEditCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
     }
 
     // Cancel Button Click Action
-    public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
-        $this->ParentControl->RemoveChildControls(true);
-        $this->CloseSelf(true);
+    public function btnMassEditCancel_Click($strFormId, $strControlId, $strParameter) {
+        $this->ParentControl->HideDialogBox();
     }
 }
 ?>
