@@ -31,9 +31,12 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
 	// An array of custom fields
 
 	// Primary Address inputs for new company
-	    public $txtLongDescription;
+    public $arrCheckboxes = array();
+    public $arrCustomFields;
 
-	    public $arrCompaniesToEdit = array();
+	public $txtLongDescription;
+    public $chkLongDescription;
+	public $arrCompaniesToEdit = array();
 
 	public function __construct($objParentObject, $strClosePanelMethod, $arrayCompanyId) {
 
@@ -45,19 +48,44 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
 		}
         $this->arrCompaniesToEdit = $arrayCompanyId;
 		$this->txtLongDescription_Create();
+        $this->chkLongDescription_Create();
+
 		$this->strOverflow = QOverflow::Auto;
-		//$this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
+
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Company, false);
+        if(count($objCustomFieldArray)>0){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Enabled = false;
+                $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
+                $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+                $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+            }
+            $this->txtLongDescription->Enabled = false;
+        }
+        //$this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
 	}
 
-	// Create and Setup txtShortDescription
+	// Create and Setup txtLongDescription
 		protected function txtLongDescription_Create() {
 		$this->txtLongDescription = new QTextBox($this);
-		$this->txtLongDescription->Name = QApplication::Translate('Description');
+        $this->txtLongDescription->TextMode = QTextMode::MultiLine;
+		$this->txtLongDescription->Name = QApplication::Translate('Long Description');
+        $this->txtLongDescription->strControlId = 'LongDescription';
 	}
+
+    // Create and Setup chkShortDescription
+    public function chkLongDescription_Create(){
+        $this->chkLongDescription = new QCheckBox($this,'chkLongDescription');
+        $this->chkLongDescription->Name = 'Description';
+        $this->chkLongDescription->Checked = false;
+        $this->chkLongDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+    }
 
 	// Save Button Click Actions
 		public function btnSave_Click($strFormId, $strControlId, $strParameter) {
-
+            if(count($this->arrCustomFields)>0){}
+            else{
 			$strQuery = sprintf("
 				UPDATE `company`
 				SET `long_description`='%s'
@@ -67,7 +95,7 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
 
 			$objDatabase = QApplication::$Database[1];
 			$objDatabase->NonQuery($strQuery);
-
+            }
 
 		$this->ParentControl->RemoveChildControls(true);
 		$this->CloseSelf(true);

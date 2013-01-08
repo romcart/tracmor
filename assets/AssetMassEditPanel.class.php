@@ -22,9 +22,10 @@ class AssetMassEditPanel extends QPanel {
 	public $arrAssetToEdit = array();
 //	public $arrFields = array();
 //
-	public $chkShortDescription;
+    public $arrCustomFields;
+    public $arrCheckboxes = array();
+
 	public $chkModel;
-	public $chkLongDescription;
 
 	public $txtShortDescription;
 	public $txtLongDescription;
@@ -44,14 +45,22 @@ class AssetMassEditPanel extends QPanel {
 		}
 		$this->arrAssetToEdit = $arrayAssetId;
 
-		$this->txtShortDescription_Create();
-		$this->txtLongDescription_Create();
 		$this->lstModel_Create();
-
-
-		$this->chkShortDescription_Create();
 		$this->chkModel_Create();
-		$this->chkLongDescription_Create();
+
+        // Load Custom Fields
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Asset, false);
+        if($objCustomFieldArray){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Enabled = false;
+                $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
+                $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+                $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+            }
+        }
+
 		$this->btnApply_Create();
 		$this->btnCancel_Create();
 
@@ -62,24 +71,9 @@ class AssetMassEditPanel extends QPanel {
 
 	}
 
-	// Create the Short Description Input
-	protected function txtShortDescription_Create() {
-		$this->txtShortDescription = new QTextBox($this);
-		$this->txtShortDescription->Name = 'Inventory Model';
-		$this->txtShortDescription->strControlId = 'short_description';
-	}
-
-	public function chkShortDescription_Create(){
-		$this->chkShortDescription = new QCheckBox($this);
-		$this->chkShortDescription->Name = 'short_description';
-		$this->chkShortDescription->strControlId = 'chk_short_description';
-		$this->chkShortDescription->Checked = false;
-		$this->chkShortDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-	}
-
 	// Create the Model Input
 	protected function lstModel_Create() {
-		$this->lstModel = new QListBox($this);
+		$this->lstModel = new QListBox($this,'Model');
 		$this->lstModel->Name = 'Model';
 		$this->lstModel->AddItem('- Select One -', null);
 		$assetModelArray = AssetModel::LoadAllIntoArray();
@@ -87,32 +81,15 @@ class AssetMassEditPanel extends QPanel {
 			$objListItem = new QListItem($assetModel['short_description'], $assetModel['asset_model_id']);
 			$this->lstModel->AddItem($objListItem);
 		}
-		$this->lstModel->strControlId = 'model';
 	}
 
 	public function chkModel_Create(){
 		$this->chkModel = new QCheckBox($this);
 		$this->chkModel->Name = 'model';
-		$this->chkModel->strControlId = 'chk_model';
+		$this->chkModel->strControlId = 'chkModel';
 		$this->chkModel->Checked = false;
 		$this->chkModel->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 
-	}
-
-	// Create and Setup txtLongDescription
-	protected function txtLongDescription_Create() {
-		$this->txtLongDescription = new QTextBox($this);
-		$this->txtLongDescription->Name = QApplication::Translate('Long Description');
-		$this->txtLongDescription->TextMode = QTextMode::MultiLine;
-		$this->txtLongDescription->strControlId = 'long_description';
-	}
-
-	public function chkLongDescription_Create(){
-		$this->chkLongDescription = new QCheckBox($this);
-		$this->chkLongDescription->Name = 'long_description';
-		$this->chkLongDescription->strControlId = 'chk_long_description';
-		$this->chkLongDescription->Checked = false;
-		$this->chkLongDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 	}
 
 	public function btnApply_Create(){
