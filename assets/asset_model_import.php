@@ -513,6 +513,7 @@
           foreach ($this->txtMapDefaultValueArray as $txtDefault) {
             if ($txtDefault->Display && $txtDefault->Required && !$txtDefault->Text) {
               $txtDefault->Warning = "You must enter default value.";
+              $blnError = true;
               break;
             }
             else {
@@ -750,7 +751,15 @@
               $objNewAssetModelArray = array();
               for ($i=0; $i<$this->FileCsvData->countRows(); $i++) {
                 $strRowArray = $this->FileCsvData->getRow($i);
-                $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
+                  if(isset($strRowArray[$intModelShortDescriptionKey])){
+                    $strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? addslashes(trim($strRowArray[$intModelShortDescriptionKey])) : false;
+                }
+                elseif(isset($this->txtMapDefaultValueArray[$intModelShortDescriptionKey])){
+                     $strShortDescription = ($this->txtMapDefaultValueArray[$intModelShortDescriptionKey]->Text);
+                }
+                else{
+                    $strShortDescription = false;
+                }
                 //$strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? trim($strRowArray[$intModelShortDescriptionKey]) : false;
                 $strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? addslashes(trim($strRowArray[$intModelCodeKey])) : addslashes(trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text));
                 //$strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? trim($strRowArray[$intModelCodeKey]) : trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text);
