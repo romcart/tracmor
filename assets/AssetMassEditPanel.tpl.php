@@ -1,7 +1,7 @@
 <?php
 /**
  * @see AssetMassEditPanel
- *
+ * @var AssetMassEditPanel $_CONTROL
  */
 ?>
 <div class="title"> Asset Mass Edit - <?php echo count($_CONTROL->arrAssetToEdit) ;?> records
@@ -15,14 +15,16 @@ Select fields to be updated and provide new values.
 		<td><?php $_CONTROL->lstModel->Render();            ?></td>
 	</tr>
     <tr>
-        <td></td>
-        <td>parent asset</td>
-        <td></td>
+        <td><?php $_CONTROL->chkParentAssetCode->Render();  ?></td>
+        <td><?php echo $_CONTROL->txtParentAssetCode->Name; ?></td>
+        <td><?php $_CONTROL->txtParentAssetCode->Render();
+                  $_CONTROL->lblIconParentAssetCode->Render();
+            ?></td>
     </tr>
     <tr>
-        <td></td>
-        <td>lock to parent</td>
-        <td></td>
+        <td><?php $_CONTROL->chkChkLockToParent->Render();  ?></td>
+        <td><?php echo $_CONTROL->chkLockToParent->Name;    ?></td>
+        <td><?php $_CONTROL->chkLockToParent->Render();     ?></td>
     </tr>
     <?php
     if($_CONTROL->arrCustomFields){

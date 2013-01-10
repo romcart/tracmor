@@ -87,5 +87,9 @@
 	<?php $this->dlgMassDelete->Render(); ?>
 	<?php $this->btnMassEdit->Render(); ?>
 	<?php $this->btnMassDelete->Render(); ?>
+    <?php        if ($this->ctlAssetSearchTool) {
+            $this->ctlAssetSearchTool->Render();
+            }
+     ?>
 	<?php  $this->RenderEnd() ?>		
 	<?php 	require_once('../includes/footer.inc.php'); ?>

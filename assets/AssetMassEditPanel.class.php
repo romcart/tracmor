@@ -5,11 +5,11 @@ class AssetMassEditPanel extends QPanel {
 
 	/**
 	 * @var  QCheckBox $chkModel
-	 * @var  QCheckBox $chkLongDescription
-	 * @var  QCheckBox $chkShortDescription
+	 * @var  QCheckBox $chkChkLockToParent
+	 * @var  QCheckBox $chkParentAssetCode
 	 *
-	 * @var QTextBox $txtLongDescription
-	 * @var QTextBox $txtShortDescription
+	 * @var QCheckBox $chkLockToParent
+	 * @var QTextBox $txtParentAssetCode
 	 * @var QListBox $lstModel
 	 */
 
@@ -26,11 +26,13 @@ class AssetMassEditPanel extends QPanel {
     public $arrCheckboxes = array();
 
 	public $chkModel;
-
-	public $txtShortDescription;
-	public $txtLongDescription;
+	public $chkParentAssetCode;
+	public $chkChkLockToParent;
+    public $txtParentAssetCode;
+    public $lblIconParentAssetCode;
+    public $ctlAssetSearchTool;
+    public $chkLockToParent;
 	public $lstModel;
-
 	public $btnApply;
 	public $btnCancel;
 	public $lblWarning;
@@ -46,7 +48,12 @@ class AssetMassEditPanel extends QPanel {
 		$this->arrAssetToEdit = $arrayAssetId;
 
 		$this->lstModel_Create();
+        $this->txtParentAssetCode_Create();
+        $this->chkLockToParent_Create();
+        $this->lblIconParentAssetCode_Create();
 		$this->chkModel_Create();
+        $this->chkChkLockToParent_Create();
+        $this->chkParentAssetCode_Create();
 
         // Load Custom Fields
         $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Asset, false);
@@ -66,9 +73,6 @@ class AssetMassEditPanel extends QPanel {
 
 		// Disable inputs
 		$this->lstModel->Enabled = false;
-		$this->txtShortDescription->Enabled = false;
-		$this->txtLongDescription->Enabled = false;
-
 	}
 
 	// Create the Model Input
@@ -83,6 +87,25 @@ class AssetMassEditPanel extends QPanel {
 		}
 	}
 
+    // Create the Asset Tag text input
+    protected function txtParentAssetCode_Create() {
+        $this->txtParentAssetCode = new QTextBox($this, 'ParentAssetCode');
+        $this->txtParentAssetCode->Name = 'Parent Asset';
+        $this->txtParentAssetCode->Width = '230';
+        $this->txtParentAssetCode->Required = false;
+        $this->txtParentAssetCode->CausesValidation = true;
+        $this->txtParentAssetCode->Enabled = false;
+    }
+
+    // Create the Lock to Parent checkbox
+    protected function chkLockToParent_Create() {
+        $this->chkLockToParent = new QCheckBox($this,'ChkLockToParent');
+        $this->chkLockToParent->Name = 'Lock to parent';
+        $this->chkLockToParent->Text = 'Lock to parent';
+        $this->chkLockToParent->CausesValidation = true;
+        $this->chkLockToParent->Enabled = false;
+    }
+
 	public function chkModel_Create(){
 		$this->chkModel = new QCheckBox($this);
 		$this->chkModel->Name = 'model';
@@ -91,6 +114,36 @@ class AssetMassEditPanel extends QPanel {
 		$this->chkModel->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 
 	}
+
+    // Create the clickable label
+    protected function lblIconParentAssetCode_Create() {
+        $this->lblIconParentAssetCode = new QLabel($this);
+        $this->lblIconParentAssetCode->HtmlEntities = false;
+        $this->lblIconParentAssetCode->Text = '<img src="../images/icons/lookup.png" border="0" style="cursor:pointer;">';
+        $this->lblIconParentAssetCode->AddAction(new QClickEvent(), new QAjaxAction('lblIconParentAssetCode_Click'));
+        $this->lblIconParentAssetCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('lblIconParentAssetCode_Click'));
+        $this->lblIconParentAssetCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+    }
+
+    // Create checkbox to Parent Asset Code text input
+    protected function chkParentAssetCode_Create() {
+        $this->chkParentAssetCode = new QCheckBox($this);
+        $this->chkParentAssetCode->Name = 'chkParentAssetCode';
+        $this->chkParentAssetCode->strControlId = 'chkParentAssetCode';
+        $this->chkParentAssetCode->Checked = false;
+        $this->chkParentAssetCode->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+
+    }
+
+    // Create the Lock to Parent checkbox
+    protected function chkChkLockToParent_Create() {
+        $this->chkChkLockToParent = new QCheckBox($this);
+        $this->chkChkLockToParent->Name = 'chkChkLockToParent';
+        $this->chkChkLockToParent->strControlId = 'chkChkLockToParent';
+        $this->chkChkLockToParent->Checked = false;
+        $this->chkChkLockToParent->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+
+    }
 
 	public function btnApply_Create(){
 

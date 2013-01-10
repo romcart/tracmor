@@ -44,7 +44,7 @@
 		 * @var  QDialogBox $dlgMassDelete
 		 * @var  QButton    $btnMassDelete
 		 * @var  QButton    $btnMassEdit
-		 *
+		 * @var  QAssetSearchToolComposite $ctlAssetSearchTool
 		 */
 
 		// Header Tabs
@@ -93,13 +93,13 @@
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
 		protected $blnAttachment;*/
-
+        protected $pnlAssetMassEdit;
 		protected $lblWarning;
 		protected $dlgMassEdit;
 		protected $dlgMassDelete;
 		protected $btnMassEdit;
 		protected $btnMassDelete;
-
+        public    $ctlAssetSearchTool;
 
 		protected function Form_Create() {
 			
@@ -183,6 +183,7 @@
 				$this->blnSearch = true;
 			}*/
 			// Mass Actions controls create
+            $this->ctlAssetSearchTool_Create();
 			$this->lblWarning_Create();
 			$this->dlgMassEdit_Create();
 			$this->dlgMassDelete_Create();
@@ -492,7 +493,7 @@
 		}
 
 		protected function dlgMassEdit_Create(){
-			$this->dlgMassEdit = new QDialogBox($this);
+			$this->dlgMassEdit = new QDialogBox($this, 'MassEdit');
 			$this->dlgMassEdit->AutoRenderChildren = true;
 			$this->dlgMassEdit->Width = '440px';
 			$this->dlgMassEdit->Overflow = QOverflow::Auto;
@@ -563,7 +564,11 @@
 			$items = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
-				$pnlAssetMassEdit = new AssetMassEditPanel($this->dlgMassEdit,'pnlAssetMassEditCancel_Click',$items);
+                if(!$this->pnlAssetMassEdit instanceof AssetMassEditPanel){
+                    $this->pnlAssetMassEdit = new AssetMassEditPanel($this->dlgMassEdit,
+                                                     'pnlAssetMassEditCancel_Click',
+                                                      $items);
+                }
 				$this->dlgMassEdit->ShowDialogBox();
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Asset to Edit" ;
@@ -573,7 +578,33 @@
 		public function pnlAssetMassEditCancel_Click(){
 			$this->dlgMassEdit->HideDialogBox();
 		}
-	}  
+
+        public function lblIconParentAssetCode_Click() {
+            // Uncheck all items but SelectAll checkbox
+           // $this->UncheckAllItems($this->pnlAssetMassEdit->ctlAssetSearchTool);
+            if($this->ctlAssetSearchTool instanceof QAssetSearchToolComposite){
+                $this->ctlAssetSearchTool->Refresh();
+                $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Parent Asset";
+                $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
+            }
+        }
+
+        public function UncheckAllItems($object) {
+            foreach ($object->GetAllControls() as $objControl) {
+                if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+                    $objControl->Checked = false;
+                }
+            }
+        }
+        public function ctlAssetSearchTool_Create() {
+            $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this,'assetSearch');
+        }
+
+        public function btnAssetSearchToolAdd_Click() {
+
+        }
+
+    }
 
 	// Go ahead and run this form object to generate the page and event handlers, using
 	// generated/asset_edit.php.inc as the included HTML template file
