@@ -601,7 +601,30 @@
         }
 
         public function btnAssetSearchToolAdd_Click() {
+            $this->ctlAssetSearchTool->lblWarning->Text = "";
+            $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
+            if (count($intSelectedAssetId) > 1) {
+                $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one parent asset.";
+            }
+            elseif (count($intSelectedAssetId) != 1) {
+                $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
+            }
+            else {
+                if (!($objParentAsset = Asset::LoadByAssetId($intSelectedAssetId[0]))) {
+                    $this->ctlAssetSearchTool->lblWarning->Text = "That asset tag does not exist. Please try another.";
 
+                }
+                elseif ($objParentAsset->AssetId == $this->objAsset->AssetId) {
+                    $this->ctlAssetSearchTool->lblWarning->Text = "Parent asset tag must not be the same as asset tag. Please try another.";
+                }
+                else {
+                    $this->pnlAssetMassEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
+                    $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+                }
+            }
+
+            // Uncheck all items but SelectAll checkbox
+            //$this->UncheckAllItems();
         }
 
     }
