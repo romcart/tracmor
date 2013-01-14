@@ -33,7 +33,7 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
 	// Primary Address inputs for new company
     public $arrCheckboxes = array();
     public $arrCustomFields;
-
+    public $arrCustomFieldsToEdit = array();
 	public $txtLongDescription;
     public $chkLongDescription;
 	public $arrCompaniesToEdit = array();
@@ -84,17 +84,52 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
 
 	// Save Button Click Actions
 		public function btnSave_Click($strFormId, $strControlId, $strParameter) {
-            if(count($this->arrCustomFields)>0){}
-            else{
-			$strQuery = sprintf("
+            $strQuery = sprintf("
 				UPDATE `company`
 				SET `long_description`='%s'
 				WHERE `company_id` IN (%s)
 			", $this->txtLongDescription->Text,
-				implode(",", $this->arrCompaniesToEdit));
+                implode(",", $this->arrCompaniesToEdit));
 
-			$objDatabase = QApplication::$Database[1];
-			$objDatabase->NonQuery($strQuery);
+            if(count($this->arrCustomFields)>0)
+            {
+                if($this->chkLongDescription->Checked){
+                    $objDatabase = QApplication::$Database[1];
+                    $objDatabase->NonQuery($strQuery);
+                }
+                $customFieldIdArray = array();
+
+                foreach ($this->arrCustomFields as $field){
+                    if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                        $this->arrCustomFieldsToEdit[] = $field;
+                        $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    }
+                }
+
+                if (count($this->arrCustomFieldsToEdit)>0) {
+                    // preparing data to edit
+                    // Save the values from all of the custom field controls to save the asset
+                    foreach($this->arrCompaniesToEdit as $intCompanyId){
+                        $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Company, false);
+                        $selectedCustomFieldsArray = array();
+                        foreach ($objCustomFieldsArray as $objCustomField){
+                            if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                            {
+                                $selectedCustomFieldsArray[]= $objCustomField;
+                            }
+                        }
+                        CustomField::SaveControls($selectedCustomFieldsArray,
+                                                  true,
+                                                  $this->arrCustomFieldsToEdit,
+                                                  $intCompanyId,
+                                                  EntityQtype::Company);
+                    }
+                    $this->arrCustomFieldsToEdit = array();
+                }
+            }
+            else{
+                $objDatabase = QApplication::$Database[1];
+                $objDatabase->NonQuery($strQuery);
             }
 
 		$this->ParentControl->RemoveChildControls(true);
