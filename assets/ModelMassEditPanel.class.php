@@ -44,7 +44,7 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
 	public $arrModelsToEdit = array();
 	public $arrFields = array();
     public $arrCheckboxes = array();
-
+    public $arrCustomFieldsToEdit = array();
 	public $chkShortDescription;
 	public $chkCategory;
 	public $chkManufacturer;
@@ -173,6 +173,38 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        if(count($this->arrCustomFields)>0)
+        {
+            $customFieldIdArray = array();
+
+            foreach ($this->arrCustomFields as $field){
+                if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                    $this->arrCustomFieldsToEdit[] = $field;
+                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                }
+            }
+
+            if (count($this->arrCustomFieldsToEdit)>0) {
+                // preparing data to edit
+                // Save the values from all of the custom field controls to save the asset
+                foreach($this->arrModelsToEdit as $intModelId){
+                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::AssetModel, false);
+                    $selectedCustomFieldsArray = array();
+                    foreach ($objCustomFieldsArray as $objCustomField){
+                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                        {
+                            $selectedCustomFieldsArray[]= $objCustomField;
+                        }
+                    }
+                    CustomField::SaveControls($selectedCustomFieldsArray,
+                        true,
+                        $this->arrCustomFieldsToEdit,
+                        $intModelId,
+                        EntityQtype::AssetModel);
+                }
+                $this->arrCustomFieldsToEdit = array();
+            }
+        }
 		$this->ParentControl->RemoveChildControls(true);
 		$this->CloseSelf(true);
 	}

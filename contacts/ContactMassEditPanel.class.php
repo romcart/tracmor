@@ -38,7 +38,7 @@ class ContactMassEditPanel extends ContactEditPanelBase {
     public $txtDescription;
     public $btnMassEditApply;
     public $btnMassEditCancel;
-
+    public $arrCustomFieldsToEdit = array();
     public $arrCustomFields;
     public $arrCheckboxes;
 
@@ -116,21 +116,53 @@ class ContactMassEditPanel extends ContactEditPanelBase {
 
     // Save Button Click Actions
     public function btnMassEditApply_Click($strFormId, $strControlId, $strParameter) {
+         if($this->chkCompany->Checked){
 
-//        $strQuery = sprintf("
-//				UPDATE `company`
-//				SET `long_description`='%s'
-//				WHERE `company_id` IN (%s)
-//			", $this->txtLongDescription->Text,
-//            implode(",", $this->arrCompaniesToEdit));
-//
-//        $objDatabase = QApplication::$Database[1];
-//        $objDatabase->NonQuery($strQuery);
-//
-//
-//        $this->ParentControl->RemoveChildControls(true);
-//        $this->CloseSelf(true);
-//        QApplication::Redirect('');
+         }
+         if($this->chkDescription->Checked){
+              $strQuery = sprintf("
+				UPDATE `contact`
+				SET `description`='%s'
+				WHERE `contact_id` IN (%s)
+			  ", $this->txtDescription->Text,
+              implode(",", $this->arrContactToEdit));
+
+              $objDatabase = QApplication::$Database[1];
+              $objDatabase->NonQuery($strQuery);
+         }
+        // Custom Fields handling
+        if(count($this->arrCustomFields)>0)
+        {
+            $customFieldIdArray = array();
+
+            foreach ($this->arrCustomFields as $field){
+                if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                    $this->arrCustomFieldsToEdit[] = $field;
+                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                }
+            }
+
+            if (count($this->arrCustomFieldsToEdit)>0) {
+                // preparing data to edit
+                foreach($this->arrContactToEdit as $intContactId){
+                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Contact, false);
+                    $selectedCustomFieldsArray = array();
+                    foreach ($objCustomFieldsArray as $objCustomField){
+                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                        {
+                            $selectedCustomFieldsArray[]= $objCustomField;
+                        }
+                    }
+                    CustomField::SaveControls($selectedCustomFieldsArray,
+                        true,
+                        $this->arrCustomFieldsToEdit,
+                        $intContactId,
+                        EntityQtype::Contact);
+                }
+                $this->arrCustomFieldsToEdit = array();
+            }
+        }
+        QApplication::Redirect('');
     }
 
     protected function btnMassEditApply_Create(){

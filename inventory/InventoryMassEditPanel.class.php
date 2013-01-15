@@ -19,7 +19,7 @@ class InventoryMassEditPanel extends QPanel {
 
     public $objInventoryModel;
 	public $arrInventoryToEdit = array();
-	// public $arrFields = array();
+    public $arrCustomFieldsToEdit = array();
     public $arrCustomFields;
     public $arrCheckboxes = array();
 
@@ -174,6 +174,38 @@ class InventoryMassEditPanel extends QPanel {
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        if(count($this->arrCustomFields)>0)
+        {
+            $customFieldIdArray = array();
+
+            foreach ($this->arrCustomFields as $field){
+                if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                    $this->arrCustomFieldsToEdit[] = $field;
+                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                }
+            }
+
+            if (count($this->arrCustomFieldsToEdit)>0) {
+                // preparing data to edit
+                // Save the values from all of the custom field controls to save the asset
+                foreach($this->arrInventoryToEdit as $intInventoryId){
+                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Inventory, false);
+                    $selectedCustomFieldsArray = array();
+                    foreach ($objCustomFieldsArray as $objCustomField){
+                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                        {
+                            $selectedCustomFieldsArray[]= $objCustomField;
+                        }
+                    }
+                    CustomField::SaveControls($selectedCustomFieldsArray,
+                        true,
+                        $this->arrCustomFieldsToEdit,
+                        $intInventoryId,
+                        EntityQtype::Inventory);
+                }
+                $this->arrCustomFieldsToEdit = array();
+            }
+        }
 		$this->ParentControl->HideDialogBox();
 	}
 

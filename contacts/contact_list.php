@@ -517,9 +517,16 @@
 				}
 			}
 	  }
-        public function btnMassEditCancel_Click(){
-            $this->dlgMassEdit->HideDialogBox();
-        }
+      public function btnMassEditCancel_Click(){
+          $this->dlgMassEdit->HideDialogBox();
+      }
+    // Save Button Click Actions
+    public function btnMassEditApply_Click($strFormId, $strControlId, $strParameter) {
+       $this->pnlContactEdit->btnMassEditApply_Click($strFormId, $strControlId, $strParameter);
+       $this->dlgMassEdit->HideDialogBox();
+       QApplication::Redirect('');
+    }
+
 	}
 	ContactListForm::Run('ContactListForm', __DOCROOT__ . __SUBDIRECTORY__ . '/contacts/contact_list.tpl.php');
 ?>
