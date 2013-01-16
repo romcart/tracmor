@@ -28,7 +28,7 @@ class ReceiptMassEditPanel extends QPanel {
     public $arrReceiptToEdit = array();
     public $arrCheckboxes = array();
     public $arrCustomFields;
-
+    public $arrCustomFieldsToEdit = array();
 //	public $arrFields = array();
 //
     public $chkFromCompany;
@@ -246,6 +246,37 @@ class ReceiptMassEditPanel extends QPanel {
     }
 
     public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        if(count($this->arrCustomFields)>0)
+        {
+            $customFieldIdArray = array();
+            // preparing data to edit
+            foreach ($this->arrCustomFields as $field){
+                if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                    $this->arrCustomFieldsToEdit[] = $field;
+                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                }
+            }
+
+            if (count($this->arrCustomFieldsToEdit)>0) {
+                // Save the values from all of the custom field controls to save the asset
+                foreach($this->arrReceiptToEdit as $intReceiptId){
+                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Receipt, false);
+                    $selectedCustomFieldsArray = array();
+                    foreach ($objCustomFieldsArray as $objCustomField){
+                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                        {
+                            $selectedCustomFieldsArray[]= $objCustomField;
+                        }
+                    }
+                    CustomField::SaveControls($selectedCustomFieldsArray,
+                        true,
+                        $this->arrCustomFieldsToEdit,
+                        $intReceiptId,
+                        EntityQtype::Receipt);
+                }
+                $this->arrCustomFieldsToEdit = array();
+            }
+        }
         $this->ParentControl->HideDialogBox();
     }
 

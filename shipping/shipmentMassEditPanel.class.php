@@ -30,8 +30,8 @@ class ShipmentMassEditPanel extends QPanel {
 	public $arrShipmentToEdit = array();
     public $arrCheckboxes = array();
     public $arrCustomFields;
-//	public $arrFields = array();
-//
+    public $arrCustomFieldsToEdit = array();
+
 	public $chkFromCompany;
 	public $chkToCompany;
 	public $chkCourier;
@@ -276,6 +276,38 @@ class ShipmentMassEditPanel extends QPanel {
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        if(count($this->arrCustomFields)>0)
+        {
+            $customFieldIdArray = array();
+
+            foreach ($this->arrCustomFields as $field){
+                if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                    $this->arrCustomFieldsToEdit[] = $field;
+                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                }
+            }
+
+            if (count($this->arrCustomFieldsToEdit)>0) {
+                // preparing data to edit
+                // Save the values from all of the custom field controls to save the asset
+                foreach($this->arrShipmentToEdit as $intShipmentId){
+                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Shipment, false);
+                    $selectedCustomFieldsArray = array();
+                    foreach ($objCustomFieldsArray as $objCustomField){
+                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                        {
+                            $selectedCustomFieldsArray[]= $objCustomField;
+                        }
+                    }
+                    CustomField::SaveControls($selectedCustomFieldsArray,
+                        true,
+                        $this->arrCustomFieldsToEdit,
+                        $intShipmentId,
+                        EntityQtype::Shipment);
+                }
+                $this->arrCustomFieldsToEdit = array();
+            }
+        }
 		$this->ParentControl->HideDialogBox();
 	}
 
