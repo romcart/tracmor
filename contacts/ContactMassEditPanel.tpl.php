@@ -13,6 +13,11 @@ Select fields to be updated and provide new values.
         <td><?php echo $_CONTROL->lstCompany->Name;        ?></td>
         <td><?php $_CONTROL->lstCompany->Render();         ?></td>
     </tr>
+    <tr>
+        <td></td>
+        <td><?php echo $_CONTROL->lstAddress->Name;        ?></td>
+        <td><?php $_CONTROL->lstAddress->Render();         ?></td>
+    </tr>
     <?php
     // Custom Fields
     if ($_CONTROL->arrCustomFields) {

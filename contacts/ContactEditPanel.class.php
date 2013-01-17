@@ -59,7 +59,7 @@
 		}
 		
 		protected function lstCompany_Create() {
-			$this->lstCompany = new QListBox($this);
+			$this->lstCompany = new QListBox($this,'Company');
 			$this->lstCompany->Name = QApplication::Translate('Company');
 			$this->lstCompany->Required = true;
 			if (!$this->blnEditMode)
@@ -81,7 +81,7 @@
 		}
 		
 		protected function lstAddress_Create() {
-			$this->lstAddress = new QListBox($this);
+			$this->lstAddress = new QListBox($this,'Address');
 			$this->lstAddress->Name = QApplication::Translate('Address');
 			$this->lstAddress->AddItem(QApplication::Translate('- Select One -'), null);
 			if ($this->lstCompany->SelectedValue) {

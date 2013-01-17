@@ -22,9 +22,9 @@
 
 <?php
 // Include the classfile for ContactEditPanelBase
-require(__PANELBASE_CLASSES__ . '/ContactEditPanelBase.class.php');
+require('ContactEditPanel.class.php');
 
-class ContactMassEditPanel extends ContactEditPanelBase {
+class ContactMassEditPanel extends ContactEditPanel {
 
    // Specify the Location of the Template (feel free to modify) for this Panel
    protected $strTemplate = '../contacts/ContactMassEditPanel.tpl.php';
@@ -52,6 +52,9 @@ class ContactMassEditPanel extends ContactEditPanelBase {
             $objExc->IncrementOffset();
             throw $objExc;
         }
+        $this->lstAddress->Enabled = false;
+        $this->lstCompany->Enabled = false;
+
         // Load Custom Fields
         $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(8, false);
         if($objCustomFieldArray){
@@ -69,7 +72,6 @@ class ContactMassEditPanel extends ContactEditPanelBase {
         $this->chkCompany_Create();
         $this->chkDescription_Create();
         $this->txtDescription_Create();
-        $this->lstCompany_Create();
         $this->strOverflow = QOverflow::Auto;
         $this->btnMassEditApply_Create();
         $this->btnMassEditCancel_Create();
@@ -80,7 +82,7 @@ class ContactMassEditPanel extends ContactEditPanelBase {
     protected function chkCompany_Create(){
        $this->chkCompany = new QCheckBox($this, 'chkCompany');
         $this->chkCompany->Name = 'company';
-        $this->chkCompany->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+        $this->chkCompany->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this,['Address'])"));
     }
 
     // Create checkbox for Description
@@ -97,39 +99,28 @@ class ContactMassEditPanel extends ContactEditPanelBase {
         $this->txtDescription->strControlId = 'Description';
         $this->txtDescription->Warning = '';
         $this->txtDescription->Enabled = false;
+        $this->txtDescription->TextMode = QTextMode::MultiLine;
     }
-
-    protected function lstCompany_Create(){
-    $this->lstCompany = new QListBox($this);
-    $this->lstCompany->Name = 'Company';
-    $this->lstCompany->strControlId = 'Company';
-    $this->lstCompany->AddItem('- Select One -', null);
-    $objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
-    if ($objCompanyArray) foreach ($objCompanyArray as $objCompany) {
-        $objListItem = new QListItem($objCompany->__toString(), $objCompany->CompanyId);
-        if ((QApplication::$TracmorSettings->CompanyId) && (QApplication::$TracmorSettings->CompanyId == $objCompany->CompanyId))
-            $objListItem->Selected = true;
-        $this->lstCompany->AddItem($objListItem);
-    }
-    $this->lstCompany->Enabled = false;
-}
 
     // Save Button Click Actions
     public function btnMassEditApply_Click($strFormId, $strControlId, $strParameter) {
-         if($this->chkCompany->Checked){
-
-         }
-         if($this->chkDescription->Checked){
-              $strQuery = sprintf("
-				UPDATE `contact`
-				SET `description`='%s'
-				WHERE `contact_id` IN (%s)
-			  ", $this->txtDescription->Text,
-              implode(",", $this->arrContactToEdit));
-
-              $objDatabase = QApplication::$Database[1];
-              $objDatabase->NonQuery($strQuery);
-         }
+        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+        if($this->chkCompany->Checked
+            && $this->lstCompany->SelectedValue !== null
+            && $this->lstAddress->SelectedValue !== null){
+            $set[] = sprintf('`company_id` = %s' , $this->lstCompany->SelectedValue);
+            $set[] = sprintf('`address_id` = %s' , $this->lstAddress->SelectedValue);
+        }
+        if($this->chkDescription->Checked){
+            $set[] = sprintf('`description` ="%s"', $this->txtDescription->Text);
+        }
+        $strQuery = sprintf("UPDATE `contact`
+				             SET ". implode(",",$set). "
+				             WHERE `contact_id` IN (%s)",
+                             implode(",", $this->arrContactToEdit));
+        //print $strQuery; exit;
+        $objDatabase = QApplication::$Database[1];
+        $objDatabase->NonQuery($strQuery);
         // Custom Fields handling
         if(count($this->arrCustomFields)>0)
         {
