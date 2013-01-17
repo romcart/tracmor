@@ -205,6 +205,27 @@ class InventoryMassEditPanel extends QPanel {
                 }
                 $this->arrCustomFieldsToEdit = array();
             }
+            // Apply checked main_table fields
+            $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+            if($this->chkShortDescription->Checked){
+                $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
+            }
+            if($this->chkLongDescription->Checked){
+                $set[] = sprintf('`long_description`="%s"', $this->txtLongDescription->Text);
+            }
+            if($this->chkManufacturer->Checked && $this->lstManufacturer->SelectedValue !== null){
+                $set[] = sprintf('`manufacturer_id`=%s', $this->lstManufacturer->SelectedValue);
+            }
+            if($this->chkCategory->Checked && $this->lstCategory->SelectedValue!== null){
+                $set[] = sprintf('`category_id`= %s', $this->lstCategory->SelectedValue);
+            }
+            $strQuery = sprintf("UPDATE `inventory_model`
+				                 SET ". implode(",",$set). "
+				                 WHERE `inventory_model_id` IN (%s)",
+                                 implode(",", $this->arrInventoryToEdit));
+
+            $objDatabase = QApplication::$Database[1];
+            $objDatabase->NonQuery($strQuery);
         }
 		$this->ParentControl->HideDialogBox();
 	}
