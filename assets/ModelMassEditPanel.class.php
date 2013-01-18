@@ -145,13 +145,13 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         $this->ifcImage->WebPath = "../images/asset_models/";
         $this->ifcImage->ThumbUploadPath = "../images/asset_models/thumbs/";
         $this->ifcImage->ThumbWebPath = "../images/asset_models/thumbs/";
-        // $this->ifcImage->FileName = $this->objAssetModel->ImagePath;
+       // $this->ifcImage->FileName = $this->objAssetModel->ImagePath;
         $this->ifcImage->Name = 'Upload Picture';
         $this->ifcImage->BuildThumbs = true;
         $this->ifcImage->ThumbWidth = 150;
         $this->ifcImage->ThumbHeight = 250;
         $this->ifcImage->Required = false;
-        // $this->ifcImage->ThumbPrefix = "thumb_";
+        //$this->ifcImage->ThumbPrefix = "thumb_";
         $this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
         $this->ifcImage->Suffix = "_asset_model";
     }
@@ -205,6 +205,47 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
                 $this->arrCustomFieldsToEdit = array();
             }
         }
+        // Apply checked main_table fields
+        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+        if($this->chkShortDescription->Checked && $this->txtShortDescription->Text!==null){
+            $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
+        }
+        if($this->chkLongDescription->Checked){
+            $set[] = sprintf('`long_description`="%s"', $this->txtLongDescription->Text);
+        }
+        if($this->chkManufacturer->Checked && $this->lstManufacturer->SelectedValue !== null){
+            $set[] = sprintf('`manufacturer_id`=%s', $this->lstManufacturer->SelectedValue);
+        }
+        if($this->chkCategory->Checked && $this->lstCategory->SelectedValue!== null){
+            $set[] = sprintf('`category_id`= %s', $this->lstCategory->SelectedValue);
+        }
+
+
+        if( $this->chkImage->Checked){
+            // Retrieve the extension (.jpg, .gif) from the filename
+            echo $this->ifcImage->FileName; exit;
+            $explosion = explode(".", $this->ifcImage->FileName);
+            // Set the file name to ID_asset_model.ext
+            $this->ifcImage->strFileName = sprintf('%s%s%s.%s',
+                                                $this->ifcImage->Prefix,
+                                                $this->arrModelsToEdit[0],
+                                                $this->ifcImage->Suffix, $explosion[1]);
+            // Set the image path for saving the asset model
+            $this->txtImagePath->Text = $this->ifcImage->FileName;
+            // Upload the file to the server
+            $this->ifcImage->ProcessUpload();
+
+            // Save the image path information to the AssetModel object
+            $set[] = sprintf('`image_path`="%s"',$this->txtImagePath->Text);
+        }
+
+        $strQuery = sprintf("UPDATE `asset_model`
+				                 SET ". implode(",",$set). "
+				                 WHERE `asset_model_id` IN (%s)",
+            implode(",", $this->arrModelsToEdit));
+
+        $objDatabase = QApplication::$Database[1];
+        $objDatabase->NonQuery($strQuery);
 		$this->ParentControl->RemoveChildControls(true);
 		$this->CloseSelf(true);
 	}

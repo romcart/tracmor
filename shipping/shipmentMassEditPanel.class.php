@@ -308,6 +308,20 @@ class ShipmentMassEditPanel extends QPanel {
                 $this->arrCustomFieldsToEdit = array();
             }
         }
+        // Apply checked main_table fields
+        // TODO add condition
+        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+
+        // Edit TransAction
+        // Apdate main table
+        $strQuery = sprintf("UPDATE `shipment`
+				                 SET ". implode(",",$set). "
+				                 WHERE `shipment_id` IN (%s)",
+            implode(",", $this->arrShipmentToEdit));
+
+        $objDatabase = QApplication::$Database[1];
+        $objDatabase->NonQuery($strQuery);
+
 		$this->ParentControl->HideDialogBox();
 	}
 

@@ -277,6 +277,18 @@ class ReceiptMassEditPanel extends QPanel {
                 $this->arrCustomFieldsToEdit = array();
             }
         }
+        // Apply checked main_table fields
+        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+
+        // Edit TransAction
+        // Apdate main table
+        $strQuery = sprintf("UPDATE `receipt`
+				                 SET ". implode(",",$set). "
+				                 WHERE `receipt_id` IN (%s)",
+            implode(",", $this->arrReceiptToEdit));
+
+        $objDatabase = QApplication::$Database[1];
+        $objDatabase->NonQuery($strQuery);
         $this->ParentControl->HideDialogBox();
     }
 

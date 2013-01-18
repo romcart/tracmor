@@ -205,6 +205,19 @@ class AssetMassEditPanel extends QPanel {
                 $this->arrCustomFieldsToEdit = array();
             }
         }
+        // Apply checked main_table fields
+        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+
+        // Edit TransAction
+        // Apdate main table
+        $strQuery = sprintf("UPDATE `asset`
+				                 SET ". implode(",",$set). "
+				                 WHERE `asset_id` IN (%s)",
+            implode(",", $this->arrAssetToEdit));
+
+        $objDatabase = QApplication::$Database[1];
+        $objDatabase->NonQuery($strQuery);
+
 		$this->ParentControl->HideDialogBox();
 	}
 
