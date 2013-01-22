@@ -618,6 +618,80 @@
             // Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
             $objTransaction->Delete();
         }
+
+        public function lstFromCompany_Select(){
+            $objCompany = Company::Load($this->pnlReceiptMassEdit->lstFromCompany->SelectedValue);
+            if ($objCompany) {
+                // Load the values for the 'From Contact' List
+                if ($this->pnlReceiptMassEdit->lstFromContact) {
+                    $objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId);
+                    $this->pnlReceiptMassEdit->lstFromContact->RemoveAllItems();
+                    $this->pnlReceiptMassEdit->lstFromContact->AddItem('- Select One -', null);
+                    if ($objFromContactArray) {
+                        foreach ($objFromContactArray as $objFromContact) {
+                            $objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
+                            $this->pnlReceiptMassEdit->lstFromContact->AddItem($objListItem);
+                        }
+
+                        $this->pnlReceiptMassEdit->lstFromContact->Enabled = true;
+                    }
+                }
+                if ($this->pnlReceiptMassEdit->lstFromAddress) {
+                    $objFromAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
+                        QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+                    $this->pnlReceiptMassEdit->lstFromAddress->RemoveAllItems();
+                    if ($objFromAddressArray) {
+                        foreach ($objFromAddressArray as $objFroomAddress) {
+                            $objListItem = new QListItem($objFromAddress->__toString(),
+                                                         $objFromAddress->AddressId);
+                            $this->pnlReceiptMassEdit->lstToAddress->AddItem($objListItem);
+                        }
+                        $this->pnlReceiptMassEdit->lstFromAddress->Enabled = true;
+                        //$this->lstToAddress_Select();
+                    }
+                }
+            }
+        }
+
+        public function lstToCompany_Select(){
+            if ($this->pnlReceiptMassEdit->lstToCompany->SelectedValue) {
+                $objCompany = Company::Load($this->pnlReceiptMassEdit->lstToCompany->SelectedValue);
+                if ($objCompany) {
+                    // Load the values for the 'To Contact' List
+                    if ($this->pnlReceiptMassEdit->lstToContact) {
+                        $objToContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId,
+                                                                          QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName,
+                                                                                                 QQN::Contact()->FirstName)
+                                                                                    )
+                                                                          );
+                        $this->pnlReceiptMassEdit->lstToContact->RemoveAllItems();
+                        if ($objToContactArray) {
+                            foreach ($objToContactArray as $objToContact) {
+                                $objListItem = new QListItem($objToContact->__toString(),
+                                                             $objToContact->ContactId);
+                                $this->pnlReceiptMassEdit->lstToContact->AddItem($objListItem);
+                            }
+                            $this->pnlReceiptMassEdit->lstToContact->Enabled = true;
+                        }
+                    }
+                    // Load the values for the 'To Address' List
+                    if ($this->pnlReceiptMassEdit->lstToAddress) {
+                        $objToAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
+                                                      QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+                        $this->pnlReceiptMassEdit->lstToAddress->RemoveAllItems();
+                        if ($objToAddressArray) {
+                            foreach ($objToAddressArray as $objToAddress) {
+                                $objListItem = new QListItem($objToAddress->__toString(),
+                                                             $objToAddress->AddressId);
+                                $this->pnlReceiptMassEdit->lstToAddress->AddItem($objListItem);
+                            }
+                            $this->pnlReceiptMassEdit->lstToAddress->Enabled = true;
+                            //$this->lstToAddress_Select();
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 

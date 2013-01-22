@@ -131,6 +131,7 @@ class ReceiptMassEditPanel extends QPanel {
             $objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
             $this->lstFromCompany->AddItem($objListItem);
         }
+        $this->lstFromCompany->AddAction(new QChangeEvent, new QAjaxAction('lstFromCompany_Select'));
     }
 
     public function chkFromCompany_Create(){
@@ -151,6 +152,7 @@ class ReceiptMassEditPanel extends QPanel {
             $objListItem = new QListItem($objToCompany->__toString(), $objToCompany->CompanyId);
             $this->lstToCompany->AddItem($objListItem);
         }
+        $this->lstToCompany->AddAction(new QChangeEvent, new QAjaxAction('lstToCompany_Select'));
     }
 
     public function chkToCompany_Create(){
@@ -170,6 +172,15 @@ class ReceiptMassEditPanel extends QPanel {
     public function lstToAddress_Create(){
         $this->lstToAddress = new QListBox($this,'ToAddress');
         $this->lstToAddress->Name = 'To Address';
+        $objToAddressArray = Address::LoadArrayByCompanyId(QApplication::$TracmorSettings->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+        if (is_array($objToAddressArray) && count($objToAddressArray)>0)
+        {
+            foreach ($objToAddressArray as $objToAddress)
+            {
+                $objListItem = new QListItem($objToAddress->__toString(), $objToAddress->AddressId);
+                $this->lstToAddress->AddItem($objListItem);
+            }
+        }
     }
     // From Contact, To Address inputs
     public function lstFromContact_Create(){
@@ -180,6 +191,16 @@ class ReceiptMassEditPanel extends QPanel {
     public function lstFromAddress_Create(){
         $this->lstFromAddress = new QListBox($this,'FromAddress');
         $this->lstFromAddress->Name = 'From Address';
+        $intCompanyId = QApplication::$TracmorSettings->CompanyId;
+        $objFromAddressArray = Address::LoadArrayByCompanyId($intCompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+        if ($objFromAddressArray)
+        {
+            foreach ($objFromAddressArray as $objFromAddress)
+            {
+                $objListItem = new QListItem($objFromAddress->__toString(), $objFromAddress->AddressId);
+                $this->lstFromAddress->AddItem($objListItem);
+            }
+        }
     }
 
     // Date Due Inputs
@@ -299,14 +320,5 @@ class ReceiptMassEditPanel extends QPanel {
         //$this->CloseSelf(true);
         $this->ParentControl->HideDialogBox();
     }
-
-    public function lstToCompany_Select(){
-
-    }
-
-    public function lstFromCompany_Select(){
-
-    }
-
 }
 ?>
