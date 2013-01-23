@@ -191,9 +191,8 @@ class ReceiptMassEditPanel extends QPanel {
     public function lstFromAddress_Create(){
         $this->lstFromAddress = new QListBox($this,'FromAddress');
         $this->lstFromAddress->Name = 'From Address';
-        $intCompanyId = QApplication::$TracmorSettings->CompanyId;
-        $objFromAddressArray = Address::LoadArrayByCompanyId($intCompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
-        if ($objFromAddressArray)
+        $objFromAddressArray = Address::LoadArrayByCompanyId(QApplication::$TracmorSettings->CompanyId, QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+        if (is_array($objFromAddressArray) && count($objFromAddressArray)>0)
         {
             foreach ($objFromAddressArray as $objFromAddress)
             {

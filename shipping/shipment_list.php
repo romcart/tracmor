@@ -582,7 +582,83 @@
             $this->dlgMassDelete->HideDialogBox();
             QApplication::Redirect('');
         }
-	}
+
+        public function lstFromCompany_Select(){
+            $objCompany = Company::Load($this->pnlShipmentMassEdit->lstFromCompany->SelectedValue);
+            if ($objCompany) {
+                // Load the values for the 'From Contact' List
+                if ($this->pnlShipmentMassEdit->lstFromContact) {
+                    $objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId);
+                    $this->pnlShipmentMassEdit->lstFromContact->RemoveAllItems();
+                    $this->pnlShipmentMassEdit->lstFromContact->AddItem('- Select One -', null);
+                    if ($objFromContactArray) {
+                        foreach ($objFromContactArray as $objFromContact) {
+                            $objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
+                            $this->pnlShipmentMassEdit->lstFromContact->AddItem($objListItem);
+                        }
+
+                        $this->pnlShipmentMassEdit->lstFromContact->Enabled = true;
+                    }
+                }
+                if ($this->pnlShipmentMassEdit->lstFromAddress) {
+                    $objFromAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
+                        QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+                    $this->pnlShipmentMassEdit->lstFromAddress->RemoveAllItems();
+                    if ($objFromAddressArray) {
+                        foreach ($objFromAddressArray as $objFromAddress) {
+                            $objListItem = new QListItem($objFromAddress->__toString(),
+                                $objFromAddress->AddressId);
+                            $this->pnlShipmentMassEdit->lstFromAddress->AddItem($objListItem);
+                        }
+                        $this->pnlShipmentMassEdit->lstFromAddress->Enabled = true;
+                        //$this->lstToAddress_Select();
+                    }
+                }
+            }
+        }
+
+        public function lstToCompany_Select(){
+            if ($this->pnlShipmentMassEdit->lstToCompany->SelectedValue) {
+                $objCompany = Company::Load($this->pnlShipmentMassEdit->lstToCompany->SelectedValue);
+                if ($objCompany) {
+                    // Load the values for the 'To Contact' List
+                    if ($this->pnlShipmentMassEdit->lstToContact) {
+                        $objToContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId,
+                            QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName,
+                                    QQN::Contact()->FirstName)
+                            )
+                        );
+                        $this->pnlShipmentMassEdit->lstToContact->RemoveAllItems();
+                        if ($objToContactArray) {
+                            foreach ($objToContactArray as $objToContact) {
+                                $objListItem = new QListItem($objToContact->__toString(),
+                                    $objToContact->ContactId);
+                                $this->pnlShipmentMassEdit->lstToContact->AddItem($objListItem);
+                            }
+                            $this->pnlShipmentMassEdit->lstToContact->Enabled = true;
+                        }
+                    }
+                    // Load the values for the 'To Address' List
+                    if ($this->pnlShipmentMassEdit->lstToAddress) {
+                        $objToAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
+                            QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+                        $this->pnlShipmentMassEdit->lstToAddress->RemoveAllItems();
+                        if ($objToAddressArray) {
+                            foreach ($objToAddressArray as $objToAddress) {
+                                $objListItem = new QListItem($objToAddress->__toString(),
+                                    $objToAddress->AddressId);
+                                $this->pnlShipmentMassEdit->lstToAddress->AddItem($objListItem);
+                            }
+                            $this->pnlShipmentMassEdit->lstToAddress->Enabled = true;
+                            //$this->lstToAddress_Select();
+                        }
+                    }
+                }
+            }
+        }
+
+
+}
 
 
 

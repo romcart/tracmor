@@ -640,11 +640,11 @@
                     $objFromAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
                         QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
                     $this->pnlReceiptMassEdit->lstFromAddress->RemoveAllItems();
-                    if ($objFromAddressArray) {
-                        foreach ($objFromAddressArray as $objFroomAddress) {
+                    if (is_array($objFromAddressArray) && count($objFromAddressArray)>0) {
+                        foreach ($objFromAddressArray as $objFromAddress) {
                             $objListItem = new QListItem($objFromAddress->__toString(),
                                                          $objFromAddress->AddressId);
-                            $this->pnlReceiptMassEdit->lstToAddress->AddItem($objListItem);
+                            $this->pnlReceiptMassEdit->lstFromAddress->AddItem($objListItem);
                         }
                         $this->pnlReceiptMassEdit->lstFromAddress->Enabled = true;
                         //$this->lstToAddress_Select();
