@@ -93,6 +93,7 @@
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
 		protected $blnAttachment;*/
+        public $arrToEdit;
         protected $pnlAssetMassEdit;
 		protected $lblWarning;
 		protected $dlgMassEdit;
@@ -561,15 +562,16 @@
 		}
 
 		protected function btnMassEdit_Click(){
-			$items = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
-			if(count($items)>0){
+			$this->arrToEdit = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
+			if(count($this->arrToEdit)>0){
 				$this->lblWarning->Text = "";
                 if(!$this->pnlAssetMassEdit instanceof AssetMassEditPanel){
                     $this->pnlAssetMassEdit = new AssetMassEditPanel($this->dlgMassEdit,
                                                      'pnlAssetMassEditCancel_Click',
-                                                      $items);
+                                                      $this->arrToEdit);
                 }
 				$this->dlgMassEdit->ShowDialogBox();
+                $this->UncheckAllItems($this);
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Asset to Edit" ;
 			}
@@ -586,6 +588,7 @@
                 $this->ctlAssetSearchTool->Refresh();
                 $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Parent Asset";
                 $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
+                $this->dlgMassEdit->HideDialogBox();
             }
         }
 
@@ -597,7 +600,7 @@
             }
         }
         public function ctlAssetSearchTool_Create() {
-            $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this,'assetSearch');
+            $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
         }
 
         public function btnAssetSearchToolAdd_Click() {
@@ -614,17 +617,19 @@
                     $this->ctlAssetSearchTool->lblWarning->Text = "That asset tag does not exist. Please try another.";
 
                 }
-                elseif ($objParentAsset->AssetId == $this->objAsset->AssetId) {
+                elseif (in_array($objParentAsset->AssetId, $this->arrToEdit)) {
                     $this->ctlAssetSearchTool->lblWarning->Text = "Parent asset tag must not be the same as asset tag. Please try another.";
                 }
                 else {
                     $this->pnlAssetMassEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
+                    $this->UncheckAllItems($this);
+                    $this->dlgMassEdit->ShowDialogBox();
                     $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
                 }
             }
 
             // Uncheck all items but SelectAll checkbox
-            //$this->UncheckAllItems();
+
         }
 
     }
