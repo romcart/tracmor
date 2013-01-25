@@ -18,161 +18,195 @@
  * along with Tracmor; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+/**
+ * @var  QCheckBox $chkImage
+ * @var  QCheckBox $chkCategory
+ * @var  QCheckBox $chkManufacturer
+ * @var  QCheckBox $chkLongDescription
+ * @var  QCheckBox $chkImage
+ */
 ?>
 
 <?php
-// Include the classfile for CompanyEditPanelBase
+// Include the classfile for AssetModelEditPanelBase
 require(__PANELBASE_CLASSES__ . '/AssetModelEditPanelBase.class.php');
 
+/**
+ * This is a quick-and-dirty draft panel object to do Create, Edit, and Delete functionality
+ * of the AssetModel class.  It extends from the code-generated
+ * abstract AssetModelEditPanelBase class.
+ *
+ * Any display custimizations and presentation-tier logic can be implemented
+ * here by overriding existing or implementing new methods, properties and variables.
+ *
+ * Additional qform control objects can also be defined and used here, as well.
+ *
+ * @package My Application
+ * @subpackage PanelDraftObjects
+ *
+ */
 class ModelMassEditPanel extends AssetModelEditPanelBase {
 
-	/**
-	 * @var  QCheckBox $chkImage
-	 * @var  QCheckBox $chkCategory
-	 * @var  QCheckBox $chkManufacturer
-	 * @var  QCheckBox $chkLongDescription
-	 * @var  QCheckBox $chkImage
-	 */
-
-	// Specify the Location of the Template (feel free to modify) for this Panel
-	protected $strTemplate = '../assets/ModelMassEditPanel.tpl.php';
-
-
-	// Inputs for can be Edited
-    // public $txtLongDescription;
-
-	public $arrModelsToEdit = array();
-	public $arrFields = array();
-    public $arrCheckboxes = array();
-    public $arrCustomFieldsToEdit = array();
-	public $chkShortDescription;
-	public $chkCategory;
-	public $chkManufacturer;
-	public $chkLongDescription;
-	public $chkImage;
-	public $btnApply;
-	public $lblWarning;
+    // Specify the Location of the Template (feel free to modify) for this Panel
+    protected $strTemplate = 'ModelMassEditPanel.tpl.php';
+    // Image File Control
     public $ifcImage;
+    // An array of custom fields
     public $arrCustomFields;
 
-	public function __construct($objParentObject, $strClosePanelMethod , $arrayModelId) {
+    public $arrModelsToEdit = array();
+    public $arrFields = array();
+    public $arrCheckboxes = array();
+    public $arrCustomFieldsToEdit = array();
+    public $chkShortDescription;
+    public $chkCategory;
+    public $chkManufacturer;
+    public $chkLongDescription;
+    public $chkImage;
+    public $btnApply;
+    public $lblWarning;
 
-		try {
-			parent::__construct($objParentObject, $strClosePanelMethod);
-		} catch (QCallerException $objExc) {
-			$objExc->IncrementOffset();
-			throw $objExc;
-		}
-		$this->arrModelsToEdit = $arrayModelId;
-		$this->strOverflow = QOverflow::Auto;
-		$this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
+    public function __construct($objParentObject, $strClosePanelMethod, $arrayModelId) {
 
-        //
+        try {
+            parent::__construct($objParentObject, $strClosePanelMethod);
+        } catch (QCallerException $objExc) {
+            $objExc->IncrementOffset();
+            throw $objExc;
+        }
+
+        $this->arrModelsToEdit = $arrayModelId;
+
+
+        $this->txtShortDescription->Required = false;
+
+        // Create the Image File Control
         $this->ifcImage_Create();
-		// Setup id for controls
-		$this->lstCategory->strControlId = 'Category';
-		$this->lstManufacturer->strControlId = 'Manufacturer';
-		$this->txtShortDescription->strControlId = 'ShortDescription';
-		$this->ifcImage->strControlId = 'Image';
-		$this->txtLongDescription->strControlId = 'LongDescription';
+        // Create all custom asset model fields
+        $this->customFields_Create();
+        // Create Asset Custom Fields
+        $this->UpdateCustomFields();
 
-		// Disable inputs
-		$this->lstCategory->Enabled = false;
-		$this->lstManufacturer->Enabled = false;
-		$this->txtShortDescription->Enabled = false;
-		$this->ifcImage->Enabled = false;
-		$this->txtLongDescription->Enabled = false;
+        // Create Checkboxes
+        $this->chkShortDescription_Create();
+        $this->chkCategory_Create();
+        $this->chkManufacturer_Create();
+        $this->chkLongDescription_Create();
+        $this->chkImage_Create();
+        $this->btnApply_Create();
 
-		$this->chkShortDescription_Create();
-		$this->chkCategory_Create();
-		$this->chkManufacturer_Create();
-		$this->chkLongDescription_Create();
-		$this->chkImage_Create();
-		$this->btnApply_Create();
-
+        // Create custom fields checkboxes
         $this->objAssetModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(4, $this->blnEditMode, $this->objAssetModel->AssetModelId);
         $this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this, false, true, false);
         foreach($this->arrCustomFields as $field){
-            $field['input']->Enabled = false;
             $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
-            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
             $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
         }
 
-	}
 
-	public function chkShortDescription_Create(){
-		$this->chkShortDescription = new QCheckBox($this, 'chkShortDescription');
-		$this->chkShortDescription->Name = 'ShortDescription';
-		$this->chkShortDescription->Checked = false;
-		$this->chkShortDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-	}
+        $this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
 
-	public function chkCategory_Create(){
-		$this->chkCategory = new QCheckBox($this,'chkCategory');
-		$this->chkCategory->Name = 'Category';
-		$this->chkCategory->Checked = false;
-		$this->chkCategory->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+        $this->strOverflow = QOverflow::Auto;
+        // Modify Code Generated Controls
+       // $this->btnSave->RemoveAllActions('onclick');
+        $this->btnSave->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
+    }
 
-	}
+    // Create and Setup lstCategory with alphabetic ordering
+    protected function lstCategory_Create() {
+        $this->lstCategory = new QListBox($this);
+        $this->lstCategory->Name = QApplication::Translate('Category');
+        $this->lstCategory->AddItem(QApplication::Translate('- Select One -'), null);
+        $objCategoryArray = Category::LoadAllWithFlags(true, false, 'short_description ASC');
+        if ($objCategoryArray) foreach ($objCategoryArray as $objCategory) {
+            $objListItem = new QListItem($objCategory->__toString(), $objCategory->CategoryId);
+            if (($this->objAssetModel->Category) && ($this->objAssetModel->Category->CategoryId == $objCategory->CategoryId))
+                $objListItem->Selected = true;
+            $this->lstCategory->AddItem($objListItem);
+        }
+    }
 
-	public function chkManufacturer_Create(){
-		$this->chkManufacturer = new QCheckBox($this,'chkManufacturer');
-		$this->chkManufacturer->Name = 'Manufacturer';
-		$this->chkManufacturer->Checked = false;
-		$this->chkManufacturer->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-
-	}
-
-	public function chkLongDescription_Create(){
-		$this->chkLongDescription = new QCheckBox($this,'chkLongDescription');
-		$this->chkLongDescription->Name = 'LongDescription';
-		$this->chkLongDescription->Checked = false;
-		$this->chkLongDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-	}
-
-	public function chkImage_Create(){
-		$this->chkImage = new QCheckBox($this,'chkImage');
-		$this->chkImage->Name = 'image';
-		$this->chkImage->Checked = false;
-		$this->chkImage->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-	}
+    // Create and Setup lstManufacturer with alphabetic ordering
+    protected function lstManufacturer_Create() {
+        $this->lstManufacturer = new QListBox($this);
+        $this->lstManufacturer->Name = QApplication::Translate('Manufacturer');
+        $this->lstManufacturer->AddItem(QApplication::Translate('- Select One -'), null);
+        $objManufacturerArray = Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription)));
+        if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
+            $objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
+            if (($this->objAssetModel->Manufacturer) && ($this->objAssetModel->Manufacturer->ManufacturerId == $objManufacturer->ManufacturerId))
+                $objListItem->Selected = true;
+            $this->lstManufacturer->AddItem($objListItem);
+        }
+    }
 
     // Create the Image File Control
     protected function ifcImage_Create() {
-        $this->ifcImage = new QImageFileControl($this);
+        $this->ifcImage = new QImageFileControl($this,'Image');
         $this->ifcImage->UploadPath = "../images/asset_models/";
         $this->ifcImage->WebPath = "../images/asset_models/";
         $this->ifcImage->ThumbUploadPath = "../images/asset_models/thumbs/";
         $this->ifcImage->ThumbWebPath = "../images/asset_models/thumbs/";
-       // $this->ifcImage->FileName = $this->objAssetModel->ImagePath;
+        // $this->ifcImage->FileName = $this->objAssetModel->ImagePath;
         $this->ifcImage->Name = 'Upload Picture';
         $this->ifcImage->BuildThumbs = true;
         $this->ifcImage->ThumbWidth = 150;
         $this->ifcImage->ThumbHeight = 250;
         $this->ifcImage->Required = false;
-        //$this->ifcImage->ThumbPrefix = "thumb_";
+        // $this->ifcImage->ThumbPrefix = "thumb_";
         $this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
         $this->ifcImage->Suffix = "_asset_model";
     }
 
-	public function btnApply_Create(){
+    public function chkShortDescription_Create(){
+        $this->chkShortDescription = new QCheckBox($this, 'chk' . $this->txtShortDescription->ControlId );
+        $this->chkShortDescription->Name = 'ShortDescription';
+        $this->chkShortDescription->Checked = false;
+        $this->chkShortDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+    }
 
-		$this->btnApply = new QButton($this);
-		$this->btnApply->Name = 'Apply';
-		$this->btnApply->Text = 'Apply';
-		$this->btnApply->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnApply_Click'));
-		$this->btnApply->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnApply_Click'));
-		$this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+    public function chkCategory_Create(){
+        $this->chkCategory = new QCheckBox($this,'chk' . $this->lstCategory->ControlId);
+        $this->chkCategory->Name = 'Category';
+        $this->chkCategory->Checked = false;
+        $this->chkCategory->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 
-	}
+    }
 
-	public function lblWarning_Create(){
-		$this->lblWarning = new QLabel($this);
-		//$this->lblWarning->Class = 'warning';
-	}
+    public function chkManufacturer_Create(){
+        $this->chkManufacturer = new QCheckBox($this ,'chk' . $this->lstManufacturer->ControlId );
+        $this->chkManufacturer->Name = 'Manufacturer';
+        $this->chkManufacturer->Checked = false;
+        $this->chkManufacturer->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 
-	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+    }
+
+    public function chkLongDescription_Create(){
+        $this->chkLongDescription = new QCheckBox($this, 'chk' . $this->txtLongDescription->ControlId);
+        $this->chkLongDescription->Name = 'LongDescription';
+        $this->chkLongDescription->Checked = false;
+        $this->chkLongDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+    }
+
+    public function chkImage_Create(){
+        $this->chkImage = new QCheckBox($this,'chk'.$this->ifcImage->strControlId);
+        $this->chkImage->Name = 'image';
+        $this->chkImage->Checked = false;
+        $this->chkImage->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+    }
+
+    // Create all Custom Asset Fields
+    protected function customFields_Create() {
+
+        // Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
+        $this->objAssetModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(4, $this->blnEditMode, $this->objAssetModel->AssetModelId);
+
+        // Create the Custom Field Controls - labels and inputs (text or list) for each
+        $this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this, false, true, false);
+    }
+
+    // Save Button Click Actions
+    public function btnSave_Click($strFormId, $strControlId, $strParameter) {
         if(count($this->arrCustomFields)>0)
         {
             $customFieldIdArray = array();
@@ -205,9 +239,21 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
                 $this->arrCustomFieldsToEdit = array();
             }
         }
-        // Apply checked main_table fields
         $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
-        if($this->chkShortDescription->Checked && $this->txtShortDescription->Text!==null){
+        if ($this->ifcImage->FileName) {
+            // Retrieve the extension (.jpg, .gif) from the filename
+            $explosion = explode(".", $this->ifcImage->FileName);
+            // Set the file name to ID_asset_model.ext
+            $this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objAssetModel->AssetModelId, $this->ifcImage->Suffix, $explosion[1]);
+            // Set the image path for saving the asset model
+            $this->txtImagePath->Text = $this->ifcImage->FileName;
+            // Upload the file to the server
+            $this->ifcImage->ProcessUpload();
+
+            // Save the image path information to the AssetModel object
+            $set[] = sprintf('`image_path`="%s"',$this->txtImagePath->Text);
+        }
+        if($this->chkShortDescription->Checked &&  $this->txtShortDescription->Text!== null){
             $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
         }
         if($this->chkLongDescription->Checked){
@@ -220,25 +266,6 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
             $set[] = sprintf('`category_id`= %s', $this->lstCategory->SelectedValue);
         }
 
-
-        if( $this->chkImage->Checked){
-            // Retrieve the extension (.jpg, .gif) from the filename
-            echo $this->ifcImage->FileName; exit;
-            $explosion = explode(".", $this->ifcImage->FileName);
-            // Set the file name to ID_asset_model.ext
-            $this->ifcImage->strFileName = sprintf('%s%s%s.%s',
-                                                $this->ifcImage->Prefix,
-                                                $this->arrModelsToEdit[0],
-                                                $this->ifcImage->Suffix, $explosion[1]);
-            // Set the image path for saving the asset model
-            $this->txtImagePath->Text = $this->ifcImage->FileName;
-            // Upload the file to the server
-            $this->ifcImage->ProcessUpload();
-
-            // Save the image path information to the AssetModel object
-            $set[] = sprintf('`image_path`="%s"',$this->txtImagePath->Text);
-        }
-
         $strQuery = sprintf("UPDATE `asset_model`
 				                 SET ". implode(",",$set). "
 				                 WHERE `asset_model_id` IN (%s)",
@@ -246,14 +273,41 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
 
         $objDatabase = QApplication::$Database[1];
         $objDatabase->NonQuery($strQuery);
-		$this->ParentControl->RemoveChildControls(true);
-		$this->CloseSelf(true);
-	}
 
-	// Cancel Button Click Action
-	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
-		$this->ParentControl->RemoveChildControls(true);
-		$this->CloseSelf(true);
-	}
+        $this->ParentControl->RemoveChildControls(true);
+        $this->CloseSelf(true);
+    }
+
+    // Cancel Button Click Action
+    public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
+
+        $this->ParentControl->RemoveChildControls(true);
+        $this->CloseSelf(true);
+    }
+    //Set display logic for the CustomFields
+    protected function UpdateCustomFields(){
+        if($this->arrCustomFields){
+            foreach ($this->arrCustomFields as $objCustomField) {
+                //If the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+                if (!$objCustomField['blnEdit']){
+                    $objCustomField['lbl']->Display=true;
+                    $objCustomField['input']->Display=false;
+                    if(($objCustomField['blnRequired']))
+                        $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+                }
+            }
+        }
+
+    }
+
+    public function btnApply_Create(){
+        $this->btnApply = new QButton($this);
+        $this->btnApply->Name = 'Apply';
+        $this->btnApply->Text = 'Apply';
+        $this->btnApply->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
+        $this->btnApply->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSave_Click'));
+        $this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+
+    }
 }
 ?>
