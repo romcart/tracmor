@@ -12,19 +12,19 @@ Select fields to be updated and provide new values.
 	<tr>
 		<td><?php $_CONTROL->chkModel->Render();            ?></td>
 		<td><?php echo $_CONTROL->lstModel->Name;           ?></td>
-		<td><?php $_CONTROL->lstModel->Render();            ?></td>
+		<td><?php $_CONTROL->lstModel->RenderWithError();            ?></td>
 	</tr>
     <tr>
         <td><?php $_CONTROL->chkParentAssetCode->Render();  ?></td>
         <td><?php echo $_CONTROL->txtParentAssetCode->Name; ?></td>
-        <td><?php $_CONTROL->txtParentAssetCode->Render();
+        <td><?php $_CONTROL->txtParentAssetCode->RenderWithError();
                   $_CONTROL->lblIconParentAssetCode->Render();
             ?></td>
     </tr>
     <tr>
-        <td><?php $_CONTROL->chkChkLockToParent->Render();  ?></td>
-        <td><?php echo $_CONTROL->chkLockToParent->Name;    ?></td>
-        <td><?php $_CONTROL->chkLockToParent->Render();     ?></td>
+        <td><?php $_CONTROL->chkChkLockToParent->Render();             ?></td>
+        <td><?php echo $_CONTROL->chkLockToParent->Name;               ?></td>
+        <td><?php $_CONTROL->chkLockToParent->RenderWithError();  ?></td>
     </tr>
     <?php
     if($_CONTROL->arrCustomFields){
