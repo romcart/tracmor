@@ -601,7 +601,7 @@
 						$arrCustomFields[$i]['lbl'] = new QLabel($objForm);
 					}
 	 				$arrCustomFields[$i]['lbl']->Name = $objCustomFieldArray[$i]->ShortDescription;
-	 				if ($blnEditMode && $objCustomFieldArray[$i]->CustomFieldSelection && $objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription) {
+	 				if ($blnEditMode && $objCustomFieldArray[$i]->CustomFieldSelection && $objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue && $objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription) {
 	 					$arrCustomFields[$i]['lbl']->Text = nl2br($objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription);
 	 				}
 	 				elseif ($blnEditMode && (!$objCustomFieldArray[$i]->CustomFieldSelection || (empty($objCustomFieldArray[$i]->CustomFieldSelection->CustomFieldValue->ShortDescription) && $objCustomFieldArray[$i]->CustomFieldQtypeId == 2))) {
