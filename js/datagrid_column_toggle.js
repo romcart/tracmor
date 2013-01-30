@@ -130,7 +130,7 @@ function enableInput(element,dependent_elements) {
 }
 
 function enableCalInput(element){
-    var id_root = element.id.replace('chk_','');
+    var id_root = element.id.replace('chk','');
     var day = document.getElementById(id_root + "_lstDay");
     var month = document.getElementById(id_root + "_lstMonth");
     var year = document.getElementById(id_root + "_lstYear");

@@ -94,7 +94,7 @@ class ReceiptMassEditPanel extends QPanel {
         $this->txtNote->Enabled = false;
 
         // Load Custom Fields
-        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(11, false);
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Receipt, false);
         if($objCustomFieldArray){
             $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
 
@@ -210,13 +210,12 @@ class ReceiptMassEditPanel extends QPanel {
         $this->calDateDue->DateTime = new QDateTime(QDateTime::Now);
         $dttNow = new QDateTime(QDateTime::Now);
         $this->calDateDue->MaximumYear = $dttNow->Year + 30;
-        $this->calDateDue->strControlId = 'date_due';
+        $this->calDateDue->strControlId = 'DateDue';
     }
     //
     public function chkDateDue_Create(){
-        $this->chkDateDue = new QCheckBox($this);
-        $this->chkDateDue->Name = 'date_due';
-        $this->chkDateDue->strControlId = 'chk_date_due';
+        $this->chkDateDue = new QCheckBox($this,'chkDateDue');
+        $this->chkDateDue->Name = 'DateDue';
         $this->chkDateDue->Checked = false;
         $this->chkDateDue->AddAction(new QClickEvent(), new QJavaScriptAction('enableCalInput(this)'));
     }
@@ -228,12 +227,11 @@ class ReceiptMassEditPanel extends QPanel {
         $this->calDateReceived->DateTime = new QDateTime(QDateTime::Now);
         $dttNow = new QDateTime(QDateTime::Now);
         $this->calDateReceived->MaximumYear = $dttNow->Year + 30;
-        $this->calDateReceived->strControlId = 'date_received';
+        $this->calDateReceived->strControlId = 'DateReceived';
     }
     public function chkDateReceived_Create(){
-        $this->chkDateReceived = new QCheckBox($this);
+        $this->chkDateReceived = new QCheckBox($this,'chkDateReceived');
         $this->chkDateReceived->Name = 'date_received';
-        $this->chkDateReceived->strControlId = 'chk_date_received';
         $this->chkDateReceived->Checked = false;
         $this->chkDateReceived->AddAction(new QClickEvent(), new QJavaScriptAction('enableCalInput(this)'));
     }
@@ -266,6 +264,7 @@ class ReceiptMassEditPanel extends QPanel {
     }
 
     public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        $blnError = false;
         if(count($this->arrCustomFields)>0)
         {
             $customFieldIdArray = array();
@@ -299,17 +298,78 @@ class ReceiptMassEditPanel extends QPanel {
         }
         // Apply checked main_table fields
         $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+        if($this->chkToCompany->Checked)
+        {
+            if($this->lstToContact->SelectedValue){
+                $set[] = sprintf('`to_contact_id`="%s"' , $this->lstToContact->SelectedValue);
+            }
+            else{
+                $this->lstToContact->Warning = 'Contact name must be chosen';
+                $blnError = true;
+            }
+            if($this->lstToAddress->SelectedValue){
+                $set[] = sprintf('`to_address_id`="%s"' , $this->lstToAddress->SelectedValue);
+            }
+            else{
+                $this->lstToContact->Warning = 'Address name must be chosen';
+                $blnError = true;
+            }
+        }
+        if($this->chkFromCompany->Checked)
+        {
+            if($this->lstFromCompany->SelectedValue){
+                $set[] = sprintf('`from_company_id`="%s"' , $this->lstFromCompany->SelectedValue);
+            }
+            else{
+                $this->lstFromCompany->Warning = 'Company name must be chosen';
+                $blnError = true;
+            }
+            if($this->lstFromContact->SelectedValue){
+                $set[] = sprintf('`from_contact_id`="%s"' , $this->lstFromContact->SelectedValue);
+            }
+            else{
+                $this->lstFromContact->Warning = 'Contact name must be chosen';
+                $blnError = true;
+            }
+        }
 
-        // Edit TransAction
-        // Apdate main table
-        $strQuery = sprintf("UPDATE `receipt`
+        if($this->chkDateReceived->Checked && $this->calDateReceived->DateTime)
+        {   // Check all receipts are completed
+            if(Receipt::QueryCount(QQ::AndCondition(QQ::Equal(QQN::Receipt()->ReceivedFlag, 0),
+                                   QQ::In(QQN::Receipt()->ReceiptId,$this->arrReceiptToEdit)))>0)
+            {
+                $this->calDateReceived->Warning = 'Can be set only for completed receipts';
+                $blnError = true;
+            }
+            else{
+                $set[] = sprintf('`receipt_date`="%s"' , $this->calDateReceived->DateTime->__toString('YYYY-MM-DD'));
+            }
+        }
+        if($this->chkDateDue->Checked && $this->calDateDue->DateTime){
+            $set[] = sprintf('`due_date`="%s"' ,$this->calDateDue->DateTime->__toString('YYYY-MM-DD'));
+        }
+        // Modifying transactions
+        foreach($this->arrReceiptToEdit as $intReceiptId){
+            $objTransaction = Transaction::Load(Receipt::Load($intReceiptId)->Transaction->TransactionId);
+            $objTransaction->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
+            if($this->chkNote->Checked){
+                $objTransaction->Note = $this->txtNote->Text;
+            }
+            $objTransaction->Save();
+        }
+        if(!$blnError){
+            // Update Transaction
+            // Update main table
+            $strQuery = sprintf("UPDATE `receipt`
 				                 SET ". implode(",",$set). "
 				                 WHERE `receipt_id` IN (%s)",
-            implode(",", $this->arrReceiptToEdit));
+                implode(",", $this->arrReceiptToEdit));
 
-        $objDatabase = QApplication::$Database[1];
-        $objDatabase->NonQuery($strQuery);
-        $this->ParentControl->HideDialogBox();
+            $objDatabase = QApplication::$Database[1];
+            $objDatabase->NonQuery($strQuery);
+            $this->ParentControl->HideDialogBox();
+        }
+
     }
 
 
