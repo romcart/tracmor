@@ -1,6 +1,6 @@
 <?php
 /**
- * @see ShipmentMassEditPanel
+ * @var $_CONTROL ShipmentMassEditPanel
  * @var  QCheckBox      $chkFromCompany
  * @var  QCheckBox      $chkToCompany
  * @var  QCheckBox      $chkCourier
@@ -37,27 +37,27 @@ Select fields to be updated and provide new values.
 	<tr>
 		<td></td>
 		<td><?php echo $_CONTROL->lstToContact->Name;?></td>
-		<td><?php $_CONTROL->lstToContact->Render(); ?></td>
+		<td><?php $_CONTROL->lstToContact->RenderWithError(); ?></td>
 	</tr>
 	<tr>
 		<td></td>
 		<td><?php echo $_CONTROL->lstToAddress->Name;?></td>
-		<td><?php $_CONTROL->lstToAddress->Render(); ?></td>
+		<td><?php $_CONTROL->lstToAddress->RenderWithError(); ?></td>
 	</tr>
 	<tr>
 		<td><?php $_CONTROL->chkCourier->Render();   ?></td>
 		<td><?php echo $_CONTROL->lstCourier->Name;  ?></td>
-		<td><?php $_CONTROL->lstCourier->Render();   ?></td>
+		<td><?php $_CONTROL->lstCourier->RenderWithError();   ?></td>
 	</tr>
 	<tr>
 		<td><?php $_CONTROL->chkNote->Render();     ?></td>
 		<td><?php echo $_CONTROL->txtNote->Name;    ?></td>
-		<td><?php $_CONTROL->txtNote->Render();     ?></td>
+		<td><?php $_CONTROL->txtNote->RenderWithError();     ?></td>
 	</tr>
 	<tr>
 		<td><?php $_CONTROL->chkShipDate->Render();  ?></td>
 		<td><?php echo $_CONTROL->calShipDate->Name; ?></td>
-		<td><?php $_CONTROL->calShipDate->Render()   ?></td>
+		<td><?php $_CONTROL->calShipDate->RenderWithError()   ?></td>
 	</tr>
     <?php
     // Custom Fields
@@ -76,5 +76,6 @@ Select fields to be updated and provide new values.
     }
     ?>
 </table>
+<?php $_CONTROL->lblWarning->Render(); ?>
 <br />
 <?php $_CONTROL->btnCancel->Render(); ?><?php $_CONTROL->btnApply->Render(); ?>

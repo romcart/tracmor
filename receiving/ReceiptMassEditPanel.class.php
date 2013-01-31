@@ -260,7 +260,8 @@ class ReceiptMassEditPanel extends QPanel {
 
     public function lblWarning_Create(){
         $this->lblWarning = new QLabel($this);
-        $this->lblWarning->Class = 'warning';
+        $this->lblWarning->CssClass = 'warning';
+        $this->lblWarning->Text = '';
     }
 
     public function btnApply_Click($strFormId, $strControlId, $strParameter){

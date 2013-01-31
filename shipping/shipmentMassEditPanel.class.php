@@ -79,6 +79,7 @@ class ShipmentMassEditPanel extends QPanel {
 		$this->lstFromContact_Create();
 		$this->lstFromAddress_Create();
 		$this->txtNote_Create();
+        $this->lblWarning_Create();
 
 		$this->btnApply_Create();
 		$this->btnCancel_Create();
@@ -256,13 +257,13 @@ class ShipmentMassEditPanel extends QPanel {
 //		$this->calShipDate->AddAction(new QChangeEvent(), new QAjaxAction('calShipDate_Select'));
 //	    }
 		$this->calShipDate->MaximumYear = $dttNow->Year + 30;
-		$this->calShipDate->strControlId = 'ship_date';
+		$this->calShipDate->strControlId = 'ShipDate';
 	}
 	//
 	public function chkShipDate_Create(){
 		$this->chkShipDate = new QCheckBox($this);
 		$this->chkShipDate->Name = 'ship_date';
-		$this->chkShipDate->strControlId = 'chk_ship_date';
+		$this->chkShipDate->strControlId = 'chkShipDate';
 		$this->chkShipDate->Checked = false;
 		$this->chkShipDate->AddAction(new QClickEvent(), new QJavaScriptAction('enableCalInput(this)'));
 	}
@@ -291,10 +292,82 @@ class ShipmentMassEditPanel extends QPanel {
 
 	public function lblWarning_Create(){
 		$this->lblWarning = new QLabel($this);
-		$this->lblWarning->Class = 'warning';
+		$this->lblWarning->CssClass = 'warning';
+        $this->lblWarning->Text = '';
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        $this->lblWarning->Text = '';
+        $blnError = false;
+        // Check "Contact To", "Contact From", "Coutrier" wasn't changed for shipped items
+        if(Shipment::QueryCount(QQ::AndCondition(QQ::Equal(QQN::Shipment()->ShippedFlag, 1),
+                 QQ::In(QQN::Shipment()->ShipmentId,$this->arrShipmentToEdit)))>0 &&
+           ($this->chkToCompany->Checked || $this->chkFromCompany->Checked || $this->chkCourier->Checked))
+        {
+            $this->lblWarning->Text = '"To Company", "From Company", "Courier" shouldn\'t be changed for already
+                                        Shipped items';
+            $blnError = true;
+        }
+        if(!$blnError){
+            // Apply checked main_table fields
+            $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+
+            if($this->chkToCompany->Checked)
+            {
+                if($this->lstToCompany->SelectedValue){
+                    $set[] = sprintf('`to_company_id`="%s"' , $this->lstToCompany->SelectedValue);
+                }
+                else{
+                    $this->lstToCompany->Warning = 'Company name must be chosen';
+                    $blnError = true;
+                }
+                if($this->lstToContact->SelectedValue){
+                    $set[] = sprintf('`to_contact_id`="%s"' , $this->lstToContact->SelectedValue);
+                }
+                else{
+                    $this->lstToContact->Warning = 'Contact name must be chosen';
+                    $blnError = true;
+                }
+                if($this->lstToAddress->SelectedValue){
+                    $set[] = sprintf('`to_address_id`="%s"' , $this->lstToAddress->SelectedValue);
+                }
+                else{
+                    $this->lstToContact->Warning = 'Address name must be chosen';
+                    $blnError = true;
+                }
+            }
+            if($this->chkFromCompany->Checked)
+            {
+                if($this->lstFromCompany->SelectedValue){
+                    $set[] = sprintf('`from_company_id`="%s"' , $this->lstFromCompany->SelectedValue);
+                }
+                else{
+                    $this->lstFromCompany->Warning = 'Company name must be chosen';
+                    $blnError = true;
+                }
+                if($this->lstFromContact->SelectedValue){
+                    $set[] = sprintf('`from_contact_id`="%s"' , $this->lstFromContact->SelectedValue);
+                }
+                else{
+                    $this->lstFromContact->Warning = 'Contact name must be chosen';
+                    $blnError = true;
+                }
+                if($this->lstFromAddress->SelectedValue){
+                    $set[] = sprintf('`from_address_id`="%s"' , $this->lstFromAddress->SelectedValue);
+                }
+                else{
+                    $this->lstFromAddress->Warning = 'Address name must be chosen';
+                    $blnError = true;
+                }
+            }
+            if($this->chkCourier->Checked){
+                $set[] = sprintf('`courier_id`="%s"', $this->lstCourier->SelectedValue);
+            }
+            if($this->chkShipDate->Checked && $this->calShipDate->DateTime)
+            {
+                $set[] = sprintf('`ship_date`="%s"' , $this->calShipDate->DateTime->__toString('YYYY-MM-DD'));
+            }
+        }
         if(count($this->arrCustomFields)>0)
         {
             $customFieldIdArray = array();
@@ -327,21 +400,25 @@ class ShipmentMassEditPanel extends QPanel {
                 $this->arrCustomFieldsToEdit = array();
             }
         }
-        // Apply checked main_table fields
-        // TODO add condition
-        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
-
-        // Edit TransAction
+        // Edit Transactions
+        foreach($this->arrShipmentToEdit as $intShipmetId){
+            $objTransaction = Transaction::Load(Shipment::Load($intShipmetId)->Transaction->TransactionId);
+            $objTransaction->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
+            if($this->chkNote->Checked){
+                $objTransaction->Note = $this->txtNote->Text;
+            }
+            $objTransaction->Save();
+        }
         // Apdate main table
-        $strQuery = sprintf("UPDATE `shipment`
-				                 SET ". implode(",",$set). "
-				                 WHERE `shipment_id` IN (%s)",
-            implode(",", $this->arrShipmentToEdit));
-
-        $objDatabase = QApplication::$Database[1];
-        $objDatabase->NonQuery($strQuery);
-
-		$this->ParentControl->HideDialogBox();
+        if(!$blnError){
+            $strQuery = sprintf("UPDATE `shipment`
+                                     SET ". implode(",",$set). "
+                                     WHERE `shipment_id` IN (%s)",
+                implode(",", $this->arrShipmentToEdit));
+            $objDatabase = QApplication::$Database[1];
+            $objDatabase->NonQuery($strQuery);
+            $this->ParentControl->HideDialogBox();
+        }
 	}
 
 
