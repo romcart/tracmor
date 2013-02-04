@@ -20,8 +20,7 @@ class AssetMassEditPanel extends QPanel {
 	// public $txtLongDescription;
 
 	public $arrAssetToEdit = array();
-//	public $arrFields = array();
-//
+    protected $objCustomFieldArray;
     public $arrCustomFields;
     public $arrCheckboxes = array();
     public $arrCustomFieldsToEdit = array();
@@ -56,9 +55,9 @@ class AssetMassEditPanel extends QPanel {
         $this->chkParentAssetCode_Create();
 
         // Load Custom Fields
-        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Asset, false);
-        if($objCustomFieldArray){
-            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+        $this->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Asset, false, null, false, 'all');
+        if($this->objCustomFieldArray){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCustomFieldArray, false, $this, true, true, false);
 
             foreach($this->arrCustomFields as $field){
                 $field['input']->Enabled = false;
@@ -173,7 +172,39 @@ class AssetMassEditPanel extends QPanel {
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
-         $blnError = false;
+        $blnError = false;
+        if(count($this->arrCustomFields)>0)
+        {
+            $customFieldIdArray = array();
+
+            foreach ($this->arrCustomFields as $field){
+                if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                    $this->arrCustomFieldsToEdit[] = $field;
+                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                }
+            }
+
+            if (count($this->arrCustomFieldsToEdit)>0) {
+                // preparing data to edit
+                // Save the values from all of the custom field controls to save the asset
+                foreach($this->arrAssetToEdit as $intAssetId){
+                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Asset, false, null, false, 'all');
+                    $selectedCustomFieldsArray = array();
+                    foreach ($objCustomFieldsArray as $objCustomField){
+                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                        {
+                            $selectedCustomFieldsArray[]= $objCustomField;
+                        }
+                    }
+                    CustomField::SaveControls($selectedCustomFieldsArray,
+                        true,
+                        $this->arrCustomFieldsToEdit,
+                        $intAssetId,
+                        EntityQtype::Asset);
+                }
+                $this->arrCustomFieldsToEdit = array();
+            }
+        }
          if ($this->chkParentAssetCode->Checked && $this->txtParentAssetCode->Text) {
                 // Check if the parent asset tag is already a child asset of this asset
                 foreach ($this->arrAssetToEdit as $intAssetToEditId){
@@ -244,39 +275,9 @@ class AssetMassEditPanel extends QPanel {
                     $this->chkLockToParent->Checked = false;
                 }
             }
+         }
             if (!$blnError) {
-                if(count($this->arrCustomFields)>0)
-                {
-                    $customFieldIdArray = array();
 
-                    foreach ($this->arrCustomFields as $field){
-                        if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
-                            $this->arrCustomFieldsToEdit[] = $field;
-                            $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
-                        }
-                    }
-
-                    if (count($this->arrCustomFieldsToEdit)>0) {
-                        // preparing data to edit
-                        // Save the values from all of the custom field controls to save the asset
-                        foreach($this->arrAssetToEdit as $intAssetId){
-                            $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Asset, false);
-                            $selectedCustomFieldsArray = array();
-                            foreach ($objCustomFieldsArray as $objCustomField){
-                                if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
-                                {
-                                    $selectedCustomFieldsArray[]= $objCustomField;
-                                }
-                            }
-                            CustomField::SaveControls($selectedCustomFieldsArray,
-                                true,
-                                $this->arrCustomFieldsToEdit,
-                                $intAssetId,
-                                EntityQtype::Asset);
-                        }
-                        $this->arrCustomFieldsToEdit = array();
-                    }
-                }
                 // Apply checked main_table fields
                 $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
                 if($this->chkModel->Checked && $this->lstModel->SelectedValue !== null){
@@ -299,10 +300,8 @@ class AssetMassEditPanel extends QPanel {
                 $objDatabase = QApplication::$Database[1];
                 $objDatabase->NonQuery($strQuery);
 
-                //	$this->ParentControl->HideDialogBox();
-            }
         }
-
+        $this->ParentControl->HideDialogBox();
 	}
 
 	// Cancel Button Click Action
