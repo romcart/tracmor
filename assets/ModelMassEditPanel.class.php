@@ -82,8 +82,6 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
 
         // Create the Image File Control
         $this->ifcImage_Create();
-        // Create all custom asset model fields
-        $this->customFields_Create();
         // Create Asset Custom Fields
         $this->UpdateCustomFields();
 
@@ -95,12 +93,16 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         $this->chkImage_Create();
         $this->btnApply_Create();
 
-        // Create custom fields checkboxes
-        $this->objAssetModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(4, $this->blnEditMode, $this->objAssetModel->AssetModelId);
-        $this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this, false, true, false);
-        foreach($this->arrCustomFields as $field){
-            $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
-            $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+        // Load Custom Fields
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::AssetModel, false);
+        if($objCustomFieldArray){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+
+            foreach($this->arrCustomFields as $field){
+                $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
+                $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+                $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+            }
         }
 
 
@@ -193,16 +195,6 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         $this->chkImage->Name = 'image';
         $this->chkImage->Checked = false;
         $this->chkImage->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-    }
-
-    // Create all Custom Asset Fields
-    protected function customFields_Create() {
-
-        // Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
-        $this->objAssetModel->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(4, $this->blnEditMode, $this->objAssetModel->AssetModelId);
-
-        // Create the Custom Field Controls - labels and inputs (text or list) for each
-        $this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this, false, true, false);
     }
 
     // Save Button Click Actions
