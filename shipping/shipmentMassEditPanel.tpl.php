@@ -17,22 +17,22 @@ Select fields to be updated and provide new values.
 	<tr>
 		<td><?php $_CONTROL->chkFromCompany->Render(); ?></td>
 		<td><?php echo $_CONTROL->lstFromCompany->Name;?></td>
-		<td><?php $_CONTROL->lstFromCompany->Render(); ?></td>
+		<td><?php $_CONTROL->lstFromCompany->RenderWithError(); ?></td>
 	</tr>
 	<tr>
 		<td></td>
 		<td><?php echo $_CONTROL->lstFromContact->Name;?></td>
-		<td><?php $_CONTROL->lstFromContact->Render(); ?></td>
+		<td><?php $_CONTROL->lstFromContact->RenderWithError(); ?></td>
 	</tr>
 	<tr>
 		<td></td>
 		<td><?php echo $_CONTROL->lstFromAddress->Name;?></td>
-		<td><?php $_CONTROL->lstFromAddress->Render(); ?></td>
+		<td><?php $_CONTROL->lstFromAddress->RenderWithError(); ?></td>
 	</tr>
 	<tr>
 		<td><?php $_CONTROL->chkToCompany->Render(); ?></td>
 		<td><?php echo $_CONTROL->lstToCompany->Name;?></td>
-		<td><?php $_CONTROL->lstToCompany->Render(); ?></td>
+		<td><?php $_CONTROL->lstToCompany->RenderWithError(); ?></td>
 	</tr>
 	<tr>
 		<td></td>

@@ -523,8 +523,8 @@
     // Save Button Click Actions
     public function btnMassEditApply_Click($strFormId, $strControlId, $strParameter) {
        $this->pnlContactEdit->btnMassEditApply_Click($strFormId, $strControlId, $strParameter);
-       $this->dlgMassEdit->HideDialogBox();
-       QApplication::Redirect('');
+//       $this->dlgMassEdit->HideDialogBox();
+//       QApplication::Redirect('');
     }
 
 	}

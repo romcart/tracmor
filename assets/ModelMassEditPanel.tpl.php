@@ -59,7 +59,7 @@ $arrAssetModelFields[] = array('checkbox' => $_CONTROL->chkImage->RenderWithErro
     foreach ($arrAssetModelFields as $arrAssetModelField) {
 
         echo('<td class="record_field_name">' . $arrAssetModelField['name'] .'&nbsp;</td>');
-        echo('<td class="record_field_value">'.  $arrAssetModelField['checkbox']
+        echo('<td class="record_field_value">'. $arrAssetModelField['checkbox']
                                               . $arrAssetModelField['value'] .'&nbsp;</td>');
         echo('</tr>');
     }

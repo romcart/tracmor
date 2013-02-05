@@ -83,58 +83,75 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
     }
 
 	// Save Button Click Actions
-		public function btnSave_Click($strFormId, $strControlId, $strParameter) {
-            $strQuery = sprintf("
-				UPDATE `company`
-				SET `long_description`='%s'
-				WHERE `company_id` IN (%s)
-			", $this->txtLongDescription->Text,
-                implode(",", $this->arrCompaniesToEdit));
+    public function btnSave_Click($strFormId, $strControlId, $strParameter) {
+        $blnError = false;
+        $strQuery = sprintf("
+            UPDATE `company`
+            SET `long_description`='%s'
+            WHERE `company_id` IN (%s)
+        ", $this->txtLongDescription->Text,
+            implode(",", $this->arrCompaniesToEdit));
 
-            if(count($this->arrCustomFields)>0)
-            {
-                if($this->chkLongDescription->Checked){
-                    $objDatabase = QApplication::$Database[1];
-                    $objDatabase->NonQuery($strQuery);
-                }
-                $customFieldIdArray = array();
+        if(count($this->arrCustomFields)>0)
+        {
+            $customFieldIdArray = array();
 
-                foreach ($this->arrCustomFields as $field){
-                    if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+            foreach ($this->arrCustomFields as $field){
+                if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                    if($field['input'] instanceof QTextBox
+                        && $field['input']->Required
+                        && $field['input']->Text == null
+                        ||$field['input'] instanceof QListBox
+                            && $field['input']->Required
+                            && $field['input']->SelectedValue == null
+                    )
+                    {
+                        $blnError = true;
+                        $field['input']->Warning = "Required.";
+                    }
+                    else
+                    {
                         $this->arrCustomFieldsToEdit[] = $field;
                         $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
                     }
                 }
-
-                if (count($this->arrCustomFieldsToEdit)>0) {
-                    // preparing data to edit
-                    // Save the values from all of the custom field controls to save the asset
-                    foreach($this->arrCompaniesToEdit as $intCompanyId){
-                        $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Company, false);
-                        $selectedCustomFieldsArray = array();
-                        foreach ($objCustomFieldsArray as $objCustomField){
-                            if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
-                            {
-                                $selectedCustomFieldsArray[]= $objCustomField;
-                            }
-                        }
-                        CustomField::SaveControls($selectedCustomFieldsArray,
-                                                  true,
-                                                  $this->arrCustomFieldsToEdit,
-                                                  $intCompanyId,
-                                                  EntityQtype::Company);
-                    }
-                    $this->arrCustomFieldsToEdit = array();
-                }
             }
-            else{
+
+            if (count($this->arrCustomFieldsToEdit)>0 && !$blnError) {
+                // preparing data to edit
+                // Save the values from all of the custom field controls to save the asset
+                foreach($this->arrCompaniesToEdit as $intCompanyId){
+                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Company, false);
+                    $selectedCustomFieldsArray = array();
+                    foreach ($objCustomFieldsArray as $objCustomField){
+                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                        {
+                            $selectedCustomFieldsArray[]= $objCustomField;
+                        }
+                    }
+                    CustomField::SaveControls($selectedCustomFieldsArray,
+                                              true,
+                                              $this->arrCustomFieldsToEdit,
+                                              $intCompanyId,
+                                              EntityQtype::Company);
+                }
+                $this->arrCustomFieldsToEdit = array();
+            }
+            if($this->chkLongDescription->Checked  && !$blnError){
                 $objDatabase = QApplication::$Database[1];
                 $objDatabase->NonQuery($strQuery);
             }
+        }
+        else{
+            $objDatabase = QApplication::$Database[1];
+            $objDatabase->NonQuery($strQuery);
+        }
 
-		$this->ParentControl->RemoveChildControls(true);
-		$this->CloseSelf(true);
-	    QApplication::Redirect('');
+        if(!$blnError){
+            $this->ParentControl->RemoveChildControls(true);
+            $this->CloseSelf(true);
+            QApplication::Redirect('');
+        }
 	}
 
 	// Cancel Button Click Action

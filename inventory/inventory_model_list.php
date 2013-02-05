@@ -63,6 +63,7 @@
 		protected $dlgMassDelete;
 		protected $btnMassEdit;
 		protected $btnMassDelete;
+        protected $pnlInventoryMassEditPanel;
 
 		/*// Basic Inputs
 		protected $lstCategory;
@@ -474,9 +475,11 @@
 			$items = $this->ctlSearchMenu->dtgInventoryModel->getSelected('InventoryModelId');
 			if(count($items)>0){
 				$this->lblWarning->Text = "";
-				$pnlInventoryMassEditPanel = new InventoryMassEditPanel($this->dlgMassEdit,
+                if(!$this->pnlInventoryMassEditPanel instanceof InventoryMassEditPanel){
+				$this->pnlInventoryMassEditPanel = new InventoryMassEditPanel($this->dlgMassEdit,
 					                                                    'pnlInventoryMassEditPanelCancel_Click',
 				                                                        $items);
+                }
 				$this->dlgMassEdit->ShowDialogBox();
 			}else{
 				$this->lblWarning->Text = "You haven't chosen any Inventory to Edit" ;

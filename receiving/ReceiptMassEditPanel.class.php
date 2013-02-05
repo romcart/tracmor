@@ -272,29 +272,21 @@ class ReceiptMassEditPanel extends QPanel {
             // preparing data to edit
             foreach ($this->arrCustomFields as $field){
                 if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
-                    $this->arrCustomFieldsToEdit[] = $field;
-                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
-                }
-            }
-
-            if (count($this->arrCustomFieldsToEdit)>0) {
-                // Save the values from all of the custom field controls to save the asset
-                foreach($this->arrReceiptToEdit as $intReceiptId){
-                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Receipt, false);
-                    $selectedCustomFieldsArray = array();
-                    foreach ($objCustomFieldsArray as $objCustomField){
-                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
-                        {
-                            $selectedCustomFieldsArray[]= $objCustomField;
-                        }
+                    if($field['input'] instanceof QTextBox
+                        && $field['input']->Required
+                        && $field['input']->Text == null
+                        ||$field['input'] instanceof QListBox
+                            && $field['input']->Required
+                            && $field['input']->SelectedValue == null
+                    ){
+                        $blnError = true;
+                        $field['input']->Warning = "Required.";
                     }
-                    CustomField::SaveControls($selectedCustomFieldsArray,
-                        true,
-                        $this->arrCustomFieldsToEdit,
-                        $intReceiptId,
-                        EntityQtype::Receipt);
+                    else{
+                        $this->arrCustomFieldsToEdit[] = $field;
+                        $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    }
                 }
-                $this->arrCustomFieldsToEdit = array();
             }
         }
         // Apply checked main_table fields
@@ -359,6 +351,25 @@ class ReceiptMassEditPanel extends QPanel {
             $objTransaction->Save();
         }
         if(!$blnError){
+            if (count($this->arrCustomFieldsToEdit)>0) {
+                // Save the values from all of the custom field controls to save the asset
+                foreach($this->arrReceiptToEdit as $intReceiptId){
+                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Receipt, false);
+                    $selectedCustomFieldsArray = array();
+                    foreach ($objCustomFieldsArray as $objCustomField){
+                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                        {
+                            $selectedCustomFieldsArray[]= $objCustomField;
+                        }
+                    }
+                    CustomField::SaveControls($selectedCustomFieldsArray,
+                        true,
+                        $this->arrCustomFieldsToEdit,
+                        $intReceiptId,
+                        EntityQtype::Receipt);
+                }
+                $this->arrCustomFieldsToEdit = array();
+            }
             // Update Transaction
             // Update main table
             $strQuery = sprintf("UPDATE `receipt`
@@ -368,9 +379,9 @@ class ReceiptMassEditPanel extends QPanel {
 
             $objDatabase = QApplication::$Database[1];
             $objDatabase->NonQuery($strQuery);
-            $this->ParentControl->HideDialogBox();
+            QApplication::Redirect('');
         }
-
+        $this->arrCustomFieldsToEdit = array();
     }
 
 

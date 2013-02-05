@@ -15,19 +15,19 @@ Select fields to be updated and provide new values.
 		<td><?php $_CONTROL->txtShortDescription->Render(); ?></td>
 	</tr>
 	<tr>
-		<td><?php $_CONTROL->chkCategory->Render();         ?></td>
-		<td><?php echo $_CONTROL->lstCategory->Name;        ?></td>
-		<td><?php $_CONTROL->lstCategory->Render();         ?></td>
+		<td><?php $_CONTROL->chkCategory->Render();                  ?></td>
+		<td><?php echo $_CONTROL->lstCategory->Name;                 ?></td>
+		<td><?php $_CONTROL->lstCategory->RenderWithError();         ?></td>
 	</tr>
 	<tr>
-		<td><?php $_CONTROL->chkManufacturer->Render();     ?></td>
-		<td><?php echo $_CONTROL->lstManufacturer->Name;    ?></td>
-		<td><?php $_CONTROL->lstManufacturer->Render();     ?></td>
+		<td><?php $_CONTROL->chkManufacturer->Render();              ?></td>
+		<td><?php echo $_CONTROL->lstManufacturer->Name;             ?></td>
+		<td><?php $_CONTROL->lstManufacturer->RenderWithError();     ?></td>
 	</tr>
 	<tr>
 		<td><?php $_CONTROL->chkLongDescription->Render();  ?></td>
 		<td><?php echo $_CONTROL->txtLongDescription->Name; ?></td>
-		<td><?php $_CONTROL->txtLongDescription->Render()   ?></td>
+		<td><?php $_CONTROL->txtLongDescription->RenderWithError()   ?></td>
 	</tr>
     <?php
     // Custom Fields
@@ -42,7 +42,6 @@ Select fields to be updated and provide new values.
                 </tr><?php
             }
         }
-
     }
     ?>
 </table>

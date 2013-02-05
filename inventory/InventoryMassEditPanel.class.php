@@ -174,17 +174,60 @@ class InventoryMassEditPanel extends QPanel {
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        $blnError = false;
         if(count($this->arrCustomFields)>0)
         {
             $customFieldIdArray = array();
 
             foreach ($this->arrCustomFields as $field){
                 if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
-                    $this->arrCustomFieldsToEdit[] = $field;
-                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    if($field['input'] instanceof QTextBox
+                        && $field['input']->Required
+                        && $field['input']->Text == null
+                        ||$field['input'] instanceof QListBox
+                            && $field['input']->Required
+                            && $field['input']->SelectedValue == null
+                    ){
+                        $blnError = true;
+                        $field['input']->Warning = "Required.";
+                    }
+                    else{
+                        $this->arrCustomFieldsToEdit[] = $field;
+                        $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    }
                 }
             }
-
+        }
+        // Apply checked main_table fields
+        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+        if($this->chkShortDescription->Checked){
+            $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
+        }
+        if($this->chkLongDescription->Checked){
+            $set[] = sprintf('`long_description`="%s"', $this->txtLongDescription->Text);
+        }
+        if($this->chkManufacturer->Checked){
+            if($this->lstManufacturer->SelectedValue !== null){
+                $set[] = sprintf('`manufacturer_id`=%s', $this->lstManufacturer->SelectedValue);
+            }
+            else{
+                $blnError = true;
+                $this->lstManufacturer->Warning = 'Manufacturer can\'t be empty';
+            }
+        }
+        if($this->chkCategory->Checked)
+        {
+            if($this->lstCategory->SelectedValue!== null){
+                $set[] = sprintf('`category_id`= %s', $this->lstCategory->SelectedValue);
+            }
+            else{
+                $blnError = true;
+                $this->lstCategory->Warning = 'Category can\'t be empty';
+            }
+        }
+        // Save
+        if(!$blnError)
+        {
             if (count($this->arrCustomFieldsToEdit)>0) {
                 // preparing data to edit
                 // Save the values from all of the custom field controls to save the asset
@@ -203,31 +246,17 @@ class InventoryMassEditPanel extends QPanel {
                         $intInventoryId,
                         EntityQtype::Inventory);
                 }
-                $this->arrCustomFieldsToEdit = array();
-            }
-            // Apply checked main_table fields
-            $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
-            if($this->chkShortDescription->Checked){
-                $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
-            }
-            if($this->chkLongDescription->Checked){
-                $set[] = sprintf('`long_description`="%s"', $this->txtLongDescription->Text);
-            }
-            if($this->chkManufacturer->Checked && $this->lstManufacturer->SelectedValue !== null){
-                $set[] = sprintf('`manufacturer_id`=%s', $this->lstManufacturer->SelectedValue);
-            }
-            if($this->chkCategory->Checked && $this->lstCategory->SelectedValue!== null){
-                $set[] = sprintf('`category_id`= %s', $this->lstCategory->SelectedValue);
             }
             $strQuery = sprintf("UPDATE `inventory_model`
-				                 SET ". implode(",",$set). "
-				                 WHERE `inventory_model_id` IN (%s)",
+                                 SET ". implode(",",$set). "
+                                 WHERE `inventory_model_id` IN (%s)",
                                  implode(",", $this->arrInventoryToEdit));
 
             $objDatabase = QApplication::$Database[1];
             $objDatabase->NonQuery($strQuery);
+            QApplication::Redirect('');
         }
-		$this->ParentControl->HideDialogBox();
+        $this->arrCustomFieldsToEdit = array();
 	}
 
 

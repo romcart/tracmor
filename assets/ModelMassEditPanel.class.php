@@ -199,17 +199,74 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
 
     // Save Button Click Actions
     public function btnSave_Click($strFormId, $strControlId, $strParameter) {
+        $blnError = false;
         if(count($this->arrCustomFields)>0)
         {
             $customFieldIdArray = array();
-
             foreach ($this->arrCustomFields as $field){
                 if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
-                    $this->arrCustomFieldsToEdit[] = $field;
-                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    if($field['input'] instanceof QTextBox
+                         && $field['input']->Required
+                         && $field['input']->Text == null
+                       ||$field['input'] instanceof QListBox
+                         && $field['input']->Required
+                         && $field['input']->SelectedValue == null
+                       ){
+                        $blnError = true;
+                        $field['input']->Warning = "Required.";
+                    }
+                    else{
+                        $this->arrCustomFieldsToEdit[] = $field;
+                        $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    }
                 }
             }
+        }
+        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
+        if ($this->ifcImage->FileName) {
+            // Retrieve the extension (.jpg, .gif) from the filename
+            $explosion = explode(".", $this->ifcImage->FileName);
+            // Set the file name to ID_asset_model.ext
+            $this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objAssetModel->AssetModelId, $this->ifcImage->Suffix, $explosion[1]);
+            // Set the image path for saving the asset model
+            $this->txtImagePath->Text = $this->ifcImage->FileName;
+            // Upload the file to the server
+            $this->ifcImage->ProcessUpload();
 
+            // Save the image path information to the AssetModel object
+            $set[] = sprintf('`image_path`="%s"',$this->txtImagePath->Text);
+        }
+        if($this->chkShortDescription->Checked){
+            if(trim($this->txtShortDescription->Text)!== ''){
+                $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
+            }
+            else{
+                $blnError = true;
+                $this->txtShortDescription->Warning = 'Name shouldn\'t be empty';
+            }
+        }
+        if($this->chkLongDescription->Checked){
+            $set[] = sprintf('`long_description`="%s"', $this->txtLongDescription->Text);
+        }
+        if($this->chkManufacturer->Checked){
+            if($this->lstManufacturer->SelectedValue !== null){
+                $set[] = sprintf('`manufacturer_id`=%s', $this->lstManufacturer->SelectedValue);
+            }
+            else{
+                $blnError = true;
+                $this->lstManufacturer->Warning = 'Manufacturer shouldn\'t be empty';
+            }
+        }
+        if($this->chkCategory->Checked){
+            if($this->lstCategory->SelectedValue!== null){
+                $set[] = sprintf('`category_id`= %s', $this->lstCategory->SelectedValue);
+            }
+            else{
+                $blnError = true;
+                $this->lstCategory->Warning = 'Category shouldn\'t be empty';
+            }
+        }
+        if(!$blnError){
             if (count($this->arrCustomFieldsToEdit)>0) {
                 // preparing data to edit
                 // Save the values from all of the custom field controls to save the asset
@@ -228,46 +285,18 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
                         $intModelId,
                         EntityQtype::AssetModel);
                 }
-                $this->arrCustomFieldsToEdit = array();
             }
-        }
-        $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
-        if ($this->ifcImage->FileName) {
-            // Retrieve the extension (.jpg, .gif) from the filename
-            $explosion = explode(".", $this->ifcImage->FileName);
-            // Set the file name to ID_asset_model.ext
-            $this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objAssetModel->AssetModelId, $this->ifcImage->Suffix, $explosion[1]);
-            // Set the image path for saving the asset model
-            $this->txtImagePath->Text = $this->ifcImage->FileName;
-            // Upload the file to the server
-            $this->ifcImage->ProcessUpload();
+            $strQuery = sprintf("UPDATE `asset_model`
+                                 SET ". implode(",",$set). "
+                                 WHERE `asset_model_id` IN (%s)",
+                                implode(",", $this->arrModelsToEdit));
 
-            // Save the image path information to the AssetModel object
-            $set[] = sprintf('`image_path`="%s"',$this->txtImagePath->Text);
+            $objDatabase = QApplication::$Database[1];
+            $objDatabase->NonQuery($strQuery);
+            //$this->ParentControl->RemoveChildControls(true);
+            $this->CloseSelf(true);
         }
-        if($this->chkShortDescription->Checked &&  $this->txtShortDescription->Text!== null){
-            $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
-        }
-        if($this->chkLongDescription->Checked){
-            $set[] = sprintf('`long_description`="%s"', $this->txtLongDescription->Text);
-        }
-        if($this->chkManufacturer->Checked && $this->lstManufacturer->SelectedValue !== null){
-            $set[] = sprintf('`manufacturer_id`=%s', $this->lstManufacturer->SelectedValue);
-        }
-        if($this->chkCategory->Checked && $this->lstCategory->SelectedValue!== null){
-            $set[] = sprintf('`category_id`= %s', $this->lstCategory->SelectedValue);
-        }
-
-        $strQuery = sprintf("UPDATE `asset_model`
-				                 SET ". implode(",",$set). "
-				                 WHERE `asset_model_id` IN (%s)",
-            implode(",", $this->arrModelsToEdit));
-
-        $objDatabase = QApplication::$Database[1];
-        $objDatabase->NonQuery($strQuery);
-
-        $this->ParentControl->RemoveChildControls(true);
-        $this->CloseSelf(true);
+        $this->arrCustomFieldsToEdit = array();
     }
 
     // Cancel Button Click Action

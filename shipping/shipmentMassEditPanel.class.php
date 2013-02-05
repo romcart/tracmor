@@ -374,11 +374,36 @@ class ShipmentMassEditPanel extends QPanel {
 
             foreach ($this->arrCustomFields as $field){
                 if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
-                    $this->arrCustomFieldsToEdit[] = $field;
-                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    if($field['input'] instanceof QTextBox
+                        && $field['input']->Required
+                        && $field['input']->Text == null
+                      ||$field['input'] instanceof QListBox
+                        && $field['input']->Required
+                        && $field['input']->SelectedValue == null
+                    )
+                    {
+                        $blnError = true;
+                        $field['input']->Warning = "Required.";
+                    }
+                    else
+                    {
+                        $this->arrCustomFieldsToEdit[] = $field;
+                        $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    }
                 }
             }
-
+        }
+        // Edit Transactions
+        foreach($this->arrShipmentToEdit as $intShipmetId){
+            $objTransaction = Transaction::Load(Shipment::Load($intShipmetId)->Transaction->TransactionId);
+            $objTransaction->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
+            if($this->chkNote->Checked){
+                $objTransaction->Note = $this->txtNote->Text;
+            }
+            $objTransaction->Save();
+        }
+        // Apdate main table
+        if(!$blnError){
             if (count($this->arrCustomFieldsToEdit)>0) {
                 // preparing data to edit
                 // Save the values from all of the custom field controls to save the asset
@@ -397,28 +422,18 @@ class ShipmentMassEditPanel extends QPanel {
                         $intShipmentId,
                         EntityQtype::Shipment);
                 }
-                $this->arrCustomFieldsToEdit = array();
             }
-        }
-        // Edit Transactions
-        foreach($this->arrShipmentToEdit as $intShipmetId){
-            $objTransaction = Transaction::Load(Shipment::Load($intShipmetId)->Transaction->TransactionId);
-            $objTransaction->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
-            if($this->chkNote->Checked){
-                $objTransaction->Note = $this->txtNote->Text;
-            }
-            $objTransaction->Save();
-        }
-        // Apdate main table
-        if(!$blnError){
+
             $strQuery = sprintf("UPDATE `shipment`
-                                     SET ". implode(",",$set). "
-                                     WHERE `shipment_id` IN (%s)",
-                implode(",", $this->arrShipmentToEdit));
+                                 SET ". implode(",",$set). "
+                                 WHERE `shipment_id` IN (%s)",
+                                 implode(",", $this->arrShipmentToEdit));
             $objDatabase = QApplication::$Database[1];
             $objDatabase->NonQuery($strQuery);
             $this->ParentControl->HideDialogBox();
+            QApplication::Redirect('');
         }
+        $this->arrCustomFieldsToEdit = array();
 	}
 
 

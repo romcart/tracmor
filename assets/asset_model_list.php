@@ -78,6 +78,7 @@
 		protected $dlgMassDelete;
         protected $btnMassDeleteConfirm;
         protected $btnMassDeleteCancel;
+        protected $pnlModelMassEditPanel;
 
         protected $arrToDelete = array();
 
@@ -390,8 +391,10 @@
 		  $items = $this->dtgAssetModel->getSelected('AssetModelId');
 		  if(count($items)>0){
 			  $this->lblWarning->Text = "";
-			  $pnlModelMassEditPanel = new ModelMassEditPanel($this->dlgMassEdit,'pnlModelMassEditPanelCancel_Click',$items);
-			  $this->dlgMassEdit->ShowDialogBox();
+              if(!$this->pnlModelMassEditPanel instanceof ModelMassEditPanel){
+			      $this->pnlModelMassEditPanel = new ModelMassEditPanel($this->dlgMassEdit,'pnlModelMassEditPanelCancel_Click',$items);
+              }
+              $this->dlgMassEdit->ShowDialogBox();
 		  }else{
 			  $this->lblWarning->Text = "You haven't chosen any Model to Edit" ;
 		  }

@@ -56,9 +56,9 @@ class ContactMassEditPanel extends ContactEditPanel {
         $this->lstCompany->Enabled = false;
 
         // Load Custom Fields
-        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(8, false);
+        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Contact, false);
         if($objCustomFieldArray){
-            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+            //$this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
 
             foreach($this->arrCustomFields as $field){
                 $field['input']->Enabled = false;
@@ -104,23 +104,31 @@ class ContactMassEditPanel extends ContactEditPanel {
 
     // Save Button Click Actions
     public function btnMassEditApply_Click($strFormId, $strControlId, $strParameter) {
+        $blnError = false;
         $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
-        if($this->chkCompany->Checked
-            && $this->lstCompany->SelectedValue !== null
-            && $this->lstAddress->SelectedValue !== null){
-            $set[] = sprintf('`company_id` = %s' , $this->lstCompany->SelectedValue);
-            $set[] = sprintf('`address_id` = %s' , $this->lstAddress->SelectedValue);
-        }
-        if($this->chkDescription->Checked){
+        if($this->chkDescription->Checked)
+        {
             $set[] = sprintf('`description` ="%s"', $this->txtDescription->Text);
         }
+
+        if($this->chkCompany->Checked)
+        {
+            if($this->lstCompany->SelectedValue !== null
+               && $this->lstAddress->SelectedValue !== null){
+                $set[] = sprintf('`company_id` = %s' , $this->lstCompany->SelectedValue);
+                $set[] = sprintf('`address_id` = %s' , $this->lstAddress->SelectedValue);
+            }
+            else{
+                $blnError = true;
+                $this->lstCompany->Warning=($this->lstCompany->SelectedValue == null)?'Company can\'t be empty':'';
+                $this->lstAddress->Warning=($this->lstAddress->SelectedValue == null)?'Address can\'t be empty':'';
+            }
+        }
+
         $strQuery = sprintf("UPDATE `contact`
 				             SET ". implode(",",$set). "
 				             WHERE `contact_id` IN (%s)",
                              implode(",", $this->arrContactToEdit));
-        //print $strQuery; exit;
-        $objDatabase = QApplication::$Database[1];
-        $objDatabase->NonQuery($strQuery);
         // Custom Fields handling
         if(count($this->arrCustomFields)>0)
         {
@@ -128,11 +136,29 @@ class ContactMassEditPanel extends ContactEditPanel {
 
             foreach ($this->arrCustomFields as $field){
                 if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
-                    $this->arrCustomFieldsToEdit[] = $field;
-                    $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    if($field['input'] instanceof QTextBox
+                        && $field['input']->Required
+                        && $field['input']->Text == null
+                        ||$field['input'] instanceof QListBox
+                            && $field['input']->Required
+                            && $field['input']->SelectedValue == null
+                    )
+                    {
+                        $blnError = true;
+                        $field['input']->Warning = "Required.";
+                    }
+                    else
+                    {
+                        $this->arrCustomFieldsToEdit[] = $field;
+                        $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
+                    }
                 }
             }
+        }
 
+        // Transaction
+        if(!$blnError)
+        {
             if (count($this->arrCustomFieldsToEdit)>0) {
                 // preparing data to edit
                 foreach($this->arrContactToEdit as $intContactId){
@@ -152,8 +178,11 @@ class ContactMassEditPanel extends ContactEditPanel {
                 }
                 $this->arrCustomFieldsToEdit = array();
             }
+            //print $strQuery; exit;
+            $objDatabase = QApplication::$Database[1];
+            $objDatabase->NonQuery($strQuery);
+            QApplication::Redirect('');
         }
-        QApplication::Redirect('');
     }
 
     protected function btnMassEditApply_Create(){
