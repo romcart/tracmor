@@ -418,7 +418,7 @@
 			$strQuery = sprintf('
 				SELECT
 					%s
-					SUM( `inventory_location` . `quantity` ) AS `inventory_model_quantity`,
+					%s
 					`inventory_model`.`inventory_model_id` AS `inventory_model_id`,
 					`inventory_model`.`category_id` AS `category_id`,
 					`inventory_model`.`manufacturer_id` AS `manufacturer_id`,
@@ -456,6 +456,7 @@
 				%s
 				%s
 			', $strLimitPrefix,
+				($intLocationId) ? '`inventory_location` . `quantity` AS `__inventory_model_quantity`,' : 'SUM( `inventory_location` . `quantity` ) AS `__inventory_model_quantity`,',
 				$objQueryExpansion->GetSelectSql(",\n					", ",\n					"), $arrCustomFieldSql['strSelect'], $arrAttachmentSql['strSelect'],
 				$objQueryExpansion->GetFromSql("", "\n					"), $arrCustomFieldSql['strFrom'], $arrAttachmentSql['strFrom'],
 				$arrSearchSql['strInventoryModelCodeSql'], $arrSearchSql['strLocationSql'], $arrSearchSql['strInventoryModelSql'], $arrSearchSql['strCategorySql'], $arrSearchSql['strManufacturerSql'], $arrSearchSql['strShortDescriptionSql'], $arrSearchSql['strCustomFieldsSql'], $arrSearchSql['strDateModifiedSql'], $arrSearchSql['strAttachmentSql'],

@@ -115,7 +115,7 @@ class QInventorySearchComposite extends QControl {
     $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM->ShortDescription ?>', 'Width=200', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->Category->__toString(); ?>', 'SortByCommand="inventory_model__category_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
     $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->Manufacturer->__toString(); ?>', 'SortByCommand="inventory_model__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
-    $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Quantity', '<?= $_ITEM->__toStringQuantity(); ?>', 'SortByCommand="inventory_model_quantity ASC"', 'ReverseSortByCommand="inventory_model_quantity DESC"', 'CssClass="dtg_column"'));
+    $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Quantity', '<?= $_ITEM->GetVirtualAttribute(\'inventory_model_quantity\'); ?>', 'SortByCommand="__inventory_model_quantity ASC"', 'ReverseSortByCommand="__inventory_model_quantity DESC"', 'CssClass="dtg_column"'));
 
     // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
     $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, false);
