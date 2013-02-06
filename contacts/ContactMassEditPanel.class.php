@@ -104,6 +104,7 @@ class ContactMassEditPanel extends ContactEditPanel {
 
     // Save Button Click Actions
     public function btnMassEditApply_Click($strFormId, $strControlId, $strParameter) {
+        $this->clearWarnings();
         $blnError = false;
         $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
         if($this->chkDescription->Checked)
@@ -176,13 +177,14 @@ class ContactMassEditPanel extends ContactEditPanel {
                         $intContactId,
                         EntityQtype::Contact);
                 }
-                $this->arrCustomFieldsToEdit = array();
             }
             //print $strQuery; exit;
             $objDatabase = QApplication::$Database[1];
             $objDatabase->NonQuery($strQuery);
             QApplication::Redirect('');
         }
+        $this->arrCustomFieldsToEdit = array();
+        $this->uncheck();
     }
 
     protected function btnMassEditApply_Create(){
@@ -204,6 +206,26 @@ class ContactMassEditPanel extends ContactEditPanel {
     // Cancel Button Click Action
     public function btnMassEditCancel_Click($strFormId, $strControlId, $strParameter) {
         $this->ParentControl->HideDialogBox();
+    }
+
+    public function uncheck(){
+        $this->chkCompany->Checked = false;
+        $this->chkDescription->Checked = false;
+        foreach($this->arrCustomFields as $field)
+        {
+            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+        }
+    }
+
+    public function clearWarnings(){
+        $this->lstCompany->Warning = '';
+        $this->txtDescription->Warning = '';
+        $this->lstAddress->Warning = '';
+
+        foreach($this->arrCustomFields as $field){
+            $field['input']->Warning = '';
+        }
+
     }
 }
 ?>

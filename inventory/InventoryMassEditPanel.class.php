@@ -174,6 +174,7 @@ class InventoryMassEditPanel extends QPanel {
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        $this->clearWarnings();
         $blnError = false;
         if(count($this->arrCustomFields)>0)
         {
@@ -201,7 +202,13 @@ class InventoryMassEditPanel extends QPanel {
         // Apply checked main_table fields
         $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
         if($this->chkShortDescription->Checked){
-            $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
+            if(trim($this->txtShortDescription->Text)!== ''){
+                $set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
+            }
+            else{
+                $blnError = true;
+                $this->txtShortDescription->Warning = 'Name shouldn\'t be empty';
+            }
         }
         if($this->chkLongDescription->Checked){
             $set[] = sprintf('`long_description`="%s"', $this->txtLongDescription->Text);
@@ -256,6 +263,8 @@ class InventoryMassEditPanel extends QPanel {
             $objDatabase->NonQuery($strQuery);
             QApplication::Redirect('');
         }
+        $this->uncheck();
+
         $this->arrCustomFieldsToEdit = array();
 	}
 
@@ -266,5 +275,27 @@ class InventoryMassEditPanel extends QPanel {
 		//$this->CloseSelf(true);
 		$this->ParentControl->HideDialogBox();
 	}
+
+    public function uncheck(){
+        $this->chkShortDescription->Checked = false;
+        $this->chkCategory->Checked = false;
+        $this->chkManufacturer->Checked = false;
+        $this->chkLongDescription->Checked = false;
+        foreach($this->arrCustomFields as $field){
+            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+        }
+    }
+
+    public function clearWarnings(){
+        $this->txtShortDescription->Warning = '';
+        $this->txtLongDescription->Warning = '';
+        $this->lstCategory->Warning = '';
+        $this->lstManufacturer->Warning = '';
+        $this->lblWarning->Text ='';
+        foreach($this->arrCustomFields as $field){
+            $field['input']->Warning = '';
+        }
+
+    }
 }
 ?>

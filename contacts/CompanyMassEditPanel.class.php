@@ -84,6 +84,7 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
 
 	// Save Button Click Actions
     public function btnSave_Click($strFormId, $strControlId, $strParameter) {
+        $this->clearWarnings();
         $blnError = false;
         $strQuery = sprintf("
             UPDATE `company`
@@ -135,7 +136,7 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
                                               $intCompanyId,
                                               EntityQtype::Company);
                 }
-                $this->arrCustomFieldsToEdit = array();
+
             }
             if($this->chkLongDescription->Checked  && !$blnError){
                 $objDatabase = QApplication::$Database[1];
@@ -152,6 +153,8 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
             $this->CloseSelf(true);
             QApplication::Redirect('');
         }
+        $this->arrCustomFieldsToEdit = array();
+        $this->uncheck();
 	}
 
 	// Cancel Button Click Action
@@ -159,5 +162,21 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
 		$this->ParentControl->RemoveChildControls(true);
 		$this->CloseSelf(true);
 	}
+    public function uncheck(){
+        $this->chkLongDescription->Checked = false;
+        foreach($this->arrCustomFields as $field)
+        {
+            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+        }
+    }
+
+    public function clearWarnings(){
+        if(count($this->arrCustomFields)>0){
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Warning = '';
+            }
+            $this->txtLongDescription->Enabled = false;
+        }
+    }
 }
 ?>

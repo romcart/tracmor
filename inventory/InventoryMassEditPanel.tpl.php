@@ -12,7 +12,7 @@ Select fields to be updated and provide new values.
 	<tr>
 		<td><?php $_CONTROL->chkShortDescription->Render(); ?></td>
 		<td><?php echo $_CONTROL->txtShortDescription->Name;?></td>
-		<td><?php $_CONTROL->txtShortDescription->Render(); ?></td>
+		<td><?php $_CONTROL->txtShortDescription->RenderWithError(); ?></td>
 	</tr>
 	<tr>
 		<td><?php $_CONTROL->chkCategory->Render();                  ?></td>
