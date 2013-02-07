@@ -120,11 +120,11 @@ function getWidth(obj) {
 
 function enableInput(element,dependent_elements) {
     var input = document.getElementById(element.id.replace('chk',''));
-        input.disabled = !(input.disabled);
+        input.disabled = !element.checked;
     if( Object.prototype.toString.call(dependent_elements ) === '[object Array]' ) {
         for (var i = 0; i<dependent_elements.length; i++){
                 var dependent_input = document.getElementById(dependent_elements[i]);
-                dependent_input.disabled = !(dependent_input.disabled);
+                element.disabled = !element.checked;
             }
     }
 }
@@ -134,7 +134,7 @@ function enableCalInput(element){
     var day = document.getElementById(id_root + "_lstDay");
     var month = document.getElementById(id_root + "_lstMonth");
     var year = document.getElementById(id_root + "_lstYear");
-    day.disabled = !(day.disabled);
-    month.disabled = !(month.disabled);
-    year.disabled = !(year.disabled);
+    day.disabled = !element.checked;
+    month.disabled = !element.checked;
+    year.disabled = !element.checked;
 }

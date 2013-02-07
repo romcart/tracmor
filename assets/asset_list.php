@@ -622,13 +622,27 @@
                 }
                 else {
                     $this->pnlAssetMassEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
-                    $this->UncheckAllItems($this);
+                    //$this->UncheckAllItems($this);
                     $this->dlgMassEdit->ShowDialogBox();
                     $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
                 }
             }
+            // Set properly checked/unchecked items
+            if($this->pnlAssetMassEdit->chkParentAssetCode->Checked){
+                $this->pnlAssetMassEdit->txtParentAssetCode->Enabled = true;
+            }
+            if($this->pnlAssetMassEdit->chkChkLockToParent->Checked){
+                $this->pnlAssetMassEdit->chkLockToParent->Enabled = true;
+            }
+            if($this->pnlAssetMassEdit->chkModel->Checked){
+                $this->pnlAssetMassEdit->lstModel->Enabled = true;
+            }
+            foreach($this->pnlAssetMassEdit->arrCustomFields as $field){
+                if($this->pnlAssetMassEdit->arrCheckboxes[$field['input']->ControlId]->Checked) {
+                    $field['input']->Enabled = true;
+                }
+            }
 
-            // Uncheck all items but SelectAll checkbox
 
         }
 
