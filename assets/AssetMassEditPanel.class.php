@@ -172,6 +172,7 @@ class AssetMassEditPanel extends QPanel {
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        $this->clearWarnings();
         $blnError = false;
         $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
         if(count($this->arrCustomFields)>0)
@@ -316,6 +317,7 @@ class AssetMassEditPanel extends QPanel {
             QApplication::Redirect('');
         }
         $this->arrCustomFieldsToEdit = array();
+        $this->uncheck();
 	}
 
 	// Cancel Button Click Action
@@ -324,5 +326,27 @@ class AssetMassEditPanel extends QPanel {
 		//$this->CloseSelf(true);
 		$this->ParentControl->HideDialogBox();
 	}
+
+    public function uncheck(){
+        $this->chkChkLockToParent->Checked = false;
+        $this->chkParentAssetCode->Checked = false;
+        $this->chkModel->Checked = false;
+        foreach($this->arrCustomFields as $field)
+        {
+            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+        }
+    }
+
+    public function clearWarnings(){
+        $this->lblWarning->Text = '';
+        $this->chkLockToParent->Warning = '';
+        $this->txtParentAssetCode->Warning = '';
+        $this->lstModel->Warning = '';
+        if(count($this->arrCustomFields)>0){
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Warning = '';
+            }
+        }
+    }
 }
 ?>

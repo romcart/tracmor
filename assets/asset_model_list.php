@@ -395,6 +395,7 @@
 			      $this->pnlModelMassEditPanel = new ModelMassEditPanel($this->dlgMassEdit,'pnlModelMassEditPanelCancel_Click',$items);
               }
               $this->dlgMassEdit->ShowDialogBox();
+              $this->UncheckAllItems($this);
 		  }else{
 			  $this->lblWarning->Text = "You haven't chosen any Model to Edit" ;
 		  }
@@ -474,6 +475,13 @@
 				}
 			}
 	  }
+        public function UncheckAllItems($object) {
+            foreach ($object->GetAllControls() as $objControl) {
+                if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+                    $objControl->Checked = false;
+                }
+            }
+        }
 	}
 
 	// Go ahead and run this form object to generate the page and event handlers, using

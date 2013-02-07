@@ -265,6 +265,7 @@ class ReceiptMassEditPanel extends QPanel {
     }
 
     public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        $this->clearWarnings();
         $blnError = false;
         if(count($this->arrCustomFields)>0)
         {
@@ -304,7 +305,7 @@ class ReceiptMassEditPanel extends QPanel {
                 $set[] = sprintf('`to_address_id`="%s"' , $this->lstToAddress->SelectedValue);
             }
             else{
-                $this->lstToContact->Warning = 'Address name must be chosen';
+                $this->lstToAddress->Warning = 'Address name must be chosen';
                 $blnError = true;
             }
         }
@@ -382,6 +383,7 @@ class ReceiptMassEditPanel extends QPanel {
             QApplication::Redirect('');
         }
         $this->arrCustomFieldsToEdit = array();
+        $this->uncheck();
     }
 
 
@@ -390,6 +392,35 @@ class ReceiptMassEditPanel extends QPanel {
         //$this->ParentControl->RemoveChildControls(true);
         //$this->CloseSelf(true);
         $this->ParentControl->HideDialogBox();
+    }
+
+    public function uncheck(){
+
+        $this->chkNote->Checked = false;
+        $this->chkDateReceived->Checked = false;
+        $this->chkToCompany->Checked = false;
+        $this->chkDateDue->Checked = false;
+        $this->chkFromCompany->Checked = false;
+        $this->txtNote->Enabled = false;
+        foreach($this->arrCustomFields as $field)
+        {
+            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+        }
+    }
+
+    public function clearWarnings(){
+        $this->lblWarning = '';
+        $this->calDateReceived->Warning = '';
+        $this->calDateDue->Warning = '';
+        $this->lstToAddress->Warning = '';
+        $this->lstToContact->Warning = '';
+        $this->lstFromCompany->Warning = '';
+        $this->lstFromContact->Warning = '';
+        if(count($this->arrCustomFields)>0){
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Warning = '';
+            }
+        }
     }
 }
 ?>

@@ -297,6 +297,7 @@ class ShipmentMassEditPanel extends QPanel {
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
+        $this->clearWarnings();
         $this->lblWarning->Text = '';
         $blnError = false;
         // Check "Contact To", "Contact From", "Coutrier" wasn't changed for shipped items
@@ -434,6 +435,7 @@ class ShipmentMassEditPanel extends QPanel {
             QApplication::Redirect('');
         }
         $this->arrCustomFieldsToEdit = array();
+        $this->uncheck();
 	}
 
 
@@ -451,5 +453,35 @@ class ShipmentMassEditPanel extends QPanel {
 	public function lstFromCompany_Select(){
 
 	}
+
+    public function uncheck(){
+        $this->chkNote->Checked = false;
+        $this->chkShipDate->Checked = false;
+        $this->chkToCompany->Checked = false;
+        $this->chkCourier->Checked = false;
+        $this->chkFromCompany->Checked = false;
+        $this->txtNote->Enabled = false;
+        foreach($this->arrCustomFields as $field)
+        {
+            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+        }
+    }
+
+    public function clearWarnings(){
+        $this->lblWarning = '';
+        $this->calShipDate->Warning = '';
+        $this->lstCourier->Warning = '';
+        $this->lstToCompany->Warning = '';
+        $this->lstToAddress->Warning = '';
+        $this->lstToContact->Warning = '';
+        $this->lstFromCompany->Warning = '';
+        $this->lstFromContact->Warning = '';
+        $this->lstFromAddress->Warning = '';
+        if(count($this->arrCustomFields)>0){
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Warning = '';
+            }
+        }
+    }
 }
 ?>

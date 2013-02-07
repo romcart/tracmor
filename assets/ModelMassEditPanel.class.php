@@ -199,6 +199,7 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
 
     // Save Button Click Actions
     public function btnSave_Click($strFormId, $strControlId, $strParameter) {
+        $this->clearWarnings();
         $blnError = false;
         if(count($this->arrCustomFields)>0)
         {
@@ -297,11 +298,11 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
             $this->CloseSelf(true);
         }
         $this->arrCustomFieldsToEdit = array();
+        $this->uncheck();
     }
 
     // Cancel Button Click Action
     public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
-
         $this->ParentControl->RemoveChildControls(true);
         $this->CloseSelf(true);
     }
@@ -328,7 +329,31 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         $this->btnApply->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
         $this->btnApply->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSave_Click'));
         $this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+    }
 
+    public function uncheck(){
+        $this->chkShortDescription->Checked = false;
+        $this->chkLongDescription->Checked = false;
+        $this->chkCategory->Checked = false;
+        $this->chkManufacturer->Checked = false;
+        $this->chkImage->Checked = false;
+        foreach($this->arrCustomFields as $field)
+        {
+            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+        }
+    }
+
+    public function clearWarnings(){
+        $this->txtShortDescription->Warning = '';
+        $this->txtLongDescription->Warning = '';
+        $this->lstCategory->Warning = '';
+        $this->lstManufacturer->Warning = '';
+        $this->ifcImage->Warning = '';
+        if(count($this->arrCustomFields)>0){
+            foreach($this->arrCustomFields as $field){
+                $field['input']->Warning = '';
+            }
+        }
     }
 }
 ?>
