@@ -280,12 +280,22 @@ class AssetMassEditPanel extends QPanel {
                  $this->lstModel->Warning = 'Model can\'t be empty';
              }
          }
-         if($this->chkParentAssetCode->Checked && $this->txtParentAssetCode->Text){
-             $set[] = sprintf('`parent_asset_id`="%s"', $this->txtParentAssetCode->Text);
-         }
          if($this->chkChkLockToParent->Checked){
-             $set[] = sprintf('`linked_flag`=%s', $this->chkLockToParent->Checked);
+             $set[] = sprintf('`linked_flag`=%s', $this->chkLockToParent->Checked?1:"NULL");
          }
+         if($this->chkParentAssetCode->Checked){
+
+             $parent_asset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
+             if($parent_asset instanceof Asset){
+                 $parent_asset_id = $parent_asset->AssetId;
+             }
+             else{
+                 $parent_asset_id = "NULL";
+                 $set[] = sprintf('`linked_flag`=%s',"NULL");
+             }
+             $set[] = sprintf('`parent_asset_id`=%s', $parent_asset_id);
+         }
+
         if (!$blnError){
             if (count($this->arrCustomFieldsToEdit)>0 && !$blnError) {
                 // preparing data to edit
@@ -313,6 +323,7 @@ class AssetMassEditPanel extends QPanel {
                          SET ". implode(",",$set). " WHERE `asset_id` IN (%s)",
                         implode(",", $this->arrAssetToEdit));
             $objDatabase = QApplication::$Database[1];
+            //print $strQuery; exit;
             $objDatabase->NonQuery($strQuery);
             QApplication::Redirect('');
         }
@@ -324,6 +335,8 @@ class AssetMassEditPanel extends QPanel {
 	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
 		//$this->ParentControl->RemoveChildControls(true);
 		//$this->CloseSelf(true);
+        $this->clearWarnings();
+        $this->uncheck();
 		$this->ParentControl->HideDialogBox();
 	}
 
