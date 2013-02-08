@@ -86,75 +86,89 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
     public function btnSave_Click($strFormId, $strControlId, $strParameter) {
         $this->clearWarnings();
         $blnError = false;
+        // Get an instance of the database
+        $objDatabase = QApplication::$Database[1];
+        // Begin a MySQL Transaction to be either committed or rolled back
+        $objDatabase->TransactionBegin();
         $strQuery = sprintf("
             UPDATE `company`
             SET `long_description`='%s'
             WHERE `company_id` IN (%s)
         ", $this->txtLongDescription->Text,
             implode(",", $this->arrCompaniesToEdit));
+        try{
+            if(count($this->arrCustomFields)>0)
+            {
+                $customFieldIdArray = array();
 
-        if(count($this->arrCustomFields)>0)
-        {
-            $customFieldIdArray = array();
-
-            foreach ($this->arrCustomFields as $field){
-                if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
-                    if($field['input'] instanceof QTextBox
-                        && $field['input']->Required
-                        && $field['input']->Text == null
-                        ||$field['input'] instanceof QListBox
+                foreach ($this->arrCustomFields as $field){
+                    if($this->arrCheckboxes[$field['input']->strControlId]->Checked){
+                        if($field['input'] instanceof QTextBox
                             && $field['input']->Required
-                            && $field['input']->SelectedValue == null
-                    )
-                    {
-                        $blnError = true;
-                        $field['input']->Warning = "Required.";
-                    }
-                    else
-                    {
-                        $this->arrCustomFieldsToEdit[] = $field;
-                        $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
-                    }
-                }
-            }
-
-            if (count($this->arrCustomFieldsToEdit)>0 && !$blnError) {
-                // preparing data to edit
-                // Save the values from all of the custom field controls to save the asset
-                foreach($this->arrCompaniesToEdit as $intCompanyId){
-                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Company, false);
-                    $selectedCustomFieldsArray = array();
-                    foreach ($objCustomFieldsArray as $objCustomField){
-                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                            && $field['input']->Text == null
+                            ||$field['input'] instanceof QListBox
+                                && $field['input']->Required
+                                && $field['input']->SelectedValue == null
+                        )
                         {
-                            $selectedCustomFieldsArray[]= $objCustomField;
+                            $blnError = true;
+                            $field['input']->Warning = "Required.";
+                        }
+                        else
+                        {
+                            $this->arrCustomFieldsToEdit[] = $field;
+                            $customFieldIdArray[] = (int)(str_replace('cf','',$field['input']->strControlId));
                         }
                     }
-                    CustomField::SaveControls($selectedCustomFieldsArray,
-                                              true,
-                                              $this->arrCustomFieldsToEdit,
-                                              $intCompanyId,
-                                              EntityQtype::Company);
                 }
 
+                    if (count($this->arrCustomFieldsToEdit)>0 && !$blnError) {
+                        // preparing data to edit
+                        // Save the values from all of the custom field controls to save the asset
+                        foreach($this->arrCompaniesToEdit as $intCompanyId){
+                            $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Company, false);
+                            $selectedCustomFieldsArray = array();
+                            foreach ($objCustomFieldsArray as $objCustomField){
+                                if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                                {
+                                    $selectedCustomFieldsArray[]= $objCustomField;
+                                }
+                            }
+                            CustomField::SaveControls($selectedCustomFieldsArray,
+                                                      true,
+                                                      $this->arrCustomFieldsToEdit,
+                                                      $intCompanyId,
+                                                      EntityQtype::Company);
+                        }
+
+                    }
+                    if($this->chkLongDescription->Checked  && !$blnError){
+                        $objDatabase->NonQuery($strQuery);
+                    }
+
+
             }
-            if($this->chkLongDescription->Checked  && !$blnError){
-                $objDatabase = QApplication::$Database[1];
+            else{
                 $objDatabase->NonQuery($strQuery);
             }
+            $objDatabase->TransactionCommit();
         }
-        else{
-            $objDatabase = QApplication::$Database[1];
-            $objDatabase->NonQuery($strQuery);
+        catch(QMySqliDatabaseException $objExc) {
+            $objDatabase->TransactionRollback();
+            throw new QDatabaseException();
         }
+
 
         if(!$blnError){
             $this->ParentControl->RemoveChildControls(true);
             $this->CloseSelf(true);
             QApplication::Redirect('');
         }
-        $this->arrCustomFieldsToEdit = array();
-        $this->uncheck();
+        else{
+            $objDatabase->TransactionRollback();
+            $this->arrCustomFieldsToEdit = array();
+            $this->uncheck();
+        }
 	}
 
 	// Cancel Button Click Action

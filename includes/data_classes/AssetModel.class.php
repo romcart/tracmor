@@ -568,24 +568,22 @@
 		}
 
         public static function DeleteSelected(array $selected){
-            foreach($selected as $intItemId){
-                $objAssetModel = self::Load($intItemId);
-                $objAssetModel->DeleteImageFile();
-                $objAssetModel->Delete();
-//                try {
-//                    // Get an instance of the database
-//                    $objDatabase = QApplication::$Database[1];
-//                    // Begin a MySQL Transaction to be either committed or rolled back
-//                    $objDatabase->TransactionBegin();
-//                    $strImagePath = $objAssetModel->ImagePath;
-//                 //   $objCustomFieldArray = $this->objAssetModel->objCustomFieldArray;
-//                    $objAssetModel->Delete();
-//                    $objDatabase->TransactionCommit();
-//                }
-//                catch (QDatabaseExceptionBase $objExc) {
-//                    $objDatabase->TransactionRollback();
-//                    throw new QDatabaseExceptionBase();
-//                }
+            try {
+                // Get an instance of the database
+                $objDatabase = QApplication::$Database[1];
+                // Begin a MySQL Transaction to be either committed or rolled back
+                $objDatabase->TransactionBegin();
+                foreach($selected as $intItemId){
+                    $objAssetModel = self::Load($intItemId);
+                    $objAssetModel->DeleteImageFile();
+                    $objAssetModel->Delete();
+                }
+
+                $objDatabase->TransactionCommit();
+            }
+            catch (QDatabaseExceptionBase $objExc) {
+                $objDatabase->TransactionRollback();
+                throw new QDatabaseExceptionBase();
             }
         }
 

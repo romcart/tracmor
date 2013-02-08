@@ -298,8 +298,10 @@ class ShipmentMassEditPanel extends QPanel {
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
         $this->clearWarnings();
-        $this->lblWarning->Text = '';
         $blnError = false;
+        $objDatabase = QApplication::$Database[1];
+        // Begin a MySQL Transaction to be either committed or rolled back
+        $objDatabase->TransactionBegin();
         // Check "Contact To", "Contact From", "Coutrier" wasn't changed for shipped items
         if(Shipment::QueryCount(QQ::AndCondition(QQ::Equal(QQN::Shipment()->ShippedFlag, 1),
                  QQ::In(QQN::Shipment()->ShipmentId,$this->arrShipmentToEdit)))>0 &&
@@ -394,48 +396,57 @@ class ShipmentMassEditPanel extends QPanel {
                 }
             }
         }
-        // Edit Transactions
-        foreach($this->arrShipmentToEdit as $intShipmetId){
-            $objTransaction = Transaction::Load(Shipment::Load($intShipmetId)->Transaction->TransactionId);
-            $objTransaction->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
-            if($this->chkNote->Checked){
-                $objTransaction->Note = $this->txtNote->Text;
-            }
-            $objTransaction->Save();
-        }
         // Apdate main table
         if(!$blnError){
-            if (count($this->arrCustomFieldsToEdit)>0) {
-                // preparing data to edit
-                // Save the values from all of the custom field controls to save the asset
-                foreach($this->arrShipmentToEdit as $intShipmentId){
-                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Shipment, false);
-                    $selectedCustomFieldsArray = array();
-                    foreach ($objCustomFieldsArray as $objCustomField){
-                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
-                        {
-                            $selectedCustomFieldsArray[]= $objCustomField;
-                        }
+            try{
+                // Edit Transactions
+                foreach($this->arrShipmentToEdit as $intShipmetId){
+                    $objTransaction = Transaction::Load(Shipment::Load($intShipmetId)->Transaction->TransactionId);
+                    $objTransaction->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
+                    if($this->chkNote->Checked){
+                        $objTransaction->Note = $this->txtNote->Text;
                     }
-                    CustomField::SaveControls($selectedCustomFieldsArray,
-                        true,
-                        $this->arrCustomFieldsToEdit,
-                        $intShipmentId,
-                        EntityQtype::Shipment);
+                    $objTransaction->Save();
                 }
-            }
+                if (count($this->arrCustomFieldsToEdit)>0) {
+                    // preparing data to edit
+                    // Save the values from all of the custom field controls to save the asset
+                    foreach($this->arrShipmentToEdit as $intShipmentId){
+                        $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Shipment, false);
+                        $selectedCustomFieldsArray = array();
+                        foreach ($objCustomFieldsArray as $objCustomField){
+                            if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                            {
+                                $selectedCustomFieldsArray[]= $objCustomField;
+                            }
+                        }
+                        CustomField::SaveControls($selectedCustomFieldsArray,
+                            true,
+                            $this->arrCustomFieldsToEdit,
+                            $intShipmentId,
+                            EntityQtype::Shipment);
+                    }
+                }
 
-            $strQuery = sprintf("UPDATE `shipment`
-                                 SET ". implode(",",$set). "
-                                 WHERE `shipment_id` IN (%s)",
-                                 implode(",", $this->arrShipmentToEdit));
-            $objDatabase = QApplication::$Database[1];
-            $objDatabase->NonQuery($strQuery);
-            $this->ParentControl->HideDialogBox();
-            QApplication::Redirect('');
+                $strQuery = sprintf("UPDATE `shipment`
+                                     SET ". implode(",",$set). "
+                                     WHERE `shipment_id` IN (%s)",
+                                     implode(",", $this->arrShipmentToEdit));
+                $objDatabase->NonQuery($strQuery);
+                $objDatabase->TransactionCommit();
+                $this->ParentControl->HideDialogBox();
+                QApplication::Redirect('');
+            }
+            catch(QMySqliDatabaseException $objExc) {
+                $objDatabase->TransactionRollback();
+                throw new QDatabaseException();
+            }
         }
-        $this->arrCustomFieldsToEdit = array();
-        $this->uncheck();
+        else{
+            $objDatabase->TransactionRollback();
+            $this->arrCustomFieldsToEdit = array();
+            $this->uncheck();
+        }
 	}
 
 

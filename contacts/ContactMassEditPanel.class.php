@@ -106,6 +106,10 @@ class ContactMassEditPanel extends ContactEditPanel {
     public function btnMassEditApply_Click($strFormId, $strControlId, $strParameter) {
         $this->clearWarnings();
         $blnError = false;
+        // Get an instance of the database
+        $objDatabase = QApplication::$Database[1];
+        // Begin a MySQL Transaction to be either committed or rolled back
+        $objDatabase->TransactionBegin();
         $set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
         if($this->chkDescription->Checked)
         {
@@ -160,31 +164,40 @@ class ContactMassEditPanel extends ContactEditPanel {
         // Transaction
         if(!$blnError)
         {
-            if (count($this->arrCustomFieldsToEdit)>0) {
-                // preparing data to edit
-                foreach($this->arrContactToEdit as $intContactId){
-                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Contact, false);
-                    $selectedCustomFieldsArray = array();
-                    foreach ($objCustomFieldsArray as $objCustomField){
-                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
-                        {
-                            $selectedCustomFieldsArray[]= $objCustomField;
+            try{
+                if (count($this->arrCustomFieldsToEdit)>0) {
+                    // preparing data to edit
+                    foreach($this->arrContactToEdit as $intContactId){
+                        $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Contact, false);
+                        $selectedCustomFieldsArray = array();
+                        foreach ($objCustomFieldsArray as $objCustomField){
+                            if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                            {
+                                $selectedCustomFieldsArray[]= $objCustomField;
+                            }
                         }
+                        CustomField::SaveControls($selectedCustomFieldsArray,
+                            true,
+                            $this->arrCustomFieldsToEdit,
+                            $intContactId,
+                            EntityQtype::Contact);
                     }
-                    CustomField::SaveControls($selectedCustomFieldsArray,
-                        true,
-                        $this->arrCustomFieldsToEdit,
-                        $intContactId,
-                        EntityQtype::Contact);
                 }
+                //print $strQuery; exit;
+                $objDatabase->NonQuery($strQuery);
+                $objDatabase->TransactionCommit();
+                QApplication::Redirect('');
             }
-            //print $strQuery; exit;
-            $objDatabase = QApplication::$Database[1];
-            $objDatabase->NonQuery($strQuery);
-            QApplication::Redirect('');
+            catch(QMySqliDatabaseException $objExc) {
+                $objDatabase->TransactionRollback();
+                throw new QDatabaseException();
+            }
         }
-        $this->arrCustomFieldsToEdit = array();
-        $this->uncheck();
+        else{
+            $objDatabase->TransactionRollback();
+            $this->arrCustomFieldsToEdit = array();
+            $this->uncheck();
+        }
     }
 
     protected function btnMassEditApply_Create(){

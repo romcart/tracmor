@@ -176,6 +176,10 @@ class InventoryMassEditPanel extends QPanel {
 	public function btnApply_Click($strFormId, $strControlId, $strParameter){
         $this->clearWarnings();
         $blnError = false;
+        // Get an instance of the database
+        $objDatabase = QApplication::$Database[1];
+        // Begin a MySQL Transaction to be either committed or rolled back
+        $objDatabase->TransactionBegin();
         if(count($this->arrCustomFields)>0)
         {
             $customFieldIdArray = array();
@@ -235,37 +239,46 @@ class InventoryMassEditPanel extends QPanel {
         // Save
         if(!$blnError)
         {
-            if (count($this->arrCustomFieldsToEdit)>0) {
-                // preparing data to edit
-                // Save the values from all of the custom field controls to save the asset
-                foreach($this->arrInventoryToEdit as $intInventoryId){
-                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Inventory, false);
-                    $selectedCustomFieldsArray = array();
-                    foreach ($objCustomFieldsArray as $objCustomField){
-                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
-                        {
-                            $selectedCustomFieldsArray[]= $objCustomField;
+            try{
+                if (count($this->arrCustomFieldsToEdit)>0) {
+                    // preparing data to edit
+                    // Save the values from all of the custom field controls to save the asset
+                    foreach($this->arrInventoryToEdit as $intInventoryId){
+                        $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Inventory, false);
+                        $selectedCustomFieldsArray = array();
+                        foreach ($objCustomFieldsArray as $objCustomField){
+                            if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                            {
+                                $selectedCustomFieldsArray[]= $objCustomField;
+                            }
                         }
+                        CustomField::SaveControls($selectedCustomFieldsArray,
+                            true,
+                            $this->arrCustomFieldsToEdit,
+                            $intInventoryId,
+                            EntityQtype::Inventory);
                     }
-                    CustomField::SaveControls($selectedCustomFieldsArray,
-                        true,
-                        $this->arrCustomFieldsToEdit,
-                        $intInventoryId,
-                        EntityQtype::Inventory);
                 }
+                $strQuery = sprintf("UPDATE `inventory_model`
+                                     SET ". implode(",",$set). "
+                                     WHERE `inventory_model_id` IN (%s)",
+                                     implode(",", $this->arrInventoryToEdit));
+
+                $objDatabase = QApplication::$Database[1];
+                $objDatabase->NonQuery($strQuery);
+                $objDatabase->TransactionCommit();
+                QApplication::Redirect('');
             }
-            $strQuery = sprintf("UPDATE `inventory_model`
-                                 SET ". implode(",",$set). "
-                                 WHERE `inventory_model_id` IN (%s)",
-                                 implode(",", $this->arrInventoryToEdit));
-
-            $objDatabase = QApplication::$Database[1];
-            $objDatabase->NonQuery($strQuery);
-            QApplication::Redirect('');
+            catch(QMySqliDatabaseException $objExc) {
+                $objDatabase->TransactionRollback();
+                throw new QDatabaseException();
+            }
         }
-        $this->uncheck();
-
-        $this->arrCustomFieldsToEdit = array();
+        else{
+            $objDatabase->TransactionRollback();
+            $this->uncheck();
+            $this->arrCustomFieldsToEdit = array();
+        }
 	}
 
 

@@ -267,6 +267,10 @@ class ReceiptMassEditPanel extends QPanel {
     public function btnApply_Click($strFormId, $strControlId, $strParameter){
         $this->clearWarnings();
         $blnError = false;
+        // Get an instance of the database
+        $objDatabase = QApplication::$Database[1];
+        // Begin a MySQL Transaction to be either committed or rolled back
+        $objDatabase->TransactionBegin();
         if(count($this->arrCustomFields)>0)
         {
             $customFieldIdArray = array();
@@ -342,48 +346,59 @@ class ReceiptMassEditPanel extends QPanel {
         if($this->chkDateDue->Checked && $this->calDateDue->DateTime){
             $set[] = sprintf('`due_date`="%s"' ,$this->calDateDue->DateTime->__toString('YYYY-MM-DD'));
         }
-        // Modifying transactions
-        foreach($this->arrReceiptToEdit as $intReceiptId){
-            $objTransaction = Transaction::Load(Receipt::Load($intReceiptId)->Transaction->TransactionId);
-            $objTransaction->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
-            if($this->chkNote->Checked){
-                $objTransaction->Note = $this->txtNote->Text;
-            }
-            $objTransaction->Save();
-        }
-        if(!$blnError){
-            if (count($this->arrCustomFieldsToEdit)>0) {
-                // Save the values from all of the custom field controls to save the asset
-                foreach($this->arrReceiptToEdit as $intReceiptId){
-                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Receipt, false);
-                    $selectedCustomFieldsArray = array();
-                    foreach ($objCustomFieldsArray as $objCustomField){
-                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
-                        {
-                            $selectedCustomFieldsArray[]= $objCustomField;
-                        }
-                    }
-                    CustomField::SaveControls($selectedCustomFieldsArray,
-                        true,
-                        $this->arrCustomFieldsToEdit,
-                        $intReceiptId,
-                        EntityQtype::Receipt);
-                }
-                $this->arrCustomFieldsToEdit = array();
-            }
-            // Update Transaction
-            // Update main table
-            $strQuery = sprintf("UPDATE `receipt`
-				                 SET ". implode(",",$set). "
-				                 WHERE `receipt_id` IN (%s)",
-                implode(",", $this->arrReceiptToEdit));
 
-            $objDatabase = QApplication::$Database[1];
-            $objDatabase->NonQuery($strQuery);
-            QApplication::Redirect('');
+        if(!$blnError){
+            try{
+                // Modifying transactions
+                foreach($this->arrReceiptToEdit as $intReceiptId){
+                    $objTransaction = Transaction::Load(Receipt::Load($intReceiptId)->Transaction->TransactionId);
+                    $objTransaction->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
+                    if($this->chkNote->Checked){
+                        $objTransaction->Note = $this->txtNote->Text;
+                    }
+                    $objTransaction->Save();
+                }
+                if (count($this->arrCustomFieldsToEdit)>0) {
+
+                    // Save the values from all of the custom field controls to save the asset
+                    foreach($this->arrReceiptToEdit as $intReceiptId){
+                        $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Receipt, false);
+                        $selectedCustomFieldsArray = array();
+                        foreach ($objCustomFieldsArray as $objCustomField){
+                            if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                            {
+                                $selectedCustomFieldsArray[]= $objCustomField;
+                            }
+                        }
+                        CustomField::SaveControls($selectedCustomFieldsArray,
+                            true,
+                            $this->arrCustomFieldsToEdit,
+                            $intReceiptId,
+                            EntityQtype::Receipt);
+                    }
+                    $this->arrCustomFieldsToEdit = array();
+                }
+                // Update Transaction
+                // Update main table
+                $strQuery = sprintf("UPDATE `receipt`
+                                     SET ". implode(",",$set). "
+                                     WHERE `receipt_id` IN (%s)",
+                    implode(",", $this->arrReceiptToEdit));
+
+                $objDatabase->NonQuery($strQuery);
+                $objDatabase->TransactionCommit();
+                QApplication::Redirect('');
+            }
+            catch(QMySqliDatabaseException $objExc) {
+                $objDatabase->TransactionRollback();
+                throw new QDatabaseException();
+            }
         }
-        $this->arrCustomFieldsToEdit = array();
-        $this->uncheck();
+        else{
+            $objDatabase->TransactionRollback();
+            $this->arrCustomFieldsToEdit = array();
+            $this->uncheck();
+        }
     }
 
 

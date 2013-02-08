@@ -201,6 +201,11 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
     public function btnSave_Click($strFormId, $strControlId, $strParameter) {
         $this->clearWarnings();
         $blnError = false;
+        // Get an instance of the database
+        $objDatabase = QApplication::$Database[1];
+        // Begin a MySQL Transaction to be either committed or rolled back
+        $objDatabase->TransactionBegin();
+
         if(count($this->arrCustomFields)>0)
         {
             $customFieldIdArray = array();
@@ -268,37 +273,46 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
             }
         }
         if(!$blnError){
-            if (count($this->arrCustomFieldsToEdit)>0) {
-                // preparing data to edit
-                // Save the values from all of the custom field controls to save the asset
-                foreach($this->arrModelsToEdit as $intModelId){
-                    $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::AssetModel, false);
-                    $selectedCustomFieldsArray = array();
-                    foreach ($objCustomFieldsArray as $objCustomField){
-                        if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
-                        {
-                            $selectedCustomFieldsArray[]= $objCustomField;
+            try{
+                if (count($this->arrCustomFieldsToEdit)>0) {
+                    // preparing data to edit
+                    // Save the values from all of the custom field controls to save the asset
+                    foreach($this->arrModelsToEdit as $intModelId){
+                        $objCustomFieldsArray = CustomField::LoadObjCustomFieldArray(EntityQtype::AssetModel, false);
+                        $selectedCustomFieldsArray = array();
+                        foreach ($objCustomFieldsArray as $objCustomField){
+                            if(in_array($objCustomField->CustomFieldId,$customFieldIdArray))
+                            {
+                                $selectedCustomFieldsArray[]= $objCustomField;
+                            }
                         }
+                        CustomField::SaveControls($selectedCustomFieldsArray,
+                            true,
+                            $this->arrCustomFieldsToEdit,
+                            $intModelId,
+                            EntityQtype::AssetModel);
                     }
-                    CustomField::SaveControls($selectedCustomFieldsArray,
-                        true,
-                        $this->arrCustomFieldsToEdit,
-                        $intModelId,
-                        EntityQtype::AssetModel);
                 }
-            }
-            $strQuery = sprintf("UPDATE `asset_model`
-                                 SET ". implode(",",$set). "
-                                 WHERE `asset_model_id` IN (%s)",
-                                implode(",", $this->arrModelsToEdit));
+                $strQuery = sprintf("UPDATE `asset_model`
+                                     SET ". implode(",",$set). "
+                                     WHERE `asset_model_id` IN (%s)",
+                                    implode(",", $this->arrModelsToEdit));
 
-            $objDatabase = QApplication::$Database[1];
-            $objDatabase->NonQuery($strQuery);
-            //$this->ParentControl->RemoveChildControls(true);
-            $this->CloseSelf(true);
+                $objDatabase->NonQuery($strQuery);
+                $objDatabase->TransactionCommit();
+                //$this->ParentControl->RemoveChildControls(true);
+                $this->CloseSelf(true);
+            }
+            catch(QMySqliDatabaseException $objExc) {
+                $objDatabase->TransactionRollback();
+                throw new QDatabaseException();
+            }
         }
-        $this->arrCustomFieldsToEdit = array();
-        $this->uncheck();
+        else{
+            $objDatabase->TransactionRollback();
+            $this->arrCustomFieldsToEdit = array();
+            $this->uncheck();
+        }
     }
 
     // Cancel Button Click Action

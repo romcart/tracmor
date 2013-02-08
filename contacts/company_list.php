@@ -495,14 +495,24 @@
 					}
 					else{
 						if (count($this->arrToDelete)>0){
-							foreach ($this->arrToDelete as $intCompanyId){
-								Company::Load($intCompanyId)->Delete();
-							}
-							$this->arrToDelete = array();
-							QApplication::Redirect('');
+                            try{
+                                // Get an instance of the database
+                                $objDatabase = QApplication::$Database[1];
+                                // Begin a MySQL Transaction to be either committed or rolled back
+                                $objDatabase->TransactionBegin();
+                                foreach ($this->arrToDelete as $intCompanyId){
+                                    Company::Load($intCompanyId)->Delete();
+                                }
+                                $objDatabase->TransactionCommit();
+                                $this->arrToDelete = array();
+                                QApplication::Redirect('');
+                            }
+                            catch(QMySqliDatabaseException $objExc) {
+                                $objDatabase->TransactionRollback();
+                                throw new QDatabaseException();
+                            }
 						}
 					}
-
 					//	print_r(get_class_methods(get_class($this->dlgDelete)));exit;//$this->dlgDelete->ShowDialogBox() ;
 				}
 			}
