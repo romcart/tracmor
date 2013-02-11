@@ -26,7 +26,7 @@ class ShipmentMassEditPanel extends QPanel {
 	// Inputs for can be Edited
 	// public $txtLongDescription;
     protected $objCompanyArray;
-
+    protected $objCustomFieldArray;
 	public $arrShipmentToEdit = array();
     public $arrCheckboxes = array();
     public $arrCustomFields;
@@ -96,9 +96,9 @@ class ShipmentMassEditPanel extends QPanel {
 		$this->txtNote->Enabled = false;
 
         // Load Custom Fields
-        $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Shipment, false);
-        if($objCustomFieldArray){
-            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
+        $this->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Shipment, false);
+        if($this->objCustomFieldArray){
+            $this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objCustomFieldArray, false, $this, true, true, false);
 
             foreach($this->arrCustomFields as $field){
                 $field['input']->Enabled = false;
@@ -454,7 +454,8 @@ class ShipmentMassEditPanel extends QPanel {
 	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
 		//$this->ParentControl->RemoveChildControls(true);
 		//$this->CloseSelf(true);
-		$this->ParentControl->HideDialogBox();
+        $this->ParentControl->HideDialogBox();
+        QApplication::Redirect('');
 	}
 
 	public function lstToCompany_Select(){
@@ -479,7 +480,7 @@ class ShipmentMassEditPanel extends QPanel {
     }
 
     public function clearWarnings(){
-        $this->lblWarning = '';
+        $this->lblWarning->Text = '';
         $this->calShipDate->Warning = '';
         $this->lstCourier->Warning = '';
         $this->lstToCompany->Warning = '';

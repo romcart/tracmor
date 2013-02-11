@@ -349,9 +349,8 @@ class AssetMassEditPanel extends QPanel {
 	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
 		//$this->ParentControl->RemoveChildControls(true);
 		//$this->CloseSelf(true);
-        $this->clearWarnings();
-        $this->uncheck();
 		$this->ParentControl->HideDialogBox();
+        QApplication::Redirect('');
 	}
 
     public function uncheck(){

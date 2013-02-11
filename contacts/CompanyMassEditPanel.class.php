@@ -175,6 +175,7 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
 	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
 		$this->ParentControl->RemoveChildControls(true);
 		$this->CloseSelf(true);
+        QApplication::Redirect('');
 	}
     public function uncheck(){
         $this->chkLongDescription->Checked = false;

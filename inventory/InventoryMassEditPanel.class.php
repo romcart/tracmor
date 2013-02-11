@@ -287,6 +287,7 @@ class InventoryMassEditPanel extends QPanel {
 		//$this->ParentControl->RemoveChildControls(true);
 		//$this->CloseSelf(true);
 		$this->ParentControl->HideDialogBox();
+        QApplication::Redirect('');
 	}
 
     public function uncheck(){

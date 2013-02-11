@@ -319,6 +319,7 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
     public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
         $this->ParentControl->RemoveChildControls(true);
         $this->CloseSelf(true);
+        QApplication::Redirect('');
     }
     //Set display logic for the CustomFields
     protected function UpdateCustomFields(){

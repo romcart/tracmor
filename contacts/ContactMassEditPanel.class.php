@@ -219,6 +219,7 @@ class ContactMassEditPanel extends ContactEditPanel {
     // Cancel Button Click Action
     public function btnMassEditCancel_Click($strFormId, $strControlId, $strParameter) {
         $this->ParentControl->HideDialogBox();
+        QApplication::Redirect('');
     }
 
     public function uncheck(){
