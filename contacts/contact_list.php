@@ -431,8 +431,19 @@
 					}
 				}
 				if(count($arrToBeSkipped)>0){
+                    if(count($arrToBeSkipped)==1){
+                        $toBe = 'is';
+                        $ending = '';
+                    }
+                    else{
+                        $toBe = 'are';
+                        $ending = 's';
+                    }
 					// Show dialog box "There are {number} {entity_type}s that are not able to be deleted. Would you like to continue the deletion process, skipping these items?"
-					$this->dlgDelete->Text =sprintf("There are %s contacts that are not able to be deleted.Would you like to continue the deletion process, skipping these items?<br />",implode(",",$arrToBeSkipped));
+					$this->dlgDelete->Text =sprintf("There %s %s contact%s that %s not able to be deleted.
+					                                 Would you like to continue the deletion process,
+					                                 skipping these item%s?<br />",
+                                                     $toBe,count($arrToBeSkipped),$ending,$toBe,$ending);
 					$this->dlgDelete->ShowDialogBox();
 				}
 				else{

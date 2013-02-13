@@ -372,7 +372,18 @@
                   }
               }
               if (count($arrToSkip)>0){
-                  $this->dlgMassDelete->Text =sprintf("There are %s Models that are not able to be deleted. Would you like to continue the deletion process, skipping these items?<br />",implode(",",$arrToSkip));
+                  if(count($arrToSkip)==1){
+                      $toBe = 'is';
+                      $ending = '';
+                  }
+                  else{
+                      $toBe = 'are';
+                      $ending = 's';
+                  }
+                  $this->dlgMassDelete->Text =sprintf("There %s %s Model%s that %s not able to be deleted.
+                                                       Would you like to continue the deletion process,
+                                                       skipping these item%s?<br />",
+                                                       $toBe,count($arrToSkip),$ending,$toBe,$ending);
                   $this->dlgMassDelete->ShowDialogBox();
               }
               else{
@@ -394,6 +405,9 @@
               if(!$this->pnlModelMassEditPanel instanceof ModelMassEditPanel){
 			      $this->pnlModelMassEditPanel = new ModelMassEditPanel($this->dlgMassEdit,'pnlModelMassEditPanelCancel_Click',$items);
               }
+              else{
+                  $this->pnlModelMassEditPanel->setItems($items);
+              }
               $this->dlgMassEdit->ShowDialogBox();
               $this->UncheckAllItems($this);
 		  }else{
@@ -402,7 +416,6 @@
 	  }
 
 	  public function pnlModelMassEditPanelCancel_Click(){
-		  // TODO uncheck selected in DataGrid
 		  $this->dlgMassEdit->HideDialogBox();
 	  }
 

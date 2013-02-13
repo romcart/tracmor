@@ -106,12 +106,17 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         }
 
 
+
         $this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
 
         $this->strOverflow = QOverflow::Auto;
         // Modify Code Generated Controls
        // $this->btnSave->RemoveAllActions('onclick');
         $this->btnSave->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
+    }
+
+    public function setItems($arrayModelId){
+        $this->arrModelsToEdit = $arrayModelId;
     }
 
     // Create and Setup lstCategory with alphabetic ordering
@@ -233,14 +238,23 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
             // Retrieve the extension (.jpg, .gif) from the filename
             $explosion = explode(".", $this->ifcImage->FileName);
             // Set the file name to ID_asset_model.ext
-            $this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix, $this->objAssetModel->AssetModelId, $this->ifcImage->Suffix, $explosion[1]);
-            // Set the image path for saving the asset model
-            $this->txtImagePath->Text = $this->ifcImage->FileName;
-            // Upload the file to the server
-            $this->ifcImage->ProcessUpload();
+            $blnOnceUploaded = false;
+            foreach($this->arrModelsToEdit as $AssetModelId){
+                $this->ifcImage->FileName = sprintf('%s%s%s.%s', $this->ifcImage->Prefix,
+                                                    $AssetModelId, $this->ifcImage->Suffix, $explosion[1]);
+                if(!$blnOnceUploaded){
+                    $blnOnceUploaded = true;
+                    $upoadedFile = $this->ifcImage->ProcessUpload();
+                }
+                else{
+                    $this->ifcImage->CopyUploaded($upoadedFile, $this->ifcImage->FileName);
+                }
+
+            }
 
             // Save the image path information to the AssetModel object
-            $set[] = sprintf('`image_path`="%s"',$this->txtImagePath->Text);
+            $set[] = sprintf('`image_path`= CONCAT("%s" , %s , "%s")',$this->ifcImage->Prefix, '`asset_model_id`',
+                                                   sprintf('%s.%s', $this->ifcImage->Suffix, $explosion[1]));
         }
         if($this->chkShortDescription->Checked){
             if(trim($this->txtShortDescription->Text)!== ''){
@@ -298,8 +312,10 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
                                      WHERE `asset_model_id` IN (%s)",
                                     implode(",", $this->arrModelsToEdit));
 
+                // print $strQuery; exit;
                 $objDatabase->NonQuery($strQuery);
                 $objDatabase->TransactionCommit();
+                $this->uncheck();
                 //$this->ParentControl->RemoveChildControls(true);
                 $this->CloseSelf(true);
             }

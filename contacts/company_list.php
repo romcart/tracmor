@@ -489,8 +489,22 @@
 						}
 					}
 					if(count($arrToBeSkipped)>0){
+                        if(count($arrToBeSkipped)==1){
+                            $toBe = 'is';
+                            $ending1 = 'y';
+                            $ending2 = '';
+
+                        }
+                        else{
+                            $toBe = 'are';
+                            $ending1 = 'ies';
+                            $ending2 = 's';
+                        }
 						// Show dialog box "There are {number} {entity_type}s that are not able to be deleted. Would you like to continue the deletion process, skipping these items?"
-						$this->dlgMassDelete->Text =sprintf("There are %s companies that are not able to be deleted. Would you like to continue the deletion process, skipping these items?<br />",implode(",",$arrToBeSkipped));
+						$this->dlgMassDelete->Text =sprintf("There %s %s compan%s that %s not able to be deleted.
+						                                     Would you like to continue the deletion process,
+						                                     skipping these item%s?<br />",
+                                                             $toBe, count($arrToBeSkipped), $ending1, $toBe, $ending2);
 						$this->dlgMassDelete->ShowDialogBox();
 					}
 					else{

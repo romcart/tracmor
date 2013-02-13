@@ -93,7 +93,29 @@
 					}
 				}
 			}
+            return $this->strUploadPath.$this->strFileName;
 		}
+
+        public function CopyUploaded($file,$strFileName) {
+            copy($file,$this->strUploadPath.$strFileName) ;
+
+            if ($this->boolBuildThumbs) {
+                $this->CreateThumbnail(  $this->strUploadPath.$strFileName,
+                    $this->strThumbUploadPath.$this->strThumbPrefix.$strFileName,
+                    $this->intThumbWidth,
+                    $this->intThumbHeight,
+                    $this->intThumbQuality);
+            }
+
+            if (AWS_S3) {
+                QApplication::MoveToS3($this->strUploadPath, $strFileName, $this->strType, '/images/asset_models');
+                if ($this->boolBuildThumbs) {
+                    if (file_exists($this->strThumbUploadPath.$strFileName)) {
+                        QApplication::MoveToS3($this->strThumbUploadPath, $strFileName, $this->strType, '/images/asset_models/thumbs');
+                    }
+                }
+            }
+        }
 	
 		/**
 		 * Creates a thumbnail of the image passed and saves it to $thumbnail
@@ -257,7 +279,7 @@
 					}
 			}
 		}
-	
+
 	/////////////////////////
 	// Public Properties: SET
 	/////////////////////////
