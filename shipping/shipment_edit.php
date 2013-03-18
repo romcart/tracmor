@@ -2240,7 +2240,7 @@
 					// Check to see if that InventoryLocation has some quantity scheduled for shipment
 					// If so, make sure that there is enough inventory available to add the new quantity.
 					// This can be made faster by making a more targeted SQL query
-					else {
+					/*else {
 						$objExpansionMap[InventoryTransaction::ExpandTransaction] = true;
 						$objInventoryTransactionArray = InventoryTransaction::LoadArrayByInventoryLocationId($objNewInventoryLocation->InventoryLocationId, null, null, $objExpansionMap);
 						if ($objInventoryTransactionArray) {
@@ -2248,17 +2248,7 @@
 							foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
 								// If there is a pending shipment
 								if ($objInventoryTransaction->Transaction->TransactionTypeId == 6) {
-/*
-									QCodo Beta3 is not generating a LoadArrayByTransactionId method anymore. Instead, it generates LoadByTransactionId.
-									That is actually better, so we will use that from now on.
-									$objShipmentArray = Shipment::LoadArrayByTransactionId($objInventoryTransaction->TransactionId);
-									if ($objShipmentArray) {
-										foreach ($objShipmentArray as $objShipment) {
-											if (!$objShipment->ShippedFlag) {
-												$intQuantityScheduled += $objInventoryTransaction->Quantity;
-											}
-										}
-									}*/
+
 									$objShipment = Shipment::LoadByTransactionId($objInventoryTransaction->TransactionId);
 									if ($objShipment && !$objShipment->ShippedFlag) {
 										$intQuantityScheduled += $objInventoryTransaction->Quantity;
@@ -2270,7 +2260,7 @@
 								$this->txtNewInventoryModelCode->Warning = sprintf("That inventory has %s units already scheduled for shipment. Not enough available inventory.", $intQuantityScheduled);
 							}
 						}
-					}
+					}*/
 					$this->dtgInventoryTransact->Refresh();
 				}
 			}
