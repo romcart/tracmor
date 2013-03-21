@@ -208,9 +208,11 @@ class DepreciationListForm extends QForm {
                                                          'Total Purchase Cost' => $this->totals[1],
                                                          'Total Book Value'    => ($this->totals[1]-$this->totals[0])));
                 $this->dtrDepreciation->SetDataBinder('dtrDepreciation_Bind');
-                print $this->getTitle();
-                print $this->dtrDepreciation->GetReportHtml();
-                QApplication::ExecuteJavaScript("reportWindow=window;newWindow = window.open('../reports/depreciation_report.php');reportWindow.focus;");
+                //print $this->getTitle();
+                //print $this->dtrDepreciation->GetReportHtml();
+                $content = str_replace("'",'"',$this->dtrDepreciation->GetReportHtml());
+                $content = preg_replace('/^\s+|\n|\r|\s+$/m', '',$content);
+                QApplication::ExecuteJavaScript("var w = window.open('../reports/depreciation_report.php');var d = w.document.open();d.write('".$content."');window.history.back(-1)");
                 exit;
             }
             else{
