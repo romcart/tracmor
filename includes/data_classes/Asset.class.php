@@ -73,7 +73,16 @@
             }
             else{
             $fltBookValue =	$this->PurchaseCost - $this->getCurrentDepreciation();
-            return round($fltBookValue,2);
+            return money_format('%i' ,round($fltBookValue,2));
+            }
+        }
+
+        public function getPurchaseCost(){
+            if (!$this->DepreciationFlag){
+                return null;
+            }
+            else{
+                return money_format('%i' ,round($this->PurchaseCost,2));
             }
         }
 

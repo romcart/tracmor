@@ -155,7 +155,7 @@ class QAssetSearchComposite extends QControl {
 				'SortByCommand="asset__asset_model_id__depreciation_class_id__short_description ASC"',
 				'ReverseSortByCommand="asset__asset_model_id__depreciation_class_id__short_description DESC"',
 				'CssClass="dtg_column"'));
-			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Cost','<?= $_ITEM->PurchaseCost ?>','SortByCommand="purchase_cost ASC"','ReverseSortByCommand="purchase_cost DESC"', 'CssClass="dtg_column"'));
+			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Cost','<?= $_ITEM->getPurchaseCost() ?>','SortByCommand="purchase_cost ASC"','ReverseSortByCommand="purchase_cost DESC"', 'CssClass="dtg_column"'));
 			$this->dtgAsset->addColumn(new QDataGridColumnExt('Purchase Date','<?= $_ITEM->PurchaseDate ?>','SortByCommand="purchase_date ASC"','ReverseSortByCommand="purchase_date DESC"', 'CssClass="dtg_column"'));
             $this->dtgAsset->addColumn(new QDataGridColumnExt('Book Value','<?= $_ITEM->getBookValue() ?>', 'CssClass="dtg_column"'));
         }
