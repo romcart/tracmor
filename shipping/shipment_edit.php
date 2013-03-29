@@ -50,9 +50,6 @@
 		// Shortcut Menu
 		protected $ctlShortcutMenu;
 
-		// Qpanel
-//		protected $pnlFedExShipment;
-
 		// Booleans
 		protected $blnModifyAssets = false;
 		protected $blnModifyInventory = false;
@@ -140,8 +137,7 @@
 		protected $objTransaction;
 		protected $dttNow;
 		protected $dttFiveDaysFromNow;
-		//protected $objFedexShipment;
-    protected $receiveInternalShipmentTransaction;
+    	protected $receiveInternalShipmentTransaction;
 
 		// Integers
 		protected $intNewTempId = 1;
@@ -166,13 +162,6 @@
 			// Call SetupShipment to either Load/Edit Existing or Create New
 			$this->SetupShipment();
 
-			// If the courier is FedEx, load the FedexShipment object
-			//if ($this->blnEditMode) {
-			//	if ($this->objShipment->CourierId === 1) {
-			//		$this->objFedexShipment = FedexShipment::LoadByShipmentId($this->objShipment->ShipmentId);
-			//	}
-			//}
-
 			$this->objCompanyArray = Company::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Company()->ShortDescription)));
 
 			// Create the Header Menu
@@ -180,21 +169,19 @@
 			// Create the Shortcut Menu
 			$this->ctlShortcutMenu_Create();
 
-			// FedEx Shipment Panel
-			// $this->pnlFedExShipment_Create();
-
 			// Packing List Link
 			$this->lblPackingListLink_Create();
-//			$this->lblFedexShippingLabelLink_Create();
 
 			// Shipping Labels
 			$this->lblShipmentNumber_Create();
 			$this->lblHeaderShipment_Create();
 
+			$this->lstToCompany_Create();
+			$this->lstToContact_Create();
+			$this->lstToAddress_Create();
             $this->lblNewToCompany_Create();
             $this->lblNewToContact_Create();
             $this->lblNewToAddress_Create();
-			// $this->lblHeaderCompleteShipment_Create();
 			$this->lblShipDate_Create();
 			$this->lblFromCompany_Create();
 			$this->lblFromContact_Create();
@@ -218,10 +205,7 @@
 			$this->lblNewFromContact_Create();
 			$this->lstFromAddress_Create();
 			$this->lblNewFromAddress_Create();
-			$this->lstToCompany_Create();
-
-			$this->lstToContact_Create();
-			$this->lstToAddress_Create();
+			
 			if (QApplication::$TracmorSettings->CustomShipmentNumbers) {
 				$this->txtShipmentNumber_Create();
 			}
@@ -620,22 +604,6 @@
 			//$this->lblAdvanced->TabIndex = 29;
 		}
 
-		// Create and Setup lblSenderLabel
-		//protected function lblSenderLabel_Create() {
-		//	$this->lblSenderLabel = new QLabel($this->pnlFedExShipment);
-		//	$this->lblSenderLabel->Name = 'Sender';
-			//if ($this->blnEditMode && $this->objFedexShipment) {
-			//	if ($this->objFedexShipment->PayType === 1) {
-			//		$this->lblSenderLabel->Text = 'Sender Account';
-			//	} else {
-			//		$this->lblSenderLabel->Text = 'Recipient/third party<br>account';
-			//	}
-			//} else {
-			//	$this->lblSenderLabel->Text = 'Sender Account';
-			//}
-			//$this->lblSenderLabel->HtmlEntities=false;
-		//}
-
 		protected function lblNewFromCompany_Create() {
 			$this->lblNewFromCompany = new QLabel($this);
 			$this->lblNewFromCompany->HtmlEntities = false;
@@ -673,8 +641,7 @@
 			$this->lblNewToCompany->ToolTip = "New Company";
 			$this->lblNewToCompany->CssClass = "add_icon";
 			$this->lblNewToCompany->AddAction(new QClickEvent(), new QAjaxAction('lblNewToCompany_Click'));
-			$this->lblNewToCompany->ActionParameter = ($this->lstToCompany instanceof QListBox)?
-                                                      $this->lstToCompany->ControlId:null;
+			$this->lblNewToCompany->ActionParameter = $this->lstToCompany->ControlId;
 		}
 
 		protected function lblNewToContact_Create() {
@@ -683,8 +650,7 @@
 			$this->lblNewToContact->Text = '<img src="../images/add.png">';
 			$this->lblNewToContact->ToolTip = "New Contact";
 			$this->lblNewToContact->CssClass = "add_icon";
-			$this->lblNewToContact->ActionParameter = ($this->lstToContact instanceof QListBox)?
-                                                       $this->lstToContact->ControlId : null;
+			$this->lblNewToContact->ActionParameter = $this->lstToContact->ControlId;
 			$this->lblNewToContact->AddAction(new QClickEvent(), new QAjaxAction('lblNewToContact_Click'));
 		}
 
@@ -695,8 +661,7 @@
 			$this->lblNewToAddress->ToolTip = "New Address";
 			$this->lblNewToAddress->CssClass = "add_icon";
 			$this->lblNewToAddress->AddAction(new QClickEvent(), new QAjaxAction('lblNewToAddress_Click'));
-			$this->lblNewToAddress->ActionParameter = ($this->lstToAddress instanceof QListBox)?
-                                                       $this->lstToAddress->ControlId : null;
+			$this->lblNewToAddress->ActionParameter = $this->lstToAddress->ControlId;
 		}
 
 		// Create and Setup pnlNote
@@ -1482,17 +1447,9 @@
 		}
 
 		// This is run every time a 'From Contact' is selected
-		// It loads the value for the 'Sender Email' for the FedEx shipment notification
 		protected function lstFromContact_Select() {
 			if ($this->lstFromContact->SelectedValue) {
 				$objContact = Contact::Load($this->lstFromContact->SelectedValue);
-//				if ($objContact) {
-//					if ($objContact->Email) {
-//						$this->txtFedexNotifySenderEmail->Text = $objContact->Email;
-//					} else {
-//						$this->txtFedexNotifySenderEmail->Text = '';
-//					}
-//				}
 			}
 		}
 
@@ -2554,14 +2511,7 @@
 
 					if ($this->blnEditMode) {
 						$this->UpdateShipmentFields();
-						//if ($this->objShipment->CourierId === 1) {
-						//	$this->UpdateFedexFields();
-						//}
 					}
-					//elseif ($this->objShipment->CourierId === 1) {
-					//	// Update $this->objShipment with FedEx tracking number
-					//	$this->objShipment->TrackingNumber = $this->txtTrackingNumber->Text;
-					//}
 
 					$this->objShipment->ShippedFlag = true;
 					// $this->objShipment->Save(false, true);
