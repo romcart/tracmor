@@ -176,16 +176,18 @@
 			$this->lblShipmentNumber_Create();
 			$this->lblHeaderShipment_Create();
 
-			$this->lstToCompany_Create();
-			$this->lstToContact_Create();
-			$this->lstToAddress_Create();
-            $this->lblNewToCompany_Create();
-            $this->lblNewToContact_Create();
-            $this->lblNewToAddress_Create();
 			$this->lblShipDate_Create();
 			$this->lblFromCompany_Create();
 			$this->lblFromContact_Create();
 			$this->lblFromAddress_Create();
+
+			$this->lstToCompany_Create();
+			$this->lblNewToCompany_Create();
+			$this->lstToContact_Create();
+			$this->lblNewToContact_Create();
+			$this->lstToAddress_Create();
+            $this->lblNewToAddress_Create();
+
 			$this->lblFromAddressFull_Create();
 			$this->lblToCompany_Create();
 			$this->lblToContact_Create();
@@ -1458,8 +1460,10 @@
 		protected function lstToCompany_Select() {
       $this->disableAdvancedIfInternal();
 			// Clear any displayed warnings
-			$this->lblNewToContact->Warning = '';
-			$this->lblNewToAddress->Warning = '';
+			if ($this->lblNewToContact) {
+				$this->lblNewToContact->Warning = '';
+				$this->lblNewToAddress->Warning = '';
+			}
 			
 			if ($this->lstToCompany->SelectedValue) {
 				$objCompany = Company::Load($this->lstToCompany->SelectedValue);
