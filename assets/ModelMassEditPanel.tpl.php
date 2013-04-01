@@ -91,16 +91,20 @@ $arrAssetModelFields[] = array('checkbox' => $_CONTROL->chkImage->RenderWithErro
 <?php
 // Apply javascript action to execute ServerAction properly
 $strForCustomFields = '';
-foreach ($_CONTROL->arrCustomFields as $field) {
-    $strForCustomFields.= sprintf('document.getElementById("%s").setAttribute("disabled",true);',$field['input']->ControlId);
+if(count($_CONTROL->arrCustomFields)>0){
+    foreach ($_CONTROL->arrCustomFields as $field) {
+        $strForCustomFields.= sprintf('document.getElementById("%s").setAttribute("disabled",true);',$field['input']->ControlId);
+    }
 }
-QApplication::ExecuteJavaScript('
- document.getElementById("'.$_CONTROL->txtShortDescription->ControlId.'").setAttribute("disabled",true);
- document.getElementById("'.$_CONTROL->txtLongDescription->ControlId.'").setAttribute("disabled",true);
- document.getElementById("'.$_CONTROL->lstManufacturer->ControlId.'").setAttribute("disabled",true);
- document.getElementById("'.$_CONTROL->ifcImage->ControlId.'").setAttribute("disabled",true);
- document.getElementById("'.$_CONTROL->lstCategory->ControlId.'").setAttribute("disabled",true);
-'.$strForCustomFields)?>
+    QApplication::ExecuteJavaScript('
+     document.getElementById("'.$_CONTROL->txtShortDescription->ControlId.'").setAttribute("disabled",true);
+     document.getElementById("'.$_CONTROL->txtLongDescription->ControlId.'").setAttribute("disabled",true);
+     document.getElementById("'.$_CONTROL->lstManufacturer->ControlId.'").setAttribute("disabled",true);
+     document.getElementById("'.$_CONTROL->ifcImage->ControlId.'").setAttribute("disabled",true);
+     document.getElementById("'.$_CONTROL->lstCategory->ControlId.'").setAttribute("disabled",true);
+    '.$strForCustomFields);
+
+?>
 <script type="text/javascript" language="JavaScript">
 
 </script>

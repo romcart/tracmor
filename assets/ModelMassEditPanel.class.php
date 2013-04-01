@@ -368,9 +368,11 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         $this->chkCategory->Checked = false;
         $this->chkManufacturer->Checked = false;
         $this->chkImage->Checked = false;
-        foreach($this->arrCustomFields as $field)
-        {
-            $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+        if(count($this->arrCustomFields)>0)  {
+            foreach($this->arrCustomFields as $field)
+            {
+                $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
+            }
         }
     }
 
