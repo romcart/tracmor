@@ -418,8 +418,6 @@
 			$this->btnMassEdit = new QButton($this);
 			$this->btnMassEdit->Name = 'Edit';
 			$this->btnMassEdit->Text = 'Edit';
-			$this->btnMassEdit->AddAction(new QClickEvent(),
-				                          new QConfirmAction("Are you sure you want to edit these objects?"));
 			$this->btnMassEdit->AddAction(new QClickEvent(), new QAjaxAction('btnMassEdit_Click'));
 			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
 			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
