@@ -49,6 +49,7 @@ class CompanyMassEditPanel extends CompanyEditPanelBase {
         $this->arrCompaniesToEdit = $arrayCompanyId;
 		$this->txtLongDescription_Create();
         $this->chkLongDescription_Create();
+        $this->btnSave->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
 
 		$this->strOverflow = QOverflow::Auto;
 

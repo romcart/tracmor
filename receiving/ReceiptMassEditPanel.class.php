@@ -241,6 +241,7 @@ class ReceiptMassEditPanel extends QPanel {
         $this->btnApply = new QButton($this);
         $this->btnApply->Name = 'Apply';
         $this->btnApply->Text = 'Apply';
+        $this->btnApply->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
         $this->btnApply->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnApply_Click'));
         $this->btnApply->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnApply_Click'));
         $this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());

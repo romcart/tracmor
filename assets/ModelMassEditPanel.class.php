@@ -357,6 +357,7 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         $this->btnApply = new QButton($this);
         $this->btnApply->Name = 'Apply';
         $this->btnApply->Text = 'Apply';
+        $this->btnApply->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
         $this->btnApply->AddAction(new QClickEvent(), new QServerControlAction($this, 'btnSave_Click'));
         $this->btnApply->AddAction(new QEnterKeyEvent(), new QServerControlAction($this, 'btnSave_Click'));
         $this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());

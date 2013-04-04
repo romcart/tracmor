@@ -220,8 +220,6 @@
 		$this->btnEdit = new QButton($this);
 		$this->btnEdit->Name = 'edit';
 		$this->btnEdit->Text = 'Edit';
-		$this->btnEdit->AddAction(new QClickEvent(),
-			                      new QConfirmAction("Are you sure you want to edit these objects?"));
 		$this->btnEdit->AddAction(new QClickEvent(), new QAjaxAction('btnEdit_Click'));
 		$this->btnEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnEdit_Click'));
 		$this->btnEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());

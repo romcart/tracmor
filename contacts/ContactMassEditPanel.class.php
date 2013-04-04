@@ -203,6 +203,8 @@ class ContactMassEditPanel extends ContactEditPanel {
     protected function btnMassEditApply_Create(){
         $this->btnMassEditApply = new QButton($this);
         $this->btnMassEditApply->Text = 'Apply';
+        $this->btnMassEditApply
+             ->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
         $this->btnMassEditApply->AddAction(new QClickEvent(),new QAjaxAction('btnMassEditApply_Click'));
         $this->btnMassEditApply->AddAction(new QEnterKeyEvent(),new QAjaxAction('btnMassEditApply_Click'));
         $this->btnMassEditApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
