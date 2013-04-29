@@ -1536,11 +1536,13 @@ class QAssetEditComposite extends QControl {
 						$this->chkLockToParent->TabIndex = $this->txtParentAssetCode->TabIndex + 1;
 					}
 
-					//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
-					if (!$this->blnEditMode && !$objCustomField['blnEdit']){
+					// Enforce edit authorization
+					if (!$objCustomField['blnEdit']){
 						$objCustomField['lbl']->Display=true;
 						$objCustomField['input']->Display=false;
-						if(($objCustomField['blnRequired'])){
+
+						//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
+						if(!$this->blnEditMode && $objCustomField['blnRequired']){
 						  if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 						}
 					}
