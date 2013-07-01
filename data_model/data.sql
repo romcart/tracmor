@@ -22,12 +22,12 @@ INSERT INTO `notification` (`notification_id`, `short_description`, `long_descri
 	(1,'Overdue Receipt','Send notification when a receipt is overdue','10','once',false);
 
 INSERT INTO `location` (`location_id`, `short_description`, `long_description`, `enabled_flag`, `created_by`, `creation_date`, `modified_by`, `modified_date`) VALUES
-	(1,'Checked Out',NULL,'1',NULL,NULL,NULL,NULL),
-	(2,'Shipped',NULL,'1',NULL,NULL,NULL,NULL),
-	(3,'Taken Out',NULL,'1',NULL,NULL,NULL,NULL),
-	(4,'New Inventory',NULL,'1',NULL,NULL,NULL,NULL),
-	(5,'To Be Received',NULL,'1',NULL,NULL,NULL,NULL),
-	(6,'Archived',NULL,'1',NULL,NULL,NULL,NULL);
+	(1,'Checked Out',NULL,1,NULL,NULL,NULL,NULL),
+	(2,'Shipped',NULL,1,NULL,NULL,NULL,NULL),
+	(3,'Taken Out',NULL,1,NULL,NULL,NULL,NULL),
+	(4,'New Inventory',NULL,1,NULL,NULL,NULL,NULL),
+	(5,'To Be Received',NULL,1,NULL,NULL,NULL,NULL),
+	(6,'Archived',NULL,1,NULL,NULL,NULL,NULL);
 
 INSERT INTO `transaction_type` VALUES
 	(1,'Move',1,1),
