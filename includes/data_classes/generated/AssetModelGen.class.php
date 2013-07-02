@@ -26,10 +26,12 @@
 	 * @property QDateTime $CreationDate the value for dttCreationDate 
 	 * @property integer $ModifiedBy the value for intModifiedBy 
 	 * @property string $ModifiedDate the value for strModifiedDate (Read-Only Timestamp)
+	 * @property integer $DepreciationClassId the value for intDepreciationClassId 
 	 * @property Category $Category the value for the Category object referenced by intCategoryId 
 	 * @property Manufacturer $Manufacturer the value for the Manufacturer object referenced by intManufacturerId 
 	 * @property UserAccount $CreatedByObject the value for the UserAccount object referenced by intCreatedBy 
 	 * @property UserAccount $ModifiedByObject the value for the UserAccount object referenced by intModifiedBy 
+	 * @property DepreciationClass $DepreciationClass the value for the DepreciationClass object referenced by intDepreciationClassId 
 	 * @property AssetModelCustomFieldHelper $AssetModelCustomFieldHelper the value for the AssetModelCustomFieldHelper object that uniquely references this AssetModel
 	 * @property Asset $_Asset the value for the private _objAsset (Read-Only) if set due to an expansion on the asset.asset_model_id reverse relationship
 	 * @property Asset[] $_AssetArray the value for the private _objAssetArray (Read-Only) if set due to an ExpandAsArray on the asset.asset_model_id reverse relationship
@@ -135,6 +137,14 @@
 
 
 		/**
+		 * Protected member variable that maps to the database column asset_model.depreciation_class_id
+		 * @var integer intDepreciationClassId
+		 */
+		protected $intDepreciationClassId;
+		const DepreciationClassIdDefault = null;
+
+
+		/**
 		 * Private member variable that stores a reference to a single Asset object
 		 * (of type Asset), if this AssetModel object was restored with
 		 * an expansion on the asset association table.
@@ -227,6 +237,16 @@
 		 * @var UserAccount objModifiedByObject
 		 */
 		protected $objModifiedByObject;
+
+		/**
+		 * Protected member variable that contains the object pointed by the reference
+		 * in the database column asset_model.depreciation_class_id.
+		 *
+		 * NOTE: Always use the DepreciationClass property getter to correctly retrieve this DepreciationClass object.
+		 * (Because this class implements late binding, this variable reference MAY be null.)
+		 * @var DepreciationClass objDepreciationClass
+		 */
+		protected $objDepreciationClass;
 
 		/**
 		 * Protected member variable that contains the object which points to
@@ -567,6 +587,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'creation_date', $strAliasPrefix . 'creation_date');
 			$objBuilder->AddSelectItem($strTableName, 'modified_by', $strAliasPrefix . 'modified_by');
 			$objBuilder->AddSelectItem($strTableName, 'modified_date', $strAliasPrefix . 'modified_date');
+			$objBuilder->AddSelectItem($strTableName, 'depreciation_class_id', $strAliasPrefix . 'depreciation_class_id');
 		}
 
 
@@ -666,6 +687,8 @@
 			$objToReturn->intModifiedBy = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'modified_date', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'modified_date'] : $strAliasPrefix . 'modified_date';
 			$objToReturn->strModifiedDate = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'depreciation_class_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'depreciation_class_id'] : $strAliasPrefix . 'depreciation_class_id';
+			$objToReturn->intDepreciationClassId = $objDbRow->GetColumn($strAliasName, 'Integer');
 
 			// Instantiate Virtual Attributes
 			foreach ($objDbRow->GetColumnNameArray() as $strColumnName => $mixValue) {
@@ -702,6 +725,12 @@
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName)))
 				$objToReturn->objModifiedByObject = UserAccount::InstantiateDbRow($objDbRow, $strAliasPrefix . 'modified_by__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+
+			// Check for DepreciationClass Early Binding
+			$strAlias = $strAliasPrefix . 'depreciation_class_id__depreciation_class_id';
+			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+			if (!is_null($objDbRow->GetColumn($strAliasName)))
+				$objToReturn->objDepreciationClass = DepreciationClass::InstantiateDbRow($objDbRow, $strAliasPrefix . 'depreciation_class_id__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 
 
 			// Check for AssetModelCustomFieldHelper Unique ReverseReference Binding
@@ -957,6 +986,40 @@
 			, $objOptionalClauses
 			);
 		}
+			
+		/**
+		 * Load an array of AssetModel objects,
+		 * by DepreciationClassId Index(es)
+		 * @param integer $intDepreciationClassId
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return AssetModel[]
+		*/
+		public static function LoadArrayByDepreciationClassId($intDepreciationClassId, $objOptionalClauses = null) {
+			// Call AssetModel::QueryArray to perform the LoadArrayByDepreciationClassId query
+			try {
+				return AssetModel::QueryArray(
+					QQ::Equal(QQN::AssetModel()->DepreciationClassId, $intDepreciationClassId),
+					$objOptionalClauses
+					);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Count AssetModels
+		 * by DepreciationClassId Index(es)
+		 * @param integer $intDepreciationClassId
+		 * @return int
+		*/
+		public static function CountByDepreciationClassId($intDepreciationClassId, $objOptionalClauses = null) {
+			// Call AssetModel::QueryCount to perform the CountByDepreciationClassId query
+			return AssetModel::QueryCount(
+				QQ::Equal(QQN::AssetModel()->DepreciationClassId, $intDepreciationClassId)
+			, $objOptionalClauses
+			);
+		}
 
 
 
@@ -996,7 +1059,8 @@
 							`image_path`,
 							`created_by`,
 							`creation_date`,
-							`modified_by`
+							`modified_by`,
+							`depreciation_class_id`
 						) VALUES (
 							' . $objDatabase->SqlVariable($this->intCategoryId) . ',
 							' . $objDatabase->SqlVariable($this->intManufacturerId) . ',
@@ -1006,7 +1070,8 @@
 							' . $objDatabase->SqlVariable($this->strImagePath) . ',
 							' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 							' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-							' . $objDatabase->SqlVariable($this->intModifiedBy) . '
+							' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+							' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 						)
 					');
 
@@ -1049,7 +1114,8 @@
 							`image_path` = ' . $objDatabase->SqlVariable($this->strImagePath) . ',
 							`created_by` = ' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 							`creation_date` = ' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-							`modified_by` = ' . $objDatabase->SqlVariable($this->intModifiedBy) . '
+							`modified_by` = ' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+							`depreciation_class_id` = ' . $objDatabase->SqlVariable($this->intDepreciationClassId) . '
 						WHERE
 							`asset_model_id` = ' . $objDatabase->SqlVariable($this->intAssetModelId) . '
 					');
@@ -1185,6 +1251,7 @@
 			$this->dttCreationDate = $objReloaded->dttCreationDate;
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
+			$this->DepreciationClassId = $objReloaded->DepreciationClassId;
 		}
 
 		/**
@@ -1207,6 +1274,7 @@
 					`created_by`,
 					`creation_date`,
 					`modified_by`,
+					`depreciation_class_id`,
 					__sys_login_id,
 					__sys_action,
 					__sys_date
@@ -1221,6 +1289,7 @@
 					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
 					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . $objDatabase->SqlVariable($this->intDepreciationClassId) . ',
 					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
 					' . $objDatabase->SqlVariable($strJournalCommand) . ',
 					NOW()
@@ -1326,6 +1395,11 @@
 					// @return string
 					return $this->strModifiedDate;
 
+				case 'DepreciationClassId':
+					// Gets the value for intDepreciationClassId 
+					// @return integer
+					return $this->intDepreciationClassId;
+
 
 				///////////////////
 				// Member Objects
@@ -1373,6 +1447,18 @@
 						if ((!$this->objModifiedByObject) && (!is_null($this->intModifiedBy)))
 							$this->objModifiedByObject = UserAccount::Load($this->intModifiedBy);
 						return $this->objModifiedByObject;
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'DepreciationClass':
+					// Gets the value for the DepreciationClass object referenced by intDepreciationClassId 
+					// @return DepreciationClass
+					try {
+						if ((!$this->objDepreciationClass) && (!is_null($this->intDepreciationClassId)))
+							$this->objDepreciationClass = DepreciationClass::Load($this->intDepreciationClassId);
+						return $this->objDepreciationClass;
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -1556,6 +1642,18 @@
 						throw $objExc;
 					}
 
+				case 'DepreciationClassId':
+					// Sets the value for intDepreciationClassId 
+					// @param integer $mixValue
+					// @return integer
+					try {
+						$this->objDepreciationClass = null;
+						return ($this->intDepreciationClassId = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 
 				///////////////////
 				// Member Objects
@@ -1674,6 +1772,36 @@
 						// Update Local Member Variables
 						$this->objModifiedByObject = $mixValue;
 						$this->intModifiedBy = $mixValue->UserAccountId;
+
+						// Return $mixValue
+						return $mixValue;
+					}
+					break;
+
+				case 'DepreciationClass':
+					// Sets the value for the DepreciationClass object referenced by intDepreciationClassId 
+					// @param DepreciationClass $mixValue
+					// @return DepreciationClass
+					if (is_null($mixValue)) {
+						$this->intDepreciationClassId = null;
+						$this->objDepreciationClass = null;
+						return null;
+					} else {
+						// Make sure $mixValue actually is a DepreciationClass object
+						try {
+							$mixValue = QType::Cast($mixValue, 'DepreciationClass');
+						} catch (QInvalidCastException $objExc) {
+							$objExc->IncrementOffset();
+							throw $objExc;
+						} 
+
+						// Make sure $mixValue is a SAVED DepreciationClass object
+						if (is_null($mixValue->DepreciationClassId))
+							throw new QCallerException('Unable to set an unsaved DepreciationClass for this AssetModel');
+
+						// Update Local Member Variables
+						$this->objDepreciationClass = $mixValue;
+						$this->intDepreciationClassId = $mixValue->DepreciationClassId;
 
 						// Return $mixValue
 						return $mixValue;
@@ -2129,6 +2257,7 @@
 			$strToReturn .= '<element name="CreationDate" type="xsd:dateTime"/>';
 			$strToReturn .= '<element name="ModifiedByObject" type="xsd1:UserAccount"/>';
 			$strToReturn .= '<element name="ModifiedDate" type="xsd:string"/>';
+			$strToReturn .= '<element name="DepreciationClass" type="xsd1:DepreciationClass"/>';
 			$strToReturn .= '<element name="__blnRestored" type="xsd:boolean"/>';
 			$strToReturn .= '</sequence></complexType>';
 			return $strToReturn;
@@ -2141,6 +2270,7 @@
 				Manufacturer::AlterSoapComplexTypeArray($strComplexTypeArray);
 				UserAccount::AlterSoapComplexTypeArray($strComplexTypeArray);
 				UserAccount::AlterSoapComplexTypeArray($strComplexTypeArray);
+				DepreciationClass::AlterSoapComplexTypeArray($strComplexTypeArray);
 			}
 		}
 
@@ -2181,6 +2311,9 @@
 				$objToReturn->ModifiedByObject = UserAccount::GetObjectFromSoapObject($objSoapObject->ModifiedByObject);
 			if (property_exists($objSoapObject, 'ModifiedDate'))
 				$objToReturn->strModifiedDate = $objSoapObject->ModifiedDate;
+			if ((property_exists($objSoapObject, 'DepreciationClass')) &&
+				($objSoapObject->DepreciationClass))
+				$objToReturn->DepreciationClass = DepreciationClass::GetObjectFromSoapObject($objSoapObject->DepreciationClass);
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
@@ -2217,6 +2350,10 @@
 				$objObject->objModifiedByObject = UserAccount::GetSoapObjectFromObject($objObject->objModifiedByObject, false);
 			else if (!$blnBindRelatedObjects)
 				$objObject->intModifiedBy = null;
+			if ($objObject->objDepreciationClass)
+				$objObject->objDepreciationClass = DepreciationClass::GetSoapObjectFromObject($objObject->objDepreciationClass, false);
+			else if (!$blnBindRelatedObjects)
+				$objObject->intDepreciationClassId = null;
 			return $objObject;
 		}
 
@@ -2298,6 +2435,7 @@
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`creation_date` AS `%s__%s__creation_date`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`modified_by` AS `%s__%s__modified_by`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`modified_date` AS `%s__%s__modified_date`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`depreciation_class_id` AS `%s__%s__depreciation_class_id`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 
 				$strParentAlias = $strParentAlias . '__' . $strAlias;
 			}
@@ -2337,6 +2475,14 @@
 								$objExc->IncrementOffset();
 								throw $objExc;
 							}
+						case 'depreciation_class_id':
+							try {
+								DepreciationClass::ExpandQuery($strParentAlias, $strKey, $objValue, $objQueryExpansion);
+								break;
+							} catch (QCallerException $objExc) {
+								$objExc->IncrementOffset();
+								throw $objExc;
+							}
 						default:
 							throw new QCallerException(sprintf('Unknown Object to Expand in %s: %s', $strParentAlias, $strKey));
 					}
@@ -2353,6 +2499,7 @@
 		const ExpandManufacturer = 'manufacturer_id';
 		const ExpandCreatedByObject = 'created_by';
 		const ExpandModifiedByObject = 'modified_by';
+		const ExpandDepreciationClass = 'depreciation_class_id';
 
 	}
 
@@ -2378,6 +2525,8 @@
 	 * @property-read QQNode $ModifiedBy
 	 * @property-read QQNodeUserAccount $ModifiedByObject
 	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQNode $DepreciationClassId
+	 * @property-read QQNodeDepreciationClass $DepreciationClass
 	 * @property-read QQReverseReferenceNodeAsset $Asset
 	 * @property-read QQReverseReferenceNodeAssetCustomFieldAssetModel $AssetCustomFieldAssetModel
 	 * @property-read QQReverseReferenceNodeAssetModelCustomFieldHelper $AssetModelCustomFieldHelper
@@ -2418,6 +2567,10 @@
 					return new QQNodeUserAccount('modified_by', 'ModifiedByObject', 'integer', $this);
 				case 'ModifiedDate':
 					return new QQNode('modified_date', 'ModifiedDate', 'string', $this);
+				case 'DepreciationClassId':
+					return new QQNode('depreciation_class_id', 'DepreciationClassId', 'integer', $this);
+				case 'DepreciationClass':
+					return new QQNodeDepreciationClass('depreciation_class_id', 'DepreciationClass', 'integer', $this);
 				case 'Asset':
 					return new QQReverseReferenceNodeAsset($this, 'asset', 'reverse_reference', 'asset_model_id');
 				case 'AssetCustomFieldAssetModel':
@@ -2454,6 +2607,8 @@
 	 * @property-read QQNode $ModifiedBy
 	 * @property-read QQNodeUserAccount $ModifiedByObject
 	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQNode $DepreciationClassId
+	 * @property-read QQNodeDepreciationClass $DepreciationClass
 	 * @property-read QQReverseReferenceNodeAsset $Asset
 	 * @property-read QQReverseReferenceNodeAssetCustomFieldAssetModel $AssetCustomFieldAssetModel
 	 * @property-read QQReverseReferenceNodeAssetModelCustomFieldHelper $AssetModelCustomFieldHelper
@@ -2495,6 +2650,10 @@
 					return new QQNodeUserAccount('modified_by', 'ModifiedByObject', 'integer', $this);
 				case 'ModifiedDate':
 					return new QQNode('modified_date', 'ModifiedDate', 'string', $this);
+				case 'DepreciationClassId':
+					return new QQNode('depreciation_class_id', 'DepreciationClassId', 'integer', $this);
+				case 'DepreciationClass':
+					return new QQNodeDepreciationClass('depreciation_class_id', 'DepreciationClass', 'integer', $this);
 				case 'Asset':
 					return new QQReverseReferenceNodeAsset($this, 'asset', 'reverse_reference', 'asset_model_id');
 				case 'AssetCustomFieldAssetModel':

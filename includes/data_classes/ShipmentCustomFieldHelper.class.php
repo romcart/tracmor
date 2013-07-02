@@ -1,37 +1,37 @@
 <?php
-require(__DATAGEN_CLASSES__ . '/ShipmentCustomFieldHelperGen.class.php');
+	require(__DATAGEN_CLASSES__ . '/ShipmentCustomFieldHelperGen.class.php');
 
-/**
- * The ShipmentCustomFieldHelper class defined here contains any
- * customized code for the ShipmentCustomFieldHelper class in the
- * Object Relational Model.  It represents the "shipment_custom_field_helper" table
- * in the database, and extends from the code generated abstract ShipmentCustomFieldHelperGen
- * class, which contains all the basic CRUD-type functionality as well as
- * basic methods to handle relationships and index-based loading.
- *
- * @package My Application
- * @subpackage DataObjects
- *
- */
-class ShipmentCustomFieldHelper extends ShipmentCustomFieldHelperGen {
 	/**
-	 * Default "to string" handler
-	 * Allows pages to _p()/echo()/print() this object, and to define the default
-	 * way this object would be outputted.
-	 *
-	 * Can also be called directly via $objShipmentCustomFieldHelper->__toString().
-	 *
-	 * @return string a nicely formatted string representation of this object
+	 * The ShipmentCustomFieldHelper class defined here contains any
+	 * customized code for the ShipmentCustomFieldHelper class in the
+	 * Object Relational Model.  It represents the "shipment_custom_field_helper" table 
+	 * in the database, and extends from the code generated abstract ShipmentCustomFieldHelperGen
+	 * class, which contains all the basic CRUD-type functionality as well as
+	 * basic methods to handle relationships and index-based loading.
+	 * 
+	 * @package My Application
+	 * @subpackage DataObjects
+	 * 
 	 */
-	public function __toString() {
-		return sprintf('ShipmentCustomFieldHelper Object %s',  $this->intShipmentId);
-	}
+	class ShipmentCustomFieldHelper extends ShipmentCustomFieldHelperGen {
+		/**
+		 * Default "to string" handler
+		 * Allows pages to _p()/echo()/print() this object, and to define the default
+		 * way this object would be outputted.
+		 *
+		 * Can also be called directly via $objShipmentCustomFieldHelper->__toString().
+		 *
+		 * @return string a nicely formatted string representation of this object
+		 */
+		public function __toString() {
+			return sprintf('ShipmentCustomFieldHelper Object %s',  $this->intShipmentId);
+		}
 
 
-	// Override or Create New Load/Count methods
-	// (For obvious reasons, these methods are commented out...
-	// but feel free to use these as a starting point)
-	/*
+		// Override or Create New Load/Count methods
+		// (For obvious reasons, these methods are commented out...
+		// but feel free to use these as a starting point)
+/*
 		public static function LoadArrayBySample($strParam1, $intParam2, $objOptionalClauses = null) {
 			// This will return an array of ShipmentCustomFieldHelper objects
 			return ShipmentCustomFieldHelper::QueryArray(
@@ -95,11 +95,11 @@ class ShipmentCustomFieldHelper extends ShipmentCustomFieldHelperGen {
 
 
 
-	// Override or Create New Properties and Variables
-	// For performance reasons, these variables and __set and __get override methods
-	// are commented out.  But if you wish to implement or override any
-	// of the data generated properties, please feel free to uncomment them.
-	/*
+		// Override or Create New Properties and Variables
+		// For performance reasons, these variables and __set and __get override methods
+		// are commented out.  But if you wish to implement or override any
+		// of the data generated properties, please feel free to uncomment them.
+/*
 		protected $strSomeNewProperty;
 
 		public function __get($strName) {
@@ -136,5 +136,5 @@ class ShipmentCustomFieldHelper extends ShipmentCustomFieldHelperGen {
 			}
 		}
 */
-}
+	}
 ?>

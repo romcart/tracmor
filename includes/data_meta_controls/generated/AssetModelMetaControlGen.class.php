@@ -38,6 +38,8 @@
 	 * property-read QLabel $ModifiedByLabel
 	 * property QLabel $ModifiedDateControl
 	 * property-read QLabel $ModifiedDateLabel
+	 * property QListBox $DepreciationClassIdControl
+	 * property-read QLabel $DepreciationClassIdLabel
 	 * property QListBox $AssetModelCustomFieldHelperControl
 	 * property-read QLabel $AssetModelCustomFieldHelperLabel
 	 * property-read string $TitleVerb a verb indicating whether or not this is being edited or created
@@ -137,6 +139,12 @@
          */
 		protected $lblModifiedDate;
 
+        /**
+         * @var QListBox lstDepreciationClass;
+         * @access protected
+         */
+		protected $lstDepreciationClass;
+
 
 		// Controls that allow the viewing of AssetModel's individual data fields
         /**
@@ -192,6 +200,12 @@
          * @access protected
          */
 		protected $lblModifiedBy;
+
+        /**
+         * @var QLabel lblDepreciationClassId
+         * @access protected
+         */
+		protected $lblDepreciationClassId;
 
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
@@ -405,7 +419,7 @@
 		 */
 		public function txtAssetModelCode_Create($strControlId = null) {
 			$this->txtAssetModelCode = new QTextBox($this->objParentObject, $strControlId);
-			$this->txtAssetModelCode->Name = QApplication::Translate('Model Number');
+			$this->txtAssetModelCode->Name = QApplication::Translate('Asset Model Code');
 			$this->txtAssetModelCode->Text = $this->objAssetModel->AssetModelCode;
 			$this->txtAssetModelCode->MaxLength = AssetModel::AssetModelCodeMaxLength;
 			return $this->txtAssetModelCode;
@@ -418,7 +432,7 @@
 		 */
 		public function lblAssetModelCode_Create($strControlId = null) {
 			$this->lblAssetModelCode = new QLabel($this->objParentObject, $strControlId);
-			$this->lblAssetModelCode->Name = QApplication::Translate('Model Number');
+			$this->lblAssetModelCode->Name = QApplication::Translate('Asset Model Code');
 			$this->lblAssetModelCode->Text = $this->objAssetModel->AssetModelCode;
 			return $this->lblAssetModelCode;
 		}
@@ -625,6 +639,46 @@
 		}
 
 		/**
+		 * Create and setup QListBox lstDepreciationClass
+		 * @param string $strControlId optional ControlId to use
+		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause object or array of QQClause objects for the query
+		 * @return QListBox
+		 */
+		public function lstDepreciationClass_Create($strControlId = null, QQCondition $objCondition = null, $objOptionalClauses = null) {
+			$this->lstDepreciationClass = new QListBox($this->objParentObject, $strControlId);
+			$this->lstDepreciationClass->Name = QApplication::Translate('Depreciation Class');
+			$this->lstDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
+
+			// Setup and perform the Query
+			if (is_null($objCondition)) $objCondition = QQ::All();
+			$objDepreciationClassCursor = DepreciationClass::QueryCursor($objCondition, $objOptionalClauses);
+
+			// Iterate through the Cursor
+			while ($objDepreciationClass = DepreciationClass::InstantiateCursor($objDepreciationClassCursor)) {
+				$objListItem = new QListItem($objDepreciationClass->__toString(), $objDepreciationClass->DepreciationClassId);
+				if (($this->objAssetModel->DepreciationClass) && ($this->objAssetModel->DepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
+					$objListItem->Selected = true;
+				$this->lstDepreciationClass->AddItem($objListItem);
+			}
+
+			// Return the QListBox
+			return $this->lstDepreciationClass;
+		}
+
+		/**
+		 * Create and setup QLabel lblDepreciationClassId
+		 * @param string $strControlId optional ControlId to use
+		 * @return QLabel
+		 */
+		public function lblDepreciationClassId_Create($strControlId = null) {
+			$this->lblDepreciationClassId = new QLabel($this->objParentObject, $strControlId);
+			$this->lblDepreciationClassId->Name = QApplication::Translate('Depreciation Class');
+			$this->lblDepreciationClassId->Text = ($this->objAssetModel->DepreciationClass) ? $this->objAssetModel->DepreciationClass->__toString() : null;
+			return $this->lblDepreciationClassId;
+		}
+
+		/**
 		 * Create and setup QListBox lstAssetModelCustomFieldHelper
 		 * @param string $strControlId optional ControlId to use
 		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
@@ -750,6 +804,19 @@
 
 			if ($this->lblModifiedDate) if ($this->blnEditMode) $this->lblModifiedDate->Text = $this->objAssetModel->ModifiedDate;
 
+			if ($this->lstDepreciationClass) {
+					$this->lstDepreciationClass->RemoveAllItems();
+				$this->lstDepreciationClass->AddItem(QApplication::Translate('- Select One -'), null);
+				$objDepreciationClassArray = DepreciationClass::LoadAll();
+				if ($objDepreciationClassArray) foreach ($objDepreciationClassArray as $objDepreciationClass) {
+					$objListItem = new QListItem($objDepreciationClass->__toString(), $objDepreciationClass->DepreciationClassId);
+					if (($this->objAssetModel->DepreciationClass) && ($this->objAssetModel->DepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
+						$objListItem->Selected = true;
+					$this->lstDepreciationClass->AddItem($objListItem);
+				}
+			}
+			if ($this->lblDepreciationClassId) $this->lblDepreciationClassId->Text = ($this->objAssetModel->DepreciationClass) ? $this->objAssetModel->DepreciationClass->__toString() : null;
+
 			if ($this->lstAssetModelCustomFieldHelper) {
 				$this->lstAssetModelCustomFieldHelper->RemoveAllItems();
 				$this->lstAssetModelCustomFieldHelper->AddItem(QApplication::Translate('- Select One -'), null);
@@ -800,6 +867,7 @@
 				if ($this->lstCreatedByObject) $this->objAssetModel->CreatedBy = $this->lstCreatedByObject->SelectedValue;
 				if ($this->calCreationDate) $this->objAssetModel->CreationDate = $this->calCreationDate->DateTime;
 				if ($this->lstModifiedByObject) $this->objAssetModel->ModifiedBy = $this->lstModifiedByObject->SelectedValue;
+				if ($this->lstDepreciationClass) $this->objAssetModel->DepreciationClassId = $this->lstDepreciationClass->SelectedValue;
 
 				// Update any UniqueReverseReferences (if any) for controls that have been created for it
 				if ($this->lstAssetModelCustomFieldHelper) $this->objAssetModel->AssetModelCustomFieldHelper = AssetModelCustomFieldHelper::Load($this->lstAssetModelCustomFieldHelper->SelectedValue);
@@ -909,6 +977,12 @@
 				case 'ModifiedDateLabel':
 					if (!$this->lblModifiedDate) return $this->lblModifiedDate_Create();
 					return $this->lblModifiedDate;
+				case 'DepreciationClassIdControl':
+					if (!$this->lstDepreciationClass) return $this->lstDepreciationClass_Create();
+					return $this->lstDepreciationClass;
+				case 'DepreciationClassIdLabel':
+					if (!$this->lblDepreciationClassId) return $this->lblDepreciationClassId_Create();
+					return $this->lblDepreciationClassId;
 				case 'AssetModelCustomFieldHelperControl':
 					if (!$this->lstAssetModelCustomFieldHelper) return $this->lstAssetModelCustomFieldHelper_Create();
 					return $this->lstAssetModelCustomFieldHelper;
@@ -959,6 +1033,8 @@
 						return ($this->lstModifiedByObject = QType::Cast($mixValue, 'QControl'));
 					case 'ModifiedDateControl':
 						return ($this->lblModifiedDate = QType::Cast($mixValue, 'QControl'));
+					case 'DepreciationClassIdControl':
+						return ($this->lstDepreciationClass = QType::Cast($mixValue, 'QControl'));
 					case 'AssetModelCustomFieldHelperControl':
 						return ($this->lstAssetModelCustomFieldHelper = QType::Cast($mixValue, 'QControl'));
 					default:

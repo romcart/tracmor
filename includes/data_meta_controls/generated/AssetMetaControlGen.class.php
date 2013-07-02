@@ -44,6 +44,12 @@
 	 * property-read QLabel $ModifiedByLabel
 	 * property QLabel $ModifiedDateControl
 	 * property-read QLabel $ModifiedDateLabel
+	 * property QCheckBox $DepreciationFlagControl
+	 * property-read QLabel $DepreciationFlagLabel
+	 * property QDateTimePicker $PurchaseDateControl
+	 * property-read QLabel $PurchaseDateLabel
+	 * property QFloatTextBox $PurchaseCostControl
+	 * property-read QLabel $PurchaseCostLabel
 	 * property QListBox $AssetCustomFieldHelperControl
 	 * property-read QLabel $AssetCustomFieldHelperLabel
 	 * property-read string $TitleVerb a verb indicating whether or not this is being edited or created
@@ -161,6 +167,24 @@
          */
 		protected $lblModifiedDate;
 
+        /**
+         * @var QCheckBox chkDepreciationFlag;
+         * @access protected
+         */
+		protected $chkDepreciationFlag;
+
+        /**
+         * @var QDateTimePicker calPurchaseDate;
+         * @access protected
+         */
+		protected $calPurchaseDate;
+
+        /**
+         * @var QFloatTextBox txtPurchaseCost;
+         * @access protected
+         */
+		protected $txtPurchaseCost;
+
 
 		// Controls that allow the viewing of Asset's individual data fields
         /**
@@ -234,6 +258,24 @@
          * @access protected
          */
 		protected $lblModifiedBy;
+
+        /**
+         * @var QLabel lblDepreciationFlag
+         * @access protected
+         */
+		protected $lblDepreciationFlag;
+
+        /**
+         * @var QLabel lblPurchaseDate
+         * @access protected
+         */
+		protected $lblPurchaseDate;
+
+        /**
+         * @var QLabel lblPurchaseCost
+         * @access protected
+         */
+		protected $lblPurchaseCost;
 
 
 		// QListBox Controls (if applicable) to edit Unique ReverseReferences and ManyToMany References
@@ -490,7 +532,7 @@
 		 */
 		public function txtAssetCode_Create($strControlId = null) {
 			$this->txtAssetCode = new QTextBox($this->objParentObject, $strControlId);
-			$this->txtAssetCode->Name = QApplication::Translate('Asset Tag');
+			$this->txtAssetCode->Name = QApplication::Translate('Asset Code');
 			$this->txtAssetCode->Text = $this->objAsset->AssetCode;
 			$this->txtAssetCode->Required = true;
 			$this->txtAssetCode->MaxLength = Asset::AssetCodeMaxLength;
@@ -504,7 +546,7 @@
 		 */
 		public function lblAssetCode_Create($strControlId = null) {
 			$this->lblAssetCode = new QLabel($this->objParentObject, $strControlId);
-			$this->lblAssetCode->Name = QApplication::Translate('Asset Tag');
+			$this->lblAssetCode->Name = QApplication::Translate('Asset Code');
 			$this->lblAssetCode->Text = $this->objAsset->AssetCode;
 			$this->lblAssetCode->Required = true;
 			return $this->lblAssetCode;
@@ -756,6 +798,85 @@
 		}
 
 		/**
+		 * Create and setup QCheckBox chkDepreciationFlag
+		 * @param string $strControlId optional ControlId to use
+		 * @return QCheckBox
+		 */
+		public function chkDepreciationFlag_Create($strControlId = null) {
+			$this->chkDepreciationFlag = new QCheckBox($this->objParentObject, $strControlId);
+			$this->chkDepreciationFlag->Name = QApplication::Translate('Depreciation Flag');
+			$this->chkDepreciationFlag->Checked = $this->objAsset->DepreciationFlag;
+			return $this->chkDepreciationFlag;
+		}
+
+		/**
+		 * Create and setup QLabel lblDepreciationFlag
+		 * @param string $strControlId optional ControlId to use
+		 * @return QLabel
+		 */
+		public function lblDepreciationFlag_Create($strControlId = null) {
+			$this->lblDepreciationFlag = new QLabel($this->objParentObject, $strControlId);
+			$this->lblDepreciationFlag->Name = QApplication::Translate('Depreciation Flag');
+			$this->lblDepreciationFlag->Text = ($this->objAsset->DepreciationFlag) ? QApplication::Translate('Yes') : QApplication::Translate('No');
+			return $this->lblDepreciationFlag;
+		}
+
+		/**
+		 * Create and setup QDateTimePicker calPurchaseDate
+		 * @param string $strControlId optional ControlId to use
+		 * @return QDateTimePicker
+		 */
+		public function calPurchaseDate_Create($strControlId = null) {
+			$this->calPurchaseDate = new QDateTimePicker($this->objParentObject, $strControlId);
+			$this->calPurchaseDate->Name = QApplication::Translate('Purchase Date');
+			$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
+			$this->calPurchaseDate->DateTimePickerType = QDateTimePickerType::Date;
+			return $this->calPurchaseDate;
+		}
+
+		/**
+		 * Create and setup QLabel lblPurchaseDate
+		 * @param string $strControlId optional ControlId to use
+		 * @param string $strDateTimeFormat optional DateTimeFormat to use
+		 * @return QLabel
+		 */
+		public function lblPurchaseDate_Create($strControlId = null, $strDateTimeFormat = null) {
+			$this->lblPurchaseDate = new QLabel($this->objParentObject, $strControlId);
+			$this->lblPurchaseDate->Name = QApplication::Translate('Purchase Date');
+			$this->strPurchaseDateDateTimeFormat = $strDateTimeFormat;
+			$this->lblPurchaseDate->Text = sprintf($this->objAsset->PurchaseDate) ? $this->objAsset->PurchaseDate->__toString($this->strPurchaseDateDateTimeFormat) : null;
+			return $this->lblPurchaseDate;
+		}
+
+		protected $strPurchaseDateDateTimeFormat;
+
+		/**
+		 * Create and setup QFloatTextBox txtPurchaseCost
+		 * @param string $strControlId optional ControlId to use
+		 * @return QFloatTextBox
+		 */
+		public function txtPurchaseCost_Create($strControlId = null) {
+			$this->txtPurchaseCost = new QFloatTextBox($this->objParentObject, $strControlId);
+			$this->txtPurchaseCost->Name = QApplication::Translate('Purchase Cost');
+			$this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
+			return $this->txtPurchaseCost;
+		}
+
+		/**
+		 * Create and setup QLabel lblPurchaseCost
+		 * @param string $strControlId optional ControlId to use
+		 * @param string $strFormat optional sprintf format to use
+		 * @return QLabel
+		 */
+		public function lblPurchaseCost_Create($strControlId = null, $strFormat = null) {
+			$this->lblPurchaseCost = new QLabel($this->objParentObject, $strControlId);
+			$this->lblPurchaseCost->Name = QApplication::Translate('Purchase Cost');
+			$this->lblPurchaseCost->Text = $this->objAsset->PurchaseCost;
+			$this->lblPurchaseCost->Format = $strFormat;
+			return $this->lblPurchaseCost;
+		}
+
+		/**
 		 * Create and setup QListBox lstAssetCustomFieldHelper
 		 * @param string $strControlId optional ControlId to use
 		 * @param QQCondition $objConditions override the default condition of QQ::All() to the query, itself
@@ -901,6 +1022,15 @@
 
 			if ($this->lblModifiedDate) if ($this->blnEditMode) $this->lblModifiedDate->Text = $this->objAsset->ModifiedDate;
 
+			if ($this->chkDepreciationFlag) $this->chkDepreciationFlag->Checked = $this->objAsset->DepreciationFlag;
+			if ($this->lblDepreciationFlag) $this->lblDepreciationFlag->Text = ($this->objAsset->DepreciationFlag) ? QApplication::Translate('Yes') : QApplication::Translate('No');
+
+			if ($this->calPurchaseDate) $this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
+			if ($this->lblPurchaseDate) $this->lblPurchaseDate->Text = sprintf($this->objAsset->PurchaseDate) ? $this->objAsset->__toString($this->strPurchaseDateDateTimeFormat) : null;
+
+			if ($this->txtPurchaseCost) $this->txtPurchaseCost->Text = $this->objAsset->PurchaseCost;
+			if ($this->lblPurchaseCost) $this->lblPurchaseCost->Text = $this->objAsset->PurchaseCost;
+
 			if ($this->lstAssetCustomFieldHelper) {
 				$this->lstAssetCustomFieldHelper->RemoveAllItems();
 				$this->lstAssetCustomFieldHelper->AddItem(QApplication::Translate('- Select One -'), null);
@@ -954,6 +1084,9 @@
 				if ($this->lstCreatedByObject) $this->objAsset->CreatedBy = $this->lstCreatedByObject->SelectedValue;
 				if ($this->calCreationDate) $this->objAsset->CreationDate = $this->calCreationDate->DateTime;
 				if ($this->lstModifiedByObject) $this->objAsset->ModifiedBy = $this->lstModifiedByObject->SelectedValue;
+				if ($this->chkDepreciationFlag) $this->objAsset->DepreciationFlag = $this->chkDepreciationFlag->Checked;
+				if ($this->calPurchaseDate) $this->objAsset->PurchaseDate = $this->calPurchaseDate->DateTime;
+				if ($this->txtPurchaseCost) $this->objAsset->PurchaseCost = $this->txtPurchaseCost->Text;
 
 				// Update any UniqueReverseReferences (if any) for controls that have been created for it
 				if ($this->lstAssetCustomFieldHelper) $this->objAsset->AssetCustomFieldHelper = AssetCustomFieldHelper::Load($this->lstAssetCustomFieldHelper->SelectedValue);
@@ -1081,6 +1214,24 @@
 				case 'ModifiedDateLabel':
 					if (!$this->lblModifiedDate) return $this->lblModifiedDate_Create();
 					return $this->lblModifiedDate;
+				case 'DepreciationFlagControl':
+					if (!$this->chkDepreciationFlag) return $this->chkDepreciationFlag_Create();
+					return $this->chkDepreciationFlag;
+				case 'DepreciationFlagLabel':
+					if (!$this->lblDepreciationFlag) return $this->lblDepreciationFlag_Create();
+					return $this->lblDepreciationFlag;
+				case 'PurchaseDateControl':
+					if (!$this->calPurchaseDate) return $this->calPurchaseDate_Create();
+					return $this->calPurchaseDate;
+				case 'PurchaseDateLabel':
+					if (!$this->lblPurchaseDate) return $this->lblPurchaseDate_Create();
+					return $this->lblPurchaseDate;
+				case 'PurchaseCostControl':
+					if (!$this->txtPurchaseCost) return $this->txtPurchaseCost_Create();
+					return $this->txtPurchaseCost;
+				case 'PurchaseCostLabel':
+					if (!$this->lblPurchaseCost) return $this->lblPurchaseCost_Create();
+					return $this->lblPurchaseCost;
 				case 'AssetCustomFieldHelperControl':
 					if (!$this->lstAssetCustomFieldHelper) return $this->lstAssetCustomFieldHelper_Create();
 					return $this->lstAssetCustomFieldHelper;
@@ -1137,6 +1288,12 @@
 						return ($this->lstModifiedByObject = QType::Cast($mixValue, 'QControl'));
 					case 'ModifiedDateControl':
 						return ($this->lblModifiedDate = QType::Cast($mixValue, 'QControl'));
+					case 'DepreciationFlagControl':
+						return ($this->chkDepreciationFlag = QType::Cast($mixValue, 'QControl'));
+					case 'PurchaseDateControl':
+						return ($this->calPurchaseDate = QType::Cast($mixValue, 'QControl'));
+					case 'PurchaseCostControl':
+						return ($this->txtPurchaseCost = QType::Cast($mixValue, 'QControl'));
 					case 'AssetCustomFieldHelperControl':
 						return ($this->lstAssetCustomFieldHelper = QType::Cast($mixValue, 'QControl'));
 					default:

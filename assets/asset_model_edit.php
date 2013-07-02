@@ -49,10 +49,13 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 	protected $lblAssetModelCode;
 	protected $lblCategory;
 	protected $lblManufacturer;
+	protected $lblDepreciationClass;
 	protected $btnEdit;
 	protected $ifcImage;
 	protected $lblImage;
 	protected $pnlLongDescription;
+
+	protected $lstDepreciationClass;
 
 	protected $atcAttach;
 	protected $pnlAttachments;
@@ -99,6 +102,12 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		// Image label must be created AFTER image control
 		$this->lblImage_Create();
 		$this->pnlLongDescription_Create();
+
+
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->lblDepreciationClass_Create();
+			$this->lstDepreciationClass_Create();
+		}
 
 		// Set a variable which defines whether the built-in fields must be rendered or not.
 		$this->UpdateBuiltInFields();
@@ -199,6 +208,22 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		}
 	}
 
+	// Create the Depreciation Class Label
+	protected function lblDepreciationClass_Create(){
+		$this->lblDepreciationClass = new QLabel($this);
+		$this->lblDepreciationClass->Name = 'Depreciation Class';
+
+		if($this->blnEditMode){
+			if($this->objAssetModel->DepreciationClassId == null){
+			$this->lblDepreciationClass->Text = '';
+			}
+			else{
+			$this->lblDepreciationClass->Text = $this->objAssetModel->DepreciationClass->ShortDescription;
+			}
+		}
+
+	}
+
 	// Output the image
 	protected function lblImage_Create() {
 		$this->lblImage = new QLabel($this);
@@ -289,7 +314,9 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lstManufacturer->Name = QApplication::Translate('Manufacturer');
 		$this->lstManufacturer->Required = true;
 		if (!$this->blnEditMode)
-		$this->lstManufacturer->AddItem('- Select One -', null);
+		{
+			$this->lstManufacturer->AddItem('- Select One -', null);
+		}
 		// $objManufacturerArray = Manufacturer::LoadAll('short_description ASC');
 		$objManufacturerArray = Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription)));
 		if ($objManufacturerArray) foreach ($objManufacturerArray as $objManufacturer) {
@@ -312,6 +339,25 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAssetModel->objCustomFieldArray, $this->blnEditMode, $this, true, true);
 
 		$this->UpdateCustomFields();
+	}
+
+	// Create Depreciation Class select
+
+	protected function lstDepreciationClass_Create(){
+		$this->lstDepreciationClass = new QListBox($this);
+		$this->lstDepreciationClass->Name = QApplication::Translate('Depreciation Class');
+		//if (!$this->blnEditMode)
+			$this->lstDepreciationClass->AddItem('- Select One -', null);
+		$objDepreciationClassArray = DepreciationClass::LoadAll();
+
+		if (is_array($objDepreciationClassArray)) {
+			foreach ($objDepreciationClassArray as $objDepreciationClass) {
+				$objListItem = new QListItem($objDepreciationClass->ShortDescription, $objDepreciationClass->DepreciationClassId);
+				if (($this->objAssetModel->DepreciationClass) && ($this->objAssetModel->DepreciationClass->DepreciationClassId == $objDepreciationClass->DepreciationClassId))
+					$objListItem->Selected = true;
+				$this->lstDepreciationClass->AddItem($objListItem);
+			}
+		}
 	}
 
 	// Setup Save Button
@@ -491,7 +537,21 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			return;
 		}
 
-        $this->UpdateAssetModelFields();
+		if(QApplication::$TracmorSettings->DepreciationFlag =='1'&& $this->blnEditMode){
+			if($this->objAssetModel->DepreciationClassId != $this->lstDepreciationClass->SelectedValue){
+				$arrAssetToChange =	Asset::LoadArrayDepreciatedByAssetModelId($this->objAssetModel->AssetModelId);
+				if($this->lstDepreciationClass->SelectedValue == null){
+					foreach($arrAssetToChange as $objAssetToChange){
+						$objAssetToChange->DepreciationFlag = null;
+						$objAssetToChange->PurchaseCost = null;
+						$objAssetToChange->PurchaseDate= null;
+						$objAssetToChange->Save();
+					}
+				}
+			}
+		}
+
+    $this->UpdateAssetModelFields();
 		$this->objAssetModel->Save();
         $this->UpdateAssetModelCustomFields();
 		// Assign input values to custom fields
@@ -516,7 +576,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 			$this->objAssetModel->Save(false, true);
 		}
 
-    		if ($this->blnEditMode) {
+    	if ($this->blnEditMode) {
 			$this->UpdateLabels();
 			// This was necessary because it was not saving the changes of a second edit/save in a row
 			// Reload all custom fields
@@ -584,6 +644,10 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->objAssetModel->AssetModelCode = $this->txtAssetModelCode->Text;
 		$this->objAssetModel->ShortDescription = $this->txtShortDescription->Text;
 		$this->objAssetModel->LongDescription = $this->txtLongDescription->Text;
+		// Display Depreciation field if enabled
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->objAssetModel->DepreciationClassId = $this->lstDepreciationClass->SelectedValue;
+		}
 		// $this->objAssetModel->ImagePath = $this->txtImagePath->Text;
 	}
 
@@ -623,6 +687,12 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblManufacturer->Display = true;
 		$this->pnlLongDescription->Display = true;
 
+		// Display Depreciation label if option enabled
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->lblDepreciationClass->Display = true;
+			$this->lstDepreciationClass->Display = false;
+		}
+
 		// Display Edit and Delete buttons
 		$this->btnEdit->Display = true;
 		$this->btnDelete->Display = true;
@@ -654,7 +724,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->txtLongDescription->Display = true;
 		$this->ifcImage->Display = true;
 
-
+		// Display Depreciation field if enabled
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->lblDepreciationClass->Display = false;
+			$this->lstDepreciationClass->Display = true;
+		}
 
 		// Display Asset Tag and Asset Model input for edit mode
 		// new: if the user is authorized to edit the built-in fields.
@@ -689,6 +763,8 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblManufacturer->Text = $this->lstManufacturer->SelectedName;
 		$this->pnlLongDescription->Text = nl2br($this->txtLongDescription->Text);
 		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath);
+		$this->lblDepreciationClass->Text = ($this->lstDepreciationClass->SelectedValue==null)?'':
+		                                            $this->lstDepreciationClass->SelectedName;
 
 		// Update custom labels
 		if ($this->arrCustomFields) {
@@ -795,7 +871,7 @@ class AssetModelEditForm extends AssetModelEditFormBase {
         foreach($arrAssetCustomFieldsToAdd as $keyAssetCustomField){
           $blnToAdd = true;
           foreach($currentAssetCustomFields as $currentAssetCustomField){
-            if ($currentAssetCustomField->CustomField->CustomFieldId == $keyAssetCustomField){
+            if ($currentAssetCustomField->CustomField->CustomFieldId == $arrAssetCustomFieldsToAdd){
               $blnToAdd = false;
             }
           }

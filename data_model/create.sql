@@ -1,4 +1,6 @@
-CREATE TABLE `_version` (`version` VARCHAR(50)) ENGINE = INNODB;
+CREATE TABLE `_version` (
+`version` VARCHAR(50),
+PRIMARY KEY ( `version`)) ENGINE = INNODB;
 
 CREATE TABLE category (
   category_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -59,11 +61,13 @@ CREATE TABLE asset_model (
   creation_date     DATETIME   NULL   DEFAULT NULL,
   modified_by       INTEGER UNSIGNED   NULL,
   modified_date     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
+  `depreciation_class_id` INTEGER UNSIGNED   NULL,
     PRIMARY KEY ( asset_model_id ),
     INDEX asset_model_fkindex1 ( category_id ),
     INDEX asset_model_fkindex2 ( manufacturer_id ),
     INDEX asset_model_fkindex3 ( created_by ),
-    INDEX asset_model_fkindex4 ( modified_by ))
+    INDEX asset_model_fkindex4 ( modified_by ),
+    INDEX asset_model_fkindex5 ( depreciation_class_id ))
 ENGINE = INNODB;
 
 CREATE TABLE `asset` (
@@ -81,6 +85,9 @@ CREATE TABLE `asset` (
   `creation_date`    DATETIME   NULL   DEFAULT NULL,
   `modified_by`      INTEGER UNSIGNED   NULL,
   `modified_date`    TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
+  `depreciation_flag` BIT(1) DEFAULT NULL,
+  `purchase_date`    DATE  DEFAULT NULL,
+  `purchase_cost`    DECIMAL(10,2) DEFAULT NULL,
     PRIMARY KEY ( `asset_id` ),
     INDEX asset_fkindex1 ( `asset_model_id` ),
     INDEX asset_fkindex2 ( `location_id` ),
@@ -230,7 +237,7 @@ CREATE TABLE custom_field (
   short_description             VARCHAR(255)   NOT NULL,
   active_flag                   BIT   NULL,
   required_flag                 BIT   NULL,
-  all_asset_models_flag         BIT   NULL,
+  all_asset_models_flag         BIT   NULL  DEFAULT 1,
   searchable_flag               BIT   NULL,
   created_by                    INTEGER UNSIGNED   NULL,
   creation_date                 DATETIME   NULL,
@@ -701,57 +708,84 @@ ENGINE = INNODB;
 
 CREATE TABLE asset_custom_field_helper (
   asset_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( asset_id), 
+  	PRIMARY KEY ( asset_id),
   	INDEX asset_custom_field_helper_fkindex1 ( asset_id ))
 ENGINE = INNODB;
 
 CREATE TABLE inventory_model_custom_field_helper (
   inventory_model_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( inventory_model_id), 
+  	PRIMARY KEY ( inventory_model_id),
   	INDEX inventory_model_custom_field_helper_fkindex1 ( inventory_model_id ))
 ENGINE = INNODB;
 
 CREATE TABLE asset_model_custom_field_helper (
   asset_model_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( asset_model_id), 
+  	PRIMARY KEY ( asset_model_id),
   	INDEX asset_model_custom_field_helper_fkindex1 ( asset_model_id ))
 ENGINE = INNODB;
 
 CREATE TABLE manufacturer_custom_field_helper (
   manufacturer_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( manufacturer_id), 
+  	PRIMARY KEY ( manufacturer_id),
   	INDEX manufacturer_custom_field_helper_fkindex1 ( manufacturer_id ))
 ENGINE = INNODB;
 
 CREATE TABLE category_custom_field_helper (
   category_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( category_id), 
+  	PRIMARY KEY ( category_id),
   	INDEX category_custom_field_helper_fkindex1 ( category_id ))
 ENGINE = INNODB;
 
 CREATE TABLE company_custom_field_helper (
   company_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( company_id), 
+  	PRIMARY KEY ( company_id),
   	INDEX company_custom_field_helper_fkindex1 ( company_id ))
 ENGINE = INNODB;
 
 CREATE TABLE contact_custom_field_helper (
   contact_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( contact_id), 
+  	PRIMARY KEY ( contact_id),
   	INDEX contact_custom_field_helper_fkindex1 ( contact_id ))
 ENGINE = INNODB;
 
 CREATE TABLE shipment_custom_field_helper (
   shipment_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( shipment_id), 
+  	PRIMARY KEY ( shipment_id),
   	INDEX shipment_custom_field_helper_fkindex1 ( shipment_id ))
 ENGINE = INNODB;
 
 CREATE TABLE receipt_custom_field_helper (
   receipt_id INTEGER UNSIGNED NOT NULL,
-  	PRIMARY KEY ( receipt_id), 
+  	PRIMARY KEY ( receipt_id),
   	INDEX receipt_custom_field_helper_fkindex1 ( receipt_id ))
 ENGINE = INNODB;
+
+CREATE TABLE  depreciation_class(
+   depreciation_class_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+   depreciation_method_qtype_id INTEGER UNSIGNED NOT NULL,
+   short_description VARCHAR(255)   NOT NULL,
+   life INTEGER UNSIGNED   NULL,
+   PRIMARY KEY (depreciation_class_id),
+   INDEX depreciation_class_fkindex1 ( depreciation_class_id ),
+   UNIQUE (short_description),
+   INDEX depreciation_class_fkindex2 ( depreciation_method_qtype_id )
+)
+ENGINE = INNODB;
+
+CREATE TABLE depreciation_method_qtype(
+  depreciation_method_qtype_id  INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  short_description  VARCHAR(255)   NOT NULL,
+  PRIMARY KEY (depreciation_method_qtype_id),
+  INDEX depreciation_method_qtype_fkindex1 (depreciation_method_qtype_id),
+  INDEX `short_description_UNIQUE` (`short_description` ASC),
+  UNIQUE (short_description))
+ENGINE = INNODB;
+
+ALTER TABLE depreciation_class
+  ADD CONSTRAINT FOREIGN KEY(depreciation_method_qtype_id) references depreciation_method_qtype (
+    depreciation_method_qtype_id
+  )
+ON Delete NO ACTION ON Update NO ACTION;
 
 ALTER TABLE asset_model
   ADD CONSTRAINT FOREIGN KEY( category_id) references category (
@@ -762,6 +796,12 @@ ON Delete NO ACTION ON Update NO ACTION;
 ALTER TABLE asset_model
   ADD CONSTRAINT FOREIGN KEY( manufacturer_id) references manufacturer (
     manufacturer_id
+  )
+ON Delete NO ACTION ON Update NO ACTION;
+
+ALTER TABLE asset_model
+  ADD CONSTRAINT FOREIGN KEY(depreciation_class_id) references depreciation_class (
+    depreciation_class_id
   )
 ON Delete NO ACTION ON Update NO ACTION;
 
@@ -777,7 +817,7 @@ ALTER TABLE asset
   )
 ON Delete NO ACTION ON Update NO ACTION;
 
-ALTER TABLE asset 
+ALTER TABLE asset
 	ADD CONSTRAINT FOREIGN KEY ( `parent_asset_id` ) REFERENCES `asset` ( `asset_id` )
 ON Delete NO ACTION ON Update NO ACTION;
 
@@ -1262,8 +1302,8 @@ ALTER TABLE role_module_authorization
 ON Delete NO ACTION ON Update NO ACTION;
 
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		created_by
 	) references user_account (
 		user_account_id
@@ -1271,26 +1311,26 @@ alter table role_transaction_type_authorization
 	ON Delete NO ACTION ON Update NO ACTION;
 
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		modified_by
 	) references user_account (
 		user_account_id
 	)
 	ON Delete NO ACTION ON Update NO ACTION;
-	
+
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		authorization_level_id
 	) references authorization_level (
 		authorization_level_id
 	)
 	ON Delete NO ACTION ON Update NO ACTION;
-	
+
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		transaction_type_id
 	) references transaction_type (
 		transaction_type_id
@@ -1298,8 +1338,8 @@ alter table role_transaction_type_authorization
 	ON Delete NO ACTION ON Update NO ACTION;
 
 alter table role_transaction_type_authorization
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		role_id
 	) references role (
 		role_id
@@ -1331,8 +1371,8 @@ ALTER TABLE shortcut
 ON Delete NO ACTION ON Update NO ACTION;
 
 alter table shortcut
-	add constraint 
-	foreign key (			
+	add constraint
+	foreign key (
 		transaction_type_id
 	) references transaction_type (
 		transaction_type_id

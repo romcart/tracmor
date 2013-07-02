@@ -29,6 +29,9 @@
 	 * @property QDateTime $CreationDate the value for dttCreationDate 
 	 * @property integer $ModifiedBy the value for intModifiedBy 
 	 * @property string $ModifiedDate the value for strModifiedDate (Read-Only Timestamp)
+	 * @property boolean $DepreciationFlag the value for blnDepreciationFlag 
+	 * @property QDateTime $PurchaseDate the value for dttPurchaseDate 
+	 * @property double $PurchaseCost the value for fltPurchaseCost 
 	 * @property Asset $ParentAsset the value for the Asset object referenced by intParentAssetId 
 	 * @property AssetModel $AssetModel the value for the AssetModel object referenced by intAssetModelId (Not Null)
 	 * @property Location $Location the value for the Location object referenced by intLocationId 
@@ -161,6 +164,30 @@
 		 */
 		protected $strModifiedDate;
 		const ModifiedDateDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column asset.depreciation_flag
+		 * @var boolean blnDepreciationFlag
+		 */
+		protected $blnDepreciationFlag;
+		const DepreciationFlagDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column asset.purchase_date
+		 * @var QDateTime dttPurchaseDate
+		 */
+		protected $dttPurchaseDate;
+		const PurchaseDateDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column asset.purchase_cost
+		 * @var double fltPurchaseCost
+		 */
+		protected $fltPurchaseCost;
+		const PurchaseCostDefault = null;
 
 
 		/**
@@ -625,6 +652,9 @@
 			$objBuilder->AddSelectItem($strTableName, 'creation_date', $strAliasPrefix . 'creation_date');
 			$objBuilder->AddSelectItem($strTableName, 'modified_by', $strAliasPrefix . 'modified_by');
 			$objBuilder->AddSelectItem($strTableName, 'modified_date', $strAliasPrefix . 'modified_date');
+			$objBuilder->AddSelectItem($strTableName, 'depreciation_flag', $strAliasPrefix . 'depreciation_flag');
+			$objBuilder->AddSelectItem($strTableName, 'purchase_date', $strAliasPrefix . 'purchase_date');
+			$objBuilder->AddSelectItem($strTableName, 'purchase_cost', $strAliasPrefix . 'purchase_cost');
 		}
 
 
@@ -744,6 +774,12 @@
 			$objToReturn->intModifiedBy = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'modified_date', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'modified_date'] : $strAliasPrefix . 'modified_date';
 			$objToReturn->strModifiedDate = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'depreciation_flag', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'depreciation_flag'] : $strAliasPrefix . 'depreciation_flag';
+			$objToReturn->blnDepreciationFlag = $objDbRow->GetColumn($strAliasName, 'Bit');
+			$strAliasName = array_key_exists($strAliasPrefix . 'purchase_date', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'purchase_date'] : $strAliasPrefix . 'purchase_date';
+			$objToReturn->dttPurchaseDate = $objDbRow->GetColumn($strAliasName, 'Date');
+			$strAliasName = array_key_exists($strAliasPrefix . 'purchase_cost', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'purchase_cost'] : $strAliasPrefix . 'purchase_cost';
+			$objToReturn->fltPurchaseCost = $objDbRow->GetColumn($strAliasName, 'Float');
 
 			// Instantiate Virtual Attributes
 			foreach ($objDbRow->GetColumnNameArray() as $strColumnName => $mixValue) {
@@ -1182,7 +1218,10 @@
 							`archived_flag`,
 							`created_by`,
 							`creation_date`,
-							`modified_by`
+							`modified_by`,
+							`depreciation_flag`,
+							`purchase_date`,
+							`purchase_cost`
 						) VALUES (
 							' . $objDatabase->SqlVariable($this->intParentAssetId) . ',
 							' . $objDatabase->SqlVariable($this->intAssetModelId) . ',
@@ -1195,7 +1234,10 @@
 							' . $objDatabase->SqlVariable($this->blnArchivedFlag) . ',
 							' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 							' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-							' . $objDatabase->SqlVariable($this->intModifiedBy) . '
+							' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+							' . $objDatabase->SqlVariable($this->blnDepreciationFlag) . ',
+							' . $objDatabase->SqlVariable($this->dttPurchaseDate) . ',
+							' . $objDatabase->SqlVariable($this->fltPurchaseCost) . '
 						)
 					');
 
@@ -1241,7 +1283,10 @@
 							`archived_flag` = ' . $objDatabase->SqlVariable($this->blnArchivedFlag) . ',
 							`created_by` = ' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 							`creation_date` = ' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-							`modified_by` = ' . $objDatabase->SqlVariable($this->intModifiedBy) . '
+							`modified_by` = ' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+							`depreciation_flag` = ' . $objDatabase->SqlVariable($this->blnDepreciationFlag) . ',
+							`purchase_date` = ' . $objDatabase->SqlVariable($this->dttPurchaseDate) . ',
+							`purchase_cost` = ' . $objDatabase->SqlVariable($this->fltPurchaseCost) . '
 						WHERE
 							`asset_id` = ' . $objDatabase->SqlVariable($this->intAssetId) . '
 					');
@@ -1380,6 +1425,9 @@
 			$this->dttCreationDate = $objReloaded->dttCreationDate;
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
 			$this->strModifiedDate = $objReloaded->strModifiedDate;
+			$this->blnDepreciationFlag = $objReloaded->blnDepreciationFlag;
+			$this->dttPurchaseDate = $objReloaded->dttPurchaseDate;
+			$this->fltPurchaseCost = $objReloaded->fltPurchaseCost;
 		}
 
 		/**
@@ -1405,6 +1453,9 @@
 					`created_by`,
 					`creation_date`,
 					`modified_by`,
+					`depreciation_flag`,
+					`purchase_date`,
+					`purchase_cost`,
 					__sys_login_id,
 					__sys_action,
 					__sys_date
@@ -1422,6 +1473,9 @@
 					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
 					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . $objDatabase->SqlVariable($this->blnDepreciationFlag) . ',
+					' . $objDatabase->SqlVariable($this->dttPurchaseDate) . ',
+					' . $objDatabase->SqlVariable($this->fltPurchaseCost) . ',
 					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
 					' . $objDatabase->SqlVariable($strJournalCommand) . ',
 					NOW()
@@ -1541,6 +1595,21 @@
 					// Gets the value for strModifiedDate (Read-Only Timestamp)
 					// @return string
 					return $this->strModifiedDate;
+
+				case 'DepreciationFlag':
+					// Gets the value for blnDepreciationFlag 
+					// @return boolean
+					return $this->blnDepreciationFlag;
+
+				case 'PurchaseDate':
+					// Gets the value for dttPurchaseDate 
+					// @return QDateTime
+					return $this->dttPurchaseDate;
+
+				case 'PurchaseCost':
+					// Gets the value for fltPurchaseCost 
+					// @return double
+					return $this->fltPurchaseCost;
 
 
 				///////////////////
@@ -1825,6 +1894,39 @@
 					try {
 						$this->objModifiedByObject = null;
 						return ($this->intModifiedBy = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'DepreciationFlag':
+					// Sets the value for blnDepreciationFlag 
+					// @param boolean $mixValue
+					// @return boolean
+					try {
+						return ($this->blnDepreciationFlag = QType::Cast($mixValue, QType::Boolean));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'PurchaseDate':
+					// Sets the value for dttPurchaseDate 
+					// @param QDateTime $mixValue
+					// @return QDateTime
+					try {
+						return ($this->dttPurchaseDate = QType::Cast($mixValue, QType::DateTime));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'PurchaseCost':
+					// Sets the value for fltPurchaseCost 
+					// @param double $mixValue
+					// @return double
+					try {
+						return ($this->fltPurchaseCost = QType::Cast($mixValue, QType::Float));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -2618,6 +2720,9 @@
 			$strToReturn .= '<element name="CreationDate" type="xsd:dateTime"/>';
 			$strToReturn .= '<element name="ModifiedByObject" type="xsd1:UserAccount"/>';
 			$strToReturn .= '<element name="ModifiedDate" type="xsd:string"/>';
+			$strToReturn .= '<element name="DepreciationFlag" type="xsd:boolean"/>';
+			$strToReturn .= '<element name="PurchaseDate" type="xsd:dateTime"/>';
+			$strToReturn .= '<element name="PurchaseCost" type="xsd:float"/>';
 			$strToReturn .= '<element name="__blnRestored" type="xsd:boolean"/>';
 			$strToReturn .= '</sequence></complexType>';
 			return $strToReturn;
@@ -2678,6 +2783,12 @@
 				$objToReturn->ModifiedByObject = UserAccount::GetObjectFromSoapObject($objSoapObject->ModifiedByObject);
 			if (property_exists($objSoapObject, 'ModifiedDate'))
 				$objToReturn->strModifiedDate = $objSoapObject->ModifiedDate;
+			if (property_exists($objSoapObject, 'DepreciationFlag'))
+				$objToReturn->blnDepreciationFlag = $objSoapObject->DepreciationFlag;
+			if (property_exists($objSoapObject, 'PurchaseDate'))
+				$objToReturn->dttPurchaseDate = new QDateTime($objSoapObject->PurchaseDate);
+			if (property_exists($objSoapObject, 'PurchaseCost'))
+				$objToReturn->fltPurchaseCost = $objSoapObject->PurchaseCost;
 			if (property_exists($objSoapObject, '__blnRestored'))
 				$objToReturn->__blnRestored = $objSoapObject->__blnRestored;
 			return $objToReturn;
@@ -2718,6 +2829,8 @@
 				$objObject->objModifiedByObject = UserAccount::GetSoapObjectFromObject($objObject->objModifiedByObject, false);
 			else if (!$blnBindRelatedObjects)
 				$objObject->intModifiedBy = null;
+			if ($objObject->dttPurchaseDate)
+				$objObject->dttPurchaseDate = $objObject->dttPurchaseDate->__toString(QDateTime::FormatSoap);
 			return $objObject;
 		}
 
@@ -2802,6 +2915,9 @@
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`creation_date` AS `%s__%s__creation_date`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`modified_by` AS `%s__%s__modified_by`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`modified_date` AS `%s__%s__modified_date`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`depreciation_flag` AS `%s__%s__depreciation_flag`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`purchase_date` AS `%s__%s__purchase_date`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`purchase_cost` AS `%s__%s__purchase_cost`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 
 				$strParentAlias = $strParentAlias . '__' . $strAlias;
 			}
@@ -2895,6 +3011,9 @@
 	 * @property-read QQNode $ModifiedBy
 	 * @property-read QQNodeUserAccount $ModifiedByObject
 	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQNode $DepreciationFlag
+	 * @property-read QQNode $PurchaseDate
+	 * @property-read QQNode $PurchaseCost
 	 * @property-read QQReverseReferenceNodeAsset $ChildAsset
 	 * @property-read QQReverseReferenceNodeAssetCustomFieldHelper $AssetCustomFieldHelper
 	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransaction
@@ -2944,6 +3063,12 @@
 					return new QQNodeUserAccount('modified_by', 'ModifiedByObject', 'integer', $this);
 				case 'ModifiedDate':
 					return new QQNode('modified_date', 'ModifiedDate', 'string', $this);
+				case 'DepreciationFlag':
+					return new QQNode('depreciation_flag', 'DepreciationFlag', 'boolean', $this);
+				case 'PurchaseDate':
+					return new QQNode('purchase_date', 'PurchaseDate', 'QDateTime', $this);
+				case 'PurchaseCost':
+					return new QQNode('purchase_cost', 'PurchaseCost', 'double', $this);
 				case 'ChildAsset':
 					return new QQReverseReferenceNodeAsset($this, 'childasset', 'reverse_reference', 'parent_asset_id');
 				case 'AssetCustomFieldHelper':
@@ -2986,6 +3111,9 @@
 	 * @property-read QQNode $ModifiedBy
 	 * @property-read QQNodeUserAccount $ModifiedByObject
 	 * @property-read QQNode $ModifiedDate
+	 * @property-read QQNode $DepreciationFlag
+	 * @property-read QQNode $PurchaseDate
+	 * @property-read QQNode $PurchaseCost
 	 * @property-read QQReverseReferenceNodeAsset $ChildAsset
 	 * @property-read QQReverseReferenceNodeAssetCustomFieldHelper $AssetCustomFieldHelper
 	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransaction
@@ -3036,6 +3164,12 @@
 					return new QQNodeUserAccount('modified_by', 'ModifiedByObject', 'integer', $this);
 				case 'ModifiedDate':
 					return new QQNode('modified_date', 'ModifiedDate', 'string', $this);
+				case 'DepreciationFlag':
+					return new QQNode('depreciation_flag', 'DepreciationFlag', 'boolean', $this);
+				case 'PurchaseDate':
+					return new QQNode('purchase_date', 'PurchaseDate', 'QDateTime', $this);
+				case 'PurchaseCost':
+					return new QQNode('purchase_cost', 'PurchaseCost', 'double', $this);
 				case 'ChildAsset':
 					return new QQReverseReferenceNodeAsset($this, 'childasset', 'reverse_reference', 'parent_asset_id');
 				case 'AssetCustomFieldHelper':

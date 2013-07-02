@@ -57,6 +57,59 @@
 			return $this->AssetModel->ShortDescription;
 		}
 
+        public function getEndDate(){
+            if($this->DepreciationFlag){
+                $strToReturn = clone $this->PurchaseDate;
+                return $strToReturn->AddMonths($this->AssetModel->DepreciationClass->Life);
+            }
+            else{
+                return null;
+            }
+        }
+
+        public function getBookValue(){
+            if (!$this->DepreciationFlag){
+                return null;
+            }
+            else{
+            $fltBookValue =	$this->PurchaseCost - $this->getCurrentDepreciation();
+            return money_format('%i' ,round($fltBookValue,2));
+            }
+        }
+
+        public function getPurchaseCost(){
+            if (!$this->DepreciationFlag){
+                return null;
+            }
+            else{
+                return money_format('%i' ,round($this->PurchaseCost,2));
+            }
+        }
+
+        public function getCurrentDepreciation(){
+
+            if(QDateTime::Now() < $this->PurchaseDate){
+                return 0;
+            }
+            else {
+                $interval = QDateTime::Now()->diff($this->PurchaseDate);
+                $interval = $interval->y*12 + $interval->m;
+                $currentDepreciation = $this->PurchaseCost * ($interval/$this->AssetModel->DepreciationClass->Life);
+                $currentDepreciation = $currentDepreciation > $this->PurchaseCost ? $this->PurchaseCost : $currentDepreciation;
+                return round($currentDepreciation,2);
+            }
+        }
+
+		/**
+		* @return depreciation class if assigned;
+		*/
+		public function getActiveDepreciationClass() {
+			 if($this->DepreciationFlag)
+			 {
+				 return $this->AssetModel->DepreciationClass;
+			 }
+		}
+
 		/**
 		 * Returns the HTML needed for the asset list datagrid to show reserved and checked out by icons, with hovertips with the username.
 		 * If the asset is neither reserved nor checked out, it returns an empty string.
@@ -314,6 +367,18 @@
 			return $intAssetCode;
 		}
 
+		public static function LoadArrayDepreciatedByAssetModelId($intAssetModelId){
+			try {
+				return Asset::QueryArray(QQ::AndCondition(
+					QQ::Equal(QQN::Asset()->AssetModelId, $intAssetModelId),
+					QQ::Equal(QQN::Asset()->DepreciationFlag, 1))
+				);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
 		/**
 		 * Returns an Account object the created the most recent transaction for this asset
 		 *
@@ -394,6 +459,74 @@
 
 			return $Location;
 		}
+
+       public static function LoadByEndDate($dates_condition,$sort_condition = null, $limit_condition = null){
+            $strQuery =sprintf( " SELECT `asset`.`asset_id`   AS `asset_id`,
+				              	 `asset`.`asset_code` AS `asset_code`,
+				                 `asset`.`depreciation_flag` AS `depreciation_flag`,
+					             `asset`.`purchase_date` AS `purchase_date`,
+					             `asset`.`purchase_cost` AS `purchase_cost`,
+					             `asset`.`asset_model_id`,
+					             `asset_model`.`short_description` AS `model_name`,
+					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_date`
+                                  FROM `asset` AS `asset`
+                                  LEFT JOIN `asset_model` AS `asset_model`
+                                  ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
+                                  LEFT JOIN `depreciation_class` AS `depreciation_class`
+                                  ON `depreciation_class`.`depreciation_class_id`=`asset_model`.`depreciation_class_id`
+                                  WHERE `depreciation_flag` = 1
+                                  %s%s
+					           ", $dates_condition, $sort_condition);
+            $objDatabase = Asset::GetDatabase();
+            $objDbResult = $objDatabase->Query($strQuery);
+            return Asset::InstantiateDbResult($objDbResult);
+        }
+
+        public static function getTotalsByEndDate($dates_condition){
+            $strQuery = " SELECT
+                          SUM(IF(NOW()>`asset`.`purchase_date` AND ".$dates_condition.",
+                              IF(PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(`asset`.`purchase_date`, '%Y%m'))
+                                                                                         <`depreciation_class`.`life`,
+                          `asset`.`purchase_cost` * (PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'),
+                                                                 DATE_FORMAT(`asset`.`purchase_date`, '%Y%m')))/
+                          `depreciation_class`.`life`, `asset`.`purchase_cost`),0)) AS `total_current_depreciation`,
+                          SUM(IF(".$dates_condition.",`asset`.`purchase_cost`,0)) AS `total_purchase_cost`
+                          FROM `asset` AS `asset`
+                          LEFT JOIN `asset_model` AS `asset_model`
+                          ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
+                          LEFT JOIN `depreciation_class` AS `depreciation_class`
+                          ON `depreciation_class`.`depreciation_class_id`=`asset_model`.`depreciation_class_id`
+                          WHERE `depreciation_flag` = 1 ";
+
+            $objDatabase = Asset::GetDatabase();
+            $objDbResult = $objDatabase->Query($strQuery);
+            //print $strQuery; exit;
+            $strDbRow = $objDbResult->FetchRow();
+            return $strDbRow; //QType::Cast($strDbRow[0], QType::Integer);
+        }
+
+        public static function CountByEndDate($dates_condition){
+            $strQuery =sprintf( " SELECT
+                                 COUNT(`asset`.`asset_id`) AS `row_count`,
+                                 `asset`.`asset_id`   AS `asset_id`,
+				                 `asset`.`depreciation_flag` AS `depreciation_flag`,
+					             `asset`.`purchase_date` AS `purchase_date`,
+					             `asset`.`asset_model_id`,
+					             `asset_model`.`short_description` AS `model_name`,
+					              DATE_ADD(`asset`.`purchase_date`, INTERVAL `depreciation_class`.`life` MONTH) AS `end_date`
+                                  FROM `asset` AS `asset`
+                                  LEFT JOIN `asset_model` AS `asset_model`
+                                  ON `asset`.`asset_model_id`=`asset_model`.`asset_model_id`
+                                  LEFT JOIN `depreciation_class` AS `depreciation_class`
+                                  ON `depreciation_class`.`depreciation_class_id`=`asset_model`.`depreciation_class_id`
+                                  WHERE `depreciation_flag` = 1
+                                  %s
+					           ", $dates_condition);
+            $objDatabase = Asset::GetDatabase();
+            $objDbResult = $objDatabase->Query($strQuery);
+            $strDbRow = $objDbResult->FetchRow();
+            return QType::Cast($strDbRow[0], QType::Integer);
+        }
 
 		/**
 		 * Returns due date of the asset that have been checked out
@@ -717,7 +850,10 @@
 					`asset`.`created_by` AS `created_by`,
 					`asset`.`creation_date` AS `creation_date`,
 					`asset`.`modified_by` AS `modified_by`,
-					`asset`.`modified_date` AS `modified_date`
+					`asset`.`modified_date` AS `modified_date`,
+					`asset`.`depreciation_flag` AS `depreciation_flag`,
+					`asset`.`purchase_date` AS `purchase_date`,
+					`asset`.`purchase_cost` AS `purchase_cost`
 					%s
 					%s
 					%s

@@ -137,7 +137,7 @@
 			}*/
 		}
 		
-		public function GetHelperTableByEntityQtypeId($intEntityQtypeId) {
+		public static function GetHelperTableByEntityQtypeId($intEntityQtypeId) {
 		  switch ($intEntityQtypeId) {
     	  case 1: 
     		  $strTableName = "asset";

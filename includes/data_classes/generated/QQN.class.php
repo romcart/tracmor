@@ -1,6 +1,12 @@
 <?php
 	class QQN {
 		/**
+		 * @return QQNodeVersion
+		 */
+		static public function Version() {
+			return new QQNodeVersion('_version', null, null);
+		}
+		/**
 		 * @return QQNodeAddress
 		 */
 		static public function Address() {
@@ -161,6 +167,12 @@
 		 */
 		static public function DatagridColumnPreference() {
 			return new QQNodeDatagridColumnPreference('datagrid_column_preference', null, null);
+		}
+		/**
+		 * @return QQNodeDepreciationClass
+		 */
+		static public function DepreciationClass() {
+			return new QQNodeDepreciationClass('depreciation_class', null, null);
 		}
 		/**
 		 * @return QQNodeEntityQtypeCustomField

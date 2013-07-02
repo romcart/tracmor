@@ -69,7 +69,7 @@
 	}
 
     $this->txtParentAssetCode->TabIndex = $parentTabIndex;
-    $this->chkLockToParent->TabIndex = $parentTabIndex + 1;
+    $this->chkLockToParent->TabIndex = $parentTabIndex++;
 
 	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . $this->lblIconParentAssetCode->Render(false) . $this->chkLockToParent->RenderWithError(false) . $this->lblLockedToParent->Render(false));
 
@@ -78,6 +78,36 @@
 		$arrAssetFields[] = array('name' => 'Date Created:', 'value' => $this->lblCreationDate->Render(false));
 		$arrAssetFields[] = array('name' => 'Date Modified:', 'value' => $this->lblModifiedDate->Render(false));
 	}
+
+    // Adding depreciation fields to rendering
+		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+				$this->chkAssetDepreciation->TabIndex = $parentTabIndex++;
+				$this->txtPurchaseCost->TabIndex = $parentTabIndex++;
+				$this->calPurchaseDate->TabIndex = $parentTabIndex++;
+			if($this->chkAssetDepreciation->Display == true){
+				$arrAssetFields[] = array('name'  => $this->chkAssetDepreciation->Name.':'
+										 ,'value' => $this->chkAssetDepreciation->RenderWithError(false));
+			}
+			if($this->txtPurchaseCost->Display == true || $this->lblPurchaseCost->Display == true){
+				$arrAssetFields[] = array('name'  => $this->txtPurchaseCost->Name,
+										  'value' => $this->txtPurchaseCost->RenderWithError(false)
+													.$this->lblPurchaseCost->Render(false));
+				$arrAssetFields[] = array('name'  => $this->calPurchaseDate->Name,
+										  'value' => $this->calPurchaseDate->Render(false)
+													.$this->lblPurchaseDate->Render(false));
+				$arrAssetFields[] = array('name'  => $this->lblBookValue->Name
+										 ,'value' => $this->lblBookValue->Render(false));
+		}
+
+		/*	$this->chkAssetDepreciation->RenderWithName();
+			$this->lblPurchaseCost->RenderWithName();
+			$this->txtPurchaseCost->RenderWithName();
+			$this->lblPurchaseDate->RenderWithName();
+			$this->calPurchaseDate->RenderWithName();
+			$this->lblBookValue->RenderWithName();
+		*/
+		}
+
 
 ?>
 
@@ -138,6 +168,7 @@
 		</td>
 	</tr>
 </table>
+
 <?php
 $this->pnlAttachments->Render();
 ?>
