@@ -7,7 +7,7 @@ require_once('../includes/prepend.inc.php');
 $objDatabase = QApplication::$Database[1];
 
 // Check if this script has already been run
-$objDbResult = $objDatabase->Query("SELECT `version` FROM '_version'");
+$objDbResult = $objDatabase->Query("SELECT `version` FROM `_version`");
 $arrRecord = $objDbResult->FetchArray();
 if ($arrRecord['version'] == '0.4.1') {
         echo('This script has already been run! Exiting...');
