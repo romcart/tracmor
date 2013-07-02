@@ -6,6 +6,14 @@ require_once('../includes/prepend.inc.php');
 
 $objDatabase = QApplication::$Database[1];
 
+// Check if this script has already been run
+$objDbResult = $objDatabase->Query("SELECT `version` FROM '_version'");
+$arrRecord = $objDbResult->FetchArray();
+if ($arrRecord['version'] == '0.4.1') {
+        echo('This script has already been run! Exiting...');
+        exit;
+}
+
 // Put the following in a transaction and rollback if there are any problems
 try {
 	$objDatabase->TransactionBegin();
@@ -14,10 +22,9 @@ try {
 	$strQuery = "ALTER TABLE `_version` CHANGE COLUMN `version` `version` VARCHAR(50) NOT NULL
 	, ADD PRIMARY KEY (`version`) ;";
 	$objDatabase->NonQuery($strQuery);
-	//
 
-	// Set version to 0.4.0
-	$strQuery = "UPDATE `_version` SET `version`='0.4.1' WHERE `version` <>'0.4.1';";
+	// Set version
+	$strQuery = "UPDATE `_version` SET `version`='0.4.1';";
 	$objDatabase->NonQuery($strQuery);
 
 	// Change default value for custom_field all_asset_model_flag
