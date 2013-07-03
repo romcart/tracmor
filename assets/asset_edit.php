@@ -883,36 +883,35 @@ CREATE FIELD METHODS
 
 		// Display the Child Assets form
 		public function DisplayChildAssets() {
-			if ($this->ctlAssetEdit->btnSaveDisplay && $this->blnEditChild) {
-  		  $this->lblChildAssets->Display = true;
-			  $this->lblAssetCode->Display = true;
-  		  $this->pnlAddChildAsset->Display = true;
-			  $this->btnChildAssetsRemove->Display = true;
-  		  $this->btnReassign->Display = true;
-  		  $this->btnLinkToParent->Display = true;
-  		  $this->btnUnlink->Display = true;
-  		  $this->dtgChildAssets->GetColumn(0)->Display = true;
-  		  $this->dtgChildAssets_Bind();
-			}
-			else {
-			  if ($this->intTransactionTypeId) {
-			    $this->lblChildAssets->Display = false;
-			    $this->dtgChildAssets->Display = false;
-			  }
-			  elseif (!$this->ctlAssetEdit->Display) {
-			    $this->lblChildAssets->Visible = false;
-			    $this->dtgChildAssets->Visible = false;
-			  }
-			  else {
-			    $this->lblChildAssets->Visible = true;
-			    @$this->dtgChildAssets->Visible = true;
-			  }
-  		  $this->lblAssetCode->Display = false;
-  		  $this->pnlAddChildAsset->Display = false;
-			  $this->btnChildAssetsRemove->Display = false;
-  		  $this->btnReassign->Display = false;
-  		  $this->btnLinkToParent->Display = false;
-  		  $this->btnUnlink->Display = false;
+			if (!$this->intTransactionTypeId) {
+				if ($this->ctlAssetEdit->btnSaveDisplay && $this->blnEditChild) {
+					$this->lblChildAssets->Display = true;
+					$this->lblAssetCode->Display = true;
+					$this->pnlAddChildAsset->Display = true;
+					$this->btnChildAssetsRemove->Display = true;
+					$this->btnReassign->Display = true;
+					$this->btnLinkToParent->Display = true;
+					$this->btnUnlink->Display = true;
+					$this->dtgChildAssets->GetColumn(0)->Display = true;
+					$this->dtgChildAssets_Bind();
+				} else {
+					if ($this->intTransactionTypeId) {
+						$this->lblChildAssets->Display = false;
+						$this->dtgChildAssets->Display = false;
+					} elseif (!$this->ctlAssetEdit->Display) {
+						$this->lblChildAssets->Visible = false;
+						$this->dtgChildAssets->Visible = false;
+					} else {
+						$this->lblChildAssets->Visible = true;
+						@$this->dtgChildAssets->Visible = true;
+					}
+					$this->lblAssetCode->Display = false;
+					$this->pnlAddChildAsset->Display = false;
+					$this->btnChildAssetsRemove->Display = false;
+					$this->btnReassign->Display = false;
+					$this->btnLinkToParent->Display = false;
+					$this->btnUnlink->Display = false;
+				}
 			}
 		}
 
