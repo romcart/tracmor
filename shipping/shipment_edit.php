@@ -2895,8 +2895,8 @@
 								// Make sure that it wasn't added then removed
 								if ($objInventoryTransactionToDelete) {
 									// Change back the quantity
-									$objInventoryTransactionToDelete->InventoryLocation->Quantity += $objInventoryTransactionToDelete->Quantity;
-									$objInventoryTransactionToDelete->InventoryLocation->Save();
+									//$objInventoryTransactionToDelete->InventoryLocation->Quantity += $objInventoryTransactionToDelete->Quantity;
+									//$objInventoryTransactionToDelete->InventoryLocation->Save();
 									// Delete the InventoryTransaction
 									$objInventoryTransactionToDelete->Delete();
 									unset($objInventoryTransactionToDelete);
