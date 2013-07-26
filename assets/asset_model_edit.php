@@ -763,8 +763,11 @@ class AssetModelEditForm extends AssetModelEditFormBase {
 		$this->lblManufacturer->Text = $this->lstManufacturer->SelectedName;
 		$this->pnlLongDescription->Text = nl2br($this->txtLongDescription->Text);
 		$this->lblImage->Text = $this->ifcImage->GetDisplayHtml($this->objAssetModel->ImagePath);
-		$this->lblDepreciationClass->Text = ($this->lstDepreciationClass->SelectedValue==null)?'':
-		                                            $this->lstDepreciationClass->SelectedName;
+		
+		// Update Depreciation label if enabled
+		if (QApplication::$TracmorSettings->DepreciationFlag == '1') {
+			$this->lblDepreciationClass->Text = ($this->lstDepreciationClass->SelectedValue==null) ? '' : $this->lstDepreciationClass->SelectedName;
+		}
 
 		// Update custom labels
 		if ($this->arrCustomFields) {
