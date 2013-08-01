@@ -2932,12 +2932,11 @@
 						}
 
 						$objDatabase->TransactionCommit();
-						$this->UpdateShipmentLabels();
-						$this->SetupShipment();
-						$this->DisplayLabels();
-
-
-						$this->txtTrackingNumber->Enabled = true;
+						//$this->UpdateShipmentLabels();
+						//$this->SetupShipment();
+						//$this->DisplayLabels();
+						//$this->txtTrackingNumber->Enabled = true;
+						QApplication::Redirect('shipment_edit.php?intShipmentId=' . $this->objShipment->ShipmentId);
 
 					}
 					catch (QExtendedOptimisticLockingException $objExc) {
