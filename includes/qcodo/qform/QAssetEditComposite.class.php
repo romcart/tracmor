@@ -140,6 +140,10 @@ class QAssetEditComposite extends QControl {
 		$this->lstAssetModel_Create();
 		$this->chkAutoGenerateAssetCode_Create();
 		$this->dlgNewAssetModel_Create();
+		// Create parent asset tag field
+		$this->txtParentAssetCode_Create();
+		$this->chkLockToParent_Create();
+
 		$this->UpdateAssetControls();
 
 		// Set a variable which defines whether the built-in fields must be rendered or not.
@@ -150,10 +154,6 @@ class QAssetEditComposite extends QControl {
 
 		// Create all custom asset fields
 		$this->customFields_Create();
-
-		// Create parent asset tag field
-		$this->txtParentAssetCode_Create();
-		$this->chkLockToParent_Create();
 
 		// Create Buttons
 		$this->btnSave_Create();
