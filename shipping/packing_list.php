@@ -20,6 +20,7 @@
  */
 
 	require_once('../includes/prepend.inc.php');
+	QApplication::Authenticate(5);
 
 	class PackingListForm extends QForm {
 		
