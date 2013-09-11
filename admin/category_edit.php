@@ -154,14 +154,25 @@
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 			
 			try {
+				// Get an instance of the database
+				$objDatabase = QApplication::$Database[1];
+
+				// Begin a MySQL Transaction to be either committed or rolled back
+				$objDatabase->TransactionBegin();
+
 				$objCustomFieldArray = $this->objCategory->objCustomFieldArray;
 				$this->objCategory->Delete();
-				// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
-				// The values should not get deleted for select values
-				// CustomField::DeleteTextValues($objCustomFieldArray);
+
+				// Commit the transaction to the database
+				$objDatabase->TransactionCommit();
+
 				$this->RedirectToListPage();
 			}
 			catch (QDatabaseExceptionBase $objExc) {
+
+				// Rollback the database transaction
+				$objDatabase->TransactionRollback();
+
 				if ($objExc->ErrorNumber == 1451) {
 					$this->btnCancel->Warning = 'This category cannot be deleted because it is associated with one or more models.';
 				}
