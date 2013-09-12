@@ -27,34 +27,33 @@
 	// Asset Tag
 	// Model
 
-		if (!$this->blnEditMode){
-			$arrAssetFields[] = array('name' => 'Model:',  'value' => $this->lstAssetModel->RenderWithError(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));
-		}
-		else{
-			$arrAssetFields[] = array('name' => 'Model:',  'value' => $this->lstAssetModel->Render(false) . $this->lblNewAssetModel->Render(false) . $this->lblAssetModel->Render(false));
-		}
+	if (!$this->blnEditMode){
+		$arrAssetFields[] = array('name' => 'Model:',  'value' => $this->lstAssetModel->RenderWithError(false) . '&nbsp;' . $this->lblNewAssetModel->Render(false));
+	} else {
+		$arrAssetFields[] = array('name' => 'Model:',  'value' => $this->lstAssetModel->Render(false) . $this->lblNewAssetModel->Render(false) . $this->lblAssetModel->Render(false));
+	}
 
-		$arrAssetFields[] = array('name' => 'Asset Tag:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
+	$arrAssetFields[] = array('name' => 'Asset Tag:',   'value' => $this->txtAssetCode->RenderWithError(false) . $this->chkAutoGenerateAssetCode->Render(false) . $this->lblAssetCode->Render(false));
 
-		$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false));
-		$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false));
-		$arrAssetFields[] = array('name' => 'Model Number:',  'value' => $this->lblAssetModelCode->Render(false));
-    if (!$this->blnEditMode) {
-			$arrAssetFields[] = array('name' => 'Location:',     'value' => $this->lstLocation->RenderWithError(false));
-		}
-		else {
-			$arrAssetFields[] = array('name' => 'Location:', 'value' => $this->lblLocation->RenderWithError(false));
-		}
+	$arrAssetFields[] = array('name' => 'Category:',     'value' => $this->lblCategory->Render(false));
+	$arrAssetFields[] = array('name' => 'Manufacturer:', 'value' => $this->lblManufacturer->Render(false));
+	$arrAssetFields[] = array('name' => 'Model Number:',  'value' => $this->lblAssetModelCode->Render(false));
 
-		// Only display 'Reserved By' if the asset is reserved
-		if ($this->lblReservedBy->Visible) {
-			$arrAssetFields[] = array('name' => 'Reserved By:', 'value' => $this->lblReservedBy->Render(false));
-		}
+	if (!$this->blnEditMode) {
+		$arrAssetFields[] = array('name' => 'Location:',     'value' => $this->lstLocation->RenderWithError(false));
+	} else {
+		$arrAssetFields[] = array('name' => 'Location:', 'value' => $this->lblLocation->RenderWithError(false));
+	}
 
-	  // Only display 'Checked Out To' if the asset is checked out
-		if ($this->lblCheckedOutTo->Visible) {
-			$arrAssetFields[] = array('name' => 'Checked Out To:', 'value' => $this->lblCheckedOutTo->Render(false));
-		}
+	// Only display 'Reserved By' if the asset is reserved
+	if ($this->lblReservedBy->Visible) {
+		$arrAssetFields[] = array('name' => 'Reserved By:', 'value' => $this->lblReservedBy->Render(false));
+	}
+
+	// Only display 'Checked Out To' if the asset is checked out
+	if ($this->lblCheckedOutTo->Visible) {
+		$arrAssetFields[] = array('name' => 'Checked Out To:', 'value' => $this->lblCheckedOutTo->Render(false));
+	}
 
 	// Setting counter for calculating 	txtParentAssetCode and chkLockToParent tabIndexes handling dynamic custom fields number
 	$this->blnEditMode?$parentTabIndex=3:$parentTabIndex=4;
@@ -68,8 +67,8 @@
 		}
 	}
 
-    $this->txtParentAssetCode->TabIndex = $parentTabIndex;
-    $this->chkLockToParent->TabIndex = $parentTabIndex++;
+	$this->txtParentAssetCode->TabIndex = $parentTabIndex;
+	$this->chkLockToParent->TabIndex = $parentTabIndex++;
 
 	$arrAssetFields[] = array('name' => 'Parent Asset:', 'value' => $this->lblParentAssetCode->Render(false) . $this->txtParentAssetCode->RenderWithError(false) . $this->lblIconParentAssetCode->Render(false) . $this->chkLockToParent->RenderWithError(false) . $this->lblLockedToParent->Render(false));
 
@@ -79,34 +78,34 @@
 		$arrAssetFields[] = array('name' => 'Date Modified:', 'value' => $this->lblModifiedDate->Render(false));
 	}
 
-    // Adding depreciation fields to rendering
-		if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
-				$this->chkAssetDepreciation->TabIndex = $parentTabIndex++;
-				$this->txtPurchaseCost->TabIndex = $parentTabIndex++;
-				$this->calPurchaseDate->TabIndex = $parentTabIndex++;
-			if($this->chkAssetDepreciation->Display == true){
-				$arrAssetFields[] = array('name'  => $this->chkAssetDepreciation->Name.':'
-										 ,'value' => $this->chkAssetDepreciation->RenderWithError(false));
-			}
-			if($this->txtPurchaseCost->Display == true || $this->lblPurchaseCost->Display == true){
-				$arrAssetFields[] = array('name'  => $this->txtPurchaseCost->Name,
-										  'value' => $this->txtPurchaseCost->RenderWithError(false)
-													.$this->lblPurchaseCost->Render(false));
-				$arrAssetFields[] = array('name'  => $this->calPurchaseDate->Name,
-										  'value' => $this->calPurchaseDate->Render(false)
-													.$this->lblPurchaseDate->Render(false));
-				$arrAssetFields[] = array('name'  => $this->lblBookValue->Name
-										 ,'value' => $this->lblBookValue->Render(false));
+	// Adding depreciation fields to rendering
+	if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+			$this->chkAssetDepreciation->TabIndex = $parentTabIndex++;
+			$this->txtPurchaseCost->TabIndex = $parentTabIndex++;
+			$this->calPurchaseDate->TabIndex = $parentTabIndex++;
+		if($this->chkAssetDepreciation->Display == true){
+			$arrAssetFields[] = array('name'  => $this->chkAssetDepreciation->Name.':'
+									 ,'value' => $this->chkAssetDepreciation->RenderWithError(false));
 		}
+		if($this->txtPurchaseCost->Display == true || $this->lblPurchaseCost->Display == true){
+			$arrAssetFields[] = array('name'  => $this->txtPurchaseCost->Name,
+									  'value' => $this->txtPurchaseCost->RenderWithError(false)
+												.$this->lblPurchaseCost->Render(false));
+			$arrAssetFields[] = array('name'  => $this->calPurchaseDate->Name,
+									  'value' => $this->calPurchaseDate->Render(false)
+												.$this->lblPurchaseDate->Render(false));
+			$arrAssetFields[] = array('name'  => $this->lblBookValue->Name
+									 ,'value' => $this->lblBookValue->Render(false));
+	}
 
-		/*	$this->chkAssetDepreciation->RenderWithName();
-			$this->lblPurchaseCost->RenderWithName();
-			$this->txtPurchaseCost->RenderWithName();
-			$this->lblPurchaseDate->RenderWithName();
-			$this->calPurchaseDate->RenderWithName();
-			$this->lblBookValue->RenderWithName();
-		*/
-		}
+	/*	$this->chkAssetDepreciation->RenderWithName();
+		$this->lblPurchaseCost->RenderWithName();
+		$this->txtPurchaseCost->RenderWithName();
+		$this->lblPurchaseDate->RenderWithName();
+		$this->calPurchaseDate->RenderWithName();
+		$this->lblBookValue->RenderWithName();
+	*/
+	}
 
 
 ?>
@@ -184,20 +183,9 @@ $this->pnlAttachments->Render();
 		$this->btnArchive->Render();
 		echo '<br class="item_divider">';
 		echo '<br class="item_divider">';
-	//	echo '<div class="title">Transactions</div>';
-	//	$this->dtgAssetTransaction->RenderWithError();
 	}
 ?>
 <br class="item_divider">
 <?php
-if ($this->blnEditMode) {
-//	$this->lblShipmentReceipt->Render();
-//	$this->dtgShipmentReceipt->RenderWithError();
-
-     //$this->lblAssetHistory->Render();
-	// $this->dtgAssetHistory->RenderWithError();
-
-}
-
-$this->dlgNewAssetModel->Render();
+	$this->dlgNewAssetModel->Render();
 ?>

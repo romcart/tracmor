@@ -138,12 +138,6 @@
 			// If an existing asset is being edited, render the Transaction datagrid
 			if ($this->ctlAssetEdit->blnEditMode) {
 
-				// Specify the local databind method this datagrid will use
-				$this->ctlAssetEdit->dtgAssetTransaction->SetDataBinder('dtgAssetTransaction_Bind');
-
-				// Specify the local databind method this datagrid will use
-				$this->ctlAssetEdit->dtgShipmentReceipt->SetDataBinder('dtgShipmentReceipt_Bind');
-
                 // Specify the local databind method this datarepeater will use
                 $this->dtrAssetHistory->SetDataBinder('dtrAssetHistory_Bind');
 
@@ -187,170 +181,100 @@
 			$this->dtgChildAssets->CellSpacing = 0;
 			$this->dtgChildAssets->CssClass = "datagrid";
 
-	    // Enable AJAX - this won't work while using the DB profiler
-	    $this->dtgChildAssets->UseAjax = true;
+			// Enable AJAX - this won't work while using the DB profiler
+			$this->dtgChildAssets->UseAjax = true;
 
-	    // Enable Pagination, and set to 20 items per page
-	    $objPaginator = new QPaginator($this->dtgChildAssets);
-	    $this->dtgChildAssets->Paginator = $objPaginator;
-	    $this->dtgChildAssets->ItemsPerPage = 20;
+			// Enable Pagination, and set to 20 items per page
+			$objPaginator = new QPaginator($this->dtgChildAssets);
+			$this->dtgChildAssets->Paginator = $objPaginator;
+			$this->dtgChildAssets->ItemsPerPage = 20;
 
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15px', 'Display=false'));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => "15px", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Tag', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
-	    $this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array('CssClass' => "dtg_column", 'Width' => "30%")));
+			$this->dtgChildAssets->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false', 'Width=15px', 'Display=false'));
+			$this->dtgChildAssets->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->DisplayLockedImage($_ITEM->LinkedFlag) ?>', array('CssClass' => "dtg_column", 'Width' => "15px", 'HtmlEntities' => false)));
+			$this->dtgChildAssets->AddColumn(new QDataGridColumn('Asset Tag', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
+			$this->dtgChildAssets->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->AssetModel->__toStringWithLink("bluelink") ?>', array('CssClass' => "dtg_column", 'Width' => "30%", 'HtmlEntities' => false)));
+			$this->dtgChildAssets->AddColumn(new QDataGridColumn('Location', '<?= $_ITEM->Location->__toString() ?>', array('CssClass' => "dtg_column", 'Width' => "30%")));
 
-	    //$this->dtgChildAssets->SortColumnIndex = 2;
+			//$this->dtgChildAssets->SortColumnIndex = 2;
 
-	    $objStyle = $this->dtgChildAssets->RowStyle;
-	    $objStyle->ForeColor = '#000000';
-	    $objStyle->BackColor = '#FFFFFF';
-	    $objStyle->FontSize = 12;
+			$objStyle = $this->dtgChildAssets->RowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#FFFFFF';
+			$objStyle->FontSize = 12;
 
-	    $objStyle = $this->dtgChildAssets->AlternateRowStyle;
-	    $objStyle->BackColor = '#EFEFEF';
+			$objStyle = $this->dtgChildAssets->AlternateRowStyle;
+			$objStyle->BackColor = '#EFEFEF';
 
-	    $objStyle = $this->dtgChildAssets->HeaderRowStyle;
-	    $objStyle->ForeColor = '#000000';
-	    $objStyle->BackColor = '#EFEFEF';
-	    $objStyle->CssClass = 'dtg_header';
+			$objStyle = $this->dtgChildAssets->HeaderRowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#EFEFEF';
+			$objStyle->CssClass = 'dtg_header';
 
-	    $this->dtgChildAssets->ShowHeader = false;
-	    if (!isset($this->objAsset)) {
-	      $this->SetupAsset($this);
-	    }
-	    if ($this->objAsset && is_int($this->objAsset->AssetId)) {
-	    	$this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
-	    }
-	    else {
-	    	$this->ctlAssetEdit->objChildAssetArray = array();
-	    }
+			$this->dtgChildAssets->ShowHeader = false;
+			if (!isset($this->objAsset)) {
+				$this->SetupAsset($this);
+			}
+			if ($this->objAsset && is_int($this->objAsset->AssetId)) {
+				$this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
+			} else {
+				$this->ctlAssetEdit->objChildAssetArray = array();
+			}
 		}
 
-        protected function lblAssetHistory_Create() {
-    		$this->lblAssetHistory = new QLabel($this);
-    		$this->lblAssetHistory->Name = 'Asset History';
-    		$this->lblAssetHistory->Text = 'Asset History';
-    		$this->lblAssetHistory->CssClass = 'title';
-    	}
+		protected function lblAssetHistory_Create() {
+			$this->lblAssetHistory = new QLabel($this);
+			$this->lblAssetHistory->Name = 'Asset History';
+			$this->lblAssetHistory->Text = 'Asset History';
+			$this->lblAssetHistory->CssClass = 'title';
+		}
 
-        protected function dtrAssetHistory_Create(){
-            $this->dtrAssetHistory = new QDataRepeater($this);
-            $this->dtrAssetHistory->Paginator = new QPaginator($this);
-            $this->dtrAssetHistory->ItemsPerPage = 10;
-            $this->dtrAssetHistory->UseAjax = true;
-            $this->dtrAssetHistory->Template = 'dtr_asset_history.tpl.php';
-            $this->dtrAssetHistory->SetDataBinder('dtrAssetHistory_Bind');
-        }
+		protected function dtrAssetHistory_Create(){
+			$this->dtrAssetHistory = new QDataRepeater($this);
+			$this->dtrAssetHistory->Paginator = new QPaginator($this);
+			$this->dtrAssetHistory->ItemsPerPage = 10;
+			$this->dtrAssetHistory->UseAjax = true;
+			$this->dtrAssetHistory->Template = 'dtr_asset_history.tpl.php';
+			$this->dtrAssetHistory->SetDataBinder('dtrAssetHistory_Bind');
+		}
 
 		protected function dtgChildAssets_Bind() {
-		  $this->dtgChildAssets->TotalItemCount = count($this->ctlAssetEdit->objChildAssetArray);
-	    if ($this->dtgChildAssets->TotalItemCount) {
-        $this->dtgChildAssets->ShowHeader = true;
-        // added to fix items per page
-	       $this->dtgChildAssets->DataSource = $this->ctlAssetEdit->objChildAssetArray;
-           $intItemsPerPage = $this->dtgChildAssets->ItemsPerPage;
-	       $intItemOffset = ($this->dtgChildAssets->PageNumber - 1) * $intItemsPerPage;
-	       $arrDataSource = array_slice($this->ctlAssetEdit->objChildAssetArray, $intItemOffset, $intItemsPerPage);
-	      // end of fix
-	      $this->dtgChildAssets->DataSource = $arrDataSource;
-	      $this->btnChildAssetsRemove->Enabled = true;
-	      $this->btnReassign->Enabled = true;
-	      $this->btnLinkToParent->Enabled = true;
-	      if (!$this->btnUnlink->Enabled)
-			$this->btnUnlink->Enabled = true;
-	    }
-	    else {
-	      $this->dtgChildAssets->ShowHeader = false;
-	      $this->btnChildAssetsRemove->Enabled = false;
-	      $this->btnReassign->Enabled = false;
-	      $this->btnLinkToParent->Enabled = false;
-	      $this->btnUnlink->Enabled = false;
-	    }
+			$this->dtgChildAssets->TotalItemCount = count($this->ctlAssetEdit->objChildAssetArray);
+			if ($this->dtgChildAssets->TotalItemCount) {
+				$this->dtgChildAssets->ShowHeader = true;
+				// added to fix items per page
+				$this->dtgChildAssets->DataSource = $this->ctlAssetEdit->objChildAssetArray;
+				$intItemsPerPage = $this->dtgChildAssets->ItemsPerPage;
+				$intItemOffset = ($this->dtgChildAssets->PageNumber - 1) * $intItemsPerPage;
+				$arrDataSource = array_slice($this->ctlAssetEdit->objChildAssetArray, $intItemOffset, $intItemsPerPage);
+				// end of fix
+				$this->dtgChildAssets->DataSource = $arrDataSource;
+				$this->btnChildAssetsRemove->Enabled = true;
+				$this->btnReassign->Enabled = true;
+				$this->btnLinkToParent->Enabled = true;
+				if (!$this->btnUnlink->Enabled)
+					$this->btnUnlink->Enabled = true;
+			} else {
+				$this->dtgChildAssets->ShowHeader = false;
+				$this->btnChildAssetsRemove->Enabled = false;
+				$this->btnReassign->Enabled = false;
+				$this->btnLinkToParent->Enabled = false;
+				$this->btnUnlink->Enabled = false;
+			}
 		}
 
-		protected function dtgAssetTransaction_Bind() {
-			// Get Total Count b/c of Pagination
-			$this->ctlAssetEdit->dtgAssetTransaction->TotalItemCount = AssetTransaction::CountShipmentReceiptByAssetId($this->ctlAssetEdit->objAsset->AssetId, false);
-			if ($this->ctlAssetEdit->dtgAssetTransaction->TotalItemCount === 0) {
-				$this->ctlAssetEdit->dtgAssetTransaction->ShowHeader = false;
-			}
-			else {
-				$this->ctlAssetEdit->dtgAssetTransaction->ShowHeader = true;
-			}
+		protected function dtrAssetHistory_Bind() {
 
-			$objClauses = array();
-			if ($objClause = $this->ctlAssetEdit->dtgAssetTransaction->OrderByClause)
-				array_push($objClauses, $objClause);
-			if ($objClause = $this->ctlAssetEdit->dtgAssetTransaction->LimitClause)
-				array_push($objClauses, $objClause);
-			if ($objClause = QQ::Expand(QQN::AssetTransaction()->Transaction->TransactionType))
-				array_push($objClauses, $objClause);
-			if ($objClause = QQ::Expand(QQN::AssetTransaction()->AssetTransactionCheckout->AssetTransactionCheckoutId))
-				array_push($objClauses, $objClause);
-			if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation))
-				array_push($objClauses, $objClause);
-			if ($objClause = QQ::Expand(QQN::AssetTransaction()->DestinationLocation))
-				array_push($objClauses, $objClause);
-
-			$objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::NotEqual(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6), QQ::NotEqual(QQN::AssetTransaction()->Transaction->TransactionTypeId, 7));
-
-			$this->ctlAssetEdit->dtgAssetTransaction->DataSource = AssetTransaction::QueryArray($objCondition, $objClauses);
-		}
-
-		protected function dtgShipmentReceipt_Bind() {
 			// Get Total Count for Pagination
-
+			$this->dtrAssetHistory->TotalItemCount = AssetTransaction::CountAssetTransaction($this->ctlAssetEdit->objAsset->AssetId);
 			$objClauses = array();
-
-			$this->ctlAssetEdit->dtgShipmentReceipt->TotalItemCount = AssetTransaction::CountShipmentReceiptByAssetId($this->ctlAssetEdit->objAsset->AssetId);
-
-			if ($this->ctlAssetEdit->dtgShipmentReceipt->TotalItemCount === 0) {
-				//$this->ctlAssetEdit->lblShipmentReceipt->Display = false;
-				$this->ctlAssetEdit->dtgShipmentReceipt->ShowHeader = false;
-			}
-			else {
-
-				$objClauses = array();
-				if ($objClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false)) {
-					array_push($objClauses, $objClause);
-				}
-				if ($objClause = $this->ctlAssetEdit->dtgShipmentReceipt->LimitClause) {
-					array_push($objClauses, $objClause);
-				}
-				if ($objClause = QQ::Expand(QQN::AssetTransaction()->Transaction->Shipment)) {
-					array_push($objClauses, $objClause);
-				}
-				if ($objClause = QQ::Expand(QQN::AssetTransaction()->Transaction->Receipt)) {
-					array_push($objClauses, $objClause);
-				}
-				if ($objClause = QQ::Expand(QQN::AssetTransaction()->SourceLocation)) {
-					array_push($objClauses, $objClause);
-				}
-				if ($objClause = QQ::Expand(QQN::AssetTransaction()->DestinationLocation)) {
-					array_push($objClauses, $objClause);
-				}
-
-				$objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 6), QQ::Equal(QQN::AssetTransaction()->Transaction->TransactionTypeId, 7)));
-
-				$this->ctlAssetEdit->dtgShipmentReceipt->DataSource = AssetTransaction::QueryArray($objCondition, $objClauses);
-			}
+			$objClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false);
+			array_push($objClauses, $objClause);
+			$objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::In(QQN::AssetTransaction()->Transaction->TransactionTypeId, array(1,2,3,6,7,8,9,10,11))));
+			$intItemsPerPage = $this->dtrAssetHistory->ItemsPerPage;
+			$intItemOffset = ($this->dtrAssetHistory->PageNumber - 1) * $intItemsPerPage;
+			$arrDataSource = array_slice(AssetTransaction::QueryArray($objCondition, $objClauses), $intItemOffset, $intItemsPerPage);
+			$this->dtrAssetHistory->DataSource =$arrDataSource;
 		}
-
-        protected function dtrAssetHistory_Bind() {
-
-     		// Get Total Count for Pagination
-            $this->dtrAssetHistory->TotalItemCount = AssetTransaction::CountAssetTransaction($this->ctlAssetEdit->objAsset->AssetId);
-            $objClauses = array();
-            $objClause = QQ::OrderBy(QQN::AssetTransaction()->Transaction->CreationDate, false);
-            array_push($objClauses, $objClause);
-            $objCondition = QQ::AndCondition(QQ::Equal(QQN::AssetTransaction()->AssetId, $this->ctlAssetEdit->objAsset->AssetId), QQ::OrCondition(QQ::In(QQN::AssetTransaction()->Transaction->TransactionTypeId, array(1,2,3,6,7,8,9,10,11))));
-            $intItemsPerPage = $this->dtrAssetHistory->ItemsPerPage;
-            $intItemOffset = ($this->dtrAssetHistory->PageNumber - 1) * $intItemsPerPage;
-            $arrDataSource = array_slice(AssetTransaction::QueryArray($objCondition, $objClauses), $intItemOffset, $intItemsPerPage);
-            $this->dtrAssetHistory->DataSource =$arrDataSource;
-     	}
 
 		protected function dtgAssetTransact_Bind() {
 
