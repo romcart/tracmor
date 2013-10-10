@@ -19,27 +19,27 @@
 	abstract class TransactionEditFormBase extends QForm {
 		// General Form Variables
 		protected $objTransaction;
-		protected $strTitleVerb;
+		//protected $strTitleVerb;
 		protected $blnEditMode;
 
 		// Controls for Transaction's Data Fields
-		protected $lblTransactionId;
-		protected $lstEntityQtype;
-		protected $lstTransactionType;
-		protected $txtNote;
-		protected $lstCreatedByObject;
-		protected $calCreationDate;
-		protected $lstModifiedByObject;
-		protected $lblModifiedDate;
+		//protected $lblTransactionId;
+		//protected $lstEntityQtype;
+		//protected $lstTransactionType;
+		//protected $txtNote;
+		//protected $lstCreatedByObject;
+		//protected $calCreationDate;
+		//protected $lstModifiedByObject;
+		//protected $lblModifiedDate;
 
 		// Other ListBoxes (if applicable) via Unique ReverseReferences and ManyToMany References
-		protected $lstReceipt;
-		protected $lstShipment;
+		//protected $lstReceipt;
+		//protected $lstShipment;
 
 		// Button Actions
-		protected $btnSave;
-		protected $btnCancel;
-		protected $btnDelete;
+		//protected $btnSave;
+		//protected $btnCancel;
+		//protected $btnDelete;
 
 		protected function SetupTransaction() {
 			// Lookup Object PK information from Query String (if applicable)
@@ -51,11 +51,11 @@
 				if (!$this->objTransaction)
 					throw new Exception('Could not find a Transaction object with PK arguments: ' . $intTransactionId);
 
-				$this->strTitleVerb = QApplication::Translate('Edit');
+				//$this->strTitleVerb = QApplication::Translate('Edit');
 				$this->blnEditMode = true;
 			} else {
 				$this->objTransaction = new Transaction();
-				$this->strTitleVerb = QApplication::Translate('Create');
+				//$this->strTitleVerb = QApplication::Translate('Create');
 				$this->blnEditMode = false;
 			}
 		}
@@ -65,23 +65,23 @@
 			$this->SetupTransaction();
 
 			// Create/Setup Controls for Transaction's Data Fields
-			$this->lblTransactionId_Create();
-			$this->lstEntityQtype_Create();
-			$this->lstTransactionType_Create();
-			$this->txtNote_Create();
-			$this->lstCreatedByObject_Create();
-			$this->calCreationDate_Create();
-			$this->lstModifiedByObject_Create();
-			$this->lblModifiedDate_Create();
+			//$this->lblTransactionId_Create();
+			//$this->lstEntityQtype_Create();
+			//$this->lstTransactionType_Create();
+			//$this->txtNote_Create();
+			//$this->lstCreatedByObject_Create();
+			//$this->calCreationDate_Create();
+			//$this->lstModifiedByObject_Create();
+			//$this->lblModifiedDate_Create();
 
 			// Create/Setup ListBoxes (if applicable) via Unique ReverseReferences and ManyToMany References
-			$this->lstReceipt_Create();
-			$this->lstShipment_Create();
+			//$this->lstReceipt_Create();
+			//$this->lstShipment_Create();
 
 			// Create/Setup Button Action controls
-			$this->btnSave_Create();
-			$this->btnCancel_Create();
-			$this->btnDelete_Create();
+			//$this->btnSave_Create();
+			//$this->btnCancel_Create();
+			//$this->btnDelete_Create();
 		}
 
 		// Protected Create Methods

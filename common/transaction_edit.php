@@ -119,56 +119,69 @@
 			$this->dtgEntity->CellSpacing = 0;
 			$this->dtgEntity->CssClass = "datagrid";
 			
-	    // Enable AJAX - this won't work while using the DB profiler
-	    $this->dtgEntity->UseAjax = true;
-	
-	    // Enable Pagination, and set to 20 items per page
-	    $objPaginator = new QPaginator($this->dtgEntity);
-	    $this->dtgEntity->Paginator = $objPaginator;
-	    $this->dtgEntity->ItemsPerPage = 10;
-	    
-	    // These datagrids are not sortable because they would need early expansion
-	    // Sorting is possible to implement but not worth the time right now
-	    if ($this->objTransaction->EntityQtypeId == EntityQtype::Asset) {
-		    $this->dtgEntity->AddColumn(new QDataGridColumn('Asset Tag', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-		    $this->dtgEntity->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink($_ITEM->Asset->AssetModel,"bluelink") ?>', 'Width=200', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-		    $this->dtgEntity->AddColumn(new QDataGridColumn('Source', '<?= $_ITEM->SourceLocation->__toString() ?>', 'CssClass="dtg_column"'));
-		    $this->dtgEntity->AddColumn(new QDataGridColumn('Destination', '<?= $_ITEM->__toStringDestinationLocation() ?>', 'CssClass="dtg_column"'));
-	    }
-	    elseif ($this->objTransaction->EntityQtypeId == EntityQtype::Inventory) {
-	    	$this->dtgEntity->AddColumn(new QDataGridColumn('Inventory Code', '<?= $_ITEM->InventoryLocation->InventoryModel->__toStringWithLink("bluelink") ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));	    	
-	    	$this->dtgEntity->AddColumn(new QDataGridColumn('Inventory Model', '<?= $_ITEM->InventoryLocation->InventoryModel->ShortDescription ?>', 'CssClass="dtg_column"'));
-	    	$this->dtgEntity->AddColumn(new QDataGridColumn('Source', '<?= $_ITEM->SourceLocation->__toString() ?>', 'CssClass="dtg_column"'));
-	    	$this->dtgEntity->AddColumn(new QDataGridColumn('Destination', '<?= $_ITEM->DestinationLocation->__toString() ?>', 'CssClass="dtg_column"'));
-	    	$this->dtgEntity->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', 'CssClass="dtg_column"'));
-	    }
-	    
-	    $objStyle = $this->dtgEntity->RowStyle;
-	    $objStyle->ForeColor = '#000000';
-	    $objStyle->BackColor = '#FFFFFF';
-	    $objStyle->FontSize = 12;
-	
-	    $objStyle = $this->dtgEntity->AlternateRowStyle;
-	    $objStyle->BackColor = '#EFEFEF';
-	
-      $objStyle = $this->dtgEntity->HeaderRowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';
+			// Enable AJAX - this won't work while using the DB profiler
+			$this->dtgEntity->UseAjax = true;
+
+			// Enable Pagination, and set to 20 items per page
+			$objPaginator = new QPaginator($this->dtgEntity);
+			$this->dtgEntity->Paginator = $objPaginator;
+			$this->dtgEntity->ItemsPerPage = 10;
+
+			// These datagrids are not sortable because they would need early expansion
+			// Sorting is possible to implement but not worth the time right now
+			if ($this->objTransaction->EntityQtypeId == EntityQtype::Asset) {
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Asset Tag', '<?= $_ITEM->Asset->__toStringWithLink("bluelink") ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Model', '<?= $_ITEM->Asset->AssetModel->__toStringWithLink($_ITEM->Asset->AssetModel,"bluelink") ?>', 'Width=200', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Source', '<?= $_ITEM->SourceLocation->__toString() ?>', 'CssClass="dtg_column"'));
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Destination', '<?= $_ITEM->__toStringDestinationLocation() ?>', 'CssClass="dtg_column"'));
+			}
+			elseif ($this->objTransaction->EntityQtypeId == EntityQtype::Inventory) {
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Inventory Code', '<?= $_ITEM->InventoryLocation->InventoryModel->__toStringWithLink("bluelink") ?>', 'CssClass="dtg_column"', 'HtmlEntities="false"'));	    	
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Inventory Model', '<?= $_ITEM->InventoryLocation->InventoryModel->ShortDescription ?>', 'CssClass="dtg_column"'));
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Source', '<?= $_ITEM->SourceLocation->__toString() ?>', 'CssClass="dtg_column"'));
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Destination', '<?= $_ITEM->DestinationLocation->__toString() ?>', 'CssClass="dtg_column"'));
+				$this->dtgEntity->AddColumn(new QDataGridColumn('Quantity', '<?= $_ITEM->Quantity ?>', 'CssClass="dtg_column"'));
+			}
+
+			$this->dtgEntity->SetDataBinder('dtgEntity_Bind');
+
+			$objStyle = $this->dtgEntity->RowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#FFFFFF';
+			$objStyle->FontSize = 12;
+
+			$objStyle = $this->dtgEntity->AlternateRowStyle;
+			$objStyle->BackColor = '#EFEFEF';
+
+			$objStyle = $this->dtgEntity->HeaderRowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#EFEFEF';
+			$objStyle->CssClass = 'dtg_header';
 		}
 		
-		protected function Form_PreRender() {
+		protected function dtgEntity_Bind() {
+			if ($this->objTransaction->EntityQtypeId == EntityQtype::Asset) {
+				$objExpansionMap[AssetTransaction::ExpandAsset][Asset::ExpandAssetModel] = true;
+				$this->dtgEntity->TotalItemCount = $this->objTransaction->CountAssetTransactions();
+				$this->dtgEntity->DataSource = $this->objTransaction->GetAssetTransactionArray(QQ::Clause($this->dtgEntity->OrderByClause, $this->dtgEntity->LimitClause));
+			} else if ($this->objTransaction->EntityQtypeId == EntityQtype::Inventory) {
+				$this->dtgEntity->TotalItemCount = $this->objTransaction->CountInventoryTransactions();
+				$this->dtgEntity->DataSource = $this->objTransaction->GetInventoryTransactionArray(QQ::Clause($this->dtgEntity->OrderByClause, $this->dtgEntity->LimitClause));
+			}
+		}
+
+		/*protected function Form_PreRender() {
 			
 			if ($this->objTransaction->EntityQtypeId == EntityQtype::Asset) {
 				$objExpansionMap[AssetTransaction::ExpandAsset][Asset::ExpandAssetModel] = true;
-		    $this->dtgEntity->TotalItemCount = $this->objTransaction->CountAssetTransactions();
-		    $this->dtgEntity->DataSource = $this->objTransaction->GetAssetTransactionArray();				
+				$this->dtgEntity->TotalItemCount = $this->objTransaction->CountAssetTransactions();
+				$this->dtgEntity->DataSource = $this->objTransaction->GetAssetTransactionArray();				
 			}
 			elseif ($this->objTransaction->EntityQtypeId == EntityQtype::Inventory) {
 				$this->dtgEntity->TotalItemCount = $this->objTransaction->CountInventoryTransactions();
 				$this->dtgEntity->DataSource = $this->objTransaction->GetInventoryTransactionArray();
 			}
-		}
+		}*/
 	}
 
 	// Go ahead and run this form object to render the page and its event handlers, using
