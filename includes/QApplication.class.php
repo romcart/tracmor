@@ -268,34 +268,30 @@
 		/**
 		* This moves a file from the local filesystem to the S3 file system provided in the tracmor_configuration.inc.php file
 		*
-		* @param string $strPath should not include trailing slash
+		* @param string $strPath
 		* @param string $strFileName
 		* @param string $strType MIME type of the file
-		* @param string $strS3Path path to S3 folder (do not include bucket) - '/images/shipping_labels' for example
+		* @param string $strS3Path path to S3 folder including leading slash- '/attachments' for example
 		* @return bool
 		*/
-		// strPath and strS3Path should not include trailing slash but this will still work if it doesn't
-		// strS3Path should include beginning slash '/images/shipping_labels' for example
 		public static function MoveToS3($strPath, $strFileName, $strType, $strS3Path) {
 			
-			rtrim($strPath, '/');
-			rtrim($strS3Path, '/');
+			$strPath = rtrim($strPath, '/');
+			$strS3Path = rtrim($strS3Path, '/');
 			
 			if (file_exists($strPath . '/' . $strFileName)) {
-				require_once( __DOCROOT__ . __PHP_ASSETS__ . '/s3.class.php');
-				$objS3 = new S3();
-				$objS3->putBucket(AWS_BUCKET);
+				require_once( __DOCROOT__ . __PHP_ASSETS__ . '/S3.php');
+				$objS3 = new S3(AWS_ACCESS_KEY, AWS_SECRET_KEY);
 				
-				$fh = fopen($strPath . '/' . $strFileName, 'rb');
-				$contents = fread($fh, filesize($strPath . '/' . $strFileName));
-				fclose($fh);
-				$objS3->putObject($strFileName, $contents, AWS_BUCKET . $strS3Path, 'public-read', $strType);
+				// Put the file in S3
+				$objS3->putObjectFile($strPath . '/' . $strFileName, AWS_BUCKET, ltrim(AWS_PATH, '/') . $strS3Path . '/' . $strFileName, S3::ACL_PUBLIC_READ);
 				
+				// Delete the temporary file from web server
 				unlink($strPath . '/' . $strFileName);
+				
 				unset($objS3);
 				return true;
-			}
-			else {
+			} else {
 				return false;
 			}
 		}

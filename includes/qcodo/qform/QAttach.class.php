@@ -146,7 +146,7 @@
 					if (AWS_S3) {
 						QApplication::MoveToS3(__DOCROOT__ . __SUBDIRECTORY__ . '/uploads/attachments', $objAttachment->TmpFilename, $objAttachment->FileType, '/attachments');
 	
-						$objAttachment->Path = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/attachments/' . $objAttachment->TmpFilename;
+						$objAttachment->Path = 'http://s3.amazonaws.com/' . AWS_BUCKET .  AWS_PATH . '/attachments/' . $objAttachment->TmpFilename;
 						$objAttachment->Save();
 					}
 	

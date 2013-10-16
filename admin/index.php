@@ -74,7 +74,7 @@
 				$this->flaCompanyLogo->imgFileIcon->ImagePath = '../images/empty.gif';
 			} else {
 				if (AWS_S3) {
-					$this->flaCompanyLogo->imgFileIcon->ImagePath = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/images/' . QApplication::$TracmorSettings->CompanyLogo;
+					$this->flaCompanyLogo->imgFileIcon->ImagePath = 'http://s3.amazonaws.com/' . AWS_BUCKET . AWS_PATH . '/images/' . QApplication::$TracmorSettings->CompanyLogo;
 				} else {
 					$this->flaCompanyLogo->imgFileIcon->ImagePath = '../images/' . QApplication::$TracmorSettings->CompanyLogo;
 				}

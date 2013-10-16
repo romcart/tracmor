@@ -85,9 +85,10 @@
 		public function lblDelete_Click($strFormId, $strControlId, $strParameter) {
 			$objAttachment = Attachment::Load($strParameter);
 			if (AWS_S3) {
-				require( __DOCROOT__ . __PHP_ASSETS__ . '/s3.class.php');
-				$objS3 = new S3();
-				$objS3->deleteObject('attachments/' . $objAttachment->TmpFilename, AWS_BUCKET);
+				require(__DOCROOT__ . __PHP_ASSETS__ . '/S3.php');
+				$objS3 = new S3(AWS_ACCESS_KEY, AWS_SECRET_KEY);
+				$strS3Path = (AWS_PATH != '') ? ltrim(AWS_PATH, '/') . '/' : '';
+				$objS3->deleteObject(AWS_BUCKET, $strS3Path . 'attachments/' . $objAttachment->TmpFilename);
 			}
 			else {
 				if (file_exists($objAttachment->Path)) {

@@ -78,7 +78,8 @@
 	DEFINE('AWS_S3', false);
 	DEFINE('AWS_ACCESS_KEY', '');
 	DEFINE('AWS_SECRET_KEY', '');
-	DEFINE('AWS_BUCKET', '');
+	DEFINE('AWS_BUCKET', '');	// S3 Bucket to store Tracmor files. Example: MyBucket
+	DEFINE('AWS_PATH', ''); 	// Path in AWS_BUCKET to store Tracmor files, including leading slash. Example: /tracmor/files
 	
 	// Location of tmp directory
 	DEFINE('__TRACMOR_TMP__', '/tmp');

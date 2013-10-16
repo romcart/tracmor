@@ -145,8 +145,8 @@
 		public function GetDisplayHtml($strImagePath) {
 			if ($strImagePath) {
 				if (AWS_S3) {
-					$href = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/images/asset_models/' . $strImagePath;
-					$src = 'http://s3.amazonaws.com/' . AWS_BUCKET . '/images/asset_models/thumbs/' . $strImagePath;
+					$href = 'http://s3.amazonaws.com/' . AWS_BUCKET . AWS_PATH . '/images/asset_models/' . $strImagePath;
+					$src = 'http://s3.amazonaws.com/' . AWS_BUCKET . AWS_PATH . '/images/asset_models/thumbs/' . $strImagePath;
 				}
 				else {
 					$href = $this->strWebPath . $strImagePath;
