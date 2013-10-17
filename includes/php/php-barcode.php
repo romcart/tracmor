@@ -1,6 +1,6 @@
 <?php
 /*
- * PHP-Barcode 0.3pl1
+ * PHP-Barcode 0.4
  
  * PHP-Barcode generates
  *   - Barcode-Images using libgd2 (png, jpg, gif)
@@ -13,11 +13,11 @@
  *     barcode-encoder which uses GNU-Barcode
  *     genbarcode can encode EAN-13, EAN-8, UPC, ISBN, 39, 128(a,b,c),
  *     I25, 128RAW, CBR, MSI, PLS
- *     genbarcode is available at www.ashberg.de/bar 
+ *     genbarcode is available at www.ashberg.de/php-barcode 
  
- * (C) 2001,2002,2003,2004 by Folke Ashberg <folke@ashberg.de>
+ * (C) 2001,2002,2003,2004,2011 by Folke Ashberg <folke@ashberg.de>
  
- * The newest version can be found at http://www.ashberg.de/bar
+ * The newest version can be found at http://www.ashberg.de/php-barcode
  
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,26 +50,8 @@ $text_color=Array(0,0,0);
 /*                          FONT FILE                                   */
 /* ******************************************************************** */
 /* location the the ttf-font */
-/* the file arialbd.ttf isn't included! */
 
-/* SAMPLE1 : 
- * use arialbd.ttf located in same directory like the script
- * which includes/requires php-barcode.php
- */
-// $font_loc=dirname($_SERVER["PATH_TRANSLATED"])."/"."arialbd.ttf";
-
-/* SAMPLE2 :
- * use font specified by full-path
- */
-//$font_loc="/path/font.ttf"
-
-/* Automatic-Detection of Font if running Windows
- * kick this lines if you don't need them! */
-/*if (isset($_ENV['windir']) && file_exists($_ENV['windir'])){
-    $font_loc=$_ENV['windir']."\Fonts\arialbd.ttf";
-}*/
-
-$font_loc = "../fonts/Vera.ttf";
+$font_loc="../fonts/Vera.ttf";
 
 /* ******************************************************************** */
 /*                          GENBARCODE                                  */
@@ -84,6 +66,7 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 else {
 	$genbarcode_loc="./genbarcode";
 }
+
 
 /* CONFIGURATION ENDS HERE */
 
@@ -110,7 +93,8 @@ require("encode_bars.php"); /* build-in encoders */
  */
 
 
-function barcode_outimage($text, $bars, $scale = 1, $mode = "png", $total_y = 0, $space = '') {
+function barcode_outimage($text, $bars, $scale = 1, $mode = "png",
+	    $total_y = 0, $space = ''){
     global $bar_color, $bg_color, $text_color;
     global $font_loc;
     /* set defaults */
@@ -130,7 +114,7 @@ function barcode_outimage($text, $bars, $scale = 1, $mode = "png", $total_y = 0,
 	    $width=false;
 	    continue;
 	}
-	if (ereg("[a-z]", $val)){
+	if (preg_match("#[a-z]#", $val)){
 	    /* tall bar */
 	    $val=ord($val)-ord('a')+1;
 	} 
@@ -159,7 +143,7 @@ function barcode_outimage($text, $bars, $scale = 1, $mode = "png", $total_y = 0,
 	print "The author of php-barcode will give not support on this topic!<BR>\n";
 	print "<BR>\n";
 	print "<BR>\n";
-	print "<A HREF=\"http://www.ashberg.de/bar/\">Folke Ashberg's OpenSource PHP-Barcode</A><BR>\n";
+	print "<A HREF=\"http://www.ashberg.de/php-barcode/\">Folke Ashberg's OpenSource PHP-Barcode</A><BR>\n";
 	return "";
     }
     $im=imagecreate($total_x, $total_y);
@@ -180,7 +164,7 @@ function barcode_outimage($text, $bars, $scale = 1, $mode = "png", $total_y = 0,
 	    $width=false;
 	    continue;
 	}
-	if (ereg("[a-z]", $val)){
+	if (preg_match("#[a-z]#", $val)){
 	    /* tall bar */
 	    $val=ord($val)-ord('a')+1;
 	    $h=$height2;
@@ -240,7 +224,7 @@ function barcode_outtext($code,$bars){
 	    for ($a=0;$a<$val;$a++) $bar_line.="-";
 	    continue;
 	}
-	if (ereg("[a-z]", $val)){
+	if (preg_match("#[a-z]#", $val)){
 	    $val=ord($val)-ord('a')+1;
 	    $h=$heigh2;
 	    for ($a=0;$a<$val;$a++) $bar_line.="I";
@@ -285,34 +269,34 @@ function barcode_outhtml($code, $bars, $scale = 1, $total_y = 0, $space = ''){
     $height=round($total_y-($scale*10));
     $height2=round($total_y)-$space['bottom'];
     $out=
-      '<Table border=0 cellspacing=0 cellpadding=0 bgcolor="white">'."\n".
-      '<TR><TD><img src=white.png height="'.$space['top'].'" width=1></TD></TR>'."\n".
-      '<TR><TD>'."\n".
-      '<IMG src=white.png height="'.$height2.'" width="'.$space['left'].'">';
+      '<table border=0 cellspacing=0 cellpadding=0 bgcolor="white">'."\n".
+      '<tr><td><img src="white.png" height="'.$space['top'].'" width="1" alt=" "></td></tr>'."\n".
+      '<tr><td>'."\n".
+      '<img src="white.png" height="'.$height2.'" width="'.$space['left'].'" alt="#"/>';
     
     $width=true;
     for ($i=0;$i<strlen($bars);$i++){
 	$val=strtolower($bars[$i]);
 	if ($width){
 	    $w=$val*$scale;
-	    if ($w>0) $out.="<IMG src=white.png height=\"$total_y\" width=\"$w\" align=top>";
+	    if ($w>0) $out.='<img src="white.png" height="'.$total_y.'" width="'.$w.'" align="top" alt="" />';
 	    $width=false;
 	    continue;
 	}
-	if (ereg("[a-z]", $val)){
+	if (preg_match("#[a-z]#", $val)){
 	    //hoher strich
 	    $val=ord($val)-ord('a')+1;
 	    $h=$height2;
 	}else $h=$height;
 	$w=$val*$scale;
-	if ($w>0) $out.='<IMG src="black.png" height="'.$h.'" width="'.$w.'" align=top>';
+	if ($w>0) $out.='<img src="black.png" height="'.$h.'" width="'.$w.'" align="top" />';
 	$width=true;
     }
     $out.=
-      '<IMG src=white.png height="'.$height2.'" width=".'.$space['right'].'">'.
-      '</TD></TR>'."\n".
-      '<TR><TD><img src="white.png" height="'.$space['bottom'].'" width="1"></TD></TR>'."\n".
-      '</TABLE>'."\n";
+      '<img src="white.png" height="'.$height2.'" width=".'.$space['right'].'" />'.
+      '</td></tr>'."\n".
+      '<tr><td><img src="white.png" height="'.$space['bottom'].'" width="1"></td></tr>'."\n".
+      '</table>'."\n";
     //for ($i=0;$i<strlen($bars);$i+=2) print $line[$i]."<B>".$line[$i+1]."</B>&nbsp;";
     return $out;
 }
@@ -329,13 +313,13 @@ function barcode_outhtml($code, $bars, $scale = 1, $total_y = 0, $space = ''){
 function barcode_encode_genbarcode($code,$encoding){
     global $genbarcode_loc;
     /* delete EAN-13 checksum */
-    if (eregi("^ean$", $encoding) && strlen($code)==13) $code=substr($code,0,12);
+    if (preg_match("#^ean$#i", $encoding) && strlen($code)==13) $code=substr($code,0,12);
     if (!$encoding) $encoding="ANY";
-    $encoding=ereg_replace("[|\\]", "_", $encoding);
-    $code=ereg_replace("[|\\]", "_", $code);
-    $cmd=$genbarcode_loc." \""
-	.str_replace("\"", "\\\"",$code)."\" \""
-	.str_replace("\"", "\\\"",strtoupper($encoding))."\"";
+    $encoding=preg_replace("#[|\\\\]#", "_", $encoding);
+    $code=preg_replace("#[|\\\\]#", "_", $code);
+    $cmd=$genbarcode_loc." "
+	.escapeshellarg($code)." "
+	.escapeshellarg(strtoupper($encoding))."";
     //print "'$cmd'<BR>\n";
     $fp=popen($cmd, "r");
     if ($fp){
@@ -382,16 +366,16 @@ function barcode_encode_genbarcode($code,$encoding){
 function barcode_encode($code,$encoding){
     global $genbarcode_loc;
     if (
-		((eregi("^ean$", $encoding)
+		((preg_match("#^ean$#i", $encoding)
 		 && ( strlen($code)==12 || strlen($code)==13)))
 		 
-		|| (($encoding) && (eregi("^isbn$", $encoding))
+		|| (($encoding) && (preg_match("#^isbn$#i", $encoding))
 		 && (( strlen($code)==9 || strlen($code)==10) ||
-		 (((ereg("^978", $code) && strlen($code)==12) ||
+		 (((preg_match("#^978#", $code) && strlen($code)==12) ||
 		  (strlen($code)==13)))))
 
-		|| (( !isset($encoding) || !$encoding || (eregi("^ANY$", $encoding) ))
-		 && (ereg("^[0-9]{12,13}$", $code)))
+		|| (( !isset($encoding) || !$encoding || (preg_match("#^ANY$#i", $encoding) ))
+		 && (preg_match("#^[0-9]{12,13}$#", $code)))
 	      
 		){
 	/* use built-in EAN-Encoder */
@@ -401,15 +385,15 @@ function barcode_encode($code,$encoding){
 	$bars=barcode_encode_genbarcode($code, $encoding);
     } else {
 	print "php-barcode needs an external programm for encodings other then EAN/ISBN<BR>\n";
-	print "<UL>\n";
-	print "<LI>download gnu-barcode from <A href=\"http://www.gnu.org/software/barcode/\">www.gnu.org/software/barcode/</A>\n";
-	print "<LI>compile and install them\n";
-	print "<LI>download genbarcode from <A href=\"http://www.ashberg.de/bar/\">www.ashberg.de/bar/</A>\n";
-	print "<LI>compile and install them\n";
-	print "<LI>specify path the genbarcode in php-barcode.php\n";
-	print "</UL>\n";
-	print "<BR>\n";
-	print "<A HREF=\"http://www.ashberg.de/bar/\">Folke Ashberg's OpenSource PHP-Barcode</A><BR>\n";
+	print "<ul>\n";
+	print "<li>download gnu-barcode from <a href=\"http://www.gnu.org/software/barcode/\">www.gnu.org/software/barcode/</a></li>\n";
+	print "<li>compile and install them</li>\n";
+	print "<li>download genbarcode from <a href=\"http://www.ashberg.de/php-barcode/\">www.ashberg.de/php-barcode/</a></li>\n";
+	print "<li>compile and install them</li>\n";
+	print "<li>specify path to genbarcode in php-barcode.php</li>\n";
+	print "</ul>\n";
+	print "<br />\n";
+	print "<a href=\"http://www.ashberg.de/php-barcode/\">Folke Ashberg's OpenSource PHP-Barcode</a><br />\n";
 	return false;
     }
     return $bars;
@@ -426,15 +410,15 @@ function barcode_encode($code,$encoding){
  */
 
 
-function barcode_print($code, $encoding="ANY", $scale = 2 , $mode = "png", $total_y = 0 ) {
-    $bars=barcode_encode($code,$encoding);
-    if (!$bars) return;
-    if (!$mode) $mode="png";
-    if ($total_y == 0) $total_y = $scale * 60;
-    if (eregi($mode,"^(text|txt|plain)$")) print barcode_outtext($bars['text'],$bars['bars']);
-    elseif (eregi($mode,"^(html|htm)$")) print barcode_outhtml($bars['text'],$bars['bars'], $scale,0, 0);
-    else barcode_outimage($bars['text'],$bars['bars'],$scale, $mode, $total_y);
-    return $bars;
+function barcode_print($code, $encoding="ANY", $scale = 2 ,$mode = "png", $total_y = 0 ){
+	$bars=barcode_encode($code,$encoding);
+	if (!$bars) return;
+	if (!$mode) $mode="png";
+	if ($total_y == 0) $total_y = $scale * 60;
+	if (preg_match("#^(text|txt|plain)$#i", $mode)) print barcode_outtext($bars['text'],$bars['bars']);
+	elseif (preg_match("#^(html|htm)$#i", $mode)) print barcode_outhtml($bars['text'],$bars['bars'], $scale,0, 0);
+	else barcode_outimage($bars['text'],$bars['bars'],$scale, $mode, $total_y);
+	return $bars;
 }
 
 ?>

@@ -2,11 +2,11 @@
 /*
 
  * Built-In Encoders
- * Part of PHP-Barcode 0.3pl1
+ * Part of PHP-Barcode 0.4
  
- * (C) 2001,2002,2003,2004 by Folke Ashberg <folke@ashberg.de>
+ * (C) 2001,2002,2003,2004,2011 by Folke Ashberg <folke@ashberg.de>
  
- * The newest version can be found at http://www.ashberg.de/bar
+ * The newest version can be found at http://www.ashberg.de/php-barcode
  
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,14 +47,14 @@ function barcode_encode_ean($ean, $encoding = "EAN-13"){
     $guards=array("9a1a","1a1a1","a1a");
 
     $ean=trim($ean);
-    if (eregi("[^0-9]",$ean)){
+    if (preg_match("#[^0-9]#i",$ean)){
 	return array("text"=>"Invalid EAN-Code");
     }
     $encoding=strtoupper($encoding);
     if ($encoding=="ISBN"){
-	if (!ereg("^978", $ean)) $ean="978".$ean;
+	if (!preg_match("#^978#", $ean)) $ean="978".$ean;
     }
-    if (ereg("^978", $ean)) $encoding="ISBN";
+    if (preg_match("#^978#", $ean)) $encoding="ISBN";
     if (strlen($ean)<12 || strlen($ean)>13){
 	return array("text"=>"Invalid $encoding Code (must have 12/13 numbers)");
     }
