@@ -166,7 +166,7 @@
 			$this->lblLogo = new QLabel($this);
 			$this->lblLogo->HtmlEntities=false;
 			$strProtocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
-			$strImagePath = (AWS_S3) ? sprintf('%ss3.amazonaws.com/%s/images', $strProtocol, AWS_BUCKET) : '../images';
+			$strImagePath = (AWS_S3) ? sprintf('%ss3.amazonaws.com/%s/images', $strProtocol, AWS_BUCKET . AWS_PATH) : '../images';
 			if (!QApplication::$TracmorSettings->PackingListLogo) {
 				$this->lblLogo->Text = '<img src="../images/empty.gif">';
 			} else {
