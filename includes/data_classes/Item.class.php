@@ -26,11 +26,9 @@
 		
 		public function RenderBarcode() {
 			
-			$strEncoding = '128';
-			
 			$strPath = '../includes/php/barcode.php';
 			
-			$strToReturn = sprintf('<img src="%s?code=%s&encoding=%s&scale=1">',$strPath, $this->strCode, $strEncoding);
+			$strToReturn = sprintf('<img src="%s?code=%s">',$strPath, $this->strCode);
 			
 			return $strToReturn;
 		}

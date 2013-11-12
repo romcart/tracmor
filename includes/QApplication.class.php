@@ -9,6 +9,8 @@
 	 * This Application class should extend from the ApplicationBase class in
 	 * the framework.
 	 */
+	use Zend\Barcode\Barcode;
+
 	abstract class QApplication extends QApplicationBase {
 		/**
 		 * This is called by the PHP5 Autoloader.  This method overrides the
@@ -23,6 +25,11 @@
 				if (file_exists($strFilePath = sprintf('%s/%s.class.php', __DATA_CLASSES__, $strClassName))) {
 					require($strFilePath);
 					return true;
+				} else if (substr($strClassName, 0, 4) == 'Zend') {
+					if (file_exists($strFilePath = sprintf('%s/%s.php', __INCLUDES__, str_replace('\\', '/', $strClassName)))) {
+						require($strFilePath);
+						return true;
+					}
 				}
 			}
 			return false;			
@@ -293,6 +300,39 @@
 				return true;
 			} else {
 				return false;
+			}
+		}
+
+		/**
+		 * This draws and optionally renders a barcode image
+		 *
+		 * @param string $strText The text to represent as a barcode
+		 * @param bool $blnRender 
+		 * @return image 
+		 */
+		public static function DrawBarcode($strText, $blnRender = false) {
+
+			$arrBarcodeOptions = array(
+				'text' => $strText,
+				'font' => __INCLUDES__ . '/fonts/VeraMono.ttf'
+			);
+
+			// No required renderer options
+			$arrRendererOptions = array();
+
+			if (!$blnRender) {
+				// Draw the barcode and return the resource
+				$imgResource = Barcode::draw(
+					'code128', 'image', $arrBarcodeOptions, $arrRendererOptions
+				);
+
+				return $imgResource;
+			} else {
+				// Draw the barcode in a new image,
+				// send the headers and the image
+				Barcode::render(
+					'code128', 'image', $arrBarcodeOptions, $arrRendererOptions
+				);
 			}
 		}
 	}
