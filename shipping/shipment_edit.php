@@ -2636,20 +2636,8 @@
 					}
 				}
 
-				// Set all 'Complete Shipment' information to null
-				// $this->objShipment->PackageTypeId = null;
-				// $this->objShipment->PackageWeight = null;
-				// $this->objShipment->WeightUnitId = null;
-				// $this->objShipment->PackageLength = null;
-				// $this->objShipment->PackageWidth = null;
-				// $this->objShipment->PackageHeight = null;
-				// $this->objShipment->LengthUnitId = null;
-				// $this->objShipment->Value = null;
-				// $this->objShipment->CurrencyUnitId = null;
-				// $this->objShipment->NotificationFlag = null;
-
 				// Set the TrackingNumber back to null
-				$this->objShipment->TrackingNumber = null;
+				//$this->objShipment->TrackingNumber = null;
 
 				// Set the shipment as pending
 				$this->objShipment->ShippedFlag = false;
