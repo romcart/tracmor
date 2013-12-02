@@ -26,7 +26,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	
 	foreach ($arrInventoryCodeLocationQuantity as $strInventoryCodeLocationQuantity) {
 	  $blnErrorCurrentInventory = false;
-	  list($strInventoryModelCode, $strSourceLocation, $intQuantity) = split('[|]',$strInventoryCodeLocationQuantity,3);
+	  list($strInventoryModelCode, $strSourceLocation, $intQuantity) = explode('[|]',$strInventoryCodeLocationQuantity,3);
 	  if ($strInventoryModelCode && $strSourceLocation && $intQuantity) {
 		  $intNewInventoryLocationId = 0;
 		  // Begin error checking
@@ -153,7 +153,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
   
   if (is_array($arrCheckedInventoryCodeLocationQuantity)) {
 	  foreach ($arrCheckedInventoryCodeLocationQuantity as $strInventoryCodeLocationQuantity) {
-	    list($strInventoryModelCode, $strSourceLocation, $intQuantity) = split('[|]',$strInventoryCodeLocationQuantity,3);
+	    list($strInventoryModelCode, $strSourceLocation, $intQuantity) = explode('[|]',$strInventoryCodeLocationQuantity,3);
 	  	$strJavaScriptCode .= "AddInventoryPost('".$strInventoryModelCode."','".$strSourceLocation."','".$intQuantity."');";
 	  }
 	}

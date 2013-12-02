@@ -25,7 +25,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	$arrCheckedAssetCodeLocation = array();
 	$arrLocation = array();
 	foreach ($arrAssetCodeLocation as $strAssetCodeLocation) {
-	  list($strAssetCode, $strLocation) = split('[|]',$strAssetCodeLocation,2);
+	  list($strAssetCode, $strLocation) = explode('[|]',$strAssetCodeLocation,2);
 		if ($strAssetCode && $strLocation) {
 			// Begin error checking
 			// Asset Tag must match an existing asset in the system
@@ -128,7 +128,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	}
 	if (is_array($arrCheckedAssetCodeLocation)) {
 	  foreach ($arrCheckedAssetCodeLocation as $strAssetCodeLocation) {
-	    list($strAssetCode, $strLocation) = split('[|]',$strAssetCodeLocation,2);
+	    list($strAssetCode, $strLocation) = explode('[|]',$strAssetCodeLocation,2);
 	  	$strJavaScriptCode .= "AddAssetLocationPost('".$strAssetCode."','".$strLocation."');";
 	  }
 	}

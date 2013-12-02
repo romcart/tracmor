@@ -26,7 +26,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
 	
 	foreach ($arrInventoryCodeQuantity as $strInventoryCodeQuantity) {
 	  $blnErrorCurrentInventory = false;
-	  list($strInventoryModelCode, $intQuantity) = split('[|]',$strInventoryCodeQuantity,2);
+	  list($strInventoryModelCode, $intQuantity) = explode('[|]',$strInventoryCodeQuantity,2);
 	  if ($strInventoryModelCode && $intQuantity) {
 		  // Begin error checking
 	    // Load the inventory model object based on the inventory_model_code submitted
@@ -147,7 +147,7 @@ if ($_POST && $_POST['method'] == 'complete_transaction') {
   
   if (is_array($arrCheckedInventoryCodeQuantity)) {
 	  foreach ($arrCheckedInventoryCodeQuantity as $strInventoryCodeQuantity) {
-	    list($strInventoryModelCode, $intQuantity) = split('[|]',$strInventoryCodeQuantity,2);
+	    list($strInventoryModelCode, $intQuantity) = explode('[|]',$strInventoryCodeQuantity,2);
 	  	$strJavaScriptCode .= "AddInventoryQuantityPost('".$strInventoryModelCode."','".$intQuantity."');";
 	  }
 	}
