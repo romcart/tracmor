@@ -499,9 +499,9 @@ INSERT INTO `admin_setting` (`setting_id`,`short_description`,`value`) VALUES
 	(24,'depreciation_flag','1');
 
 INSERT INTO `shortcut` (`module_id`, `authorization_id`, `transaction_type_id`, `short_description`, `link`, `image_path`, `entity_qtype_id`, `create_flag`) VALUES
-        (2,2,NULL,'Create Asset Model','../assets/asset_model_edit.php','asset_model_create.png',4,1),
-        (2,1,NULL,'Asset Models','../assets/asset_model_list.php','asset_model.png',4,0),
-        (2,2,NULL,'Import Asset Models','../assets/asset_model_import.php','asset_model_import.png',4,1),
+        (2,2,NULL,'Create Model','../assets/asset_model_edit.php','asset_model_create.png',4,1),
+        (2,1,NULL,'Models','../assets/asset_model_list.php','asset_model.png',4,0),
+        (2,2,NULL,'Import Models','../assets/asset_model_import.php','asset_model_import.png',4,1),
         (2,2,NULL,'Create Asset','../assets/asset_edit.php','asset_create.png',1,1),
         (2,1,NULL,'Assets','../assets/asset_list.php','asset.png',1,0),
         (2,2,NULL,'Import Assets','../assets/asset_import.php','asset_import.png',1,1),
