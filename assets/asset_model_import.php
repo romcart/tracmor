@@ -802,7 +802,7 @@
                 }
 
 				// depreciation
-				if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+				if(QApplication::$TracmorSettings->DepreciationFlag == '1' && $this->intDepreciationKey != null){
 				  $strKeyArray = array_keys($intDepreciationClassArray, strtolower(trim($strRowArray[$this->intDepreciationKey])));
 				  if (count($strKeyArray)) {
 					  $intDepreciationId = $strKeyArray[0];
@@ -900,7 +900,7 @@
                         $strAssetModelArray[] = $strAssetModel;
 
 						 // $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s',  NOW())", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId, $_SESSION['intUserAccountId']);
-						  $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', NOW(), '%s')", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId ,$_SESSION['intUserAccountId'], $intDepreciationId?$intDepreciationId:'NULL');
+						  $this->strModelValuesArray[] = sprintf("('%s', '%s', '%s', '%s', '%s', '%s', NOW(), %s)", $strShortDescription, (isset($intModelLongDescriptionKey)) ? addslashes(trim($strRowArray[$intModelLongDescriptionKey])) : null, $strAssetModelCode, $intCategoryId, $intManufacturerId ,$_SESSION['intUserAccountId'], $intDepreciationId?$intDepreciationId:'NULL');
                         $objNewAssetModelArray[] = $strShortDescription;
                         if (isset($strCFVArray) && count($strCFVArray)) {
                           $strModelCFVArray[] = implode(', ', $strCFVArray);
