@@ -35,7 +35,13 @@
 	 * @subpackage DataObjects
 	 *
 	 */
+
+
 	class AssetModel extends AssetModelGen {
+
+
+        CONST UPLOAD_PATH       = "../images/asset_models/";
+        CONST THUMB_UPLOAD_PATH = "../images/asset_models/thumbs/";
 
 		protected $intAssetCount;
 		public $objCustomFieldArray;
@@ -560,5 +566,44 @@
 			$objToReturn->intAssetCount = $objDbRow->GetColumn($strAliasPrefix . 'asset_count', 'Integer');
 			return $objToReturn;
 		}
+
+        public static function DeleteSelected(array $selected){
+            try {
+                // Get an instance of the database
+                $objDatabase = QApplication::$Database[1];
+                // Begin a MySQL Transaction to be either committed or rolled back
+                $objDatabase->TransactionBegin();
+                foreach($selected as $intItemId){
+                    $objAssetModel = self::Load($intItemId);
+                    $objAssetModel->DeleteImageFile();
+                    $objAssetModel->Delete();
+                }
+
+                $objDatabase->TransactionCommit();
+            }
+            catch (QDatabaseExceptionBase $objExc) {
+                $objDatabase->TransactionRollback();
+                throw new QDatabaseExceptionBase();
+            }
+        }
+
+        protected function DeleteImageFile(){
+            if ($this->strImagePath) {
+                $filename = self::UPLOAD_PATH.$this->strImagePath;
+                if (is_file($filename)) {
+                    unlink(self::UPLOAD_PATH.$this->strImagePath);
+                }
+                else {
+                    // throw new Exception('File '.$filename.' does not exist to delete.');
+                }
+                $filename_thumb = self::THUMB_UPLOAD_PATH . QApplication::$TracmorSettings->ImageUploadPrefix . $this->strImagePath;
+                if (is_file($filename_thumb)) {
+                    unlink(self::THUMB_UPLOAD_PATH . QApplication::$TracmorSettings->ImageUploadPrefix . $this->strImagePath);
+                }
+                else {
+                    // throw new Exception('File '.$filename_thumb.' does not exist to delete.');
+                }
+            }
+        }
 	}
 ?>

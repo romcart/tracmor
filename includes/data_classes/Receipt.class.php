@@ -684,6 +684,54 @@
 			return $arrSearchSql;
 	  }
 
+
+		/**
+		 * Check if Receipt contains contact
+		 * by FromContactId Index(es)
+		 * @param integer $intContactId
+		 * @return bool
+		 */
+	public static function hasContact($intContactId){
+		try {
+			$intReceipts = Receipt::QueryCount(
+				//QQ::OrCondition(
+					QQ::Equal(QQN::Receipt()->FromContactId, $intContactId)
+					//,QQ::Equal(QQN::Receipt()->ToContactId, $intContactId)
+		//		)
+		);
+
+			return $intReceipts>0?true:false;
+
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
+	}
+
+	/**
+	 * Check if Receipt contains company
+	 * by FromContactId Index(es)
+	 * @param integer $intContactId
+	 * @return bool
+	 */
+	public static function hasCompany($intCompanyId){
+		try {
+			$intReceipts = Receipt::QueryCount(
+				QQ::OrCondition(
+					QQ::Equal(QQN::Receipt()->FromCompanyId, $intCompanyId),
+					QQ::Equal(QQN::Receipt()->ToContact->CompanyId, $intCompanyId)
+				));
+
+			return $intReceipts>0?true:false;
+
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
+	}
+
+	/**
+
 	 /**
       * Load an Reciept Object
       * The method should check for assets or inventory in reciept that is still 'To Be Received' (TBR)

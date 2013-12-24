@@ -118,6 +118,23 @@ function getWidth(obj) {
 	return strWidth;
 }
 
+function enableInput(element,dependent_elements) {
+    var input = document.getElementById(element.id.replace('chk',''));
+        input.disabled = !element.checked;
+    if( Object.prototype.toString.call(dependent_elements ) === '[object Array]' ) {
+        for (var i = 0; i<dependent_elements.length; i++){
+                var dependent_input = document.getElementById(dependent_elements[i]);
+                element.disabled = !element.checked;
+            }
+    }
+}
 
-
-
+function enableCalInput(element){
+    var id_root = element.id.replace('chk','');
+    var day = document.getElementById(id_root + "_lstDay");
+    var month = document.getElementById(id_root + "_lstMonth");
+    var year = document.getElementById(id_root + "_lstYear");
+    day.disabled = !element.checked;
+    month.disabled = !element.checked;
+    year.disabled = !element.checked;
+}

@@ -826,6 +826,50 @@
 			return $arrSearchSql;
 	  }
 
+	/**
+	 * Check if Shipment contains contact
+	 * by ContactId Index(es)
+	 * @param integer $intContactId
+	 * @return bool
+	 */
+	public static function hasContact($intContactId){
+		try {
+			$intShipments = Shipment::QueryCount(
+				QQ::OrCondition(
+					QQ::Equal(QQN::Shipment()->FromContactId, $intContactId),
+					QQ::Equal(QQN::Shipment()->ToContactId,$intContactId)
+				));
+
+			return $intShipments>0?true:false;
+
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
+	}
+
+	/**
+	 * Check if Shipment contains company
+	 * by CompanyId Index(es)
+	 * @param integer $intCompanyId
+	 * @return bool
+	 */
+	public static function hasCompany($intCompanyId){
+		try {
+			$intShipments = Shipment::QueryCount(
+				QQ::OrCondition(
+					QQ::Equal(QQN::Shipment()->FromCompanyId, $intCompanyId),
+					QQ::Equal(QQN::Shipment()->ToCompanyId,$intCompanyId)
+				));
+
+			return $intShipments>0?true:false;
+
+		} catch (QCallerException $objExc) {
+			$objExc->IncrementOffset();
+			throw $objExc;
+		}
+	}
+
 /*
 This is correct
 SELECT asset_model.short_description AS short_description, asset.asset_code AS code, 'N/A' AS quantity FROM asset_transaction

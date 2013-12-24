@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(5);
 	require_once(__FORMBASE_CLASSES__ . '/ShipmentListFormBase.class.php');
-
+    require('../shipping/shipmentMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the Shipment class.  It extends from the code-generated
@@ -38,7 +38,15 @@
 	 * 
 	 */
 	class ShipmentListForm extends ShipmentListFormBase {
-		
+
+	/**
+	 * @var  QLabel     $lblWarning
+	 * @var  QDialogBox $dlgMassEdit
+	 * @var  QDialogBox $dlgMassDelete
+	 * @var  QButton    $btnMassDelete
+	 * @var  QButton    $btnMassEdit
+	 *
+	 */
 		// Header Tabs
 		protected $ctlHeaderMenu;
 		
@@ -89,7 +97,18 @@
 		// HoverTip Arrays
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
-		
+
+		// Mass Actions Elements
+		protected $lblWarning;
+		protected $dlgMassEdit;
+		protected $dlgMassDelete;
+		protected $btnMassEdit;
+		protected $btnMassDelete;
+		protected $pnlShipmentMassEdit;
+        protected $btnMassDeleteConfirm;
+        protected $btnMassDeleteCancel;
+
+        protected $arrToDelete = array();
 
 		protected function Form_Create() {
 			
@@ -110,6 +129,16 @@
 			$this->ctlAdvanced_Create();
 			$this->lblAdvanced_Create();
 			$this->dtgShipment_Create();
+
+			// Mass Actions controls create
+			$this->lblWarning_Create();
+			$this->dlgMassEdit_Create();
+			$this->dlgMassDelete_Create();
+            $this->btnMassDeleteCancel_Create();
+            $this->btnMassDeleteConfirm_Create();
+			$this->btnMassDelete_Create();
+			$this->btnMassEdit_Create();
+
 		}
 		
 		//protected function Form_Exit() {
@@ -287,7 +316,8 @@
       $objPaginator = new QPaginator($this->dtgShipment);
       $this->dtgShipment->Paginator = $objPaginator;
       $this->dtgShipment->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
-          
+
+	  $this->dtgShipment->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ShipmentId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Shipment Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="shipment_number * 1 ASC"', 'ReverseSortByCommand="shipment_number * 1 DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship Date', '<?= $_ITEM->ShipDate->__toString(); ?>', 'SortByCommand="ship_date ASC"', 'ReverseSortByCommand="ship_date DESC"', 'CssClass="dtg_column"'));
@@ -419,7 +449,240 @@
 				}
 			}
 	  }
-	}
+		// Mass Actions controls creating/handling functions
+		protected function dlgMassDelete_Create(){
+			$this->dlgMassDelete = new QDialogBox($this);
+			$this->dlgMassDelete->AutoRenderChildren = true;
+			$this->dlgMassDelete->Width = '440px';
+			$this->dlgMassDelete->Overflow = QOverflow::Auto;
+			$this->dlgMassDelete->Padding = '10px';
+			$this->dlgMassDelete->Display = false;
+			$this->dlgMassDelete->BackColor = '#FFFFFF';
+			$this->dlgMassDelete->MatteClickable = false;
+			$this->dlgMassDelete->CssClass = "modal_dialog";
+		}
+
+		protected function dlgMassEdit_Create(){
+			$this->dlgMassEdit = new QDialogBox($this);
+			$this->dlgMassEdit->AutoRenderChildren = true;
+			$this->dlgMassEdit->Width = '440px';
+			$this->dlgMassEdit->Overflow = QOverflow::Auto;
+			$this->dlgMassEdit->Padding = '10px';
+			$this->dlgMassEdit->Display = false;
+			$this->dlgMassEdit->BackColor = '#FFFFFF';
+			$this->dlgMassEdit->MatteClickable = false;
+			$this->dlgMassEdit->CssClass = "modal_dialog";
+		}
+
+		protected function btnMassDelete_Create(){
+			$this->btnMassDelete = new QButton($this);
+			$this->btnMassDelete->Name = "delete";
+			$this->btnMassDelete->Text = "Delete";
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to delete these items?'));
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function btnMassEdit_Create(){
+			$this->btnMassEdit = new QButton($this);
+			$this->btnMassEdit->Text = "edit";
+			$this->btnMassEdit->Text = "Edit";
+			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function lblWarning_Create(){
+			$this->lblWarning = new QLabel($this);
+			$this->lblWarning->Text = "";
+			$this->lblWarning->CssClass = "warning";
+		}
+
+		protected function btnMassDelete_Click(){
+			$items = $this->dtgShipment->getSelected('ShipmentId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+                $arrToSkip = array();
+                // Separating items able to be deleted
+                foreach ($items as $item){
+                    $shipmentToDelete = Shipment::Load($item);
+                    if ($shipmentToDelete instanceof Shipment && !($shipmentToDelete->ShippedFlag)){
+                        $this->arrToDelete[] = $shipmentToDelete; // objects stored in array!
+                    }
+                    else{
+                        $arrToSkip[] = $shipmentToDelete->ShipmentNumber;
+                    }
+                }
+                if (count($arrToSkip)>0){
+                    if(count($arrToSkip)==1){
+                        $toBe = 'is';
+                        $ending = '';
+                    }
+                    else{
+                        $toBe = 'are';
+                        $ending = 's';
+                    }
+                    $this->dlgMassDelete->Text =sprintf("There %s %s Shipment%s that %s not able to be deleted.
+                                                         Would you like to continue the deletion process,
+                                                         skipping these item%s?<br />",
+                                                         $toBe, count($arrToSkip), $ending, $toBe, $ending);
+                    $this->dlgMassDelete->ShowDialogBox();
+                }
+                else{
+                    if (count($this->arrToDelete)>0){
+                        try{
+                            // Get an instance of the database
+                            $objDatabase = QApplication::$Database[1];
+                            // Begin a MySQL Transaction to be either committed or rolled back
+                            $objDatabase->TransactionBegin();
+                            foreach($this->arrToDelete as $shipment){
+                                $objTransaction = Transaction::Load($shipment->TransactionId);
+                                $objTransaction->Delete();
+                            }
+                            $objDatabase->TransactionCommit();
+                            $this->arrToDelete = array();
+                            QApplication::Redirect('');
+                        }
+                        catch(QMySqliDatabaseException $objExc) {
+                            $objDatabase->TransactionRollback();
+                            throw new QDatabaseException();
+                        }
+                    }
+                }
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Shipment to Delete" ;
+			}
+		}
+
+		protected function btnMassEdit_Click(){
+			$items = $this->dtgShipment->getSelected('ShipmentId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+				if(!($this->pnlShipmentMassEdit instanceof ShipmentMassEditPanel)){
+					$this->pnlShipmentMassEdit = new ShipmentMassEditPanel($this->dlgMassEdit,
+						                                                   'pnlShipmentMassEdit_Close',
+					                                                       $items);
+				}
+				$this->dlgMassEdit->ShowDialogBox();
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Shipment to Edit" ;
+			}
+		}
+		public function pnlShipmentMassEdit_Close(){
+			$this->dlgMassEdit->HideDialogBox();
+		}
+
+        protected function btnMassDeleteCancel_Create(){
+            $this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
+            $this->btnMassDeleteCancel->Text = "Cancel";
+            $this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+            $this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+        }
+
+        protected function btnMassDeleteConfirm_Create(){
+            $this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
+            $this->btnMassDeleteConfirm->Text = "Confirm";
+            $this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+            $this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+        }
+
+        protected function btnMassDeleteConfirm_Click(){
+            if (count($this->arrToDelete)>0){
+                foreach($this->arrToDelete as $shipment){
+                    $objTransaction = Transaction::Load($shipment->TransactionId);
+                    $objTransaction->Delete();
+                }
+                $this->arrToDelete = array();
+            }
+            $this->dlgMassDelete->HideDialogBox();
+            QApplication::Redirect('');
+        }
+
+        protected function btnMassDeleteCancel_Click(){
+            $this->dlgMassDelete->HideDialogBox();
+            QApplication::Redirect('');
+        }
+
+        public function lstFromCompany_Select(){
+            $objCompany = Company::Load($this->pnlShipmentMassEdit->lstFromCompany->SelectedValue);
+            if ($objCompany) {
+                // Load the values for the 'From Contact' List
+                if ($this->pnlShipmentMassEdit->lstFromContact) {
+                    $objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId);
+                    $this->pnlShipmentMassEdit->lstFromContact->RemoveAllItems();
+                    $this->pnlShipmentMassEdit->lstFromContact->AddItem('- Select One -', null);
+                    if ($objFromContactArray) {
+                        foreach ($objFromContactArray as $objFromContact) {
+                            $objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
+                            $this->pnlShipmentMassEdit->lstFromContact->AddItem($objListItem);
+                        }
+
+                        $this->pnlShipmentMassEdit->lstFromContact->Enabled = true;
+                    }
+                }
+                if ($this->pnlShipmentMassEdit->lstFromAddress) {
+                    $objFromAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
+                        QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+                    $this->pnlShipmentMassEdit->lstFromAddress->RemoveAllItems();
+                    if ($objFromAddressArray) {
+                        foreach ($objFromAddressArray as $objFromAddress) {
+                            $objListItem = new QListItem($objFromAddress->__toString(),
+                                $objFromAddress->AddressId);
+                            $this->pnlShipmentMassEdit->lstFromAddress->AddItem($objListItem);
+                        }
+                        $this->pnlShipmentMassEdit->lstFromAddress->Enabled = true;
+                        //$this->lstToAddress_Select();
+                    }
+                }
+            }
+        }
+
+        public function lstToCompany_Select(){
+            if ($this->pnlShipmentMassEdit->lstToCompany->SelectedValue) {
+                $objCompany = Company::Load($this->pnlShipmentMassEdit->lstToCompany->SelectedValue);
+                if ($objCompany) {
+                    // Load the values for the 'To Contact' List
+                    if ($this->pnlShipmentMassEdit->lstToContact) {
+                        $objToContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId,
+                            QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName,
+                                    QQN::Contact()->FirstName)
+                            )
+                        );
+                        $this->pnlShipmentMassEdit->lstToContact->RemoveAllItems();
+                        if ($objToContactArray) {
+                            foreach ($objToContactArray as $objToContact) {
+                                $objListItem = new QListItem($objToContact->__toString(),
+                                    $objToContact->ContactId);
+                                $this->pnlShipmentMassEdit->lstToContact->AddItem($objListItem);
+                            }
+                            $this->pnlShipmentMassEdit->lstToContact->Enabled = true;
+                        }
+                    }
+                    // Load the values for the 'To Address' List
+                    if ($this->pnlShipmentMassEdit->lstToAddress) {
+                        $objToAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
+                            QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+                        $this->pnlShipmentMassEdit->lstToAddress->RemoveAllItems();
+                        if ($objToAddressArray) {
+                            foreach ($objToAddressArray as $objToAddress) {
+                                $objListItem = new QListItem($objToAddress->__toString(),
+                                    $objToAddress->AddressId);
+                                $this->pnlShipmentMassEdit->lstToAddress->AddItem($objListItem);
+                            }
+                            $this->pnlShipmentMassEdit->lstToAddress->Enabled = true;
+                            //$this->lstToAddress_Select();
+                        }
+                    }
+                }
+            }
+        }
+
+
+}
+
+
+
 
 	// Go ahead and run this form object to generate the page and event handlers, using
 	// generated/shipment_edit.php.inc as the included HTML template file

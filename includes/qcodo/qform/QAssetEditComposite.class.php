@@ -1718,7 +1718,9 @@ class QAssetEditComposite extends QControl {
   public function reloadCustomFields($intAssetModelId){
     // Load all custom fields and their values into an array objCustomFieldArray->CustomFieldSelection->CustomFieldValue
           $this->objAsset->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(1, $this->blnEditMode, $this->objAsset->AssetId, false, $intAssetModelId);
-
+            foreach($this->arrCustomFields as $objCustomField){
+                $objCustomField['input']->Form->RemoveControl($objCustomField['input']->ControlId);
+            }
     		// Create the Custom Field Controls - labels and inputs (text or list) for each
     		$this->arrCustomFields = CustomField::CustomFieldControlsCreate($this->objAsset->objCustomFieldArray, $this->blnEditMode, $this, true, true, false);
 	        // Add TabIndex for all txt custom fields

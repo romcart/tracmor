@@ -78,6 +78,10 @@
 		
 		<?php $this->dtgShipment->Render() ?>
 		<br />
-				
+			<?php $this->lblWarning->Render(); ?><br />
+			<?php $this->dlgMassEdit->Render(); ?>
+			<?php $this->dlgMassDelete->Render(); ?>
+			<?php $this->btnMassEdit->Render(); ?>
+			<?php $this->btnMassDelete->Render(); ?>
 	<?php $this->RenderEnd() ?>
 	<?php 	require_once('../includes/footer.inc.php'); ?>

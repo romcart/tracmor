@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(6);
 	require_once(__FORMBASE_CLASSES__ . '/ReceiptListFormBase.class.php');
-
+    require('../receiving/ReceiptMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the Receipt class.  It extends from the code-generated
@@ -38,7 +38,15 @@
 	 * 
 	 */
 	class ReceiptListForm extends ReceiptListFormBase {
-		
+
+	/**
+	 * @var  QLabel     $lblWarning
+	 * @var  QDialogBox $dlgMassEdit
+	 * @var  QDialogBox $dlgMassDelete
+	 * @var  QButton    $btnMassDelete
+	 * @var  QButton    $btnMassEdit
+	 *
+	 */
 		// Header Tabs
 		protected $ctlHeaderMenu;
 		
@@ -87,6 +95,18 @@
 		public $objAssetTransactionArray;
 		public $objInventoryTransactionArray;
 
+		// Mass Action Controls
+		protected $lblWarning;
+		protected $dlgMassEdit;
+		protected $dlgMassDelete;
+		protected $btnMassEdit;
+		protected $btnMassDelete;
+        protected $pnlReceiptMassEdit;
+        protected $btnMassDeleteConfirm;
+        protected $btnMassDeleteCancel;
+
+        protected $arrToDelete = array();
+
 		protected function Form_Create() {
 			
 			// Create the Header Menu
@@ -105,6 +125,16 @@
 			$this->ctlAdvanced_Create();
 			$this->lblAdvanced_Create();
 			$this->dtgReceipt_Create();
+
+			// Mass Actions controls create
+			$this->lblWarning_Create();
+			$this->dlgMassEdit_Create();
+			$this->dlgMassDelete_Create();
+			$this->btnMassDelete_Create();
+            $this->btnMassDeleteCancel_Create();
+            $this->btnMassDeleteConfirm_Create();
+			$this->btnMassEdit_Create();
+
 		}
 		
 		protected function dtgReceipt_Bind() {
@@ -273,7 +303,8 @@
       $objPaginator = new QPaginator($this->dtgReceipt);
       $this->dtgReceipt->Paginator = $objPaginator;
       $this->dtgReceipt->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
-          
+	  // Add column with checkBoxes to perform MassActions
+	  $this->dtgReceipt->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ReceiptId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receipt Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="receipt_number * 1 ASC"', 'ReverseSortByCommand="receipt_number * 1 DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Sender Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="receipt__from_company_id__short_description ASC"', 'ReverseSortByCommand="receipt__from_company_id__short_description DESC"', 'CssClass="dtg_column"'));
@@ -406,9 +437,285 @@
 					}
 				}
 			}
-	  }  	  
-		
+	  }
+
+		/**
+		 * Mass Actions controls creating/handling functions
+		*/
+		protected function dlgMassDelete_Create(){
+			$this->dlgMassDelete = new QDialogBox($this);
+			$this->dlgMassDelete->AutoRenderChildren = true;
+			$this->dlgMassDelete->Width = '440px';
+			$this->dlgMassDelete->Overflow = QOverflow::Auto;
+			$this->dlgMassDelete->Padding = '10px';
+			$this->dlgMassDelete->Display = false;
+			$this->dlgMassDelete->BackColor = '#FFFFFF';
+			$this->dlgMassDelete->MatteClickable = false;
+			$this->dlgMassDelete->CssClass = "modal_dialog";
+		}
+
+		protected function dlgMassEdit_Create(){
+			$this->dlgMassEdit = new QDialogBox($this);
+			$this->dlgMassEdit->AutoRenderChildren = true;
+			$this->dlgMassEdit->Width = '440px';
+			$this->dlgMassEdit->Overflow = QOverflow::Auto;
+			$this->dlgMassEdit->Padding = '10px';
+			$this->dlgMassEdit->Display = false;
+			$this->dlgMassEdit->BackColor = '#FFFFFF';
+			$this->dlgMassEdit->MatteClickable = false;
+			$this->dlgMassEdit->CssClass = "modal_dialog";
+		}
+
+		protected function btnMassDelete_Create(){
+			$this->btnMassDelete = new QButton($this);
+			$this->btnMassDelete->Name = "delete";
+			$this->btnMassDelete->Text = "Delete";
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to delete these items?'));
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function btnMassEdit_Create(){
+			$this->btnMassEdit = new QButton($this);
+			$this->btnMassEdit->Text = "edit";
+			$this->btnMassEdit->Text = "Edit";
+			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function lblWarning_Create(){
+			$this->lblWarning = new QLabel($this);
+			$this->lblWarning->Text = "";
+			$this->lblWarning->CssClass = "warning";
+		}
+
+		protected function btnMassDelete_Click(){
+			$items = $this->dtgReceipt->getSelected('ReceiptId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+                $arrToSkip = array();
+                // Separating items able to be deleted
+                foreach ($items as $item){
+                    $receiptToDelete = Receipt::Load($item);
+                    $objAssetTransactionArray     = AssetTransaction::LoadArrayByTransactionId($receiptToDelete->TransactionId);
+                    $objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($receiptToDelete->TransactionId);
+                    $blnError = false;
+                    if ($objAssetTransactionArray) {
+                        foreach ($objAssetTransactionArray as $objAssetTransaction) {
+                            if ($objAssetTransaction->blnReturnReceivedStatus()) {
+                                $blnError = true;
+                            }
+                        }
+                    }
+
+                    if ($objInventoryTransactionArray) {
+                        foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
+                            if ($objInventoryTransaction->blnReturnReceivedStatus()) {
+                                $blnError = true;
+                            }
+                        }
+                    }
+
+                    if ($blnError){
+                        $arrToSkip[] = $receiptToDelete->ReceiptNumber;
+                    }
+                    else{
+                        $this->arrToDelete[] = $receiptToDelete; // objects stored in array!
+                    }
+                }
+                if (count($arrToSkip)>0){
+                    if(count($arrToSkip)==1){
+                        $toBe = 'is';
+                        $ending = '';
+                    }
+                    else{
+                        $toBe = 'are';
+                        $ending = 's';
+                    }
+                    $this->dlgMassDelete->Text =sprintf("There %s %s Receipt%s that %s not able to be deleted.
+                                                         Would you like to continue the deletion process,
+                                                         skipping these item%s?<br />",
+                                                         $toBe, count($arrToSkip), $ending, $toBe, $ending);
+                    $this->dlgMassDelete->ShowDialogBox();
+                }
+                else{
+                    if (count($this->arrToDelete)>0){
+                        try{
+                            // Get an instance of the database
+                            $objDatabase = QApplication::$Database[1];
+                            // Begin a MySQL Transaction to be either committed or rolled back
+                            $objDatabase->TransactionBegin();
+                            foreach($this->arrToDelete as $receipt){
+                                $this->receiptDelete($receipt);
+                            }
+                            $objDatabase->TransactionCommit();
+                            $this->arrToDelete = array();
+                            QApplication::Redirect('');
+                        }
+                        catch(QMySqliDatabaseException $objExc) {
+                            $objDatabase->TransactionRollback();
+                            throw new QDatabaseException();
+                        }
+                    }
+                }
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Receipt to Delete" ;
+			}
+		}
+
+		protected function btnMassEdit_Click(){
+			$items = $this->dtgReceipt->getSelected('ReceiptId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+                if(!($this->pnlReceiptMassEdit instanceof ReceiptMassEditPanel)){
+                    $this->pnlReceiptMassEdit = new ReceiptMassEditPanel($this->dlgMassEdit,
+                        'pnlReceiptMassEdit_Close',
+                        $items);
+                }
+				$this->dlgMassEdit->ShowDialogBox();
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Receipt to Edit" ;
+			}
+		}
+
+        public function pnlReceiptMassEdit_Close(){
+            $this->dlgMassEdit->HideDialogBox();
+        }
+
+        protected function btnMassDeleteCancel_Create(){
+            $this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
+            $this->btnMassDeleteCancel->Text = "Cancel";
+            $this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+            $this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+        }
+
+        protected function btnMassDeleteConfirm_Create(){
+            $this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
+            $this->btnMassDeleteConfirm->Text = "Confirm";
+            $this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+            $this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+        }
+
+        protected function btnMassDeleteConfirm_Click(){
+            if (count($this->arrToDelete)>0){
+                foreach($this->arrToDelete as $receipt){
+                    $this->receiptDelete($receipt);
+                }
+                $this->arrToDelete = array();
+            }
+            $this->dlgMassDelete->HideDialogBox();
+            QApplication::Redirect('');
+        }
+
+        protected function btnMassDeleteCancel_Click(){
+            $this->dlgMassDelete->HideDialogBox();
+            QApplication::Redirect('');
+        }
+
+        public function receiptDelete(Receipt $receipt){
+            $objAssetTransactionArray     = AssetTransaction::LoadArrayByTransactionId($receipt->TransactionId);
+            $objInventoryTransactionArray = InventoryTransaction::LoadArrayByTransactionId($receipt->TransactionId);
+            // Take out the inventory from the TBR InventoryLocation
+            if ($objInventoryTransactionArray) {
+                foreach ($objInventoryTransactionArray as $objInventoryTransaction) {
+                    $objInventoryTransaction->InventoryLocation->Quantity -= $objInventoryTransaction->Quantity;
+                    $objInventoryTransaction->InventoryLocation->Save();
+                }
+            }
+
+            // Delete any assets that were created while scheduling this receipt
+            if ($objAssetTransactionArray) {
+                foreach ($objAssetTransactionArray as $objAssetTransaction) {
+                    if ($objAssetTransaction->NewAssetFlag) {
+                        $objAssetTransaction->Asset->Delete();
+                    }
+                }
+            }
+
+            // Load the Transaction
+            $objTransaction = Transaction::Load($receipt->TransactionId);
+            // Delete the Transaction Object and let it MySQL CASCADE down to asset_transaction, inventory_transaction, and receipt
+            $objTransaction->Delete();
+        }
+
+        public function lstFromCompany_Select(){
+            $objCompany = Company::Load($this->pnlReceiptMassEdit->lstFromCompany->SelectedValue);
+            if ($objCompany) {
+                // Load the values for the 'From Contact' List
+                if ($this->pnlReceiptMassEdit->lstFromContact) {
+                    $objFromContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId);
+                    $this->pnlReceiptMassEdit->lstFromContact->RemoveAllItems();
+                    $this->pnlReceiptMassEdit->lstFromContact->AddItem('- Select One -', null);
+                    if ($objFromContactArray) {
+                        foreach ($objFromContactArray as $objFromContact) {
+                            $objListItem = new QListItem($objFromContact->__toString(), $objFromContact->ContactId);
+                            $this->pnlReceiptMassEdit->lstFromContact->AddItem($objListItem);
+                        }
+
+                        $this->pnlReceiptMassEdit->lstFromContact->Enabled = true;
+                    }
+                }
+                if ($this->pnlReceiptMassEdit->lstFromAddress) {
+                    $objFromAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
+                        QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+                    $this->pnlReceiptMassEdit->lstFromAddress->RemoveAllItems();
+                    if (is_array($objFromAddressArray) && count($objFromAddressArray)>0) {
+                        foreach ($objFromAddressArray as $objFromAddress) {
+                            $objListItem = new QListItem($objFromAddress->__toString(),
+                                                         $objFromAddress->AddressId);
+                            $this->pnlReceiptMassEdit->lstFromAddress->AddItem($objListItem);
+                        }
+                        $this->pnlReceiptMassEdit->lstFromAddress->Enabled = true;
+                        //$this->lstToAddress_Select();
+                    }
+                }
+            }
+        }
+
+        public function lstToCompany_Select(){
+            if ($this->pnlReceiptMassEdit->lstToCompany->SelectedValue) {
+                $objCompany = Company::Load($this->pnlReceiptMassEdit->lstToCompany->SelectedValue);
+                if ($objCompany) {
+                    // Load the values for the 'To Contact' List
+                    if ($this->pnlReceiptMassEdit->lstToContact) {
+                        $objToContactArray = Contact::LoadArrayByCompanyId($objCompany->CompanyId,
+                                                                          QQ::Clause(QQ::OrderBy(QQN::Contact()->LastName,
+                                                                                                 QQN::Contact()->FirstName)
+                                                                                    )
+                                                                          );
+                        $this->pnlReceiptMassEdit->lstToContact->RemoveAllItems();
+                        if ($objToContactArray) {
+                            foreach ($objToContactArray as $objToContact) {
+                                $objListItem = new QListItem($objToContact->__toString(),
+                                                             $objToContact->ContactId);
+                                $this->pnlReceiptMassEdit->lstToContact->AddItem($objListItem);
+                            }
+                            $this->pnlReceiptMassEdit->lstToContact->Enabled = true;
+                        }
+                    }
+                    // Load the values for the 'To Address' List
+                    if ($this->pnlReceiptMassEdit->lstToAddress) {
+                        $objToAddressArray = Address::LoadArrayByCompanyId($objCompany->CompanyId,
+                                                      QQ::Clause(QQ::OrderBy(QQN::Address()->ShortDescription)));
+                        $this->pnlReceiptMassEdit->lstToAddress->RemoveAllItems();
+                        if ($objToAddressArray) {
+                            foreach ($objToAddressArray as $objToAddress) {
+                                $objListItem = new QListItem($objToAddress->__toString(),
+                                                             $objToAddress->AddressId);
+                                $this->pnlReceiptMassEdit->lstToAddress->AddItem($objListItem);
+                            }
+                            $this->pnlReceiptMassEdit->lstToAddress->Enabled = true;
+                            //$this->lstToAddress_Select();
+                        }
+                    }
+                }
+            }
+        }
 	}
+
+
 
 	// Go ahead and run this form object to generate the page and event handlers, using
 	// generated/receipt_edit.php.inc as the included HTML template file

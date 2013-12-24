@@ -17,6 +17,7 @@
 	 * @subpackage FormBaseObjects
 	 * 
 	 */
+    /* @var  QDataGrid dtgAssetModel */
 	abstract class AssetModelListFormBase extends QForm {
 		protected $dtgAssetModel;
 

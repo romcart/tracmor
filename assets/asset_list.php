@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(2);
 	require_once(__FORMBASE_CLASSES__ . '/AssetListFormBase.class.php');
-
+    require('../assets/AssetMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the Asset class.  It extends from the code-generated
@@ -38,6 +38,14 @@
 	 * 
 	 */
 	class AssetListForm extends AssetListFormBase {
+		/**
+		 * @var  QLabel     $lblWarning
+		 * @var  QDialogBox $dlgMassEdit
+		 * @var  QDialogBox $dlgMassDelete
+		 * @var  QButton    $btnMassDelete
+		 * @var  QButton    $btnMassEdit
+		 * @var  QAssetSearchToolComposite $ctlAssetSearchTool
+		 */
 
 		// Header Tabs
 		protected $ctlHeaderMenu;
@@ -85,7 +93,15 @@
 		protected $strDateModifiedFirst;
 		protected $strDateModifiedLast;
 		protected $blnAttachment;*/
-		
+        public $arrToEdit;
+        protected $pnlAssetMassEdit;
+		protected $lblWarning;
+		protected $dlgMassEdit;
+		protected $dlgMassDelete;
+		protected $btnMassEdit;
+		protected $btnMassDelete;
+        public    $ctlAssetSearchTool;
+
 		protected function Form_Create() {
 			
 			$this->ctlHeaderMenu_Create();
@@ -167,6 +183,13 @@
 				$this->lblAssetModelId->Text = QApplication::QueryString('intAssetModelId');
 				$this->blnSearch = true;
 			}*/
+			// Mass Actions controls create
+            $this->ctlAssetSearchTool_Create();
+			$this->lblWarning_Create();
+			$this->dlgMassEdit_Create();
+			$this->dlgMassDelete_Create();
+			$this->btnMassDelete_Create();
+			$this->btnMassEdit_Create();
   	}
   	
 		/*protected function dtgAsset_Bind() {
@@ -457,7 +480,172 @@
 				}
 			}
 	  }*/
-	}  
+		// Mass Actions controls creating/handling functions
+		protected function dlgMassDelete_Create(){
+			$this->dlgMassDelete = new QDialogBox($this);
+			$this->dlgMassDelete->AutoRenderChildren = true;
+			$this->dlgMassDelete->Width = '440px';
+			$this->dlgMassDelete->Overflow = QOverflow::Auto;
+			$this->dlgMassDelete->Padding = '10px';
+			$this->dlgMassDelete->Display = false;
+			$this->dlgMassDelete->BackColor = '#FFFFFF';
+			$this->dlgMassDelete->MatteClickable = false;
+			$this->dlgMassDelete->CssClass = "modal_dialog";
+		}
+
+		protected function dlgMassEdit_Create(){
+			$this->dlgMassEdit = new QDialogBox($this, 'MassEdit');
+			$this->dlgMassEdit->AutoRenderChildren = true;
+			$this->dlgMassEdit->Width = '440px';
+			$this->dlgMassEdit->Overflow = QOverflow::Auto;
+			$this->dlgMassEdit->Padding = '10px';
+			$this->dlgMassEdit->Display = false;
+			$this->dlgMassEdit->BackColor = '#FFFFFF';
+			$this->dlgMassEdit->MatteClickable = false;
+			$this->dlgMassEdit->CssClass = "modal_dialog";
+		}
+
+		protected function btnMassDelete_Create(){
+			$this->btnMassDelete = new QButton($this);
+			$this->btnMassDelete->Name = "delete";
+			$this->btnMassDelete->Text = "Delete";
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to delete these items?'));
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function btnMassEdit_Create(){
+			$this->btnMassEdit = new QButton($this);
+			$this->btnMassEdit->Text = "edit";
+			$this->btnMassEdit->Text = "Edit";
+			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		protected function lblWarning_Create(){
+			$this->lblWarning = new QLabel($this);
+			$this->lblWarning->Text = "";
+			$this->lblWarning->CssClass = "warning";
+		}
+
+		protected function btnMassDelete_Click(){
+			$items = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
+			if(count($items)>0){
+				$this->lblWarning->Text = "";
+				// TODO perform validate
+                foreach($items as $item){
+                    try {
+                        // Get an instance of the database
+                        $objDatabase = QApplication::$Database[1];
+                        // Begin a MySQL Transaction to be either committed or rolled back
+                        $objDatabase->TransactionBegin();
+                        // ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
+                        Asset::ResetParentAssetIdToNullByAssetId($item);
+                        // Delete any audit scans of this asset
+                        Asset::DeleteAuditScanByAssetId($item);
+                        // Delete the asset
+                        Asset::LoadByAssetId($item)->Delete();
+                        $objDatabase->TransactionCommit();
+                    }
+                    catch (QMySqliDatabaseException $objExc) {
+                        // Rollback the transaction
+                        $objDatabase->TransactionRollback();
+                        throw new QDatabaseException();
+                    }
+                }
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Asset to Delete" ;
+			}
+		}
+
+		protected function btnMassEdit_Click(){
+			$this->arrToEdit = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
+			if(count($this->arrToEdit)>0){
+				$this->lblWarning->Text = "";
+                if(!$this->pnlAssetMassEdit instanceof AssetMassEditPanel){
+                    $this->pnlAssetMassEdit = new AssetMassEditPanel($this->dlgMassEdit,
+                                                     'pnlAssetMassEditCancel_Click',
+                                                      $this->arrToEdit);
+                }
+				$this->dlgMassEdit->ShowDialogBox();
+                $this->UncheckAllItems($this);
+			}else{
+				$this->lblWarning->Text = "You haven't chosen any Asset to Edit" ;
+			}
+		}
+
+		public function pnlAssetMassEditCancel_Click(){
+			$this->dlgMassEdit->HideDialogBox();
+		}
+
+        public function lblIconParentAssetCode_Click() {
+            // Uncheck all items but SelectAll checkbox
+           // $this->UncheckAllItems($this->pnlAssetMassEdit->ctlAssetSearchTool);
+            if($this->ctlAssetSearchTool instanceof QAssetSearchToolComposite){
+                $this->ctlAssetSearchTool->Refresh();
+                $this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Parent Asset";
+                $this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
+                $this->dlgMassEdit->HideDialogBox();
+            }
+        }
+
+        public function UncheckAllItems($object) {
+            foreach ($object->GetAllControls() as $objControl) {
+                if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+                    $objControl->Checked = false;
+                }
+            }
+        }
+        public function ctlAssetSearchTool_Create() {
+            $this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
+        }
+
+        public function btnAssetSearchToolAdd_Click() {
+            $this->ctlAssetSearchTool->lblWarning->Text = "";
+            $intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
+            if (count($intSelectedAssetId) > 1) {
+                $this->ctlAssetSearchTool->lblWarning->Text = "You must select only one parent asset.";
+            }
+            elseif (count($intSelectedAssetId) != 1) {
+                $this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
+            }
+            else {
+                if (!($objParentAsset = Asset::LoadByAssetId($intSelectedAssetId[0]))) {
+                    $this->ctlAssetSearchTool->lblWarning->Text = "That asset tag does not exist. Please try another.";
+
+                }
+                elseif (in_array($objParentAsset->AssetId, $this->arrToEdit)) {
+                    $this->ctlAssetSearchTool->lblWarning->Text = "Parent asset tag must not be the same as asset tag. Please try another.";
+                }
+                else {
+                    $this->pnlAssetMassEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
+                    //$this->UncheckAllItems($this);
+                    $this->dlgMassEdit->ShowDialogBox();
+                    $this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
+                }
+            }
+            // Set properly checked/unchecked items
+            if($this->pnlAssetMassEdit->chkParentAssetCode->Checked){
+                $this->pnlAssetMassEdit->txtParentAssetCode->Enabled = true;
+            }
+            if($this->pnlAssetMassEdit->chkChkLockToParent->Checked){
+                $this->pnlAssetMassEdit->chkLockToParent->Enabled = true;
+            }
+            if($this->pnlAssetMassEdit->chkModel->Checked){
+                $this->pnlAssetMassEdit->lstModel->Enabled = true;
+            }
+            foreach($this->pnlAssetMassEdit->arrCustomFields as $field){
+                if($this->pnlAssetMassEdit->arrCheckboxes[$field['input']->ControlId]->Checked) {
+                    $field['input']->Enabled = true;
+                }
+            }
+
+
+        }
+
+    }
 
 	// Go ahead and run this form object to generate the page and event handlers, using
 	// generated/asset_edit.php.inc as the included HTML template file

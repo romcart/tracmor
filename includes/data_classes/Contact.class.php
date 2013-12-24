@@ -415,5 +415,42 @@
 
 			return $arrSearchSql;
 	  }
+
+		/**
+		 * Delete all selected records
+		 *
+		 * @param arr $intAssetId
+		 */
+		public static function DeleteSelected($arrContactId) {
+			$strQuery = sprintf("
+				DELETE
+				FROM
+				  `contact`
+				WHERE
+				  `contact`.`contact_id` IN(%s)",
+				implode(",",$arrContactId));
+
+			$objDatabase = QApplication::$Database[1];
+			$objDatabase->NonQuery($strQuery);
+		}
+
+		/**
+		 * Update all selected records
+		 */
+		public static function UpdateSelected($arrContactId, $params){
+			$sqlSetStatement = array();
+			foreach($params as $paramName=>$paramValue){
+				$sqlSetStatement[]=sprintf("`%s` = '%s'",$paramName, $paramValue);
+			}
+			$strQuery = sprintf("
+				UPDATE `contact`
+				SET %s
+				WHERE `contact_id` IN (%s)
+			", implode(",", $sqlSetStatement),
+			   implode(",", $arrContactId));
+
+			$objDatabase = QApplication::$Database[1];
+			$objDatabase->NonQuery($strQuery);
+		}
 	}
 ?>

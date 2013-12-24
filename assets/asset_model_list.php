@@ -22,8 +22,9 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(2);
 	require_once(__FORMBASE_CLASSES__ . '/AssetModelListFormBase.class.php');
+	require('../assets/ModelMassEditPanel.class.php');
 
-	/**
+/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the AssetModel class.  It extends from the code-generated
 	 * abstract AssetModelListFormBase class.
@@ -70,6 +71,18 @@
 		protected $blnAttachment;
 		protected $intDepreciationClassId;
 
+		// MassActions Controls
+		protected $btnMassEdit;
+		protected $btnMassDelete;
+		protected $lblWarning;
+		protected $dlgMassEdit;
+		protected $dlgMassDelete;
+        protected $btnMassDeleteConfirm;
+        protected $btnMassDeleteCancel;
+        protected $pnlModelMassEditPanel;
+
+        protected $arrToDelete = array();
+
 		protected function Form_Create() {
 			
 			$this->ctlHeaderMenu_Create();
@@ -94,7 +107,10 @@
       $objPaginator = new QPaginator($this->dtgAssetModel);
       $this->dtgAssetModel->Paginator = $objPaginator;
       $this->dtgAssetModel->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
-      
+
+      // Add column with checkBoxes to perform MassActions
+	  $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->AssetModelId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->AssetModelId ?>', array('OrderByClause' => QQ::OrderBy(QQN::AssetModel()->AssetModelId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::AssetModel()->AssetModelId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgAssetModel->AddColumn(new QDataGridColumnExt('Assets', '<?= $_ITEM->__toStringWithAssetCountLink($_ITEM,"bluelink"); ?>', 'SortByCommand="asset_count ASC"', 'ReverseSortByCommand="asset_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
@@ -149,6 +165,17 @@
       $this->btnClear_Create();
       $this->ctlAdvanced_Create();
       $this->lblAdvanced_Create();
+
+	  // Mass Actions controls create
+	  $this->lblWarning_Create();
+
+      $this->dlgMassDelete_Create();
+      $this->btnMassDeleteCancel_Create();
+      $this->btnMassDeleteConfirm_Create();
+      $this->dlgMassEdit_Create();
+	  $this->btnMassDelete_Create();
+	  $this->btnMassEdit_Create();
+
   	}
 
 		protected function dtgAssetModel_Bind() {
@@ -261,7 +288,148 @@
 	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
 	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
 	  }
-	  
+
+	  // Mass Actions controls creating/handling functions
+	  protected function dlgMassDelete_Create(){
+		  $this->dlgMassDelete = new QDialogBox($this);
+		  $this->dlgMassDelete->AutoRenderChildren = true;
+		  $this->dlgMassDelete->Width = '440px';
+		  $this->dlgMassDelete->Overflow = QOverflow::Auto;
+		  $this->dlgMassDelete->Padding = '10px';
+		  $this->dlgMassDelete->Display = false;
+		  $this->dlgMassDelete->BackColor = '#FFFFFF';
+		  $this->dlgMassDelete->MatteClickable = false;
+		  $this->dlgMassDelete->CssClass = "modal_dialog";
+	  }
+
+	  protected function dlgMassEdit_Create(){
+		  $this->dlgMassEdit = new QDialogBox($this);
+		  $this->dlgMassEdit->AutoRenderChildren = true;
+		  $this->dlgMassEdit->Width = '440px';
+		  $this->dlgMassEdit->Overflow = QOverflow::Auto;
+		  $this->dlgMassEdit->Padding = '10px';
+		  $this->dlgMassEdit->Display = false;
+		  $this->dlgMassEdit->BackColor = '#FFFFFF';
+		  $this->dlgMassEdit->MatteClickable = false;
+		  $this->dlgMassEdit->CssClass = "modal_dialog";
+	  }
+
+	  protected function btnMassDelete_Create(){
+		  $this->btnMassDelete = new QButton($this);
+		  $this->btnMassDelete->Name = "delete";
+		  $this->btnMassDelete->Text = "Delete";
+		  $this->btnMassDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to delete these items?'));
+		  $this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
+		  $this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
+		  $this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	  }
+
+	  protected function btnMassEdit_Create(){
+		  $this->btnMassEdit = new QButton($this);
+		  $this->btnMassEdit->Text = "edit";
+		  $this->btnMassEdit->Text = "Edit";
+		  $this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
+		  $this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
+		  $this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	  }
+
+	  protected function lblWarning_Create(){
+		  $this->lblWarning = new QLabel($this);
+		  $this->lblWarning->Text = "";
+		  $this->lblWarning->CssClass = "warning";
+	  }
+
+      protected function btnMassDeleteCancel_Create(){
+          $this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
+          $this->btnMassDeleteCancel->Text = "Cancel";
+          $this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+          $this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
+      }
+
+      protected function btnMassDeleteConfirm_Create(){
+          $this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
+          $this->btnMassDeleteConfirm->Text = "Confirm";
+          $this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+          $this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+      }
+
+      protected function btnMassDeleteConfirm_Click(){
+          if (count($this->arrToDelete)>0){
+              AssetModel::DeleteSelected($this->arrToDelete);
+              $this->arrToDelete = array();
+          }
+          $this->dlgMassDelete->HideDialogBox();
+          QApplication::Redirect('');
+      }
+
+      protected function btnMassDeleteCancel_Click(){
+          $this->dlgMassDelete->HideDialogBox();
+          QApplication::Redirect('');
+      }
+
+	  protected function btnMassDelete_Click(){
+		  $items = $this->dtgAssetModel->getSelected('AssetModelId');
+		  if(count($items)>0){
+			  $this->lblWarning->Text = "";
+              $arrToSkip = array();
+              // Separating items able to be deleted
+              foreach ($items as $item){
+                  $arrAssetAssigned = Asset::LoadArrayByAssetModelId($item);
+                  if(!$arrAssetAssigned || count($arrAssetAssigned) <= 0 ){
+                      $this->arrToDelete[] = $item;
+                  }
+                  else{
+                      $arrToSkip[] = $item;
+                  }
+              }
+              if (count($arrToSkip)>0){
+                  if(count($arrToSkip)==1){
+                      $toBe = 'is';
+                      $ending = '';
+                  }
+                  else{
+                      $toBe = 'are';
+                      $ending = 's';
+                  }
+                  $this->dlgMassDelete->Text =sprintf("There %s %s Model%s that %s not able to be deleted.
+                                                       Would you like to continue the deletion process,
+                                                       skipping these item%s?<br />",
+                                                       $toBe,count($arrToSkip),$ending,$toBe,$ending);
+                  $this->dlgMassDelete->ShowDialogBox();
+              }
+              else{
+                  if (count($this->arrToDelete)>0){
+                      AssetModel::DeleteSelected($this->arrToDelete);
+                      $this->arrToDelete = array();
+                      QApplication::Redirect('');
+                  }
+              }
+		  }else{
+			  $this->lblWarning->Text = "You haven't chosen any Model to Delete" ;
+		  }
+	  }
+
+	  protected function btnMassEdit_Click(){
+		  $items = $this->dtgAssetModel->getSelected('AssetModelId');
+		  if(count($items)>0){
+			  $this->lblWarning->Text = "";
+              if(!$this->pnlModelMassEditPanel instanceof ModelMassEditPanel){
+			      $this->pnlModelMassEditPanel = new ModelMassEditPanel($this->dlgMassEdit,'pnlModelMassEditPanelCancel_Click',$items);
+              }
+              else{
+                  $this->pnlModelMassEditPanel->setItems($items);
+              }
+              $this->dlgMassEdit->ShowDialogBox();
+              $this->UncheckAllItems($this);
+		  }else{
+			  $this->lblWarning->Text = "You haven't chosen any Model to Edit" ;
+		  }
+	  }
+
+	  public function pnlModelMassEditPanelCancel_Click(){
+		  $this->dlgMassEdit->HideDialogBox();
+	  }
+
 	  protected function btnSearch_Click() {
 	  	$this->blnSearch = true;
 			$this->dtgAssetModel->PageNumber = 1;
@@ -331,6 +499,13 @@
 				}
 			}
 	  }
+        public function UncheckAllItems($object) {
+            foreach ($object->GetAllControls() as $objControl) {
+                if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+                    $objControl->Checked = false;
+                }
+            }
+        }
 	}
 
 	// Go ahead and run this form object to generate the page and event handlers, using
