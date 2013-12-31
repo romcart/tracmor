@@ -84,7 +84,7 @@
         public function __getProfileImage(){
             $size = 40;
             $email = $this->EmailAddress;
-            $strToReturn = "http://www.gravatar.com/avatar/" . md5( strtolower( trim( $email ) ) ) . "?d=mm&s=" . $size;
+            $strToReturn = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $email ) ) ) . "?d=mm&s=" . $size;
 
             return $strToReturn;
         }
