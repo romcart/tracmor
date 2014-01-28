@@ -154,7 +154,7 @@ class InventoryLocationReportForm extends QForm {
 	protected function btnGenerate_Click() {
 		if ($this->lstGenerateOptions->SelectedValue == 'csv') {
 			$arrConditions = $this->GetFilterConditions();
-			$objOrderByClause = QQ::Clause(QQ::OrderBy(QQN::InventoryLocation()->Location, QQN::InventoryLocation()->InventoryModel));
+			$objOrderByClause = $this->GetOrderByClause();
 			$dataSource = InventoryLocation::QueryArray(QQ::AndCondition($arrConditions), $objOrderByClause);
 			ob_end_clean();
 			header("Content-type: text/csv");
@@ -191,7 +191,7 @@ class InventoryLocationReportForm extends QForm {
 
 	protected function dtrInventoryLocation_Bind() {
 		$arrConditions = $this->GetFilterConditions();
-		$objOrderByClause = QQ::Clause(QQ::OrderBy(QQN::InventoryLocation()->Location, QQN::InventoryLocation()->InventoryModel));
+		$objOrderByClause = $this->GetOrderByClause();
 		$this->dtrInventoryLocation->TotalItemCount = InventoryLocation::QueryCount(QQ::AndCondition($arrConditions), $objOrderByClause);
 		$this->dtrInventoryLocation->DataSource = InventoryLocation::QueryArray(QQ::AndCondition($arrConditions), $objOrderByClause);
 	}
@@ -226,6 +226,17 @@ class InventoryLocationReportForm extends QForm {
 		}
 
 		return $arrConditions;
+	}
+
+	protected function GetOrderByClause() {
+		$objOrderByClause = QQ::Clause(
+			QQ::OrderBy(
+				QQN::InventoryLocation()->Location->ShortDescription, 
+				QQN::InventoryLocation()->InventoryModel->ShortDescription
+			)
+		);
+
+		return $objOrderByClause;
 	}
 
 	public function prepare($strHtml){
