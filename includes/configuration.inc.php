@@ -60,6 +60,7 @@
 	define ('__JS_ASSETS__', __SUBDIRECTORY__ . '/js');
 	define ('__CSS_ASSETS__', __SUBDIRECTORY__ . '/css');
 	define ('__IMAGE_ASSETS__', __SUBDIRECTORY__ . '/images');
+	define ('__IMAGE_CACHE__', __IMAGE_ASSETS__ . '/cache');
 	define ('__PHP_ASSETS__', __SUBDIRECTORY__ . '/includes/php');
 
 	if ((function_exists('date_default_timezone_set')) && (!ini_get('date.timezone')))

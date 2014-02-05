@@ -13,7 +13,7 @@
 		//
 		// Remember: CacheFolder *must* have a leading "/" and no trailing "/", and also
 		// be sure that the webserver process has WRITE access to the CacheFolder, itself.
-		protected $strCacheFolder = __TRACMOR_TMP__;
+		protected $strCacheFolder = __IMAGE_CACHE__;
 		
 		///////////////////////////////
 		// Public Properties: SET
