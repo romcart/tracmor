@@ -468,7 +468,7 @@
 	  		$this->blnAdvanced = false;
 	  		$this->lblAdvanced->Text = 'Advanced Search';
 	  		
-	  		$this->ctlAdvanced->ClearControls();
+	  		//$this->ctlAdvanced->ClearControls();
 	  		
 	  	}
 	  	else {
