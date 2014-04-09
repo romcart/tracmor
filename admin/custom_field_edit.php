@@ -132,6 +132,8 @@
 					array_push($objClauses, $objClause);
 				if ($objClause = $this->dtgValue->LimitClause)
 					array_push($objClauses, $objClause);
+				if ($objClause = QQ::Expand(QQN::CustomFieldValue()->CreatedByObject))
+					array_push($objClauses, $objClause);
 				$this->dtgValue->DataSource = CustomFieldValue::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId, $objClauses);
 				$this->dtgValue->ShowHeader = true;
 			}
@@ -284,11 +286,13 @@
 
 			$this->lstDefaultValue->AddItem(new QlistItem("-- None --", null, $this->objCustomField->DefaultCustomFieldValueId == null));
 
-			// Load all custom field values for this custom field
-			$objCustomFieldValueArray = CustomFieldValue::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
-			if ($objCustomFieldValueArray) {
-				foreach ($objCustomFieldValueArray as $objCustomFieldValue) {
-					$this->lstDefaultValue->AddItem(new QlistItem($objCustomFieldValue->ShortDescription, $objCustomFieldValue->CustomFieldValueId, $objCustomFieldValue->CustomFieldValueId == $this->objCustomField->DefaultCustomFieldValueId));
+			// Load all custom field values for this custom field (if it is of type Select)
+			if ($this->blnEditMode && $this->objCustomField->CustomFieldQtypeId == 2) {
+				$objCustomFieldValueArray = CustomFieldValue::LoadArrayByCustomFieldId($this->objCustomField->CustomFieldId);
+				if ($objCustomFieldValueArray) {
+					foreach ($objCustomFieldValueArray as $objCustomFieldValue) {
+						$this->lstDefaultValue->AddItem(new QlistItem($objCustomFieldValue->ShortDescription, $objCustomFieldValue->CustomFieldValueId, $objCustomFieldValue->CustomFieldValueId == $this->objCustomField->DefaultCustomFieldValueId));
+					}
 				}
 			}
 			// Only enable if there are values in the drop-down box and the required flag is checked
@@ -1163,7 +1167,7 @@
                   //  Check if Model has any Assets need to be updated with new custom field and update them
                         if($chosenAssetModels){
                             $objDatabase = CustomField::GetDatabase();
-                            $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `asset_id` IN ($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId);
+                            $strQuery = sprintf("UPDATE %s SET `cfv_%s`='%s' WHERE `asset_id` IN ($chosenAssetModels) AND cfv_%s IS NULL;", $strHelperTable,  $this->objCustomField->CustomFieldId, $txtDefaultValue, $this->objCustomField->CustomFieldId, $this->objCustomField->CustomFieldId);
                             $objDatabase->NonQuery($strQuery);
                             $strQuery = sprintf("UPDATE %s SET `cfv_%s`= NULL WHERE `asset_id` NOT IN($chosenAssetModels);", $strHelperTable,  $this->objCustomField->CustomFieldId);
                             $objDatabase->NonQuery($strQuery);

@@ -469,7 +469,9 @@ class QAdvancedSearchComposite extends QControl {
 		$this->dtpDateModifiedFirst->Enabled = false;
 		$this->dtpDateModifiedLast->Enabled = false;
 		$this->chkAttachment->Checked = false;
-		$this->chkArchived->Checked = false;
+		if ($this->chkArchived) {
+			$this->chkArchived->Checked = false;
+		}
 		
 		foreach ($this->arrCustomFields as $field) {
 			if ($field['input'] instanceof QTextBox) {

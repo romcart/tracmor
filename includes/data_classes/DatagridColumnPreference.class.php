@@ -35,14 +35,14 @@
 		 * @param integer $intUserAccountId
 		 * @return DatagridColumnPreference
 		*/
-		public static function LoadByDatagridShortDescriptionColumnNameUserAccountId($strDatagridShortDescription, $strColumnName, $intUserAccountId) {
-			$objDatagrid = Datagrid::LoadByShortDescription($strDatagridShortDescription);
-			if ($objDatagrid) {
-				return DatagridColumnPreference::LoadByDatagridIdColumnNameUserAccountId($objDatagrid->DatagridId, $strColumnName, $intUserAccountId);
-			}
-			else {
-				throw new Exception(sprintf('The datagrid %s is not represented in the datagrid table in the database', $strDatagridShortDescription));
-			}
+		public static function LoadByDatagridShortDescriptionColumnNameUserAccountId($strDatagridShortDescription, $strColumnName, $intUserAccountId) {	
+			return DatagridColumnPreference::QuerySingle(
+				QQ::AndCondition(
+				QQ::Equal(QQN::DatagridColumnPreference()->Datagrid->ShortDescription, $strDatagridShortDescription),
+				QQ::Equal(QQN::DatagridColumnPreference()->ColumnName, $strColumnName),
+				QQ::Equal(QQN::DatagridColumnPreference()->UserAccountId, $intUserAccountId)
+				)
+			);
 		}
 
 		// Override or Create New Load/Count methods
