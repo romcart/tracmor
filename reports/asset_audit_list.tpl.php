@@ -52,12 +52,13 @@
       <table>
 <?php 
 
-if ($this->objAuditArray) {
+if ($this->objAuditArray && count($this->objAuditArray)) {
 	foreach ($this->objAuditArray as $objAudit) {
-		// Assets reports only
-	  if ($objAudit->EntityQtypeId == 1)  
-		  echo "<tr><td><a href='./asset_audit_view.php?intAuditId=".$objAudit->AuditId."'>Audit by ".$objAudit->CreatedByObject->FirstName." ".$objAudit->CreatedByObject->LastName."</a> on ".$objAudit->CreationDate->PHPDate("Y-m-d H:i:s")." <a href='#' onclick='javascript:ConfirmDeleteAudit(".$objAudit->AuditId.");'>Delete</a></td></tr>";
+		echo "<tr><td><a href='./asset_audit_view.php?intAuditId=".$objAudit->AuditId."'>Audit by ".$objAudit->CreatedByObject->FirstName." ".$objAudit->CreatedByObject->LastName."</a> on ".$objAudit->CreationDate->PHPDate("Y-m-d H:i:s")." <a href='#' onclick='javascript:ConfirmDeleteAudit(".$objAudit->AuditId.");'>Delete</a></td></tr>";
 	}
+} else {
+	echo '<tr><td><strong>No Asset Audits Found</strong></td></tr>';
+	echo '<tr><td>To perform an audit, use the portable interface <a href="/portable" target="_blank">here</a>.</td></tr>';
 }
 
 ?>

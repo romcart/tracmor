@@ -40,15 +40,15 @@
 			$this->ctlShortcutMenu_Create();
 			//QApplication::$Database[1]->EnableProfiling();
 			if ($_GET && $_GET['method'] == 'delete') {
-        $objAudit = Audit::Load($_GET['intAuditId']);
-        if ($objAudit) {
-        	// Set the relationship to ON DELETE CASCADE so that the AuditScans will be automatically deleted when deleting the Audit Object
-          $objAudit->Delete();
-          QApplication::Redirect("./asset_audit_list.php");
-        }
-      }
-	    // Load an array of Audit objects using join on UserAccount.
-			$this->objAuditArray = Audit::LoadAll(QQ::Clause(QQ::Expand(QQN::Audit()->CreatedByObject)));
+				$objAudit = Audit::Load($_GET['intAuditId']);
+				if ($objAudit) {
+					// Set the relationship to ON DELETE CASCADE so that the AuditScans will be automatically deleted when deleting the Audit Object
+					$objAudit->Delete();
+					QApplication::Redirect("./asset_audit_list.php");
+				}
+			}
+			// Load an array of Audit objects using join on UserAccount.
+			$this->objAuditArray = Audit::LoadArrayByEntityQtypeId(1, QQ::Clause(QQ::Expand(QQN::Audit()->CreatedByObject)));
 		}
 		
 		// Create and Setup the Header Composite Control
@@ -57,11 +57,9 @@
 		}
 		
 		// Create and Setp the Shortcut Menu Composite Control
-  	protected function ctlShortcutMenu_Create() {
-  		$this->ctlShortcutMenu = new QShortcutMenu($this);
-  	}
-  	  	
-  	
+		protected function ctlShortcutMenu_Create() {
+			$this->ctlShortcutMenu = new QShortcutMenu($this);
+		}
 	}
 	
 	// Go ahead and run this form object to generate the page
