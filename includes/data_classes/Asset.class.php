@@ -230,7 +230,7 @@
       }
 		}
 
-        public function LoadByAssetIdWithCustomFields($strAssetId) {
+        public static function LoadByAssetIdWithCustomFields($strAssetId) {
             Asset::QueryHelper($objDatabase);
             $arrCustomFieldSql = CustomField::GenerateHelperSql(EntityQtype::Asset);
 
@@ -1139,7 +1139,7 @@
 		 * @param int $intParentAssetId AssetId of the parent asset to load linked assets
 		 * @return mixed
 		 */
-		public function LoadChildLinkedArrayByParentAssetId($intParentAssetId) {
+		public static function LoadChildLinkedArrayByParentAssetId($intParentAssetId) {
 			$objLinkedAssetArray = array();
 			
 			Asset::QueryHelper($objDatabase);
@@ -1182,7 +1182,7 @@
 			}
 		}
 
-        public function LoadChildLinkedArrayByParentAssetIdWithNoCustomFields($intParentAssetId) {
+        public static function LoadChildLinkedArrayByParentAssetIdWithNoCustomFields($intParentAssetId) {
             $objLinkedAssetArray = array();
 
             Asset::QueryHelper($objDatabase);
@@ -1226,7 +1226,7 @@
 		 *
 		 * @param string $strAssetCode
 		 */
-		public function ResetParentAssetIdToNullByAssetId($intAssetId) {
+		public static function ResetParentAssetIdToNullByAssetId($intAssetId) {
 		  $strQuery = sprintf("
 				UPDATE
 					`asset` AS `asset`
@@ -1246,7 +1246,7 @@
 		 *
 		 * @param string $intAssetId
 		 */
-		public function DeleteAuditScanByAssetId($intAssetId) {
+		public static function DeleteAuditScanByAssetId($intAssetId) {
 		  $strQuery = sprintf("
 				DELETE
 				  `audit_scan`.*
