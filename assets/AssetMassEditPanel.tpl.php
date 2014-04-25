@@ -14,33 +14,31 @@ Select fields to be updated and provide new values.
 		<td><?php echo $_CONTROL->lstModel->Name;           ?></td>
 		<td><?php $_CONTROL->lstModel->RenderWithError();            ?></td>
 	</tr>
-    <tr>
-        <td><?php $_CONTROL->chkParentAssetCode->Render();  ?></td>
-        <td><?php echo $_CONTROL->txtParentAssetCode->Name; ?></td>
-        <td><?php $_CONTROL->txtParentAssetCode->RenderWithError();
-                  $_CONTROL->lblIconParentAssetCode->Render();
-            ?></td>
-    </tr>
-    <tr>
-        <td><?php $_CONTROL->chkChkLockToParent->Render();             ?></td>
-        <td><?php echo $_CONTROL->chkLockToParent->Name;               ?></td>
-        <td><?php $_CONTROL->chkLockToParent->RenderWithError();  ?></td>
-    </tr>
-    <?php
-    if($_CONTROL->arrCustomFields){
-        foreach ($_CONTROL->arrCustomFields as $field) {
-            if($field['blnView']){
-                ?>
-                <tr>
-                    <td><?php $_CONTROL->arrCheckboxes[$field['input']->ControlId]->Render(); ?></td>
-                    <td><?php echo $field['input']->Name; ?>
-                    <td><?php echo $field['input']->RenderWithError(false); ?></td>
-                </tr><?php
-            }
-        }
-    }
-    ?>
+	<tr>
+		<td><?php $_CONTROL->chkParentAssetCode->Render();  ?></td>
+		<td><?php echo $_CONTROL->txtParentAssetCode->Name; ?></td>
+		<td><?php $_CONTROL->txtParentAssetCode->RenderWithError(); ?></td>
+	</tr>
+	<tr>
+		<td><?php $_CONTROL->chkChkLockToParent->Render();             ?></td>
+		<td><?php echo $_CONTROL->chkLockToParent->Name;               ?></td>
+		<td><?php $_CONTROL->chkLockToParent->RenderWithError();  ?></td>
+	</tr>
+	<?php
+	if ($_CONTROL->arrCustomFields) {
+		foreach ($_CONTROL->arrCustomFields as $field) {
+			if ($field['blnView']) {
+				?>
+				<tr>
+					<td><?php $_CONTROL->arrCheckboxes[$field['input']->ControlId]->Render(); ?></td>
+					<td><?php echo $field['input']->Name; ?>
+					<td><?php echo $field['input']->RenderWithError(false); ?></td>
+				</tr><?php
+			}
+		}
+	}
+	?>
 </table>
 <br />
-<?php $_CONTROL->btnCancel->Render(); ?><?php $_CONTROL->btnApply->Render(); ?>
+<?php $_CONTROL->btnApply->Render(); ?><?php $_CONTROL->btnCancel->Render(); ?>
 <?php //Short Desc, Model, Long Description ?>
