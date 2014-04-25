@@ -172,7 +172,7 @@ class QAssetSearchComposite extends QControl {
     }
 
     // Column to originally sort by (Asset Model)
-    $this->dtgAsset->SortColumnIndex = 2;
+    $this->dtgAsset->SortColumnIndex = 4;
     $this->dtgAsset->SortDirection = 0;
 
     $objStyle = $this->dtgAsset->RowStyle;
@@ -482,7 +482,7 @@ class QAssetSearchComposite extends QControl {
 	  			$field['value'] = null;
 	  		}
 	  	}
-	  	$this->dtgAsset->SortColumnIndex = 2;
+	  	$this->dtgAsset->SortColumnIndex = 4;
 	  	$this->dtgAsset->SortDirection = 0;
 	  	$this->blnSearch = false;
 	  	if ($this->blnUseAjax) {

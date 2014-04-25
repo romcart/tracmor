@@ -327,7 +327,7 @@
       	}
       }
            
-      $this->dtgReceipt->SortColumnIndex = 1;
+      $this->dtgReceipt->SortColumnIndex = 2;
     	$this->dtgReceipt->SortDirection = 1;
       
       $objStyle = $this->dtgReceipt->RowStyle;

@@ -343,7 +343,7 @@
       	}
       }
       
-      $this->dtgShipment->SortColumnIndex = 1;
+      $this->dtgShipment->SortColumnIndex = 2;
     	$this->dtgShipment->SortDirection = 1;
       
       $objStyle = $this->dtgShipment->RowStyle;
