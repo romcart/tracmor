@@ -40,5 +40,5 @@ Select fields to be updated and provide new values.
 	?>
 </table>
 <br />
-<?php $_CONTROL->btnApply->Render(); ?><?php $_CONTROL->btnCancel->Render(); ?>
+<?php $_CONTROL->btnApply->Render(); ?><?php $_CONTROL->btnCancel->RenderWithError(); ?>
 <?php //Short Desc, Model, Long Description ?>

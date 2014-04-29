@@ -44,7 +44,6 @@
 		 * @var  QDialogBox $dlgMassDelete
 		 * @var  QButton    $btnMassDelete
 		 * @var  QButton    $btnMassEdit
-		 * @var  QAssetSearchToolComposite $ctlAssetSearchTool
 		 */
 
 		// Header Tabs
@@ -65,7 +64,6 @@
 		protected $btnMassDelete;
 		protected $btnMassDeleteConfirm;
 		protected $btnMassDeleteCancel;
-		public    $ctlAssetSearchTool;
 
 		protected function Form_Create() {
 			
@@ -74,7 +72,6 @@
 			$this->ctlSearchMenu_Create();
 
 			// Mass Actions controls create
-			$this->ctlAssetSearchTool_Create();
 			$this->lblWarning_Create();
 			$this->dlgMassEdit_Create();
 			$this->dlgMassDelete_Create();
@@ -82,6 +79,7 @@
 			$this->btnMassDeleteConfirm_Create();
 			$this->btnMassDeleteCancel_Create();
 			$this->btnMassEdit_Create();
+			$this->AddMassButtonActions();
 		}
 
 		// Create and Setup the Header Composite Control
@@ -128,9 +126,7 @@
 			$this->btnMassDelete = new QButton($this);
 			$this->btnMassDelete->Name = "delete";
 			$this->btnMassDelete->Text = "Mass Delete";
-			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
-			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
-			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			// Actions added in AddMassButtonActions()
 		}
 
 		protected function btnMassDeleteConfirm_Create() {
@@ -161,8 +157,18 @@
 			$this->btnMassEdit = new QButton($this);
 			$this->btnMassEdit->Name = "edit";
 			$this->btnMassEdit->Text = "Mass Edit";
-			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
-			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
+			// Actions added in AddMassButtonActions()
+		}
+
+		protected function AddMassButtonActions() {
+			// btnMassDelete actions
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
+			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+
+			// btnMassEdit actions
+			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
+			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
 			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
@@ -217,64 +223,10 @@
 			$this->dlgMassEdit->HideDialogBox();
 		}
 
-		public function lblIconParentAssetCode_Click() {
-			// Uncheck all items but SelectAll checkbox
-			// $this->UncheckAllItems($this->pnlAssetMassEdit->ctlAssetSearchTool);
-			if ($this->ctlAssetSearchTool instanceof QAssetSearchToolComposite) {
-				$this->ctlAssetSearchTool->Refresh();
-				$this->ctlAssetSearchTool->btnAssetSearchToolAdd->Text = "Add Parent Asset";
-				$this->ctlAssetSearchTool->dlgAssetSearchTool->ShowDialogBox();
-				$this->dlgMassEdit->HideDialogBox();
-			}
-		}
-
 		public function UncheckAllItems($object) {
 			foreach ($object->GetAllControls() as $objControl) {
 				if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
 					$objControl->Checked = false;
-				}
-			}
-		}
-
-		public function ctlAssetSearchTool_Create() {
-			$this->ctlAssetSearchTool = new QAssetSearchToolComposite($this);
-		}
-
-		public function btnAssetSearchToolAdd_Click() {
-			$this->ctlAssetSearchTool->lblWarning->Text = "";
-			$intSelectedAssetId = $this->ctlAssetSearchTool->ctlAssetSearch->dtgAsset->GetSelected("AssetId");
-			if (count($intSelectedAssetId) > 1) {
-				$this->ctlAssetSearchTool->lblWarning->Text = "You must select only one parent asset.";
-			} elseif (count($intSelectedAssetId) != 1) {
-				$this->ctlAssetSearchTool->lblWarning->Text = "No selected assets.";
-			} else {
-				if (!($objParentAsset = Asset::LoadByAssetId($intSelectedAssetId[0]))) {
-					$this->ctlAssetSearchTool->lblWarning->Text = "That asset tag does not exist. Please try another.";
-				} elseif (in_array($objParentAsset->AssetId, $this->arrToEdit)) {
-					$this->ctlAssetSearchTool->lblWarning->Text = "Parent asset tag must not be the same as asset tag. Please try another.";
-				} else {
-					$this->pnlAssetMassEdit->txtParentAssetCode->Text = $objParentAsset->AssetCode;
-					//$this->UncheckAllItems($this);
-					$this->dlgMassEdit->ShowDialogBox();
-					$this->ctlAssetSearchTool->dlgAssetSearchTool->HideDialogBox();
-				}
-			}
-			// Set properly checked/unchecked items
-			if ($this->pnlAssetMassEdit->chkParentAssetCode->Checked) {
-				$this->pnlAssetMassEdit->txtParentAssetCode->Enabled = true;
-			}
-			
-			if ($this->pnlAssetMassEdit->chkChkLockToParent->Checked) {
-				$this->pnlAssetMassEdit->chkLockToParent->Enabled = true;
-			}
-			
-			if ($this->pnlAssetMassEdit->chkModel->Checked) {
-				$this->pnlAssetMassEdit->lstModel->Enabled = true;
-			}
-
-			foreach ($this->pnlAssetMassEdit->arrCustomFields as $field) {
-				if ($this->pnlAssetMassEdit->arrCheckboxes[$field['input']->ControlId]->Checked) {
-					$field['input']->Enabled = true;
 				}
 			}
 		}

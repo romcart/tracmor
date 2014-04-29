@@ -64,8 +64,8 @@ class AssetMassEditPanel extends QPanel {
 			}
 		}
 
-		$this->btnApply_Create();
 		$this->btnCancel_Create();
+		$this->btnApply_Create();
 	}
 
 	// Create the Model Input
@@ -126,16 +126,6 @@ class AssetMassEditPanel extends QPanel {
 		$this->chkChkLockToParent->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
 	}
 
-	public function btnApply_Create() {
-		$this->btnApply = new QButton($this);
-		$this->btnApply->Name = 'Apply';
-		$this->btnApply->Text = 'Apply';
-		$this->btnApply->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
-		$this->btnApply->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnApply_Click'));
-		$this->btnApply->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnApply_Click'));
-		$this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	}
-
 	public function btnCancel_Create() {
 		$this->btnCancel = new QButton($this);
 		$this->btnCancel->Name = 'Cancel';
@@ -144,10 +134,38 @@ class AssetMassEditPanel extends QPanel {
 		$this->btnCancel->AddAction(new QClickEvent(), new QHideDialogBox($this->ParentControl));
 	}
 
+	public function btnApply_Create() {
+		$this->btnApply = new QButton($this);
+		$this->btnApply->Name = 'Apply';
+		$this->btnApply->Text = 'Apply';
+		$this->btnApply->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
+		$this->btnApply->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnApply_Click', null, null, array($this->btnApply, $this->btnCancel)));
+		$this->btnApply->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnApply_Click', null, null, array($this->btnApply, $this->btnCancel)));
+		$this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+	}
+
 	public function btnApply_Click($strFormId, $strControlId, $strParameter) {
 		$this->EnableSelectedControls();
 		$this->ClearWarnings();
 		$blnError = false;
+
+		// Make sure at least one checkbox is checked
+		if (!$this->chkModel->Checked && !$this->chkParentAssetCode->Checked && !$this->chkChkLockToParent->Checked) {
+			$blnChecked = false;
+			foreach ($this->arrCheckboxes as $objCheckBox) {
+				if ($objCheckBox->Checked) {
+					$blnChecked = true;
+					break;
+				}
+			}
+
+			if (!$blnChecked) {
+				$blnError = true;
+				$this->btnCancel->Warning = 'You must select at least one field to edit.';
+				return;
+			}
+		}
+
 		// Get an instance of the database
 		$objDatabase = QApplication::$Database[1];
 		// Begin a MySQL Transaction to be either committed or rolled back
@@ -237,6 +255,16 @@ class AssetMassEditPanel extends QPanel {
 					$this->chkLockToParent->Checked = false;
 				}
 			}
+		} else if ($this->chkChkLockToParent->Checked && $this->chkLockToParent->Checked) {
+			// Make sure assets have a parent to lock to if lock is checked and no parent being assigned
+			foreach ($this->arrAssetToEdit as $intAssetToEditId) {
+				$objAsset = Asset::Load($intAssetToEditId);
+				if (!$objAsset->ParentAssetId) {
+					$blnError = true;
+					$this->chkLockToParent->Warning = 'Asset cannot be locked without a parent assigned.';
+					break;
+				}
+			}
 		}
 
 		// Apply checked main_table fields
@@ -305,6 +333,7 @@ class AssetMassEditPanel extends QPanel {
 		$this->chkLockToParent->Warning = '';
 		$this->txtParentAssetCode->Warning = '';
 		$this->lstModel->Warning = '';
+		$this->btnCancel->Warning = '';
 		if (count($this->arrCustomFields)>0) {
 			foreach ($this->arrCustomFields as $field) {
 				$field['input']->Warning = '';
@@ -314,7 +343,7 @@ class AssetMassEditPanel extends QPanel {
 
 	public function EnableSelectedControls() {
 		$this->lstModel->Enabled = $this->chkModel->Checked;
-		$this->txtParentAssetCode->Enabled = $this->chkModel->Checked;
+		$this->txtParentAssetCode->Enabled = $this->chkParentAssetCode->Checked;
 		$this->chkLockToParent->Enabled = $this->chkChkLockToParent->Checked;
 
 		foreach ($this->arrCustomFields as $field) {
