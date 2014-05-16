@@ -110,6 +110,29 @@
 			 }
 		}
 
+		public function GetLocation() {
+			if ($this->blnCheckedOutFlag) {
+				$arrObjects = $this->GetLastTransactionCheckoutObjectArray();
+				$objAccount = $arrObjects['objAccount'];
+				$objAssetTransactionCheckout = $arrObjects['objAssetTransactionCheckout'];
+
+				if (!$objAssetTransactionCheckout) {
+					$strToReturn = 'Checked Out by ' . $objAccount->__toString();
+				} else {
+					$strToReturn = 'Checked Out to ';
+					if ($objAssetTransactionCheckout->ToContactId) {
+						$strToReturn .= $objAssetTransactionCheckout->ToContact->__toString();
+					} else {
+						$strToReturn .= $objAssetTransactionCheckout->ToUser->__toString();
+					}
+
+					return $strToReturn;
+				}
+			} else {
+				return $this->Location->__toString();
+			}
+		}
+
 		/**
 		 * Returns the HTML needed for the asset list datagrid to show reserved and checked out by icons, with hovertips with the username.
 		 * If the asset is neither reserved nor checked out, it returns an empty string.
