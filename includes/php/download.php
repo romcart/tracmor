@@ -24,6 +24,7 @@ require_once('../prepend.inc.php');
 $objAttachment = Attachment::Load($_GET['attachment_id']);
 // Check that the filenames exist
 if ($objAttachment->TmpFilename == $_GET['tmp_filename']) {
+	header("Pragma: hack"); // IE chokes on "no cache", so set to something, anything, else.
 	header("Content-Type: " . $objAttachment->FileType );
 	header("Content-Length:" . $objAttachment->Size);
 	header("Content-Disposition: attachment; filename=".$objAttachment->Filename);
