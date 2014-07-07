@@ -29,10 +29,12 @@ if ($objAttachment->TmpFilename == $_GET['tmp_filename']) {
 	header("Content-Length:" . $objAttachment->Size);
 	header("Content-Disposition: attachment; filename=".$objAttachment->Filename);
 	header("Content-Transfer-Encoding: binary");
-	echo readfile($objAttachment->Path);
+	
+	ob_clean();
+	flush();
+	readfile($objAttachment->Path);
 	exit();
-}
-else {
+} else {
 	echo("HACKING ATTEMPT");
 	exit();
 }
