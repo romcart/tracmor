@@ -58,7 +58,7 @@ if ($this->objAuditArray && count($this->objAuditArray)) {
 	}
 } else {
 	echo '<tr><td><strong>No Inventory Audits Found</strong></td></tr>';
-	echo '<tr><td>To perform an audit, use the portable interface <a href="/portable" target="_blank">here</a>.</td></tr>';
+	echo '<tr><td>To perform an audit, use the portable interface <a href="../portable" target="_blank">here</a>.</td></tr>';
 }
 
 ?>
