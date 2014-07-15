@@ -33,6 +33,7 @@ class AssetMassEditPanel extends QPanel {
 	public $lstModel;
 	public $btnApply;
 	public $btnCancel;
+	public $blnEditBuiltInFields;
 
 	public function __construct($objParentObject, $strClosePanelMethod , $arrayAssetId) {
 
@@ -43,6 +44,14 @@ class AssetMassEditPanel extends QPanel {
 			throw $objExc;
 		}
 		$this->arrAssetToEdit = $arrayAssetId;
+
+		//Set Edit Display Logic of Built-In Fields
+		$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,1,2);
+		if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
+			$this->blnEditBuiltInFields=true;
+		} else{
+			$this->blnEditBuiltInFields=false;
+		}
 
 		$this->lstModel_Create();
 		$this->txtParentAssetCode_Create();
@@ -61,6 +70,7 @@ class AssetMassEditPanel extends QPanel {
 				$this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
 				$this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
 				$this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+				$this->arrCheckboxes[$field['input']->strControlId]->Enabled = $field['blnEdit'];
 			}
 		}
 
@@ -105,6 +115,7 @@ class AssetMassEditPanel extends QPanel {
 		$this->chkModel->strControlId = 'chkModel';
 		$this->chkModel->Checked = false;
 		$this->chkModel->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+		$this->chkModel->Enabled = $this->blnEditBuiltInFields;
 	}
 
 	// Create checkbox to Parent Asset Code text input
@@ -114,7 +125,7 @@ class AssetMassEditPanel extends QPanel {
 		$this->chkParentAssetCode->strControlId = 'chkParentAssetCode';
 		$this->chkParentAssetCode->Checked = false;
 		$this->chkParentAssetCode->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-
+		$this->chkParentAssetCode->Enabled = $this->blnEditBuiltInFields;
 	}
 
 	// Create the Lock to Parent checkbox
@@ -124,6 +135,7 @@ class AssetMassEditPanel extends QPanel {
 		$this->chkChkLockToParent->strControlId = 'chkChkLockToParent';
 		$this->chkChkLockToParent->Checked = false;
 		$this->chkChkLockToParent->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+		$this->chkChkLockToParent->Enabled = $this->blnEditBuiltInFields;
 	}
 
 	public function btnCancel_Create() {
@@ -138,7 +150,7 @@ class AssetMassEditPanel extends QPanel {
 		$this->btnApply = new QButton($this);
 		$this->btnApply->Name = 'Apply';
 		$this->btnApply->Text = 'Apply';
-		$this->btnApply->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
+		//$this->btnApply->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
 		$this->btnApply->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnApply_Click', null, null, array($this->btnApply, $this->btnCancel)));
 		$this->btnApply->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnApply_Click', null, null, array($this->btnApply, $this->btnCancel)));
 		$this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -166,6 +178,13 @@ class AssetMassEditPanel extends QPanel {
 			}
 		}
 
+		// If Model is checked, make sure a model is selected
+		if ($this->chkModel->Checked && $this->lstModel->SelectedValue == null) {
+				$blnError = true;
+				$this->lstModel->Warning = 'You must select a Model.';
+				return;
+		}
+
 		// Get an instance of the database
 		$objDatabase = QApplication::$Database[1];
 		// Begin a MySQL Transaction to be either committed or rolled back
@@ -187,77 +206,81 @@ class AssetMassEditPanel extends QPanel {
 				}
 			}
 		}
-		if ($this->chkParentAssetCode->Checked && $this->txtParentAssetCode->Text) {
-			// Check if the parent asset tag is already a child asset of this asset
-			foreach ($this->arrAssetToEdit as $intAssetToEditId){
+		
+		foreach ($this->arrAssetToEdit as $intAssetToEditId) {
+			$objAsset = Asset::Load($intAssetToEditId);
+
+			// First check that the user is authorized to edit this asset
+			if (!QApplication::AuthorizeEntityBoolean($objAsset, 2)) {
+				$blnError = true;
+				$this->btnCancel->Warning = 'You are not authorized to edit one or more of the selected assets.';
+				break;
+			}
+
+			if ($this->chkParentAssetCode->Checked && $this->txtParentAssetCode->Text) {
+				// Check if the parent asset tag is already a child asset of this asset
 				$arrChildAsset = Asset::LoadArrayByParentAssetId($intAssetToEditId);
 				foreach ($arrChildAsset as $objChildAsset) {
 					if ($objChildAsset->AssetCode == $this->txtParentAssetCode->Text) {
 						$blnError = true;
 						$this->txtParentAssetCode->Warning = "Parent asset tag is already a child of this asset.";
-						break;
+						break 2;
 					}
 				}
-				if (!$blnError) {
-					$objAsset = Asset::Load($intAssetToEditId);
-					if ($this->txtParentAssetCode->Text != $objAsset->AssetCode) {
-						$objParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
-						if (!$objParentAsset) {
-							$blnError = true;
-							$this->txtParentAssetCode->Warning = "That asset tag does not exist.";
-						} else if ($this->chkLockToParent->Checked
-							 	   && !($objAsset->ParentAssetId == $objParentAsset->AssetId
-								   && $objAsset->LinkedFlag == 1)
-								   && $objParentAsset->LocationId != $objAsset->LocationId) {
-							// If locking child to parent, make sure assets are at the same location
-							$blnError = true;
-							$this->chkLockToParent->Warning = 'Cannot lock to parent asset at another location.';
-						} else if ($this->chkLockToParent->Checked
-								   && !($objAsset->ParentAssetId == $objParentAsset->AssetId
-								   && $objAsset->LinkedFlag == 1)
-								   && ($objParentAsset->CheckedOutFlag
-								   || $objParentAsset->ReservedFlag
-								   || $objParentAsset->ArchivedFlag
-								   || $objParentAsset->LocationId == 2
-								   || $objParentAsset->LocationId == 5
-								   || AssetTransaction::PendingTransaction($objParentAsset->AssetId))) {
-							$blnError = true;
-							$this->chkLockToParent->Warning = "Parent asset tag (" . $objParentAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
-						} else if ($this->chkLockToParent->Checked
-								   && !($objAsset->ParentAssetId == $objParentAsset->AssetId
-								   && $objAsset->LinkedFlag == 1)
-								   && ($objAsset->CheckedOutFlag
-								   || $objAsset->ReservedFlag
-								   || $objAsset->ArchivedFlag
-								   || $objAsset->LocationId == 2
-								   || $objAsset->LocationId == 5
-								   || AssetTransaction::PendingTransaction($objAsset->AssetId))) {
-							$blnError = true;
-							$this->chkLockToParent->Warning .= "Child asset must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
-						} else {
-							$objAsset->ParentAssetId = $objParentAsset->AssetId;
-							if ($this->chkLockToParent->Checked) {
-								$objAsset->LinkedFlag = 1;
-							} else {
-								$objAsset->LinkedFlag = 0;
-							}
-						}
-					} else {
+
+				if ($this->txtParentAssetCode->Text != $objAsset->AssetCode) {
+					$objParentAsset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
+					if (!$objParentAsset) {
 						$blnError = true;
-						$this->txtParentAssetCode->Warning = "Asset cannot be assigned as its own parent.";
+						$this->txtParentAssetCode->Warning = "That asset tag does not exist.";
+						break;
+					} else if ($this->chkLockToParent->Checked
+						 	   && !($objAsset->ParentAssetId == $objParentAsset->AssetId
+							   && $objAsset->LinkedFlag == 1)
+							   && $objParentAsset->LocationId != $objAsset->LocationId) {
+						// If locking child to parent, make sure assets are at the same location
+						$blnError = true;
+						$this->chkLockToParent->Warning = 'Cannot lock to parent asset at another location.';
+						break;
+					} else if ($this->chkLockToParent->Checked
+							   && !($objAsset->ParentAssetId == $objParentAsset->AssetId
+							   && $objAsset->LinkedFlag == 1)
+							   && ($objParentAsset->CheckedOutFlag
+							   || $objParentAsset->ReservedFlag
+							   || $objParentAsset->ArchivedFlag
+							   || $objParentAsset->LocationId == 2
+							   || $objParentAsset->LocationId == 5
+							   || AssetTransaction::PendingTransaction($objParentAsset->AssetId))) {
+						$blnError = true;
+						$this->chkLockToParent->Warning = "Parent asset tag (" . $objParentAsset->AssetCode . ") must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
+						break;
+					} else if ($this->chkLockToParent->Checked
+							   && !($objAsset->ParentAssetId == $objParentAsset->AssetId
+							   && $objAsset->LinkedFlag == 1)
+							   && ($objAsset->CheckedOutFlag
+							   || $objAsset->ReservedFlag
+							   || $objAsset->ArchivedFlag
+							   || $objAsset->LocationId == 2
+							   || $objAsset->LocationId == 5
+							   || AssetTransaction::PendingTransaction($objAsset->AssetId))) {
+						$blnError = true;
+						$this->chkLockToParent->Warning .= "Child asset must not be currently Archived, Checked Out, Pending Shipment, Shipped/TBR, or Reserved.";
+						break;
+					} else {
+						$objAsset->ParentAssetId = $objParentAsset->AssetId;
+						if ($this->chkLockToParent->Checked) {
+							$objAsset->LinkedFlag = 1;
+						} else {
+							$objAsset->LinkedFlag = 0;
+						}
 					}
 				} else {
-					// If txtParentAssetCode is empty
-					if ($objAsset) {
-						$objAsset->LinkedFlag = false;
-						$objAsset->ParentAssetId = null;
-					}
-					$this->chkLockToParent->Checked = false;
+					$blnError = true;
+					$this->txtParentAssetCode->Warning = "Asset cannot be assigned as its own parent.";
+					break;
 				}
-			}
-		} else if ($this->chkChkLockToParent->Checked && $this->chkLockToParent->Checked) {
-			// Make sure assets have a parent to lock to if lock is checked and no parent being assigned
-			foreach ($this->arrAssetToEdit as $intAssetToEditId) {
+			} else if ($this->chkChkLockToParent->Checked && $this->chkLockToParent->Checked) {
+				// Make sure assets have a parent to lock to if lock is checked and no parent being assigned
 				$objAsset = Asset::Load($intAssetToEditId);
 				if (!$objAsset->ParentAssetId) {
 					$blnError = true;
@@ -269,19 +292,14 @@ class AssetMassEditPanel extends QPanel {
 
 		// Apply checked main_table fields
 		if ($this->chkModel->Checked) {
-			if ($this->lstModel->SelectedValue !== null) {
-				 $set[] = sprintf('`asset_model_id`="%s"' , $this->lstModel->SelectedValue);
-			} else {
-				$blnError = true;
-				$this->lstModel->Warning = 'Model can\'t be empty';
-			}
+			$set[] = sprintf('`asset_model_id`="%s"' , $this->lstModel->SelectedValue);
 		}
 		if ($this->chkChkLockToParent->Checked) {
 			$set[] = sprintf('`linked_flag`=%s', $this->chkLockToParent->Checked?1:"NULL");
 		}
 		if ($this->chkParentAssetCode->Checked) {
 			$parent_asset = Asset::LoadByAssetCode($this->txtParentAssetCode->Text);
-			if($parent_asset instanceof Asset){
+			if($parent_asset instanceof Asset) {
 				$parent_asset_id = $parent_asset->AssetId;
 			} else {
 				$parent_asset_id = "NULL";
@@ -289,6 +307,9 @@ class AssetMassEditPanel extends QPanel {
 			}
 			$set[] = sprintf('`parent_asset_id`=%s', $parent_asset_id);
 		}
+
+		// Force modified_date timestamp update
+		$set[] = '`modified_date` = NOW()';
 
 		if (!$blnError){
 			try{
@@ -312,7 +333,7 @@ class AssetMassEditPanel extends QPanel {
 
 				}
 				// Edit TransAction
-				// Apdate main table
+				// Update main table
 				$strQuery = sprintf("UPDATE `asset`
 							SET ". implode(",",$set). " WHERE `asset_id` IN (%s)",
 							implode(",", $this->arrAssetToEdit));

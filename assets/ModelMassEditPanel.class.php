@@ -77,8 +77,9 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
 
         $this->arrModelsToEdit = $arrayModelId;
 
-
+        $this->txtShortDescription->Enabled = false;
         $this->txtShortDescription->Required = false;
+        $this->txtLongDescription->Enabled = false;
 
         // Create the Image File Control
         $this->ifcImage_Create();
@@ -99,13 +100,12 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
             $this->arrCustomFields = CustomField::CustomFieldControlsCreate($objCustomFieldArray, false, $this, true, true, false);
 
             foreach($this->arrCustomFields as $field){
+                $field['input']->Enabled = false;
                 $this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
                 $this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
                 $this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
             }
         }
-
-
 
         $this->btnSave->CausesValidation = QCausesValidation::SiblingsOnly;
 
@@ -131,6 +131,7 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
                 $objListItem->Selected = true;
             $this->lstCategory->AddItem($objListItem);
         }
+        $this->lstCategory->Enabled = false;
     }
 
     // Create and Setup lstManufacturer with alphabetic ordering
@@ -145,6 +146,7 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
                 $objListItem->Selected = true;
             $this->lstManufacturer->AddItem($objListItem);
         }
+        $this->lstManufacturer->Enabled = false;
     }
 
     // Create the Image File Control
@@ -163,6 +165,7 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         // $this->ifcImage->ThumbPrefix = "thumb_";
         $this->ifcImage->Prefix = QApplication::$TracmorSettings->ImageUploadPrefix;
         $this->ifcImage->Suffix = "_asset_model";
+        $this->ifcImage->Enabled = false;
     }
 
     public function chkShortDescription_Create(){
@@ -200,6 +203,14 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
         $this->chkImage->Name = 'image';
         $this->chkImage->Checked = false;
         $this->chkImage->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+    }
+
+    public function btnCancel_Create() {
+        $this->btnCancel = new QButton($this);
+        $this->btnCancel->Name = 'Cancel';
+        $this->btnCancel->Text = 'Cancel';
+        $this->btnCancel->SetCustomStyle('margin-left', '4px');
+        $this->btnCancel->AddAction(new QClickEvent(), new QHideDialogBox($this->ParentControl));
     }
 
     // Save Button Click Actions

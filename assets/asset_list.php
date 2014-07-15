@@ -94,11 +94,11 @@
 
 		// Create and Setup the Asset Search Composite Control
 		protected function ctlSearchMenu_Create() {
-			$this->ctlSearchMenu = new QAssetSearchComposite($this, null, false);
+			$this->ctlSearchMenu = new QAssetSearchComposite($this, null, QApplication::AuthorizeEntityTypeBoolean(2));
 		}
 
 		// Mass Actions controls creating/handling functions
-		protected function dlgMassDelete_Create(){
+		protected function dlgMassDelete_Create() {
 			$this->dlgMassDelete = new QDialogBox($this);
 			$this->dlgMassDelete->AutoRenderChildren = true;
 			$this->dlgMassDelete->Width = '440px';
@@ -110,7 +110,7 @@
 			$this->dlgMassDelete->CssClass = "modal_dialog";
 		}
 
-		protected function dlgMassEdit_Create(){
+		protected function dlgMassEdit_Create() {
 			$this->dlgMassEdit = new QDialogBox($this, 'MassEdit');
 			$this->dlgMassEdit->AutoRenderChildren = true;
 			$this->dlgMassEdit->Width = '440px';
@@ -122,17 +122,18 @@
 			$this->dlgMassEdit->CssClass = "modal_dialog";
 		}
 
-		protected function btnMassDelete_Create(){
+		protected function btnMassDelete_Create() {
 			$this->btnMassDelete = new QButton($this);
 			$this->btnMassDelete->Name = "delete";
 			$this->btnMassDelete->Text = "Mass Delete";
+			$this->btnMassDelete->Display = QApplication::AuthorizeEntityTypeBoolean(3);
 			// Actions added in AddMassButtonActions()
 		}
 
 		protected function btnMassDeleteConfirm_Create() {
 			$this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
 			$this->btnMassDeleteConfirm->Text = 'Confirm';
-			$this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
+			// Actions added in AddMassButtonActions()
 		}
 
 		protected function btnMassDeleteCancel_Create() {
@@ -153,57 +154,57 @@
 			}
 		}
 
-		protected function btnMassEdit_Create(){
+		protected function btnMassEdit_Create() {
 			$this->btnMassEdit = new QButton($this);
 			$this->btnMassEdit->Name = "edit";
 			$this->btnMassEdit->Text = "Mass Edit";
+			$this->btnMassEdit->Display = QApplication::AuthorizeEntityTypeBoolean(2);
 			// Actions added in AddMassButtonActions()
 		}
 
 		protected function AddMassButtonActions() {
-			// btnMassDelete actions
 			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
-			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
-			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-
-			// btnMassEdit actions
 			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
-			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
-			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click', null, null, array($this->btnMassDeleteCancel, $this->btnMassDeleteConfirm)));
 		}
 
-		protected function lblWarning_Create(){
+		protected function lblWarning_Create() {
 			$this->lblWarning = new QLabel($this);
 			$this->lblWarning->Text = "";
 			$this->lblWarning->CssClass = "warning";
 		}
 
-		protected function btnMassDeleteConfirm_Click(){
+		protected function btnMassDeleteConfirm_Click() {
 			$items = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
 
 			$this->lblWarning->Text = "";
 			// TODO perform validate
-			foreach($items as $item){
-				try {
-					// Get an instance of the database
-					$objDatabase = QApplication::$Database[1];
-					// Begin a MySQL Transaction to be either committed or rolled back
-					$objDatabase->TransactionBegin();
+			// Get an instance of the database
+			$objDatabase = QApplication::$Database[1];
+
+			try {
+				// Begin a MySQL Transaction to be either committed or rolled back
+				$objDatabase->TransactionBegin();
+
+				foreach($items as $item) {
 					// ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
 					Asset::ResetParentAssetIdToNullByAssetId($item);
 					// Delete any audit scans of this asset
 					Asset::DeleteAuditScanByAssetId($item);
 					// Delete the asset
 					Asset::LoadByAssetId($item)->Delete();
-					$objDatabase->TransactionCommit();
-
-					// Hide the dialog
-					$this->dlgMassDelete->HideDialogBox();
-				} catch (QMySqliDatabaseException $objExc) {
-					// Rollback the transaction
-					$objDatabase->TransactionRollback();
-					throw new QDatabaseException();
 				}
+
+				$objDatabase->TransactionCommit();
+				$this->UncheckAllItems($this);
+
+				// Hide the dialog
+				$this->dlgMassDelete->HideDialogBox();
+
+			} catch (QMySqliDatabaseException $objExc) {
+				// Rollback the transaction
+				$objDatabase->TransactionRollback();
+				throw new QDatabaseException();
 			}
 		}
 

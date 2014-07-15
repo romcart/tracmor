@@ -199,6 +199,19 @@
 				}
 			}
 		}
+
+		/**
+		 * Authorizes an entity type and returns a boolean value
+		 * 
+		 * @param integer $intAuthorizationId
+		 * @return bool $blnAuthorized
+		 */
+		public static function AuthorizeEntityTypeBoolean($intAuthorizationId) {
+			$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, $intAuthorizationId);
+
+			// Authorization Level: 1 = All, 2 = Owner
+			return ($objRoleModuleAuthorization->AuthorizationLevelId == 1 || $objRoleModuleAuthorization->AuthorizationLevelId == 2);
+		}
 		
 		/**
 		 * Authorizes an entity for editing and returns a boolean value for error checking purposes
