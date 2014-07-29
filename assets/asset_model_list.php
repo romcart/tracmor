@@ -140,7 +140,7 @@
 
 			$this->dtgAssetModel->SortColumnIndex = ($blnShowCheckboxes) ? 4 : 3;
 			$this->dtgAssetModel->SortDirection = 0;
-	  
+
 			$objStyle = $this->dtgAssetModel->RowStyle;
 			$objStyle->ForeColor = '#000000';
 			$objStyle->BackColor = '#FFFFFF';
@@ -523,14 +523,6 @@
 					elseif ($field['input'] instanceof QTextBox) {
 						$field['value'] = $field['input']->Text;
 					}
-				}
-			}
-		}
-		
-		public function ($object) {
-			foreach ($object->GetAllControls() as $objControl) {
-				if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
-					$objControl->Checked = false;
 				}
 			}
 		}
