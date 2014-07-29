@@ -10,11 +10,6 @@
 Select fields to be updated and provide new values.
 <table>
 	<tr>
-		<td><?php $_CONTROL->chkShortDescription->Render(); ?></td>
-		<td><?php echo $_CONTROL->txtShortDescription->Name;?></td>
-		<td><?php $_CONTROL->txtShortDescription->RenderWithError(); ?></td>
-	</tr>
-	<tr>
 		<td><?php $_CONTROL->chkCategory->Render();                  ?></td>
 		<td><?php echo $_CONTROL->lstCategory->Name;                 ?></td>
 		<td><?php $_CONTROL->lstCategory->RenderWithError();         ?></td>
@@ -46,5 +41,5 @@ Select fields to be updated and provide new values.
     ?>
 </table>
 <br />
-<?php $_CONTROL->btnCancel->Render(); ?><?php $_CONTROL->btnApply->Render(); ?>
+<?php $_CONTROL->btnApply->Render(); ?> <?php $_CONTROL->btnCancel->RenderWithError(); ?>
 <?php //Short Desc, Category, Manufacturer, Long Description ?>

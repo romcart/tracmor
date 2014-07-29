@@ -22,7 +22,7 @@
 	require_once('../includes/prepend.inc.php');
 	QApplication::Authenticate(3);
 	require_once(__FORMBASE_CLASSES__ . '/InventoryModelListFormBase.class.php');
-    require('../inventory/InventoryMassEditPanel.class.php');
+	require('../inventory/InventoryMassEditPanel.class.php');
 	/**
 	 * This is a quick-and-dirty draft form object to do the List All functionality
 	 * of the InventoryModel class.  It extends from the code-generated
@@ -58,337 +58,48 @@
 
 		// Mass Actions controls
 
-        protected $lblWarning;
+		protected $lblWarning;
 		protected $dlgMassEdit;
 		protected $dlgMassDelete;
 		protected $btnMassEdit;
 		protected $btnMassDelete;
-        protected $pnlInventoryMassEditPanel;
-
-		/*// Basic Inputs
-		protected $lstCategory;
-		protected $lstManufacturer;
-		protected $lstLocation;
-		protected $txtShortDescription;
-		protected $txtInventoryModelCode;
-		protected $arrCustomFields;
-		
-		// Buttons
-		protected $btnSearch;
-		protected $blnSearch;
-		protected $btnClear;
-		
-		// Advanced Label/Link
-		protected $lblAdvanced;
-		// Boolean that toggles Advanced Search display
-		protected $blnAdvanced;
-		// Advanced Search Composite control
-		protected $ctlAdvanced;
-
-		// Search Values
-		protected $intLocationId;
-		protected $intInventoryModelId;
-		protected $strShortDescription;
-		protected $strInventoryModelCode;
-		protected $intCategoryId;
-		protected $intManufacturerId;
-		protected $strDateModified;
-		protected $strDateModifiedFirst;
-		protected $strDateModifiedLast;
-		protected $blnAttachment;
-		*/
+		protected $pnlInventoryMassEditPanel;
+		protected $btnMassDeleteConfirm;
+		protected $btnMassDeleteCancel;
 		
 		protected function Form_Create() {
 			
 			$this->ctlHeaderMenu_Create();
 			$this->ctlShortcutMenu_Create();			
 			$this->ctlSearchMenu_Create();
-			/*$this->dtgInventoryModel = new QDataGrid($this);
-			$this->dtgInventoryModel->Name = 'inventory_model_list';
-  		$this->dtgInventoryModel->CellPadding = 5;
-  		$this->dtgInventoryModel->CellSpacing = 0;
-  		$this->dtgInventoryModel->CssClass = "datagrid";
-      		
-      // Disable AJAX for the datagrid
-      $this->dtgInventoryModel->UseAjax = false;
-      
-      // Allow for column toggling
-      $this->dtgInventoryModel->ShowColumnToggle = true;
-      
-      // Allow for CSV Export
-      $this->dtgInventoryModel->ShowExportCsv = true;
+			$this->lblWarning_Create();
+			$this->dlgMassEdit_Create();
+			$this->dlgMassDelete_Create();
+			$this->btnMassDelete_Create();
+			$this->btnMassEdit_Create();
+			$this->btnMassDeleteConfirm_Create();
+			$this->btnMassDeleteCancel_Create();
+			$this->AddMassButtonActions();
+		}
+	
+		// Create and Setup the Header Composite Control
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+		}
 
-      // Enable Pagination, and set to 20 items per page
-      $objPaginator = new QPaginator($this->dtgInventoryModel);
-      $this->dtgInventoryModel->Paginator = $objPaginator;
-      $this->dtgInventoryModel->ItemsPerPage = 20;
-          
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Inventory Code', '<?= $_ITEM->__toStringWithLink("bluelink"); ?>', 'SortByCommand="inventory_model_code ASC"', 'ReverseSortByCommand="inventory_model_code DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Model', '<?= $_ITEM->ShortDescription ?>', 'Width=200', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Category', '<?= $_ITEM->Category->__toString(); ?>', 'SortByCommand="inventory_model__category_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__category_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Manufacturer', '<?= $_ITEM->Manufacturer->__toString(); ?>', 'SortByCommand="inventory_model__manufacturer_id__short_description ASC"', 'ReverseSortByCommand="inventory_model__manufacturer_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('Quantity', '<?= $_ITEM->__toStringQuantity(); ?>', 'SortByCommand="inventory_model_quantity ASC"', 'ReverseSortByCommand="inventory_model_quantity DESC"', 'CssClass="dtg_column"'));
-      
-      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
-      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, false);
-      if ($objCustomFieldArray) {
-      	foreach ($objCustomFieldArray as $objCustomField) {
-      		//Only add the custom field column if the role has authorization to view it.
-      		if($objCustomField->objRoleAuthView && $objCustomField->objRoleAuthView->AuthorizedFlag){
-      			$this->dtgInventoryModel->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
-      		}
-      	}
-      }
-
-      $this->dtgInventoryModel->SortColumnIndex = 2;
-    	$this->dtgInventoryModel->SortDirection = 0;
-      
-      $objStyle = $this->dtgInventoryModel->RowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#FFFFFF';
-      $objStyle->FontSize = 12;
-
-      $objStyle = $this->dtgInventoryModel->AlternateRowStyle;
-      $objStyle->BackColor = '#EFEFEF';
-
-      $objStyle = $this->dtgInventoryModel->HeaderRowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';
-      
-      $this->dtgInventoryModel->SetDataBinder('dtgInventoryModel_Bind');
-      
-      $this->lstCategory_Create();
-      $this->lstManufacturer_Create();
-      $this->lstLocation_Create();
-      $this->txtShortDescription_Create();
-      $this->txtInventoryModelCode_Create();
-      $this->btnSearch_Create();
-      $this->btnClear_Create();
-      $this->ctlAdvanced_Create();
-      $this->lblAdvanced_Create();
-      */
-	  $this->lblWarning_Create();
-	  $this->dlgMassEdit_Create();
-	  $this->dlgMassDelete_Create();
-	  $this->btnMassDelete_Create();
-	  $this->btnMassEdit_Create();
-  	}
-  	
-		/*protected function dtgInventoryModel_Bind() {
-			
-			// If the search button has been pressed
-			if ($this->blnSearch) {
-				$this->assignSearchValues();
-			}
-			
-			$strInventoryModelCode = $this->strInventoryModelCode;
-			$intLocationId = $this->intLocationId;
-			$intInventoryModelId = $this->intInventoryModelId;
-			$intCategoryId = $this->intCategoryId;
-			$intManufacturerId = $this->intManufacturerId;
-			$strShortDescription = $this->strShortDescription;
-			$strDateModifiedFirst = $this->strDateModifiedFirst;
-			$strDateModifiedLast = $this->strDateModifiedLast;
-			$strDateModified = $this->strDateModified;
-			$blnAttachment = $this->blnAttachment;
-			$arrCustomFields = $this->arrCustomFields;
-					
-			// Enable Profiling
-      // QApplication::$Database[1]->EnableProfiling();
-
-      // Expand the Asset object to include the AssetModel, Category, Manufacturer, and Location Objects
-      $objExpansionMap[InventoryModel::ExpandCategory] = true;
-      $objExpansionMap[InventoryModel::ExpandManufacturer] = true;
-
-      // If the search form has been posted
-			$this->dtgInventoryModel->TotalItemCount = InventoryModel::CountBySearch($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $objExpansionMap);
-			if ($this->dtgInventoryModel->TotalItemCount == 0) {
-				$this->dtgInventoryModel->ShowHeader = false;
-			}
-			else {
-				$this->dtgInventoryModel->ShowHeader = true;
-				$this->dtgInventoryModel->DataSource = InventoryModel::LoadArrayBySearch($strInventoryModelCode, $intLocationId, $intInventoryModelId, $intCategoryId, $intManufacturerId, $strShortDescription, $arrCustomFields, $strDateModified, $strDateModifiedFirst, $strDateModifiedLast, $blnAttachment, $this->dtgInventoryModel->SortInfo, $this->dtgInventoryModel->LimitInfo, $objExpansionMap);
-			}
-			$this->blnSearch = false;
-    }  	
-  	*/
-  	// Create and Setup the Header Composite Control
-  	protected function ctlHeaderMenu_Create() {
-  		$this->ctlHeaderMenu = new QHeaderMenu($this);
-  	}
-
-  	// Create and Setp the Shortcut Menu Composite Control
-  	protected function ctlShortcutMenu_Create() {
-  		$this->ctlShortcutMenu = new QShortcutMenu($this);
-  	}    
-    
-  	// Create and Setup the Invnetory Search Composite Control
-  	protected function ctlSearchMenu_Create() {
-  		//require_once(__QCODO__ . '/qform/QInventorySearchComposite.class.php');
-  	  $this->ctlSearchMenu = new QInventorySearchComposite($this, null, false);
-  	}
-  	/*protected function ctlAdvanced_Create() {
-  		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 2);
-  		$this->ctlAdvanced->Display = false;
-  	}*/
-
-		/*************************
-		 *	CREATE INPUT METHODS
-		*************************/
-  	
-  	/*protected function lstLocation_Create() {
-  		$this->lstLocation = new QListBox($this);
-  		$this->lstLocation->Name = 'Location';
-  		$this->lstLocation->AddItem('- ALL -', null);
-  		foreach (Location::LoadAllLocations(false, false, 'short_description') as $objLocation) {
-  			$this->lstLocation->AddItem($objLocation->ShortDescription, $objLocation->LocationId);
-  		}
-      $this->lstLocation->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-      $this->lstLocation->AddAction(new QEnterKeyEvent(), new QTerminateAction());  		
-  	}
-
-	  protected function lstCategory_Create() {
-	  	$this->lstCategory = new QListBox($this);
-			$this->lstCategory->Name = 'Category';
-			$this->lstCategory->AddItem('- ALL -', null);
-			foreach (Category::LoadAllWithFlags(false, true, 'short_description') as $objCategory) {
-				$this->lstCategory->AddItem($objCategory->ShortDescription, $objCategory->CategoryId);
-			}
-	  }
-
-	  protected function lstManufacturer_Create() {
-      $this->lstManufacturer = new QListBox($this);
-			$this->lstManufacturer->Name = 'Manufacturer';
-			$this->lstManufacturer->AddItem('- ALL -', null);
-			foreach (Manufacturer::LoadAll(QQ::Clause(QQ::OrderBy(QQN::Manufacturer()->ShortDescription))) as $objManufacturer) {
-				$this->lstManufacturer->AddItem($objManufacturer->ShortDescription, $objManufacturer->ManufacturerId);
-			}
-	  }
-
-	  protected function txtShortDescription_Create() {
-	    $this->txtShortDescription = new QTextBox($this);
-			$this->txtShortDescription->Name = 'Model';
-      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
-	  
-	  protected function txtInventoryModelCode_Create() {
-	  	$this->txtInventoryModelCode = new QTextBox($this);
-	  	$this->txtInventoryModelCode->Name = 'Inventory Code';
-	  	$this->txtInventoryModelCode->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-	  	$this->txtInventoryModelCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
-	  
-	  /**************************
-	   *	CREATE BUTTON METHODS
-	  **************************/
+		// Create and Setp the Shortcut Menu Composite Control
+		protected function ctlShortcutMenu_Create() {
+			$this->ctlShortcutMenu = new QShortcutMenu($this);
+		}
 		
-	  /*protected function btnSearch_Create() {
-			$this->btnSearch = new QButton($this);
-			$this->btnSearch->Name = 'search';
-			$this->btnSearch->Text = 'Search';
-			$this->btnSearch->AddAction(new QClickEvent(), new QServerAction('btnSearch_Click'));
-			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
-	  
-	  protected function btnClear_Create() {
-	  	$this->btnClear = new QButton($this);
-			$this->btnClear->Name = 'clear';
-			$this->btnClear->Text = 'Clear';
-			$this->btnClear->AddAction(new QClickEvent(), new QServerAction('btnClear_Click'));
-			$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerAction('btnClear_Click'));
-			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
-	  
-	  protected function lblAdvanced_Create() {
-	  	$this->lblAdvanced = new QLabel($this);
-	  	$this->lblAdvanced->Name = 'Advanced';
-	  	$this->lblAdvanced->Text = 'Advanced Search';
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
-	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
-	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
-	  }
-	  
-	  protected function btnSearch_Click() {
-	  	$this->blnSearch = true;
-			$this->dtgInventoryModel->PageNumber = 1;
-	  }
-
-	  protected function btnClear_Click() {
-  		// Set controls to null
-	  	$this->lstCategory->SelectedIndex = 0;
-	  	$this->lstManufacturer->SelectedIndex = 0;
-	  	$this->txtShortDescription->Text = '';
-	  	$this->txtInventoryModelCode->Text = '';
-	  	$this->lstLocation->SelectedIndex = 0;
-	  	$this->ctlAdvanced->ClearControls();
-	  	
-	  	// Set search variables to null
-	  	$this->intCategoryId = null;
-	  	$this->intManufacturerId = null;
-	  	$this->intLocationId = null;
-	  	$this->intInventoryModelId = null;
-	  	$this->strShortDescription = null;
-	  	$this->strInventoryModelCode = null;
-	  	$this->strDateModified = null;
-	  	$this->strDateModifiedFirst = null;
-	  	$this->strDateModifiedLast = null;
-	  	$this->blnAttachment = false;
-	  	if ($this->arrCustomFields) {
-	  		foreach ($this->arrCustomFields as $field) {
-	  			$field['value'] = null;
-	  		}
-	  	}
-	  	$this->blnSearch = false;
-  	}
-  	
-	  protected function lblAdvanced_Click() {
-	  	if ($this->blnAdvanced) {
-	  		
-	  		$this->blnAdvanced = false;
-	  		$this->lblAdvanced->Text = 'Advanced Search';
-	  		
-	  		$this->ctlAdvanced->ClearControls();
-	  		
-	  	}
-	  	else {
-	  		$this->blnAdvanced = true;
-	  		$this->lblAdvanced->Text = 'Hide Advanced';
-	  	}
-	  }
-
-	  protected function assignSearchValues() {
-	  	$this->intCategoryId = $this->lstCategory->SelectedValue;
-			$this->intManufacturerId = $this->lstManufacturer->SelectedValue;
-			$this->strShortDescription = $this->txtShortDescription->Text;
-			$this->strInventoryModelCode = $this->txtInventoryModelCode->Text;
-			$this->intLocationId = $this->lstLocation->SelectedValue;
-			$this->intInventoryModelId = QApplication::QueryString('intInventoryModelId');
-			$this->strDateModified = $this->ctlAdvanced->DateModified;
-			$this->strDateModifiedFirst = $this->ctlAdvanced->DateModifiedFirst;
-			$this->strDateModifiedLast = $this->ctlAdvanced->DateModifiedLast;
-			$this->blnAttachment = $this->ctlAdvanced->Attachment;
-			
-			$this->arrCustomFields = $this->ctlAdvanced->CustomFieldArray;
-			if ($this->arrCustomFields) {
-				foreach ($this->arrCustomFields as &$field) {
-					if ($field['input'] instanceof QListBox) {
-						$field['value'] = $field['input']->SelectedValue;
-					}
-					elseif ($field['input'] instanceof QTextBox) {
-						$field['value'] = $field['input']->Text;
-					}
-				}
-			}
-	  }
-	  */
+		// Create and Setup the Invnetory Search Composite Control
+		protected function ctlSearchMenu_Create() {
+			//require_once(__QCODO__ . '/qform/QInventorySearchComposite.class.php');
+			$this->ctlSearchMenu = new QInventorySearchComposite($this, null, false);
+		}
 
 		// Mass Actions controls creating/handling functions
-		protected function dlgMassDelete_Create(){
+		protected function dlgMassDelete_Create() {
 			$this->dlgMassDelete = new QDialogBox($this);
 			$this->dlgMassDelete->AutoRenderChildren = true;
 			$this->dlgMassDelete->Width = '440px';
@@ -400,7 +111,7 @@
 			$this->dlgMassDelete->CssClass = "modal_dialog";
 		}
 
-		protected function dlgMassEdit_Create(){
+		protected function dlgMassEdit_Create() {
 			$this->dlgMassEdit = new QDialogBox($this);
 			$this->dlgMassEdit->AutoRenderChildren = true;
 			$this->dlgMassEdit->Width = '440px';
@@ -412,82 +123,117 @@
 			$this->dlgMassEdit->CssClass = "modal_dialog";
 		}
 
-		protected function btnMassDelete_Create(){
+		protected function btnMassDelete_Create() {
 			$this->btnMassDelete = new QButton($this);
 			$this->btnMassDelete->Name = "delete";
-			$this->btnMassDelete->Text = "Delete";
-			$this->btnMassDelete->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to delete these items?'));
+			$this->btnMassDelete->Text = "Mass Delete";
+			$this->btnMassDelete->Display = QApplication::AuthorizeEntityTypeBoolean(3);
+			// Actions added in AddMassButtonActions()
 			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
-			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
-			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
-		protected function btnMassEdit_Create(){
+		protected function btnMassEdit_Create() {
 			$this->btnMassEdit = new QButton($this);
 			$this->btnMassEdit->Text = "edit";
-			$this->btnMassEdit->Text = "Edit";
+			$this->btnMassEdit->Text = "Mass Edit";
 			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
 			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
 			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
-		protected function lblWarning_Create(){
+		protected function btnMassDeleteConfirm_Create() {
+			$this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
+			$this->btnMassDeleteConfirm->Text = 'Confirm';
+			// Actions added in AddMassButtonActions()
+		}
+
+		protected function btnMassDeleteCancel_Create() {
+			$this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
+			$this->btnMassDeleteCancel->Text = 'Cancel';
+			$this->btnMassDeleteCancel->SetCustomStyle('margin-left', '4px');
+			$this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QHideDialogBox($this->dlgMassDelete));
+		}
+
+		protected function lblWarning_Create() {
 			$this->lblWarning = new QLabel($this);
 			$this->lblWarning->Text = "";
 			$this->lblWarning->CssClass = "warning";
 		}
 
-		protected function btnMassDelete_Click(){
+		protected function AddMassButtonActions() {
+			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
+			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
+			$this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click', null, null, array($this->btnMassDeleteCancel, $this->btnMassDeleteConfirm)));
+		}
+
+		protected function btnMassDelete_Click() {
+			$items = $this->ctlSearchMenu->dtgInventoryModel->getSelected('InventoryModelId');
+			if (count($items)>0) {
+				$this->dlgMassDelete->Text = sprintf('<div class="title"> Inventory Mass Delete - %s records</div><hr/>', count($items));
+				$this->dlgMassDelete->Text .= 'Are you sure you want to DELETE these inventory models?<br/><br/>';
+				$this->dlgMassDelete->ShowDialogBox();
+			} else {
+				$this->lblWarning->Text = "You must select one or more inventory models to Delete";
+			}
+		}
+
+		protected function btnMassDeleteConfirm_Click() {
 
 			$items = $this->ctlSearchMenu->dtgInventoryModel->getSelected('InventoryModelId');
-			if(count($items)>0){
+			if (count($items)>0) {
 				$this->lblWarning->Text = "";
 				// TODO perform validate
-                foreach($items as $item){
-                    try {
-                        // Get an instance of the database
-                        $objDatabase = QApplication::$Database[1];
-                        // Begin a MySQL Transaction to be either committed or rolled back
-                        $objDatabase->TransactionBegin();
-                        InventoryModel::Load($item)->Delete();
-                        $objDatabase->TransactionCommit();
-                    }
-                    catch (QDatabaseExceptionBase $objExc) {
-                        // Roll back the transaction from the database
-                        $objDatabase->TransactionRollback();
-                        if ($objExc->ErrorNumber == 1451) {
-                            $this->lblWarning->Text .= 'Inventory model '
-                                                       . $item
-                                                       .'cannot be deleted because it is associated with one or more transactions.';
-                        }
-                        else {
-                            throw new QDatabaseExceptionBase();
-                        }
-                    }
-                }
-			}else{
+				foreach ($items as $item) {
+					try {
+						// Get an instance of the database
+						$objDatabase = QApplication::$Database[1];
+						// Begin a MySQL Transaction to be either committed or rolled back
+						$objDatabase->TransactionBegin();
+						InventoryModel::Load($item)->Delete();
+						$objDatabase->TransactionCommit();
+						$this->UncheckAllItems($this);
+						// Hide the dialog
+						$this->dlgMassDelete->HideDialogBox();
+					} catch (QDatabaseExceptionBase $objExc) {
+						// Roll back the transaction from the database
+						$objDatabase->TransactionRollback();
+						if ($objExc->ErrorNumber == 1451) {
+							$this->lblWarning->Text .= 'Inventory model '
+													   . $item
+													   .'cannot be deleted because it is associated with one or more transactions.';
+						} else {
+							throw new QDatabaseExceptionBase();
+						}
+					}
+				}
+			} else {
 				$this->lblWarning->Text = "You haven't chosen any Inventory to Delete" ;
 			}
 		}
 
-		protected function btnMassEdit_Click(){
+		protected function btnMassEdit_Click() {
 			$items = $this->ctlSearchMenu->dtgInventoryModel->getSelected('InventoryModelId');
-			if(count($items)>0){
+			if (count($items)>0) {
 				$this->lblWarning->Text = "";
-                if(!$this->pnlInventoryMassEditPanel instanceof InventoryMassEditPanel){
-				$this->pnlInventoryMassEditPanel = new InventoryMassEditPanel($this->dlgMassEdit,
-					                                                    'pnlInventoryMassEditPanelCancel_Click',
-				                                                        $items);
-                }
+				$this->dlgMassEdit->RemoveChildControls(true);
+				$this->pnlInventoryMassEditPanel = new InventoryMassEditPanel($this->dlgMassEdit, 'pnlInventoryMassEditPanelCancel_Click', $items);
 				$this->dlgMassEdit->ShowDialogBox();
-			}else{
-				$this->lblWarning->Text = "You haven't chosen any Inventory to Edit" ;
+			} else {
+				$this->lblWarning->Text = "You must select one or more Inventory to Edit" ;
 			}
 		}
 
-		public function pnlInventoryMassEditPanelCancel_Click(){
+		public function pnlInventoryMassEditPanelCancel_Click() {
 			// TODO uncheck selected in DataGrid
 			$this->dlgMassEdit->HideDialogBox();
+		}
+
+		public function UncheckAllItems($object) {
+			foreach ($object->GetAllControls() as $objControl) {
+				if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+					$objControl->Checked = false;
+				}
+			}
 		}
 	}
 

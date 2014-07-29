@@ -6,10 +6,8 @@ class InventoryMassEditPanel extends QPanel {
 	 * @var  QCheckBox $chkCategory
 	 * @var  QCheckBox $chkManufacturer
 	 * @var  QCheckBox $chkLongDescription
-	 * @var  QCheckBox $chkShortDescription
 	 *
 	 * @var QTextBox $txtLongDescription
-	 * @var QTextBox $txtShortDescription
 	 * @var QListBox $lstManufacturer
 	 * @var QListBox $lstCategory
 	 */
@@ -23,19 +21,16 @@ class InventoryMassEditPanel extends QPanel {
 	public $arrCustomFields;
 	public $arrCheckboxes = array();
 
-	public $chkShortDescription;
 	public $chkCategory;
 	public $chkManufacturer;
 	public $chkLongDescription;
 
-	public $txtShortDescription;
 	public $txtLongDescription;
 	public $lstManufacturer;
 	public $lstCategory;
 
 	public $btnApply;
 	public $btnCancel;
-	public $lblWarning;
 
 	public function __construct($objParentObject, $strClosePanelMethod , $arrayInventoryId) {
 
@@ -47,24 +42,15 @@ class InventoryMassEditPanel extends QPanel {
 		}
 		$this->arrInventoryToEdit = $arrayInventoryId;
 
-		$this->txtShortDescription_Create();
 		$this->txtLongDescription_Create();
 		$this->lstCategory_Create();
 		$this->lstManufacturer_Create();
 
-
-		$this->chkShortDescription_Create();
 		$this->chkCategory_Create();
 		$this->chkManufacturer_Create();
 		$this->chkLongDescription_Create();
 		$this->btnApply_Create();
 		$this->btnCancel_Create();
-
-		// Disable inputs
-		$this->lstCategory->Enabled = false;
-		$this->lstManufacturer->Enabled = false;
-		$this->txtShortDescription->Enabled = false;
-		$this->txtLongDescription->Enabled = false;
 
 		// Load Custom Fields
 		$objCustomFieldArray = CustomField::LoadObjCustomFieldArray(2, false);
@@ -80,19 +66,6 @@ class InventoryMassEditPanel extends QPanel {
 		}
 	}
 
-	// Create the Short Description Input
-	protected function txtShortDescription_Create() {
-		$this->txtShortDescription = new QTextBox($this, 'ShortDescription');
-		$this->txtShortDescription->Name = 'Short Description';
-	}
-
-	public function chkShortDescription_Create() {
-		$this->chkShortDescription = new QCheckBox($this, 'chkShortDescription');
-		$this->chkShortDescription->Name = 'Short Description';
-		$this->chkShortDescription->Checked = false;
-		$this->chkShortDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-	}
-
 	// Create the Category Input
 	protected function lstCategory_Create() {
 		$this->lstCategory = new QListBox($this, 'Category');
@@ -103,6 +76,7 @@ class InventoryMassEditPanel extends QPanel {
 			$objListItem = new QListItem($objCategory->__toString(), $objCategory->CategoryId);
 			$this->lstCategory->AddItem($objListItem);
 		}
+		$this->lstCategory->Enabled = false;
 	}
 
 	public function chkCategory_Create() {
@@ -110,8 +84,8 @@ class InventoryMassEditPanel extends QPanel {
 		$this->chkCategory->Name = 'category';
 		$this->chkCategory->Checked = false;
 		$this->chkCategory->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
-
 	}
+
 	// Create and Setup lstManufacturer
 	protected function lstManufacturer_Create() {
 		$this->lstManufacturer = new QListBox($this, 'Manufacturer');
@@ -123,6 +97,7 @@ class InventoryMassEditPanel extends QPanel {
 			$objListItem = new QListItem($objManufacturer->__toString(), $objManufacturer->ManufacturerId);
 			$this->lstManufacturer->AddItem($objListItem);
 		}
+		$this->lstManufacturer->Enabled = false;
 	}
 
 	public function chkManufacturer_Create() {
@@ -137,6 +112,7 @@ class InventoryMassEditPanel extends QPanel {
 		$this->txtLongDescription = new QTextBox($this, 'LongDescription');
 		$this->txtLongDescription->Name = QApplication::Translate('Long Description');
 		$this->txtLongDescription->TextMode = QTextMode::MultiLine;
+		$this->txtLongDescription->Enabled = false;
 	}
 
 	public function chkLongDescription_Create() {
@@ -150,31 +126,38 @@ class InventoryMassEditPanel extends QPanel {
 		$this->btnApply = new QButton($this);
 		$this->btnApply->Name = 'Apply';
 		$this->btnApply->Text = 'Apply';
-		$this->btnApply->AddAction(new QClickEvent(), new QConfirmAction('Are you sure you want to edit these items?'));
 		$this->btnApply->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnApply_Click'));
-		$this->btnApply->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnApply_Click'));
-		$this->btnApply->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-
 	}
 
 	public function btnCancel_Create() {
 		$this->btnCancel = new QButton($this);
 		$this->btnCancel->Name = 'Cancel';
 		$this->btnCancel->Text = 'Cancel';
-		$this->btnCancel->AddAction(new QClickEvent(), new QAjaxControlAction($this, 'btnCancel_Click'));
-		$this->btnCancel->AddAction(new QEnterKeyEvent(), new QAjaxControlAction($this, 'btnCancel_Click'));
-		$this->btnCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-
-	}
-
-	public function lblWarning_Create() {
-		$this->lblWarning = new QLabel($this);
-		$this->lblWarning->Class = 'warning';
+		$this->btnCancel->AddAction(new QClickEvent(), new QHideDialogBox($this->ParentControl));
 	}
 
 	public function btnApply_Click($strFormId, $strControlId, $strParameter) {
-		$this->clearWarnings();
+		$this->EnableSelectedControls();
+		$this->ClearWarnings();
 		$blnError = false;
+
+		// Make sure at least one checkbox is checked
+		if (!$this->chkCategory->Checked && !$this->chkManufacturer->Checked && !$this->chkLongDescription->Checked) {
+			$blnChecked = false;
+			foreach ($this->arrCheckboxes as $objCheckBox) {
+				if ($objCheckBox->Checked) {
+					$blnChecked = true;
+					break;
+				}
+			}
+
+			if (!$blnChecked) {
+				$blnError = true;
+				$this->btnCancel->Warning = 'You must select at least one field to edit.';
+				return;
+			}
+		}
+
 		// Get an instance of the database
 		$objDatabase = QApplication::$Database[1];
 		// Begin a MySQL Transaction to be either committed or rolled back
@@ -202,14 +185,10 @@ class InventoryMassEditPanel extends QPanel {
 		}
 		// Apply checked main_table fields
 		$set = array(sprintf('`modified_by`= %s',QApplication::$objUserAccount->UserAccountId));
-		if ($this->chkShortDescription->Checked) {
-			if (trim($this->txtShortDescription->Text)!== '') {
-				$set[] = sprintf('`short_description`="%s"' , $this->txtShortDescription->Text);
-			} else {
-				$blnError = true;
-				$this->txtShortDescription->Warning = 'Name shouldn\'t be empty';
-			}
-		}
+		
+		// Force modified_date timestamp update
+		$set[] = '`modified_date` = NOW()';
+
 		if ($this->chkLongDescription->Checked) {
 			$set[] = sprintf('`long_description`="%s"', $this->txtLongDescription->Text);
 		}
@@ -218,7 +197,7 @@ class InventoryMassEditPanel extends QPanel {
 				$set[] = sprintf('`manufacturer_id`=%s', $this->lstManufacturer->SelectedValue);
 			} else {
 				$blnError = true;
-				$this->lstManufacturer->Warning = 'Manufacturer can\'t be empty';
+				$this->lstManufacturer->Warning = 'You must select a Manufacturer.';
 			}
 		}
 		if ($this->chkCategory->Checked) {
@@ -226,7 +205,7 @@ class InventoryMassEditPanel extends QPanel {
 				$set[] = sprintf('`category_id`= %s', $this->lstCategory->SelectedValue);
 			} else {
 				$blnError = true;
-				$this->lstCategory->Warning = 'Category can\'t be empty';
+				$this->lstCategory->Warning = 'You must select a Category.';
 			}
 		}
 		// Save
@@ -266,40 +245,27 @@ class InventoryMassEditPanel extends QPanel {
 			}
 		} else {
 			$objDatabase->TransactionRollback();
-			$this->uncheck();
-			$this->arrCustomFieldsToEdit = array();
-		}
-	}
-
-
-	// Cancel Button Click Action
-	public function btnCancel_Click($strFormId, $strControlId, $strParameter) {
-		//$this->ParentControl->RemoveChildControls(true);
-		//$this->CloseSelf(true);
-		$this->ParentControl->HideDialogBox();
-		QApplication::Redirect('');
-	}
-
-	public function uncheck() {
-		$this->chkShortDescription->Checked = false;
-		$this->chkCategory->Checked = false;
-		$this->chkManufacturer->Checked = false;
-		$this->chkLongDescription->Checked = false;
-		foreach ($this->arrCustomFields as $field) {
-			$this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
 		}
 	}
 
 	public function clearWarnings() {
-		$this->txtShortDescription->Warning = '';
 		$this->txtLongDescription->Warning = '';
 		$this->lstCategory->Warning = '';
 		$this->lstManufacturer->Warning = '';
-		$this->lblWarning->Text ='';
+
 		foreach ($this->arrCustomFields as $field) {
 			$field['input']->Warning = '';
 		}
+	}
 
+	public function EnableSelectedControls() {
+		$this->lstCategory->Enabled = $this->chkCategory->Checked;
+		$this->lstManufacturer->Enabled = $this->chkManufacturer->Checked;
+		$this->txtLongDescription->Enabled = $this->chkLongDescription->Checked;
+
+		foreach ($this->arrCustomFields as $field) {
+			$field['input']->Enabled = $this->arrCheckboxes[$field['input']->strControlId]->Checked;
+		}
 	}
 }
 ?>
