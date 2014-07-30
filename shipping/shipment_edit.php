@@ -2310,34 +2310,36 @@
 
 					}
 
+					// Create receipt transaction for internal shipment
+					if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
+						$this->receiveInternalShipmentTransaction = new Transaction();
+						$this->receiveInternalShipmentTransaction->EntityQtypeId = $intEntityQtypeId;
+						$this->receiveInternalShipmentTransaction->TransactionTypeId = 7;
+						$note = sprintf('This receipt was automatically created when creating internal shipment Number %s. ',  $this->objShipment->ShipmentNumber);
+						$this->receiveInternalShipmentTransaction->Note = $note . $this->txtNote->Text;
+						$this->receiveInternalShipmentTransaction->Save();
+						// Create a new receipt
+						$objInternalReceipt = new Receipt();
+						$objInternalReceipt->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
+						// The receipt will mimic the shipment information
+						$objInternalReceipt->FromCompanyId = $this->objShipment->FromCompanyId;
+						$objInternalReceipt->FromContactId = $this->objShipment->FromContactId;
+						$objInternalReceipt->ToContactId = $this->objShipment->ToContactId;
+						$objInternalReceipt->ToAddressId = $this->objShipment->ToAddressId;
+						$objInternalReceipt->ReceivedFlag = 0;
+						$objInternalReceipt->ReceiptNumber = Receipt::LoadNewReceiptNumber();
+						$objInternalReceipt->Save();
+					}
+
 					if ($intEntityQtypeId == EntityQtype::AssetInventory || $intEntityQtypeId == EntityQtype::Asset) {
 
 						$objTransaction = '';
 						$objReceipt = '';
-            $objNewAssetTransactionArray = array();
-            foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+            			$objNewAssetTransactionArray = array();
+						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 							$objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
 						}
-            // Create receipt transaction for internal shipment
-            if($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId){
-              $this->receiveInternalShipmentTransaction = new Transaction();
-              $this->receiveInternalShipmentTransaction->EntityQtypeId = EntityQtype::Asset;
-              $this->receiveInternalShipmentTransaction->TransactionTypeId = 7;
-              $note = sprintf('This receipt was automatically created when creating internal shipment Number %s. ',  $this->objShipment->ShipmentNumber);
-              $this->receiveInternalShipmentTransaction->Note = $note . $this->txtNote->Text;
-              $this->receiveInternalShipmentTransaction->Save();
-              // Create a new receipt
-              $objInternalReceipt = new Receipt();
-              $objInternalReceipt->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
-             // The receipt will mimic the shipment information
-              $objInternalReceipt->FromCompanyId = $this->objShipment->FromCompanyId;
-              $objInternalReceipt->FromContactId = $this->objShipment->FromContactId;
-              $objInternalReceipt->ToContactId = $this->objShipment->ToContactId;
-              $objInternalReceipt->ToAddressId = $this->objShipment->ToAddressId;
-              $objInternalReceipt->ReceivedFlag = 0;
-              $objInternalReceipt->ReceiptNumber = Receipt::LoadNewReceiptNumber();
-              $objInternalReceipt->Save();
-            }
+					
 						// Assign a destinationLocation to the AssetTransaction, and change the Location of the asset
 						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 							if ($objAssetTransaction->Asset instanceof Asset) {
@@ -2463,26 +2465,25 @@
 									// Set the Receipt Asset Transaction as child of the Shipment Asset Transaction
 									$objAssetTransaction->AssociateChildAssetTransaction($objReceiptAssetTransaction);
 								}
-                if(($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) && !$objAssetTransaction->Asset->LinkedFlag){
-                  $objReceiptAssetTransaction = new AssetTransaction();
+								if (($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) && !$objAssetTransaction->Asset->LinkedFlag) {
+									$objReceiptAssetTransaction = new AssetTransaction();
 									$objReceiptAssetTransaction->AssetId = $objAssetTransaction->AssetId;
 									$objReceiptAssetTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
-                  $objReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->SourceLocationId;
-                  $objReceiptAssetTransaction->Save();
-                   // Load all child assets
+									$objReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->SourceLocationId;
+									$objReceiptAssetTransaction->Save();
+									// Load all child assets
 									if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
-									  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
-									    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
-									    $objLinkedReceiptAssetTransaction = new AssetTransaction();
-									    // add data to linked asset
-									    $objLinkedReceiptAssetTransaction->AssetId = $objLinkedAssetTransaction->AssetId;
-									    $objLinkedReceiptAssetTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
-    									$objLinkedReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->SourceLocationId;
-    									$objLinkedReceiptAssetTransaction->Save();
-
-									  }
+										foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+											$objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+											$objLinkedReceiptAssetTransaction = new AssetTransaction();
+											// add data to linked asset
+											$objLinkedReceiptAssetTransaction->AssetId = $objLinkedAssetTransaction->AssetId;
+											$objLinkedReceiptAssetTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
+											$objLinkedReceiptAssetTransaction->SourceLocationId = $objAssetTransaction->SourceLocationId;
+											$objLinkedReceiptAssetTransaction->Save();
+										}
 									}
-                }
+								}
 
 								$objReceipt = null;
 								$objTransaction = null;
@@ -2510,6 +2511,30 @@
 							// Finish the InventoryTransaction and save it
 							$objInventoryTransaction->DestinationLocationId = $DestinationLocationId;
 							$objInventoryTransaction->Save();
+
+							// Add Inventory to receipt if this is an internal shipment
+							if ($this->objShipment->ToCompanyId == $this->objShipment->FromCompanyId) {
+								$objReceiptInventoryLocation = InventoryLocation::LoadByLocationIdInventoryModelId(5, $objInventoryTransaction->InventoryLocation->InventoryModelId);
+								if (!$objReceiptInventoryLocation) {
+									// First create the inventory location if it doesn't exist
+									$objReceiptInventoryLocation = new InventoryLocation();
+									$objReceiptInventoryLocation->InventoryModelId = $objInventoryTransaction->InventoryLocation->InventoryModelId;
+									$objReceiptInventoryLocation->LocationId = 5;
+									$objReceiptInventoryLocation->Quantity = 0;
+								}
+
+								// Set the To Be Received quantity
+								$objReceiptInventoryLocation->Quantity += $objInventoryTransaction->Quantity;
+								$objReceiptInventoryLocation->Save();
+
+								// Create the inventory transaction
+								$objReceiptInventoryTransaction = new InventoryTransaction();
+								$objReceiptInventoryTransaction->TransactionId = $this->receiveInternalShipmentTransaction->TransactionId;
+								$objReceiptInventoryTransaction->InventoryLocationId = $objReceiptInventoryLocation->InventoryLocationId;
+								$objReceiptInventoryTransaction->Quantity = $objInventoryTransaction->Quantity;
+								$objReceiptInventoryTransaction->SourceLocationId = 5;
+								$objReceiptInventoryTransaction->Save();
+							}
 						}
 					}
 
