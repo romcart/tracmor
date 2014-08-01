@@ -3218,12 +3218,16 @@
 			$this->txtNewAssetCode->Display = false;
 			$this->btnAddAsset->Display = false;
 			$this->lblAddAsset->Display = false;
-			$this->btnLookup->Display = false;
-			$this->lblLookup->Display = false;
-			$this->btnAddInventory->Display = false;
-			$this->txtNewInventoryModelCode->Display = false;
-			$this->lstSourceLocation->Display = false;
-			$this->txtQuantity->Display = false;
+			
+			if ($this->blnShowInventory) {
+				$this->btnLookup->Display = false;
+				$this->lblLookup->Display = false;
+				$this->btnAddInventory->Display = false;
+				$this->txtNewInventoryModelCode->Display = false;
+				$this->lstSourceLocation->Display = false;
+				$this->txtQuantity->Display = false;
+			}
+			
 			$this->lblNewFromCompany->Display = false;
 			$this->lblNewFromContact->Display = false;
 			$this->lblNewFromAddress->Display = false;
@@ -3346,14 +3350,17 @@
 				//$this->lblAdvanced->Display = true;
 				$this->btnAddAsset->Display = true;
 				$this->lblAddAsset->Display = true;
-				$this->txtNewInventoryModelCode->Display = true;
-				$this->btnLookup->Display = true;
-				$this->lblLookup->Display = true;
-				$this->lstSourceLocation->Display = true;
-				$this->txtQuantity->Display = true;
-				$this->btnAddInventory->Display = true;
+				
+				if ($this->blnShowInventory) {
+					$this->txtNewInventoryModelCode->Display = true;
+					$this->btnLookup->Display = true;
+					$this->lblLookup->Display = true;
+					$this->lstSourceLocation->Display = true;
+					$this->txtQuantity->Display = true;
+					$this->btnAddInventory->Display = true;
+				}
 
-    			$this->lblNewFromCompany->Display = true;
+				$this->lblNewFromCompany->Display = true;
 				$this->lblNewFromContact->Display = true;
 				$this->lblNewFromAddress->Display = true;
 				$this->lblNewToCompany->Display = true;
@@ -3363,17 +3370,17 @@
 			}
 
 			if ($this->blnEditMode) {
-	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-                if($this->lstFromCompany->SelectedValue!=$this->lstToCompany->SelectedValue){
-                    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-                    $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-                }
-            }
+				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+				$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('Action', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+				if ($this->lstFromCompany->SelectedValue!=$this->lstToCompany->SelectedValue) {
+					$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+					$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+				}
+			}
 
 			// If the user is not authorized to edit built-in fields, the fields are render as labels.
 			// Also used if editing a completed shipment
-			if(!$this->blnEditBuiltInFields || $this->objShipment->ShippedFlag)
+			if (!$this->blnEditBuiltInFields || $this->objShipment->ShippedFlag)
 				$this->DisplayLabels();
 
 			$this->calShipDate->Display = true;
@@ -3391,9 +3398,9 @@
 			}
 
 			// Display custom field inputs
-	    if ($this->arrCustomFields) {
-	    	CustomField::DisplayInputs($this->arrCustomFields);
-	    }
+			if ($this->arrCustomFields) {
+				CustomField::DisplayInputs($this->arrCustomFields);
+			}
 		}
 
 		// This method is run when the company edit dialog box is closed
@@ -3422,126 +3429,124 @@
 			$this->lstToAddress_Select();
 			$this->CloseNewPanel($blnUpdates);
 		}
-	//Set display logic of the BuiltInFields in View Access and Edit Access
+		
+		//Set display logic of the BuiltInFields in View Access and Edit Access
 		protected function UpdateBuiltInFields() {
-		//Set View Display Logic of Built-In Fields
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Shipment,1);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag)
-			$this->blnViewBuiltInFields=true;
-		else
-			$this->blnViewBuiltInFields=false;
+			//Set View Display Logic of Built-In Fields
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Shipment,1);
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
+				$this->blnViewBuiltInFields=true;
+			} else {
+				$this->blnViewBuiltInFields=false;
+			}
 
-		//Set Edit Display Logic of Built-In Fields
-		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Shipment,2);
-		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag)
-			$this->blnEditBuiltInFields=true;
-		else
-			$this->blnEditBuiltInFields=false;
-
-
+			//Set Edit Display Logic of Built-In Fields
+			$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Shipment,2);
+			if ($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag) {
+				$this->blnEditBuiltInFields=true;
+			} else {
+				$this->blnEditBuiltInFields=false;
+			}
 		}
+
 		//Set display logic for the CustomFields
-		protected function UpdateCustomFields(){
-			if($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
+		protected function UpdateCustomFields() {
+			if ($this->arrCustomFields)foreach ($this->arrCustomFields as $objCustomField) {
 
 				//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
-				if (!$this->blnEditMode && !$objCustomField['blnEdit'] && $objCustomField['blnRequired']){
-					if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
+				if (!$this->blnEditMode && !$objCustomField['blnEdit'] && $objCustomField['blnRequired']) {
+					if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) 
+						$objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 					$objCustomField['lbl']->Display=true;
 					$objCustomField['input']->Display=false;
 				}
 			}
 
 		}
+
 		//Set display logic of the GreenPlusButton of Address
 		protected function UpdateAddressAccess() {
 			//checks if the entity has edit authorization
 			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
-			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 				$this->lblNewFromAddress->Visible=true;
 				$this->lblNewToAddress->Visible=true;
-			}
-			else{
+			} else {
 				$this->lblNewFromAddress->Visible=false;
 				$this->lblNewToAddress->Visible=false;
 			}
-	
 		}
-			//Set display logic of the GreenPlusButton of Company
+
+		//Set display logic of the GreenPlusButton of Company
 		protected function UpdateCompanyAccess() {
 			//checks if the entity  has edit authorization
 			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Company,2);
-			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 				$this->lblNewFromCompany->Visible=true;
 				$this->lblNewToCompany->Visible=true;
-			}
-			else{
+			} else {
 				$this->lblNewFromCompany->Visible=false;
 				$this->lblNewToCompany->Visible=false;
 			}
-	
 		}
-			//Set display logic of the GreenPlusButton of Contact
+		
+		//Set display logic of the GreenPlusButton of Contact
 		protected function UpdateContactAccess() {
 			//checks if the entity  has edit authorization
 			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Contact,2);
-			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 				$this->lblNewFromContact->Visible=true;
 				$this->lblNewToContact->Visible=true;
-			}
-			else{
+			} else {
 				$this->lblNewFromContact->Visible=false;
 				$this->lblNewToContact->Visible=false;
 			}
-	
 		}
 		
-	  protected function disableAdvancedIfInternal(){
-			if(!$this->lblFromCompany->Display){
+		protected function disableAdvancedIfInternal() {
+			if (!$this->lblFromCompany->Display) {
 	
-				if($this->lstToCompany->SelectedValue==$this->lstFromCompany->SelectedValue){
+				if ($this->lstToCompany->SelectedValue==$this->lstFromCompany->SelectedValue) {
 				
 					// switch off advansed parameters
 					if ($this->objAssetTransactionArray) {
 						$objNewAssetTransactionArray = array();
+						
 						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 						  $objNewAssetTransactionArray[$objAssetTransaction->Asset->AssetCode] = $objAssetTransaction;
 						}
-					foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
+						
+						foreach ($this->objAssetTransactionArray as $objAssetTransaction) {
 			
-						// set advansed to 'None'
+							// set advansed to 'None'
 							$objAssetTransaction->ScheduleReceiptFlag = false;
 							$objAssetTransaction->NewAssetFlag = false;
 							$objAssetTransaction->NewAssetId = null;
 							$objAssetTransaction->NewAsset = null;
-						              $objAssetTransaction->ScheduleReceiptDueDate = null;
+							$objAssetTransaction->ScheduleReceiptDueDate = null;
 						
 							if ($objLinkedAssetCodeArray = Asset::LoadChildLinkedArrayByParentAssetId($objAssetTransaction->Asset->AssetId)) {
-							  foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
-							    $objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
-							    $objLinkedAssetTransaction->ScheduleReceiptFlag = false;
+								foreach ($objLinkedAssetCodeArray as $objLinkedAssetCode) {
+									$objLinkedAssetTransaction = $objNewAssetTransactionArray[$objLinkedAssetCode->AssetCode];
+									$objLinkedAssetTransaction->ScheduleReceiptFlag = false;
 									$objLinkedAssetTransaction->NewAssetFlag = false;
 									$objLinkedAssetTransaction->NewAssetId = null;
 									$objLinkedAssetTransaction->NewAsset = null;
-						                  $objLinkedAssetTransaction->ScheduleReceiptDueDate = null;
-							  }
+									$objLinkedAssetTransaction->ScheduleReceiptDueDate = null;
+								}
 							}
-						
-						// Return
-			
-	 				}
-	 				$this->blnModifyAssets = true;
-	 			}
-				//
-				$this->dtgAssetTransact->RemoveColumnByName('Advanced');
-				$this->dtgAssetTransact->RemoveColumnByName('Due Date');
-			}	
-			else {
-			    if(!$this->dtgAssetTransact->GetColumnByName('Advanced')){
-			       $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-			       $this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-				  }
-			 	}
+						}
+						$this->blnModifyAssets = true;
+					}
+
+					$this->dtgAssetTransact->RemoveColumnByName('Advanced');
+					$this->dtgAssetTransact->RemoveColumnByName('Due Date');
+				} else {
+					if (!$this->dtgAssetTransact->GetColumnByName('Advanced')) {
+						$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Advanced', '<?= $_FORM->AdvancedColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+						$this->dtgAssetTransact->AddColumn(new QDataGridColumn('Due Date', '<?= $_FORM->DueDateColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+					}
+				}
 			}
 		}
 	}

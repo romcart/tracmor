@@ -2583,10 +2583,13 @@
 			$this->chkAutoGenerateAssetCode->Display = false;
 			$this->btnAddAsset->Display = false;
 			$this->lblAddAsset->Display = false;
-			$this->txtNewInventoryModelCode->Display = false;
-			$this->lblLookup->Display = false;
-			$this->txtQuantity->Display = false;
-			$this->btnAddInventory->Display = false;
+			
+			if ($this->blnShowInventory) {
+				$this->txtNewInventoryModelCode->Display = false;
+				$this->lblLookup->Display = false;
+				$this->txtQuantity->Display = false;
+				$this->btnAddInventory->Display = false;
+			}
 
 			// Display labels
 			$this->lblFromCompany->Display = true;
@@ -2660,19 +2663,22 @@
 				$this->chkAutoGenerateAssetCode->Display = false;
 				$this->btnAddAsset->Display = true;
 				$this->lblAddAsset->Display = true;
-				$this->txtNewInventoryModelCode->Display = true;
-				$this->txtQuantity->Display = true;
-				$this->lblLookup->Display = true;
-				$this->btnAddInventory->Display = true;
-	    	$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-	    	$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
-			}
-			else{
-			     if($this->blnEditMode){
-					  $this->calDateReceived->DateTime = $this->objReceipt->ReceiptDate;
-					  $this->calDateReceived->Display = true;
-					  $this->lblReceiptDate->Display = false;
-			     }
+				
+				if ($this->blnShowInventory) {
+					$this->txtNewInventoryModelCode->Display = true;
+					$this->txtQuantity->Display = true;
+					$this->lblLookup->Display = true;
+					$this->btnAddInventory->Display = true;
+				}
+
+				$this->dtgAssetTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveAssetColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+				$this->dtgInventoryTransact->AddColumn(new QDataGridColumn('&nbsp;', '<?= $_FORM->RemoveInventoryColumn_Render($_ITEM) ?>', array('CssClass' => "dtg_column", 'HtmlEntities' => false)));
+			} else {
+				if ($this->blnEditMode) {
+					$this->calDateReceived->DateTime = $this->objReceipt->ReceiptDate;
+					$this->calDateReceived->Display = true;
+					$this->lblReceiptDate->Display = false;
+				}
 			}
 			$this->lblNewFromCompany->Display = true;
 			$this->lblNewFromContact->Display = true;
@@ -2681,7 +2687,7 @@
 
 
 			//If the user is not authorized to edit built-in fields, the fields are render as labels.
-			if(!$this->blnEditBuiltInFields){
+			if (!$this->blnEditBuiltInFields) {
 				$this->DisplayLabels();
 			}
 
@@ -2689,9 +2695,9 @@
 			$this->btnCancel->Display = true;
 
 			// Display custom field inputs
-	    if ($this->arrCustomFields) {
-	    	CustomField::DisplayInputs($this->arrCustomFields);
-	    }
+			if ($this->arrCustomFields) {
+				CustomField::DisplayInputs($this->arrCustomFields);
+			}
 		}
 
 		// This method is run when the new entity edit dialog box is closed
@@ -2704,86 +2710,79 @@
 			$this->CloseNewPanel($blnUpdates);
 		}
 
-	//Set display logic of the BuiltInFields in View Access and Edit Access
+		//Set display logic of the BuiltInFields in View Access and Edit Access
 		protected function UpdateBuiltInFields() {
-		//Set View Display Logic of Built-In Fields
-		$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Receipt,1);
-		if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
-			$this->blnViewBuiltInFields=true;
-		}
-		else{
-			$this->blnViewBuiltInFields=false;
-		}
+			//Set View Display Logic of Built-In Fields
+			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Receipt,1);
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
+				$this->blnViewBuiltInFields=true;
+			} else {
+				$this->blnViewBuiltInFields=false;
+			}
 
-		//Set Edit Display Logic of Built-In Fields
-		$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Receipt,2);
-		if($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag){
-			$this->blnEditBuiltInFields=true;
+			//Set Edit Display Logic of Built-In Fields
+			$objRoleEntityQtypeBuiltInAuthorization2= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Receipt,2);
+			if ($objRoleEntityQtypeBuiltInAuthorization2 && $objRoleEntityQtypeBuiltInAuthorization2->AuthorizedFlag) {
+				$this->blnEditBuiltInFields=true;
+			} else {
+				$this->blnEditBuiltInFields=false;
+			}
 		}
-		else{
-			$this->blnEditBuiltInFields=false;
-		}
-
-
-		}
+		
 		//Set display logic for the CustomFields
 		protected function UpdateCustomFields(){
-			if($this->arrCustomFields){
+			if ($this->arrCustomFields) {
 				foreach ($this->arrCustomFields as $objCustomField) {
 					//Set NextTabIndex only if the custom field is show
-					if($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
+					if ($objCustomField['input']->TabIndex == 0 && $objCustomField['ViewAuth'] && $objCustomField['ViewAuth']->AuthorizedFlag){
 						$objCustomField['input']->TabIndex=$this->GetNextTabIndex();
 					}
 					//In Create Mode, if the role doesn't have edit access for the custom field and the custom field is required, the field shows as a label with the default value
-					if (!$this->blnEditMode && !$objCustomField['blnEdit']){
+					if (!$this->blnEditMode && !$objCustomField['blnEdit']) {
 						$objCustomField['lbl']->Display=true;
 						$objCustomField['input']->Display=false;
-						if(($objCustomField['blnRequired'])){
+						if (($objCustomField['blnRequired'])) {
 							if ($objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue) $objCustomField['lbl']->Text=$objCustomField['EditAuth']->EntityQtypeCustomField->CustomField->DefaultCustomFieldValue->__toString();
 						}
 					}
 				}
 			}
-
 		}
+
 		//Set display logic of the GreenPlusButton of Company
 		protected function UpdateCompanyAccess() {
 			//checks if the entity  has edit authorization
 			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Company,2);
-			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 				$this->lblNewFromCompany->Visible=true;
-			}
-			else{
+			} else {
 				$this->lblNewFromCompany->Visible=false;
 			}
-
 		}
-			//Set display logic of the GreenPlusButton of Contact
+		
+		//Set display logic of the GreenPlusButton of Contact
 		protected function UpdateContactAccess() {
 			//checks if the entity  has edit authorization
 			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Contact,2);
-			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 				$this->lblNewFromContact->Visible=true;
 				$this->lblNewToContact->Visible=true;
-			}
-			else{
+			} else {
 				$this->lblNewFromContact->Visible=false;
 				$this->lblNewToContact->Visible=false;
 			}
-
 		}
+
 		//Set display logic of the GreenPlusButton of Address
 		protected function UpdateAddressAccess() {
 			//checks if the entity 4 (AssetModel) has edit authorization
 			$objRoleEntityQtypeBuiltInAuthorization= RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Address,2);
-			if($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag){
+			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 				$this->lblNewToAddress->Visible=true;
-			}
-			else{
+			} else {
 				$this->lblNewToAddress->Visible=false;
 			}
 		}
-
 
 		// Check that the prerequisites are met to allow scheduling receipts
 		protected function CheckPrerequisites() {
