@@ -46,7 +46,7 @@ class AssetMassEditPanel extends QPanel {
 		$this->arrAssetToEdit = $arrayAssetId;
 
 		//Set Edit Display Logic of Built-In Fields
-		$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,1,2);
+		$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Asset,2);
 		if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 			$this->blnEditBuiltInFields=true;
 		} else{

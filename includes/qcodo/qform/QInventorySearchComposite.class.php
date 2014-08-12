@@ -100,10 +100,10 @@ class QInventorySearchComposite extends QControl {
     $this->dtgInventoryModel->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 
     // If the user wants the checkboxes column
-    //if ($blnShowCheckboxes) {
+    if ($blnShowCheckboxes) {
     	// This will render all of the necessary controls and actions. chkSelected_Render expects a unique ID for each row of the database.
     	$this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('<?=$_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->InventoryModelId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-    //}
+    }
     $this->dtgInventoryModel->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
     // Removing any links in the column data
     if ($this->blnRemoveAllLinks) {

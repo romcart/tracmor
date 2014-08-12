@@ -20,17 +20,15 @@ class InventoryMassEditPanel extends QPanel {
 	public $arrCustomFieldsToEdit = array();
 	public $arrCustomFields;
 	public $arrCheckboxes = array();
-
 	public $chkCategory;
 	public $chkManufacturer;
 	public $chkLongDescription;
-
 	public $txtLongDescription;
 	public $lstManufacturer;
 	public $lstCategory;
-
 	public $btnApply;
 	public $btnCancel;
+	public $blnEditBuiltInFields;
 
 	public function __construct($objParentObject, $strClosePanelMethod , $arrayInventoryId) {
 
@@ -41,6 +39,14 @@ class InventoryMassEditPanel extends QPanel {
 			throw $objExc;
 		}
 		$this->arrInventoryToEdit = $arrayInventoryId;
+
+		//Set Edit Display Logic of Built-In Fields
+		$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId(QApplication::$objRoleModule->RoleId,EntityQtype::Inventory,2);
+		if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
+			$this->blnEditBuiltInFields=true;
+		} else{
+			$this->blnEditBuiltInFields=false;
+		}
 
 		$this->txtLongDescription_Create();
 		$this->lstCategory_Create();
@@ -62,6 +68,7 @@ class InventoryMassEditPanel extends QPanel {
 				$this->arrCheckboxes[$field['input']->strControlId] = new QCheckBox($this, 'chk'.$field['input']->strControlId);
 				$this->arrCheckboxes[$field['input']->strControlId]->Checked = false;
 				$this->arrCheckboxes[$field['input']->strControlId]->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+				$this->arrCheckboxes[$field['input']->strControlId]->Enabled = $field['blnEdit'];
 			}
 		}
 	}
@@ -84,6 +91,7 @@ class InventoryMassEditPanel extends QPanel {
 		$this->chkCategory->Name = 'category';
 		$this->chkCategory->Checked = false;
 		$this->chkCategory->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+		$this->chkCategory->Enabled = $this->blnEditBuiltInFields;
 	}
 
 	// Create and Setup lstManufacturer
@@ -105,6 +113,7 @@ class InventoryMassEditPanel extends QPanel {
 		$this->chkManufacturer->Name = 'manufacturer';
 		$this->chkManufacturer->Checked = false;
 		$this->chkManufacturer->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+		$this->chkManufacturer->Enabled = $this->blnEditBuiltInFields;
 	}
 
 	// Create and Setup txtLongDescription
@@ -120,6 +129,7 @@ class InventoryMassEditPanel extends QPanel {
 		$this->chkLongDescription->Name = 'long_description';
 		$this->chkLongDescription->Checked = false;
 		$this->chkLongDescription->AddAction(new QClickEvent(), new QJavaScriptAction("enableInput(this)"));
+		$this->chkLongDescription->Enabled = $this->blnEditBuiltInFields;
 	}
 
 	public function btnApply_Create() {
@@ -208,6 +218,17 @@ class InventoryMassEditPanel extends QPanel {
 				$this->lstCategory->Warning = 'You must select a Category.';
 			}
 		}
+
+		// First check that the user is authorized to edit this inventory
+		foreach ($this->arrInventoryToEdit as $intInventoryId) {
+			$objInventoryModel = InventoryModel::Load($intInventoryId);
+			if (!QApplication::AuthorizeEntityBoolean($objInventoryModel, 2)) {
+				$blnError = true;
+				$this->btnCancel->Warning = 'You are not authorized to edit one or more of the selected inventory models.';
+				break;
+			}
+		}
+
 		// Save
 		if (!$blnError)	{
 			try {

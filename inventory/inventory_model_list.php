@@ -95,7 +95,7 @@
 		// Create and Setup the Invnetory Search Composite Control
 		protected function ctlSearchMenu_Create() {
 			//require_once(__QCODO__ . '/qform/QInventorySearchComposite.class.php');
-			$this->ctlSearchMenu = new QInventorySearchComposite($this, null, false);
+			$this->ctlSearchMenu = new QInventorySearchComposite($this, null, QApplication::AuthorizeEntityTypeBoolean(2));
 		}
 
 		// Mass Actions controls creating/handling functions
@@ -136,6 +136,7 @@
 			$this->btnMassEdit = new QButton($this);
 			$this->btnMassEdit->Text = "edit";
 			$this->btnMassEdit->Text = "Mass Edit";
+			$this->btnMassEdit->Display = QApplication::AuthorizeEntityTypeBoolean(2);
 			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click'));
 			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassEdit_Click'));
 			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
@@ -180,6 +181,18 @@
 		protected function btnMassDeleteConfirm_Click() {
 
 			$items = $this->ctlSearchMenu->dtgInventoryModel->getSelected('InventoryModelId');
+
+			foreach ($items as $item) {
+				// First check that the user is authorized to delete this inventory
+				$objInventoryModel = InventoryModel::Load($item);
+				if (!QApplication::AuthorizeEntityBoolean($objInventoryModel, 3)) {
+					$blnError = true;
+					$this->lblWarning->Text = 'You are not authorized to delete one or more of the selected inventory models.';
+					$this->dlgMassDelete->HideDialogBox();
+					return;
+				}
+			}
+
 			if (count($items)>0) {
 				$this->lblWarning->Text = "";
 				// TODO perform validate

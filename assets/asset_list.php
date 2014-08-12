@@ -182,29 +182,42 @@
 			// Get an instance of the database
 			$objDatabase = QApplication::$Database[1];
 
-			try {
-				// Begin a MySQL Transaction to be either committed or rolled back
-				$objDatabase->TransactionBegin();
-
-				foreach($items as $item) {
-					// ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
-					Asset::ResetParentAssetIdToNullByAssetId($item);
-					// Delete any audit scans of this asset
-					Asset::DeleteAuditScanByAssetId($item);
-					// Delete the asset
-					Asset::LoadByAssetId($item)->Delete();
+			foreach ($items as $item) {
+				// First check that the user is authorized to delete this asset
+				$objAsset = Asset::LoadByAssetId($item);
+				if (!QApplication::AuthorizeEntityBoolean($objAsset, 3)) {
+					$blnError = true;
+					$this->lblWarning->Text = 'You are not authorized to delete one or more of the selected assets.';
+					$this->dlgMassDelete->HideDialogBox();
+					return;
 				}
+			}
 
-				$objDatabase->TransactionCommit();
-				$this->UncheckAllItems($this);
+			if (!$blnError) {
+				try {
+					// Begin a MySQL Transaction to be either committed or rolled back
+					$objDatabase->TransactionBegin();
 
-				// Hide the dialog
-				$this->dlgMassDelete->HideDialogBox();
+					foreach($items as $item) {
+						// ParentAssetId Field must be manually deleted because MySQL ON DELETE will not cascade to them
+						Asset::ResetParentAssetIdToNullByAssetId($item);
+						// Delete any audit scans of this asset
+						Asset::DeleteAuditScanByAssetId($item);
+						// Delete the asset
+						Asset::LoadByAssetId($item)->Delete();
+					}
 
-			} catch (QMySqliDatabaseException $objExc) {
-				// Rollback the transaction
-				$objDatabase->TransactionRollback();
-				throw new QDatabaseException();
+					$objDatabase->TransactionCommit();
+					$this->UncheckAllItems($this);
+
+					// Hide the dialog
+					$this->dlgMassDelete->HideDialogBox();
+
+				} catch (QMySqliDatabaseException $objExc) {
+					// Rollback the transaction
+					$objDatabase->TransactionRollback();
+					throw new QDatabaseException();
+				}
 			}
 		}
 
