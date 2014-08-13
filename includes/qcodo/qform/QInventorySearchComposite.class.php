@@ -128,7 +128,7 @@ class QInventorySearchComposite extends QControl {
      	}
     }
 
-    $this->dtgInventoryModel->SortColumnIndex = 3;
+    $this->dtgInventoryModel->SortColumnIndex = ($blnShowCheckboxes) ? 3 : 2;
     $this->dtgInventoryModel->SortDirection = 0;
 
     $objStyle = $this->dtgInventoryModel->RowStyle;
