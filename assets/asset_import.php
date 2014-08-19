@@ -89,6 +89,9 @@
 		protected $arrOldItemArray;
 		protected $objUpdatedItemArray;
 		protected $blnError;
+		protected $intAssetLimit;
+		protected $intAssetCount;
+
 		// Depreciation variables
 		protected $intDepreciationClassKey;
 		protected $intPurchaseDateKey;
@@ -125,6 +128,10 @@
 			$intRoleId = QApplication::$objUserAccount->RoleId;
 			$this->blnError = true;
 			$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId($intRoleId, EntityQtype::Asset, 2);
+
+			$this->intAssetLimit = QApplication::$TracmorSettings->AssetLimit;
+			$this->intAssetCount = Asset::CountAll();
+
 			// Check the user have edit permissions
 			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
 				$this->blnError = false;
@@ -323,6 +330,7 @@
 		// Next button click action
 		protected function btnNext_Click() {
 			$blnError = false;
+			$this->btnNext->Warning = '';
 			if ($this->intStep == 1) {
 				if ($this->chkHeaderRow->Checked) {
 					$this->blnHeaderRow = true;
@@ -386,9 +394,11 @@
 							}
 						}
 						$this->intTotalCount = ($i-1)*200 + $j-1;
-						if (QApplication::$TracmorSettings->AssetLimit != null && QApplication::$TracmorSettings->AssetLimit < ($this->intTotalCount + Asset::CountAll())) {
+						$this->intTotalCount -= ($this->chkHeaderRow->Checked) ? 1 : 0;
+
+						if ($this->lstImportAction->SelectedValue == 1 && $this->intAssetLimit != null && $this->intAssetLimit < ($this->intTotalCount + $this->intAssetCount)) {
 							$blnError = true;
-							$this->btnNext->Warning = $i . " " . $j . "Sorry that is too many assets. Your asset limit is = " . QApplication::$TracmorSettings->AssetLimit . ", this import has " . ($this->intTotalCount) . " assets, and you already have " . Asset::CountAll() . " assets in the database.";
+							$this->btnNext->Warning = sprintf('This import of %s assets would exceed your limit of %s assets.', $this->intTotalCount, $this->intAssetLimit);
 						} else {
 							$this->arrMapFields = array();
 							$this->arrTracmorField = array();
@@ -912,7 +922,10 @@
 										}
 									}
 
-									if (!$blnCheckCFVError) {
+									// Check if asset limit has been reached
+									$blnAssetLimitError = ($this->intAssetLimit != null && ($this->intAssetCount + count($objNewAssetArray)) >= $this->intAssetLimit);
+
+									if (!$blnCheckCFVError && !$blnAssetLimitError) {
 										$strAssetArray[] = stripslashes($strAssetCode);
 										$this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW(), %s, %s, '%s')",
 											$strAssetCode,
@@ -940,6 +953,10 @@
 										}
 									} else {
 										$this->intSkippedRecordCount++;
+										
+										if ($blnAssetLimitError)
+											$strRowArray[] = sprintf('Asset limit of %s reached', $this->intAssetLimit);
+
 										$this->PutSkippedRecordInFile($file_skipped, $strRowArray);
 										$strAssetCode = null;
 									}

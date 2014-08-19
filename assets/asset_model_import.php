@@ -480,7 +480,7 @@
         for ($i=0; $i < count($this->lstMapHeaderArray)-1; $i++) {
           $lstMapHeader = $this->lstMapHeaderArray[$i];
           $strSelectedValue = strtolower($lstMapHeader->SelectedValue);
-          if ($strSelectedValue == "asset model short description") {
+          if ($strSelectedValue == "short description") {
             $blnAssetModelShortDescription = true;
           }
           elseif ($strSelectedValue == "model number") {
@@ -658,10 +658,10 @@
             $arrModelCustomField = array();
             // Setup keys
             foreach ($this->arrTracmorField as $key => $value) {
-              if ($value == 'asset model short description') {
+              if ($value == 'short description') {
                 $intModelShortDescriptionKey = $key;
               }
-              elseif ($value == 'asset model long description') {
+              elseif ($value == 'long description') {
                 $intModelLongDescriptionKey = $key;
               }
               elseif ($value == 'model number') {
@@ -1202,8 +1202,8 @@
 	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    }
 	    $lstMapHeader->AddItem("Model Number", "Model Number", ($strName == 'model number') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Asset Model Short Description", "Asset Model Short Description", ($strName == 'asset model short description') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("Asset Model Long Description", "Asset Model Long Description", ($strName == 'asset model long description') ? true : false, $strAssetModelGroup);
+	    $lstMapHeader->AddItem("Short Description", "Short Description", ($strName == 'short description') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Long Description", "Long Description", ($strName == 'long description') ? true : false, $strAssetModelGroup);
 	    $lstMapHeader->AddItem("Category", "Category", ($strName == 'category') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    $lstMapHeader->AddItem("Manufacturer", "Manufacturer", ($strName == 'manufacturer') ? true : false, $strAssetModelGroup, 'CssClass="redtext"');
 	    if(QApplication::$TracmorSettings->DepreciationFlag == '1'){

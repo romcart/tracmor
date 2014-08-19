@@ -356,11 +356,6 @@
               }
             }
             $this->intTotalCount = ($i-1)*200 + $j-1;
-            if (true && QApplication::$TracmorSettings->AssetLimit != null && QApplication::$TracmorSettings->AssetLimit < ($this->intTotalCount + Asset::CountAll())) {
-              $blnError = true;
-              $this->btnNext->Warning = $i . " " . $j . "Sorry that is too many assets. Your asset limit is = " . QApplication::$TracmorSettings->AssetLimit . ", this import has " . ($this->intTotalCount) . " assets, and you already have " . Asset::CountAll() . " assets in the database.";
-            }
-            else {
               $this->arrMapFields = array();
               $this->arrTracmorField = array();
               // Load first file
@@ -421,7 +416,6 @@
               $btnAddField->AddAction(new QEnterKeyEvent(), new QServerAction('btnAddField_Click'));
               $btnAddField->AddAction(new QEnterKeyEvent(), new QTerminateAction());
               $this->lstMapHeaderArray[] = $btnAddField;
-            }
     			}
 		    }
 		  }
@@ -889,8 +883,8 @@
 	    if ($this->lstImportAction->SelectedValue == 2) {
 	      $lstMapHeader->AddItem("ID", "ID", ($strName == 'id') ? true : false, $strLocationGroup, 'CssClass="redtext"');
 	    }
-	    $lstMapHeader->AddItem("location name", "location name", ($strName == 'location') ? true : false, $strLocationGroup, 'CssClass="redtext"');
-	    $lstMapHeader->AddItem("location description", "location description", ($strName == 'description') ? true : false, $strLocationGroup);
+	    $lstMapHeader->AddItem("Location Name", "location name", ($strName == 'location name') ? true : false, $strLocationGroup, 'CssClass="redtext"');
+	    $lstMapHeader->AddItem("Description", "location description", ($strName == 'description') ? true : false, $strLocationGroup);
 	    $lstMapHeader->AddAction(new QChangeEvent(), new QAjaxAction('lstTramorField_Change'));
 	    $this->lstMapHeaderArray[] = $lstMapHeader;
 	    /*foreach ($this->arrItemCustomField as $objCustomField) {
