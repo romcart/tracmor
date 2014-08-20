@@ -146,45 +146,45 @@
 			$this->blnSearch = false;
 		}
 
-  	// Create and Setup the Header Composite Control
-  	protected function ctlHeaderMenu_Create() {
-  		$this->ctlHeaderMenu = new QHeaderMenu($this);
-  	}
+		// Create and Setup the Header Composite Control
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+		}
 
-  	// Create and Setp the Shortcut Menu Composite Control
-  	protected function ctlShortcutMenu_Create() {
-  		$this->ctlShortcutMenu = new QShortcutMenu($this);
-  	}
+		// Create and Setp the Shortcut Menu Composite Control
+		protected function ctlShortcutMenu_Create() {
+			$this->ctlShortcutMenu = new QShortcutMenu($this);
+		}
 
 		// Setup the Short Description (Company Name) Search Input
-	  protected function txtShortDescription_Create() {
-	    $this->txtShortDescription = new QTextBox($this);
+		protected function txtShortDescription_Create() {
+			$this->txtShortDescription = new QTextBox($this);
 			$this->txtShortDescription->Name = 'Company Name';
-      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-      $this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
+			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+			$this->txtShortDescription->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
 
-	  // Setup the City Search Input
-	  protected function txtCity_Create() {
-	    $this->txtCity = new QTextBox($this);
+		// Setup the City Search Input
+		protected function txtCity_Create() {
+			$this->txtCity = new QTextBox($this);
 			$this->txtCity->Name = 'City';
-      $this->txtCity->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
-      $this->txtCity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
+			$this->txtCity->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
+			$this->txtCity->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
 
-	  // Setup the State/Province Search Input
-	  protected function lstStateProvince_Create() {
-      $this->lstStateProvince = new QListBox($this);
+		// Setup the State/Province Search Input
+		protected function lstStateProvince_Create() {
+			$this->lstStateProvince = new QListBox($this);
 			$this->lstStateProvince->Name = 'State/Province';
 			$this->lstStateProvince->AddItem('- ALL -', null);
 			foreach (StateProvince::LoadAll() as $objStateProvince) {
 				$this->lstStateProvince->AddItem($objStateProvince->ShortDescription, $objStateProvince->StateProvinceId);
 			}
-	  }
+		}
 
-	  // Setup the Country Search Input
-	  protected function lstCountry_Create() {
-      $this->lstCountry = new QListBox($this);
+		// Setup the Country Search Input
+		protected function lstCountry_Create() {
+			$this->lstCountry = new QListBox($this);
 			$this->lstCountry->Name = 'Country';
 			$this->lstCountry->AddItem('- ALL -', null);
 			foreach (Country::LoadAll() as $objCountry) {
@@ -194,154 +194,153 @@
 			$this->lstCountry->AddAction(new QChangeEvent(), new QServerAction('lstCountry_Select'));
 			$this->lstCountry->AddAction(new QEnterKeyEvent(), new QServerAction('lstCountry_Select'));
 			$this->lstCountry->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
+		}
 
-	  /**************************
-	   *	CREATE BUTTON METHODS
-	  **************************/
+		/**************************
+		*	CREATE BUTTON METHODS
+		**************************/
 		// Create the Search Button
-	  protected function btnSearch_Create() {
+		protected function btnSearch_Create() {
 			$this->btnSearch = new QButton($this);
 			$this->btnSearch->Name = 'search';
 			$this->btnSearch->Text = 'Search';
 			$this->btnSearch->AddAction(new QClickEvent(), new QServerAction('btnSearch_Click'));
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QServerAction('btnSearch_Click'));
 			$this->btnSearch->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
+		}
 
-	  // Create the Clear Button
-	  protected function btnClear_Create() {
-	  	$this->btnClear = new QButton($this);
+		// Create the Clear Button
+		protected function btnClear_Create() {
+			$this->btnClear = new QButton($this);
 			$this->btnClear->Name = 'clear';
 			$this->btnClear->Text = 'Clear';
 			$this->btnClear->AddAction(new QClickEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QServerAction('btnClear_Click'));
 			$this->btnClear->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-	  }
+		}
 
-	  // Create the Advanced Search Label
-	  protected function lblAdvanced_Create() {
-	  	$this->lblAdvanced = new QLabel($this);
-	  	$this->lblAdvanced->Name = 'Advanced';
-	  	$this->lblAdvanced->Text = 'Advanced Search';
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
-	  	$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
-	  	// Make it appear like a link even though it is actually a control
-	  	$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
-	  	$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
-	  }
+		// Create the Advanced Search Label
+		protected function lblAdvanced_Create() {
+			$this->lblAdvanced = new QLabel($this);
+			$this->lblAdvanced->Name = 'Advanced';
+			$this->lblAdvanced->Text = 'Advanced Search';
+			$this->lblAdvanced->AddAction(new QClickEvent(), new QToggleDisplayAction($this->ctlAdvanced));
+			$this->lblAdvanced->AddAction(new QClickEvent(), new QAjaxAction('lblAdvanced_Click'));
+			// Make it appear like a link even though it is actually a control
+			$this->lblAdvanced->SetCustomStyle('text-decoration', 'underline');
+			$this->lblAdvanced->SetCustomStyle('cursor', 'pointer');
+		}
 
-	  // Create the Advanced Search Composite Control
-  	protected function ctlAdvanced_Create() {
-  		$this->ctlAdvanced = new QAdvancedSearchComposite($this, 7);
-  		$this->ctlAdvanced->Display = false;
-  	}
+		// Create the Advanced Search Composite Control
+		protected function ctlAdvanced_Create() {
+			$this->ctlAdvanced = new QAdvancedSearchComposite($this, 7);
+			$this->ctlAdvanced->Display = false;
+		}
 
-	  // Create the Company Datagrid
-  	protected function dtgCompany_Create() {
+		// Create the Company Datagrid
+		protected function dtgCompany_Create() {
 			$this->dtgCompany = new QDataGrid($this);
 			$this->dtgCompany->Name = 'company_list';
-  		$this->dtgCompany->CellPadding = 5;
-  		$this->dtgCompany->CellSpacing = 0;
-  		$this->dtgCompany->CssClass = "datagrid";
+			$this->dtgCompany->CellPadding = 5;
+			$this->dtgCompany->CellSpacing = 0;
+			$this->dtgCompany->CssClass = "datagrid";
 
-      // Disable AJAX for the datagrid
-      $this->dtgCompany->UseAjax = false;
+			// Disable AJAX for the datagrid
+			$this->dtgCompany->UseAjax = false;
 
-      // Allow for column toggling
-      $this->dtgCompany->ShowColumnToggle = true;
+			// Allow for column toggling
+			$this->dtgCompany->ShowColumnToggle = true;
 
-      // Allow for CSV Export
-      $this->dtgCompany->ShowExportCsv = true;
+			// Allow for CSV Export
+			$this->dtgCompany->ShowExportCsv = true;
 
-      // Enable Pagination
-      $objPaginator = new QPaginator($this->dtgCompany);
-      $this->dtgCompany->Paginator = $objPaginator;
-      $this->dtgCompany->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
+			// Enable Pagination
+			$objPaginator = new QPaginator($this->dtgCompany);
+			$this->dtgCompany->Paginator = $objPaginator;
+			$this->dtgCompany->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 
-      // Add Checkbox Column
-	  $this->dtgCompany->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->CompanyId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+			// Add Checkbox Column
+			$this->dtgCompany->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->CompanyId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
 
-	  $this->dtgCompany->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->CompanyId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
-      $this->dtgCompany->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
-      $this->dtgCompany->AddColumn(new QDataGridColumnExt('Company Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
-      $this->dtgCompany->AddColumn(new QDataGridColumnExt('City', '<?= $_ITEM->__toStringCity() ?>', 'Width=200', 'SortByCommand="company__address_id__city ASC"', 'ReverseSortByCommand="company__address_id__city DESC"', 'CssClass="dtg_column"'));
-      $this->dtgCompany->AddColumn(new QDataGridColumnExt('State/Province', '<?= $_ITEM->__toStringStateProvince() ?>', 'SortByCommand="company__address_id__state_province_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__state_province_id__short_description DESC"', 'CssClass="dtg_column"'));
-      $this->dtgCompany->AddColumn(new QDataGridColumnExt('Country', '<?= $_ITEM->__toStringCountry() ?>', 'SortByCommand="company__address_id__country_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__country_id__short_description DESC"', 'CssClass="dtg_column"'));
+			$this->dtgCompany->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->CompanyId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
+			$this->dtgCompany->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
+			$this->dtgCompany->AddColumn(new QDataGridColumnExt('Company Name', '<?= $_ITEM->__toStringWithLink("bluelink") ?>', 'SortByCommand="short_description ASC"', 'ReverseSortByCommand="short_description DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+			$this->dtgCompany->AddColumn(new QDataGridColumnExt('City', '<?= $_ITEM->__toStringCity() ?>', 'Width=200', 'SortByCommand="company__address_id__city ASC"', 'ReverseSortByCommand="company__address_id__city DESC"', 'CssClass="dtg_column"'));
+			$this->dtgCompany->AddColumn(new QDataGridColumnExt('State/Province', '<?= $_ITEM->__toStringStateProvince() ?>', 'SortByCommand="company__address_id__state_province_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__state_province_id__short_description DESC"', 'CssClass="dtg_column"'));
+			$this->dtgCompany->AddColumn(new QDataGridColumnExt('Country', '<?= $_ITEM->__toStringCountry() ?>', 'SortByCommand="company__address_id__country_id__short_description ASC"', 'ReverseSortByCommand="company__address_id__country_id__short_description DESC"', 'CssClass="dtg_column"'));
 
-      // Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
-      $objCustomFieldArray = CustomField::LoadObjCustomFieldArray(7, false);
-      if ($objCustomFieldArray) {
-      	foreach ($objCustomFieldArray as $objCustomField) {
-      		//Only add the custom field column if the role has authorization to view it.
-      		if($objCustomField->objRoleAuthView && $objCustomField->objRoleAuthView->AuthorizedFlag)
-      			$this->dtgCompany->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
-      	}
-      }
+			// Add the custom field columns with Display set to false. These can be shown by using the column toggle menu.
+			$objCustomFieldArray = CustomField::LoadObjCustomFieldArray(7, false);
+			if ($objCustomFieldArray) {
+				foreach ($objCustomFieldArray as $objCustomField) {
+					//Only add the custom field column if the role has authorization to view it.
+					if ($objCustomField->objRoleAuthView && $objCustomField->objRoleAuthView->AuthorizedFlag)
+						$this->dtgCompany->AddColumn(new QDataGridColumnExt($objCustomField->ShortDescription, '<?= $_ITEM->GetVirtualAttribute(\''.$objCustomField->CustomFieldId.'\') ?>', 'SortByCommand="__'.$objCustomField->CustomFieldId.' ASC"', 'ReverseSortByCommand="__'.$objCustomField->CustomFieldId.' DESC"','HtmlEntities="false"', 'CssClass="dtg_column"', 'Display="false"'));
+				}
+			}
 
-      $this->dtgCompany->SortColumnIndex = 3;
-    	$this->dtgCompany->SortDirection = 0;
+			$this->dtgCompany->SortColumnIndex = 3;
+			$this->dtgCompany->SortDirection = 0;
 
-      $objStyle = $this->dtgCompany->RowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#FFFFFF';
-      $objStyle->FontSize = 12;
+			$objStyle = $this->dtgCompany->RowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#FFFFFF';
+			$objStyle->FontSize = 12;
 
-      $objStyle = $this->dtgCompany->AlternateRowStyle;
-      $objStyle->BackColor = '#EFEFEF';
+			$objStyle = $this->dtgCompany->AlternateRowStyle;
+			$objStyle->BackColor = '#EFEFEF';
 
-      $objStyle = $this->dtgCompany->HeaderRowStyle;
-      $objStyle->ForeColor = '#000000';
-      $objStyle->BackColor = '#EFEFEF';
-      $objStyle->CssClass = 'dtg_header';
+			$objStyle = $this->dtgCompany->HeaderRowStyle;
+			$objStyle->ForeColor = '#000000';
+			$objStyle->BackColor = '#EFEFEF';
+			$objStyle->CssClass = 'dtg_header';
 
-      $this->dtgCompany->SetDataBinder('dtgCompany_Bind');
-  	}
+			$this->dtgCompany->SetDataBinder('dtgCompany_Bind');
+		}
 
-	  protected function btnSearch_Click() {
-	  	$this->blnSearch = true;
+		protected function btnSearch_Click() {
+			$this->blnSearch = true;
 			$this->dtgCompany->PageNumber = 1;
-	  }
+		}
 
-	  protected function btnClear_Click() {
+		protected function btnClear_Click() {
 
-  		// Set controls to null
-	  	$this->txtShortDescription->Text = '';
-	  	$this->txtCity->Text = '';
-	  	$this->lstStateProvince->SelectedIndex = 0;
-	  	$this->lstCountry->SelectedIndex = 0;
-	  	$this->ctlAdvanced->ClearControls();
+			// Set controls to null
+			$this->txtShortDescription->Text = '';
+			$this->txtCity->Text = '';
+			$this->lstStateProvince->SelectedIndex = 0;
+			$this->lstCountry->SelectedIndex = 0;
+			$this->ctlAdvanced->ClearControls();
 
-	  	// Set search variables to null
-	  	$this->strShortDescription = null;
-	  	$this->strCity = null;
-	  	$this->intStateProvinceId = null;
-	  	$this->intCountryId = null;
-	  	$this->strDateModified = null;
-	  	$this->strDateModifiedFirst = null;
-	  	$this->strDateModifiedLast = null;
-	  	$this->blnAttachment = false;
-  		if ($this->arrCustomFields) {
-	  		foreach ($this->arrCustomFields as $field) {
-	  			$field['value'] = null;
-	  		}
-	  	}
-	  	$this->blnSearch = false;
-  	}
+			// Set search variables to null
+			$this->strShortDescription = null;
+			$this->strCity = null;
+			$this->intStateProvinceId = null;
+			$this->intCountryId = null;
+			$this->strDateModified = null;
+			$this->strDateModifiedFirst = null;
+			$this->strDateModifiedLast = null;
+			$this->blnAttachment = false;
+			if ($this->arrCustomFields) {
+				foreach ($this->arrCustomFields as $field) {
+					$field['value'] = null;
+				}
+			}
+			$this->blnSearch = false;
+		}
 
-  	// Display or Hide the advanced search composite control
-	  protected function lblAdvanced_Click() {
-	  	if ($this->blnAdvanced) {
-	  		$this->blnAdvanced = false;
-	  		$this->lblAdvanced->Text = 'Advanced Search';
+		// Display or Hide the advanced search composite control
+		protected function lblAdvanced_Click() {
+			if ($this->blnAdvanced) {
+				$this->blnAdvanced = false;
+				$this->lblAdvanced->Text = 'Advanced Search';
 
-	  		//$this->ctlAdvanced->ClearControls();
-	  	}
-	  	else {
-	  		$this->blnAdvanced = true;
-	  		$this->lblAdvanced->Text = 'Hide Advanced';
-	  	}
-	  }
+				//$this->ctlAdvanced->ClearControls();
+			} else {
+				$this->blnAdvanced = true;
+				$this->lblAdvanced->Text = 'Hide Advanced';
+			}
+		}
 
 		// Update state/province list when country is selected
 		protected function lstCountry_Select($strFormId, $strControlId, $strParameter) {
@@ -355,8 +354,7 @@
 				$objCountry = Country::Load($this->lstCountry->SelectedValue);
 				// Get all available state/provinces for that company
 				$objStateProvinceArray = $objCountry->GetStateProvinceArray();
-			}
-			else {
+			} else {
 				// Or load all addresses for all companies
 				$objStateProvinceArray = StateProvince::LoadAll();
 			}
@@ -367,13 +365,12 @@
 					$objListItem->Selected = true;
 				$this->lstStateProvince->AddItem($objListItem);
 				$this->lstStateProvince->Enabled = true;
-			}
-			else {
+			} else {
 				$this->lstStateProvince->Enabled = false;
 			}
 		}
 
-	  protected function assignSearchValues() {
+		protected function assignSearchValues() {
 
 			$this->strShortDescription = $this->txtShortDescription->Text;
 			$this->strCity = $this->txtCity->Text;
@@ -389,32 +386,30 @@
 				foreach ($this->arrCustomFields as &$field) {
 					if ($field['input'] instanceof QListBox) {
 						$field['value'] = $field['input']->SelectedValue;
-					}
-					elseif ($field['input'] instanceof QTextBox) {
+					} else if ($field['input'] instanceof QTextBox) {
 						$field['value'] = $field['input']->Text;
 					}
 				}
 			}
-	  }
-
+		}
 
 		/**
 		 * Mass Action Methods
 		 *
 		 */
 
-		protected function btnMassDelete_Create(){
+		protected function btnMassDelete_Create() {
 			$this->btnMassDelete = new QButton($this);
 			$this->btnMassDelete->Name = 'Delete';
 			$this->btnMassDelete->Text = 'Delete';
 			$this->btnMassDelete->AddAction(new QClickEvent(),
-				                            new QConfirmAction("Are you sure you want to delete these objects?"));
+											new QConfirmAction("Are you sure you want to delete these objects?"));
 			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click'));
 			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnMassDelete_Click'));
 			$this->btnMassDelete->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
-		protected function btnMassEdit_Create(){
+		protected function btnMassEdit_Create() {
 			$this->btnMassEdit = new QButton($this);
 			$this->btnMassEdit->Name = 'Edit';
 			$this->btnMassEdit->Text = 'Edit';
@@ -423,13 +418,13 @@
 			$this->btnMassEdit->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
-		protected function lblMassActionError_Create(){
+		protected function lblMassActionError_Create() {
 			$this->lblMassActionError = new QLabel($this);
 			$this->lblMassActionError->Text = '';
 			$this->lblMassActionError->CssClass = "warning";
 		}
 
-		protected function dlgMassEdit_Create(){
+		protected function dlgMassEdit_Create() {
 			$this->dlgMassEdit = new QDialogBox($this);
 			$this->dlgMassEdit->AutoRenderChildren = true;
 			$this->dlgMassEdit->Width = '440px';
@@ -441,7 +436,7 @@
 			$this->dlgMassEdit->CssClass = "modal_dialog";
 		}
 
-		protected function dlgDelete_Create(){
+		protected function dlgDelete_Create() {
 			$this->dlgMassDelete = new QDialogBox($this);
 			$this->dlgMassDelete->AutoRenderChildren = true;
 			$this->dlgMassDelete->Width = '440px';
@@ -453,7 +448,7 @@
 			$this->dlgMassDelete->CssClass = "modal_dialog";
 		}
 
-		protected function btnMassDeleteConfirm_Create(){
+		protected function btnMassDeleteConfirm_Create() {
 			$this->btnMassDeleteConfirm = new QButton($this->dlgMassDelete);
 			$this->btnMassDeleteConfirm->Text = "Confirm";
 			$this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click'));
@@ -461,7 +456,7 @@
 			$this->btnMassDeleteConfirm->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
-		protected function btnMassDeleteCancel_Create(){
+		protected function btnMassDeleteCancel_Create() {
 			$this->btnMassDeleteCancel = new QButton($this->dlgMassDelete);
 			$this->btnMassDeleteCancel->Text = "Cancel";
 			$this->btnMassDeleteCancel->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteCancel_Click'));
@@ -469,74 +464,69 @@
 			$this->btnMassDeleteCancel->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
 
-		protected function btnMassDelete_Click($strFormId, $strControlId, $strParameter){
+		protected function btnMassDelete_Click($strFormId, $strControlId, $strParameter) {
 			$items = $this->dtgCompany->getSelected('CompanyId');
 			// Show confirm "Are you sure you want to {delete/edit} these objects?"
-			if(count($items)>0){
+			if (count($items)>0) {
 				$this->lblMassActionError->Text = "";
 				if (!$this->dlgMassDelete->Display) {
 					$arrToBeSkipped = array();
-					foreach ($items as $item){
+					foreach ($items as $item) {
 						// Check if any Shipments or Receipts include selected contact
-						if(Shipment::hasCompany($item)/*||Receipt::hasCompany($item)*/){
+						if (Shipment::hasCompany($item)/*||Receipt::hasCompany($item)*/) {
 							// append $item to  be skipped
 							$arrToBeSkipped[] = $item;
-						}
-						else{
+						} else {
 							$this->arrToDelete[] = $item;
 						}
 					}
-					if(count($arrToBeSkipped)>0){
-                        if(count($arrToBeSkipped)==1){
-                            $toBe = 'is';
-                            $ending1 = 'y';
-                            $ending2 = '';
 
-                        }
-                        else{
-                            $toBe = 'are';
-                            $ending1 = 'ies';
-                            $ending2 = 's';
-                        }
+					if (count($arrToBeSkipped)>0) {
+						if (count($arrToBeSkipped)==1) {
+							$toBe = 'is';
+							$ending1 = 'y';
+							$ending2 = '';
+						} else {
+							$toBe = 'are';
+							$ending1 = 'ies';
+							$ending2 = 's';
+						}
 						// Show dialog box "There are {number} {entity_type}s that are not able to be deleted. Would you like to continue the deletion process, skipping these items?"
 						$this->dlgMassDelete->Text =sprintf("There %s %s compan%s that %s not able to be deleted.
-						                                     Would you like to continue the deletion process,
-						                                     skipping these item%s?<br />",
-                                                             $toBe, count($arrToBeSkipped), $ending1, $toBe, $ending2);
+															 Would you like to continue the deletion process,
+															 skipping these item%s?<br />",
+															 $toBe, count($arrToBeSkipped), $ending1, $toBe, $ending2);
 						$this->dlgMassDelete->ShowDialogBox();
-					}
-					else{
-						if (count($this->arrToDelete)>0){
-                            try{
-                                // Get an instance of the database
-                                $objDatabase = QApplication::$Database[1];
-                                // Begin a MySQL Transaction to be either committed or rolled back
-                                $objDatabase->TransactionBegin();
-                                foreach ($this->arrToDelete as $intCompanyId){
-                                    Company::Load($intCompanyId)->Delete();
-                                }
-                                $objDatabase->TransactionCommit();
-                                $this->arrToDelete = array();
-                                QApplication::Redirect('');
-                            }
-                            catch(QMySqliDatabaseException $objExc) {
-                                $objDatabase->TransactionRollback();
-                                throw new QDatabaseException();
-                            }
+					} else {
+						if (count($this->arrToDelete)>0) {
+							try {
+								// Get an instance of the database
+								$objDatabase = QApplication::$Database[1];
+								// Begin a MySQL Transaction to be either committed or rolled back
+								$objDatabase->TransactionBegin();
+								foreach ($this->arrToDelete as $intCompanyId) {
+									Company::Load($intCompanyId)->Delete();
+								}
+								$objDatabase->TransactionCommit();
+								$this->arrToDelete = array();
+								QApplication::Redirect('');
+							} catch(QMySqliDatabaseException $objExc) {
+								$objDatabase->TransactionRollback();
+								throw new QDatabaseException();
+							}
 						}
 					}
 					//	print_r(get_class_methods(get_class($this->dlgDelete)));exit;//$this->dlgDelete->ShowDialogBox() ;
 				}
-			}
-			else{
+			} else {
 				$this->lblMassActionError->Text = "You haven't chosen any Company to Delete" ;
 			}
 		}
 
-		protected function btnMassEdit_Click(){
+		protected function btnMassEdit_Click() {
 			$this->lblMassActionError->Text = "";
 			$items = $this->dtgCompany->getSelected('CompanyId');
-			if(count($items)>0){
+			if (count($items)>0) {
 				if (!$this->dlgMassEdit->Display) {
 
 					// Create the panel, assigning it to the Dialog Box
@@ -544,19 +534,20 @@
 					// Show the dialog box
 					$this->dlgMassEdit->ShowDialogBox();
 				}
-			}
-			else{
+			} else {
 				$this->lblMassActionError->Text = "You haven't chosen any Company to Edit" ;
 			}
 		}
 
-		public function dlgMassEdit_Close(){
+		public function dlgMassEdit_Close() {
 			$this->dlgMassEdit->HideDialogBox();
 		}
-		protected function btnMassDeleteConfirm_Click(){
+
+		protected function btnMassDeleteConfirm_Click() {
 
 		}
-		protected function btnMassDeleteCancel_Click(){
+
+		protected function btnMassDeleteCancel_Click() {
 			$this->dlgMassDelete->HideDialogBox();
 		}
 	}
