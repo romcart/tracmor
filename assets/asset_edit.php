@@ -873,11 +873,13 @@ CREATE FIELD METHODS
 
 		// This method is called by btnSave_Click() or btnCancel_Click()
 		public function RefreshChildAssets() {
-		  $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
-		  $this->ctlAssetEdit->objRemovedChildAssetArray = array();
-		  // Hide the column with checkboxes
-		  $this->dtgChildAssets->GetColumn(0)->Display = false;
-		  $this->dtgChildAssets_Bind();
+		  if ($this->objAsset->AssetId != null) {
+		    $this->ctlAssetEdit->objChildAssetArray = Asset::LoadArrayByParentAssetId($this->objAsset->AssetId);
+		    $this->ctlAssetEdit->objRemovedChildAssetArray = array();
+		    // Hide the column with checkboxes
+		    $this->dtgChildAssets->GetColumn(0)->Display = false;
+		    $this->dtgChildAssets_Bind();
+		  }
 		}
 
 		public function lblIconParentAssetCode_Click() {
