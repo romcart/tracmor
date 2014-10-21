@@ -717,16 +717,13 @@ class QAssetEditComposite extends QControl {
 
 		QApplication::AuthorizeControl($this->objAsset, $this->btnArchive, 2);
 		if ($this->btnArchive->Visible) {
-			// Check if they have the ability to create a new Archivement
-			QApplication::AuthorizeControl(null, $this->btnArchive, 2, 5);
 			if ($this->objAsset->ArchivedFlag) {
-  		  $this->btnArchive->Text = 'Unarchive';
-  		  RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnArchive, 11);
-  		}
-  		else {
-  		  $this->btnArchive->Text = 'Archive';
-  		  RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnArchive, 10);
-  		}
+				$this->btnArchive->Text = 'Unarchive';
+			  	RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnArchive, 11);
+			} else {
+				$this->btnArchive->Text = 'Archive';
+				RoleTransactionTypeAuthorization::AuthorizeControlByRoleTransactionType($this->objAsset, $this->btnArchive, 10);
+			}
 		}
 	}
 
