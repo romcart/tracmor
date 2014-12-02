@@ -171,6 +171,7 @@ class QAssetTransactComposite extends QControl {
 			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
 			$this->lstLocation->AddItem($objListItem);
 		}
+		$this->lstLocation->SelectedIndex = ($this->lstLocation->ItemCount == 2);
 		$this->lstLocation->CausesValidation = false;
 	}
 

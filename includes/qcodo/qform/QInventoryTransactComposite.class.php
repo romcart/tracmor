@@ -136,6 +136,7 @@ class QInventoryTransactComposite extends QControl {
 			$objListItem = new QListItem($objLocation->__toString(), $objLocation->LocationId);
 			$this->lstDestinationLocation->AddItem($objListItem);
 		}
+		$this->lstDestinationLocation->SelectedIndex = ($this->lstDestinationLocation->ItemCount == 2);
 		$this->lstDestinationLocation->CausesValidation = false;
 	}
 
@@ -280,6 +281,7 @@ class QInventoryTransactComposite extends QControl {
 					}
 					$this->lstSourceLocation->Enabled = true;
 					$this->txtQuantity->Enabled = true;
+					$this->lstSourceLocation->SelectedIndex = ($this->lstSourceLocation->ItemCount == 2);
 				}
         // Exclude restock transaction type as it doesn't contain Source Location parameter
 				elseif($this->intTransactionTypeId != 4) {
