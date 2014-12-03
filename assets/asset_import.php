@@ -130,7 +130,7 @@
 			$objRoleEntityQtypeBuiltInAuthorization = RoleEntityQtypeBuiltInAuthorization::LoadByRoleIdEntityQtypeIdAuthorizationId($intRoleId, EntityQtype::Asset, 2);
 
 			$this->intAssetLimit = QApplication::$TracmorSettings->AssetLimit;
-			$this->intAssetCount = Asset::CountAll();
+			$this->intAssetCount = Asset::CountActive();
 
 			// Check the user have edit permissions
 			if ($objRoleEntityQtypeBuiltInAuthorization && $objRoleEntityQtypeBuiltInAuthorization->AuthorizedFlag) {
