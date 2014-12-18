@@ -862,6 +862,7 @@
 									$strAssetCode =  null;
 									$this->intSkippedRecordCount++;
 									$this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+									continue;
 								} else {
 									if ($this->lstImportAction->SelectedValue == 2) {
 										$intItemId = intval(trim($strRowArray[$this->intItemIdKey]));
