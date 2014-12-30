@@ -348,5 +348,9 @@
 				);
 			}
 		}
+
+		public static function MoneyFormat($intNumber) {
+			return number_format($intNumber, 2, '.', '');
+		}
 	}
 ?>

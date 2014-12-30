@@ -754,7 +754,7 @@ class QAssetEditComposite extends QControl {
 		if ($this->blnEditMode
 			&& $this->objAsset->DepreciationFlag){
 			$this->chkAssetDepreciation->Checked = true;
-			$this->lblPurchaseCost->Text = money_format('%i',$this->objAsset->PurchaseCost);
+			$this->lblPurchaseCost->Text = QApplication::MoneyFormat($this->objAsset->PurchaseCost);
 			$this->lblPurchaseDate->Text = $this->objAsset->PurchaseDate->__toString();
 		}
 		else{
@@ -837,7 +837,7 @@ class QAssetEditComposite extends QControl {
 			$this->txtPurchaseCost->AddAction(new QChangeEvent(), new QAjaxControlAction($this, 'txtPurchaseCost_Change'));
 		}
 		if ($this->blnEditMode){
-			$this->txtPurchaseCost->Text = money_format('%i',$this->objAsset->PurchaseCost);
+			$this->txtPurchaseCost->Text = QApplication::MoneyFormat($this->objAsset->PurchaseCost);
 		}
 	}
 	public function txtPurchaseCost_Change($control){
@@ -1234,7 +1234,7 @@ class QAssetEditComposite extends QControl {
 					$this->chkAssetDepreciation->Checked = true;
 					// Return original values to recalculate bookvalue
 					$this->lstAssetModel->SelectedValue = $this->objAsset->AssetModelId;
-					$this->txtPurchaseCost->Text = money_format('%i',$this->objAsset->PurchaseCost);
+					$this->txtPurchaseCost->Text = QApplication::MoneyFormat($this->objAsset->PurchaseCost);
 					$this->calPurchaseDate->DateTime = $this->objAsset->PurchaseDate;
 					$this->lblBookValue->Display = true;
 					$this->lblBookValue_Update();
@@ -1628,7 +1628,7 @@ class QAssetEditComposite extends QControl {
 			$this->chkAssetDepreciation->Enabled = false;
 			$this->hideAssetDepreciationFields();
 			if($this->objAsset->DepreciationFlag == 1){
-				$this->lblPurchaseCost->Text = money_format('%i',$this->objAsset->PurchaseCost);
+				$this->lblPurchaseCost->Text = QApplication::MoneyFormat($this->objAsset->PurchaseCost);
 				$this->lblPurchaseDate->Text = $this->objAsset->PurchaseDate->__toString();
 				$this->lblPurchaseCost->Display = true;
 				$this->lblPurchaseDate->Display = true;
@@ -1825,7 +1825,7 @@ class QAssetEditComposite extends QControl {
 			$fltBookValue =	$this->txtPurchaseCost->Text - ($this->txtPurchaseCost->Text * ($interval/$life));
 			// prevent negative results
 			$fltBookValue = $fltBookValue < 0 ?  0 : $fltBookValue;
-			$this->lblBookValue->Text = money_format('%i', $fltBookValue);
+			$this->lblBookValue->Text = QApplication::MoneyFormat( $fltBookValue);
 		}
         else{
 			$this->lblBookValue->Text = '...';

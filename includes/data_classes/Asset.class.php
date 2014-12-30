@@ -73,7 +73,7 @@
             }
             else{
             $fltBookValue =	$this->PurchaseCost - $this->getCurrentDepreciation();
-            return money_format('%i' ,round($fltBookValue,2));
+            return QApplication::MoneyFormat(round($fltBookValue,2));
             }
         }
 
@@ -82,7 +82,7 @@
                 return null;
             }
             else{
-                return money_format('%i' ,round($this->PurchaseCost,2));
+                return QApplication::MoneyFormat(round($this->PurchaseCost,2));
             }
         }
 
