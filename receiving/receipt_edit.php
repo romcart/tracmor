@@ -1916,7 +1916,7 @@
 	        public function btnReceiveInventoryTransaction_Click($strFormId, $strControlId, $strParameter) {
 
 			$blnError = false;
-
+			$this->dtgInventoryTransact->Warning = '';
 			$intInventoryTransactionId = $strParameter;
 			if ($this->objInventoryTransactionArray) {
 
