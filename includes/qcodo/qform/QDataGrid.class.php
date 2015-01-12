@@ -419,49 +419,46 @@
 	    }
 	  }
 	  
-	  public function GetSelected($strId) {
-	  	$intObjectIdArray = array();
-	  	$intItemsPerPage = $this->ItemsPerPage;
-      $intPageNumber = $this->PageNumber;
-      
-	  	if ($this->chkSelectAll->Checked) {
-      	
-      	for ($i=1; $i <= (ceil($this->TotalItemCount/200)); $i++) {
-			
+		public function GetSelected($strId) {
+			$intObjectIdArray = array();
+			$intItemsPerPage = $this->ItemsPerPage;
+			$intPageNumber = $this->PageNumber;
+	
+			if ($this->chkSelectAll && $this->chkSelectAll->Checked) {
+	
+				for ($i=1; $i <= (ceil($this->TotalItemCount/200)); $i++) {
+	
 					$this->PageNumber = $i;
 					$this->ItemsPerPage = 200;
 					$this->DataBind();
-	      	
-	      	foreach ($this->DataSource as $objObject) {
-	      		if ($chkControl = $this->objForm->GetControl('chkSelected' . $objObject->$strId . 'x' . $this->ControlId)) {
-	      			if ($chkControl->Checked) {
-	      				array_push($intObjectIdArray, $objObject->$strId);
-	      			}
-	      		}
-	      		elseif ($this->chkSelectAll->Checked) {
-	      			array_push($intObjectIdArray, $objObject->$strId);
-	      		}
-	      	}
-	      	
-	      	$this->DataSource = null;
-      	}
-	  	}
-
-	  	else {
-	  		foreach ($this->objForm->GetAllControls() as $objControl) {
-	        if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
-	          if ($objControl->Checked) {
-	            array_push($intObjectIdArray, $objControl->ActionParameter);
-	          }
-	        }
-	  		}
-	  	}
-	  	
-	  	$this->ItemsPerPage = $intItemsPerPage;
-      $this->PageNumber = $intPageNumber;
-	  	
-	  	return $intObjectIdArray;
-	  }
+	
+					foreach ($this->DataSource as $objObject) {
+						if ($chkControl = $this->objForm->GetControl('chkSelected' . $objObject->$strId . 'x' . $this->ControlId)) {
+							if ($chkControl->Checked) {
+								array_push($intObjectIdArray, $objObject->$strId);
+							}
+						} else if ($this->chkSelectAll->Checked) {
+							array_push($intObjectIdArray, $objObject->$strId);
+						}
+					}
+		      	
+					$this->DataSource = null;
+				}
+			} else {
+				foreach ($this->objForm->GetAllControls() as $objControl) {
+					if (substr($objControl->ControlId, 0, 11) == 'chkSelected') {
+						if ($objControl->Checked) {
+							array_push($intObjectIdArray, $objControl->ActionParameter);
+						}
+					}
+				}
+			}
+	
+			$this->ItemsPerPage = $intItemsPerPage;
+			$this->PageNumber = $intPageNumber;
+	
+			return $intObjectIdArray;
+		}
 
 
 		/////////////////////////
