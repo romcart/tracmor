@@ -31,7 +31,7 @@ if ($objAttachment->TmpFilename == $_GET['tmp_filename']) {
 	header("Content-Transfer-Encoding: binary");
 	
 	ob_clean();
-	flush();
+	ob_end_flush();
 	readfile($objAttachment->Path);
 	exit();
 } else {
