@@ -377,7 +377,7 @@
 		 * @param $objExpansionMap
 		 * @return strSqlQuery / objAssetTransaction[]
 		*/
-		public function LoadArrayBySearch($blnReturnStrQuery = true, $strAssetModel = null, $strAssetCode = null, $strAssetModelCode = null, $strUser = null, $intCheckedOutBy = null, $intReservedBy = null, $strCategory = null, $strManufacturer = null, $strSortByDate = "ASC", $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $arrTransactionTypes = null, $objExpansionMap = null) {
+		public static function LoadArrayBySearch($blnReturnStrQuery = true, $strAssetModel = null, $strAssetCode = null, $strAssetModelCode = null, $strUser = null, $intCheckedOutBy = null, $intReservedBy = null, $strCategory = null, $strManufacturer = null, $strSortByDate = "ASC", $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $arrTransactionTypes = null, $objExpansionMap = null) {
 		  // Setup QueryExpansion
 			$objQueryExpansion = new QQueryExpansion();
 			if ($objExpansionMap) {
@@ -520,7 +520,7 @@
 		 * @param $objExpansionMap
 		 * @return int
 		*/
-		public function CountTransactionsBySearch($strAssetModel = null, $strAssetCode = null, $strAssetModelCode = null, $strUser = null, $intCheckedOutBy = null, $intReservedBy = null, $strCategory = null, $strManufacturer = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $arrTransactionTypes = null, $objExpansionMap = null) {
+		public static function CountTransactionsBySearch($strAssetModel = null, $strAssetCode = null, $strAssetModelCode = null, $strUser = null, $intCheckedOutBy = null, $intReservedBy = null, $strCategory = null, $strManufacturer = null, $strDateModified = null, $strDateModifiedFirst = null, $strDateModifiedLast = null, $arrTransactionTypes = null, $objExpansionMap = null) {
 		  // Setup QueryExpansion
 			$objQueryExpansion = new QQueryExpansion();
 			if ($objExpansionMap) {
