@@ -447,15 +447,29 @@
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
 			try {
+				// Get an instance of the database
+				$objDatabase = QApplication::$Database[1];
+
+				// Begin a MySQL Transaction to be either committed or rolled back
+				$objDatabase->TransactionBegin();
+
 				$strRedirect = 'company_edit.php?intCompanyId='.$this->objAddress->CompanyId;
 				$objCustomFieldArray = $this->objAddress->objCustomFieldArray;
 				$this->objAddress->Delete();
+
+				// Commit the transaction to the database
+				$objDatabase->TransactionCommit();
+
 				// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 				// The values should not get deleted for select values
 				// CustomField::DeleteTextValues($objCustomFieldArray);
 				QApplication::Redirect($strRedirect);
 			}
 			catch (QDatabaseExceptionBase $objExc) {
+
+				// Rollback the database transaction
+				$objDatabase->TransactionRollback();
+
 				if ($objExc->ErrorNumber == 1451) {
 					$this->btnDelete->Warning = 'This address cannot be deleted because it is associated with one or more shipments or receipts.';
 				}

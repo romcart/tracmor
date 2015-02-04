@@ -665,18 +665,31 @@ class ContactEditForm extends ContactEditFormBase {
 	protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
 		try {
+			// Get an instance of the database
+			$objDatabase = QApplication::$Database[1];
+
+			// Begin a MySQL Transaction to be either committed or rolled back
+			$objDatabase->TransactionBegin();
+			
 			$objCustomFieldArray = $this->objContact->objCustomFieldArray;
 			$this->objContact->Delete();
+
+			// Commit the transaction to the database
+			$objDatabase->TransactionCommit();
+
 			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
 			// The values should not get deleted for select values
 			// CustomField::DeleteTextValues($objCustomFieldArray);
 			$this->RedirectToListPage();
 		}
 		catch (QDatabaseExceptionBase $objExc) {
+
+			// Rollback the database transaction
+			$objDatabase->TransactionRollback();
+
 			if ($objExc->ErrorNumber == 1451) {
 				$this->btnDelete->Warning = 'This contact cannot be deleted because it is associated with one or more transactions (check-in/check-out) or shipments or receipts.';
-			}
-			else {
+			} else {
 				throw new QDatabaseExceptionBase();
 			}
 		}

@@ -769,18 +769,31 @@ class CompanyEditForm extends CompanyEditFormBase {
 	protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
 
 		try {
-			$objCustomFieldArray = $this->objCompany->objCustomFieldArray;
-			$this->objCompany->Delete();
-			// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
-			// The values should not get deleted for select values
-			// CustomField::DeleteTextValues($objCustomFieldArray);
-			$this->RedirectToListPage();
+				// Get an instance of the database
+				$objDatabase = QApplication::$Database[1];
+
+				// Begin a MySQL Transaction to be either committed or rolled back
+				$objDatabase->TransactionBegin();
+				
+				$objCustomFieldArray = $this->objCompany->objCustomFieldArray;
+				$this->objCompany->Delete();
+
+				// Commit the transaction to the database
+				$objDatabase->TransactionCommit();
+				
+				// Custom Field Values for text fields must be manually deleted because MySQL ON DELETE will not cascade to them
+				// The values should not get deleted for select values
+				// CustomField::DeleteTextValues($objCustomFieldArray);
+				$this->RedirectToListPage();
 		}
 		catch (QDatabaseExceptionBase $objExc) {
+				
+			// Rollback the database transaction
+			$objDatabase->TransactionRollback();
+
 			if ($objExc->ErrorNumber == 1451) {
 				$this->btnDelete->Warning = 'This company cannot be deleted because it is associated with one or more shipments or receipts.';
-			}
-			else {
+			} else {
 				throw new QDatabaseExceptionBase();
 			}
 		}
