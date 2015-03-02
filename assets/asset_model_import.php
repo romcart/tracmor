@@ -802,18 +802,22 @@
                 }
 
 				// depreciation
-				if(QApplication::$TracmorSettings->DepreciationFlag == '1' && $this->intDepreciationKey != null){
+				if(QApplication::$TracmorSettings->DepreciationFlag == '1' && $this->intDepreciationKey != null) {
 				  $strKeyArray = array_keys($intDepreciationClassArray, strtolower(trim($strRowArray[$this->intDepreciationKey])));
 				  if (count($strKeyArray)) {
 					  $intDepreciationId = $strKeyArray[0];
-				  }
-				  else {
+				  } else {
 					  $strKeyArray = array_keys($intDepreciationClassArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intDepreciationKey]->Text)));
 					  if (count($strKeyArray)) {
 						  $intDepreciationId = $strKeyArray[0];
-					  }
-					  else {
-						  $intDepreciationId = false;
+					  } else {
+              if (trim($strRowArray[$this->intDepreciationKey]) == '') {
+						    // Depreciation class is blank, so null it out
+                $intDepreciationId = 'NULL';
+              } else {
+                // Depreciation class is invalid, so skip this record
+                $intDepreciationId = false;
+              }
 					  }
 				  }
 				}
@@ -822,13 +826,14 @@
 				}
 				//
                 $objAssetModel = false;
-                if (!$strShortDescription || $intCategoryId === false || $intManufacturerId === false) {
+                if (!$strShortDescription || $intCategoryId === false || $intManufacturerId === false || $intDepreciationId === false) {
                   //$blnError = true;
                   //echo sprintf("Desc: %s AssetCode: %s Cat: %s Man: %s<br/>", $strShortDescription, $strAssetModelCode, $intCategoryId, $intManufacturerId);
                   //break;
                   $strAssetModel =  null;
                   $this->intSkippedRecordCount++;
                   $this->PutSkippedRecordInFile($file_skipped, $strRowArray);
+                  continue;
                 }
                 else {
                   //$blnError = false;
@@ -923,7 +928,9 @@
                     $strUpdateFieldArray[] = sprintf("`category_id`='%s'", $intCategoryId);
                     $strUpdateFieldArray[] = sprintf("`short_description`='%s'", $strShortDescription);
                     $strUpdateFieldArray[] = sprintf("`asset_model_code`='%s'", $strAssetModelCode);
-					//$strUpdateFieldArray[] = sprintf("`depreciation_class_id = %s`", $intDepreciationId);
+					          
+                    if (QApplication::$TracmorSettings->DepreciationFlag == '1' && $this->intDepreciationKey != null && $intDepreciationId != null)
+                      $strUpdateFieldArray[] = sprintf("`depreciation_class_id` = %s", $intDepreciationId);
                     $strModelLongDescription = "";
                     if (isset($intModelLongDescription)) {
                       if (trim($strRowArray[$intModelLongDescriptionKey]))
