@@ -93,11 +93,11 @@
 		protected $intAssetCount;
 
 		// Depreciation variables
-		protected $intDepreciationClassKey;
+		//protected $intDepreciationClassKey;
 		protected $intPurchaseDateKey;
 		protected $intPurchaseCostKey;
 		protected $intDepreciationFlagKey;
-		protected $intDepreciationClassArray = array();
+		//protected $intDepreciationClassArray = array();
 
 		protected function Form_Create() {
 			if (QApplication::QueryString('intDownloadCsv')) {
@@ -666,7 +666,7 @@
 									$arrAssetCustomField[substr($value, 6)] = $this->arrAssetCustomField[substr($value, 6)];
 								}
 							} elseif (QApplication::$TracmorSettings->DepreciationFlag == '1' && $value == "depreciate asset") {
-								$this->intDepreciationClassKey = $key;
+								$this->intDepreciationFlagKey = $key;
 							} elseif (QApplication::$TracmorSettings->DepreciationFlag == '1'&& $value == "purchase cost") {
 								$this->intPurchaseCostKey = $key;
 							} elseif (QApplication::$TracmorSettings->DepreciationFlag == '1'&& $value == "purchase date") {
@@ -691,11 +691,11 @@
 							$intLocationArray[$objLocation->LocationId] = strtolower($objLocation->ShortDescription);
 						}
 						// Depreciation
-						if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
+						/*if(QApplication::$TracmorSettings->DepreciationFlag == '1'){
 							foreach (DepreciationClass::LoadAll() as $objDepreciationClass){
 								$this->intDepreciationClassArray[$objDepreciationClass->DepreciationClassId] = strtolower($objDepreciationClass->ShortDescription);
 							}
-						}
+						}*/
 
 						$strAssetArray = array();
 						// Load all assets
@@ -812,47 +812,36 @@
 
 								// If depreciation is enabled within Application
 								// Any non-empty value sets to 1
-								// If this is checked and no depreciation class short description is not corresponding asset model default depreciation class, this will skip due to error
 								$blnDepreciationError = false;
 								$blnDepreciationFlag = null;
-								$intDepreciationClassId = null;
 								$intPurchaseCost = null;
 								$dttPurchaseDate = null;
-								if (QApplication::$TracmorSettings->DepreciationFlag == '1'	&& $this->intDepreciationClassKey) {
-									// print($this->intDepreciationClassKey)."__".$this->intPurchaseCostKey."__".$this->intPurchaseDateKey."__".strtolower(trim($strRowArray[$this->intDepreciationClassKey]))."<br />" ; if(!empty($strRowArray[$this->intDepreciationClassKey])){exit;}
-									$strKeyArray = array_keys($this->intDepreciationClassArray, strtolower(trim($strRowArray[$this->intDepreciationClassKey])));
-
-									if (count($strKeyArray)>0) {
-										$intDepreciationClassId = $strKeyArray[0];
-									} else {
-										$strKeyArray = array_keys($this->intDepreciationClassArray, strtolower(trim($this->txtMapDefaultValueArray[$this->intDepreciationClassKey]->Text)));
-										if (count($strKeyArray)) {
-											$intDepreciationClassId = $strKeyArray[0];
-										} else {
-											$intDepreciationClassId = false;
-										}
-									}
-
-									if ($intDepreciationClassId>0 && $intAssetModelId>0) {
-										if ($intDepreciationClassId != AssetModel::Load($intAssetModelId)->DepreciationClassId) {
-											$blnDepreciationError = true;
-										} elseif(isset($this->intPurchaseCostKey)&&isset($this->intPurchaseCostKey)) {
+								if (QApplication::$TracmorSettings->DepreciationFlag == '1'	&& $this->intDepreciationFlagKey && strlen(trim($strRowArray[$this->intDepreciationFlagKey]))) {
+									// Verify that the model has a depreciation class assigned
+									if ($intAssetModelId>0 && AssetModel::Load($intAssetModelId)->DepreciationClassId) {
+										// Verify that purchase date and purchase cost are set and valid
+										if(isset($this->intPurchaseCostKey)&&isset($this->intPurchaseDateKey)) {
 											// Check intVal for Purchase cost
 											$intPurchaseCost = (trim($strRowArray[$this->intPurchaseCostKey])) ? addslashes(trim($strRowArray[$this->intPurchaseCostKey])) : false;
 											if (!is_numeric($intPurchaseCost)) {
 												$blnDepreciationError = true;
 											}
-											$strPurchaseDate = (trim($strRowArray[$this->intPurchaseDateKey])) ? trim($strRowArray[$this->intPurchaseDateKey]) : false;
+											
+											$strPurchaseDate = (trim($strRowArray[$this->intPurchaseDateKey]));
+											$dttPurchaseDate = new DateTime();
+
 											// Check isDate for Purchase date
-											if (!($dttPurchaseDate = DateTime::createFromFormat('M d Y g:i A', $strPurchaseDate))) {
+											if (!strlen($strPurchaseDate) || !($dttPurchaseDate = $dttPurchaseDate->setTimestamp(strtotime($strPurchaseDate)))) {
 												$blnDepreciationError = true;
 											} else {
-										 		$dttPurchaseDate = $dttPurchaseDate->format('Y-m-d h:i:s');// print $intDepreciationClassId."__".$intPurchaseCost."__".$dttPurchaseDate; exit;
+										 		$dttPurchaseDate = $dttPurchaseDate->format('Y-m-d');
 											}
 											$blnDepreciationFlag = 1;
 										} else {
 											$blnDepreciationError = true;
 										}
+									} else {
+										$blnDepreciationError = true;
 									}
 								}
 	                			$objAsset = false;
@@ -928,7 +917,7 @@
 
 									if (!$blnCheckCFVError && !$blnAssetLimitError) {
 										$strAssetArray[] = stripslashes($strAssetCode);
-										$this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW(), %s, %s, '%s')",
+										$this->strAssetValuesArray[] = sprintf("('%s', '%s', '%s', %s, %s, '%s', NOW(), %s, %s, %s)",
 											$strAssetCode,
 											$intLocationId,
 											$intAssetModelId,
@@ -967,12 +956,12 @@
 									$strUpdateFieldArray[] = sprintf("`asset_code`='%s'", $strAssetCode);
 									$strUpdateFieldArray[] = sprintf("`asset_model_id`='%s'", $intAssetModelId);
 									$strUpdateFieldArray[] = sprintf("`parent_asset_id`=%s", QApplication::$Database[1]->SqlVariable($intParentAssetId));
-									$strUpdateFieldArray[] = sprintf("`linked_flag`='%s'", ($blnLinked) ? 1 : 0);
+									$strUpdateFieldArray[] = sprintf("`linked_flag`=b'%s'", ($blnLinked) ? 1 : 0);
 									$strUpdateFieldArray[] = sprintf("`modified_by`='%s'", $_SESSION['intUserAccountId']);
 									// Depreciation Fields
 									$strUpdateFieldArray[] = sprintf("`depreciation_flag`=%s", ($blnDepreciationFlag)?$blnDepreciationFlag:"NULL");
 									$strUpdateFieldArray[] = sprintf("`purchase_cost`=%s", ($intPurchaseCost)?$intPurchaseCost:"NULL");
-									$strUpdateFieldArray[] = sprintf("`purchase_date`=%s", ($dttPurchaseDate)?$dttPurchaseDate:"NULL");
+									$strUpdateFieldArray[] = sprintf("`purchase_date`=%s", ($dttPurchaseDate)?"'$dttPurchaseDate'":"NULL");
 
 									$blnCheckCFVError = false;
 									foreach ($arrAssetCustomField as $objCustomField) {
@@ -1246,7 +1235,7 @@
 			$lstMapHeader->AddItem("Locked To Parent", "Locked To Parent", ($strName == 'locked to parent') ? true : false, $strAssetGroup);
 			// Add Depreciation fields if enabled
 			if (QApplication::$TracmorSettings->DepreciationFlag == '1') {
-				$lstMapHeader->AddItem("Depreciate Asset", "Depreciate Asset", ($strName == "depreciation class")? true:false,$strAssetGroup);
+				$lstMapHeader->AddItem("Depreciate Asset", "Depreciate Asset", ($strName == "depreciate asset")? true:false,$strAssetGroup);
 				$lstMapHeader->AddItem("Purchase Date", "Purchase Date", ($strName == "purchase date")? true:false,$strAssetGroup);
 				$lstMapHeader->AddItem("Purchase Cost", "Purchase Cost", ($strName == "purchase cost")? true:false,$strAssetGroup);
 			}
