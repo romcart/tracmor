@@ -152,7 +152,7 @@
 			}
 
 			// Enforce positive integer for Life
-			if (!preg_match("/^\d+$/", $this->txtLife->Text)) {
+			if (!preg_match("/^[1-9][0-9]*$/", $this->txtLife->Text)) {
 				$this->btnCancel->Warning = 'Life must be a positive whole number';
 				$blnError = true;
 			}
