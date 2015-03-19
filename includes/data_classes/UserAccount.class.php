@@ -62,6 +62,11 @@
 			else {
 				$this->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
 			}
+
+			if ($this->OwnerFlag == null) {
+				$this->OwnerFlag = '0';
+			}
+
 			parent::Save($blnForceInsert, $blnForceUpdate);
 		}
 		

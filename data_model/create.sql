@@ -199,6 +199,7 @@ CREATE TABLE user_account (
   email_address        VARCHAR(50)   NULL,
   active_flag          BIT   NOT NULL   COMMENT 'User account enabled/disabled',
   admin_flag           BIT   NOT NULL   COMMENT 'Designates user as normal or administrator',
+  owner_flag           BIT   NOT NULL  DEFAULT 0,
   portable_access_flag BIT   NULL,
   portable_user_pin    INT(10)   NULL,
   role_id              INTEGER UNSIGNED   NOT NULL,
