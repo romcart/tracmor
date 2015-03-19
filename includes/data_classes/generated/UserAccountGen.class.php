@@ -23,6 +23,7 @@
 	 * @property string $EmailAddress the value for strEmailAddress 
 	 * @property boolean $ActiveFlag the value for blnActiveFlag (Not Null)
 	 * @property boolean $AdminFlag the value for blnAdminFlag (Not Null)
+	 * @property boolean $OwnerFlag the value for blnOwnerFlag (Not Null)
 	 * @property boolean $PortableAccessFlag the value for blnPortableAccessFlag 
 	 * @property integer $PortableUserPin the value for intPortableUserPin 
 	 * @property integer $RoleId the value for intRoleId (Not Null)
@@ -33,18 +34,18 @@
 	 * @property Role $Role the value for the Role object referenced by intRoleId (Not Null)
 	 * @property UserAccount $CreatedByObject the value for the UserAccount object referenced by intCreatedBy 
 	 * @property UserAccount $ModifiedByObject the value for the UserAccount object referenced by intModifiedBy 
-	 * @property Address $_AddressAsCreatedBy the value for the private _objAddressAsCreatedBy (Read-Only) if set due to an expansion on the address.created_by reverse relationship
-	 * @property Address[] $_AddressAsCreatedByArray the value for the private _objAddressAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the address.created_by reverse relationship
 	 * @property Address $_AddressAsModifiedBy the value for the private _objAddressAsModifiedBy (Read-Only) if set due to an expansion on the address.modified_by reverse relationship
 	 * @property Address[] $_AddressAsModifiedByArray the value for the private _objAddressAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the address.modified_by reverse relationship
-	 * @property Asset $_AssetAsModifiedBy the value for the private _objAssetAsModifiedBy (Read-Only) if set due to an expansion on the asset.modified_by reverse relationship
-	 * @property Asset[] $_AssetAsModifiedByArray the value for the private _objAssetAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the asset.modified_by reverse relationship
+	 * @property Address $_AddressAsCreatedBy the value for the private _objAddressAsCreatedBy (Read-Only) if set due to an expansion on the address.created_by reverse relationship
+	 * @property Address[] $_AddressAsCreatedByArray the value for the private _objAddressAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the address.created_by reverse relationship
 	 * @property Asset $_AssetAsCreatedBy the value for the private _objAssetAsCreatedBy (Read-Only) if set due to an expansion on the asset.created_by reverse relationship
 	 * @property Asset[] $_AssetAsCreatedByArray the value for the private _objAssetAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the asset.created_by reverse relationship
-	 * @property AssetModel $_AssetModelAsModifiedBy the value for the private _objAssetModelAsModifiedBy (Read-Only) if set due to an expansion on the asset_model.modified_by reverse relationship
-	 * @property AssetModel[] $_AssetModelAsModifiedByArray the value for the private _objAssetModelAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the asset_model.modified_by reverse relationship
+	 * @property Asset $_AssetAsModifiedBy the value for the private _objAssetAsModifiedBy (Read-Only) if set due to an expansion on the asset.modified_by reverse relationship
+	 * @property Asset[] $_AssetAsModifiedByArray the value for the private _objAssetAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the asset.modified_by reverse relationship
 	 * @property AssetModel $_AssetModelAsCreatedBy the value for the private _objAssetModelAsCreatedBy (Read-Only) if set due to an expansion on the asset_model.created_by reverse relationship
 	 * @property AssetModel[] $_AssetModelAsCreatedByArray the value for the private _objAssetModelAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the asset_model.created_by reverse relationship
+	 * @property AssetModel $_AssetModelAsModifiedBy the value for the private _objAssetModelAsModifiedBy (Read-Only) if set due to an expansion on the asset_model.modified_by reverse relationship
+	 * @property AssetModel[] $_AssetModelAsModifiedByArray the value for the private _objAssetModelAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the asset_model.modified_by reverse relationship
 	 * @property AssetTransaction $_AssetTransactionAsCreatedBy the value for the private _objAssetTransactionAsCreatedBy (Read-Only) if set due to an expansion on the asset_transaction.created_by reverse relationship
 	 * @property AssetTransaction[] $_AssetTransactionAsCreatedByArray the value for the private _objAssetTransactionAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the asset_transaction.created_by reverse relationship
 	 * @property AssetTransaction $_AssetTransactionAsModifiedBy the value for the private _objAssetTransactionAsModifiedBy (Read-Only) if set due to an expansion on the asset_transaction.modified_by reverse relationship
@@ -57,18 +58,18 @@
 	 * @property AssetTransactionCheckout[] $_AssetTransactionCheckoutAsModifiedByArray the value for the private _objAssetTransactionCheckoutAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the asset_transaction_checkout.modified_by reverse relationship
 	 * @property Attachment $_AttachmentAsCreatedBy the value for the private _objAttachmentAsCreatedBy (Read-Only) if set due to an expansion on the attachment.created_by reverse relationship
 	 * @property Attachment[] $_AttachmentAsCreatedByArray the value for the private _objAttachmentAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the attachment.created_by reverse relationship
-	 * @property Audit $_AuditAsModifiedBy the value for the private _objAuditAsModifiedBy (Read-Only) if set due to an expansion on the audit.modified_by reverse relationship
-	 * @property Audit[] $_AuditAsModifiedByArray the value for the private _objAuditAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the audit.modified_by reverse relationship
 	 * @property Audit $_AuditAsCreatedBy the value for the private _objAuditAsCreatedBy (Read-Only) if set due to an expansion on the audit.created_by reverse relationship
 	 * @property Audit[] $_AuditAsCreatedByArray the value for the private _objAuditAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the audit.created_by reverse relationship
-	 * @property Category $_CategoryAsModifiedBy the value for the private _objCategoryAsModifiedBy (Read-Only) if set due to an expansion on the category.modified_by reverse relationship
-	 * @property Category[] $_CategoryAsModifiedByArray the value for the private _objCategoryAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the category.modified_by reverse relationship
+	 * @property Audit $_AuditAsModifiedBy the value for the private _objAuditAsModifiedBy (Read-Only) if set due to an expansion on the audit.modified_by reverse relationship
+	 * @property Audit[] $_AuditAsModifiedByArray the value for the private _objAuditAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the audit.modified_by reverse relationship
 	 * @property Category $_CategoryAsCreatedBy the value for the private _objCategoryAsCreatedBy (Read-Only) if set due to an expansion on the category.created_by reverse relationship
 	 * @property Category[] $_CategoryAsCreatedByArray the value for the private _objCategoryAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the category.created_by reverse relationship
-	 * @property Company $_CompanyAsModifiedBy the value for the private _objCompanyAsModifiedBy (Read-Only) if set due to an expansion on the company.modified_by reverse relationship
-	 * @property Company[] $_CompanyAsModifiedByArray the value for the private _objCompanyAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the company.modified_by reverse relationship
+	 * @property Category $_CategoryAsModifiedBy the value for the private _objCategoryAsModifiedBy (Read-Only) if set due to an expansion on the category.modified_by reverse relationship
+	 * @property Category[] $_CategoryAsModifiedByArray the value for the private _objCategoryAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the category.modified_by reverse relationship
 	 * @property Company $_CompanyAsCreatedBy the value for the private _objCompanyAsCreatedBy (Read-Only) if set due to an expansion on the company.created_by reverse relationship
 	 * @property Company[] $_CompanyAsCreatedByArray the value for the private _objCompanyAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the company.created_by reverse relationship
+	 * @property Company $_CompanyAsModifiedBy the value for the private _objCompanyAsModifiedBy (Read-Only) if set due to an expansion on the company.modified_by reverse relationship
+	 * @property Company[] $_CompanyAsModifiedByArray the value for the private _objCompanyAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the company.modified_by reverse relationship
 	 * @property Contact $_ContactAsModifiedBy the value for the private _objContactAsModifiedBy (Read-Only) if set due to an expansion on the contact.modified_by reverse relationship
 	 * @property Contact[] $_ContactAsModifiedByArray the value for the private _objContactAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the contact.modified_by reverse relationship
 	 * @property Contact $_ContactAsCreatedBy the value for the private _objContactAsCreatedBy (Read-Only) if set due to an expansion on the contact.created_by reverse relationship
@@ -83,56 +84,56 @@
 	 * @property CustomFieldValue[] $_CustomFieldValueAsModifiedByArray the value for the private _objCustomFieldValueAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the custom_field_value.modified_by reverse relationship
 	 * @property DatagridColumnPreference $_DatagridColumnPreference the value for the private _objDatagridColumnPreference (Read-Only) if set due to an expansion on the datagrid_column_preference.user_account_id reverse relationship
 	 * @property DatagridColumnPreference[] $_DatagridColumnPreferenceArray the value for the private _objDatagridColumnPreferenceArray (Read-Only) if set due to an ExpandAsArray on the datagrid_column_preference.user_account_id reverse relationship
-	 * @property InventoryLocation $_InventoryLocationAsCreatedBy the value for the private _objInventoryLocationAsCreatedBy (Read-Only) if set due to an expansion on the inventory_location.created_by reverse relationship
-	 * @property InventoryLocation[] $_InventoryLocationAsCreatedByArray the value for the private _objInventoryLocationAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_location.created_by reverse relationship
 	 * @property InventoryLocation $_InventoryLocationAsModifiedBy the value for the private _objInventoryLocationAsModifiedBy (Read-Only) if set due to an expansion on the inventory_location.modified_by reverse relationship
 	 * @property InventoryLocation[] $_InventoryLocationAsModifiedByArray the value for the private _objInventoryLocationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_location.modified_by reverse relationship
-	 * @property InventoryModel $_InventoryModelAsModifiedBy the value for the private _objInventoryModelAsModifiedBy (Read-Only) if set due to an expansion on the inventory_model.modified_by reverse relationship
-	 * @property InventoryModel[] $_InventoryModelAsModifiedByArray the value for the private _objInventoryModelAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_model.modified_by reverse relationship
+	 * @property InventoryLocation $_InventoryLocationAsCreatedBy the value for the private _objInventoryLocationAsCreatedBy (Read-Only) if set due to an expansion on the inventory_location.created_by reverse relationship
+	 * @property InventoryLocation[] $_InventoryLocationAsCreatedByArray the value for the private _objInventoryLocationAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_location.created_by reverse relationship
 	 * @property InventoryModel $_InventoryModelAsCreatedBy the value for the private _objInventoryModelAsCreatedBy (Read-Only) if set due to an expansion on the inventory_model.created_by reverse relationship
 	 * @property InventoryModel[] $_InventoryModelAsCreatedByArray the value for the private _objInventoryModelAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_model.created_by reverse relationship
-	 * @property InventoryTransaction $_InventoryTransactionAsModifiedBy the value for the private _objInventoryTransactionAsModifiedBy (Read-Only) if set due to an expansion on the inventory_transaction.modified_by reverse relationship
-	 * @property InventoryTransaction[] $_InventoryTransactionAsModifiedByArray the value for the private _objInventoryTransactionAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_transaction.modified_by reverse relationship
+	 * @property InventoryModel $_InventoryModelAsModifiedBy the value for the private _objInventoryModelAsModifiedBy (Read-Only) if set due to an expansion on the inventory_model.modified_by reverse relationship
+	 * @property InventoryModel[] $_InventoryModelAsModifiedByArray the value for the private _objInventoryModelAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_model.modified_by reverse relationship
 	 * @property InventoryTransaction $_InventoryTransactionAsCreatedBy the value for the private _objInventoryTransactionAsCreatedBy (Read-Only) if set due to an expansion on the inventory_transaction.created_by reverse relationship
 	 * @property InventoryTransaction[] $_InventoryTransactionAsCreatedByArray the value for the private _objInventoryTransactionAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_transaction.created_by reverse relationship
-	 * @property Location $_LocationAsModifiedBy the value for the private _objLocationAsModifiedBy (Read-Only) if set due to an expansion on the location.modified_by reverse relationship
-	 * @property Location[] $_LocationAsModifiedByArray the value for the private _objLocationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the location.modified_by reverse relationship
+	 * @property InventoryTransaction $_InventoryTransactionAsModifiedBy the value for the private _objInventoryTransactionAsModifiedBy (Read-Only) if set due to an expansion on the inventory_transaction.modified_by reverse relationship
+	 * @property InventoryTransaction[] $_InventoryTransactionAsModifiedByArray the value for the private _objInventoryTransactionAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the inventory_transaction.modified_by reverse relationship
 	 * @property Location $_LocationAsCreatedBy the value for the private _objLocationAsCreatedBy (Read-Only) if set due to an expansion on the location.created_by reverse relationship
 	 * @property Location[] $_LocationAsCreatedByArray the value for the private _objLocationAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the location.created_by reverse relationship
-	 * @property Manufacturer $_ManufacturerAsModifiedBy the value for the private _objManufacturerAsModifiedBy (Read-Only) if set due to an expansion on the manufacturer.modified_by reverse relationship
-	 * @property Manufacturer[] $_ManufacturerAsModifiedByArray the value for the private _objManufacturerAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the manufacturer.modified_by reverse relationship
+	 * @property Location $_LocationAsModifiedBy the value for the private _objLocationAsModifiedBy (Read-Only) if set due to an expansion on the location.modified_by reverse relationship
+	 * @property Location[] $_LocationAsModifiedByArray the value for the private _objLocationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the location.modified_by reverse relationship
 	 * @property Manufacturer $_ManufacturerAsCreatedBy the value for the private _objManufacturerAsCreatedBy (Read-Only) if set due to an expansion on the manufacturer.created_by reverse relationship
 	 * @property Manufacturer[] $_ManufacturerAsCreatedByArray the value for the private _objManufacturerAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the manufacturer.created_by reverse relationship
-	 * @property Notification $_NotificationAsModifiedBy the value for the private _objNotificationAsModifiedBy (Read-Only) if set due to an expansion on the notification.modified_by reverse relationship
-	 * @property Notification[] $_NotificationAsModifiedByArray the value for the private _objNotificationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the notification.modified_by reverse relationship
+	 * @property Manufacturer $_ManufacturerAsModifiedBy the value for the private _objManufacturerAsModifiedBy (Read-Only) if set due to an expansion on the manufacturer.modified_by reverse relationship
+	 * @property Manufacturer[] $_ManufacturerAsModifiedByArray the value for the private _objManufacturerAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the manufacturer.modified_by reverse relationship
 	 * @property Notification $_NotificationAsCreatedBy the value for the private _objNotificationAsCreatedBy (Read-Only) if set due to an expansion on the notification.created_by reverse relationship
 	 * @property Notification[] $_NotificationAsCreatedByArray the value for the private _objNotificationAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the notification.created_by reverse relationship
+	 * @property Notification $_NotificationAsModifiedBy the value for the private _objNotificationAsModifiedBy (Read-Only) if set due to an expansion on the notification.modified_by reverse relationship
+	 * @property Notification[] $_NotificationAsModifiedByArray the value for the private _objNotificationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the notification.modified_by reverse relationship
 	 * @property NotificationUserAccount $_NotificationUserAccount the value for the private _objNotificationUserAccount (Read-Only) if set due to an expansion on the notification_user_account.user_account_id reverse relationship
 	 * @property NotificationUserAccount[] $_NotificationUserAccountArray the value for the private _objNotificationUserAccountArray (Read-Only) if set due to an ExpandAsArray on the notification_user_account.user_account_id reverse relationship
 	 * @property Receipt $_ReceiptAsCreatedBy the value for the private _objReceiptAsCreatedBy (Read-Only) if set due to an expansion on the receipt.created_by reverse relationship
 	 * @property Receipt[] $_ReceiptAsCreatedByArray the value for the private _objReceiptAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the receipt.created_by reverse relationship
 	 * @property Receipt $_ReceiptAsModifiedBy the value for the private _objReceiptAsModifiedBy (Read-Only) if set due to an expansion on the receipt.modified_by reverse relationship
 	 * @property Receipt[] $_ReceiptAsModifiedByArray the value for the private _objReceiptAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the receipt.modified_by reverse relationship
-	 * @property Role $_RoleAsModifiedBy the value for the private _objRoleAsModifiedBy (Read-Only) if set due to an expansion on the role.modified_by reverse relationship
-	 * @property Role[] $_RoleAsModifiedByArray the value for the private _objRoleAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role.modified_by reverse relationship
 	 * @property Role $_RoleAsCreatedBy the value for the private _objRoleAsCreatedBy (Read-Only) if set due to an expansion on the role.created_by reverse relationship
 	 * @property Role[] $_RoleAsCreatedByArray the value for the private _objRoleAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the role.created_by reverse relationship
-	 * @property RoleEntityQtypeBuiltInAuthorization $_RoleEntityQtypeBuiltInAuthorizationAsModifiedBy the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy (Read-Only) if set due to an expansion on the role_entity_qtype_built_in_authorization.modified_by reverse relationship
-	 * @property RoleEntityQtypeBuiltInAuthorization[] $_RoleEntityQtypeBuiltInAuthorizationAsModifiedByArray the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role_entity_qtype_built_in_authorization.modified_by reverse relationship
+	 * @property Role $_RoleAsModifiedBy the value for the private _objRoleAsModifiedBy (Read-Only) if set due to an expansion on the role.modified_by reverse relationship
+	 * @property Role[] $_RoleAsModifiedByArray the value for the private _objRoleAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role.modified_by reverse relationship
 	 * @property RoleEntityQtypeBuiltInAuthorization $_RoleEntityQtypeBuiltInAuthorizationAsCreatedBy the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsCreatedBy (Read-Only) if set due to an expansion on the role_entity_qtype_built_in_authorization.created_by reverse relationship
 	 * @property RoleEntityQtypeBuiltInAuthorization[] $_RoleEntityQtypeBuiltInAuthorizationAsCreatedByArray the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the role_entity_qtype_built_in_authorization.created_by reverse relationship
-	 * @property RoleEntityQtypeCustomFieldAuthorization $_RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy (Read-Only) if set due to an expansion on the role_entity_qtype_custom_field_authorization.modified_by reverse relationship
-	 * @property RoleEntityQtypeCustomFieldAuthorization[] $_RoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role_entity_qtype_custom_field_authorization.modified_by reverse relationship
+	 * @property RoleEntityQtypeBuiltInAuthorization $_RoleEntityQtypeBuiltInAuthorizationAsModifiedBy the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy (Read-Only) if set due to an expansion on the role_entity_qtype_built_in_authorization.modified_by reverse relationship
+	 * @property RoleEntityQtypeBuiltInAuthorization[] $_RoleEntityQtypeBuiltInAuthorizationAsModifiedByArray the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role_entity_qtype_built_in_authorization.modified_by reverse relationship
 	 * @property RoleEntityQtypeCustomFieldAuthorization $_RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsCreatedBy (Read-Only) if set due to an expansion on the role_entity_qtype_custom_field_authorization.created_by reverse relationship
 	 * @property RoleEntityQtypeCustomFieldAuthorization[] $_RoleEntityQtypeCustomFieldAuthorizationAsCreatedByArray the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the role_entity_qtype_custom_field_authorization.created_by reverse relationship
-	 * @property RoleModule $_RoleModuleAsModifiedBy the value for the private _objRoleModuleAsModifiedBy (Read-Only) if set due to an expansion on the role_module.modified_by reverse relationship
-	 * @property RoleModule[] $_RoleModuleAsModifiedByArray the value for the private _objRoleModuleAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role_module.modified_by reverse relationship
+	 * @property RoleEntityQtypeCustomFieldAuthorization $_RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy (Read-Only) if set due to an expansion on the role_entity_qtype_custom_field_authorization.modified_by reverse relationship
+	 * @property RoleEntityQtypeCustomFieldAuthorization[] $_RoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role_entity_qtype_custom_field_authorization.modified_by reverse relationship
 	 * @property RoleModule $_RoleModuleAsCreatedBy the value for the private _objRoleModuleAsCreatedBy (Read-Only) if set due to an expansion on the role_module.created_by reverse relationship
 	 * @property RoleModule[] $_RoleModuleAsCreatedByArray the value for the private _objRoleModuleAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the role_module.created_by reverse relationship
-	 * @property RoleModuleAuthorization $_RoleModuleAuthorizationAsModifiedBy the value for the private _objRoleModuleAuthorizationAsModifiedBy (Read-Only) if set due to an expansion on the role_module_authorization.modified_by reverse relationship
-	 * @property RoleModuleAuthorization[] $_RoleModuleAuthorizationAsModifiedByArray the value for the private _objRoleModuleAuthorizationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role_module_authorization.modified_by reverse relationship
+	 * @property RoleModule $_RoleModuleAsModifiedBy the value for the private _objRoleModuleAsModifiedBy (Read-Only) if set due to an expansion on the role_module.modified_by reverse relationship
+	 * @property RoleModule[] $_RoleModuleAsModifiedByArray the value for the private _objRoleModuleAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role_module.modified_by reverse relationship
 	 * @property RoleModuleAuthorization $_RoleModuleAuthorizationAsCreatedBy the value for the private _objRoleModuleAuthorizationAsCreatedBy (Read-Only) if set due to an expansion on the role_module_authorization.created_by reverse relationship
 	 * @property RoleModuleAuthorization[] $_RoleModuleAuthorizationAsCreatedByArray the value for the private _objRoleModuleAuthorizationAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the role_module_authorization.created_by reverse relationship
+	 * @property RoleModuleAuthorization $_RoleModuleAuthorizationAsModifiedBy the value for the private _objRoleModuleAuthorizationAsModifiedBy (Read-Only) if set due to an expansion on the role_module_authorization.modified_by reverse relationship
+	 * @property RoleModuleAuthorization[] $_RoleModuleAuthorizationAsModifiedByArray the value for the private _objRoleModuleAuthorizationAsModifiedByArray (Read-Only) if set due to an ExpandAsArray on the role_module_authorization.modified_by reverse relationship
 	 * @property RoleTransactionTypeAuthorization $_RoleTransactionTypeAuthorizationAsCreatedBy the value for the private _objRoleTransactionTypeAuthorizationAsCreatedBy (Read-Only) if set due to an expansion on the role_transaction_type_authorization.created_by reverse relationship
 	 * @property RoleTransactionTypeAuthorization[] $_RoleTransactionTypeAuthorizationAsCreatedByArray the value for the private _objRoleTransactionTypeAuthorizationAsCreatedByArray (Read-Only) if set due to an ExpandAsArray on the role_transaction_type_authorization.created_by reverse relationship
 	 * @property RoleTransactionTypeAuthorization $_RoleTransactionTypeAuthorizationAsModifiedBy the value for the private _objRoleTransactionTypeAuthorizationAsModifiedBy (Read-Only) if set due to an expansion on the role_transaction_type_authorization.modified_by reverse relationship
@@ -227,6 +228,14 @@
 
 
 		/**
+		 * Protected member variable that maps to the database column user_account.owner_flag
+		 * @var boolean blnOwnerFlag
+		 */
+		protected $blnOwnerFlag;
+		const OwnerFlagDefault = null;
+
+
+		/**
 		 * Protected member variable that maps to the database column user_account.portable_access_flag
 		 * @var boolean blnPortableAccessFlag
 		 */
@@ -283,22 +292,6 @@
 
 
 		/**
-		 * Private member variable that stores a reference to a single AddressAsCreatedBy object
-		 * (of type Address), if this UserAccount object was restored with
-		 * an expansion on the address association table.
-		 * @var Address _objAddressAsCreatedBy;
-		 */
-		private $_objAddressAsCreatedBy;
-
-		/**
-		 * Private member variable that stores a reference to an array of AddressAsCreatedBy objects
-		 * (of type Address[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the address association table.
-		 * @var Address[] _objAddressAsCreatedByArray;
-		 */
-		private $_objAddressAsCreatedByArray = array();
-
-		/**
 		 * Private member variable that stores a reference to a single AddressAsModifiedBy object
 		 * (of type Address), if this UserAccount object was restored with
 		 * an expansion on the address association table.
@@ -315,20 +308,20 @@
 		private $_objAddressAsModifiedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single AssetAsModifiedBy object
-		 * (of type Asset), if this UserAccount object was restored with
-		 * an expansion on the asset association table.
-		 * @var Asset _objAssetAsModifiedBy;
+		 * Private member variable that stores a reference to a single AddressAsCreatedBy object
+		 * (of type Address), if this UserAccount object was restored with
+		 * an expansion on the address association table.
+		 * @var Address _objAddressAsCreatedBy;
 		 */
-		private $_objAssetAsModifiedBy;
+		private $_objAddressAsCreatedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of AssetAsModifiedBy objects
-		 * (of type Asset[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the asset association table.
-		 * @var Asset[] _objAssetAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of AddressAsCreatedBy objects
+		 * (of type Address[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the address association table.
+		 * @var Address[] _objAddressAsCreatedByArray;
 		 */
-		private $_objAssetAsModifiedByArray = array();
+		private $_objAddressAsCreatedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single AssetAsCreatedBy object
@@ -347,20 +340,20 @@
 		private $_objAssetAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single AssetModelAsModifiedBy object
-		 * (of type AssetModel), if this UserAccount object was restored with
-		 * an expansion on the asset_model association table.
-		 * @var AssetModel _objAssetModelAsModifiedBy;
+		 * Private member variable that stores a reference to a single AssetAsModifiedBy object
+		 * (of type Asset), if this UserAccount object was restored with
+		 * an expansion on the asset association table.
+		 * @var Asset _objAssetAsModifiedBy;
 		 */
-		private $_objAssetModelAsModifiedBy;
+		private $_objAssetAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of AssetModelAsModifiedBy objects
-		 * (of type AssetModel[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the asset_model association table.
-		 * @var AssetModel[] _objAssetModelAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of AssetAsModifiedBy objects
+		 * (of type Asset[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the asset association table.
+		 * @var Asset[] _objAssetAsModifiedByArray;
 		 */
-		private $_objAssetModelAsModifiedByArray = array();
+		private $_objAssetAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single AssetModelAsCreatedBy object
@@ -377,6 +370,22 @@
 		 * @var AssetModel[] _objAssetModelAsCreatedByArray;
 		 */
 		private $_objAssetModelAsCreatedByArray = array();
+
+		/**
+		 * Private member variable that stores a reference to a single AssetModelAsModifiedBy object
+		 * (of type AssetModel), if this UserAccount object was restored with
+		 * an expansion on the asset_model association table.
+		 * @var AssetModel _objAssetModelAsModifiedBy;
+		 */
+		private $_objAssetModelAsModifiedBy;
+
+		/**
+		 * Private member variable that stores a reference to an array of AssetModelAsModifiedBy objects
+		 * (of type AssetModel[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the asset_model association table.
+		 * @var AssetModel[] _objAssetModelAsModifiedByArray;
+		 */
+		private $_objAssetModelAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single AssetTransactionAsCreatedBy object
@@ -475,22 +484,6 @@
 		private $_objAttachmentAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single AuditAsModifiedBy object
-		 * (of type Audit), if this UserAccount object was restored with
-		 * an expansion on the audit association table.
-		 * @var Audit _objAuditAsModifiedBy;
-		 */
-		private $_objAuditAsModifiedBy;
-
-		/**
-		 * Private member variable that stores a reference to an array of AuditAsModifiedBy objects
-		 * (of type Audit[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the audit association table.
-		 * @var Audit[] _objAuditAsModifiedByArray;
-		 */
-		private $_objAuditAsModifiedByArray = array();
-
-		/**
 		 * Private member variable that stores a reference to a single AuditAsCreatedBy object
 		 * (of type Audit), if this UserAccount object was restored with
 		 * an expansion on the audit association table.
@@ -507,20 +500,20 @@
 		private $_objAuditAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single CategoryAsModifiedBy object
-		 * (of type Category), if this UserAccount object was restored with
-		 * an expansion on the category association table.
-		 * @var Category _objCategoryAsModifiedBy;
+		 * Private member variable that stores a reference to a single AuditAsModifiedBy object
+		 * (of type Audit), if this UserAccount object was restored with
+		 * an expansion on the audit association table.
+		 * @var Audit _objAuditAsModifiedBy;
 		 */
-		private $_objCategoryAsModifiedBy;
+		private $_objAuditAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of CategoryAsModifiedBy objects
-		 * (of type Category[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the category association table.
-		 * @var Category[] _objCategoryAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of AuditAsModifiedBy objects
+		 * (of type Audit[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the audit association table.
+		 * @var Audit[] _objAuditAsModifiedByArray;
 		 */
-		private $_objCategoryAsModifiedByArray = array();
+		private $_objAuditAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single CategoryAsCreatedBy object
@@ -539,20 +532,20 @@
 		private $_objCategoryAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single CompanyAsModifiedBy object
-		 * (of type Company), if this UserAccount object was restored with
-		 * an expansion on the company association table.
-		 * @var Company _objCompanyAsModifiedBy;
+		 * Private member variable that stores a reference to a single CategoryAsModifiedBy object
+		 * (of type Category), if this UserAccount object was restored with
+		 * an expansion on the category association table.
+		 * @var Category _objCategoryAsModifiedBy;
 		 */
-		private $_objCompanyAsModifiedBy;
+		private $_objCategoryAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of CompanyAsModifiedBy objects
-		 * (of type Company[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the company association table.
-		 * @var Company[] _objCompanyAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of CategoryAsModifiedBy objects
+		 * (of type Category[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the category association table.
+		 * @var Category[] _objCategoryAsModifiedByArray;
 		 */
-		private $_objCompanyAsModifiedByArray = array();
+		private $_objCategoryAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single CompanyAsCreatedBy object
@@ -569,6 +562,22 @@
 		 * @var Company[] _objCompanyAsCreatedByArray;
 		 */
 		private $_objCompanyAsCreatedByArray = array();
+
+		/**
+		 * Private member variable that stores a reference to a single CompanyAsModifiedBy object
+		 * (of type Company), if this UserAccount object was restored with
+		 * an expansion on the company association table.
+		 * @var Company _objCompanyAsModifiedBy;
+		 */
+		private $_objCompanyAsModifiedBy;
+
+		/**
+		 * Private member variable that stores a reference to an array of CompanyAsModifiedBy objects
+		 * (of type Company[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the company association table.
+		 * @var Company[] _objCompanyAsModifiedByArray;
+		 */
+		private $_objCompanyAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single ContactAsModifiedBy object
@@ -683,22 +692,6 @@
 		private $_objDatagridColumnPreferenceArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single InventoryLocationAsCreatedBy object
-		 * (of type InventoryLocation), if this UserAccount object was restored with
-		 * an expansion on the inventory_location association table.
-		 * @var InventoryLocation _objInventoryLocationAsCreatedBy;
-		 */
-		private $_objInventoryLocationAsCreatedBy;
-
-		/**
-		 * Private member variable that stores a reference to an array of InventoryLocationAsCreatedBy objects
-		 * (of type InventoryLocation[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the inventory_location association table.
-		 * @var InventoryLocation[] _objInventoryLocationAsCreatedByArray;
-		 */
-		private $_objInventoryLocationAsCreatedByArray = array();
-
-		/**
 		 * Private member variable that stores a reference to a single InventoryLocationAsModifiedBy object
 		 * (of type InventoryLocation), if this UserAccount object was restored with
 		 * an expansion on the inventory_location association table.
@@ -715,20 +708,20 @@
 		private $_objInventoryLocationAsModifiedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single InventoryModelAsModifiedBy object
-		 * (of type InventoryModel), if this UserAccount object was restored with
-		 * an expansion on the inventory_model association table.
-		 * @var InventoryModel _objInventoryModelAsModifiedBy;
+		 * Private member variable that stores a reference to a single InventoryLocationAsCreatedBy object
+		 * (of type InventoryLocation), if this UserAccount object was restored with
+		 * an expansion on the inventory_location association table.
+		 * @var InventoryLocation _objInventoryLocationAsCreatedBy;
 		 */
-		private $_objInventoryModelAsModifiedBy;
+		private $_objInventoryLocationAsCreatedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of InventoryModelAsModifiedBy objects
-		 * (of type InventoryModel[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the inventory_model association table.
-		 * @var InventoryModel[] _objInventoryModelAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of InventoryLocationAsCreatedBy objects
+		 * (of type InventoryLocation[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the inventory_location association table.
+		 * @var InventoryLocation[] _objInventoryLocationAsCreatedByArray;
 		 */
-		private $_objInventoryModelAsModifiedByArray = array();
+		private $_objInventoryLocationAsCreatedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single InventoryModelAsCreatedBy object
@@ -747,20 +740,20 @@
 		private $_objInventoryModelAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single InventoryTransactionAsModifiedBy object
-		 * (of type InventoryTransaction), if this UserAccount object was restored with
-		 * an expansion on the inventory_transaction association table.
-		 * @var InventoryTransaction _objInventoryTransactionAsModifiedBy;
+		 * Private member variable that stores a reference to a single InventoryModelAsModifiedBy object
+		 * (of type InventoryModel), if this UserAccount object was restored with
+		 * an expansion on the inventory_model association table.
+		 * @var InventoryModel _objInventoryModelAsModifiedBy;
 		 */
-		private $_objInventoryTransactionAsModifiedBy;
+		private $_objInventoryModelAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of InventoryTransactionAsModifiedBy objects
-		 * (of type InventoryTransaction[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the inventory_transaction association table.
-		 * @var InventoryTransaction[] _objInventoryTransactionAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of InventoryModelAsModifiedBy objects
+		 * (of type InventoryModel[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the inventory_model association table.
+		 * @var InventoryModel[] _objInventoryModelAsModifiedByArray;
 		 */
-		private $_objInventoryTransactionAsModifiedByArray = array();
+		private $_objInventoryModelAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single InventoryTransactionAsCreatedBy object
@@ -779,20 +772,20 @@
 		private $_objInventoryTransactionAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single LocationAsModifiedBy object
-		 * (of type Location), if this UserAccount object was restored with
-		 * an expansion on the location association table.
-		 * @var Location _objLocationAsModifiedBy;
+		 * Private member variable that stores a reference to a single InventoryTransactionAsModifiedBy object
+		 * (of type InventoryTransaction), if this UserAccount object was restored with
+		 * an expansion on the inventory_transaction association table.
+		 * @var InventoryTransaction _objInventoryTransactionAsModifiedBy;
 		 */
-		private $_objLocationAsModifiedBy;
+		private $_objInventoryTransactionAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of LocationAsModifiedBy objects
-		 * (of type Location[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the location association table.
-		 * @var Location[] _objLocationAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of InventoryTransactionAsModifiedBy objects
+		 * (of type InventoryTransaction[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the inventory_transaction association table.
+		 * @var InventoryTransaction[] _objInventoryTransactionAsModifiedByArray;
 		 */
-		private $_objLocationAsModifiedByArray = array();
+		private $_objInventoryTransactionAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single LocationAsCreatedBy object
@@ -811,20 +804,20 @@
 		private $_objLocationAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single ManufacturerAsModifiedBy object
-		 * (of type Manufacturer), if this UserAccount object was restored with
-		 * an expansion on the manufacturer association table.
-		 * @var Manufacturer _objManufacturerAsModifiedBy;
+		 * Private member variable that stores a reference to a single LocationAsModifiedBy object
+		 * (of type Location), if this UserAccount object was restored with
+		 * an expansion on the location association table.
+		 * @var Location _objLocationAsModifiedBy;
 		 */
-		private $_objManufacturerAsModifiedBy;
+		private $_objLocationAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of ManufacturerAsModifiedBy objects
-		 * (of type Manufacturer[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the manufacturer association table.
-		 * @var Manufacturer[] _objManufacturerAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of LocationAsModifiedBy objects
+		 * (of type Location[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the location association table.
+		 * @var Location[] _objLocationAsModifiedByArray;
 		 */
-		private $_objManufacturerAsModifiedByArray = array();
+		private $_objLocationAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single ManufacturerAsCreatedBy object
@@ -843,20 +836,20 @@
 		private $_objManufacturerAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single NotificationAsModifiedBy object
-		 * (of type Notification), if this UserAccount object was restored with
-		 * an expansion on the notification association table.
-		 * @var Notification _objNotificationAsModifiedBy;
+		 * Private member variable that stores a reference to a single ManufacturerAsModifiedBy object
+		 * (of type Manufacturer), if this UserAccount object was restored with
+		 * an expansion on the manufacturer association table.
+		 * @var Manufacturer _objManufacturerAsModifiedBy;
 		 */
-		private $_objNotificationAsModifiedBy;
+		private $_objManufacturerAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of NotificationAsModifiedBy objects
-		 * (of type Notification[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the notification association table.
-		 * @var Notification[] _objNotificationAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of ManufacturerAsModifiedBy objects
+		 * (of type Manufacturer[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the manufacturer association table.
+		 * @var Manufacturer[] _objManufacturerAsModifiedByArray;
 		 */
-		private $_objNotificationAsModifiedByArray = array();
+		private $_objManufacturerAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single NotificationAsCreatedBy object
@@ -873,6 +866,22 @@
 		 * @var Notification[] _objNotificationAsCreatedByArray;
 		 */
 		private $_objNotificationAsCreatedByArray = array();
+
+		/**
+		 * Private member variable that stores a reference to a single NotificationAsModifiedBy object
+		 * (of type Notification), if this UserAccount object was restored with
+		 * an expansion on the notification association table.
+		 * @var Notification _objNotificationAsModifiedBy;
+		 */
+		private $_objNotificationAsModifiedBy;
+
+		/**
+		 * Private member variable that stores a reference to an array of NotificationAsModifiedBy objects
+		 * (of type Notification[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the notification association table.
+		 * @var Notification[] _objNotificationAsModifiedByArray;
+		 */
+		private $_objNotificationAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single NotificationUserAccount object
@@ -923,22 +932,6 @@
 		private $_objReceiptAsModifiedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single RoleAsModifiedBy object
-		 * (of type Role), if this UserAccount object was restored with
-		 * an expansion on the role association table.
-		 * @var Role _objRoleAsModifiedBy;
-		 */
-		private $_objRoleAsModifiedBy;
-
-		/**
-		 * Private member variable that stores a reference to an array of RoleAsModifiedBy objects
-		 * (of type Role[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the role association table.
-		 * @var Role[] _objRoleAsModifiedByArray;
-		 */
-		private $_objRoleAsModifiedByArray = array();
-
-		/**
 		 * Private member variable that stores a reference to a single RoleAsCreatedBy object
 		 * (of type Role), if this UserAccount object was restored with
 		 * an expansion on the role association table.
@@ -955,20 +948,20 @@
 		private $_objRoleAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single RoleEntityQtypeBuiltInAuthorizationAsModifiedBy object
-		 * (of type RoleEntityQtypeBuiltInAuthorization), if this UserAccount object was restored with
-		 * an expansion on the role_entity_qtype_built_in_authorization association table.
-		 * @var RoleEntityQtypeBuiltInAuthorization _objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy;
+		 * Private member variable that stores a reference to a single RoleAsModifiedBy object
+		 * (of type Role), if this UserAccount object was restored with
+		 * an expansion on the role association table.
+		 * @var Role _objRoleAsModifiedBy;
 		 */
-		private $_objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy;
+		private $_objRoleAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of RoleEntityQtypeBuiltInAuthorizationAsModifiedBy objects
-		 * (of type RoleEntityQtypeBuiltInAuthorization[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the role_entity_qtype_built_in_authorization association table.
-		 * @var RoleEntityQtypeBuiltInAuthorization[] _objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of RoleAsModifiedBy objects
+		 * (of type Role[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the role association table.
+		 * @var Role[] _objRoleAsModifiedByArray;
 		 */
-		private $_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray = array();
+		private $_objRoleAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single RoleEntityQtypeBuiltInAuthorizationAsCreatedBy object
@@ -987,20 +980,20 @@
 		private $_objRoleEntityQtypeBuiltInAuthorizationAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy object
-		 * (of type RoleEntityQtypeCustomFieldAuthorization), if this UserAccount object was restored with
-		 * an expansion on the role_entity_qtype_custom_field_authorization association table.
-		 * @var RoleEntityQtypeCustomFieldAuthorization _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy;
+		 * Private member variable that stores a reference to a single RoleEntityQtypeBuiltInAuthorizationAsModifiedBy object
+		 * (of type RoleEntityQtypeBuiltInAuthorization), if this UserAccount object was restored with
+		 * an expansion on the role_entity_qtype_built_in_authorization association table.
+		 * @var RoleEntityQtypeBuiltInAuthorization _objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy;
 		 */
-		private $_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy;
+		private $_objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy objects
-		 * (of type RoleEntityQtypeCustomFieldAuthorization[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the role_entity_qtype_custom_field_authorization association table.
-		 * @var RoleEntityQtypeCustomFieldAuthorization[] _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of RoleEntityQtypeBuiltInAuthorizationAsModifiedBy objects
+		 * (of type RoleEntityQtypeBuiltInAuthorization[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the role_entity_qtype_built_in_authorization association table.
+		 * @var RoleEntityQtypeBuiltInAuthorization[] _objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray;
 		 */
-		private $_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray = array();
+		private $_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy object
@@ -1019,20 +1012,20 @@
 		private $_objRoleEntityQtypeCustomFieldAuthorizationAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single RoleModuleAsModifiedBy object
-		 * (of type RoleModule), if this UserAccount object was restored with
-		 * an expansion on the role_module association table.
-		 * @var RoleModule _objRoleModuleAsModifiedBy;
+		 * Private member variable that stores a reference to a single RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy object
+		 * (of type RoleEntityQtypeCustomFieldAuthorization), if this UserAccount object was restored with
+		 * an expansion on the role_entity_qtype_custom_field_authorization association table.
+		 * @var RoleEntityQtypeCustomFieldAuthorization _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy;
 		 */
-		private $_objRoleModuleAsModifiedBy;
+		private $_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of RoleModuleAsModifiedBy objects
-		 * (of type RoleModule[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the role_module association table.
-		 * @var RoleModule[] _objRoleModuleAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy objects
+		 * (of type RoleEntityQtypeCustomFieldAuthorization[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the role_entity_qtype_custom_field_authorization association table.
+		 * @var RoleEntityQtypeCustomFieldAuthorization[] _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray;
 		 */
-		private $_objRoleModuleAsModifiedByArray = array();
+		private $_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single RoleModuleAsCreatedBy object
@@ -1051,20 +1044,20 @@
 		private $_objRoleModuleAsCreatedByArray = array();
 
 		/**
-		 * Private member variable that stores a reference to a single RoleModuleAuthorizationAsModifiedBy object
-		 * (of type RoleModuleAuthorization), if this UserAccount object was restored with
-		 * an expansion on the role_module_authorization association table.
-		 * @var RoleModuleAuthorization _objRoleModuleAuthorizationAsModifiedBy;
+		 * Private member variable that stores a reference to a single RoleModuleAsModifiedBy object
+		 * (of type RoleModule), if this UserAccount object was restored with
+		 * an expansion on the role_module association table.
+		 * @var RoleModule _objRoleModuleAsModifiedBy;
 		 */
-		private $_objRoleModuleAuthorizationAsModifiedBy;
+		private $_objRoleModuleAsModifiedBy;
 
 		/**
-		 * Private member variable that stores a reference to an array of RoleModuleAuthorizationAsModifiedBy objects
-		 * (of type RoleModuleAuthorization[]), if this UserAccount object was restored with
-		 * an ExpandAsArray on the role_module_authorization association table.
-		 * @var RoleModuleAuthorization[] _objRoleModuleAuthorizationAsModifiedByArray;
+		 * Private member variable that stores a reference to an array of RoleModuleAsModifiedBy objects
+		 * (of type RoleModule[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the role_module association table.
+		 * @var RoleModule[] _objRoleModuleAsModifiedByArray;
 		 */
-		private $_objRoleModuleAuthorizationAsModifiedByArray = array();
+		private $_objRoleModuleAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single RoleModuleAuthorizationAsCreatedBy object
@@ -1081,6 +1074,22 @@
 		 * @var RoleModuleAuthorization[] _objRoleModuleAuthorizationAsCreatedByArray;
 		 */
 		private $_objRoleModuleAuthorizationAsCreatedByArray = array();
+
+		/**
+		 * Private member variable that stores a reference to a single RoleModuleAuthorizationAsModifiedBy object
+		 * (of type RoleModuleAuthorization), if this UserAccount object was restored with
+		 * an expansion on the role_module_authorization association table.
+		 * @var RoleModuleAuthorization _objRoleModuleAuthorizationAsModifiedBy;
+		 */
+		private $_objRoleModuleAuthorizationAsModifiedBy;
+
+		/**
+		 * Private member variable that stores a reference to an array of RoleModuleAuthorizationAsModifiedBy objects
+		 * (of type RoleModuleAuthorization[]), if this UserAccount object was restored with
+		 * an ExpandAsArray on the role_module_authorization association table.
+		 * @var RoleModuleAuthorization[] _objRoleModuleAuthorizationAsModifiedByArray;
+		 */
+		private $_objRoleModuleAuthorizationAsModifiedByArray = array();
 
 		/**
 		 * Private member variable that stores a reference to a single RoleTransactionTypeAuthorizationAsCreatedBy object
@@ -1580,6 +1589,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'email_address', $strAliasPrefix . 'email_address');
 			$objBuilder->AddSelectItem($strTableName, 'active_flag', $strAliasPrefix . 'active_flag');
 			$objBuilder->AddSelectItem($strTableName, 'admin_flag', $strAliasPrefix . 'admin_flag');
+			$objBuilder->AddSelectItem($strTableName, 'owner_flag', $strAliasPrefix . 'owner_flag');
 			$objBuilder->AddSelectItem($strTableName, 'portable_access_flag', $strAliasPrefix . 'portable_access_flag');
 			$objBuilder->AddSelectItem($strTableName, 'portable_user_pin', $strAliasPrefix . 'portable_user_pin');
 			$objBuilder->AddSelectItem($strTableName, 'role_id', $strAliasPrefix . 'role_id');
@@ -1625,20 +1635,6 @@
 					$strAliasPrefix = 'user_account__';
 
 
-				$strAlias = $strAliasPrefix . 'addressascreatedby__address_id';
-				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
-					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objAddressAsCreatedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objAddressAsCreatedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressascreatedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
-						if ($objChildItem)
-							$objPreviousItem->_objAddressAsCreatedByArray[] = $objChildItem;
-					} else
-						$objPreviousItem->_objAddressAsCreatedByArray[] = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-					$blnExpandedViaArray = true;
-				}
-
 				$strAlias = $strAliasPrefix . 'addressasmodifiedby__address_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
@@ -1653,17 +1649,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'assetasmodifiedby__asset_id';
+				$strAlias = $strAliasPrefix . 'addressascreatedby__address_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objAssetAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objAssetAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objAddressAsCreatedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objAddressAsCreatedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressascreatedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objAssetAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objAddressAsCreatedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objAssetAsModifiedByArray[] = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objAddressAsCreatedByArray[] = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -1681,17 +1677,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'assetmodelasmodifiedby__asset_model_id';
+				$strAlias = $strAliasPrefix . 'assetasmodifiedby__asset_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objAssetModelAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objAssetModelAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objAssetAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objAssetAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objAssetModelAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objAssetAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objAssetModelAsModifiedByArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objAssetAsModifiedByArray[] = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -1706,6 +1702,20 @@
 							$objPreviousItem->_objAssetModelAsCreatedByArray[] = $objChildItem;
 					} else
 						$objPreviousItem->_objAssetModelAsCreatedByArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$blnExpandedViaArray = true;
+				}
+
+				$strAlias = $strAliasPrefix . 'assetmodelasmodifiedby__asset_model_id';
+				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
+					(!is_null($objDbRow->GetColumn($strAliasName)))) {
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objAssetModelAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objAssetModelAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+						if ($objChildItem)
+							$objPreviousItem->_objAssetModelAsModifiedByArray[] = $objChildItem;
+					} else
+						$objPreviousItem->_objAssetModelAsModifiedByArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -1793,20 +1803,6 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'auditasmodifiedby__audit_id';
-				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
-					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objAuditAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objAuditAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
-						if ($objChildItem)
-							$objPreviousItem->_objAuditAsModifiedByArray[] = $objChildItem;
-					} else
-						$objPreviousItem->_objAuditAsModifiedByArray[] = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-					$blnExpandedViaArray = true;
-				}
-
 				$strAlias = $strAliasPrefix . 'auditascreatedby__audit_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
@@ -1821,17 +1817,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'categoryasmodifiedby__category_id';
+				$strAlias = $strAliasPrefix . 'auditasmodifiedby__audit_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objCategoryAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objCategoryAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objAuditAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objAuditAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objCategoryAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objAuditAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objCategoryAsModifiedByArray[] = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objAuditAsModifiedByArray[] = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -1849,17 +1845,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'companyasmodifiedby__company_id';
+				$strAlias = $strAliasPrefix . 'categoryasmodifiedby__category_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objCompanyAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objCompanyAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objCategoryAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objCategoryAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objCompanyAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objCategoryAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objCompanyAsModifiedByArray[] = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objCategoryAsModifiedByArray[] = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -1874,6 +1870,20 @@
 							$objPreviousItem->_objCompanyAsCreatedByArray[] = $objChildItem;
 					} else
 						$objPreviousItem->_objCompanyAsCreatedByArray[] = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$blnExpandedViaArray = true;
+				}
+
+				$strAlias = $strAliasPrefix . 'companyasmodifiedby__company_id';
+				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
+					(!is_null($objDbRow->GetColumn($strAliasName)))) {
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objCompanyAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objCompanyAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+						if ($objChildItem)
+							$objPreviousItem->_objCompanyAsModifiedByArray[] = $objChildItem;
+					} else
+						$objPreviousItem->_objCompanyAsModifiedByArray[] = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -1975,20 +1985,6 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'inventorylocationascreatedby__inventory_location_id';
-				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
-					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objInventoryLocationAsCreatedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objInventoryLocationAsCreatedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationascreatedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
-						if ($objChildItem)
-							$objPreviousItem->_objInventoryLocationAsCreatedByArray[] = $objChildItem;
-					} else
-						$objPreviousItem->_objInventoryLocationAsCreatedByArray[] = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-					$blnExpandedViaArray = true;
-				}
-
 				$strAlias = $strAliasPrefix . 'inventorylocationasmodifiedby__inventory_location_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
@@ -2003,17 +1999,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'inventorymodelasmodifiedby__inventory_model_id';
+				$strAlias = $strAliasPrefix . 'inventorylocationascreatedby__inventory_location_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objInventoryModelAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objInventoryModelAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objInventoryLocationAsCreatedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objInventoryLocationAsCreatedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationascreatedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objInventoryModelAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objInventoryLocationAsCreatedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objInventoryModelAsModifiedByArray[] = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objInventoryLocationAsCreatedByArray[] = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2031,17 +2027,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'inventorytransactionasmodifiedby__inventory_transaction_id';
+				$strAlias = $strAliasPrefix . 'inventorymodelasmodifiedby__inventory_model_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objInventoryTransactionAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objInventoryTransactionAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objInventoryModelAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objInventoryModelAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objInventoryTransactionAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objInventoryModelAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objInventoryTransactionAsModifiedByArray[] = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objInventoryModelAsModifiedByArray[] = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2059,17 +2055,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'locationasmodifiedby__location_id';
+				$strAlias = $strAliasPrefix . 'inventorytransactionasmodifiedby__inventory_transaction_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objLocationAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objLocationAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objInventoryTransactionAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objInventoryTransactionAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objLocationAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objInventoryTransactionAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objLocationAsModifiedByArray[] = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objInventoryTransactionAsModifiedByArray[] = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2087,17 +2083,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'manufacturerasmodifiedby__manufacturer_id';
+				$strAlias = $strAliasPrefix . 'locationasmodifiedby__location_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objManufacturerAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objManufacturerAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objLocationAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objLocationAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objManufacturerAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objLocationAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objManufacturerAsModifiedByArray[] = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objLocationAsModifiedByArray[] = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2115,17 +2111,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'notificationasmodifiedby__notification_id';
+				$strAlias = $strAliasPrefix . 'manufacturerasmodifiedby__manufacturer_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objNotificationAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objNotificationAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objManufacturerAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objManufacturerAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objNotificationAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objManufacturerAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objNotificationAsModifiedByArray[] = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objManufacturerAsModifiedByArray[] = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2140,6 +2136,20 @@
 							$objPreviousItem->_objNotificationAsCreatedByArray[] = $objChildItem;
 					} else
 						$objPreviousItem->_objNotificationAsCreatedByArray[] = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$blnExpandedViaArray = true;
+				}
+
+				$strAlias = $strAliasPrefix . 'notificationasmodifiedby__notification_id';
+				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
+					(!is_null($objDbRow->GetColumn($strAliasName)))) {
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objNotificationAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objNotificationAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+						if ($objChildItem)
+							$objPreviousItem->_objNotificationAsModifiedByArray[] = $objChildItem;
+					} else
+						$objPreviousItem->_objNotificationAsModifiedByArray[] = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2185,20 +2195,6 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'roleasmodifiedby__role_id';
-				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
-					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objRoleAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
-						if ($objChildItem)
-							$objPreviousItem->_objRoleAsModifiedByArray[] = $objChildItem;
-					} else
-						$objPreviousItem->_objRoleAsModifiedByArray[] = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-					$blnExpandedViaArray = true;
-				}
-
 				$strAlias = $strAliasPrefix . 'roleascreatedby__role_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
@@ -2213,17 +2209,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__role_entity_built_in_id';
+				$strAlias = $strAliasPrefix . 'roleasmodifiedby__role_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objRoleAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objRoleAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray[] = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objRoleAsModifiedByArray[] = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2241,17 +2237,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__role_entity_qtype_custom_field_authorization_id';
+				$strAlias = $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__role_entity_built_in_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray[] = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray[] = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2269,17 +2265,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'rolemoduleasmodifiedby__role_module_id';
+				$strAlias = $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__role_entity_qtype_custom_field_authorization_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleModuleAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objRoleModuleAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objRoleModuleAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objRoleModuleAsModifiedByArray[] = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray[] = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2297,17 +2293,17 @@
 					$blnExpandedViaArray = true;
 				}
 
-				$strAlias = $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__role_module_authorization_id';
+				$strAlias = $strAliasPrefix . 'rolemoduleasmodifiedby__role_module_id';
 				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
 					(!is_null($objDbRow->GetColumn($strAliasName)))) {
-					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleModuleAuthorizationAsModifiedByArray)) {
-						$objPreviousChildItem = $objPreviousItem->_objRoleModuleAuthorizationAsModifiedByArray[$intPreviousChildItemCount - 1];
-						$objChildItem = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleModuleAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objRoleModuleAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
 						if ($objChildItem)
-							$objPreviousItem->_objRoleModuleAuthorizationAsModifiedByArray[] = $objChildItem;
+							$objPreviousItem->_objRoleModuleAsModifiedByArray[] = $objChildItem;
 					} else
-						$objPreviousItem->_objRoleModuleAuthorizationAsModifiedByArray[] = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+						$objPreviousItem->_objRoleModuleAsModifiedByArray[] = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2322,6 +2318,20 @@
 							$objPreviousItem->_objRoleModuleAuthorizationAsCreatedByArray[] = $objChildItem;
 					} else
 						$objPreviousItem->_objRoleModuleAuthorizationAsCreatedByArray[] = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$blnExpandedViaArray = true;
+				}
+
+				$strAlias = $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__role_module_authorization_id';
+				$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+				if ((array_key_exists($strAlias, $strExpandAsArrayNodes)) &&
+					(!is_null($objDbRow->GetColumn($strAliasName)))) {
+					if ($intPreviousChildItemCount = count($objPreviousItem->_objRoleModuleAuthorizationAsModifiedByArray)) {
+						$objPreviousChildItem = $objPreviousItem->_objRoleModuleAuthorizationAsModifiedByArray[$intPreviousChildItemCount - 1];
+						$objChildItem = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__', $strExpandAsArrayNodes, $objPreviousChildItem, $strColumnAliasArray);
+						if ($objChildItem)
+							$objPreviousItem->_objRoleModuleAuthorizationAsModifiedByArray[] = $objChildItem;
+					} else
+						$objPreviousItem->_objRoleModuleAuthorizationAsModifiedByArray[] = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 					$blnExpandedViaArray = true;
 				}
 
@@ -2464,6 +2474,8 @@
 			$objToReturn->blnActiveFlag = $objDbRow->GetColumn($strAliasName, 'Bit');
 			$strAliasName = array_key_exists($strAliasPrefix . 'admin_flag', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'admin_flag'] : $strAliasPrefix . 'admin_flag';
 			$objToReturn->blnAdminFlag = $objDbRow->GetColumn($strAliasName, 'Bit');
+			$strAliasName = array_key_exists($strAliasPrefix . 'owner_flag', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'owner_flag'] : $strAliasPrefix . 'owner_flag';
+			$objToReturn->blnOwnerFlag = $objDbRow->GetColumn($strAliasName, 'Bit');
 			$strAliasName = array_key_exists($strAliasPrefix . 'portable_access_flag', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'portable_access_flag'] : $strAliasPrefix . 'portable_access_flag';
 			$objToReturn->blnPortableAccessFlag = $objDbRow->GetColumn($strAliasName, 'Bit');
 			$strAliasName = array_key_exists($strAliasPrefix . 'portable_user_pin', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'portable_user_pin'] : $strAliasPrefix . 'portable_user_pin';
@@ -2512,16 +2524,6 @@
 
 
 
-			// Check for AddressAsCreatedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'addressascreatedby__address_id';
-			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-			if (!is_null($objDbRow->GetColumn($strAliasName))) {
-				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objAddressAsCreatedByArray[] = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-				else
-					$objToReturn->_objAddressAsCreatedBy = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-			}
-
 			// Check for AddressAsModifiedBy Virtual Binding
 			$strAlias = $strAliasPrefix . 'addressasmodifiedby__address_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
@@ -2532,14 +2534,14 @@
 					$objToReturn->_objAddressAsModifiedBy = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for AssetAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'assetasmodifiedby__asset_id';
+			// Check for AddressAsCreatedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'addressascreatedby__address_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objAssetAsModifiedByArray[] = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objAddressAsCreatedByArray[] = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objAssetAsModifiedBy = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objAddressAsCreatedBy = Address::InstantiateDbRow($objDbRow, $strAliasPrefix . 'addressascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for AssetAsCreatedBy Virtual Binding
@@ -2552,14 +2554,14 @@
 					$objToReturn->_objAssetAsCreatedBy = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for AssetModelAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'assetmodelasmodifiedby__asset_model_id';
+			// Check for AssetAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'assetasmodifiedby__asset_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objAssetModelAsModifiedByArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objAssetAsModifiedByArray[] = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objAssetModelAsModifiedBy = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objAssetAsModifiedBy = Asset::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for AssetModelAsCreatedBy Virtual Binding
@@ -2570,6 +2572,16 @@
 					$objToReturn->_objAssetModelAsCreatedByArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
 					$objToReturn->_objAssetModelAsCreatedBy = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+			}
+
+			// Check for AssetModelAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'assetmodelasmodifiedby__asset_model_id';
+			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+			if (!is_null($objDbRow->GetColumn($strAliasName))) {
+				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
+					$objToReturn->_objAssetModelAsModifiedByArray[] = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+				else
+					$objToReturn->_objAssetModelAsModifiedBy = AssetModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'assetmodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for AssetTransactionAsCreatedBy Virtual Binding
@@ -2632,16 +2644,6 @@
 					$objToReturn->_objAttachmentAsCreatedBy = Attachment::InstantiateDbRow($objDbRow, $strAliasPrefix . 'attachmentascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for AuditAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'auditasmodifiedby__audit_id';
-			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-			if (!is_null($objDbRow->GetColumn($strAliasName))) {
-				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objAuditAsModifiedByArray[] = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-				else
-					$objToReturn->_objAuditAsModifiedBy = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-			}
-
 			// Check for AuditAsCreatedBy Virtual Binding
 			$strAlias = $strAliasPrefix . 'auditascreatedby__audit_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
@@ -2652,14 +2654,14 @@
 					$objToReturn->_objAuditAsCreatedBy = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for CategoryAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'categoryasmodifiedby__category_id';
+			// Check for AuditAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'auditasmodifiedby__audit_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objCategoryAsModifiedByArray[] = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objAuditAsModifiedByArray[] = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objCategoryAsModifiedBy = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objAuditAsModifiedBy = Audit::InstantiateDbRow($objDbRow, $strAliasPrefix . 'auditasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for CategoryAsCreatedBy Virtual Binding
@@ -2672,14 +2674,14 @@
 					$objToReturn->_objCategoryAsCreatedBy = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for CompanyAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'companyasmodifiedby__company_id';
+			// Check for CategoryAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'categoryasmodifiedby__category_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objCompanyAsModifiedByArray[] = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objCategoryAsModifiedByArray[] = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objCompanyAsModifiedBy = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objCategoryAsModifiedBy = Category::InstantiateDbRow($objDbRow, $strAliasPrefix . 'categoryasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for CompanyAsCreatedBy Virtual Binding
@@ -2690,6 +2692,16 @@
 					$objToReturn->_objCompanyAsCreatedByArray[] = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
 					$objToReturn->_objCompanyAsCreatedBy = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+			}
+
+			// Check for CompanyAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'companyasmodifiedby__company_id';
+			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+			if (!is_null($objDbRow->GetColumn($strAliasName))) {
+				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
+					$objToReturn->_objCompanyAsModifiedByArray[] = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+				else
+					$objToReturn->_objCompanyAsModifiedBy = Company::InstantiateDbRow($objDbRow, $strAliasPrefix . 'companyasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for ContactAsModifiedBy Virtual Binding
@@ -2762,16 +2774,6 @@
 					$objToReturn->_objDatagridColumnPreference = DatagridColumnPreference::InstantiateDbRow($objDbRow, $strAliasPrefix . 'datagridcolumnpreference__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for InventoryLocationAsCreatedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'inventorylocationascreatedby__inventory_location_id';
-			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-			if (!is_null($objDbRow->GetColumn($strAliasName))) {
-				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objInventoryLocationAsCreatedByArray[] = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-				else
-					$objToReturn->_objInventoryLocationAsCreatedBy = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-			}
-
 			// Check for InventoryLocationAsModifiedBy Virtual Binding
 			$strAlias = $strAliasPrefix . 'inventorylocationasmodifiedby__inventory_location_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
@@ -2782,14 +2784,14 @@
 					$objToReturn->_objInventoryLocationAsModifiedBy = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for InventoryModelAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'inventorymodelasmodifiedby__inventory_model_id';
+			// Check for InventoryLocationAsCreatedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'inventorylocationascreatedby__inventory_location_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objInventoryModelAsModifiedByArray[] = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objInventoryLocationAsCreatedByArray[] = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objInventoryModelAsModifiedBy = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objInventoryLocationAsCreatedBy = InventoryLocation::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorylocationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for InventoryModelAsCreatedBy Virtual Binding
@@ -2802,14 +2804,14 @@
 					$objToReturn->_objInventoryModelAsCreatedBy = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for InventoryTransactionAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'inventorytransactionasmodifiedby__inventory_transaction_id';
+			// Check for InventoryModelAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'inventorymodelasmodifiedby__inventory_model_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objInventoryTransactionAsModifiedByArray[] = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objInventoryModelAsModifiedByArray[] = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objInventoryTransactionAsModifiedBy = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objInventoryModelAsModifiedBy = InventoryModel::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorymodelasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for InventoryTransactionAsCreatedBy Virtual Binding
@@ -2822,14 +2824,14 @@
 					$objToReturn->_objInventoryTransactionAsCreatedBy = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for LocationAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'locationasmodifiedby__location_id';
+			// Check for InventoryTransactionAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'inventorytransactionasmodifiedby__inventory_transaction_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objLocationAsModifiedByArray[] = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objInventoryTransactionAsModifiedByArray[] = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objLocationAsModifiedBy = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objInventoryTransactionAsModifiedBy = InventoryTransaction::InstantiateDbRow($objDbRow, $strAliasPrefix . 'inventorytransactionasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for LocationAsCreatedBy Virtual Binding
@@ -2842,14 +2844,14 @@
 					$objToReturn->_objLocationAsCreatedBy = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for ManufacturerAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'manufacturerasmodifiedby__manufacturer_id';
+			// Check for LocationAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'locationasmodifiedby__location_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objManufacturerAsModifiedByArray[] = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objLocationAsModifiedByArray[] = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objManufacturerAsModifiedBy = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objLocationAsModifiedBy = Location::InstantiateDbRow($objDbRow, $strAliasPrefix . 'locationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for ManufacturerAsCreatedBy Virtual Binding
@@ -2862,14 +2864,14 @@
 					$objToReturn->_objManufacturerAsCreatedBy = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for NotificationAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'notificationasmodifiedby__notification_id';
+			// Check for ManufacturerAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'manufacturerasmodifiedby__manufacturer_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objNotificationAsModifiedByArray[] = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objManufacturerAsModifiedByArray[] = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objNotificationAsModifiedBy = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objManufacturerAsModifiedBy = Manufacturer::InstantiateDbRow($objDbRow, $strAliasPrefix . 'manufacturerasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for NotificationAsCreatedBy Virtual Binding
@@ -2880,6 +2882,16 @@
 					$objToReturn->_objNotificationAsCreatedByArray[] = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
 					$objToReturn->_objNotificationAsCreatedBy = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+			}
+
+			// Check for NotificationAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'notificationasmodifiedby__notification_id';
+			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+			if (!is_null($objDbRow->GetColumn($strAliasName))) {
+				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
+					$objToReturn->_objNotificationAsModifiedByArray[] = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+				else
+					$objToReturn->_objNotificationAsModifiedBy = Notification::InstantiateDbRow($objDbRow, $strAliasPrefix . 'notificationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for NotificationUserAccount Virtual Binding
@@ -2912,16 +2924,6 @@
 					$objToReturn->_objReceiptAsModifiedBy = Receipt::InstantiateDbRow($objDbRow, $strAliasPrefix . 'receiptasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for RoleAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'roleasmodifiedby__role_id';
-			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
-			if (!is_null($objDbRow->GetColumn($strAliasName))) {
-				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objRoleAsModifiedByArray[] = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-				else
-					$objToReturn->_objRoleAsModifiedBy = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
-			}
-
 			// Check for RoleAsCreatedBy Virtual Binding
 			$strAlias = $strAliasPrefix . 'roleascreatedby__role_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
@@ -2932,14 +2934,14 @@
 					$objToReturn->_objRoleAsCreatedBy = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for RoleEntityQtypeBuiltInAuthorizationAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__role_entity_built_in_id';
+			// Check for RoleAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'roleasmodifiedby__role_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray[] = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objRoleAsModifiedByArray[] = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objRoleAsModifiedBy = Role::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for RoleEntityQtypeBuiltInAuthorizationAsCreatedBy Virtual Binding
@@ -2952,14 +2954,14 @@
 					$objToReturn->_objRoleEntityQtypeBuiltInAuthorizationAsCreatedBy = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__role_entity_qtype_custom_field_authorization_id';
+			// Check for RoleEntityQtypeBuiltInAuthorizationAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__role_entity_built_in_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray[] = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray[] = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy = RoleEntityQtypeBuiltInAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypebuiltinauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy Virtual Binding
@@ -2972,14 +2974,14 @@
 					$objToReturn->_objRoleEntityQtypeCustomFieldAuthorizationAsCreatedBy = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for RoleModuleAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'rolemoduleasmodifiedby__role_module_id';
+			// Check for RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__role_entity_qtype_custom_field_authorization_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objRoleModuleAsModifiedByArray[] = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray[] = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objRoleModuleAsModifiedBy = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy = RoleEntityQtypeCustomFieldAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'roleentityqtypecustomfieldauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for RoleModuleAsCreatedBy Virtual Binding
@@ -2992,14 +2994,14 @@
 					$objToReturn->_objRoleModuleAsCreatedBy = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
-			// Check for RoleModuleAuthorizationAsModifiedBy Virtual Binding
-			$strAlias = $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__role_module_authorization_id';
+			// Check for RoleModuleAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'rolemoduleasmodifiedby__role_module_id';
 			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
 			if (!is_null($objDbRow->GetColumn($strAliasName))) {
 				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
-					$objToReturn->_objRoleModuleAuthorizationAsModifiedByArray[] = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objRoleModuleAsModifiedByArray[] = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
-					$objToReturn->_objRoleModuleAuthorizationAsModifiedBy = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+					$objToReturn->_objRoleModuleAsModifiedBy = RoleModule::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for RoleModuleAuthorizationAsCreatedBy Virtual Binding
@@ -3010,6 +3012,16 @@
 					$objToReturn->_objRoleModuleAuthorizationAsCreatedByArray[] = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 				else
 					$objToReturn->_objRoleModuleAuthorizationAsCreatedBy = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationascreatedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+			}
+
+			// Check for RoleModuleAuthorizationAsModifiedBy Virtual Binding
+			$strAlias = $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__role_module_authorization_id';
+			$strAliasName = array_key_exists($strAlias, $strColumnAliasArray) ? $strColumnAliasArray[$strAlias] : $strAlias;
+			if (!is_null($objDbRow->GetColumn($strAliasName))) {
+				if (($strExpandAsArrayNodes) && (array_key_exists($strAlias, $strExpandAsArrayNodes)))
+					$objToReturn->_objRoleModuleAuthorizationAsModifiedByArray[] = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
+				else
+					$objToReturn->_objRoleModuleAuthorizationAsModifiedBy = RoleModuleAuthorization::InstantiateDbRow($objDbRow, $strAliasPrefix . 'rolemoduleauthorizationasmodifiedby__', $strExpandAsArrayNodes, null, $strColumnAliasArray);
 			}
 
 			// Check for RoleTransactionTypeAuthorizationAsCreatedBy Virtual Binding
@@ -3328,6 +3340,7 @@
 							`email_address`,
 							`active_flag`,
 							`admin_flag`,
+							`owner_flag`,
 							`portable_access_flag`,
 							`portable_user_pin`,
 							`role_id`,
@@ -3342,6 +3355,7 @@
 							' . $objDatabase->SqlVariable($this->strEmailAddress) . ',
 							' . $objDatabase->SqlVariable($this->blnActiveFlag) . ',
 							' . $objDatabase->SqlVariable($this->blnAdminFlag) . ',
+							' . $objDatabase->SqlVariable($this->blnOwnerFlag) . ',
 							' . $objDatabase->SqlVariable($this->blnPortableAccessFlag) . ',
 							' . $objDatabase->SqlVariable($this->intPortableUserPin) . ',
 							' . $objDatabase->SqlVariable($this->intRoleId) . ',
@@ -3389,6 +3403,7 @@
 							`email_address` = ' . $objDatabase->SqlVariable($this->strEmailAddress) . ',
 							`active_flag` = ' . $objDatabase->SqlVariable($this->blnActiveFlag) . ',
 							`admin_flag` = ' . $objDatabase->SqlVariable($this->blnAdminFlag) . ',
+							`owner_flag` = ' . $objDatabase->SqlVariable($this->blnOwnerFlag) . ',
 							`portable_access_flag` = ' . $objDatabase->SqlVariable($this->blnPortableAccessFlag) . ',
 							`portable_user_pin` = ' . $objDatabase->SqlVariable($this->intPortableUserPin) . ',
 							`role_id` = ' . $objDatabase->SqlVariable($this->intRoleId) . ',
@@ -3498,6 +3513,7 @@
 			$this->strEmailAddress = $objReloaded->strEmailAddress;
 			$this->blnActiveFlag = $objReloaded->blnActiveFlag;
 			$this->blnAdminFlag = $objReloaded->blnAdminFlag;
+			$this->blnOwnerFlag = $objReloaded->blnOwnerFlag;
 			$this->blnPortableAccessFlag = $objReloaded->blnPortableAccessFlag;
 			$this->intPortableUserPin = $objReloaded->intPortableUserPin;
 			$this->RoleId = $objReloaded->RoleId;
@@ -3525,6 +3541,7 @@
 					`email_address`,
 					`active_flag`,
 					`admin_flag`,
+					`owner_flag`,
 					`portable_access_flag`,
 					`portable_user_pin`,
 					`role_id`,
@@ -3543,6 +3560,7 @@
 					' . $objDatabase->SqlVariable($this->strEmailAddress) . ',
 					' . $objDatabase->SqlVariable($this->blnActiveFlag) . ',
 					' . $objDatabase->SqlVariable($this->blnAdminFlag) . ',
+					' . $objDatabase->SqlVariable($this->blnOwnerFlag) . ',
 					' . $objDatabase->SqlVariable($this->blnPortableAccessFlag) . ',
 					' . $objDatabase->SqlVariable($this->intPortableUserPin) . ',
 					' . $objDatabase->SqlVariable($this->intRoleId) . ',
@@ -3639,6 +3657,11 @@
 					// @return boolean
 					return $this->blnAdminFlag;
 
+				case 'OwnerFlag':
+					// Gets the value for blnOwnerFlag (Not Null)
+					// @return boolean
+					return $this->blnOwnerFlag;
+
 				case 'PortableAccessFlag':
 					// Gets the value for blnPortableAccessFlag 
 					// @return boolean
@@ -3720,18 +3743,6 @@
 				// (If restored via a "Many-to" expansion)
 				////////////////////////////
 
-				case '_AddressAsCreatedBy':
-					// Gets the value for the private _objAddressAsCreatedBy (Read-Only)
-					// if set due to an expansion on the address.created_by reverse relationship
-					// @return Address
-					return $this->_objAddressAsCreatedBy;
-
-				case '_AddressAsCreatedByArray':
-					// Gets the value for the private _objAddressAsCreatedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the address.created_by reverse relationship
-					// @return Address[]
-					return (array) $this->_objAddressAsCreatedByArray;
-
 				case '_AddressAsModifiedBy':
 					// Gets the value for the private _objAddressAsModifiedBy (Read-Only)
 					// if set due to an expansion on the address.modified_by reverse relationship
@@ -3744,17 +3755,17 @@
 					// @return Address[]
 					return (array) $this->_objAddressAsModifiedByArray;
 
-				case '_AssetAsModifiedBy':
-					// Gets the value for the private _objAssetAsModifiedBy (Read-Only)
-					// if set due to an expansion on the asset.modified_by reverse relationship
-					// @return Asset
-					return $this->_objAssetAsModifiedBy;
+				case '_AddressAsCreatedBy':
+					// Gets the value for the private _objAddressAsCreatedBy (Read-Only)
+					// if set due to an expansion on the address.created_by reverse relationship
+					// @return Address
+					return $this->_objAddressAsCreatedBy;
 
-				case '_AssetAsModifiedByArray':
-					// Gets the value for the private _objAssetAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the asset.modified_by reverse relationship
-					// @return Asset[]
-					return (array) $this->_objAssetAsModifiedByArray;
+				case '_AddressAsCreatedByArray':
+					// Gets the value for the private _objAddressAsCreatedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the address.created_by reverse relationship
+					// @return Address[]
+					return (array) $this->_objAddressAsCreatedByArray;
 
 				case '_AssetAsCreatedBy':
 					// Gets the value for the private _objAssetAsCreatedBy (Read-Only)
@@ -3768,17 +3779,17 @@
 					// @return Asset[]
 					return (array) $this->_objAssetAsCreatedByArray;
 
-				case '_AssetModelAsModifiedBy':
-					// Gets the value for the private _objAssetModelAsModifiedBy (Read-Only)
-					// if set due to an expansion on the asset_model.modified_by reverse relationship
-					// @return AssetModel
-					return $this->_objAssetModelAsModifiedBy;
+				case '_AssetAsModifiedBy':
+					// Gets the value for the private _objAssetAsModifiedBy (Read-Only)
+					// if set due to an expansion on the asset.modified_by reverse relationship
+					// @return Asset
+					return $this->_objAssetAsModifiedBy;
 
-				case '_AssetModelAsModifiedByArray':
-					// Gets the value for the private _objAssetModelAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the asset_model.modified_by reverse relationship
-					// @return AssetModel[]
-					return (array) $this->_objAssetModelAsModifiedByArray;
+				case '_AssetAsModifiedByArray':
+					// Gets the value for the private _objAssetAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the asset.modified_by reverse relationship
+					// @return Asset[]
+					return (array) $this->_objAssetAsModifiedByArray;
 
 				case '_AssetModelAsCreatedBy':
 					// Gets the value for the private _objAssetModelAsCreatedBy (Read-Only)
@@ -3791,6 +3802,18 @@
 					// if set due to an ExpandAsArray on the asset_model.created_by reverse relationship
 					// @return AssetModel[]
 					return (array) $this->_objAssetModelAsCreatedByArray;
+
+				case '_AssetModelAsModifiedBy':
+					// Gets the value for the private _objAssetModelAsModifiedBy (Read-Only)
+					// if set due to an expansion on the asset_model.modified_by reverse relationship
+					// @return AssetModel
+					return $this->_objAssetModelAsModifiedBy;
+
+				case '_AssetModelAsModifiedByArray':
+					// Gets the value for the private _objAssetModelAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the asset_model.modified_by reverse relationship
+					// @return AssetModel[]
+					return (array) $this->_objAssetModelAsModifiedByArray;
 
 				case '_AssetTransactionAsCreatedBy':
 					// Gets the value for the private _objAssetTransactionAsCreatedBy (Read-Only)
@@ -3864,18 +3887,6 @@
 					// @return Attachment[]
 					return (array) $this->_objAttachmentAsCreatedByArray;
 
-				case '_AuditAsModifiedBy':
-					// Gets the value for the private _objAuditAsModifiedBy (Read-Only)
-					// if set due to an expansion on the audit.modified_by reverse relationship
-					// @return Audit
-					return $this->_objAuditAsModifiedBy;
-
-				case '_AuditAsModifiedByArray':
-					// Gets the value for the private _objAuditAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the audit.modified_by reverse relationship
-					// @return Audit[]
-					return (array) $this->_objAuditAsModifiedByArray;
-
 				case '_AuditAsCreatedBy':
 					// Gets the value for the private _objAuditAsCreatedBy (Read-Only)
 					// if set due to an expansion on the audit.created_by reverse relationship
@@ -3888,17 +3899,17 @@
 					// @return Audit[]
 					return (array) $this->_objAuditAsCreatedByArray;
 
-				case '_CategoryAsModifiedBy':
-					// Gets the value for the private _objCategoryAsModifiedBy (Read-Only)
-					// if set due to an expansion on the category.modified_by reverse relationship
-					// @return Category
-					return $this->_objCategoryAsModifiedBy;
+				case '_AuditAsModifiedBy':
+					// Gets the value for the private _objAuditAsModifiedBy (Read-Only)
+					// if set due to an expansion on the audit.modified_by reverse relationship
+					// @return Audit
+					return $this->_objAuditAsModifiedBy;
 
-				case '_CategoryAsModifiedByArray':
-					// Gets the value for the private _objCategoryAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the category.modified_by reverse relationship
-					// @return Category[]
-					return (array) $this->_objCategoryAsModifiedByArray;
+				case '_AuditAsModifiedByArray':
+					// Gets the value for the private _objAuditAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the audit.modified_by reverse relationship
+					// @return Audit[]
+					return (array) $this->_objAuditAsModifiedByArray;
 
 				case '_CategoryAsCreatedBy':
 					// Gets the value for the private _objCategoryAsCreatedBy (Read-Only)
@@ -3912,17 +3923,17 @@
 					// @return Category[]
 					return (array) $this->_objCategoryAsCreatedByArray;
 
-				case '_CompanyAsModifiedBy':
-					// Gets the value for the private _objCompanyAsModifiedBy (Read-Only)
-					// if set due to an expansion on the company.modified_by reverse relationship
-					// @return Company
-					return $this->_objCompanyAsModifiedBy;
+				case '_CategoryAsModifiedBy':
+					// Gets the value for the private _objCategoryAsModifiedBy (Read-Only)
+					// if set due to an expansion on the category.modified_by reverse relationship
+					// @return Category
+					return $this->_objCategoryAsModifiedBy;
 
-				case '_CompanyAsModifiedByArray':
-					// Gets the value for the private _objCompanyAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the company.modified_by reverse relationship
-					// @return Company[]
-					return (array) $this->_objCompanyAsModifiedByArray;
+				case '_CategoryAsModifiedByArray':
+					// Gets the value for the private _objCategoryAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the category.modified_by reverse relationship
+					// @return Category[]
+					return (array) $this->_objCategoryAsModifiedByArray;
 
 				case '_CompanyAsCreatedBy':
 					// Gets the value for the private _objCompanyAsCreatedBy (Read-Only)
@@ -3935,6 +3946,18 @@
 					// if set due to an ExpandAsArray on the company.created_by reverse relationship
 					// @return Company[]
 					return (array) $this->_objCompanyAsCreatedByArray;
+
+				case '_CompanyAsModifiedBy':
+					// Gets the value for the private _objCompanyAsModifiedBy (Read-Only)
+					// if set due to an expansion on the company.modified_by reverse relationship
+					// @return Company
+					return $this->_objCompanyAsModifiedBy;
+
+				case '_CompanyAsModifiedByArray':
+					// Gets the value for the private _objCompanyAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the company.modified_by reverse relationship
+					// @return Company[]
+					return (array) $this->_objCompanyAsModifiedByArray;
 
 				case '_ContactAsModifiedBy':
 					// Gets the value for the private _objContactAsModifiedBy (Read-Only)
@@ -4020,18 +4043,6 @@
 					// @return DatagridColumnPreference[]
 					return (array) $this->_objDatagridColumnPreferenceArray;
 
-				case '_InventoryLocationAsCreatedBy':
-					// Gets the value for the private _objInventoryLocationAsCreatedBy (Read-Only)
-					// if set due to an expansion on the inventory_location.created_by reverse relationship
-					// @return InventoryLocation
-					return $this->_objInventoryLocationAsCreatedBy;
-
-				case '_InventoryLocationAsCreatedByArray':
-					// Gets the value for the private _objInventoryLocationAsCreatedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the inventory_location.created_by reverse relationship
-					// @return InventoryLocation[]
-					return (array) $this->_objInventoryLocationAsCreatedByArray;
-
 				case '_InventoryLocationAsModifiedBy':
 					// Gets the value for the private _objInventoryLocationAsModifiedBy (Read-Only)
 					// if set due to an expansion on the inventory_location.modified_by reverse relationship
@@ -4044,17 +4055,17 @@
 					// @return InventoryLocation[]
 					return (array) $this->_objInventoryLocationAsModifiedByArray;
 
-				case '_InventoryModelAsModifiedBy':
-					// Gets the value for the private _objInventoryModelAsModifiedBy (Read-Only)
-					// if set due to an expansion on the inventory_model.modified_by reverse relationship
-					// @return InventoryModel
-					return $this->_objInventoryModelAsModifiedBy;
+				case '_InventoryLocationAsCreatedBy':
+					// Gets the value for the private _objInventoryLocationAsCreatedBy (Read-Only)
+					// if set due to an expansion on the inventory_location.created_by reverse relationship
+					// @return InventoryLocation
+					return $this->_objInventoryLocationAsCreatedBy;
 
-				case '_InventoryModelAsModifiedByArray':
-					// Gets the value for the private _objInventoryModelAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the inventory_model.modified_by reverse relationship
-					// @return InventoryModel[]
-					return (array) $this->_objInventoryModelAsModifiedByArray;
+				case '_InventoryLocationAsCreatedByArray':
+					// Gets the value for the private _objInventoryLocationAsCreatedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the inventory_location.created_by reverse relationship
+					// @return InventoryLocation[]
+					return (array) $this->_objInventoryLocationAsCreatedByArray;
 
 				case '_InventoryModelAsCreatedBy':
 					// Gets the value for the private _objInventoryModelAsCreatedBy (Read-Only)
@@ -4068,17 +4079,17 @@
 					// @return InventoryModel[]
 					return (array) $this->_objInventoryModelAsCreatedByArray;
 
-				case '_InventoryTransactionAsModifiedBy':
-					// Gets the value for the private _objInventoryTransactionAsModifiedBy (Read-Only)
-					// if set due to an expansion on the inventory_transaction.modified_by reverse relationship
-					// @return InventoryTransaction
-					return $this->_objInventoryTransactionAsModifiedBy;
+				case '_InventoryModelAsModifiedBy':
+					// Gets the value for the private _objInventoryModelAsModifiedBy (Read-Only)
+					// if set due to an expansion on the inventory_model.modified_by reverse relationship
+					// @return InventoryModel
+					return $this->_objInventoryModelAsModifiedBy;
 
-				case '_InventoryTransactionAsModifiedByArray':
-					// Gets the value for the private _objInventoryTransactionAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the inventory_transaction.modified_by reverse relationship
-					// @return InventoryTransaction[]
-					return (array) $this->_objInventoryTransactionAsModifiedByArray;
+				case '_InventoryModelAsModifiedByArray':
+					// Gets the value for the private _objInventoryModelAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the inventory_model.modified_by reverse relationship
+					// @return InventoryModel[]
+					return (array) $this->_objInventoryModelAsModifiedByArray;
 
 				case '_InventoryTransactionAsCreatedBy':
 					// Gets the value for the private _objInventoryTransactionAsCreatedBy (Read-Only)
@@ -4092,17 +4103,17 @@
 					// @return InventoryTransaction[]
 					return (array) $this->_objInventoryTransactionAsCreatedByArray;
 
-				case '_LocationAsModifiedBy':
-					// Gets the value for the private _objLocationAsModifiedBy (Read-Only)
-					// if set due to an expansion on the location.modified_by reverse relationship
-					// @return Location
-					return $this->_objLocationAsModifiedBy;
+				case '_InventoryTransactionAsModifiedBy':
+					// Gets the value for the private _objInventoryTransactionAsModifiedBy (Read-Only)
+					// if set due to an expansion on the inventory_transaction.modified_by reverse relationship
+					// @return InventoryTransaction
+					return $this->_objInventoryTransactionAsModifiedBy;
 
-				case '_LocationAsModifiedByArray':
-					// Gets the value for the private _objLocationAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the location.modified_by reverse relationship
-					// @return Location[]
-					return (array) $this->_objLocationAsModifiedByArray;
+				case '_InventoryTransactionAsModifiedByArray':
+					// Gets the value for the private _objInventoryTransactionAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the inventory_transaction.modified_by reverse relationship
+					// @return InventoryTransaction[]
+					return (array) $this->_objInventoryTransactionAsModifiedByArray;
 
 				case '_LocationAsCreatedBy':
 					// Gets the value for the private _objLocationAsCreatedBy (Read-Only)
@@ -4116,17 +4127,17 @@
 					// @return Location[]
 					return (array) $this->_objLocationAsCreatedByArray;
 
-				case '_ManufacturerAsModifiedBy':
-					// Gets the value for the private _objManufacturerAsModifiedBy (Read-Only)
-					// if set due to an expansion on the manufacturer.modified_by reverse relationship
-					// @return Manufacturer
-					return $this->_objManufacturerAsModifiedBy;
+				case '_LocationAsModifiedBy':
+					// Gets the value for the private _objLocationAsModifiedBy (Read-Only)
+					// if set due to an expansion on the location.modified_by reverse relationship
+					// @return Location
+					return $this->_objLocationAsModifiedBy;
 
-				case '_ManufacturerAsModifiedByArray':
-					// Gets the value for the private _objManufacturerAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the manufacturer.modified_by reverse relationship
-					// @return Manufacturer[]
-					return (array) $this->_objManufacturerAsModifiedByArray;
+				case '_LocationAsModifiedByArray':
+					// Gets the value for the private _objLocationAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the location.modified_by reverse relationship
+					// @return Location[]
+					return (array) $this->_objLocationAsModifiedByArray;
 
 				case '_ManufacturerAsCreatedBy':
 					// Gets the value for the private _objManufacturerAsCreatedBy (Read-Only)
@@ -4140,17 +4151,17 @@
 					// @return Manufacturer[]
 					return (array) $this->_objManufacturerAsCreatedByArray;
 
-				case '_NotificationAsModifiedBy':
-					// Gets the value for the private _objNotificationAsModifiedBy (Read-Only)
-					// if set due to an expansion on the notification.modified_by reverse relationship
-					// @return Notification
-					return $this->_objNotificationAsModifiedBy;
+				case '_ManufacturerAsModifiedBy':
+					// Gets the value for the private _objManufacturerAsModifiedBy (Read-Only)
+					// if set due to an expansion on the manufacturer.modified_by reverse relationship
+					// @return Manufacturer
+					return $this->_objManufacturerAsModifiedBy;
 
-				case '_NotificationAsModifiedByArray':
-					// Gets the value for the private _objNotificationAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the notification.modified_by reverse relationship
-					// @return Notification[]
-					return (array) $this->_objNotificationAsModifiedByArray;
+				case '_ManufacturerAsModifiedByArray':
+					// Gets the value for the private _objManufacturerAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the manufacturer.modified_by reverse relationship
+					// @return Manufacturer[]
+					return (array) $this->_objManufacturerAsModifiedByArray;
 
 				case '_NotificationAsCreatedBy':
 					// Gets the value for the private _objNotificationAsCreatedBy (Read-Only)
@@ -4163,6 +4174,18 @@
 					// if set due to an ExpandAsArray on the notification.created_by reverse relationship
 					// @return Notification[]
 					return (array) $this->_objNotificationAsCreatedByArray;
+
+				case '_NotificationAsModifiedBy':
+					// Gets the value for the private _objNotificationAsModifiedBy (Read-Only)
+					// if set due to an expansion on the notification.modified_by reverse relationship
+					// @return Notification
+					return $this->_objNotificationAsModifiedBy;
+
+				case '_NotificationAsModifiedByArray':
+					// Gets the value for the private _objNotificationAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the notification.modified_by reverse relationship
+					// @return Notification[]
+					return (array) $this->_objNotificationAsModifiedByArray;
 
 				case '_NotificationUserAccount':
 					// Gets the value for the private _objNotificationUserAccount (Read-Only)
@@ -4200,18 +4223,6 @@
 					// @return Receipt[]
 					return (array) $this->_objReceiptAsModifiedByArray;
 
-				case '_RoleAsModifiedBy':
-					// Gets the value for the private _objRoleAsModifiedBy (Read-Only)
-					// if set due to an expansion on the role.modified_by reverse relationship
-					// @return Role
-					return $this->_objRoleAsModifiedBy;
-
-				case '_RoleAsModifiedByArray':
-					// Gets the value for the private _objRoleAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the role.modified_by reverse relationship
-					// @return Role[]
-					return (array) $this->_objRoleAsModifiedByArray;
-
 				case '_RoleAsCreatedBy':
 					// Gets the value for the private _objRoleAsCreatedBy (Read-Only)
 					// if set due to an expansion on the role.created_by reverse relationship
@@ -4224,17 +4235,17 @@
 					// @return Role[]
 					return (array) $this->_objRoleAsCreatedByArray;
 
-				case '_RoleEntityQtypeBuiltInAuthorizationAsModifiedBy':
-					// Gets the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy (Read-Only)
-					// if set due to an expansion on the role_entity_qtype_built_in_authorization.modified_by reverse relationship
-					// @return RoleEntityQtypeBuiltInAuthorization
-					return $this->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy;
+				case '_RoleAsModifiedBy':
+					// Gets the value for the private _objRoleAsModifiedBy (Read-Only)
+					// if set due to an expansion on the role.modified_by reverse relationship
+					// @return Role
+					return $this->_objRoleAsModifiedBy;
 
-				case '_RoleEntityQtypeBuiltInAuthorizationAsModifiedByArray':
-					// Gets the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the role_entity_qtype_built_in_authorization.modified_by reverse relationship
-					// @return RoleEntityQtypeBuiltInAuthorization[]
-					return (array) $this->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray;
+				case '_RoleAsModifiedByArray':
+					// Gets the value for the private _objRoleAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the role.modified_by reverse relationship
+					// @return Role[]
+					return (array) $this->_objRoleAsModifiedByArray;
 
 				case '_RoleEntityQtypeBuiltInAuthorizationAsCreatedBy':
 					// Gets the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsCreatedBy (Read-Only)
@@ -4248,17 +4259,17 @@
 					// @return RoleEntityQtypeBuiltInAuthorization[]
 					return (array) $this->_objRoleEntityQtypeBuiltInAuthorizationAsCreatedByArray;
 
-				case '_RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy':
-					// Gets the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy (Read-Only)
-					// if set due to an expansion on the role_entity_qtype_custom_field_authorization.modified_by reverse relationship
-					// @return RoleEntityQtypeCustomFieldAuthorization
-					return $this->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy;
+				case '_RoleEntityQtypeBuiltInAuthorizationAsModifiedBy':
+					// Gets the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy (Read-Only)
+					// if set due to an expansion on the role_entity_qtype_built_in_authorization.modified_by reverse relationship
+					// @return RoleEntityQtypeBuiltInAuthorization
+					return $this->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedBy;
 
-				case '_RoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray':
-					// Gets the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the role_entity_qtype_custom_field_authorization.modified_by reverse relationship
-					// @return RoleEntityQtypeCustomFieldAuthorization[]
-					return (array) $this->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray;
+				case '_RoleEntityQtypeBuiltInAuthorizationAsModifiedByArray':
+					// Gets the value for the private _objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the role_entity_qtype_built_in_authorization.modified_by reverse relationship
+					// @return RoleEntityQtypeBuiltInAuthorization[]
+					return (array) $this->_objRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray;
 
 				case '_RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy':
 					// Gets the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsCreatedBy (Read-Only)
@@ -4272,17 +4283,17 @@
 					// @return RoleEntityQtypeCustomFieldAuthorization[]
 					return (array) $this->_objRoleEntityQtypeCustomFieldAuthorizationAsCreatedByArray;
 
-				case '_RoleModuleAsModifiedBy':
-					// Gets the value for the private _objRoleModuleAsModifiedBy (Read-Only)
-					// if set due to an expansion on the role_module.modified_by reverse relationship
-					// @return RoleModule
-					return $this->_objRoleModuleAsModifiedBy;
+				case '_RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy':
+					// Gets the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy (Read-Only)
+					// if set due to an expansion on the role_entity_qtype_custom_field_authorization.modified_by reverse relationship
+					// @return RoleEntityQtypeCustomFieldAuthorization
+					return $this->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy;
 
-				case '_RoleModuleAsModifiedByArray':
-					// Gets the value for the private _objRoleModuleAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the role_module.modified_by reverse relationship
-					// @return RoleModule[]
-					return (array) $this->_objRoleModuleAsModifiedByArray;
+				case '_RoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray':
+					// Gets the value for the private _objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the role_entity_qtype_custom_field_authorization.modified_by reverse relationship
+					// @return RoleEntityQtypeCustomFieldAuthorization[]
+					return (array) $this->_objRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray;
 
 				case '_RoleModuleAsCreatedBy':
 					// Gets the value for the private _objRoleModuleAsCreatedBy (Read-Only)
@@ -4296,17 +4307,17 @@
 					// @return RoleModule[]
 					return (array) $this->_objRoleModuleAsCreatedByArray;
 
-				case '_RoleModuleAuthorizationAsModifiedBy':
-					// Gets the value for the private _objRoleModuleAuthorizationAsModifiedBy (Read-Only)
-					// if set due to an expansion on the role_module_authorization.modified_by reverse relationship
-					// @return RoleModuleAuthorization
-					return $this->_objRoleModuleAuthorizationAsModifiedBy;
+				case '_RoleModuleAsModifiedBy':
+					// Gets the value for the private _objRoleModuleAsModifiedBy (Read-Only)
+					// if set due to an expansion on the role_module.modified_by reverse relationship
+					// @return RoleModule
+					return $this->_objRoleModuleAsModifiedBy;
 
-				case '_RoleModuleAuthorizationAsModifiedByArray':
-					// Gets the value for the private _objRoleModuleAuthorizationAsModifiedByArray (Read-Only)
-					// if set due to an ExpandAsArray on the role_module_authorization.modified_by reverse relationship
-					// @return RoleModuleAuthorization[]
-					return (array) $this->_objRoleModuleAuthorizationAsModifiedByArray;
+				case '_RoleModuleAsModifiedByArray':
+					// Gets the value for the private _objRoleModuleAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the role_module.modified_by reverse relationship
+					// @return RoleModule[]
+					return (array) $this->_objRoleModuleAsModifiedByArray;
 
 				case '_RoleModuleAuthorizationAsCreatedBy':
 					// Gets the value for the private _objRoleModuleAuthorizationAsCreatedBy (Read-Only)
@@ -4319,6 +4330,18 @@
 					// if set due to an ExpandAsArray on the role_module_authorization.created_by reverse relationship
 					// @return RoleModuleAuthorization[]
 					return (array) $this->_objRoleModuleAuthorizationAsCreatedByArray;
+
+				case '_RoleModuleAuthorizationAsModifiedBy':
+					// Gets the value for the private _objRoleModuleAuthorizationAsModifiedBy (Read-Only)
+					// if set due to an expansion on the role_module_authorization.modified_by reverse relationship
+					// @return RoleModuleAuthorization
+					return $this->_objRoleModuleAuthorizationAsModifiedBy;
+
+				case '_RoleModuleAuthorizationAsModifiedByArray':
+					// Gets the value for the private _objRoleModuleAuthorizationAsModifiedByArray (Read-Only)
+					// if set due to an ExpandAsArray on the role_module_authorization.modified_by reverse relationship
+					// @return RoleModuleAuthorization[]
+					return (array) $this->_objRoleModuleAuthorizationAsModifiedByArray;
 
 				case '_RoleTransactionTypeAuthorizationAsCreatedBy':
 					// Gets the value for the private _objRoleTransactionTypeAuthorizationAsCreatedBy (Read-Only)
@@ -4520,6 +4543,17 @@
 						throw $objExc;
 					}
 
+				case 'OwnerFlag':
+					// Sets the value for blnOwnerFlag (Not Null)
+					// @param boolean $mixValue
+					// @return boolean
+					try {
+						return ($this->blnOwnerFlag = QType::Cast($mixValue, QType::Boolean));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 				case 'PortableAccessFlag':
 					// Sets the value for blnPortableAccessFlag 
 					// @param boolean $mixValue
@@ -4712,188 +4746,6 @@
 
 			
 		
-		// Related Objects' Methods for AddressAsCreatedBy
-		//-------------------------------------------------------------------
-
-		/**
-		 * Gets all associated AddressesAsCreatedBy as an array of Address objects
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Address[]
-		*/ 
-		public function GetAddressAsCreatedByArray($objOptionalClauses = null) {
-			if ((is_null($this->intUserAccountId)))
-				return array();
-
-			try {
-				return Address::LoadArrayByCreatedBy($this->intUserAccountId, $objOptionalClauses);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-		}
-
-		/**
-		 * Counts all associated AddressesAsCreatedBy
-		 * @return int
-		*/ 
-		public function CountAddressesAsCreatedBy() {
-			if ((is_null($this->intUserAccountId)))
-				return 0;
-
-			return Address::CountByCreatedBy($this->intUserAccountId);
-		}
-
-		/**
-		 * Associates a AddressAsCreatedBy
-		 * @param Address $objAddress
-		 * @return void
-		*/ 
-		public function AssociateAddressAsCreatedBy(Address $objAddress) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAddressAsCreatedBy on this unsaved UserAccount.');
-			if ((is_null($objAddress->AddressId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAddressAsCreatedBy on this UserAccount with an unsaved Address.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`address`
-				SET
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-				WHERE
-					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . '
-			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->CreatedBy = $this->intUserAccountId;
-				$objAddress->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates a AddressAsCreatedBy
-		 * @param Address $objAddress
-		 * @return void
-		*/ 
-		public function UnassociateAddressAsCreatedBy(Address $objAddress) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this unsaved UserAccount.');
-			if ((is_null($objAddress->AddressId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this UserAccount with an unsaved Address.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`address`
-				SET
-					`created_by` = null
-				WHERE
-					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->CreatedBy = null;
-				$objAddress->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates all AddressesAsCreatedBy
-		 * @return void
-		*/ 
-		public function UnassociateAllAddressesAsCreatedBy() {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this unsaved UserAccount.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Address::LoadArrayByCreatedBy($this->intUserAccountId) as $objAddress) {
-					$objAddress->CreatedBy = null;
-					$objAddress->Journal('UPDATE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`address`
-				SET
-					`created_by` = null
-				WHERE
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-		}
-
-		/**
-		 * Deletes an associated AddressAsCreatedBy
-		 * @param Address $objAddress
-		 * @return void
-		*/ 
-		public function DeleteAssociatedAddressAsCreatedBy(Address $objAddress) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this unsaved UserAccount.');
-			if ((is_null($objAddress->AddressId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this UserAccount with an unsaved Address.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`address`
-				WHERE
-					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAddress->Journal('DELETE');
-			}
-		}
-
-		/**
-		 * Deletes all associated AddressesAsCreatedBy
-		 * @return void
-		*/ 
-		public function DeleteAllAddressesAsCreatedBy() {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this unsaved UserAccount.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Address::LoadArrayByCreatedBy($this->intUserAccountId) as $objAddress) {
-					$objAddress->Journal('DELETE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`address`
-				WHERE
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-		}
-
-			
-		
 		// Related Objects' Methods for AddressAsModifiedBy
 		//-------------------------------------------------------------------
 
@@ -5076,20 +4928,20 @@
 
 			
 		
-		// Related Objects' Methods for AssetAsModifiedBy
+		// Related Objects' Methods for AddressAsCreatedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated AssetsAsModifiedBy as an array of Asset objects
+		 * Gets all associated AddressesAsCreatedBy as an array of Address objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Asset[]
+		 * @return Address[]
 		*/ 
-		public function GetAssetAsModifiedByArray($objOptionalClauses = null) {
+		public function GetAddressAsCreatedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return Asset::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return Address::LoadArrayByCreatedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -5097,26 +4949,26 @@
 		}
 
 		/**
-		 * Counts all associated AssetsAsModifiedBy
+		 * Counts all associated AddressesAsCreatedBy
 		 * @return int
 		*/ 
-		public function CountAssetsAsModifiedBy() {
+		public function CountAddressesAsCreatedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return Asset::CountByModifiedBy($this->intUserAccountId);
+			return Address::CountByCreatedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a AssetAsModifiedBy
-		 * @param Asset $objAsset
+		 * Associates a AddressAsCreatedBy
+		 * @param Address $objAddress
 		 * @return void
 		*/ 
-		public function AssociateAssetAsModifiedBy(Asset $objAsset) {
+		public function AssociateAddressAsCreatedBy(Address $objAddress) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAsset->AssetId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetAsModifiedBy on this UserAccount with an unsaved Asset.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAddressAsCreatedBy on this unsaved UserAccount.');
+			if ((is_null($objAddress->AddressId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAddressAsCreatedBy on this UserAccount with an unsaved Address.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -5124,30 +4976,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`asset`
+					`address`
 				SET
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . '
+					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objAsset->ModifiedBy = $this->intUserAccountId;
-				$objAsset->Journal('UPDATE');
+				$objAddress->CreatedBy = $this->intUserAccountId;
+				$objAddress->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a AssetAsModifiedBy
-		 * @param Asset $objAsset
+		 * Unassociates a AddressAsCreatedBy
+		 * @param Address $objAddress
 		 * @return void
 		*/ 
-		public function UnassociateAssetAsModifiedBy(Asset $objAsset) {
+		public function UnassociateAddressAsCreatedBy(Address $objAddress) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAsset->AssetId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this UserAccount with an unsaved Asset.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this unsaved UserAccount.');
+			if ((is_null($objAddress->AddressId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this UserAccount with an unsaved Address.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -5155,61 +5007,61 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`asset`
+					`address`
 				SET
-					`modified_by` = null
+					`created_by` = null
 				WHERE
-					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objAsset->ModifiedBy = null;
-				$objAsset->Journal('UPDATE');
+				$objAddress->CreatedBy = null;
+				$objAddress->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all AssetsAsModifiedBy
+		 * Unassociates all AddressesAsCreatedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllAssetsAsModifiedBy() {
+		public function UnassociateAllAddressesAsCreatedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Asset::LoadArrayByModifiedBy($this->intUserAccountId) as $objAsset) {
-					$objAsset->ModifiedBy = null;
-					$objAsset->Journal('UPDATE');
+				foreach (Address::LoadArrayByCreatedBy($this->intUserAccountId) as $objAddress) {
+					$objAddress->CreatedBy = null;
+					$objAddress->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`asset`
+					`address`
 				SET
-					`modified_by` = null
+					`created_by` = null
 				WHERE
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 		}
 
 		/**
-		 * Deletes an associated AssetAsModifiedBy
-		 * @param Asset $objAsset
+		 * Deletes an associated AddressAsCreatedBy
+		 * @param Address $objAddress
 		 * @return void
 		*/ 
-		public function DeleteAssociatedAssetAsModifiedBy(Asset $objAsset) {
+		public function DeleteAssociatedAddressAsCreatedBy(Address $objAddress) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAsset->AssetId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this UserAccount with an unsaved Asset.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this unsaved UserAccount.');
+			if ((is_null($objAddress->AddressId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this UserAccount with an unsaved Address.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -5217,42 +5069,42 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`asset`
+					`address`
 				WHERE
-					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`address_id` = ' . $objDatabase->SqlVariable($objAddress->AddressId) . ' AND
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objAsset->Journal('DELETE');
+				$objAddress->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated AssetsAsModifiedBy
+		 * Deletes all associated AddressesAsCreatedBy
 		 * @return void
 		*/ 
-		public function DeleteAllAssetsAsModifiedBy() {
+		public function DeleteAllAddressesAsCreatedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAddressAsCreatedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Asset::LoadArrayByModifiedBy($this->intUserAccountId) as $objAsset) {
-					$objAsset->Journal('DELETE');
+				foreach (Address::LoadArrayByCreatedBy($this->intUserAccountId) as $objAddress) {
+					$objAddress->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`asset`
+					`address`
 				WHERE
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 		}
 
@@ -5440,20 +5292,20 @@
 
 			
 		
-		// Related Objects' Methods for AssetModelAsModifiedBy
+		// Related Objects' Methods for AssetAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated AssetModelsAsModifiedBy as an array of AssetModel objects
+		 * Gets all associated AssetsAsModifiedBy as an array of Asset objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return AssetModel[]
+		 * @return Asset[]
 		*/ 
-		public function GetAssetModelAsModifiedByArray($objOptionalClauses = null) {
+		public function GetAssetAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return AssetModel::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return Asset::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -5461,26 +5313,26 @@
 		}
 
 		/**
-		 * Counts all associated AssetModelsAsModifiedBy
+		 * Counts all associated AssetsAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountAssetModelsAsModifiedBy() {
+		public function CountAssetsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return AssetModel::CountByModifiedBy($this->intUserAccountId);
+			return Asset::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a AssetModelAsModifiedBy
-		 * @param AssetModel $objAssetModel
+		 * Associates a AssetAsModifiedBy
+		 * @param Asset $objAsset
 		 * @return void
 		*/ 
-		public function AssociateAssetModelAsModifiedBy(AssetModel $objAssetModel) {
+		public function AssociateAssetAsModifiedBy(Asset $objAsset) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetModelAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAssetModel->AssetModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetModelAsModifiedBy on this UserAccount with an unsaved AssetModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAsset->AssetId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetAsModifiedBy on this UserAccount with an unsaved Asset.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -5488,30 +5340,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`asset_model`
+					`asset`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . '
+					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objAssetModel->ModifiedBy = $this->intUserAccountId;
-				$objAssetModel->Journal('UPDATE');
+				$objAsset->ModifiedBy = $this->intUserAccountId;
+				$objAsset->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a AssetModelAsModifiedBy
-		 * @param AssetModel $objAssetModel
+		 * Unassociates a AssetAsModifiedBy
+		 * @param Asset $objAsset
 		 * @return void
 		*/ 
-		public function UnassociateAssetModelAsModifiedBy(AssetModel $objAssetModel) {
+		public function UnassociateAssetAsModifiedBy(Asset $objAsset) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAssetModel->AssetModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this UserAccount with an unsaved AssetModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAsset->AssetId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this UserAccount with an unsaved Asset.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -5519,44 +5371,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`asset_model`
+					`asset`
 				SET
 					`modified_by` = null
 				WHERE
-					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
+					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objAssetModel->ModifiedBy = null;
-				$objAssetModel->Journal('UPDATE');
+				$objAsset->ModifiedBy = null;
+				$objAsset->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all AssetModelsAsModifiedBy
+		 * Unassociates all AssetsAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllAssetModelsAsModifiedBy() {
+		public function UnassociateAllAssetsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (AssetModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetModel) {
-					$objAssetModel->ModifiedBy = null;
-					$objAssetModel->Journal('UPDATE');
+				foreach (Asset::LoadArrayByModifiedBy($this->intUserAccountId) as $objAsset) {
+					$objAsset->ModifiedBy = null;
+					$objAsset->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`asset_model`
+					`asset`
 				SET
 					`modified_by` = null
 				WHERE
@@ -5565,15 +5417,15 @@
 		}
 
 		/**
-		 * Deletes an associated AssetModelAsModifiedBy
-		 * @param AssetModel $objAssetModel
+		 * Deletes an associated AssetAsModifiedBy
+		 * @param Asset $objAsset
 		 * @return void
 		*/ 
-		public function DeleteAssociatedAssetModelAsModifiedBy(AssetModel $objAssetModel) {
+		public function DeleteAssociatedAssetAsModifiedBy(Asset $objAsset) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAssetModel->AssetModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this UserAccount with an unsaved AssetModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAsset->AssetId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this UserAccount with an unsaved Asset.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -5581,40 +5433,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`asset_model`
+					`asset`
 				WHERE
-					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
+					`asset_id` = ' . $objDatabase->SqlVariable($objAsset->AssetId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objAssetModel->Journal('DELETE');
+				$objAsset->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated AssetModelsAsModifiedBy
+		 * Deletes all associated AssetsAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllAssetModelsAsModifiedBy() {
+		public function DeleteAllAssetsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (AssetModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetModel) {
-					$objAssetModel->Journal('DELETE');
+				foreach (Asset::LoadArrayByModifiedBy($this->intUserAccountId) as $objAsset) {
+					$objAsset->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`asset_model`
+					`asset`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -5799,6 +5651,188 @@
 					`asset_model`
 				WHERE
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+		}
+
+			
+		
+		// Related Objects' Methods for AssetModelAsModifiedBy
+		//-------------------------------------------------------------------
+
+		/**
+		 * Gets all associated AssetModelsAsModifiedBy as an array of AssetModel objects
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return AssetModel[]
+		*/ 
+		public function GetAssetModelAsModifiedByArray($objOptionalClauses = null) {
+			if ((is_null($this->intUserAccountId)))
+				return array();
+
+			try {
+				return AssetModel::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Counts all associated AssetModelsAsModifiedBy
+		 * @return int
+		*/ 
+		public function CountAssetModelsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				return 0;
+
+			return AssetModel::CountByModifiedBy($this->intUserAccountId);
+		}
+
+		/**
+		 * Associates a AssetModelAsModifiedBy
+		 * @param AssetModel $objAssetModel
+		 * @return void
+		*/ 
+		public function AssociateAssetModelAsModifiedBy(AssetModel $objAssetModel) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetModelAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAssetModel->AssetModelId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAssetModelAsModifiedBy on this UserAccount with an unsaved AssetModel.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`asset_model`
+				SET
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+				WHERE
+					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . '
+			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->ModifiedBy = $this->intUserAccountId;
+				$objAssetModel->Journal('UPDATE');
+			}
+		}
+
+		/**
+		 * Unassociates a AssetModelAsModifiedBy
+		 * @param AssetModel $objAssetModel
+		 * @return void
+		*/ 
+		public function UnassociateAssetModelAsModifiedBy(AssetModel $objAssetModel) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAssetModel->AssetModelId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this UserAccount with an unsaved AssetModel.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`asset_model`
+				SET
+					`modified_by` = null
+				WHERE
+					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->ModifiedBy = null;
+				$objAssetModel->Journal('UPDATE');
+			}
+		}
+
+		/**
+		 * Unassociates all AssetModelsAsModifiedBy
+		 * @return void
+		*/ 
+		public function UnassociateAllAssetModelsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this unsaved UserAccount.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetModel) {
+					$objAssetModel->ModifiedBy = null;
+					$objAssetModel->Journal('UPDATE');
+				}
+			}
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`asset_model`
+				SET
+					`modified_by` = null
+				WHERE
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+		}
+
+		/**
+		 * Deletes an associated AssetModelAsModifiedBy
+		 * @param AssetModel $objAssetModel
+		 * @return void
+		*/ 
+		public function DeleteAssociatedAssetModelAsModifiedBy(AssetModel $objAssetModel) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAssetModel->AssetModelId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this UserAccount with an unsaved AssetModel.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`asset_model`
+				WHERE
+					`asset_model_id` = ' . $objDatabase->SqlVariable($objAssetModel->AssetModelId) . ' AND
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objAssetModel->Journal('DELETE');
+			}
+		}
+
+		/**
+		 * Deletes all associated AssetModelsAsModifiedBy
+		 * @return void
+		*/ 
+		public function DeleteAllAssetModelsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAssetModelAsModifiedBy on this unsaved UserAccount.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (AssetModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objAssetModel) {
+					$objAssetModel->Journal('DELETE');
+				}
+			}
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`asset_model`
+				WHERE
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 		}
 
@@ -6896,188 +6930,6 @@
 
 			
 		
-		// Related Objects' Methods for AuditAsModifiedBy
-		//-------------------------------------------------------------------
-
-		/**
-		 * Gets all associated AuditsAsModifiedBy as an array of Audit objects
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Audit[]
-		*/ 
-		public function GetAuditAsModifiedByArray($objOptionalClauses = null) {
-			if ((is_null($this->intUserAccountId)))
-				return array();
-
-			try {
-				return Audit::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-		}
-
-		/**
-		 * Counts all associated AuditsAsModifiedBy
-		 * @return int
-		*/ 
-		public function CountAuditsAsModifiedBy() {
-			if ((is_null($this->intUserAccountId)))
-				return 0;
-
-			return Audit::CountByModifiedBy($this->intUserAccountId);
-		}
-
-		/**
-		 * Associates a AuditAsModifiedBy
-		 * @param Audit $objAudit
-		 * @return void
-		*/ 
-		public function AssociateAuditAsModifiedBy(Audit $objAudit) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAuditAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAudit->AuditId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAuditAsModifiedBy on this UserAccount with an unsaved Audit.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`audit`
-				SET
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-				WHERE
-					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . '
-			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objAudit->ModifiedBy = $this->intUserAccountId;
-				$objAudit->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates a AuditAsModifiedBy
-		 * @param Audit $objAudit
-		 * @return void
-		*/ 
-		public function UnassociateAuditAsModifiedBy(Audit $objAudit) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAudit->AuditId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this UserAccount with an unsaved Audit.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`audit`
-				SET
-					`modified_by` = null
-				WHERE
-					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . ' AND
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAudit->ModifiedBy = null;
-				$objAudit->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates all AuditsAsModifiedBy
-		 * @return void
-		*/ 
-		public function UnassociateAllAuditsAsModifiedBy() {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this unsaved UserAccount.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Audit::LoadArrayByModifiedBy($this->intUserAccountId) as $objAudit) {
-					$objAudit->ModifiedBy = null;
-					$objAudit->Journal('UPDATE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`audit`
-				SET
-					`modified_by` = null
-				WHERE
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-		}
-
-		/**
-		 * Deletes an associated AuditAsModifiedBy
-		 * @param Audit $objAudit
-		 * @return void
-		*/ 
-		public function DeleteAssociatedAuditAsModifiedBy(Audit $objAudit) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objAudit->AuditId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this UserAccount with an unsaved Audit.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`audit`
-				WHERE
-					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . ' AND
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objAudit->Journal('DELETE');
-			}
-		}
-
-		/**
-		 * Deletes all associated AuditsAsModifiedBy
-		 * @return void
-		*/ 
-		public function DeleteAllAuditsAsModifiedBy() {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this unsaved UserAccount.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Audit::LoadArrayByModifiedBy($this->intUserAccountId) as $objAudit) {
-					$objAudit->Journal('DELETE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`audit`
-				WHERE
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-		}
-
-			
-		
 		// Related Objects' Methods for AuditAsCreatedBy
 		//-------------------------------------------------------------------
 
@@ -7260,20 +7112,20 @@
 
 			
 		
-		// Related Objects' Methods for CategoryAsModifiedBy
+		// Related Objects' Methods for AuditAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated CategoriesAsModifiedBy as an array of Category objects
+		 * Gets all associated AuditsAsModifiedBy as an array of Audit objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Category[]
+		 * @return Audit[]
 		*/ 
-		public function GetCategoryAsModifiedByArray($objOptionalClauses = null) {
+		public function GetAuditAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return Category::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return Audit::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -7281,26 +7133,26 @@
 		}
 
 		/**
-		 * Counts all associated CategoriesAsModifiedBy
+		 * Counts all associated AuditsAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountCategoriesAsModifiedBy() {
+		public function CountAuditsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return Category::CountByModifiedBy($this->intUserAccountId);
+			return Audit::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a CategoryAsModifiedBy
-		 * @param Category $objCategory
+		 * Associates a AuditAsModifiedBy
+		 * @param Audit $objAudit
 		 * @return void
 		*/ 
-		public function AssociateCategoryAsModifiedBy(Category $objCategory) {
+		public function AssociateAuditAsModifiedBy(Audit $objAudit) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateCategoryAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objCategory->CategoryId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateCategoryAsModifiedBy on this UserAccount with an unsaved Category.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAuditAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAudit->AuditId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateAuditAsModifiedBy on this UserAccount with an unsaved Audit.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -7308,30 +7160,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`category`
+					`audit`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . '
+					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objCategory->ModifiedBy = $this->intUserAccountId;
-				$objCategory->Journal('UPDATE');
+				$objAudit->ModifiedBy = $this->intUserAccountId;
+				$objAudit->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a CategoryAsModifiedBy
-		 * @param Category $objCategory
+		 * Unassociates a AuditAsModifiedBy
+		 * @param Audit $objAudit
 		 * @return void
 		*/ 
-		public function UnassociateCategoryAsModifiedBy(Category $objCategory) {
+		public function UnassociateAuditAsModifiedBy(Audit $objAudit) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objCategory->CategoryId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this UserAccount with an unsaved Category.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAudit->AuditId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this UserAccount with an unsaved Audit.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -7339,44 +7191,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`category`
+					`audit`
 				SET
 					`modified_by` = null
 				WHERE
-					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . ' AND
+					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objCategory->ModifiedBy = null;
-				$objCategory->Journal('UPDATE');
+				$objAudit->ModifiedBy = null;
+				$objAudit->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all CategoriesAsModifiedBy
+		 * Unassociates all AuditsAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllCategoriesAsModifiedBy() {
+		public function UnassociateAllAuditsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Category::LoadArrayByModifiedBy($this->intUserAccountId) as $objCategory) {
-					$objCategory->ModifiedBy = null;
-					$objCategory->Journal('UPDATE');
+				foreach (Audit::LoadArrayByModifiedBy($this->intUserAccountId) as $objAudit) {
+					$objAudit->ModifiedBy = null;
+					$objAudit->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`category`
+					`audit`
 				SET
 					`modified_by` = null
 				WHERE
@@ -7385,15 +7237,15 @@
 		}
 
 		/**
-		 * Deletes an associated CategoryAsModifiedBy
-		 * @param Category $objCategory
+		 * Deletes an associated AuditAsModifiedBy
+		 * @param Audit $objAudit
 		 * @return void
 		*/ 
-		public function DeleteAssociatedCategoryAsModifiedBy(Category $objCategory) {
+		public function DeleteAssociatedAuditAsModifiedBy(Audit $objAudit) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objCategory->CategoryId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this UserAccount with an unsaved Category.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objAudit->AuditId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this UserAccount with an unsaved Audit.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -7401,40 +7253,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`category`
+					`audit`
 				WHERE
-					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . ' AND
+					`audit_id` = ' . $objDatabase->SqlVariable($objAudit->AuditId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objCategory->Journal('DELETE');
+				$objAudit->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated CategoriesAsModifiedBy
+		 * Deletes all associated AuditsAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllCategoriesAsModifiedBy() {
+		public function DeleteAllAuditsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateAuditAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Category::LoadArrayByModifiedBy($this->intUserAccountId) as $objCategory) {
-					$objCategory->Journal('DELETE');
+				foreach (Audit::LoadArrayByModifiedBy($this->intUserAccountId) as $objAudit) {
+					$objAudit->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`category`
+					`audit`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -7624,20 +7476,20 @@
 
 			
 		
-		// Related Objects' Methods for CompanyAsModifiedBy
+		// Related Objects' Methods for CategoryAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated CompaniesAsModifiedBy as an array of Company objects
+		 * Gets all associated CategoriesAsModifiedBy as an array of Category objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Company[]
+		 * @return Category[]
 		*/ 
-		public function GetCompanyAsModifiedByArray($objOptionalClauses = null) {
+		public function GetCategoryAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return Company::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return Category::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -7645,26 +7497,26 @@
 		}
 
 		/**
-		 * Counts all associated CompaniesAsModifiedBy
+		 * Counts all associated CategoriesAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountCompaniesAsModifiedBy() {
+		public function CountCategoriesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return Company::CountByModifiedBy($this->intUserAccountId);
+			return Category::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a CompanyAsModifiedBy
-		 * @param Company $objCompany
+		 * Associates a CategoryAsModifiedBy
+		 * @param Category $objCategory
 		 * @return void
 		*/ 
-		public function AssociateCompanyAsModifiedBy(Company $objCompany) {
+		public function AssociateCategoryAsModifiedBy(Category $objCategory) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateCompanyAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objCompany->CompanyId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateCompanyAsModifiedBy on this UserAccount with an unsaved Company.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateCategoryAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objCategory->CategoryId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateCategoryAsModifiedBy on this UserAccount with an unsaved Category.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -7672,30 +7524,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`company`
+					`category`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . '
+					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objCompany->ModifiedBy = $this->intUserAccountId;
-				$objCompany->Journal('UPDATE');
+				$objCategory->ModifiedBy = $this->intUserAccountId;
+				$objCategory->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a CompanyAsModifiedBy
-		 * @param Company $objCompany
+		 * Unassociates a CategoryAsModifiedBy
+		 * @param Category $objCategory
 		 * @return void
 		*/ 
-		public function UnassociateCompanyAsModifiedBy(Company $objCompany) {
+		public function UnassociateCategoryAsModifiedBy(Category $objCategory) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objCompany->CompanyId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this UserAccount with an unsaved Company.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objCategory->CategoryId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this UserAccount with an unsaved Category.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -7703,44 +7555,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`company`
+					`category`
 				SET
 					`modified_by` = null
 				WHERE
-					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
+					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objCompany->ModifiedBy = null;
-				$objCompany->Journal('UPDATE');
+				$objCategory->ModifiedBy = null;
+				$objCategory->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all CompaniesAsModifiedBy
+		 * Unassociates all CategoriesAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllCompaniesAsModifiedBy() {
+		public function UnassociateAllCategoriesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Company::LoadArrayByModifiedBy($this->intUserAccountId) as $objCompany) {
-					$objCompany->ModifiedBy = null;
-					$objCompany->Journal('UPDATE');
+				foreach (Category::LoadArrayByModifiedBy($this->intUserAccountId) as $objCategory) {
+					$objCategory->ModifiedBy = null;
+					$objCategory->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`company`
+					`category`
 				SET
 					`modified_by` = null
 				WHERE
@@ -7749,15 +7601,15 @@
 		}
 
 		/**
-		 * Deletes an associated CompanyAsModifiedBy
-		 * @param Company $objCompany
+		 * Deletes an associated CategoryAsModifiedBy
+		 * @param Category $objCategory
 		 * @return void
 		*/ 
-		public function DeleteAssociatedCompanyAsModifiedBy(Company $objCompany) {
+		public function DeleteAssociatedCategoryAsModifiedBy(Category $objCategory) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objCompany->CompanyId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this UserAccount with an unsaved Company.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objCategory->CategoryId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this UserAccount with an unsaved Category.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -7765,40 +7617,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`company`
+					`category`
 				WHERE
-					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
+					`category_id` = ' . $objDatabase->SqlVariable($objCategory->CategoryId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objCompany->Journal('DELETE');
+				$objCategory->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated CompaniesAsModifiedBy
+		 * Deletes all associated CategoriesAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllCompaniesAsModifiedBy() {
+		public function DeleteAllCategoriesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCategoryAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Company::LoadArrayByModifiedBy($this->intUserAccountId) as $objCompany) {
-					$objCompany->Journal('DELETE');
+				foreach (Category::LoadArrayByModifiedBy($this->intUserAccountId) as $objCategory) {
+					$objCategory->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`company`
+					`category`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -7983,6 +7835,188 @@
 					`company`
 				WHERE
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+		}
+
+			
+		
+		// Related Objects' Methods for CompanyAsModifiedBy
+		//-------------------------------------------------------------------
+
+		/**
+		 * Gets all associated CompaniesAsModifiedBy as an array of Company objects
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return Company[]
+		*/ 
+		public function GetCompanyAsModifiedByArray($objOptionalClauses = null) {
+			if ((is_null($this->intUserAccountId)))
+				return array();
+
+			try {
+				return Company::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Counts all associated CompaniesAsModifiedBy
+		 * @return int
+		*/ 
+		public function CountCompaniesAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				return 0;
+
+			return Company::CountByModifiedBy($this->intUserAccountId);
+		}
+
+		/**
+		 * Associates a CompanyAsModifiedBy
+		 * @param Company $objCompany
+		 * @return void
+		*/ 
+		public function AssociateCompanyAsModifiedBy(Company $objCompany) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateCompanyAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objCompany->CompanyId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateCompanyAsModifiedBy on this UserAccount with an unsaved Company.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`company`
+				SET
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+				WHERE
+					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . '
+			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->ModifiedBy = $this->intUserAccountId;
+				$objCompany->Journal('UPDATE');
+			}
+		}
+
+		/**
+		 * Unassociates a CompanyAsModifiedBy
+		 * @param Company $objCompany
+		 * @return void
+		*/ 
+		public function UnassociateCompanyAsModifiedBy(Company $objCompany) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objCompany->CompanyId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this UserAccount with an unsaved Company.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`company`
+				SET
+					`modified_by` = null
+				WHERE
+					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->ModifiedBy = null;
+				$objCompany->Journal('UPDATE');
+			}
+		}
+
+		/**
+		 * Unassociates all CompaniesAsModifiedBy
+		 * @return void
+		*/ 
+		public function UnassociateAllCompaniesAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this unsaved UserAccount.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Company::LoadArrayByModifiedBy($this->intUserAccountId) as $objCompany) {
+					$objCompany->ModifiedBy = null;
+					$objCompany->Journal('UPDATE');
+				}
+			}
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`company`
+				SET
+					`modified_by` = null
+				WHERE
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+		}
+
+		/**
+		 * Deletes an associated CompanyAsModifiedBy
+		 * @param Company $objCompany
+		 * @return void
+		*/ 
+		public function DeleteAssociatedCompanyAsModifiedBy(Company $objCompany) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objCompany->CompanyId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this UserAccount with an unsaved Company.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`company`
+				WHERE
+					`company_id` = ' . $objDatabase->SqlVariable($objCompany->CompanyId) . ' AND
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objCompany->Journal('DELETE');
+			}
+		}
+
+		/**
+		 * Deletes all associated CompaniesAsModifiedBy
+		 * @return void
+		*/ 
+		public function DeleteAllCompaniesAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateCompanyAsModifiedBy on this unsaved UserAccount.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Company::LoadArrayByModifiedBy($this->intUserAccountId) as $objCompany) {
+					$objCompany->Journal('DELETE');
+				}
+			}
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`company`
+				WHERE
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 		}
 
@@ -9262,188 +9296,6 @@
 
 			
 		
-		// Related Objects' Methods for InventoryLocationAsCreatedBy
-		//-------------------------------------------------------------------
-
-		/**
-		 * Gets all associated InventoryLocationsAsCreatedBy as an array of InventoryLocation objects
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return InventoryLocation[]
-		*/ 
-		public function GetInventoryLocationAsCreatedByArray($objOptionalClauses = null) {
-			if ((is_null($this->intUserAccountId)))
-				return array();
-
-			try {
-				return InventoryLocation::LoadArrayByCreatedBy($this->intUserAccountId, $objOptionalClauses);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-		}
-
-		/**
-		 * Counts all associated InventoryLocationsAsCreatedBy
-		 * @return int
-		*/ 
-		public function CountInventoryLocationsAsCreatedBy() {
-			if ((is_null($this->intUserAccountId)))
-				return 0;
-
-			return InventoryLocation::CountByCreatedBy($this->intUserAccountId);
-		}
-
-		/**
-		 * Associates a InventoryLocationAsCreatedBy
-		 * @param InventoryLocation $objInventoryLocation
-		 * @return void
-		*/ 
-		public function AssociateInventoryLocationAsCreatedBy(InventoryLocation $objInventoryLocation) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryLocation->InventoryLocationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryLocationAsCreatedBy on this UserAccount with an unsaved InventoryLocation.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`inventory_location`
-				SET
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-				WHERE
-					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . '
-			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryLocation->CreatedBy = $this->intUserAccountId;
-				$objInventoryLocation->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates a InventoryLocationAsCreatedBy
-		 * @param InventoryLocation $objInventoryLocation
-		 * @return void
-		*/ 
-		public function UnassociateInventoryLocationAsCreatedBy(InventoryLocation $objInventoryLocation) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryLocation->InventoryLocationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this UserAccount with an unsaved InventoryLocation.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`inventory_location`
-				SET
-					`created_by` = null
-				WHERE
-					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryLocation->CreatedBy = null;
-				$objInventoryLocation->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates all InventoryLocationsAsCreatedBy
-		 * @return void
-		*/ 
-		public function UnassociateAllInventoryLocationsAsCreatedBy() {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryLocation::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryLocation) {
-					$objInventoryLocation->CreatedBy = null;
-					$objInventoryLocation->Journal('UPDATE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`inventory_location`
-				SET
-					`created_by` = null
-				WHERE
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-		}
-
-		/**
-		 * Deletes an associated InventoryLocationAsCreatedBy
-		 * @param InventoryLocation $objInventoryLocation
-		 * @return void
-		*/ 
-		public function DeleteAssociatedInventoryLocationAsCreatedBy(InventoryLocation $objInventoryLocation) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryLocation->InventoryLocationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this UserAccount with an unsaved InventoryLocation.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`inventory_location`
-				WHERE
-					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objInventoryLocation->Journal('DELETE');
-			}
-		}
-
-		/**
-		 * Deletes all associated InventoryLocationsAsCreatedBy
-		 * @return void
-		*/ 
-		public function DeleteAllInventoryLocationsAsCreatedBy() {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryLocation::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryLocation) {
-					$objInventoryLocation->Journal('DELETE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`inventory_location`
-				WHERE
-					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-		}
-
-			
-		
 		// Related Objects' Methods for InventoryLocationAsModifiedBy
 		//-------------------------------------------------------------------
 
@@ -9626,20 +9478,20 @@
 
 			
 		
-		// Related Objects' Methods for InventoryModelAsModifiedBy
+		// Related Objects' Methods for InventoryLocationAsCreatedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated InventoryModelsAsModifiedBy as an array of InventoryModel objects
+		 * Gets all associated InventoryLocationsAsCreatedBy as an array of InventoryLocation objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return InventoryModel[]
+		 * @return InventoryLocation[]
 		*/ 
-		public function GetInventoryModelAsModifiedByArray($objOptionalClauses = null) {
+		public function GetInventoryLocationAsCreatedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return InventoryModel::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return InventoryLocation::LoadArrayByCreatedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -9647,26 +9499,26 @@
 		}
 
 		/**
-		 * Counts all associated InventoryModelsAsModifiedBy
+		 * Counts all associated InventoryLocationsAsCreatedBy
 		 * @return int
 		*/ 
-		public function CountInventoryModelsAsModifiedBy() {
+		public function CountInventoryLocationsAsCreatedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return InventoryModel::CountByModifiedBy($this->intUserAccountId);
+			return InventoryLocation::CountByCreatedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a InventoryModelAsModifiedBy
-		 * @param InventoryModel $objInventoryModel
+		 * Associates a InventoryLocationAsCreatedBy
+		 * @param InventoryLocation $objInventoryLocation
 		 * @return void
 		*/ 
-		public function AssociateInventoryModelAsModifiedBy(InventoryModel $objInventoryModel) {
+		public function AssociateInventoryLocationAsCreatedBy(InventoryLocation $objInventoryLocation) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryModel->InventoryModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryModelAsModifiedBy on this UserAccount with an unsaved InventoryModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryLocation->InventoryLocationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryLocationAsCreatedBy on this UserAccount with an unsaved InventoryLocation.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -9674,30 +9526,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`inventory_model`
+					`inventory_location`
 				SET
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . '
+					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objInventoryModel->ModifiedBy = $this->intUserAccountId;
-				$objInventoryModel->Journal('UPDATE');
+				$objInventoryLocation->CreatedBy = $this->intUserAccountId;
+				$objInventoryLocation->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a InventoryModelAsModifiedBy
-		 * @param InventoryModel $objInventoryModel
+		 * Unassociates a InventoryLocationAsCreatedBy
+		 * @param InventoryLocation $objInventoryLocation
 		 * @return void
 		*/ 
-		public function UnassociateInventoryModelAsModifiedBy(InventoryModel $objInventoryModel) {
+		public function UnassociateInventoryLocationAsCreatedBy(InventoryLocation $objInventoryLocation) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryModel->InventoryModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this UserAccount with an unsaved InventoryModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryLocation->InventoryLocationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this UserAccount with an unsaved InventoryLocation.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -9705,61 +9557,61 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`inventory_model`
+					`inventory_location`
 				SET
-					`modified_by` = null
+					`created_by` = null
 				WHERE
-					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objInventoryModel->ModifiedBy = null;
-				$objInventoryModel->Journal('UPDATE');
+				$objInventoryLocation->CreatedBy = null;
+				$objInventoryLocation->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all InventoryModelsAsModifiedBy
+		 * Unassociates all InventoryLocationsAsCreatedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllInventoryModelsAsModifiedBy() {
+		public function UnassociateAllInventoryLocationsAsCreatedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryModel) {
-					$objInventoryModel->ModifiedBy = null;
-					$objInventoryModel->Journal('UPDATE');
+				foreach (InventoryLocation::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryLocation) {
+					$objInventoryLocation->CreatedBy = null;
+					$objInventoryLocation->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`inventory_model`
+					`inventory_location`
 				SET
-					`modified_by` = null
+					`created_by` = null
 				WHERE
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 		}
 
 		/**
-		 * Deletes an associated InventoryModelAsModifiedBy
-		 * @param InventoryModel $objInventoryModel
+		 * Deletes an associated InventoryLocationAsCreatedBy
+		 * @param InventoryLocation $objInventoryLocation
 		 * @return void
 		*/ 
-		public function DeleteAssociatedInventoryModelAsModifiedBy(InventoryModel $objInventoryModel) {
+		public function DeleteAssociatedInventoryLocationAsCreatedBy(InventoryLocation $objInventoryLocation) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryModel->InventoryModelId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this UserAccount with an unsaved InventoryModel.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryLocation->InventoryLocationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this UserAccount with an unsaved InventoryLocation.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -9767,42 +9619,42 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`inventory_model`
+					`inventory_location`
 				WHERE
-					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`inventory_location_id` = ' . $objDatabase->SqlVariable($objInventoryLocation->InventoryLocationId) . ' AND
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objInventoryModel->Journal('DELETE');
+				$objInventoryLocation->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated InventoryModelsAsModifiedBy
+		 * Deletes all associated InventoryLocationsAsCreatedBy
 		 * @return void
 		*/ 
-		public function DeleteAllInventoryModelsAsModifiedBy() {
+		public function DeleteAllInventoryLocationsAsCreatedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryLocationAsCreatedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryModel) {
-					$objInventoryModel->Journal('DELETE');
+				foreach (InventoryLocation::LoadArrayByCreatedBy($this->intUserAccountId) as $objInventoryLocation) {
+					$objInventoryLocation->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`inventory_model`
+					`inventory_location`
 				WHERE
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 		}
 
@@ -9990,20 +9842,20 @@
 
 			
 		
-		// Related Objects' Methods for InventoryTransactionAsModifiedBy
+		// Related Objects' Methods for InventoryModelAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated InventoryTransactionsAsModifiedBy as an array of InventoryTransaction objects
+		 * Gets all associated InventoryModelsAsModifiedBy as an array of InventoryModel objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return InventoryTransaction[]
+		 * @return InventoryModel[]
 		*/ 
-		public function GetInventoryTransactionAsModifiedByArray($objOptionalClauses = null) {
+		public function GetInventoryModelAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return InventoryTransaction::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return InventoryModel::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -10011,26 +9863,26 @@
 		}
 
 		/**
-		 * Counts all associated InventoryTransactionsAsModifiedBy
+		 * Counts all associated InventoryModelsAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountInventoryTransactionsAsModifiedBy() {
+		public function CountInventoryModelsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return InventoryTransaction::CountByModifiedBy($this->intUserAccountId);
+			return InventoryModel::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a InventoryTransactionAsModifiedBy
-		 * @param InventoryTransaction $objInventoryTransaction
+		 * Associates a InventoryModelAsModifiedBy
+		 * @param InventoryModel $objInventoryModel
 		 * @return void
 		*/ 
-		public function AssociateInventoryTransactionAsModifiedBy(InventoryTransaction $objInventoryTransaction) {
+		public function AssociateInventoryModelAsModifiedBy(InventoryModel $objInventoryModel) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryTransaction->InventoryTransactionId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryTransactionAsModifiedBy on this UserAccount with an unsaved InventoryTransaction.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryModel->InventoryModelId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryModelAsModifiedBy on this UserAccount with an unsaved InventoryModel.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10038,30 +9890,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`inventory_transaction`
+					`inventory_model`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . '
+					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->ModifiedBy = $this->intUserAccountId;
-				$objInventoryTransaction->Journal('UPDATE');
+				$objInventoryModel->ModifiedBy = $this->intUserAccountId;
+				$objInventoryModel->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a InventoryTransactionAsModifiedBy
-		 * @param InventoryTransaction $objInventoryTransaction
+		 * Unassociates a InventoryModelAsModifiedBy
+		 * @param InventoryModel $objInventoryModel
 		 * @return void
 		*/ 
-		public function UnassociateInventoryTransactionAsModifiedBy(InventoryTransaction $objInventoryTransaction) {
+		public function UnassociateInventoryModelAsModifiedBy(InventoryModel $objInventoryModel) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryTransaction->InventoryTransactionId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this UserAccount with an unsaved InventoryTransaction.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryModel->InventoryModelId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this UserAccount with an unsaved InventoryModel.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10069,44 +9921,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`inventory_transaction`
+					`inventory_model`
 				SET
 					`modified_by` = null
 				WHERE
-					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
+					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->ModifiedBy = null;
-				$objInventoryTransaction->Journal('UPDATE');
+				$objInventoryModel->ModifiedBy = null;
+				$objInventoryModel->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all InventoryTransactionsAsModifiedBy
+		 * Unassociates all InventoryModelsAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllInventoryTransactionsAsModifiedBy() {
+		public function UnassociateAllInventoryModelsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryTransaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryTransaction) {
-					$objInventoryTransaction->ModifiedBy = null;
-					$objInventoryTransaction->Journal('UPDATE');
+				foreach (InventoryModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryModel) {
+					$objInventoryModel->ModifiedBy = null;
+					$objInventoryModel->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`inventory_transaction`
+					`inventory_model`
 				SET
 					`modified_by` = null
 				WHERE
@@ -10115,15 +9967,15 @@
 		}
 
 		/**
-		 * Deletes an associated InventoryTransactionAsModifiedBy
-		 * @param InventoryTransaction $objInventoryTransaction
+		 * Deletes an associated InventoryModelAsModifiedBy
+		 * @param InventoryModel $objInventoryModel
 		 * @return void
 		*/ 
-		public function DeleteAssociatedInventoryTransactionAsModifiedBy(InventoryTransaction $objInventoryTransaction) {
+		public function DeleteAssociatedInventoryModelAsModifiedBy(InventoryModel $objInventoryModel) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objInventoryTransaction->InventoryTransactionId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this UserAccount with an unsaved InventoryTransaction.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryModel->InventoryModelId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this UserAccount with an unsaved InventoryModel.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10131,40 +9983,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`inventory_transaction`
+					`inventory_model`
 				WHERE
-					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
+					`inventory_model_id` = ' . $objDatabase->SqlVariable($objInventoryModel->InventoryModelId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objInventoryTransaction->Journal('DELETE');
+				$objInventoryModel->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated InventoryTransactionsAsModifiedBy
+		 * Deletes all associated InventoryModelsAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllInventoryTransactionsAsModifiedBy() {
+		public function DeleteAllInventoryModelsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryModelAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (InventoryTransaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryTransaction) {
-					$objInventoryTransaction->Journal('DELETE');
+				foreach (InventoryModel::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryModel) {
+					$objInventoryModel->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`inventory_transaction`
+					`inventory_model`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -10354,20 +10206,20 @@
 
 			
 		
-		// Related Objects' Methods for LocationAsModifiedBy
+		// Related Objects' Methods for InventoryTransactionAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated LocationsAsModifiedBy as an array of Location objects
+		 * Gets all associated InventoryTransactionsAsModifiedBy as an array of InventoryTransaction objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Location[]
+		 * @return InventoryTransaction[]
 		*/ 
-		public function GetLocationAsModifiedByArray($objOptionalClauses = null) {
+		public function GetInventoryTransactionAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return Location::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return InventoryTransaction::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -10375,26 +10227,26 @@
 		}
 
 		/**
-		 * Counts all associated LocationsAsModifiedBy
+		 * Counts all associated InventoryTransactionsAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountLocationsAsModifiedBy() {
+		public function CountInventoryTransactionsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return Location::CountByModifiedBy($this->intUserAccountId);
+			return InventoryTransaction::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a LocationAsModifiedBy
-		 * @param Location $objLocation
+		 * Associates a InventoryTransactionAsModifiedBy
+		 * @param InventoryTransaction $objInventoryTransaction
 		 * @return void
 		*/ 
-		public function AssociateLocationAsModifiedBy(Location $objLocation) {
+		public function AssociateInventoryTransactionAsModifiedBy(InventoryTransaction $objInventoryTransaction) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateLocationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objLocation->LocationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateLocationAsModifiedBy on this UserAccount with an unsaved Location.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryTransaction->InventoryTransactionId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateInventoryTransactionAsModifiedBy on this UserAccount with an unsaved InventoryTransaction.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10402,30 +10254,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`location`
+					`inventory_transaction`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . '
+					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objLocation->ModifiedBy = $this->intUserAccountId;
-				$objLocation->Journal('UPDATE');
+				$objInventoryTransaction->ModifiedBy = $this->intUserAccountId;
+				$objInventoryTransaction->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a LocationAsModifiedBy
-		 * @param Location $objLocation
+		 * Unassociates a InventoryTransactionAsModifiedBy
+		 * @param InventoryTransaction $objInventoryTransaction
 		 * @return void
 		*/ 
-		public function UnassociateLocationAsModifiedBy(Location $objLocation) {
+		public function UnassociateInventoryTransactionAsModifiedBy(InventoryTransaction $objInventoryTransaction) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objLocation->LocationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this UserAccount with an unsaved Location.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryTransaction->InventoryTransactionId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this UserAccount with an unsaved InventoryTransaction.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10433,44 +10285,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`location`
+					`inventory_transaction`
 				SET
 					`modified_by` = null
 				WHERE
-					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . ' AND
+					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objLocation->ModifiedBy = null;
-				$objLocation->Journal('UPDATE');
+				$objInventoryTransaction->ModifiedBy = null;
+				$objInventoryTransaction->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all LocationsAsModifiedBy
+		 * Unassociates all InventoryTransactionsAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllLocationsAsModifiedBy() {
+		public function UnassociateAllInventoryTransactionsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Location::LoadArrayByModifiedBy($this->intUserAccountId) as $objLocation) {
-					$objLocation->ModifiedBy = null;
-					$objLocation->Journal('UPDATE');
+				foreach (InventoryTransaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryTransaction) {
+					$objInventoryTransaction->ModifiedBy = null;
+					$objInventoryTransaction->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`location`
+					`inventory_transaction`
 				SET
 					`modified_by` = null
 				WHERE
@@ -10479,15 +10331,15 @@
 		}
 
 		/**
-		 * Deletes an associated LocationAsModifiedBy
-		 * @param Location $objLocation
+		 * Deletes an associated InventoryTransactionAsModifiedBy
+		 * @param InventoryTransaction $objInventoryTransaction
 		 * @return void
 		*/ 
-		public function DeleteAssociatedLocationAsModifiedBy(Location $objLocation) {
+		public function DeleteAssociatedInventoryTransactionAsModifiedBy(InventoryTransaction $objInventoryTransaction) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objLocation->LocationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this UserAccount with an unsaved Location.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objInventoryTransaction->InventoryTransactionId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this UserAccount with an unsaved InventoryTransaction.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10495,40 +10347,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`location`
+					`inventory_transaction`
 				WHERE
-					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . ' AND
+					`inventory_transaction_id` = ' . $objDatabase->SqlVariable($objInventoryTransaction->InventoryTransactionId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objLocation->Journal('DELETE');
+				$objInventoryTransaction->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated LocationsAsModifiedBy
+		 * Deletes all associated InventoryTransactionsAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllLocationsAsModifiedBy() {
+		public function DeleteAllInventoryTransactionsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateInventoryTransactionAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Location::LoadArrayByModifiedBy($this->intUserAccountId) as $objLocation) {
-					$objLocation->Journal('DELETE');
+				foreach (InventoryTransaction::LoadArrayByModifiedBy($this->intUserAccountId) as $objInventoryTransaction) {
+					$objInventoryTransaction->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`location`
+					`inventory_transaction`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -10718,20 +10570,20 @@
 
 			
 		
-		// Related Objects' Methods for ManufacturerAsModifiedBy
+		// Related Objects' Methods for LocationAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated ManufacturersAsModifiedBy as an array of Manufacturer objects
+		 * Gets all associated LocationsAsModifiedBy as an array of Location objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Manufacturer[]
+		 * @return Location[]
 		*/ 
-		public function GetManufacturerAsModifiedByArray($objOptionalClauses = null) {
+		public function GetLocationAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return Manufacturer::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return Location::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -10739,26 +10591,26 @@
 		}
 
 		/**
-		 * Counts all associated ManufacturersAsModifiedBy
+		 * Counts all associated LocationsAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountManufacturersAsModifiedBy() {
+		public function CountLocationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return Manufacturer::CountByModifiedBy($this->intUserAccountId);
+			return Location::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a ManufacturerAsModifiedBy
-		 * @param Manufacturer $objManufacturer
+		 * Associates a LocationAsModifiedBy
+		 * @param Location $objLocation
 		 * @return void
 		*/ 
-		public function AssociateManufacturerAsModifiedBy(Manufacturer $objManufacturer) {
+		public function AssociateLocationAsModifiedBy(Location $objLocation) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateManufacturerAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objManufacturer->ManufacturerId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateManufacturerAsModifiedBy on this UserAccount with an unsaved Manufacturer.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateLocationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objLocation->LocationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateLocationAsModifiedBy on this UserAccount with an unsaved Location.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10766,30 +10618,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`manufacturer`
+					`location`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . '
+					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objManufacturer->ModifiedBy = $this->intUserAccountId;
-				$objManufacturer->Journal('UPDATE');
+				$objLocation->ModifiedBy = $this->intUserAccountId;
+				$objLocation->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a ManufacturerAsModifiedBy
-		 * @param Manufacturer $objManufacturer
+		 * Unassociates a LocationAsModifiedBy
+		 * @param Location $objLocation
 		 * @return void
 		*/ 
-		public function UnassociateManufacturerAsModifiedBy(Manufacturer $objManufacturer) {
+		public function UnassociateLocationAsModifiedBy(Location $objLocation) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objManufacturer->ManufacturerId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this UserAccount with an unsaved Manufacturer.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objLocation->LocationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this UserAccount with an unsaved Location.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10797,44 +10649,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`manufacturer`
+					`location`
 				SET
 					`modified_by` = null
 				WHERE
-					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . ' AND
+					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objManufacturer->ModifiedBy = null;
-				$objManufacturer->Journal('UPDATE');
+				$objLocation->ModifiedBy = null;
+				$objLocation->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all ManufacturersAsModifiedBy
+		 * Unassociates all LocationsAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllManufacturersAsModifiedBy() {
+		public function UnassociateAllLocationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Manufacturer::LoadArrayByModifiedBy($this->intUserAccountId) as $objManufacturer) {
-					$objManufacturer->ModifiedBy = null;
-					$objManufacturer->Journal('UPDATE');
+				foreach (Location::LoadArrayByModifiedBy($this->intUserAccountId) as $objLocation) {
+					$objLocation->ModifiedBy = null;
+					$objLocation->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`manufacturer`
+					`location`
 				SET
 					`modified_by` = null
 				WHERE
@@ -10843,15 +10695,15 @@
 		}
 
 		/**
-		 * Deletes an associated ManufacturerAsModifiedBy
-		 * @param Manufacturer $objManufacturer
+		 * Deletes an associated LocationAsModifiedBy
+		 * @param Location $objLocation
 		 * @return void
 		*/ 
-		public function DeleteAssociatedManufacturerAsModifiedBy(Manufacturer $objManufacturer) {
+		public function DeleteAssociatedLocationAsModifiedBy(Location $objLocation) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objManufacturer->ManufacturerId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this UserAccount with an unsaved Manufacturer.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objLocation->LocationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this UserAccount with an unsaved Location.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -10859,40 +10711,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`manufacturer`
+					`location`
 				WHERE
-					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . ' AND
+					`location_id` = ' . $objDatabase->SqlVariable($objLocation->LocationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objManufacturer->Journal('DELETE');
+				$objLocation->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated ManufacturersAsModifiedBy
+		 * Deletes all associated LocationsAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllManufacturersAsModifiedBy() {
+		public function DeleteAllLocationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateLocationAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Manufacturer::LoadArrayByModifiedBy($this->intUserAccountId) as $objManufacturer) {
-					$objManufacturer->Journal('DELETE');
+				foreach (Location::LoadArrayByModifiedBy($this->intUserAccountId) as $objLocation) {
+					$objLocation->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`manufacturer`
+					`location`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -11082,20 +10934,20 @@
 
 			
 		
-		// Related Objects' Methods for NotificationAsModifiedBy
+		// Related Objects' Methods for ManufacturerAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated NotificationsAsModifiedBy as an array of Notification objects
+		 * Gets all associated ManufacturersAsModifiedBy as an array of Manufacturer objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Notification[]
+		 * @return Manufacturer[]
 		*/ 
-		public function GetNotificationAsModifiedByArray($objOptionalClauses = null) {
+		public function GetManufacturerAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return Notification::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return Manufacturer::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -11103,26 +10955,26 @@
 		}
 
 		/**
-		 * Counts all associated NotificationsAsModifiedBy
+		 * Counts all associated ManufacturersAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountNotificationsAsModifiedBy() {
+		public function CountManufacturersAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return Notification::CountByModifiedBy($this->intUserAccountId);
+			return Manufacturer::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a NotificationAsModifiedBy
-		 * @param Notification $objNotification
+		 * Associates a ManufacturerAsModifiedBy
+		 * @param Manufacturer $objManufacturer
 		 * @return void
 		*/ 
-		public function AssociateNotificationAsModifiedBy(Notification $objNotification) {
+		public function AssociateManufacturerAsModifiedBy(Manufacturer $objManufacturer) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateNotificationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objNotification->NotificationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateNotificationAsModifiedBy on this UserAccount with an unsaved Notification.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateManufacturerAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objManufacturer->ManufacturerId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateManufacturerAsModifiedBy on this UserAccount with an unsaved Manufacturer.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -11130,30 +10982,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`notification`
+					`manufacturer`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . '
+					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objNotification->ModifiedBy = $this->intUserAccountId;
-				$objNotification->Journal('UPDATE');
+				$objManufacturer->ModifiedBy = $this->intUserAccountId;
+				$objManufacturer->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a NotificationAsModifiedBy
-		 * @param Notification $objNotification
+		 * Unassociates a ManufacturerAsModifiedBy
+		 * @param Manufacturer $objManufacturer
 		 * @return void
 		*/ 
-		public function UnassociateNotificationAsModifiedBy(Notification $objNotification) {
+		public function UnassociateManufacturerAsModifiedBy(Manufacturer $objManufacturer) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objNotification->NotificationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this UserAccount with an unsaved Notification.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objManufacturer->ManufacturerId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this UserAccount with an unsaved Manufacturer.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -11161,44 +11013,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`notification`
+					`manufacturer`
 				SET
 					`modified_by` = null
 				WHERE
-					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . ' AND
+					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objNotification->ModifiedBy = null;
-				$objNotification->Journal('UPDATE');
+				$objManufacturer->ModifiedBy = null;
+				$objManufacturer->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all NotificationsAsModifiedBy
+		 * Unassociates all ManufacturersAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllNotificationsAsModifiedBy() {
+		public function UnassociateAllManufacturersAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Notification::LoadArrayByModifiedBy($this->intUserAccountId) as $objNotification) {
-					$objNotification->ModifiedBy = null;
-					$objNotification->Journal('UPDATE');
+				foreach (Manufacturer::LoadArrayByModifiedBy($this->intUserAccountId) as $objManufacturer) {
+					$objManufacturer->ModifiedBy = null;
+					$objManufacturer->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`notification`
+					`manufacturer`
 				SET
 					`modified_by` = null
 				WHERE
@@ -11207,15 +11059,15 @@
 		}
 
 		/**
-		 * Deletes an associated NotificationAsModifiedBy
-		 * @param Notification $objNotification
+		 * Deletes an associated ManufacturerAsModifiedBy
+		 * @param Manufacturer $objManufacturer
 		 * @return void
 		*/ 
-		public function DeleteAssociatedNotificationAsModifiedBy(Notification $objNotification) {
+		public function DeleteAssociatedManufacturerAsModifiedBy(Manufacturer $objManufacturer) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objNotification->NotificationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this UserAccount with an unsaved Notification.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objManufacturer->ManufacturerId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this UserAccount with an unsaved Manufacturer.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -11223,40 +11075,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`notification`
+					`manufacturer`
 				WHERE
-					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . ' AND
+					`manufacturer_id` = ' . $objDatabase->SqlVariable($objManufacturer->ManufacturerId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objNotification->Journal('DELETE');
+				$objManufacturer->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated NotificationsAsModifiedBy
+		 * Deletes all associated ManufacturersAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllNotificationsAsModifiedBy() {
+		public function DeleteAllManufacturersAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateManufacturerAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (Notification::LoadArrayByModifiedBy($this->intUserAccountId) as $objNotification) {
-					$objNotification->Journal('DELETE');
+				foreach (Manufacturer::LoadArrayByModifiedBy($this->intUserAccountId) as $objManufacturer) {
+					$objManufacturer->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`notification`
+					`manufacturer`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -11441,6 +11293,188 @@
 					`notification`
 				WHERE
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+		}
+
+			
+		
+		// Related Objects' Methods for NotificationAsModifiedBy
+		//-------------------------------------------------------------------
+
+		/**
+		 * Gets all associated NotificationsAsModifiedBy as an array of Notification objects
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return Notification[]
+		*/ 
+		public function GetNotificationAsModifiedByArray($objOptionalClauses = null) {
+			if ((is_null($this->intUserAccountId)))
+				return array();
+
+			try {
+				return Notification::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Counts all associated NotificationsAsModifiedBy
+		 * @return int
+		*/ 
+		public function CountNotificationsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				return 0;
+
+			return Notification::CountByModifiedBy($this->intUserAccountId);
+		}
+
+		/**
+		 * Associates a NotificationAsModifiedBy
+		 * @param Notification $objNotification
+		 * @return void
+		*/ 
+		public function AssociateNotificationAsModifiedBy(Notification $objNotification) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateNotificationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objNotification->NotificationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateNotificationAsModifiedBy on this UserAccount with an unsaved Notification.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`notification`
+				SET
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+				WHERE
+					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . '
+			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->ModifiedBy = $this->intUserAccountId;
+				$objNotification->Journal('UPDATE');
+			}
+		}
+
+		/**
+		 * Unassociates a NotificationAsModifiedBy
+		 * @param Notification $objNotification
+		 * @return void
+		*/ 
+		public function UnassociateNotificationAsModifiedBy(Notification $objNotification) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objNotification->NotificationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this UserAccount with an unsaved Notification.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`notification`
+				SET
+					`modified_by` = null
+				WHERE
+					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . ' AND
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->ModifiedBy = null;
+				$objNotification->Journal('UPDATE');
+			}
+		}
+
+		/**
+		 * Unassociates all NotificationsAsModifiedBy
+		 * @return void
+		*/ 
+		public function UnassociateAllNotificationsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this unsaved UserAccount.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Notification::LoadArrayByModifiedBy($this->intUserAccountId) as $objNotification) {
+					$objNotification->ModifiedBy = null;
+					$objNotification->Journal('UPDATE');
+				}
+			}
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`notification`
+				SET
+					`modified_by` = null
+				WHERE
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+		}
+
+		/**
+		 * Deletes an associated NotificationAsModifiedBy
+		 * @param Notification $objNotification
+		 * @return void
+		*/ 
+		public function DeleteAssociatedNotificationAsModifiedBy(Notification $objNotification) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objNotification->NotificationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this UserAccount with an unsaved Notification.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`notification`
+				WHERE
+					`notification_id` = ' . $objDatabase->SqlVariable($objNotification->NotificationId) . ' AND
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objNotification->Journal('DELETE');
+			}
+		}
+
+		/**
+		 * Deletes all associated NotificationsAsModifiedBy
+		 * @return void
+		*/ 
+		public function DeleteAllNotificationsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateNotificationAsModifiedBy on this unsaved UserAccount.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (Notification::LoadArrayByModifiedBy($this->intUserAccountId) as $objNotification) {
+					$objNotification->Journal('DELETE');
+				}
+			}
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`notification`
+				WHERE
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 		}
 
@@ -11992,188 +12026,6 @@
 
 			
 		
-		// Related Objects' Methods for RoleAsModifiedBy
-		//-------------------------------------------------------------------
-
-		/**
-		 * Gets all associated RolesAsModifiedBy as an array of Role objects
-		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return Role[]
-		*/ 
-		public function GetRoleAsModifiedByArray($objOptionalClauses = null) {
-			if ((is_null($this->intUserAccountId)))
-				return array();
-
-			try {
-				return Role::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
-			} catch (QCallerException $objExc) {
-				$objExc->IncrementOffset();
-				throw $objExc;
-			}
-		}
-
-		/**
-		 * Counts all associated RolesAsModifiedBy
-		 * @return int
-		*/ 
-		public function CountRolesAsModifiedBy() {
-			if ((is_null($this->intUserAccountId)))
-				return 0;
-
-			return Role::CountByModifiedBy($this->intUserAccountId);
-		}
-
-		/**
-		 * Associates a RoleAsModifiedBy
-		 * @param Role $objRole
-		 * @return void
-		*/ 
-		public function AssociateRoleAsModifiedBy(Role $objRole) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRole->RoleId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleAsModifiedBy on this UserAccount with an unsaved Role.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`role`
-				SET
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-				WHERE
-					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . '
-			');
-
-			// Journaling (if applicable)
-			if ($objDatabase->JournalingDatabase) {
-				$objRole->ModifiedBy = $this->intUserAccountId;
-				$objRole->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates a RoleAsModifiedBy
-		 * @param Role $objRole
-		 * @return void
-		*/ 
-		public function UnassociateRoleAsModifiedBy(Role $objRole) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRole->RoleId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this UserAccount with an unsaved Role.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`role`
-				SET
-					`modified_by` = null
-				WHERE
-					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . ' AND
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objRole->ModifiedBy = null;
-				$objRole->Journal('UPDATE');
-			}
-		}
-
-		/**
-		 * Unassociates all RolesAsModifiedBy
-		 * @return void
-		*/ 
-		public function UnassociateAllRolesAsModifiedBy() {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this unsaved UserAccount.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Role::LoadArrayByModifiedBy($this->intUserAccountId) as $objRole) {
-					$objRole->ModifiedBy = null;
-					$objRole->Journal('UPDATE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				UPDATE
-					`role`
-				SET
-					`modified_by` = null
-				WHERE
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-		}
-
-		/**
-		 * Deletes an associated RoleAsModifiedBy
-		 * @param Role $objRole
-		 * @return void
-		*/ 
-		public function DeleteAssociatedRoleAsModifiedBy(Role $objRole) {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRole->RoleId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this UserAccount with an unsaved Role.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`role`
-				WHERE
-					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . ' AND
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				$objRole->Journal('DELETE');
-			}
-		}
-
-		/**
-		 * Deletes all associated RolesAsModifiedBy
-		 * @return void
-		*/ 
-		public function DeleteAllRolesAsModifiedBy() {
-			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this unsaved UserAccount.');
-
-			// Get the Database Object for this Class
-			$objDatabase = UserAccount::GetDatabase();
-
-			// Journaling
-			if ($objDatabase->JournalingDatabase) {
-				foreach (Role::LoadArrayByModifiedBy($this->intUserAccountId) as $objRole) {
-					$objRole->Journal('DELETE');
-				}
-			}
-
-			// Perform the SQL Query
-			$objDatabase->NonQuery('
-				DELETE FROM
-					`role`
-				WHERE
-					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
-			');
-		}
-
-			
-		
 		// Related Objects' Methods for RoleAsCreatedBy
 		//-------------------------------------------------------------------
 
@@ -12356,20 +12208,20 @@
 
 			
 		
-		// Related Objects' Methods for RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
+		// Related Objects' Methods for RoleAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated RoleEntityQtypeBuiltInAuthorizationsAsModifiedBy as an array of RoleEntityQtypeBuiltInAuthorization objects
+		 * Gets all associated RolesAsModifiedBy as an array of Role objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return RoleEntityQtypeBuiltInAuthorization[]
+		 * @return Role[]
 		*/ 
-		public function GetRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray($objOptionalClauses = null) {
+		public function GetRoleAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return RoleEntityQtypeBuiltInAuthorization::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return Role::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -12377,26 +12229,26 @@
 		}
 
 		/**
-		 * Counts all associated RoleEntityQtypeBuiltInAuthorizationsAsModifiedBy
+		 * Counts all associated RolesAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountRoleEntityQtypeBuiltInAuthorizationsAsModifiedBy() {
+		public function CountRolesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return RoleEntityQtypeBuiltInAuthorization::CountByModifiedBy($this->intUserAccountId);
+			return Role::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
-		 * @param RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization
+		 * Associates a RoleAsModifiedBy
+		 * @param Role $objRole
 		 * @return void
 		*/ 
-		public function AssociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy(RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization) {
+		public function AssociateRoleAsModifiedBy(Role $objRole) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeBuiltInAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRole->RoleId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleAsModifiedBy on this UserAccount with an unsaved Role.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -12404,30 +12256,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_entity_qtype_built_in_authorization`
+					`role`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . '
+					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = $this->intUserAccountId;
-				$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+				$objRole->ModifiedBy = $this->intUserAccountId;
+				$objRole->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
-		 * @param RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization
+		 * Unassociates a RoleAsModifiedBy
+		 * @param Role $objRole
 		 * @return void
 		*/ 
-		public function UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy(RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization) {
+		public function UnassociateRoleAsModifiedBy(Role $objRole) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeBuiltInAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRole->RoleId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this UserAccount with an unsaved Role.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -12435,44 +12287,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_entity_qtype_built_in_authorization`
+					`role`
 				SET
 					`modified_by` = null
 				WHERE
-					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . ' AND
+					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = null;
-				$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+				$objRole->ModifiedBy = null;
+				$objRole->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all RoleEntityQtypeBuiltInAuthorizationsAsModifiedBy
+		 * Unassociates all RolesAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllRoleEntityQtypeBuiltInAuthorizationsAsModifiedBy() {
+		public function UnassociateAllRolesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (RoleEntityQtypeBuiltInAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeBuiltInAuthorization) {
-					$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = null;
-					$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
+				foreach (Role::LoadArrayByModifiedBy($this->intUserAccountId) as $objRole) {
+					$objRole->ModifiedBy = null;
+					$objRole->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_entity_qtype_built_in_authorization`
+					`role`
 				SET
 					`modified_by` = null
 				WHERE
@@ -12481,15 +12333,15 @@
 		}
 
 		/**
-		 * Deletes an associated RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
-		 * @param RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization
+		 * Deletes an associated RoleAsModifiedBy
+		 * @param Role $objRole
 		 * @return void
 		*/ 
-		public function DeleteAssociatedRoleEntityQtypeBuiltInAuthorizationAsModifiedBy(RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization) {
+		public function DeleteAssociatedRoleAsModifiedBy(Role $objRole) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeBuiltInAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRole->RoleId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this UserAccount with an unsaved Role.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -12497,40 +12349,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`role_entity_qtype_built_in_authorization`
+					`role`
 				WHERE
-					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . ' AND
+					`role_id` = ' . $objDatabase->SqlVariable($objRole->RoleId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleEntityQtypeBuiltInAuthorization->Journal('DELETE');
+				$objRole->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated RoleEntityQtypeBuiltInAuthorizationsAsModifiedBy
+		 * Deletes all associated RolesAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllRoleEntityQtypeBuiltInAuthorizationsAsModifiedBy() {
+		public function DeleteAllRolesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (RoleEntityQtypeBuiltInAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeBuiltInAuthorization) {
-					$objRoleEntityQtypeBuiltInAuthorization->Journal('DELETE');
+				foreach (Role::LoadArrayByModifiedBy($this->intUserAccountId) as $objRole) {
+					$objRole->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`role_entity_qtype_built_in_authorization`
+					`role`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -12720,20 +12572,20 @@
 
 			
 		
-		// Related Objects' Methods for RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
+		// Related Objects' Methods for RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated RoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy as an array of RoleEntityQtypeCustomFieldAuthorization objects
+		 * Gets all associated RoleEntityQtypeBuiltInAuthorizationsAsModifiedBy as an array of RoleEntityQtypeBuiltInAuthorization objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return RoleEntityQtypeCustomFieldAuthorization[]
+		 * @return RoleEntityQtypeBuiltInAuthorization[]
 		*/ 
-		public function GetRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray($objOptionalClauses = null) {
+		public function GetRoleEntityQtypeBuiltInAuthorizationAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return RoleEntityQtypeCustomFieldAuthorization::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return RoleEntityQtypeBuiltInAuthorization::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -12741,26 +12593,26 @@
 		}
 
 		/**
-		 * Counts all associated RoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy
+		 * Counts all associated RoleEntityQtypeBuiltInAuthorizationsAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountRoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy() {
+		public function CountRoleEntityQtypeBuiltInAuthorizationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return RoleEntityQtypeCustomFieldAuthorization::CountByModifiedBy($this->intUserAccountId);
+			return RoleEntityQtypeBuiltInAuthorization::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
-		 * @param RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization
+		 * Associates a RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
+		 * @param RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization
 		 * @return void
 		*/ 
-		public function AssociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy(RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization) {
+		public function AssociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy(RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeCustomFieldAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeBuiltInAuthorization.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -12768,30 +12620,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_entity_qtype_custom_field_authorization`
+					`role_entity_qtype_built_in_authorization`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . '
+					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = $this->intUserAccountId;
-				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+				$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = $this->intUserAccountId;
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
-		 * @param RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization
+		 * Unassociates a RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
+		 * @param RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization
 		 * @return void
 		*/ 
-		public function UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy(RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization) {
+		public function UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy(RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeCustomFieldAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeBuiltInAuthorization.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -12799,44 +12651,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_entity_qtype_custom_field_authorization`
+					`role_entity_qtype_built_in_authorization`
 				SET
 					`modified_by` = null
 				WHERE
-					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
+					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = null;
-				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+				$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = null;
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all RoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy
+		 * Unassociates all RoleEntityQtypeBuiltInAuthorizationsAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllRoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy() {
+		public function UnassociateAllRoleEntityQtypeBuiltInAuthorizationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeCustomFieldAuthorization) {
-					$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = null;
-					$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
+				foreach (RoleEntityQtypeBuiltInAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeBuiltInAuthorization) {
+					$objRoleEntityQtypeBuiltInAuthorization->ModifiedBy = null;
+					$objRoleEntityQtypeBuiltInAuthorization->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_entity_qtype_custom_field_authorization`
+					`role_entity_qtype_built_in_authorization`
 				SET
 					`modified_by` = null
 				WHERE
@@ -12845,15 +12697,15 @@
 		}
 
 		/**
-		 * Deletes an associated RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
-		 * @param RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization
+		 * Deletes an associated RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
+		 * @param RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization
 		 * @return void
 		*/ 
-		public function DeleteAssociatedRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy(RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization) {
+		public function DeleteAssociatedRoleEntityQtypeBuiltInAuthorizationAsModifiedBy(RoleEntityQtypeBuiltInAuthorization $objRoleEntityQtypeBuiltInAuthorization) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeCustomFieldAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeBuiltInAuthorization.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -12861,40 +12713,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`role_entity_qtype_custom_field_authorization`
+					`role_entity_qtype_built_in_authorization`
 				WHERE
-					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
+					`role_entity_built_in_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeBuiltInAuthorization->RoleEntityBuiltInId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
+				$objRoleEntityQtypeBuiltInAuthorization->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated RoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy
+		 * Deletes all associated RoleEntityQtypeBuiltInAuthorizationsAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllRoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy() {
+		public function DeleteAllRoleEntityQtypeBuiltInAuthorizationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeBuiltInAuthorizationAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeCustomFieldAuthorization) {
-					$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
+				foreach (RoleEntityQtypeBuiltInAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeBuiltInAuthorization) {
+					$objRoleEntityQtypeBuiltInAuthorization->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`role_entity_qtype_custom_field_authorization`
+					`role_entity_qtype_built_in_authorization`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -13084,20 +12936,20 @@
 
 			
 		
-		// Related Objects' Methods for RoleModuleAsModifiedBy
+		// Related Objects' Methods for RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated RoleModulesAsModifiedBy as an array of RoleModule objects
+		 * Gets all associated RoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy as an array of RoleEntityQtypeCustomFieldAuthorization objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return RoleModule[]
+		 * @return RoleEntityQtypeCustomFieldAuthorization[]
 		*/ 
-		public function GetRoleModuleAsModifiedByArray($objOptionalClauses = null) {
+		public function GetRoleEntityQtypeCustomFieldAuthorizationAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return RoleModule::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return RoleEntityQtypeCustomFieldAuthorization::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -13105,26 +12957,26 @@
 		}
 
 		/**
-		 * Counts all associated RoleModulesAsModifiedBy
+		 * Counts all associated RoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountRoleModulesAsModifiedBy() {
+		public function CountRoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return RoleModule::CountByModifiedBy($this->intUserAccountId);
+			return RoleEntityQtypeCustomFieldAuthorization::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a RoleModuleAsModifiedBy
-		 * @param RoleModule $objRoleModule
+		 * Associates a RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
+		 * @param RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization
 		 * @return void
 		*/ 
-		public function AssociateRoleModuleAsModifiedBy(RoleModule $objRoleModule) {
+		public function AssociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy(RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleModule->RoleModuleId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleModuleAsModifiedBy on this UserAccount with an unsaved RoleModule.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeCustomFieldAuthorization.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -13132,30 +12984,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_module`
+					`role_entity_qtype_custom_field_authorization`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . '
+					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleModule->ModifiedBy = $this->intUserAccountId;
-				$objRoleModule->Journal('UPDATE');
+				$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = $this->intUserAccountId;
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a RoleModuleAsModifiedBy
-		 * @param RoleModule $objRoleModule
+		 * Unassociates a RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
+		 * @param RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization
 		 * @return void
 		*/ 
-		public function UnassociateRoleModuleAsModifiedBy(RoleModule $objRoleModule) {
+		public function UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy(RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleModule->RoleModuleId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this UserAccount with an unsaved RoleModule.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeCustomFieldAuthorization.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -13163,44 +13015,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_module`
+					`role_entity_qtype_custom_field_authorization`
 				SET
 					`modified_by` = null
 				WHERE
-					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . ' AND
+					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleModule->ModifiedBy = null;
-				$objRoleModule->Journal('UPDATE');
+				$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = null;
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all RoleModulesAsModifiedBy
+		 * Unassociates all RoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllRoleModulesAsModifiedBy() {
+		public function UnassociateAllRoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (RoleModule::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModule) {
-					$objRoleModule->ModifiedBy = null;
-					$objRoleModule->Journal('UPDATE');
+				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeCustomFieldAuthorization) {
+					$objRoleEntityQtypeCustomFieldAuthorization->ModifiedBy = null;
+					$objRoleEntityQtypeCustomFieldAuthorization->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_module`
+					`role_entity_qtype_custom_field_authorization`
 				SET
 					`modified_by` = null
 				WHERE
@@ -13209,15 +13061,15 @@
 		}
 
 		/**
-		 * Deletes an associated RoleModuleAsModifiedBy
-		 * @param RoleModule $objRoleModule
+		 * Deletes an associated RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
+		 * @param RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization
 		 * @return void
 		*/ 
-		public function DeleteAssociatedRoleModuleAsModifiedBy(RoleModule $objRoleModule) {
+		public function DeleteAssociatedRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy(RoleEntityQtypeCustomFieldAuthorization $objRoleEntityQtypeCustomFieldAuthorization) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleModule->RoleModuleId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this UserAccount with an unsaved RoleModule.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleEntityQtypeCustomFieldAuthorization.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -13225,40 +13077,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`role_module`
+					`role_entity_qtype_custom_field_authorization`
 				WHERE
-					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . ' AND
+					`role_entity_qtype_custom_field_authorization_id` = ' . $objDatabase->SqlVariable($objRoleEntityQtypeCustomFieldAuthorization->RoleEntityQtypeCustomFieldAuthorizationId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleModule->Journal('DELETE');
+				$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated RoleModulesAsModifiedBy
+		 * Deletes all associated RoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllRoleModulesAsModifiedBy() {
+		public function DeleteAllRoleEntityQtypeCustomFieldAuthorizationsAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleEntityQtypeCustomFieldAuthorizationAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (RoleModule::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModule) {
-					$objRoleModule->Journal('DELETE');
+				foreach (RoleEntityQtypeCustomFieldAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleEntityQtypeCustomFieldAuthorization) {
+					$objRoleEntityQtypeCustomFieldAuthorization->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`role_module`
+					`role_entity_qtype_custom_field_authorization`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -13448,20 +13300,20 @@
 
 			
 		
-		// Related Objects' Methods for RoleModuleAuthorizationAsModifiedBy
+		// Related Objects' Methods for RoleModuleAsModifiedBy
 		//-------------------------------------------------------------------
 
 		/**
-		 * Gets all associated RoleModuleAuthorizationsAsModifiedBy as an array of RoleModuleAuthorization objects
+		 * Gets all associated RoleModulesAsModifiedBy as an array of RoleModule objects
 		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
-		 * @return RoleModuleAuthorization[]
+		 * @return RoleModule[]
 		*/ 
-		public function GetRoleModuleAuthorizationAsModifiedByArray($objOptionalClauses = null) {
+		public function GetRoleModuleAsModifiedByArray($objOptionalClauses = null) {
 			if ((is_null($this->intUserAccountId)))
 				return array();
 
 			try {
-				return RoleModuleAuthorization::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+				return RoleModule::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
 			} catch (QCallerException $objExc) {
 				$objExc->IncrementOffset();
 				throw $objExc;
@@ -13469,26 +13321,26 @@
 		}
 
 		/**
-		 * Counts all associated RoleModuleAuthorizationsAsModifiedBy
+		 * Counts all associated RoleModulesAsModifiedBy
 		 * @return int
 		*/ 
-		public function CountRoleModuleAuthorizationsAsModifiedBy() {
+		public function CountRoleModulesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
 				return 0;
 
-			return RoleModuleAuthorization::CountByModifiedBy($this->intUserAccountId);
+			return RoleModule::CountByModifiedBy($this->intUserAccountId);
 		}
 
 		/**
-		 * Associates a RoleModuleAuthorizationAsModifiedBy
-		 * @param RoleModuleAuthorization $objRoleModuleAuthorization
+		 * Associates a RoleModuleAsModifiedBy
+		 * @param RoleModule $objRoleModule
 		 * @return void
 		*/ 
-		public function AssociateRoleModuleAuthorizationAsModifiedBy(RoleModuleAuthorization $objRoleModuleAuthorization) {
+		public function AssociateRoleModuleAsModifiedBy(RoleModule $objRoleModule) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleModuleAuthorization->RoleModuleAuthorizationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleModuleAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleModuleAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleModule->RoleModuleId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleModuleAsModifiedBy on this UserAccount with an unsaved RoleModule.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -13496,30 +13348,30 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_module_authorization`
+					`role_module`
 				SET
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 				WHERE
-					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . '
+					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . '
 			');
 
 			// Journaling (if applicable)
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleModuleAuthorization->ModifiedBy = $this->intUserAccountId;
-				$objRoleModuleAuthorization->Journal('UPDATE');
+				$objRoleModule->ModifiedBy = $this->intUserAccountId;
+				$objRoleModule->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates a RoleModuleAuthorizationAsModifiedBy
-		 * @param RoleModuleAuthorization $objRoleModuleAuthorization
+		 * Unassociates a RoleModuleAsModifiedBy
+		 * @param RoleModule $objRoleModule
 		 * @return void
 		*/ 
-		public function UnassociateRoleModuleAuthorizationAsModifiedBy(RoleModuleAuthorization $objRoleModuleAuthorization) {
+		public function UnassociateRoleModuleAsModifiedBy(RoleModule $objRoleModule) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleModuleAuthorization->RoleModuleAuthorizationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleModuleAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleModule->RoleModuleId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this UserAccount with an unsaved RoleModule.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -13527,44 +13379,44 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_module_authorization`
+					`role_module`
 				SET
 					`modified_by` = null
 				WHERE
-					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
+					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleModuleAuthorization->ModifiedBy = null;
-				$objRoleModuleAuthorization->Journal('UPDATE');
+				$objRoleModule->ModifiedBy = null;
+				$objRoleModule->Journal('UPDATE');
 			}
 		}
 
 		/**
-		 * Unassociates all RoleModuleAuthorizationsAsModifiedBy
+		 * Unassociates all RoleModulesAsModifiedBy
 		 * @return void
 		*/ 
-		public function UnassociateAllRoleModuleAuthorizationsAsModifiedBy() {
+		public function UnassociateAllRoleModulesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (RoleModuleAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModuleAuthorization) {
-					$objRoleModuleAuthorization->ModifiedBy = null;
-					$objRoleModuleAuthorization->Journal('UPDATE');
+				foreach (RoleModule::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModule) {
+					$objRoleModule->ModifiedBy = null;
+					$objRoleModule->Journal('UPDATE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				UPDATE
-					`role_module_authorization`
+					`role_module`
 				SET
 					`modified_by` = null
 				WHERE
@@ -13573,15 +13425,15 @@
 		}
 
 		/**
-		 * Deletes an associated RoleModuleAuthorizationAsModifiedBy
-		 * @param RoleModuleAuthorization $objRoleModuleAuthorization
+		 * Deletes an associated RoleModuleAsModifiedBy
+		 * @param RoleModule $objRoleModule
 		 * @return void
 		*/ 
-		public function DeleteAssociatedRoleModuleAuthorizationAsModifiedBy(RoleModuleAuthorization $objRoleModuleAuthorization) {
+		public function DeleteAssociatedRoleModuleAsModifiedBy(RoleModule $objRoleModule) {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
-			if ((is_null($objRoleModuleAuthorization->RoleModuleAuthorizationId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleModuleAuthorization.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleModule->RoleModuleId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this UserAccount with an unsaved RoleModule.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
@@ -13589,40 +13441,40 @@
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`role_module_authorization`
+					`role_module`
 				WHERE
-					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
+					`role_module_id` = ' . $objDatabase->SqlVariable($objRoleModule->RoleModuleId) . ' AND
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				$objRoleModuleAuthorization->Journal('DELETE');
+				$objRoleModule->Journal('DELETE');
 			}
 		}
 
 		/**
-		 * Deletes all associated RoleModuleAuthorizationsAsModifiedBy
+		 * Deletes all associated RoleModulesAsModifiedBy
 		 * @return void
 		*/ 
-		public function DeleteAllRoleModuleAuthorizationsAsModifiedBy() {
+		public function DeleteAllRoleModulesAsModifiedBy() {
 			if ((is_null($this->intUserAccountId)))
-				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAsModifiedBy on this unsaved UserAccount.');
 
 			// Get the Database Object for this Class
 			$objDatabase = UserAccount::GetDatabase();
 
 			// Journaling
 			if ($objDatabase->JournalingDatabase) {
-				foreach (RoleModuleAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModuleAuthorization) {
-					$objRoleModuleAuthorization->Journal('DELETE');
+				foreach (RoleModule::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModule) {
+					$objRoleModule->Journal('DELETE');
 				}
 			}
 
 			// Perform the SQL Query
 			$objDatabase->NonQuery('
 				DELETE FROM
-					`role_module_authorization`
+					`role_module`
 				WHERE
 					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
@@ -13807,6 +13659,188 @@
 					`role_module_authorization`
 				WHERE
 					`created_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+		}
+
+			
+		
+		// Related Objects' Methods for RoleModuleAuthorizationAsModifiedBy
+		//-------------------------------------------------------------------
+
+		/**
+		 * Gets all associated RoleModuleAuthorizationsAsModifiedBy as an array of RoleModuleAuthorization objects
+		 * @param QQClause[] $objOptionalClauses additional optional QQClause objects for this query
+		 * @return RoleModuleAuthorization[]
+		*/ 
+		public function GetRoleModuleAuthorizationAsModifiedByArray($objOptionalClauses = null) {
+			if ((is_null($this->intUserAccountId)))
+				return array();
+
+			try {
+				return RoleModuleAuthorization::LoadArrayByModifiedBy($this->intUserAccountId, $objOptionalClauses);
+			} catch (QCallerException $objExc) {
+				$objExc->IncrementOffset();
+				throw $objExc;
+			}
+		}
+
+		/**
+		 * Counts all associated RoleModuleAuthorizationsAsModifiedBy
+		 * @return int
+		*/ 
+		public function CountRoleModuleAuthorizationsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				return 0;
+
+			return RoleModuleAuthorization::CountByModifiedBy($this->intUserAccountId);
+		}
+
+		/**
+		 * Associates a RoleModuleAuthorizationAsModifiedBy
+		 * @param RoleModuleAuthorization $objRoleModuleAuthorization
+		 * @return void
+		*/ 
+		public function AssociateRoleModuleAuthorizationAsModifiedBy(RoleModuleAuthorization $objRoleModuleAuthorization) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleModuleAuthorization->RoleModuleAuthorizationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call AssociateRoleModuleAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleModuleAuthorization.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`role_module_authorization`
+				SET
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+				WHERE
+					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . '
+			');
+
+			// Journaling (if applicable)
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->ModifiedBy = $this->intUserAccountId;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
+		}
+
+		/**
+		 * Unassociates a RoleModuleAuthorizationAsModifiedBy
+		 * @param RoleModuleAuthorization $objRoleModuleAuthorization
+		 * @return void
+		*/ 
+		public function UnassociateRoleModuleAuthorizationAsModifiedBy(RoleModuleAuthorization $objRoleModuleAuthorization) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleModuleAuthorization->RoleModuleAuthorizationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleModuleAuthorization.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`role_module_authorization`
+				SET
+					`modified_by` = null
+				WHERE
+					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->ModifiedBy = null;
+				$objRoleModuleAuthorization->Journal('UPDATE');
+			}
+		}
+
+		/**
+		 * Unassociates all RoleModuleAuthorizationsAsModifiedBy
+		 * @return void
+		*/ 
+		public function UnassociateAllRoleModuleAuthorizationsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->ModifiedBy = null;
+					$objRoleModuleAuthorization->Journal('UPDATE');
+				}
+			}
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				UPDATE
+					`role_module_authorization`
+				SET
+					`modified_by` = null
+				WHERE
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+		}
+
+		/**
+		 * Deletes an associated RoleModuleAuthorizationAsModifiedBy
+		 * @param RoleModuleAuthorization $objRoleModuleAuthorization
+		 * @return void
+		*/ 
+		public function DeleteAssociatedRoleModuleAuthorizationAsModifiedBy(RoleModuleAuthorization $objRoleModuleAuthorization) {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
+			if ((is_null($objRoleModuleAuthorization->RoleModuleAuthorizationId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this UserAccount with an unsaved RoleModuleAuthorization.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`role_module_authorization`
+				WHERE
+					`role_module_authorization_id` = ' . $objDatabase->SqlVariable($objRoleModuleAuthorization->RoleModuleAuthorizationId) . ' AND
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
+			');
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				$objRoleModuleAuthorization->Journal('DELETE');
+			}
+		}
+
+		/**
+		 * Deletes all associated RoleModuleAuthorizationsAsModifiedBy
+		 * @return void
+		*/ 
+		public function DeleteAllRoleModuleAuthorizationsAsModifiedBy() {
+			if ((is_null($this->intUserAccountId)))
+				throw new QUndefinedPrimaryKeyException('Unable to call UnassociateRoleModuleAuthorizationAsModifiedBy on this unsaved UserAccount.');
+
+			// Get the Database Object for this Class
+			$objDatabase = UserAccount::GetDatabase();
+
+			// Journaling
+			if ($objDatabase->JournalingDatabase) {
+				foreach (RoleModuleAuthorization::LoadArrayByModifiedBy($this->intUserAccountId) as $objRoleModuleAuthorization) {
+					$objRoleModuleAuthorization->Journal('DELETE');
+				}
+			}
+
+			// Perform the SQL Query
+			$objDatabase->NonQuery('
+				DELETE FROM
+					`role_module_authorization`
+				WHERE
+					`modified_by` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 			');
 		}
 
@@ -15284,6 +15318,7 @@
 			$strToReturn .= '<element name="EmailAddress" type="xsd:string"/>';
 			$strToReturn .= '<element name="ActiveFlag" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="AdminFlag" type="xsd:boolean"/>';
+			$strToReturn .= '<element name="OwnerFlag" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="PortableAccessFlag" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="PortableUserPin" type="xsd:int"/>';
 			$strToReturn .= '<element name="Role" type="xsd1:Role"/>';
@@ -15332,6 +15367,8 @@
 				$objToReturn->blnActiveFlag = $objSoapObject->ActiveFlag;
 			if (property_exists($objSoapObject, 'AdminFlag'))
 				$objToReturn->blnAdminFlag = $objSoapObject->AdminFlag;
+			if (property_exists($objSoapObject, 'OwnerFlag'))
+				$objToReturn->blnOwnerFlag = $objSoapObject->OwnerFlag;
 			if (property_exists($objSoapObject, 'PortableAccessFlag'))
 				$objToReturn->blnPortableAccessFlag = $objSoapObject->PortableAccessFlag;
 			if (property_exists($objSoapObject, 'PortableUserPin'))
@@ -15459,6 +15496,7 @@
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`email_address` AS `%s__%s__email_address`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`active_flag` AS `%s__%s__active_flag`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`admin_flag` AS `%s__%s__admin_flag`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`owner_flag` AS `%s__%s__owner_flag`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`portable_access_flag` AS `%s__%s__portable_access_flag`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`portable_user_pin` AS `%s__%s__portable_user_pin`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`role_id` AS `%s__%s__role_id`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
@@ -15530,6 +15568,7 @@
 	 * @property-read QQNode $EmailAddress
 	 * @property-read QQNode $ActiveFlag
 	 * @property-read QQNode $AdminFlag
+	 * @property-read QQNode $OwnerFlag
 	 * @property-read QQNode $PortableAccessFlag
 	 * @property-read QQNode $PortableUserPin
 	 * @property-read QQNode $RoleId
@@ -15540,24 +15579,24 @@
 	 * @property-read QQNode $ModifiedBy
 	 * @property-read QQNodeUserAccount $ModifiedByObject
 	 * @property-read QQNode $ModifiedDate
-	 * @property-read QQReverseReferenceNodeAddress $AddressAsCreatedBy
 	 * @property-read QQReverseReferenceNodeAddress $AddressAsModifiedBy
-	 * @property-read QQReverseReferenceNodeAsset $AssetAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAddress $AddressAsCreatedBy
 	 * @property-read QQReverseReferenceNodeAsset $AssetAsCreatedBy
-	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAsset $AssetAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsCreatedBy
 	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsToUser
 	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsCreatedBy
 	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAttachment $AttachmentAsCreatedBy
-	 * @property-read QQReverseReferenceNodeAudit $AuditAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAudit $AuditAsCreatedBy
-	 * @property-read QQReverseReferenceNodeCategory $CategoryAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAudit $AuditAsModifiedBy
 	 * @property-read QQReverseReferenceNodeCategory $CategoryAsCreatedBy
-	 * @property-read QQReverseReferenceNodeCompany $CompanyAsModifiedBy
+	 * @property-read QQReverseReferenceNodeCategory $CategoryAsModifiedBy
 	 * @property-read QQReverseReferenceNodeCompany $CompanyAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCompany $CompanyAsModifiedBy
 	 * @property-read QQReverseReferenceNodeContact $ContactAsModifiedBy
 	 * @property-read QQReverseReferenceNodeContact $ContactAsCreatedBy
 	 * @property-read QQReverseReferenceNodeCustomField $CustomFieldAsModifiedBy
@@ -15565,31 +15604,31 @@
 	 * @property-read QQReverseReferenceNodeCustomFieldValue $CustomFieldValueAsCreatedBy
 	 * @property-read QQReverseReferenceNodeCustomFieldValue $CustomFieldValueAsModifiedBy
 	 * @property-read QQReverseReferenceNodeDatagridColumnPreference $DatagridColumnPreference
-	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsCreatedBy
 	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsModifiedBy
-	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsCreatedBy
 	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsCreatedBy
-	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsModifiedBy
 	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsCreatedBy
-	 * @property-read QQReverseReferenceNodeLocation $LocationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsModifiedBy
 	 * @property-read QQReverseReferenceNodeLocation $LocationAsCreatedBy
-	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsModifiedBy
+	 * @property-read QQReverseReferenceNodeLocation $LocationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsCreatedBy
-	 * @property-read QQReverseReferenceNodeNotification $NotificationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsModifiedBy
 	 * @property-read QQReverseReferenceNodeNotification $NotificationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeNotification $NotificationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeNotificationUserAccount $NotificationUserAccount
 	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsCreatedBy
 	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsModifiedBy
-	 * @property-read QQReverseReferenceNodeRole $RoleAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRole $RoleAsCreatedBy
-	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRole $RoleAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsCreatedBy
-	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy
-	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsCreatedBy
-	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorizationAsCreatedBy
 	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorizationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsCreatedBy
@@ -15621,6 +15660,8 @@
 					return new QQNode('active_flag', 'ActiveFlag', 'boolean', $this);
 				case 'AdminFlag':
 					return new QQNode('admin_flag', 'AdminFlag', 'boolean', $this);
+				case 'OwnerFlag':
+					return new QQNode('owner_flag', 'OwnerFlag', 'boolean', $this);
 				case 'PortableAccessFlag':
 					return new QQNode('portable_access_flag', 'PortableAccessFlag', 'boolean', $this);
 				case 'PortableUserPin':
@@ -15641,18 +15682,18 @@
 					return new QQNodeUserAccount('modified_by', 'ModifiedByObject', 'integer', $this);
 				case 'ModifiedDate':
 					return new QQNode('modified_date', 'ModifiedDate', 'string', $this);
-				case 'AddressAsCreatedBy':
-					return new QQReverseReferenceNodeAddress($this, 'addressascreatedby', 'reverse_reference', 'created_by');
 				case 'AddressAsModifiedBy':
 					return new QQReverseReferenceNodeAddress($this, 'addressasmodifiedby', 'reverse_reference', 'modified_by');
-				case 'AssetAsModifiedBy':
-					return new QQReverseReferenceNodeAsset($this, 'assetasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'AddressAsCreatedBy':
+					return new QQReverseReferenceNodeAddress($this, 'addressascreatedby', 'reverse_reference', 'created_by');
 				case 'AssetAsCreatedBy':
 					return new QQReverseReferenceNodeAsset($this, 'assetascreatedby', 'reverse_reference', 'created_by');
-				case 'AssetModelAsModifiedBy':
-					return new QQReverseReferenceNodeAssetModel($this, 'assetmodelasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'AssetAsModifiedBy':
+					return new QQReverseReferenceNodeAsset($this, 'assetasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'AssetModelAsCreatedBy':
 					return new QQReverseReferenceNodeAssetModel($this, 'assetmodelascreatedby', 'reverse_reference', 'created_by');
+				case 'AssetModelAsModifiedBy':
+					return new QQReverseReferenceNodeAssetModel($this, 'assetmodelasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'AssetTransactionAsCreatedBy':
 					return new QQReverseReferenceNodeAssetTransaction($this, 'assettransactionascreatedby', 'reverse_reference', 'created_by');
 				case 'AssetTransactionAsModifiedBy':
@@ -15665,18 +15706,18 @@
 					return new QQReverseReferenceNodeAssetTransactionCheckout($this, 'assettransactioncheckoutasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'AttachmentAsCreatedBy':
 					return new QQReverseReferenceNodeAttachment($this, 'attachmentascreatedby', 'reverse_reference', 'created_by');
-				case 'AuditAsModifiedBy':
-					return new QQReverseReferenceNodeAudit($this, 'auditasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'AuditAsCreatedBy':
 					return new QQReverseReferenceNodeAudit($this, 'auditascreatedby', 'reverse_reference', 'created_by');
-				case 'CategoryAsModifiedBy':
-					return new QQReverseReferenceNodeCategory($this, 'categoryasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'AuditAsModifiedBy':
+					return new QQReverseReferenceNodeAudit($this, 'auditasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'CategoryAsCreatedBy':
 					return new QQReverseReferenceNodeCategory($this, 'categoryascreatedby', 'reverse_reference', 'created_by');
-				case 'CompanyAsModifiedBy':
-					return new QQReverseReferenceNodeCompany($this, 'companyasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'CategoryAsModifiedBy':
+					return new QQReverseReferenceNodeCategory($this, 'categoryasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'CompanyAsCreatedBy':
 					return new QQReverseReferenceNodeCompany($this, 'companyascreatedby', 'reverse_reference', 'created_by');
+				case 'CompanyAsModifiedBy':
+					return new QQReverseReferenceNodeCompany($this, 'companyasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'ContactAsModifiedBy':
 					return new QQReverseReferenceNodeContact($this, 'contactasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'ContactAsCreatedBy':
@@ -15691,56 +15732,56 @@
 					return new QQReverseReferenceNodeCustomFieldValue($this, 'customfieldvalueasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'DatagridColumnPreference':
 					return new QQReverseReferenceNodeDatagridColumnPreference($this, 'datagridcolumnpreference', 'reverse_reference', 'user_account_id');
-				case 'InventoryLocationAsCreatedBy':
-					return new QQReverseReferenceNodeInventoryLocation($this, 'inventorylocationascreatedby', 'reverse_reference', 'created_by');
 				case 'InventoryLocationAsModifiedBy':
 					return new QQReverseReferenceNodeInventoryLocation($this, 'inventorylocationasmodifiedby', 'reverse_reference', 'modified_by');
-				case 'InventoryModelAsModifiedBy':
-					return new QQReverseReferenceNodeInventoryModel($this, 'inventorymodelasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'InventoryLocationAsCreatedBy':
+					return new QQReverseReferenceNodeInventoryLocation($this, 'inventorylocationascreatedby', 'reverse_reference', 'created_by');
 				case 'InventoryModelAsCreatedBy':
 					return new QQReverseReferenceNodeInventoryModel($this, 'inventorymodelascreatedby', 'reverse_reference', 'created_by');
-				case 'InventoryTransactionAsModifiedBy':
-					return new QQReverseReferenceNodeInventoryTransaction($this, 'inventorytransactionasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'InventoryModelAsModifiedBy':
+					return new QQReverseReferenceNodeInventoryModel($this, 'inventorymodelasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'InventoryTransactionAsCreatedBy':
 					return new QQReverseReferenceNodeInventoryTransaction($this, 'inventorytransactionascreatedby', 'reverse_reference', 'created_by');
-				case 'LocationAsModifiedBy':
-					return new QQReverseReferenceNodeLocation($this, 'locationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'InventoryTransactionAsModifiedBy':
+					return new QQReverseReferenceNodeInventoryTransaction($this, 'inventorytransactionasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'LocationAsCreatedBy':
 					return new QQReverseReferenceNodeLocation($this, 'locationascreatedby', 'reverse_reference', 'created_by');
-				case 'ManufacturerAsModifiedBy':
-					return new QQReverseReferenceNodeManufacturer($this, 'manufacturerasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'LocationAsModifiedBy':
+					return new QQReverseReferenceNodeLocation($this, 'locationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'ManufacturerAsCreatedBy':
 					return new QQReverseReferenceNodeManufacturer($this, 'manufacturerascreatedby', 'reverse_reference', 'created_by');
-				case 'NotificationAsModifiedBy':
-					return new QQReverseReferenceNodeNotification($this, 'notificationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'ManufacturerAsModifiedBy':
+					return new QQReverseReferenceNodeManufacturer($this, 'manufacturerasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'NotificationAsCreatedBy':
 					return new QQReverseReferenceNodeNotification($this, 'notificationascreatedby', 'reverse_reference', 'created_by');
+				case 'NotificationAsModifiedBy':
+					return new QQReverseReferenceNodeNotification($this, 'notificationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'NotificationUserAccount':
 					return new QQReverseReferenceNodeNotificationUserAccount($this, 'notificationuseraccount', 'reverse_reference', 'user_account_id');
 				case 'ReceiptAsCreatedBy':
 					return new QQReverseReferenceNodeReceipt($this, 'receiptascreatedby', 'reverse_reference', 'created_by');
 				case 'ReceiptAsModifiedBy':
 					return new QQReverseReferenceNodeReceipt($this, 'receiptasmodifiedby', 'reverse_reference', 'modified_by');
-				case 'RoleAsModifiedBy':
-					return new QQReverseReferenceNodeRole($this, 'roleasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleAsCreatedBy':
 					return new QQReverseReferenceNodeRole($this, 'roleascreatedby', 'reverse_reference', 'created_by');
-				case 'RoleEntityQtypeBuiltInAuthorizationAsModifiedBy':
-					return new QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization($this, 'roleentityqtypebuiltinauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'RoleAsModifiedBy':
+					return new QQReverseReferenceNodeRole($this, 'roleasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleEntityQtypeBuiltInAuthorizationAsCreatedBy':
 					return new QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization($this, 'roleentityqtypebuiltinauthorizationascreatedby', 'reverse_reference', 'created_by');
-				case 'RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy':
-					return new QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization($this, 'roleentityqtypecustomfieldauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'RoleEntityQtypeBuiltInAuthorizationAsModifiedBy':
+					return new QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization($this, 'roleentityqtypebuiltinauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy':
 					return new QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization($this, 'roleentityqtypecustomfieldauthorizationascreatedby', 'reverse_reference', 'created_by');
-				case 'RoleModuleAsModifiedBy':
-					return new QQReverseReferenceNodeRoleModule($this, 'rolemoduleasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy':
+					return new QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization($this, 'roleentityqtypecustomfieldauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleModuleAsCreatedBy':
 					return new QQReverseReferenceNodeRoleModule($this, 'rolemoduleascreatedby', 'reverse_reference', 'created_by');
-				case 'RoleModuleAuthorizationAsModifiedBy':
-					return new QQReverseReferenceNodeRoleModuleAuthorization($this, 'rolemoduleauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'RoleModuleAsModifiedBy':
+					return new QQReverseReferenceNodeRoleModule($this, 'rolemoduleasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleModuleAuthorizationAsCreatedBy':
 					return new QQReverseReferenceNodeRoleModuleAuthorization($this, 'rolemoduleauthorizationascreatedby', 'reverse_reference', 'created_by');
+				case 'RoleModuleAuthorizationAsModifiedBy':
+					return new QQReverseReferenceNodeRoleModuleAuthorization($this, 'rolemoduleauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleTransactionTypeAuthorizationAsCreatedBy':
 					return new QQReverseReferenceNodeRoleTransactionTypeAuthorization($this, 'roletransactiontypeauthorizationascreatedby', 'reverse_reference', 'created_by');
 				case 'RoleTransactionTypeAuthorizationAsModifiedBy':
@@ -15780,6 +15821,7 @@
 	 * @property-read QQNode $EmailAddress
 	 * @property-read QQNode $ActiveFlag
 	 * @property-read QQNode $AdminFlag
+	 * @property-read QQNode $OwnerFlag
 	 * @property-read QQNode $PortableAccessFlag
 	 * @property-read QQNode $PortableUserPin
 	 * @property-read QQNode $RoleId
@@ -15790,24 +15832,24 @@
 	 * @property-read QQNode $ModifiedBy
 	 * @property-read QQNodeUserAccount $ModifiedByObject
 	 * @property-read QQNode $ModifiedDate
-	 * @property-read QQReverseReferenceNodeAddress $AddressAsCreatedBy
 	 * @property-read QQReverseReferenceNodeAddress $AddressAsModifiedBy
-	 * @property-read QQReverseReferenceNodeAsset $AssetAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAddress $AddressAsCreatedBy
 	 * @property-read QQReverseReferenceNodeAsset $AssetAsCreatedBy
-	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAsset $AssetAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsCreatedBy
+	 * @property-read QQReverseReferenceNodeAssetModel $AssetModelAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsCreatedBy
 	 * @property-read QQReverseReferenceNodeAssetTransaction $AssetTransactionAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsToUser
 	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsCreatedBy
 	 * @property-read QQReverseReferenceNodeAssetTransactionCheckout $AssetTransactionCheckoutAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAttachment $AttachmentAsCreatedBy
-	 * @property-read QQReverseReferenceNodeAudit $AuditAsModifiedBy
 	 * @property-read QQReverseReferenceNodeAudit $AuditAsCreatedBy
-	 * @property-read QQReverseReferenceNodeCategory $CategoryAsModifiedBy
+	 * @property-read QQReverseReferenceNodeAudit $AuditAsModifiedBy
 	 * @property-read QQReverseReferenceNodeCategory $CategoryAsCreatedBy
-	 * @property-read QQReverseReferenceNodeCompany $CompanyAsModifiedBy
+	 * @property-read QQReverseReferenceNodeCategory $CategoryAsModifiedBy
 	 * @property-read QQReverseReferenceNodeCompany $CompanyAsCreatedBy
+	 * @property-read QQReverseReferenceNodeCompany $CompanyAsModifiedBy
 	 * @property-read QQReverseReferenceNodeContact $ContactAsModifiedBy
 	 * @property-read QQReverseReferenceNodeContact $ContactAsCreatedBy
 	 * @property-read QQReverseReferenceNodeCustomField $CustomFieldAsModifiedBy
@@ -15815,31 +15857,31 @@
 	 * @property-read QQReverseReferenceNodeCustomFieldValue $CustomFieldValueAsCreatedBy
 	 * @property-read QQReverseReferenceNodeCustomFieldValue $CustomFieldValueAsModifiedBy
 	 * @property-read QQReverseReferenceNodeDatagridColumnPreference $DatagridColumnPreference
-	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsCreatedBy
 	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsModifiedBy
-	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryLocation $InventoryLocationAsCreatedBy
 	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsCreatedBy
-	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryModel $InventoryModelAsModifiedBy
 	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsCreatedBy
-	 * @property-read QQReverseReferenceNodeLocation $LocationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeInventoryTransaction $InventoryTransactionAsModifiedBy
 	 * @property-read QQReverseReferenceNodeLocation $LocationAsCreatedBy
-	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsModifiedBy
+	 * @property-read QQReverseReferenceNodeLocation $LocationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsCreatedBy
-	 * @property-read QQReverseReferenceNodeNotification $NotificationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeManufacturer $ManufacturerAsModifiedBy
 	 * @property-read QQReverseReferenceNodeNotification $NotificationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeNotification $NotificationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeNotificationUserAccount $NotificationUserAccount
 	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsCreatedBy
 	 * @property-read QQReverseReferenceNodeReceipt $ReceiptAsModifiedBy
-	 * @property-read QQReverseReferenceNodeRole $RoleAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRole $RoleAsCreatedBy
-	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRole $RoleAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsCreatedBy
-	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization $RoleEntityQtypeBuiltInAuthorizationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy
-	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization $RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsCreatedBy
-	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsModifiedBy
+	 * @property-read QQReverseReferenceNodeRoleModule $RoleModuleAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsCreatedBy
+	 * @property-read QQReverseReferenceNodeRoleModuleAuthorization $RoleModuleAuthorizationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorizationAsCreatedBy
 	 * @property-read QQReverseReferenceNodeRoleTransactionTypeAuthorization $RoleTransactionTypeAuthorizationAsModifiedBy
 	 * @property-read QQReverseReferenceNodeShipment $ShipmentAsCreatedBy
@@ -15872,6 +15914,8 @@
 					return new QQNode('active_flag', 'ActiveFlag', 'boolean', $this);
 				case 'AdminFlag':
 					return new QQNode('admin_flag', 'AdminFlag', 'boolean', $this);
+				case 'OwnerFlag':
+					return new QQNode('owner_flag', 'OwnerFlag', 'boolean', $this);
 				case 'PortableAccessFlag':
 					return new QQNode('portable_access_flag', 'PortableAccessFlag', 'boolean', $this);
 				case 'PortableUserPin':
@@ -15892,18 +15936,18 @@
 					return new QQNodeUserAccount('modified_by', 'ModifiedByObject', 'integer', $this);
 				case 'ModifiedDate':
 					return new QQNode('modified_date', 'ModifiedDate', 'string', $this);
-				case 'AddressAsCreatedBy':
-					return new QQReverseReferenceNodeAddress($this, 'addressascreatedby', 'reverse_reference', 'created_by');
 				case 'AddressAsModifiedBy':
 					return new QQReverseReferenceNodeAddress($this, 'addressasmodifiedby', 'reverse_reference', 'modified_by');
-				case 'AssetAsModifiedBy':
-					return new QQReverseReferenceNodeAsset($this, 'assetasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'AddressAsCreatedBy':
+					return new QQReverseReferenceNodeAddress($this, 'addressascreatedby', 'reverse_reference', 'created_by');
 				case 'AssetAsCreatedBy':
 					return new QQReverseReferenceNodeAsset($this, 'assetascreatedby', 'reverse_reference', 'created_by');
-				case 'AssetModelAsModifiedBy':
-					return new QQReverseReferenceNodeAssetModel($this, 'assetmodelasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'AssetAsModifiedBy':
+					return new QQReverseReferenceNodeAsset($this, 'assetasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'AssetModelAsCreatedBy':
 					return new QQReverseReferenceNodeAssetModel($this, 'assetmodelascreatedby', 'reverse_reference', 'created_by');
+				case 'AssetModelAsModifiedBy':
+					return new QQReverseReferenceNodeAssetModel($this, 'assetmodelasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'AssetTransactionAsCreatedBy':
 					return new QQReverseReferenceNodeAssetTransaction($this, 'assettransactionascreatedby', 'reverse_reference', 'created_by');
 				case 'AssetTransactionAsModifiedBy':
@@ -15916,18 +15960,18 @@
 					return new QQReverseReferenceNodeAssetTransactionCheckout($this, 'assettransactioncheckoutasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'AttachmentAsCreatedBy':
 					return new QQReverseReferenceNodeAttachment($this, 'attachmentascreatedby', 'reverse_reference', 'created_by');
-				case 'AuditAsModifiedBy':
-					return new QQReverseReferenceNodeAudit($this, 'auditasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'AuditAsCreatedBy':
 					return new QQReverseReferenceNodeAudit($this, 'auditascreatedby', 'reverse_reference', 'created_by');
-				case 'CategoryAsModifiedBy':
-					return new QQReverseReferenceNodeCategory($this, 'categoryasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'AuditAsModifiedBy':
+					return new QQReverseReferenceNodeAudit($this, 'auditasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'CategoryAsCreatedBy':
 					return new QQReverseReferenceNodeCategory($this, 'categoryascreatedby', 'reverse_reference', 'created_by');
-				case 'CompanyAsModifiedBy':
-					return new QQReverseReferenceNodeCompany($this, 'companyasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'CategoryAsModifiedBy':
+					return new QQReverseReferenceNodeCategory($this, 'categoryasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'CompanyAsCreatedBy':
 					return new QQReverseReferenceNodeCompany($this, 'companyascreatedby', 'reverse_reference', 'created_by');
+				case 'CompanyAsModifiedBy':
+					return new QQReverseReferenceNodeCompany($this, 'companyasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'ContactAsModifiedBy':
 					return new QQReverseReferenceNodeContact($this, 'contactasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'ContactAsCreatedBy':
@@ -15942,56 +15986,56 @@
 					return new QQReverseReferenceNodeCustomFieldValue($this, 'customfieldvalueasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'DatagridColumnPreference':
 					return new QQReverseReferenceNodeDatagridColumnPreference($this, 'datagridcolumnpreference', 'reverse_reference', 'user_account_id');
-				case 'InventoryLocationAsCreatedBy':
-					return new QQReverseReferenceNodeInventoryLocation($this, 'inventorylocationascreatedby', 'reverse_reference', 'created_by');
 				case 'InventoryLocationAsModifiedBy':
 					return new QQReverseReferenceNodeInventoryLocation($this, 'inventorylocationasmodifiedby', 'reverse_reference', 'modified_by');
-				case 'InventoryModelAsModifiedBy':
-					return new QQReverseReferenceNodeInventoryModel($this, 'inventorymodelasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'InventoryLocationAsCreatedBy':
+					return new QQReverseReferenceNodeInventoryLocation($this, 'inventorylocationascreatedby', 'reverse_reference', 'created_by');
 				case 'InventoryModelAsCreatedBy':
 					return new QQReverseReferenceNodeInventoryModel($this, 'inventorymodelascreatedby', 'reverse_reference', 'created_by');
-				case 'InventoryTransactionAsModifiedBy':
-					return new QQReverseReferenceNodeInventoryTransaction($this, 'inventorytransactionasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'InventoryModelAsModifiedBy':
+					return new QQReverseReferenceNodeInventoryModel($this, 'inventorymodelasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'InventoryTransactionAsCreatedBy':
 					return new QQReverseReferenceNodeInventoryTransaction($this, 'inventorytransactionascreatedby', 'reverse_reference', 'created_by');
-				case 'LocationAsModifiedBy':
-					return new QQReverseReferenceNodeLocation($this, 'locationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'InventoryTransactionAsModifiedBy':
+					return new QQReverseReferenceNodeInventoryTransaction($this, 'inventorytransactionasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'LocationAsCreatedBy':
 					return new QQReverseReferenceNodeLocation($this, 'locationascreatedby', 'reverse_reference', 'created_by');
-				case 'ManufacturerAsModifiedBy':
-					return new QQReverseReferenceNodeManufacturer($this, 'manufacturerasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'LocationAsModifiedBy':
+					return new QQReverseReferenceNodeLocation($this, 'locationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'ManufacturerAsCreatedBy':
 					return new QQReverseReferenceNodeManufacturer($this, 'manufacturerascreatedby', 'reverse_reference', 'created_by');
-				case 'NotificationAsModifiedBy':
-					return new QQReverseReferenceNodeNotification($this, 'notificationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'ManufacturerAsModifiedBy':
+					return new QQReverseReferenceNodeManufacturer($this, 'manufacturerasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'NotificationAsCreatedBy':
 					return new QQReverseReferenceNodeNotification($this, 'notificationascreatedby', 'reverse_reference', 'created_by');
+				case 'NotificationAsModifiedBy':
+					return new QQReverseReferenceNodeNotification($this, 'notificationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'NotificationUserAccount':
 					return new QQReverseReferenceNodeNotificationUserAccount($this, 'notificationuseraccount', 'reverse_reference', 'user_account_id');
 				case 'ReceiptAsCreatedBy':
 					return new QQReverseReferenceNodeReceipt($this, 'receiptascreatedby', 'reverse_reference', 'created_by');
 				case 'ReceiptAsModifiedBy':
 					return new QQReverseReferenceNodeReceipt($this, 'receiptasmodifiedby', 'reverse_reference', 'modified_by');
-				case 'RoleAsModifiedBy':
-					return new QQReverseReferenceNodeRole($this, 'roleasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleAsCreatedBy':
 					return new QQReverseReferenceNodeRole($this, 'roleascreatedby', 'reverse_reference', 'created_by');
-				case 'RoleEntityQtypeBuiltInAuthorizationAsModifiedBy':
-					return new QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization($this, 'roleentityqtypebuiltinauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'RoleAsModifiedBy':
+					return new QQReverseReferenceNodeRole($this, 'roleasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleEntityQtypeBuiltInAuthorizationAsCreatedBy':
 					return new QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization($this, 'roleentityqtypebuiltinauthorizationascreatedby', 'reverse_reference', 'created_by');
-				case 'RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy':
-					return new QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization($this, 'roleentityqtypecustomfieldauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'RoleEntityQtypeBuiltInAuthorizationAsModifiedBy':
+					return new QQReverseReferenceNodeRoleEntityQtypeBuiltInAuthorization($this, 'roleentityqtypebuiltinauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleEntityQtypeCustomFieldAuthorizationAsCreatedBy':
 					return new QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization($this, 'roleentityqtypecustomfieldauthorizationascreatedby', 'reverse_reference', 'created_by');
-				case 'RoleModuleAsModifiedBy':
-					return new QQReverseReferenceNodeRoleModule($this, 'rolemoduleasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'RoleEntityQtypeCustomFieldAuthorizationAsModifiedBy':
+					return new QQReverseReferenceNodeRoleEntityQtypeCustomFieldAuthorization($this, 'roleentityqtypecustomfieldauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleModuleAsCreatedBy':
 					return new QQReverseReferenceNodeRoleModule($this, 'rolemoduleascreatedby', 'reverse_reference', 'created_by');
-				case 'RoleModuleAuthorizationAsModifiedBy':
-					return new QQReverseReferenceNodeRoleModuleAuthorization($this, 'rolemoduleauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
+				case 'RoleModuleAsModifiedBy':
+					return new QQReverseReferenceNodeRoleModule($this, 'rolemoduleasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleModuleAuthorizationAsCreatedBy':
 					return new QQReverseReferenceNodeRoleModuleAuthorization($this, 'rolemoduleauthorizationascreatedby', 'reverse_reference', 'created_by');
+				case 'RoleModuleAuthorizationAsModifiedBy':
+					return new QQReverseReferenceNodeRoleModuleAuthorization($this, 'rolemoduleauthorizationasmodifiedby', 'reverse_reference', 'modified_by');
 				case 'RoleTransactionTypeAuthorizationAsCreatedBy':
 					return new QQReverseReferenceNodeRoleTransactionTypeAuthorization($this, 'roletransactiontypeauthorizationascreatedby', 'reverse_reference', 'created_by');
 				case 'RoleTransactionTypeAuthorizationAsModifiedBy':
