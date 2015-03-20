@@ -105,7 +105,7 @@
 			QFileFormStateHandler::DeleteFormStateForSession();
 			unset($_SESSION['intUserAccountId']);
 			session_destroy();
-			QApplication::Redirect('../login.php');
+			QApplication::Redirect(__SUBDIRECTORY__ . '/login.php');
 		}
 		
 		// Authenticate a certain module based on the module and the Role of the logged in user
@@ -126,7 +126,7 @@
 						$objRoleModule = RoleModule::LoadByRoleIdModuleId($objUserAccount->RoleId, $intModuleId);
 						// If they do not have access to this module
 						if (!$objRoleModule->AccessFlag) {
-							QApplication::Redirect('../common/trespass.php');
+							QApplication::Redirect(__SUBDIRECTORY__ . '/common/trespass.php');
 						}
 						// Assign the RoleModule to QApplication
 						else {
@@ -136,15 +136,15 @@
 					// ModuleId is null for the admin panel
 					// Check if the user is an admin
 					elseif (!$objUserAccount->AdminFlag) {
-						QApplication::Redirect('../common/trespass.php');
+						QApplication::Redirect(__SUBDIRECTORY__ . '/common/trespass.php');
 					}
 				}
 				else {
-					QApplication::Redirect('../common/trespass.php');
+					QApplication::Redirect(__SUBDIRECTORY__ . '/common/trespass.php');
 				}
 			}
 			else {
-				QApplication::Redirect('../login.php?strReferer=' . urlencode(QApplication::$RequestUri));
+				QApplication::Redirect(__SUBDIRECTORY__ . '/login.php?strReferer=' . urlencode(QApplication::$RequestUri));
 			}
 		}
 		
@@ -187,7 +187,7 @@
 				$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, 1);
 				// If the user doesn't have an 'All' Authorization Level, or an 'Owner' Authorization Level and owns this entity, redirect
 				if ($objRoleModuleAuthorization->AuthorizationLevelId != 1 && !($objRoleModuleAuthorization->AuthorizationLevelId == 2 && $objEntity->CreatedBy == QApplication::$objUserAccount->UserAccountId)) {
-					QApplication::Redirect('../common/trespass.php');
+					QApplication::Redirect(__SUBDIRECTORY__ . '/common/trespass.php');
 				}
 			}
 			// If it is a new entity, check that the user has 'Edit' Authorization
@@ -195,7 +195,7 @@
 				$objRoleModuleAuthorization = RoleModuleAuthorization::LoadByRoleModuleIdAuthorizationId(QApplication::$objRoleModule->RoleModuleId, 2);
 				// The user must have either an 'All' or 'Owner' Authorization Level to create a new entity
 				if (!$objRoleModuleAuthorization->AuthorizationLevelId == 1 && !$objRoleModuleAuthorization->AuthorizationLevelId == 2) {
-					QApplication::Redirect('../common/trespass.php');
+					QApplication::Redirect(__SUBDIRECTORY__ . '/common/trespass.php');
 				}
 			}
 		}
@@ -276,10 +276,10 @@
 		public static function BooleanImage($blnValue = true) {
 					
 			if ($blnValue) {
-				$strToReturn = sprintf('<img src="%s">', '../images/icons/check.png');
+				$strToReturn = sprintf('<img src="%s/icons/check.png">', __IMAGE_ASSETS__);
 			}
 			else {
-				$strToReturn = sprintf('<img src="%s">', '../images/icons/x.png');
+				$strToReturn = sprintf('<img src="%s/icons/x.png">', __IMAGE_ASSETS__);
 			}
 			
 			return $strToReturn;
