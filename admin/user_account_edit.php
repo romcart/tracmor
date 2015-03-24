@@ -223,6 +223,12 @@
 				$this->txtPasswordConfirm->Text = "";
 			}
 			
+			// Check for a valid email address
+			if (!filter_var($this->txtEmailAddress->Text, FILTER_VALIDATE_EMAIL)) {
+				$blnError = true;
+				$this->txtEmailAddress->Warning = 'Please enter a valid email address';
+			}
+
 			$intUserLimit = (is_numeric(QApplication::$TracmorSettings->UserLimit)) ? QApplication::$TracmorSettings->UserLimit : 99999;			
 			
 			// Do not allow creation of a new active user if user limit will be exceeded
