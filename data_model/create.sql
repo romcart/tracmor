@@ -196,7 +196,7 @@ CREATE TABLE user_account (
   last_name            VARCHAR(50)   NOT NULL,
   username             VARCHAR(30)   NOT NULL,
   password_hash        VARCHAR(60)   NOT NULL,
-  email_address        VARCHAR(50)   NULL,
+  email_address        VARCHAR(128)   NULL,
   active_flag          BIT   NOT NULL   COMMENT 'User account enabled/disabled',
   admin_flag           BIT   NOT NULL   COMMENT 'Designates user as normal or administrator',
   owner_flag           BIT   NOT NULL  DEFAULT 0,
