@@ -51,6 +51,7 @@
 		protected $lblHeaderUser;
 		protected $lblUserAccountId;
 		protected $pnlPortableAccess;
+		protected $objOwnerAccount;
 		
 		protected function Form_Create() {
 			// Call SetupUserAccount to either Load/Edit Existing or Create New
@@ -77,6 +78,11 @@
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
+
+			$this->objOwnerAccount = UserAccount::LoadOwner();
+
+			if ($this->blnEditMode)
+				$this->btnDelete->Display = (!$this->objOwnerAccount || $this->objOwnerAccount->UserAccountId != $this->objUserAccount->UserAccountId);
 		}
 		
 		// Create and Setup the Header Composite Control
@@ -134,6 +140,7 @@
   	protected function txtEmailAddress_Create() {
   		parent::txtEmailAddress_Create();
   		$this->txtEmailAddress->CausesValidation = true;
+  		$this->txtEmailAddress->Required = true;
 			$this->txtEmailAddress->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtEmailAddress->AddAction(new QEnterKeyEvent(), new QTerminateAction());
   	}
@@ -246,6 +253,13 @@
 				$this->btnCancel->Warning = 'A user account already exists with that username. Please choose another.';
 			}			
 			
+			// Do not allow deactivation of owner account
+			$this->objOwnerAccount = UserAccount::LoadOwner();
+			if ($this->blnEditMode && $this->objOwnerAccount && $this->objOwnerAccount->UserAccountId == $this->objUserAccount->UserAccountId && !$this->chkActiveFlag->Checked) {
+				$blnError = true;
+				$this->btnCancel->Warning = 'This user cannot be deactivated because they are the account owner.';
+			}
+
 			if (!$blnError) {
 				
 				try {
@@ -263,7 +277,12 @@
 		}
 		
 		protected function btnDelete_Click($strFormId, $strControlId, $strParameter) {
-			
+			$this->objOwnerAccount = UserAccount::LoadOwner();
+			if ($this->objOwnerAccount && $this->objUserAccount->UserAccountId == $this->objOwnerAccount->UserAccountId) {
+				$this->btnCancel->Warning = 'This user cannot be deleted because they are the account owner.';
+				return;
+			}
+
 			try {
 				$this->objUserAccount->Delete();
 				$this->RedirectToListPage();

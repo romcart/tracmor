@@ -66,7 +66,7 @@
 			if ($this->OwnerFlag == null) {
 				$this->OwnerFlag = '0';
 			}
-
+			
 			parent::Save($blnForceInsert, $blnForceUpdate);
 		}
 		
@@ -93,6 +93,11 @@
 
             return $strToReturn;
         }
+
+		public static function LoadOwner() {
+			$arrOwner = UserAccount::QueryArray(QQ::Equal(QQN::UserAccount()->OwnerFlag, '1'));
+			return (count($arrOwner)) ? $arrOwner[0] : null;
+		}
 
 		/**
 		 * Load a UserAccount Object based on the UserAccountId and PortableUserPin

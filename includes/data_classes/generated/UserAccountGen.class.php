@@ -207,7 +207,7 @@
 		 * @var string strEmailAddress
 		 */
 		protected $strEmailAddress;
-		const EmailAddressMaxLength = 50;
+		const EmailAddressMaxLength = 128;
 		const EmailAddressDefault = null;
 
 
