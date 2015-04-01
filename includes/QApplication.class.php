@@ -81,6 +81,8 @@
 		public static $objUserAccount;
 		// RoleModule object based on the user that is logged in and the module they are accessing
 		public static $objRoleModule;
+		// Password Hasher
+		public static $objPasswordHasher;
 
 		////////////////////////////
 		// Additional Static Methods
@@ -92,7 +94,13 @@
 			
 			QApplication::$TracmorSettings = new TracmorSettings();
 		}
-		
+
+		// Initialize the Password Hasher
+		public static function InitializePasswordHasher() {
+			if (!QApplication::$objPasswordHasher)
+				QApplication::$objPasswordHasher = new PasswordHash(8, PORTABLE_PASSWORDS);
+		}
+
 		// Assign the UserAccountId to a session variable
 		public static function Login(UserAccount $objUserAccount) {
 			// Assign the UserAccountId as a session variable
@@ -110,10 +118,6 @@
 		
 		// Authenticate a certain module based on the module and the Role of the logged in user
 		public static function Authenticate($intModuleId = null) {
-			
-			// If logins have been disabled for this site, log the user out
-			if (QApplication::$TracmorSettings->DisableLogins)
-				QApplication::Logout();
 
 			if (array_key_exists('intUserAccountId', $_SESSION)) {
 				$objUserAccount = UserAccount::Load($_SESSION['intUserAccountId']);
@@ -351,6 +355,29 @@
 
 		public static function MoneyFormat($intNumber) {
 			return number_format($intNumber, 2, '.', '');
+		}
+
+		public static function SendEmailUsingTemplate($strTemplateName, $strSubject, $strFrom, $strTo, $strTokenArray) {
+			$strContent = file_get_contents(__INCLUDES__ . '/email_templates/' . $strTemplateName . '.txt');
+			foreach ($strTokenArray as $strKey => $strValue) {
+				$strContent = str_replace('%' . $strKey . '%', $strValue, $strContent);
+			}
+			$objEmail = new EmailQueue();
+			$objEmail->ToAddress = $strTo;
+			$objEmail->FromAddress = $strFrom;
+			$objEmail->Subject = $strSubject;
+			$objEmail->Body = $strContent;
+			$objEmail->Save();
+		}
+
+		public static function HashPassword($strPassword) {
+			QApplication::InitializePasswordHasher();
+			return QApplication::$objPasswordHasher->HashPassword($strPassword);
+		}
+
+		public static function CheckPassword($strPassword, $strHash) {
+			QApplication::InitializePasswordHasher();
+			return QApplication::$objPasswordHasher->CheckPassword($strPassword, $strHash);
 		}
 	}
 ?>

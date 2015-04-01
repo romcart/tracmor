@@ -84,4 +84,18 @@
 	
 	// Location of tmp directory
 	DEFINE('__TRACMOR_TMP__', '/tmp');
+
+	// SMTP configuration
+	define('SMTP_SERVER', '');
+	define('SMTP_PORT', 587);
+	define('SMTP_USERNAME', '');
+	define('SMTP_PASSWORD', '');
+
+	// Email settings
+	define('EMAIL_FROM_ADDRESS', '');
+	define('EMAIL_SIGNATURE', '');
+
+	// Terms of Service and Privacy Policy URLs
+	define('TOS_URL', '');
+	define('PRIVACY_URL', '');
 ?>

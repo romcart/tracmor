@@ -22,7 +22,6 @@
 
 <?php
 	require(__DATAGEN_CLASSES__ . '/UserAccountGen.class.php');
-
 	/**
 	 * The UserAccount class defined here contains any
 	 * customized code for the UserAccount class in the
@@ -60,7 +59,8 @@
 				$this->CreationDate = new QDateTime(QDateTime::Now);
 			}
 			else {
-				$this->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
+				if (QApplication::$objUserAccount)
+					$this->ModifiedBy = QApplication::$objUserAccount->UserAccountId;
 			}
 
 			if ($this->OwnerFlag == null) {
@@ -169,6 +169,78 @@
 			}
 			return $objToReturn;
 		}
-				
+
+		public function SendPasswordResetEmail($blnForce = false) {
+			// Make sure a valid reset code does not already exist
+			if (!$blnForce && $this->PasswordResetCode && $this->PasswordResetExpiry->IsLaterThan(QDateTime::Now())) {
+				return;
+			}
+
+			$strPasswordResetCode = $this->GeneratePasswordResetCode();
+
+			// Setup Token Array
+			$strTokenArray = array(
+				'NAME' => $this->FirstName,
+				'URL' => sprintf('https://%s%s/password/reset.php?c=%s', 
+					$_SERVER['HTTP_HOST'], 
+					__SUBDIRECTORY__,
+					$strPasswordResetCode),
+				'SIGNATURE' => EMAIL_SIGNATURE
+			);
+
+			// Send message
+			QApplication::SendEmailUsingTemplate('password_recovery', 'Tracmor Account Password Reset', EMAIL_FROM_ADDRESS,
+				sprintf('%s <%s>', $this->__toStringFullName(), $this->EmailAddress), $strTokenArray);
+		}
+
+		public function GeneratePasswordResetCode() {
+			// generate password reset code
+			list($usec, $sec) = explode(' ', microtime());
+			$seed = (float) $sec + ((float) $usec * 100000);
+			srand($seed);
+			$alfa = "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
+			$token = "";
+			$code_length = 32;
+			for($i = 0; $i < $code_length; $i ++) {
+				$token .= $alfa[rand(0, strlen($alfa)-1)];
+			}
+
+			// Hash the reset code before saving
+			$strCodeHash = QApplication::HashPassword($token);
+
+			// save reset code and expiry in db
+			$this->PasswordResetCode = $strCodeHash;
+			$this->PasswordResetExpiry = QDateTime::Now()->AddHours(1);
+			$this->Save();
+			return $token; 
+		}
+
+		public static function LoadByPasswordResetCode($strPasswordResetCode) {
+			
+			// Reset code must be 32 characters
+			if (strlen($strPasswordResetCode) != 32) {
+				return null;
+			}
+			
+			// Load all users with unexpired reset codes			
+			$arrUserAccount = UserAccount::QueryArray(
+				QQ::AndCondition(
+					QQ::Equal(QQN::UserAccount()->ActiveFlag, 1),
+					QQ::IsNotNull(QQN::UserAccount()->PasswordResetCode),
+					QQ::GreaterThan(QQN::UserAccount()->PasswordResetExpiry, QDateTime::Now())
+				)
+			);
+
+			// Check submitted reset code against any valid codes
+			foreach ($arrUserAccount as $objUserAccount) {
+				if (QApplication::CheckPassword($strPasswordResetCode, $objUserAccount->PasswordResetCode)) {
+		
+					// Match found
+					return $objUserAccount;
+				}
+			}
+
+			return null;
+		}
 	}
 ?>

@@ -21,7 +21,6 @@
 
 	// Include prepend.inc to load Qcodo
 	require('../includes/prepend.inc.php');
-	require('../includes/php/PasswordHash.php');
 	
 	QApplication::Authenticate();
 	// Include the classfile for UserAccountEditFormBase
@@ -86,117 +85,121 @@
 		}
 		
 		// Create and Setup the Header Composite Control
-  	protected function ctlHeaderMenu_Create() {
-  		$this->ctlHeaderMenu = new QHeaderMenu($this);
-  		
-  	}
-  	
-  	// Create and Setup the Username textbox
-  	protected function txtUsername_Create() {
-  		parent::txtUsername_Create();
-  		$this->txtUsername->CausesValidation = true;
-		$this->txtUsername->Focus();
-		$this->txtUsername->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-		$this->txtUsername->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  	}
-  	
-  	// Create and Setup the FirstName textbox
-  	protected function txtFirstName_Create() {
-  		parent::txtFirstName_Create();
-  		$this->txtFirstName->CausesValidation = true;
-		$this->txtFirstName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-		$this->txtFirstName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  	}
-  	
-  	// Create and Setup the LastName textbox
-  	protected function txtLastName_Create() {
-  		parent::txtLastName_Create();
-  		$this->txtLastName->CausesValidation = true;
-		$this->txtLastName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-		$this->txtLastName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  	}  	
-		
+		protected function ctlHeaderMenu_Create() {
+			$this->ctlHeaderMenu = new QHeaderMenu($this);
+			
+		}
+
+		// Create and Setup the Username textbox
+		protected function txtUsername_Create() {
+			parent::txtUsername_Create();
+			$this->txtUsername->CausesValidation = true;
+			$this->txtUsername->Focus();
+			$this->txtUsername->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->txtUsername->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		// Create and Setup the FirstName textbox
+		protected function txtFirstName_Create() {
+			parent::txtFirstName_Create();
+			$this->txtFirstName->CausesValidation = true;
+			$this->txtFirstName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->txtFirstName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		// Create and Setup the LastName textbox
+		protected function txtLastName_Create() {
+			parent::txtLastName_Create();
+			$this->txtLastName->CausesValidation = true;
+			$this->txtLastName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->txtLastName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
 		// Create/Setup the password textbox
 		protected function txtPassword_Create() {
 			$this->txtPassword = new QTextBox($this);
 			$this->txtPassword->Name = 'Password';
 			$this->txtPassword->TextMode = QTextMode::Password;
 			$this->txtPassword->CausesValidation = true;
+			if (!$this->blnEditMode)
+				$this->txtPassword->Required = true;
 			$this->txtPassword->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtPassword->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
+
 		// Create/Setup the password confirmation textbox
 		protected function txtPasswordConfirm_Create() {			
 			$this->txtPasswordConfirm = new QTextBox($this);
 			$this->txtPasswordConfirm->Name = 'Confirm Password';
 			$this->txtPasswordConfirm->TextMode = QTextMode::Password;
 			$this->txtPasswordConfirm->CausesValidation = true;
+			if (!$this->blnEditMode)
+				$this->txtPasswordConfirm->Required = true;
 			$this->txtPasswordConfirm->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtPasswordConfirm->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
-		
-  	// Create and Setup the EmailAddress textbox
-  	protected function txtEmailAddress_Create() {
-  		parent::txtEmailAddress_Create();
-  		$this->txtEmailAddress->CausesValidation = true;
-  		$this->txtEmailAddress->Required = true;
-			$this->txtEmailAddress->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-			$this->txtEmailAddress->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  	}
-  	
-  	// Create and Setup the Username textbox
-  	protected function chkActiveFlag_Create() {
-  		parent::chkActiveFlag_Create();
-  		$this->chkActiveFlag->CausesValidation = true;
-		$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-		$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  	}  	
-  	
-  	// Create and Setup the Username textbox
-  	protected function chkAdminFlag_Create() {
-  		parent::chkAdminFlag_Create();
-  		$this->chkAdminFlag->CausesValidation = true;
-		$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-		$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  	}
-  	
-  	// Setup User Portable Access Flag Checkbox
-  	protected function chkPortableAccessFlag_Create() {
-  		parent::chkPortableAccessFlag_Create();
-  		$this->chkPortableAccessFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-  		$this->chkPortableAccessFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  		$this->chkPortableAccessFlag->AddAction(new QClickEvent(), new QToggleDisplayAction($this->pnlPortableAccess));
-  		$this->chkPortableAccessFlag->AddAction(new QClickEvent(), new QAjaxAction('chkPortableAccessFlag_Click'));
-  		
-  	}
-  	
-  	protected function pnlPortableAccess_Create() {
-  		$this->pnlPortableAccess = new QPanel($this);
-  		$this->pnlPortableAccess->Template = 'pnl_portable_access.inc.php';
-  		if (!$this->objUserAccount->PortableAccessFlag) {
-  			$this->pnlPortableAccess->Display = false;
-  		}
-  	}
-  	
-  	// Setup User Account Id Label
-  	protected function lblUserAccountId_Create() {
-  		parent::lblUserAccountId_Create();
-  		$this->lblUserAccountId->SetParentControl($this->pnlPortableAccess);
-  		$this->lblUserAccountId->DisplayStyle = QDisplayStyle::Inline;
-  	}
-  	
-  	// Setup Portable User Pin textbox
-  	protected function txtPortableUserPin_Create() {
-  		parent::txtPortableUserPin_Create();
-  		$this->txtPortableUserPin->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
-  		$this->txtPortableUserPin->AddAction(new QEnterKeyEvent(), new QTerminateAction());
-  		$this->txtPortableUserPin->SetParentControl($this->pnlPortableAccess);
-  		if (QApplication::$TracmorSettings->PortablePinRequired && $this->objUserAccount->PortableAccessFlag) {
-  			$this->txtPortableUserPin->Required = true;
-  		}
-  	}
-		
+
+		// Create and Setup the EmailAddress textbox
+		protected function txtEmailAddress_Create() {
+			parent::txtEmailAddress_Create();
+			$this->txtEmailAddress->CausesValidation = true;
+			$this->txtEmailAddress->Required = true;
+				$this->txtEmailAddress->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+				$this->txtEmailAddress->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		// Create and Setup the Username textbox
+		protected function chkActiveFlag_Create() {
+			parent::chkActiveFlag_Create();
+			$this->chkActiveFlag->CausesValidation = true;
+			$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->chkActiveFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		// Create and Setup the Username textbox
+		protected function chkAdminFlag_Create() {
+			parent::chkAdminFlag_Create();
+			$this->chkAdminFlag->CausesValidation = true;
+			$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->chkAdminFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
+		// Setup User Portable Access Flag Checkbox
+		protected function chkPortableAccessFlag_Create() {
+			parent::chkPortableAccessFlag_Create();
+			$this->chkPortableAccessFlag->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->chkPortableAccessFlag->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->chkPortableAccessFlag->AddAction(new QClickEvent(), new QToggleDisplayAction($this->pnlPortableAccess));
+			$this->chkPortableAccessFlag->AddAction(new QClickEvent(), new QAjaxAction('chkPortableAccessFlag_Click'));
+			
+		}
+
+		protected function pnlPortableAccess_Create() {
+			$this->pnlPortableAccess = new QPanel($this);
+			$this->pnlPortableAccess->Template = 'pnl_portable_access.inc.php';
+			if (!$this->objUserAccount->PortableAccessFlag) {
+				$this->pnlPortableAccess->Display = false;
+			}
+		}
+
+		// Setup User Account Id Label
+		protected function lblUserAccountId_Create() {
+			parent::lblUserAccountId_Create();
+			$this->lblUserAccountId->SetParentControl($this->pnlPortableAccess);
+			$this->lblUserAccountId->DisplayStyle = QDisplayStyle::Inline;
+		}
+
+		// Setup Portable User Pin textbox
+		protected function txtPortableUserPin_Create() {
+			parent::txtPortableUserPin_Create();
+			$this->txtPortableUserPin->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->txtPortableUserPin->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+			$this->txtPortableUserPin->SetParentControl($this->pnlPortableAccess);
+			if (QApplication::$TracmorSettings->PortablePinRequired && $this->objUserAccount->PortableAccessFlag) {
+				$this->txtPortableUserPin->Required = true;
+			}
+		}
+
 		// Setup btnSave
 		protected function btnSave_Create() {
 			$this->btnSave = new QButton($this);
@@ -205,13 +208,13 @@
 			$this->btnSave->PrimaryButton = true;
 			$this->btnSave->CausesValidation = true;
 		}		
-		
+
 		// Setup header label
 		protected function lblHeaderUser_Create() {
 			$this->lblHeaderUser = new QLabel($this);
 			$this->lblHeaderUser->Text = ($this->objUserAccount->Username != '') ? $this->objUserAccount->Username : 'New User Account';
 		}
-		
+
 		// Control ServerActions
 		protected function btnSave_Click($strFormId, $strControlId, $strParameter) {
 			
@@ -221,12 +224,22 @@
 				$this->txtPassword->Warning = "The passwords do not match, please re-enter.";
 				$this->txtPassword->Text = "";
 				$this->txtPasswordConfirm->Text = "";
+			} else if (!($this->blnEditMode && $this->txtPassword->Text == '') && strlen($this->txtPassword->Text) < 8) {
+				$blnError = true;
+				$this->txtPassword->Warning = "Password must be at least 8 characters.";
 			}
 			
 			// Check for a valid email address
 			if (!filter_var($this->txtEmailAddress->Text, FILTER_VALIDATE_EMAIL)) {
 				$blnError = true;
 				$this->txtEmailAddress->Warning = 'Please enter a valid email address';
+			}
+
+			// Do not allow duplicate email addresses
+			$objUserAccountDupe = UserAccount::LoadByEmailAddress($this->txtEmailAddress->Text);
+			if (($this->blnEditMode && $objUserAccountDupe && $objUserAccountDupe->UserAccountId != $this->objUserAccount->UserAccountId) || (!$this->blnEditMode && $objUserAccountDupe)) {
+				$blnError = true;
+				$this->txtEmailAddress->Warning = 'A user account with that email address already exists.';
 			}
 
 			$intUserLimit = (is_numeric(QApplication::$TracmorSettings->UserLimit)) ? QApplication::$TracmorSettings->UserLimit : 99999;			
@@ -246,7 +259,7 @@
 					$this->chkActiveFlag->Warning = "You have exceeded your user limit.";
 				}				
 			}
-			
+
 			// Do not allow duplicate usernames
 			if ($this->blnEditMode) {
 				$objUserAccountDuplicate = UserAccount::QuerySingle(QQ::AndCondition(QQ::Equal(QQN::UserAccount()->Username, $this->txtUsername->Text), QQ::NotEqual(QQN::UserAccount()->UserAccountId, $this->objUserAccount->UserAccountId)));
@@ -318,8 +331,7 @@
 			$this->objUserAccount->LastName = $this->txtLastName->Text;
 			$this->objUserAccount->Username = $this->txtUsername->Text;
 			if ($this->txtPassword->Text) {
-				$objHasher = new PasswordHash(8, PORTABLE_PASSWORDS);
-				$this->objUserAccount->PasswordHash = $objHasher->HashPassword(sha1($this->txtPassword->Text));
+				$this->objUserAccount->PasswordHash = QApplication::HashPassword(sha1($this->txtPassword->Text));
 			}
 			$this->objUserAccount->EmailAddress = $this->txtEmailAddress->Text;
 			$this->objUserAccount->ActiveFlag = $this->chkActiveFlag->Checked;

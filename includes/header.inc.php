@@ -5,6 +5,9 @@
 <?php if (isset($strPageTitle)) { ?>
 		<title><?php _p($strPageTitle); ?></title>
 <?php } ?>
+		<!--[if IE]><link rel="shortcut icon" href="<?php _p(__IMAGE_ASSETS__); ?>/favicon.ico"><![endif]-->
+		<link rel="icon" href="<?php _p(__IMAGE_ASSETS__); ?>/favicon.ico">
+
 		<!--<link rel="stylesheet" type="text/css" href="<?php _p(__CSS_ASSETS__); ?>/tracmor.css"></link>-->
 		<style type="text/css">@import url("<?php _p(__VIRTUAL_DIRECTORY__ . __CSS_ASSETS__); ?>/tracmor.css");</style>
 	</head>

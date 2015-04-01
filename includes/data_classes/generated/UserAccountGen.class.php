@@ -20,13 +20,15 @@
 	 * @property string $LastName the value for strLastName (Not Null)
 	 * @property string $Username the value for strUsername (Unique)
 	 * @property string $PasswordHash the value for strPasswordHash (Not Null)
-	 * @property string $EmailAddress the value for strEmailAddress 
+	 * @property string $EmailAddress the value for strEmailAddress (Unique)
 	 * @property boolean $ActiveFlag the value for blnActiveFlag (Not Null)
 	 * @property boolean $AdminFlag the value for blnAdminFlag (Not Null)
 	 * @property boolean $OwnerFlag the value for blnOwnerFlag (Not Null)
 	 * @property boolean $PortableAccessFlag the value for blnPortableAccessFlag 
 	 * @property integer $PortableUserPin the value for intPortableUserPin 
 	 * @property integer $RoleId the value for intRoleId (Not Null)
+	 * @property string $PasswordResetCode the value for strPasswordResetCode 
+	 * @property QDateTime $PasswordResetExpiry the value for dttPasswordResetExpiry 
 	 * @property integer $CreatedBy the value for intCreatedBy 
 	 * @property QDateTime $CreationDate the value for dttCreationDate 
 	 * @property integer $ModifiedBy the value for intModifiedBy 
@@ -257,6 +259,23 @@
 		 */
 		protected $intRoleId;
 		const RoleIdDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column user_account.password_reset_code
+		 * @var string strPasswordResetCode
+		 */
+		protected $strPasswordResetCode;
+		const PasswordResetCodeMaxLength = 64;
+		const PasswordResetCodeDefault = null;
+
+
+		/**
+		 * Protected member variable that maps to the database column user_account.password_reset_expiry
+		 * @var QDateTime dttPasswordResetExpiry
+		 */
+		protected $dttPasswordResetExpiry;
+		const PasswordResetExpiryDefault = null;
 
 
 		/**
@@ -1593,6 +1612,8 @@
 			$objBuilder->AddSelectItem($strTableName, 'portable_access_flag', $strAliasPrefix . 'portable_access_flag');
 			$objBuilder->AddSelectItem($strTableName, 'portable_user_pin', $strAliasPrefix . 'portable_user_pin');
 			$objBuilder->AddSelectItem($strTableName, 'role_id', $strAliasPrefix . 'role_id');
+			$objBuilder->AddSelectItem($strTableName, 'password_reset_code', $strAliasPrefix . 'password_reset_code');
+			$objBuilder->AddSelectItem($strTableName, 'password_reset_expiry', $strAliasPrefix . 'password_reset_expiry');
 			$objBuilder->AddSelectItem($strTableName, 'created_by', $strAliasPrefix . 'created_by');
 			$objBuilder->AddSelectItem($strTableName, 'creation_date', $strAliasPrefix . 'creation_date');
 			$objBuilder->AddSelectItem($strTableName, 'modified_by', $strAliasPrefix . 'modified_by');
@@ -2482,6 +2503,10 @@
 			$objToReturn->intPortableUserPin = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'role_id', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'role_id'] : $strAliasPrefix . 'role_id';
 			$objToReturn->intRoleId = $objDbRow->GetColumn($strAliasName, 'Integer');
+			$strAliasName = array_key_exists($strAliasPrefix . 'password_reset_code', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'password_reset_code'] : $strAliasPrefix . 'password_reset_code';
+			$objToReturn->strPasswordResetCode = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'password_reset_expiry', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'password_reset_expiry'] : $strAliasPrefix . 'password_reset_expiry';
+			$objToReturn->dttPasswordResetExpiry = $objDbRow->GetColumn($strAliasName, 'DateTime');
 			$strAliasName = array_key_exists($strAliasPrefix . 'created_by', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'created_by'] : $strAliasPrefix . 'created_by';
 			$objToReturn->intCreatedBy = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'creation_date', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'creation_date'] : $strAliasPrefix . 'creation_date';
@@ -3202,6 +3227,19 @@
 		}
 			
 		/**
+		 * Load a single UserAccount object,
+		 * by EmailAddress Index(es)
+		 * @param string $strEmailAddress
+		 * @return UserAccount
+		*/
+		public static function LoadByEmailAddress($strEmailAddress, $objOptionalClauses = null) {
+			return UserAccount::QuerySingle(
+				QQ::Equal(QQN::UserAccount()->EmailAddress, $strEmailAddress)
+			, $objOptionalClauses
+			);
+		}
+			
+		/**
 		 * Load an array of UserAccount objects,
 		 * by CreatedBy Index(es)
 		 * @param integer $intCreatedBy
@@ -3344,6 +3382,8 @@
 							`portable_access_flag`,
 							`portable_user_pin`,
 							`role_id`,
+							`password_reset_code`,
+							`password_reset_expiry`,
 							`created_by`,
 							`creation_date`,
 							`modified_by`
@@ -3359,6 +3399,8 @@
 							' . $objDatabase->SqlVariable($this->blnPortableAccessFlag) . ',
 							' . $objDatabase->SqlVariable($this->intPortableUserPin) . ',
 							' . $objDatabase->SqlVariable($this->intRoleId) . ',
+							' . $objDatabase->SqlVariable($this->strPasswordResetCode) . ',
+							' . $objDatabase->SqlVariable($this->dttPasswordResetExpiry) . ',
 							' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 							' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
 							' . $objDatabase->SqlVariable($this->intModifiedBy) . '
@@ -3407,6 +3449,8 @@
 							`portable_access_flag` = ' . $objDatabase->SqlVariable($this->blnPortableAccessFlag) . ',
 							`portable_user_pin` = ' . $objDatabase->SqlVariable($this->intPortableUserPin) . ',
 							`role_id` = ' . $objDatabase->SqlVariable($this->intRoleId) . ',
+							`password_reset_code` = ' . $objDatabase->SqlVariable($this->strPasswordResetCode) . ',
+							`password_reset_expiry` = ' . $objDatabase->SqlVariable($this->dttPasswordResetExpiry) . ',
 							`created_by` = ' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 							`creation_date` = ' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
 							`modified_by` = ' . $objDatabase->SqlVariable($this->intModifiedBy) . '
@@ -3517,6 +3561,8 @@
 			$this->blnPortableAccessFlag = $objReloaded->blnPortableAccessFlag;
 			$this->intPortableUserPin = $objReloaded->intPortableUserPin;
 			$this->RoleId = $objReloaded->RoleId;
+			$this->strPasswordResetCode = $objReloaded->strPasswordResetCode;
+			$this->dttPasswordResetExpiry = $objReloaded->dttPasswordResetExpiry;
 			$this->CreatedBy = $objReloaded->CreatedBy;
 			$this->dttCreationDate = $objReloaded->dttCreationDate;
 			$this->ModifiedBy = $objReloaded->ModifiedBy;
@@ -3545,6 +3591,8 @@
 					`portable_access_flag`,
 					`portable_user_pin`,
 					`role_id`,
+					`password_reset_code`,
+					`password_reset_expiry`,
 					`created_by`,
 					`creation_date`,
 					`modified_by`,
@@ -3564,6 +3612,8 @@
 					' . $objDatabase->SqlVariable($this->blnPortableAccessFlag) . ',
 					' . $objDatabase->SqlVariable($this->intPortableUserPin) . ',
 					' . $objDatabase->SqlVariable($this->intRoleId) . ',
+					' . $objDatabase->SqlVariable($this->strPasswordResetCode) . ',
+					' . $objDatabase->SqlVariable($this->dttPasswordResetExpiry) . ',
 					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
 					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
@@ -3643,7 +3693,7 @@
 					return $this->strPasswordHash;
 
 				case 'EmailAddress':
-					// Gets the value for strEmailAddress 
+					// Gets the value for strEmailAddress (Unique)
 					// @return string
 					return $this->strEmailAddress;
 
@@ -3676,6 +3726,16 @@
 					// Gets the value for intRoleId (Not Null)
 					// @return integer
 					return $this->intRoleId;
+
+				case 'PasswordResetCode':
+					// Gets the value for strPasswordResetCode 
+					// @return string
+					return $this->strPasswordResetCode;
+
+				case 'PasswordResetExpiry':
+					// Gets the value for dttPasswordResetExpiry 
+					// @return QDateTime
+					return $this->dttPasswordResetExpiry;
 
 				case 'CreatedBy':
 					// Gets the value for intCreatedBy 
@@ -4511,7 +4571,7 @@
 					}
 
 				case 'EmailAddress':
-					// Sets the value for strEmailAddress 
+					// Sets the value for strEmailAddress (Unique)
 					// @param string $mixValue
 					// @return string
 					try {
@@ -4583,6 +4643,28 @@
 					try {
 						$this->objRole = null;
 						return ($this->intRoleId = QType::Cast($mixValue, QType::Integer));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'PasswordResetCode':
+					// Sets the value for strPasswordResetCode 
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strPasswordResetCode = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
+				case 'PasswordResetExpiry':
+					// Sets the value for dttPasswordResetExpiry 
+					// @param QDateTime $mixValue
+					// @return QDateTime
+					try {
+						return ($this->dttPasswordResetExpiry = QType::Cast($mixValue, QType::DateTime));
 					} catch (QCallerException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
@@ -15322,6 +15404,8 @@
 			$strToReturn .= '<element name="PortableAccessFlag" type="xsd:boolean"/>';
 			$strToReturn .= '<element name="PortableUserPin" type="xsd:int"/>';
 			$strToReturn .= '<element name="Role" type="xsd1:Role"/>';
+			$strToReturn .= '<element name="PasswordResetCode" type="xsd:string"/>';
+			$strToReturn .= '<element name="PasswordResetExpiry" type="xsd:dateTime"/>';
 			$strToReturn .= '<element name="CreatedByObject" type="xsd1:UserAccount"/>';
 			$strToReturn .= '<element name="CreationDate" type="xsd:dateTime"/>';
 			$strToReturn .= '<element name="ModifiedByObject" type="xsd1:UserAccount"/>';
@@ -15376,6 +15460,10 @@
 			if ((property_exists($objSoapObject, 'Role')) &&
 				($objSoapObject->Role))
 				$objToReturn->Role = Role::GetObjectFromSoapObject($objSoapObject->Role);
+			if (property_exists($objSoapObject, 'PasswordResetCode'))
+				$objToReturn->strPasswordResetCode = $objSoapObject->PasswordResetCode;
+			if (property_exists($objSoapObject, 'PasswordResetExpiry'))
+				$objToReturn->dttPasswordResetExpiry = new QDateTime($objSoapObject->PasswordResetExpiry);
 			if ((property_exists($objSoapObject, 'CreatedByObject')) &&
 				($objSoapObject->CreatedByObject))
 				$objToReturn->CreatedByObject = UserAccount::GetObjectFromSoapObject($objSoapObject->CreatedByObject);
@@ -15408,6 +15496,8 @@
 				$objObject->objRole = Role::GetSoapObjectFromObject($objObject->objRole, false);
 			else if (!$blnBindRelatedObjects)
 				$objObject->intRoleId = null;
+			if ($objObject->dttPasswordResetExpiry)
+				$objObject->dttPasswordResetExpiry = $objObject->dttPasswordResetExpiry->__toString(QDateTime::FormatSoap);
 			if ($objObject->objCreatedByObject)
 				$objObject->objCreatedByObject = UserAccount::GetSoapObjectFromObject($objObject->objCreatedByObject, false);
 			else if (!$blnBindRelatedObjects)
@@ -15500,6 +15590,8 @@
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`portable_access_flag` AS `%s__%s__portable_access_flag`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`portable_user_pin` AS `%s__%s__portable_user_pin`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`role_id` AS `%s__%s__role_id`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`password_reset_code` AS `%s__%s__password_reset_code`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`password_reset_expiry` AS `%s__%s__password_reset_expiry`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`created_by` AS `%s__%s__created_by`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`creation_date` AS `%s__%s__creation_date`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`modified_by` AS `%s__%s__modified_by`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
@@ -15573,6 +15665,8 @@
 	 * @property-read QQNode $PortableUserPin
 	 * @property-read QQNode $RoleId
 	 * @property-read QQNodeRole $Role
+	 * @property-read QQNode $PasswordResetCode
+	 * @property-read QQNode $PasswordResetExpiry
 	 * @property-read QQNode $CreatedBy
 	 * @property-read QQNodeUserAccount $CreatedByObject
 	 * @property-read QQNode $CreationDate
@@ -15670,6 +15764,10 @@
 					return new QQNode('role_id', 'RoleId', 'integer', $this);
 				case 'Role':
 					return new QQNodeRole('role_id', 'Role', 'integer', $this);
+				case 'PasswordResetCode':
+					return new QQNode('password_reset_code', 'PasswordResetCode', 'string', $this);
+				case 'PasswordResetExpiry':
+					return new QQNode('password_reset_expiry', 'PasswordResetExpiry', 'QDateTime', $this);
 				case 'CreatedBy':
 					return new QQNode('created_by', 'CreatedBy', 'integer', $this);
 				case 'CreatedByObject':
@@ -15826,6 +15924,8 @@
 	 * @property-read QQNode $PortableUserPin
 	 * @property-read QQNode $RoleId
 	 * @property-read QQNodeRole $Role
+	 * @property-read QQNode $PasswordResetCode
+	 * @property-read QQNode $PasswordResetExpiry
 	 * @property-read QQNode $CreatedBy
 	 * @property-read QQNodeUserAccount $CreatedByObject
 	 * @property-read QQNode $CreationDate
@@ -15924,6 +16024,10 @@
 					return new QQNode('role_id', 'RoleId', 'integer', $this);
 				case 'Role':
 					return new QQNodeRole('role_id', 'Role', 'integer', $this);
+				case 'PasswordResetCode':
+					return new QQNode('password_reset_code', 'PasswordResetCode', 'string', $this);
+				case 'PasswordResetExpiry':
+					return new QQNode('password_reset_expiry', 'PasswordResetExpiry', 'QDateTime', $this);
 				case 'CreatedBy':
 					return new QQNode('created_by', 'CreatedBy', 'integer', $this);
 				case 'CreatedByObject':

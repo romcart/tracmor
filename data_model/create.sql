@@ -1,6 +1,6 @@
 CREATE TABLE `_version` (
 `version` VARCHAR(50),
-PRIMARY KEY ( `version`)) ENGINE = INNODB;
+PRIMARY KEY ( `version`)) ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE category (
   category_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -16,7 +16,7 @@ CREATE TABLE category (
     PRIMARY KEY ( category_id ),
     INDEX category_fkindex1 ( created_by ),
     INDEX category_fkindex2 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE manufacturer (
   manufacturer_id   INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -30,7 +30,7 @@ CREATE TABLE manufacturer (
     PRIMARY KEY ( manufacturer_id ),
     INDEX manufacturer_fkindex1 ( created_by ),
     INDEX manufacturer_fkindex2 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE location (
   location_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -47,7 +47,7 @@ CREATE TABLE location (
     INDEX location_fkindex1 ( created_by ),
     INDEX location_fkindex2 ( modified_by ),
     UNIQUE (short_description ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE asset_model (
   asset_model_id    INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -68,7 +68,7 @@ CREATE TABLE asset_model (
     INDEX asset_model_fkindex3 ( created_by ),
     INDEX asset_model_fkindex4 ( modified_by ),
     INDEX asset_model_fkindex5 ( depreciation_class_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `asset` (
   `asset_id`         INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -96,7 +96,7 @@ CREATE TABLE `asset` (
     INDEX asset_fkindex5 ( `parent_asset_id` ),
     INDEX `parent_asset_id_linked` ( `parent_asset_id` , `linked_flag` ),
     UNIQUE (asset_code ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE asset_transaction (
   asset_transaction_id        INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -122,7 +122,7 @@ CREATE TABLE asset_transaction (
     INDEX asset_transaction_fkindex6 ( modified_by ),
     INDEX asset_transaction_fkindex7 ( new_asset_id ),
     INDEX asset_transaction_fkindex8 ( parent_asset_transaction_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE transaction_type (
   transaction_type_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -131,7 +131,7 @@ CREATE TABLE transaction_type (
   inventory_flag      BIT   NOT NULL   DEFAULT 0,
     PRIMARY KEY ( transaction_type_id ),
     UNIQUE (short_description ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE inventory_model (
   inventory_model_id   INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -152,7 +152,7 @@ CREATE TABLE inventory_model (
     INDEX inventory_model_fkindex3 ( created_by ),
     INDEX inventory_model_fkindex4 ( modified_by ),
     UNIQUE (inventory_model_code ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE inventory_location (
   inventory_location_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -168,7 +168,7 @@ CREATE TABLE inventory_location (
     INDEX inventory_location_fkindex2 ( inventory_model_id ),
     INDEX inventory_location_fkindex3 ( modified_by ),
     INDEX inventory_location_fkindex4 ( created_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE inventory_transaction (
   inventory_transaction_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -188,32 +188,35 @@ CREATE TABLE inventory_transaction (
     INDEX inventory_transaction_fkindex1 ( inventory_location_id ),
     INDEX inventory_transaction_fkindex5 ( created_by ),
     INDEX inventory_transaction_fkindex6 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE user_account (
-  user_account_id      INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
-  first_name           VARCHAR(50)   NOT NULL,
-  last_name            VARCHAR(50)   NOT NULL,
-  username             VARCHAR(30)   NOT NULL,
-  password_hash        VARCHAR(60)   NOT NULL,
-  email_address        VARCHAR(128)   NULL,
-  active_flag          BIT   NOT NULL   COMMENT 'User account enabled/disabled',
-  admin_flag           BIT   NOT NULL   COMMENT 'Designates user as normal or administrator',
-  owner_flag           BIT   NOT NULL  DEFAULT 0,
-  portable_access_flag BIT   NULL,
-  portable_user_pin    INT(10)   NULL,
-  role_id              INTEGER UNSIGNED   NOT NULL,
-  created_by           INTEGER UNSIGNED   NULL,
-  creation_date        DATETIME   NULL   DEFAULT NULL,
-  modified_by          INTEGER UNSIGNED   NULL,
-  modified_date        TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
+  user_account_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
+  first_name            VARCHAR(50)   NOT NULL,
+  last_name             VARCHAR(50)   NOT NULL,
+  username              VARCHAR(30)   NOT NULL,
+  password_hash         VARCHAR(60)   NOT NULL,
+  email_address         VARCHAR(128)  NULL,
+  active_flag           BIT   NOT NULL   COMMENT 'User account enabled/disabled',
+  admin_flag            BIT   NOT NULL   COMMENT 'Designates user as normal or administrator',
+  owner_flag            BIT   NOT NULL  DEFAULT 0,
+  portable_access_flag  BIT   NULL,
+  portable_user_pin     INT(10)   NULL,
+  role_id               INTEGER UNSIGNED   NOT NULL,
+  password_reset_code   VARCHAR(64) DEFAULT NULL,
+  password_reset_expiry DATETIME DEFAULT NULL,
+  created_by            INTEGER UNSIGNED   NULL,
+  creation_date         DATETIME   NULL   DEFAULT NULL,
+  modified_by           INTEGER UNSIGNED   NULL,
+  modified_date         TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
     PRIMARY KEY ( user_account_id ),
     INDEX user_account_fkindex1 ( created_by ),
     INDEX user_account_fkindex2 ( modified_by ),
     INDEX user_account_fkindex3 ( role_id ),
-    UNIQUE (username ))
+    UNIQUE (username ),
+    UNIQUE (email_address))
 COMMENT 'User accounts are stored in this table'
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE transaction (
   transaction_id      INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -229,7 +232,7 @@ CREATE TABLE transaction (
     INDEX transaction_fkindex2 ( created_by ),
     INDEX transaction_fkindex3 ( modified_by ),
     INDEX transaction_fkindex4 ( entity_qtype_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE custom_field (
   custom_field_id               INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -249,7 +252,7 @@ CREATE TABLE custom_field (
     INDEX custom_field_fkindex3 ( created_by ),
     INDEX custom_field_fkindex1 ( custom_field_qtype_id ),
     INDEX custom_field_fkindex4 ( default_custom_field_value_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE custom_field_value (
   custom_field_value_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -263,21 +266,21 @@ CREATE TABLE custom_field_value (
     INDEX custom_field_value_fkindex2 ( created_by ),
     INDEX custom_field_value_fkindex3 ( modified_by ),
     INDEX custom_field_value_fkindex1 ( custom_field_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE custom_field_qtype (
   custom_field_qtype_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   name                  VARCHAR(10)   NOT NULL,
     PRIMARY KEY ( custom_field_qtype_id ),
     UNIQUE (name ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE entity_qtype (
   entity_qtype_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   name            VARCHAR(50)   NOT NULL,
     PRIMARY KEY ( entity_qtype_id ),
     UNIQUE (name ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE entity_qtype_custom_field (
   entity_qtype_custom_field_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -286,7 +289,7 @@ CREATE TABLE entity_qtype_custom_field (
     PRIMARY KEY ( entity_qtype_custom_field_id ),
     INDEX entity_qtype_custom_field_fkindex1 ( entity_qtype_id ),
     INDEX entity_qtype_custom_field_fkindex2 ( custom_field_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE asset_custom_field_asset_model (
   asset_custom_field_asset_model_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -295,7 +298,7 @@ CREATE TABLE asset_custom_field_asset_model (
     PRIMARY KEY ( asset_custom_field_asset_model_id ),
     INDEX asset_custom_field_asset_model_fkindex1 ( asset_model_id ),
     INDEX asset_custom_field_asset_model_fkindex2 ( custom_field_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE company (
   company_id        INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -315,7 +318,7 @@ CREATE TABLE company (
     INDEX company_fkindex2 ( created_by ),
     INDEX company_fkindex3 ( modified_by ),
     UNIQUE (short_description ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE contact (
   contact_id    INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -339,7 +342,7 @@ CREATE TABLE contact (
     INDEX contact_fkindex4 ( created_by ),
     INDEX contact_fkindex2 ( address_id ),
     INDEX contact_fkindex1 ( company_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE address (
   address_id        INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -361,7 +364,7 @@ CREATE TABLE address (
     INDEX address_fkindex3 ( state_province_id ),
     INDEX address_fkindex4 ( modified_by ),
     INDEX address_fkindex5 ( created_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE country (
   country_id        INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -370,7 +373,7 @@ CREATE TABLE country (
   state_flag        BIT   NULL,
   province_flag     BIT   NULL,
     PRIMARY KEY ( country_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE state_province (
   state_province_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -379,7 +382,7 @@ CREATE TABLE state_province (
   abbreviation      VARCHAR(2)   NULL,
     PRIMARY KEY ( state_province_id ),
     INDEX state_province_fkindex1 ( country_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shipment (
   shipment_id     INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -412,14 +415,14 @@ CREATE TABLE shipment (
     UNIQUE (shipment_number ),
     UNIQUE (transaction_id ),
     INDEX shipment_fkindex16 ( from_company_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE courier (
   courier_id        INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   short_description VARCHAR(255)   NOT NULL,
   active_flag       BIT   NULL,
     PRIMARY KEY ( courier_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE receipt (
   receipt_id      INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -447,7 +450,7 @@ CREATE TABLE receipt (
     UNIQUE (transaction_id ),
     INDEX receipt_index3241 ( receipt_number ),
     UNIQUE (receipt_number ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE role (
   role_id           INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -460,13 +463,13 @@ CREATE TABLE role (
     PRIMARY KEY ( role_id ),
     INDEX role_fkindex1 ( created_by ),
     INDEX role_fkindex2 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE module (
   module_id         INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   short_description VARCHAR(255)   NULL,
     PRIMARY KEY ( module_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE role_module (
   role_module_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -482,19 +485,19 @@ CREATE TABLE role_module (
     INDEX role_module_fkindex2 ( module_id ),
     INDEX role_module_fkindex3 ( created_by ),
     INDEX role_module_fkindex4 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE authorization (
   authorization_id  INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   short_description VARCHAR(255)   NULL,
     PRIMARY KEY ( authorization_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE authorization_level (
   authorization_level_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   short_description      VARCHAR(255)   NULL,
     PRIMARY KEY ( authorization_level_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE role_module_authorization (
   role_module_authorization_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -511,7 +514,7 @@ CREATE TABLE role_module_authorization (
     INDEX role_module_authorization_fkindex3 ( authorization_level_id ),
     INDEX role_module_authorization_fkindex4 ( created_by ),
     INDEX role_module_authorization_fkindex5 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE role_transaction_type_authorization (
   role_transaction_type_authorization_id INT(10) NOT NULL AUTO_INCREMENT,
@@ -530,7 +533,7 @@ CREATE TABLE role_transaction_type_authorization (
     INDEX role_transaction_type_authorization_FKIndex5(role_id),
     UNIQUE role_transaction_type_authorization_UNIQUE(role_id, transaction_type_id)
 )
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `admin_setting` (
   `setting_id`        INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -538,7 +541,7 @@ CREATE TABLE `admin_setting` (
   `value`             TEXT   NULL,
     PRIMARY KEY ( `setting_id` ),
     UNIQUE (`short_description` ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shortcut (
   shortcut_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -555,14 +558,14 @@ CREATE TABLE shortcut (
     INDEX shortcut_fkindex2 ( authorization_id ),
     INDEX shortcut_fkindex3 ( transaction_type_id ),
     INDEX shortcut_fkindex4 ( entity_qtype_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE datagrid (
   datagrid_id       INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
   short_description VARCHAR(255)   NOT NULL,
     PRIMARY KEY ( datagrid_id ),
     UNIQUE (short_description ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE datagrid_column_preference (
   datagrid_column_preference_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -574,7 +577,7 @@ CREATE TABLE datagrid_column_preference (
     UNIQUE (datagrid_id,column_name,user_account_id ),
     INDEX datagrid_column_preference_fkindex1 ( datagrid_id ),
     INDEX datagrid_column_preference_fkindex2 ( user_account_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE notification (
   notification_id   INT(10)   NOT NULL   AUTO_INCREMENT,
@@ -590,7 +593,7 @@ CREATE TABLE notification (
     PRIMARY KEY ( notification_id ),
     INDEX notification_fkindex1 ( created_by ),
     INDEX notification_fkindex2 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE notification_user_account (
   notification_user_account_id INT(10)   NOT NULL   AUTO_INCREMENT,
@@ -600,7 +603,7 @@ CREATE TABLE notification_user_account (
     PRIMARY KEY ( notification_user_account_id ),
     INDEX notification_user_account_fkindex1 ( notification_id ),
     INDEX notification_user_account_fkindex2 ( user_account_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE attachment (
   attachment_id   INT(10)   NOT NULL   AUTO_INCREMENT,
@@ -617,7 +620,7 @@ CREATE TABLE attachment (
     INDEX attachment_fkindex1 ( entity_qtype_id ),
     INDEX ( entity_id ),
     INDEX attachment_fkindex2 ( created_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE audit (
   audit_id        INT(10)   NOT NULL   AUTO_INCREMENT   COMMENT 'PK',
@@ -630,7 +633,7 @@ CREATE TABLE audit (
     INDEX audit_fkindex1 ( entity_qtype_id ),
     INDEX audit_fkindex2 ( created_by ),
     INDEX audit_fkindex3 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE audit_scan (
   audit_scan_id INT(10)   NOT NULL   AUTO_INCREMENT   COMMENT 'PK',
@@ -642,7 +645,7 @@ CREATE TABLE audit_scan (
     PRIMARY KEY ( audit_scan_id ),
     INDEX audit_scan_fkindex1 ( audit_id ),
     INDEX audit_scan_fkindex2 ( location_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE role_entity_qtype_built_in_authorization (
   role_entity_built_in_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -661,7 +664,7 @@ CREATE TABLE role_entity_qtype_built_in_authorization (
     UNIQUE (role_id,entity_qtype_id,authorization_id ),
     INDEX role_entity_qtype_built_in_authorization_fkindex4 ( created_by ),
     INDEX role_entity_qtype_built_in_authorization_fkindex5 ( modified_by ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE role_entity_qtype_custom_field_authorization (
   role_entity_qtype_custom_field_authorization_id INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -680,7 +683,7 @@ CREATE TABLE role_entity_qtype_custom_field_authorization (
     INDEX role_entity_qtype_custom_field_authorization_fkindex4 ( created_by ),
     INDEX role_entity_qtype_custom_field_authorization_fkindex5 ( modified_by ),
     UNIQUE (role_id,entity_qtype_custom_field_id,authorization_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE asset_transaction_checkout (
   asset_transaction_checkout_id      INTEGER UNSIGNED   NOT NULL   AUTO_INCREMENT,
@@ -699,67 +702,67 @@ CREATE TABLE asset_transaction_checkout (
     INDEX asset_transaction_checkout_fkindex4 ( modified_by ),
     INDEX asset_transaction_checkout_fkindex5 ( asset_transaction_id ),
     UNIQUE (asset_transaction_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE address_custom_field_helper (
   address_id INTEGER UNSIGNED NOT NULL,
         PRIMARY KEY ( address_id),
         INDEX address_custom_field_helper_fkindex1 ( address_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE asset_custom_field_helper (
   asset_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( asset_id),
   	INDEX asset_custom_field_helper_fkindex1 ( asset_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE inventory_model_custom_field_helper (
   inventory_model_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( inventory_model_id),
   	INDEX inventory_model_custom_field_helper_fkindex1 ( inventory_model_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE asset_model_custom_field_helper (
   asset_model_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( asset_model_id),
   	INDEX asset_model_custom_field_helper_fkindex1 ( asset_model_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE manufacturer_custom_field_helper (
   manufacturer_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( manufacturer_id),
   	INDEX manufacturer_custom_field_helper_fkindex1 ( manufacturer_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE category_custom_field_helper (
   category_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( category_id),
   	INDEX category_custom_field_helper_fkindex1 ( category_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE company_custom_field_helper (
   company_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( company_id),
   	INDEX company_custom_field_helper_fkindex1 ( company_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE contact_custom_field_helper (
   contact_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( contact_id),
   	INDEX contact_custom_field_helper_fkindex1 ( contact_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shipment_custom_field_helper (
   shipment_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( shipment_id),
   	INDEX shipment_custom_field_helper_fkindex1 ( shipment_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE receipt_custom_field_helper (
   receipt_id INTEGER UNSIGNED NOT NULL,
   	PRIMARY KEY ( receipt_id),
   	INDEX receipt_custom_field_helper_fkindex1 ( receipt_id ))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE  depreciation_class(
    depreciation_class_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -771,7 +774,7 @@ CREATE TABLE  depreciation_class(
    UNIQUE (short_description),
    INDEX depreciation_class_fkindex2 ( depreciation_method_qtype_id )
 )
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE depreciation_method_qtype(
   depreciation_method_qtype_id  INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -780,7 +783,19 @@ CREATE TABLE depreciation_method_qtype(
   INDEX depreciation_method_qtype_fkindex1 (depreciation_method_qtype_id),
   INDEX `short_description_UNIQUE` (`short_description` ASC),
   UNIQUE (short_description))
-ENGINE = INNODB;
+ENGINE = INNODB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `email_queue` (
+  `email_queue_id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  `to_address` VARCHAR(128) DEFAULT NULL,
+  `from_address` VARCHAR(128) DEFAULT NULL,
+  `subject` VARCHAR(255) DEFAULT NULL,
+  `body` TEXT,
+  `html` TEXT,
+  `error_flag` BOOLEAN DEFAULT NULL,
+  `error_message` VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (`email_queue_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 ALTER TABLE depreciation_class
   ADD CONSTRAINT FOREIGN KEY(depreciation_method_qtype_id) references depreciation_method_qtype (

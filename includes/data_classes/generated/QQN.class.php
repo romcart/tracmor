@@ -175,6 +175,12 @@
 			return new QQNodeDepreciationClass('depreciation_class', null, null);
 		}
 		/**
+		 * @return QQNodeEmailQueue
+		 */
+		static public function EmailQueue() {
+			return new QQNodeEmailQueue('email_queue', null, null);
+		}
+		/**
 		 * @return QQNodeEntityQtypeCustomField
 		 */
 		static public function EntityQtypeCustomField() {

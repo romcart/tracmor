@@ -1,6 +1,6 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-INSERT INTO `_version` (`version`) VALUES ('0.4.1');
+INSERT INTO `_version` (`version`) VALUES ('0.4.2');
 
 INSERT INTO `datagrid` (`short_description`) VALUES
 	('asset_list'),

@@ -202,3 +202,22 @@ TH, TD, BODY { font: 10px verdana; text-align: left; }
 	border:1px solid #CCCCCC;
 	border-top:none;
 }
+
+.login_header {
+	position:relative;
+	background-color:#102c3d;
+	width:100%;
+	height:64px;
+}
+
+.login_logo {
+	position:absolute;
+	top:50%;
+	left:50%;
+	margin-top:-16px;
+	margin-left:-77px;
+	width:155px;
+	height:32px;
+	background-image:url(../images/tracmor.png);
+	background-size:155px 32px;
+}

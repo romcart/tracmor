@@ -202,6 +202,13 @@
 		QApplicationBase::$ClassFile['depreciationclassmetacontrol'] = __DATA_META_CONTROLS__ . '/DepreciationClassMetaControl.class.php';
 		QApplicationBase::$ClassFile['depreciationclassdatagrid'] = __DATA_META_CONTROLS__ . '/DepreciationClassDataGrid.class.php';
 
+	// ClassPaths for the EmailQueue class
+		QApplicationBase::$ClassFile['emailqueue'] = __DATA_CLASSES__ . '/EmailQueue.class.php';
+		QApplicationBase::$ClassFile['qqnodeemailqueue'] = __DATA_CLASSES__ . '/EmailQueue.class.php';
+		QApplicationBase::$ClassFile['qqreversereferencenodeemailqueue'] = __DATA_CLASSES__ . '/EmailQueue.class.php';
+		QApplicationBase::$ClassFile['emailqueuemetacontrol'] = __DATA_META_CONTROLS__ . '/EmailQueueMetaControl.class.php';
+		QApplicationBase::$ClassFile['emailqueuedatagrid'] = __DATA_META_CONTROLS__ . '/EmailQueueDataGrid.class.php';
+
 	// ClassPaths for the EntityQtypeCustomField class
 		QApplicationBase::$ClassFile['entityqtypecustomfield'] = __DATA_CLASSES__ . '/EntityQtypeCustomField.class.php';
 		QApplicationBase::$ClassFile['qqnodeentityqtypecustomfield'] = __DATA_CLASSES__ . '/EntityQtypeCustomField.class.php';

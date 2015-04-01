@@ -19,7 +19,7 @@
 	 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	 */
 
-	$strPageTitle = 'Login | Tracmor';
+	$strPageTitle = 'Reset Password | Tracmor';
 	include(__INCLUDES__ . '/header.inc.php');
 	$this->RenderBegin();
 ?>
@@ -36,36 +36,30 @@
 					<td>
 						<table style="border:1px solid #AAAAAA;background-color:#EEE;padding:16px;border-radius:4px;" width="300">
 							<tr>
-								<td>
-									<div style="width:64px;height:64px;background-image:url(/images/key.png);"></div>
-								</td>
 								<td style="text-align:center;">
 									<table style="text-align:center;padding:16px">
 										<tr style="height:40px;">
-											<td style="vertical-align:top;color:#615c5c;white-space:nowrap;" class="item_label">Please enter your username & password.</td>
+											<td style="vertical-align:top;color:#615c5c;white-space:nowrap;text-align:center;" class="item_label"><?php $this->lblInstructions->Render(); ?></td>
+										</tr>
+										<?php if ($this->blnValidResetCode) { ?>
+										<tr>
+											<td style="color: #333;"><strong>New password</strong></td>
 										</tr>
 										<tr style="height:32px;">
-											<td><?php $this->txtUsername->Render(); ?></td>
+											<td><?php $this->txtNewPassword->RenderWithError(); ?></td>
+										</tr>
+										<tr>
+											<td style="color: #333;"><strong>Re-enter your new password</strong></td>
 										</tr>
 										<tr style="height:32px;">
-											<td><?php $this->txtPassword->RenderWithError(); ?></td>
+											<td><?php $this->txtNewPassword2->RenderWithError(); ?></td>
 										</tr>
 										<tr style="height:32px;">
-											<td>
-												<?php $this->btnLogin->Render(); ?>
+											<td style="font-size:11px;">
+												<?php $this->btnResetPassword->Render(); ?> or <a href="../login.php" style="font-size:11px;" class="bluelink">Cancel</a>
 											</td>
 										</tr>
-									</table>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2" style="text-align:center;">
-									<?php $this->lblForgotPassword->Render(); ?>
-									<table style="margin:auto;">
-										<tr>
-											<td style="vertical-align:top;"><?php $this->txtEmail->RenderWithError(); ?></td>
-											<td style="vertical-align:top;"><?php $this->btnRecoverPassword->Render();?></td>
-										</tr>
+										<?php } ?>
 									</table>
 								</td>
 							</tr>
