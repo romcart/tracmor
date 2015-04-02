@@ -19,8 +19,8 @@
 		</xsl:call-template>
 	<xsl:text>;&quot;</xsl:text>
 	<xsl:text>);&#10;</xsl:text>
-	<xsl:text>&#9;$oCmd</xsl:text><xsl:value-of select="count(preceding::*[name()='CMD'])+1"/><xsl:text>->setGroup(&amp;$oGroup);&#10;</xsl:text>
-	<xsl:text>&#9;$oRow->addCol(&amp;$oCmd</xsl:text><xsl:value-of select="count(preceding::*[name()='CMD'])+1"/><xsl:text>);&#10;</xsl:text>
+	<xsl:text>&#9;$oCmd</xsl:text><xsl:value-of select="count(preceding::*[name()='CMD'])+1"/><xsl:text>->setGroup($oGroup);&#10;</xsl:text>
+	<xsl:text>&#9;$oRow->addCol($oCmd</xsl:text><xsl:value-of select="count(preceding::*[name()='CMD'])+1"/><xsl:text>);&#10;</xsl:text>
 </xsl:template>
 	
 <xsl:template match="COL">
@@ -76,6 +76,10 @@
 			<xsl:text>&#9;$oCol</xsl:text><xsl:value-of select="count(preceding::*[name()='COL'])+1"/><xsl:text>->setOnMouseOut(&quot;</xsl:text><xsl:value-of select="@ONMOUSEOUT"/><xsl:text>&quot;);&#10;</xsl:text>
 		</xsl:if>
 
+		<xsl:if test="string-length(@FIXEDWIDTH)>0">
+			<xsl:text>&#9;$oCol</xsl:text><xsl:value-of select="count(preceding::*[name()='COL'])+1"/><xsl:text>->setFixedWidth(&quot;</xsl:text><xsl:value-of select="@FIXEDWIDTH"/><xsl:text>&quot;);&#10;</xsl:text>
+		</xsl:if>
+
 		<!-- CELLCLASS EXPRESSION //-->
 		<xsl:if test="string-length(@CELLCLASSEXPRESSION)>0">
 			<xsl:text>&#9;$oCol</xsl:text><xsl:value-of select="count(preceding::*[name()='COL'])+1"/><xsl:text>->setCellClassExpr(</xsl:text>
@@ -123,9 +127,9 @@
 			</xsl:otherwise>
 		</xsl:choose>		
 		<xsl:text>);&#10;</xsl:text>
-		<xsl:text>&#9;$oCol</xsl:text><xsl:value-of select="count(preceding::*[name()='COL'])+1"/><xsl:text>->setGroup(&amp;$oGroup);&#10;</xsl:text>
+		<xsl:text>&#9;$oCol</xsl:text><xsl:value-of select="count(preceding::*[name()='COL'])+1"/><xsl:text>->setGroup($oGroup);&#10;</xsl:text>
 		<xsl:apply-templates select="LINK|BOOKMARK|XHTML|IMG"/>
-		<xsl:text>&#9;$oRow->addCol(&amp;$oCol</xsl:text><xsl:value-of select="count(preceding::*[name()='COL'])+1"/><xsl:text>);&#10;</xsl:text>
+		<xsl:text>&#9;$oRow->addCol($oCol</xsl:text><xsl:value-of select="count(preceding::*[name()='COL'])+1"/><xsl:text>);&#10;</xsl:text>
 	</xsl:if>	
 </xsl:template>
 

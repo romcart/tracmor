@@ -4,7 +4,7 @@
 	*	Useful functions and classes to deal with PHPReports stuff.						*
 	*	This file is part of the standard PHPReports package.								*
 	*																										*
-	******************************************************************************/
+	******************************************************************************/	
 
 	/******************************************************************************
 	*																										*
@@ -36,7 +36,7 @@
 	/******************************************************************************
 	*																										*
 	*	This function will return the file path where the PHPReports classes			*
-	*	are.																								*
+	*	are.																								* 
 	*																										*
 	******************************************************************************/
 	function getPHPReportsFilePath(){
@@ -44,7 +44,7 @@
 		if(!is_null($sPath))
 			return $sPath;
 		// put your distro path here
-		return __INCLUDES__ . "/php/PHPReports/";
+		return "/var/htdocs/phpreports/"; 
 	}
 
 	/******************************************************************************
@@ -52,7 +52,7 @@
 	*	XSLTProcessorClass																			*
 	*	This class is used as base for XSLT process.											*
 	*																										*
-	******************************************************************************/
+	******************************************************************************/	
 	class XSLTProcessorClass{
 		var $_sXML;
 		var $_sXSLT;
@@ -71,18 +71,18 @@
 
 		/**
 			Sets the XML data file path
-		*/
+		*/			
 		function setXML($sXML_=null){
 			$this->_sXML=$sXML_;
 		}
-
+		
 		/**
 			Returns the XML data file path
 		*/
 		function getXML(){
 			return $this->_sXML;
 		}
-
+		
 		/**
 			Sets the style sheet file path
 		*/
@@ -96,7 +96,7 @@
 		function getXSLT(){
 			return $this->_sXSLT;
 		}
-
+		
 		/**
 			Specify the output file path
 			A null just returns the result on the run method
@@ -107,7 +107,7 @@
 
 		/**
 			Return the output file path
-		*/
+		*/		
 		function getOutput(){
 			return $this->_sOutput;
 		}
@@ -119,15 +119,15 @@
 			if(is_null($aParms_))
 				return;
 			if(!is_array($aParms_))
-				return;
-			$this->_aParms=$aParms_;
+				return;	
+			$this->_aParms=$aParms_;	
 		}
-
+		
 		/**
 			Insert a parameter
 			sParm_ - parameter name
 			oVal_  - parameter value
-		*/
+		*/			
 		function setParm($sParm_=null,$oVal_=null){
 			if(is_null($sParm_))
 				return;
@@ -143,7 +143,7 @@
 				return null;
 			return $this->_aParms[$sParm_];
 		}
-
+		
 		/**
 			Remove a parameter
 			sParm_ - parameter name
@@ -152,8 +152,8 @@
 			if(is_null($sParm_))
 				return;
 			if(!array_key_exists($sParm_,$this->_aParms))
-				return;
-			unset($this->_aParms[$sParm_]);
+				return;					
+			unset($this->_aParms[$sParm_]);					
 		}
 
 		/**
@@ -164,7 +164,7 @@
 		function run(){
 		}
 	}
-
+	
 	/******************************************************************************
 	*																										*
 	*	Sablotron processor																			*
@@ -185,7 +185,7 @@
 			}
 			$oXSLT = xslt_create();
 			$sRst	 = xslt_process($oXSLT,$this->_sXML,$this->_sXSLT,$this->_sOutput,null,$this->_aParms);
-			xslt_free($oXSLT);
+			xslt_free($oXSLT);					
 			return $sRst;
 		}
 	}
@@ -211,14 +211,14 @@
 			// xslt processor
 			$oProc = new XSLTProcessor();
 			$oProc->importStyleSheet($oXSL);
-
+			
 			// set all the parameters
 			if(!is_null($this->_aParms)){
 				foreach($this->_aParms as $k => $v)
 					$oProc->setParameter("",$k,$v);
-			}
+			}	
 
-			// make the transformation
+			// make the transformation				
 			$sRst = $oProc->transformToXML($oXML);
 			unset($oProc);
 			unset($oXSL);
@@ -233,7 +233,7 @@
 			return $sRst;
 		}
 	}
-
+	
 	/******************************************************************************
 	*																										*
 	*	XSLT Processor factory																		*
@@ -249,15 +249,15 @@
 			// if PHP4 and Sablotron is installed
 			if($iVer<=4 && function_exists("xslt_create"))
 				return new Sablotron_xp();
-			// if PHP5 and Sablotron is installed
+			// if PHP5 and Sablotron is installed				
 			else if($iVer>=5 && function_exists("xslt_create"))
-				return new Sablotron_xp();
-			// if PHP5, Sablotron is not installed	and XSL support is compiled
+				return new Sablotron_xp();	
+			// if PHP5, Sablotron is not installed	and XSL support is compiled			
 			else if($iVer>=5 && !function_exists("xslt_create") && class_exists("XSLTProcessor"))
 				return new PHPXSL_xp();
-			// there is no XSLT processor installed!
+			// there is no XSLT processor installed!				
 			else
-				return null;
+				return null;				
 		}
 	}
 
@@ -271,23 +271,23 @@
 		function PHPReportsError($sMsg_=null,$sURL_=null){
 			if(is_null($sMsg_))
 				return;
-
+				
 			print "<p style='width:400px;background-color:#F5F5F5;border-style:solid;border-width:2;border-color:#CCCCCC;padding:10px 10px 10px 10px;margin:20px;font-family:verdana,arial,helvetica,sans-serif;color:#505050;font-size:12px;'>";
 			print "<span style='font-size:18px;color:#FF0000;font-weight:bold;'>OOOOPS, THERE'S AN ERROR HERE.</span><br/><br/>";
 			print $sMsg_."<br/><br/>";
-
+			
 			if(!is_null($sURL_))
 				print "<a href='$sPath/help/$sURL_'>More about this error here.</a><br/><br/>";
 
 			print "<span style='font-size:10px;font-weight:bold;'>This error message was generated by PHPReports</span>";
 			print "</p>";
-			exit();
+			exit();				
 		}
 	}
 
 	class PHPReportsErrorTr {
 		var $_aMsgs;
-
+		
 		function PHPReportsErrorTr(){
 			$this->_aMsgs = Array();
 
@@ -326,47 +326,44 @@
 			// Brazilian Portuguese messages
 			$this->_aMsgs["OPS"]["pt_BR"]					= "OOOOPS, OCORREU UM ERRO AQUI.";
 			$this->_aMsgs["ERROR"]["pt_BR"]				= "Essa mensagem de erro foi gerada pelo phpReports.";
-			$this->_aMsgs["NODATA"]["pt_BR"]				= "Nï¿½o foram encontrados dados.";
-			$this->_aMsgs["NOPAGE"]["pt_BR"]				= "Nï¿½o hï¿½ um elemento PAGE (pï¿½gina) no seu relatï¿½rio.";
-			$this->_aMsgs["NOIF"]["pt_BR"]				= "Nï¿½o hï¿½ disponï¿½vel a interface '%s' para banco de dados.";
-			$this->_aMsgs["REFUSEDCON"]["pt_BR"]		= "Conexï¿½o recusada.";
+			$this->_aMsgs["NODATA"]["pt_BR"]				= "Não foram encontrados dados.";
+			$this->_aMsgs["NOPAGE"]["pt_BR"]				= "Não há um elemento PAGE (página) no seu relatório.";
+			$this->_aMsgs["NOIF"]["pt_BR"]				= "Não há disponível a interface '%s' para banco de dados.";
+			$this->_aMsgs["REFUSEDCON"]["pt_BR"]		= "Conexão recusada.";
 			$this->_aMsgs["QUERYERROR"]["pt_BR"]		= "Erro na consulta SQL.";
-			$this->_aMsgs["NOCOLUMNS"]["pt_BR"]			= "Nï¿½o foram retornados colunas de dados na sua consulta.";
-			$this->_aMsgs["PAGEPARSER"]["pt_BR"]		= "Nï¿½o consegui copiar o conversor de pï¿½ginas para o diretï¿½rio temporï¿½rio.";
-			$this->_aMsgs["DYNLINK"]["pt_BR"]			= "Foi especificado um link dinï¿½mico mas nï¿½o existe um elemento COLUMN.";
-			$this->_aMsgs["EXPLINK"]["pt_BR"]			= "Foi especificado um link com uma expressï¿½o mas nï¿½o existe um elemento COLUMN.";
-			$this->_aMsgs["NOFIELD"]["pt_BR"]			= "Vocï¿½ estï¿½ tentando recuperar o <b>VALOR</b> de um campo chamado <b>%s</b>, mas ele nï¿½o existe na sua consulta. Por favor revise sua consulta.";
-			$this->_aMsgs["NOFIELDSUM"]["pt_BR"]		= "Vocï¿½ estï¿½ tentando recuperar a <b>SOMA</b> de um campo chamado <b>%s</b>, mas ele nï¿½o existe na sua consulta. Por favor revise sua consulta.";
-			$this->_aMsgs["NOFIELDMAX"]["pt_BR"]		= "Vocï¿½ estï¿½ tentando recuperar o <b>VALOR Mï¿½XIMO</b> de um campo chamado <b>%s</b>, mas ele nï¿½o existe na sua consulta. Por favor revise sua consulta.";
-			$this->_aMsgs["NOFIELDMIN"]["pt_BR"]		= "Vocï¿½ estï¿½ tentando recuperar o <b>VALOR Mï¿½NIMO</b> de um campo chamado <b>%s</b>, mas ele nï¿½o existe na sua consulta. Por favor revise sua consulta.";
-			$this->_aMsgs["NOFIELDAVG"]["pt_BR"]		= "Vocï¿½ estï¿½ tentando recuperar o <b>VALOR Mï¿½DIO</b> de um campo chamado <b>%s</b>, mas ele nï¿½o existe na sua consulta. Por favor revise sua consulta.";
-			$this->_aMsgs["CANTWRITEPAGE"]["pt_BR"]	= "Nï¿½o consegui escrever o arquivo <b>%s</b> no disco. Verifique suas permissï¿½es e espaï¿½o em disco.";
-			$this->_aMsgs["DYNBOOK"]["pt_BR"]			= "Foi especificado um bookmark dinï¿½mico mas nï¿½o existe um elemento COLUMN.";
-			$this->_aMsgs["EXPBOOK"]["pt_BR"]			= "Foi especificado um bookmark com uma expressï¿½o mas nï¿½o existe um elemento COLUMN.";
-			$this->_aMsgs["NOXMLTRANS"]["pt_BR"]		= "O parï¿½metro <b>%s</b> de COL nï¿½o foi encontrado na traduï¿½ï¿½o para XML.";
-			$this->_aMsgs["NOXSLT"]["pt_BR"]				= "Nï¿½o hï¿½ um processador XSLT disponï¿½vel. Verifique se vocï¿½ compilou o PHP com <b>--enable-xslt</b> e a library <a href=\"http://www.gingerall.com/charlie/ga/xml/p_sab.xml\">Sablotron</a> (para o <a href=\"http://www.php.net/manual/en/ref.xslt.php\">PHP4</a>) ou com <b>--enable-xsl</b> (para o <a href=\"http://www.php.net/manual/en/ref.xsl.php\">PHP5</a>).";
-			$this->_aMsgs["NOPATH"]["pt_BR"]				= "Parece que vocï¿½ nï¿½o especificou o path do phpReports com o comando <b>include_path</b> ou no <b>php.ini</b>. Nï¿½o sei onde as classes estï¿½o.";
-			$this->_aMsgs["NOCODE"]["pt_BR"]				= "Nï¿½o pude criar o cï¿½digo de saï¿½da para rodar seu relatï¿½rio. Por favor verifique se o usuï¿½rio do servidor web tem direitos para escrever no diretï¿½rio <b>%s</b>.";
-			$this->_aMsgs["NOXML"]["pt_BR"]				= "Nï¿½o pude encontrar o arquivo XML com seus dados (<b>%s</b>) para rodar seu relatï¿½rio. Por favor verifique o nome do arquivo e se o usuï¿½rio do servidor web tem direitos de escrita no seu diretï¿½rio de arquivos temporï¿½rios.";
-			$this->_aMsgs["NOXMLSET"]["pt_BR"]			= "O arquivo XML de entrada <b>%s</b> nï¿½o foi encontrado.";
-			$this->_aMsgs["NOXSLTSET"]["pt_BR"]			= "O arquivo XSLT de entrada <b>%s</b> nï¿½o foi encontrado.";
-			$this->_aMsgs["NOPLUGIN"]["pt_BR"]			= "O plugin de saï¿½da <b>%s</b> nï¿½o existe (<b>%s</b>).";
-			$this->_aMsgs["NOLOAD"]["pt_BR"]				= "Nï¿½o encontrei o arquivo <b>%s</b> para carregar o relatï¿½rio.";
-			$this->_aMsgs["NOTEMPLATE"]["pt_BR"]		= "O arquivo de template <b>%s</b> nï¿½o foi encontrado.";
-			$this->_aMsgs["INVALIDCON"]["pt_BR"]		= "A variï¿½vel da conexï¿½o com o banco de dados nï¿½o ï¿½ vï¿½lida. %s";
+			$this->_aMsgs["NOCOLUMNS"]["pt_BR"]			= "Não foram retornados colunas de dados na sua consulta.";
+			$this->_aMsgs["PAGEPARSER"]["pt_BR"]		= "Não consegui copiar o conversor de páginas para o diretório temporário.";
+			$this->_aMsgs["DYNLINK"]["pt_BR"]			= "Foi especificado um link dinâmico mas não existe um elemento COLUMN.";
+			$this->_aMsgs["EXPLINK"]["pt_BR"]			= "Foi especificado um link com uma expressão mas não existe um elemento COLUMN.";
+			$this->_aMsgs["NOFIELD"]["pt_BR"]			= "Você está tentando recuperar o <b>VALOR</b> de um campo chamado <b>%s</b>, mas ele não existe na sua consulta. Por favor revise sua consulta.";
+			$this->_aMsgs["NOFIELDSUM"]["pt_BR"]		= "Você está tentando recuperar a <b>SOMA</b> de um campo chamado <b>%s</b>, mas ele não existe na sua consulta. Por favor revise sua consulta.";
+			$this->_aMsgs["NOFIELDMAX"]["pt_BR"]		= "Você está tentando recuperar o <b>VALOR MÁXIMO</b> de um campo chamado <b>%s</b>, mas ele não existe na sua consulta. Por favor revise sua consulta.";
+			$this->_aMsgs["NOFIELDMIN"]["pt_BR"]		= "Você está tentando recuperar o <b>VALOR MÍNIMO</b> de um campo chamado <b>%s</b>, mas ele não existe na sua consulta. Por favor revise sua consulta.";
+			$this->_aMsgs["NOFIELDAVG"]["pt_BR"]		= "Você está tentando recuperar o <b>VALOR MÉDIO</b> de um campo chamado <b>%s</b>, mas ele não existe na sua consulta. Por favor revise sua consulta.";
+			$this->_aMsgs["CANTWRITEPAGE"]["pt_BR"]	= "Não consegui escrever o arquivo <b>%s</b> no disco. Verifique suas permissões e espaço em disco.";
+			$this->_aMsgs["DYNBOOK"]["pt_BR"]			= "Foi especificado um bookmark dinâmico mas não existe um elemento COLUMN.";
+			$this->_aMsgs["EXPBOOK"]["pt_BR"]			= "Foi especificado um bookmark com uma expressão mas não existe um elemento COLUMN.";
+			$this->_aMsgs["NOXMLTRANS"]["pt_BR"]		= "O parâmetro <b>%s</b> de COL não foi encontrado na tradução para XML.";
+			$this->_aMsgs["NOXSLT"]["pt_BR"]				= "Não há um processador XSLT disponível. Verifique se você compilou o PHP com <b>--enable-xslt</b> e a library <a href=\"http://www.gingerall.com/charlie/ga/xml/p_sab.xml\">Sablotron</a> (para o <a href=\"http://www.php.net/manual/en/ref.xslt.php\">PHP4</a>) ou com <b>--enable-xsl</b> (para o <a href=\"http://www.php.net/manual/en/ref.xsl.php\">PHP5</a>).";
+			$this->_aMsgs["NOPATH"]["pt_BR"]				= "Parece que você não especificou o path do phpReports com o comando <b>include_path</b> ou no <b>php.ini</b>. Não sei onde as classes estão.";
+			$this->_aMsgs["NOCODE"]["pt_BR"]				= "Não pude criar o código de saída para rodar seu relatório. Por favor verifique se o usuário do servidor web tem direitos para escrever no diretório <b>%s</b>.";
+			$this->_aMsgs["NOXML"]["pt_BR"]				= "Não pude encontrar o arquivo XML com seus dados (<b>%s</b>) para rodar seu relatório. Por favor verifique o nome do arquivo e se o usuário do servidor web tem direitos de escrita no seu diretório de arquivos temporários.";
+			$this->_aMsgs["NOXMLSET"]["pt_BR"]			= "O arquivo XML de entrada <b>%s</b> não foi encontrado.";
+			$this->_aMsgs["NOXSLTSET"]["pt_BR"]			= "O arquivo XSLT de entrada <b>%s</b> não foi encontrado.";
+			$this->_aMsgs["NOPLUGIN"]["pt_BR"]			= "O plugin de saída <b>%s</b> não existe (<b>%s</b>).";
+			$this->_aMsgs["NOLOAD"]["pt_BR"]				= "Não encontrei o arquivo <b>%s</b> para carregar o relatório.";
+			$this->_aMsgs["NOTEMPLATE"]["pt_BR"]		= "O arquivo de template <b>%s</b> não foi encontrado.";
+			$this->_aMsgs["INVALIDCON"]["pt_BR"]		= "A variável da conexão com o banco de dados não é válida. %s";
 		}
 
 		function showMsg($sMsg_=null,$oParms_=null){
 			if(!$sMsg_)
 				return;
-			if($_SESSION["phpReportsLanguage"])
-			{
+			if(isset($_SESSION["phpReportsLanguage"]))
 				$sLang = $_SESSION["phpReportsLanguage"];
-			}
-			elseif(isset($GLOBALS["phpReportsLanguage"])){
-				$sLang = $GLOBALS["phpReportsLanguage"];
-			}
-			if(!isset($sLang))
+			else
+				$sLang = isset($GLOBALS["phpReportsLanguage"]) ? $GLOBALS["phpReportsLanguage"] : null;
+			if(!$sLang)
 				$sLang = "default";
 
 			$sTitle	= $this->_aMsgs["OPS"][$sLang];
@@ -379,16 +376,16 @@
 			// if the message is still null ...
 			if(!$sMsg)
 				$sMsg = "$sMsg_?";
-
+			
 			if($oParms_)
 				$sMsg = vsprintf($sMsg,$oParms_);
-
+			
 			print "<p style='width:400px;background-color:#F5F5F5;border-style:solid;border-width:2;border-color:#CCCCCC;padding:10px 10px 10px 10px;margin:20px;font-family:verdana,arial,helvetica,sans-serif;color:#505050;font-size:12px;'>";
 			print "<span style='font-size:18px;color:#FF0000;font-weight:bold;'>$sTitle</span><br/><br/>";
 			print "$sMsg<br/><br/>";
 			print "<span style='font-size:10px;font-weight:bold;'>$sError</span>";
 			print "</p>";
-			exit();
+			exit();				
 		}
 	}
 

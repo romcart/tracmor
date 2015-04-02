@@ -32,32 +32,34 @@
 		var $_sOnMouseOver;
 		var $_sOnMouseOut;
 		var $_oError;
+		var $_iFixedWidth;
 
 		/**
 			Constructor
 		*/
 		function PHPReportCol() {
-			$this->_aParms			= Array();	
-			$this->_sType			= "UNDEFINED";
-			$this->_sExpr			= null;
-			$this->_oGroup			= null;
-			$this->_sNform			= null;
-			$this->_iNformX		= -1;
-			$this->_sDecSep		= ",";
-			$this->_sThoSep		= ".";
-			$this->_bSuppr			= false;
-			$this->_oCurVal		= null; 
-			$this->_oOldVal		= null;
-			$this->_sEvenClass	= null;
-			$this->_sOddClass		= null;
-			$this->_oLink			= null;
-			$this->_oBookmark		= null;
-			$this->_oImg			= null;
-			$this->_sClassExpr	= null;
-			$this->_sOnClick		= "";
-			$this->_sOnMouseOver	= "";
-			$this->_sOnMouseOut	= "";
-			$this->_oError			= new PHPReportsErrorTr();
+			$this->_aParms				= Array();	
+			$this->_sType				= "UNDEFINED";
+			$this->_sExpr				= null;
+			$this->_oGroup				= null;
+			$this->_sNform				= null;
+			$this->_iNformX			= -1;
+			$this->_sDecSep			= ",";
+			$this->_sThoSep			= ".";
+			$this->_bSuppr				= false;
+			$this->_oCurVal			= null; 
+			$this->_oOldVal			= null;
+			$this->_sEvenClass		= null;
+			$this->_sOddClass			= null;
+			$this->_oLink				= null;
+			$this->_oBookmark			= null;
+			$this->_oImg				= null;
+			$this->_sClassExpr		= null;
+			$this->_sOnClick			= "";
+			$this->_sOnMouseOver		= "";
+			$this->_sOnMouseOut		= "";
+			$this->_oError				= new PHPReportsErrorTr();
+			$this->_iFixedWidth		= -1;
 			$this->makeTranslationArray();
 		}
 
@@ -76,6 +78,7 @@
 			$this->_aTrans["ONCLICK"]			="OC";
 			$this->_aTrans["ONMOUSEOVER"]		="MO";
 			$this->_aTrans["ONMOUSEOUT"]		="MT";
+			$this->_aTrans["FIXEDWIDTH"]		="FW";
 		}
 
 		/**
@@ -120,9 +123,9 @@
 			$sStr		= "<C ";
 			
 			// check for even and odd cell classes
-			if(!is_null($this->_sEvenClass)&&$iRow_%2==0) 
+			if(!is_null($this->_sEvenClass) && $iRow_%2==0) 
 				$sStr .="CC=\"".$this->_sEvenClass."\" ";
-			else if(!is_null($this->_sOddClass)&&$iRow_%2>0) 
+			else if(!is_null($this->_sOddClass) && $iRow_%2>0) 
 				$sStr .="CC=\"".$this->_sOddClass."\" ";
 
 			// check for expression on the CELLCLASS parameter
@@ -226,7 +229,7 @@
 			
 			// column value	
 			$this->avail();
-			return $this->getXMLOpen($iRow_).$sBookmark.$sLinkOpen.$sImg.($this->isSuppressed()&&strcmp($this->_oCurVal,$this->_oOldVal)==0?"&#160;":$this->_oCurVal).$sLinkClose.$this->getXMLClose();
+			return $this->getXMLOpen($iRow_).$sBookmark.$sLinkOpen.$sImg.($this->isSuppressed()&&strcmp($this->_oCurVal,$this->_oOldVal)==0?" ":$this->_oCurVal).$sLinkClose.$this->getXMLClose();
 		}
 
 		/**
@@ -274,7 +277,7 @@
 						$this->_oCurVal = sprintf($this->_sNform,$this->_oCurVal);
 				}
 				// number format extended
-				if($this->_iNformX>=0 && is_numeric($this->_oCurVal))
+				if($this->_iNformX>=0)
 					$this->_oCurVal = number_format($this->_oCurVal,$this->_iNformX,$this->_sDecSep,$this->_sThoSep);	
 			}
 			return $this->_oCurVal;
@@ -349,34 +352,40 @@
 		}
 
 		function getRowNum() {
-			$oPage =& $this->_oGroup->getPage();
+			$oPage = $this->_oGroup->getPage();
 			return $oPage->getRowNum();
 		}
 		
 		function getPageNum() {
-			$oPage =& $this->_oGroup->getPage();
+			$oPage = $this->_oGroup->getPage();
 			return $oPage->getPageNum();
 		}
 		
 		function setPageNum($iNum_=0) {
-			$oPage =& $this->_oGroup->getPage();
+			$oPage = $this->_oGroup->getPage();
 			return $oPage->setPageNum($iNum_);
 		}
 
 		function resetPageNum(){
 			return $this->setPageNum(0);
 		}
+
+      function getGroupCount() {
+			$oPage = $this->_oGroup->getPage();
+         $oDoc = $oPage->getDocument();
+			return $oDoc->getGroupCount()-1;
+      }
 		
 		/**
 			Sets the column group
 			@param Object group
 		*/
 		function setGroup(&$oGroup_) {
-			$this->_oGroup=&$oGroup_;
+			$this->_oGroup=$oGroup_;
 			$oRpt=$oGroup_->getReport();
 			if(!is_null($oRpt)) {
-				$this->_sDecSep=$oRpt->getDecSep();
-				$this->_sThoSep=$oRpt->getThoSep();
+				$this->_sDecSep=$oRpt->getDecimalsSeparator();
+				$this->_sThoSep=$oRpt->getThousandsSeparator();
 			}
 		}
 
@@ -474,7 +483,7 @@
 		}
 
 		function getNextBookmark() {
-			$oRpt=&$this->_oGroup->getReport();
+			$oRpt=$this->_oGroup->getReport();
 			return $oRpt->getNextBookmark();
 		}
 
@@ -483,7 +492,7 @@
 		}
 
 		function getFileName(){
-			$oPage =& $this->_oGroup->getPage();
+			$oPage = $this->_oGroup->getPage();
 			return basename($oPage->getFileName());
 		}
 
@@ -501,6 +510,15 @@
 
 		function setOnMouseOut($sEvent_){
 			$this->_sOnMouseOut=$sEvent_;
+		}
+
+		// fixed font size
+		function setFixedWidth($iSize_=12){
+			$this->_iFixedWidth=$iSize_;
+		}
+
+		function getFixedWidth(){
+			return $this->_iFixedWidth;
 		}
 	}
 ?>

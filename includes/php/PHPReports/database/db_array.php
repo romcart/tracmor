@@ -7,15 +7,15 @@
 	 *
 	 * Example of use:
 	 *
-	*	$a = array(	"id"=>array(1,2,3,4,5),
-	*					"name"=>array("one","two","three","four","five"),
-	*					"email"=>array("1@one","2@two","3@three","4@four","5@five"));
-	*
-	*	$r = new PHPReportMaker();
-	*	$r->setDatabaseInterface("array");
-	*	$r->setDatabaseConnection($a);
-	*	$r->setXML("test.xml");
-	*	$r->run();
+	 *	$a = array(	"id"=>array(1,2,3,4,5),
+	 *					"name"=>array("one","two","three","four","five"),
+	 *					"email"=>array("1@one","2@two","3@three","4@four","5@five"));
+	 *
+	 *	$r = new PHPReportMaker();
+	 *	$r->setDatabaseInterface("array");
+	 *	$r->setDatabaseConnection($a);
+	 *	$r->setXML("test.xml");
+	 *	$r->run();
 	*/
 	class PHPReportsDBI {
 		var $_array;

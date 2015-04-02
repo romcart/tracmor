@@ -55,11 +55,15 @@
 		}
 
 		function setDocument(&$oDoc_){
-			$this->_oDoc=&$oDoc_;
+			$this->_oDoc=$oDoc_;
 		}
+
+      function getDocument() {
+         return $this->_oDoc;
+      }
 		
 		function setGroups(&$oGroups_) {
-			$this->_oGroups=&$oGroups_;
+			$this->_oGroups=$oGroups_;
 		}
 
 		function setClass($sClass_=null){
@@ -275,7 +279,7 @@
 			$sParm  = (strlen($sTitle)>0?" TITLE=\"".$oRepo->getTitle()."\"":"");
 			$sParm .= (strlen($sColor)>0?" BGCOLOR=\"".$oRepo->getBackgroundColor()."\"":"");
 			$sParm .= (strlen($sImage)>0?" BACKGROUND=\"".$oRepo->getBackgroundImage()."\"":"");
-			$sParm .= (strlen($sBCSS)>0?" BOOKMARKS_CSS=\"".$oRepo->getBookmarksCSS()."\"":"");
+			$sParm .= (strlen($sBCSS)>0 ?" BOOKMARKS_CSS=\"".$oRepo->getBookmarksCSS()."\"":"");
 			$this->output("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n");
 			$this->output("<RP$sParm>\n");
 
@@ -366,7 +370,7 @@
 					$this->printHeader();
 					
 					if(!is_null($this->_oGroups)) {
-						$oGroup =& $this->_oGroups;
+						$oGroup = $this->_oGroups;
 						if($oGroup->isFirst()){
 							if($this->isDebugging())
 								print "(".$this->getName()."):PAGE_OPEN:putting data to ".$oGroup->getName()."<br>";
@@ -389,7 +393,7 @@
 							print "<font color='#FF0000'>(PAGE):PAGE_CLOSE:first field value:".$this->getValueByPos(0)."<hr></font><br>";
 						
 						if(!is_null($this->_oGroups)) {
-							$oGroup =& $this->_oGroups;
+							$oGroup = $this->_oGroups;
 							$oGroup->eventHandler($iEvent_);
 						}
 					}

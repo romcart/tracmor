@@ -83,6 +83,28 @@
 					$sql .= "$op(case when ".$this->_group_key."=$deli$key$deli then $col else $defv end) as $name,";
 				}
 			}
+
+			if(!isset($this->_options["RIGHT_AGGREGATION"]) or $this->_options["RIGHT_AGGREGATION"]){ 
+				foreach($cagr as $col){
+					$op = $oper;	
+
+					// if there is a customized function for this column ...
+					if($this->_options["COLUMNS_FUNCTIONS"][$col])
+						$op = $this->_options["COLUMNS_FUNCTIONS"][$col];
+
+					// check the default value of the aggregation function - convert to uppercase because they're uppercase there
+					if(!array_key_exists(strtoupper($op),$this->_default)){
+						print "THERE IS NO DEFAULT VALUE FOR $op!";
+						return;
+					}
+					$defv = $this->_default[strtoupper($op)];
+
+					// check if there is some alias to the function - some translation, for example
+					$alias= $this->_options["FUNCTIONS_ALIASES"][$op] ? $this->_options["FUNCTIONS_ALIASES"][$op] : $op;
+					$sql .= "$op($col) as $alias"."_"."$col,";
+				}
+			}
+
 			$sql = substr($sql,0,strlen($sql)-1)." from (".$this->_sql.") crosstab_table group by $group $order";
 			if($this->_options["SHOW_SQL"])
 				print $sql;

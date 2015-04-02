@@ -34,7 +34,7 @@
 		var $bDebug;			// debug report
 		var $_sNoDataMsg;		// no data message - NEW!!! on 0.2.0
 		var $_sOutputPlugin;	// output plugin name - NEW!!! on 0.2.0
-		var $_oOutputPlugin;	// output plugin - NEW!!! on 0.2.0
+		var $_oOutputPlugin;	// output plugin - NEW!!! on 0.2.0 
 		var $_sXMLOutputFile;// XML output file with the data
 		var $_sSaveTo;			// save to file - NEW!!! 0.2.0
 		var $_oProc;			// XSLT processor
@@ -50,27 +50,29 @@
 		var $_bDeleteXML;		// if needs to delete the XML file after using it
 		var $_oError;
 		var $_oInput;			// input plugins
+      var $_sDecSep;       // decimals separator
+      var $_sThoSep;       // thousands separator
 
 		/***************************************************************************
 		*																									*
 		*	Constructor - remember to set the PHPREPORTS										*
 		*	environment variable																		*
 		*																									*
-		***************************************************************************/
+		***************************************************************************/		
 		function PHPReportMaker() {
 			$this->_sPath				= getPHPReportsFilePath();
 			$this->_sTmp				= getPHPReportsTmpPath();
-			$this->sXML					= null;
-			$this->sXSLT				= $this->_sPath."/xslt/PHPReport.xsl";
-			$this->sUser				= null;
-			$this->sPass				= null;
-			$this->sCon					= null;
-			$this->sDataI				= null;
-			$this->sSQL					= null;
-			$this->_oParm				= Array();
+			$this->sXML					= null;		
+			$this->sXSLT				= $this->_sPath."/xslt/PHPReport.xsl";		
+			$this->sUser				= null;		
+			$this->sPass				= null;		
+			$this->sCon					= null;		
+			$this->sDataI				= null;	
+			$this->sSQL					= null;		
+			$this->_oParm				= Array();		
 			$this->sDatabase			= null;
-			$this->sCodeOut			= null;
-			$this->sOut					= null;
+			$this->sCodeOut			= null;	
+			$this->sOut					= null;		
 			$this->bDebug				= false;
 			$this->_sNoDataMsg		= "";
 			$this->_sNoDataFunc		= "";
@@ -86,17 +88,19 @@
 			$this->_bDeleteXML		= false;
 			$this->_oError				= new PHPReportsErrorTr();
 			$this->_oInput				= Array();
+         $this->_sDecSep         = null;
+         $this->_sThoSep         = null;
 
 			/*
 				Now we get the XSLT processor
 				new code on the 0.2.8 version, because PHP5 have XSL
 				support with libxslt, by default
-			*/
+			*/			
 			$oProcFactory = new XSLTProcessorFactory();
 			$this->_oProc = $oProcFactory->get();
 			if(is_null($this->_oProc))
 				$this->_oError->showMsg("NOXSLT");
-
+				
 			// check path stuff
 			if(is_null(getPHPReportsFilePath()))
 				$this->_oError->showMsg("NOPATH");
@@ -129,23 +133,14 @@
 					$sFileContents = str_replace("<REPLACE_WITH_PARAMETERS/>",$sParms,$sFileContents);
 			}
 
-			// check if there is some document info
-			if($oDocument){
-				$sDocument = null;
-				if(is_object($oDocument))	$sDocument = $oDocument->write();
-				if(is_string($oDocument))	$sDocument = $oDocument;
-				if($sDocument)
-					$sFileContents = str_replace("<REPLACE_WITH_DOCUMENT_INFO/>",$sDocument,$sFileContents);
-			}
-
 			// if no groups info was specified, follow the default behaviour: all the fields from the query,
 			// with no group break
 			if(!$oGroups){
-				// include the database interface and try to open the connection and execute the query
+				// include the database interface and try to open the connection and execute the query	
 				$sIfFile = realpath($sPath."/database/db_".$sIf.".php");
 				if(!file_exists($sIfFile))
 					$oError->showMsg("NOIF",$sIf);
-				include_once $sIfFile;
+				include_once $sIfFile; 
 
 				// if the database connection is null, open it
 				if(is_null($this->_oCon))
@@ -168,13 +163,19 @@
 				// insert the column names
 				$sNames				= "";
 				$sReplacedNames	= "";
+				$sTotals				= "";
 
-				$iColNum = PHPREportsDBI::db_colnum($this->_oQuery);
+				$iColNum = PHPReportsDBI::db_colnum($this->_oQuery);
 				for($i=1; $i<=$iColNum; $i++){
 					$sName				= PHPReportsDBI::db_columnName($this->_oQuery,$i);
 					$sExtra				= isNumericType(PHPReportsDBI::db_columnType($this->_oQuery,$i))?" ALIGN=\"RIGHT\"":"";
 					$sReplacedNames  .= "<COL CELLCLASS=\"bold\"$sExtra>".ucfirst(strtolower(str_replace("_"," ",$sName)))."</COL>";
 					$sNames			  .= "<COL TYPE=\"FIELD\"$sExtra>$sName</COL>";
+					
+					if(isNumericType(PHPReportsDBI::db_columnType($this->_oQuery,$i)))
+						$sTotals		  .= "\t\t\t<COL TYPE=\"EXPRESSION\" ALIGN=\"RIGHT\">\$this->getSum(\"$sName\");</COL>\n";
+					else
+						$sTotals		  .= "\t\t\t<COL></COL>\n";
 				}
 
 				// build the group info
@@ -182,12 +183,25 @@
 				$sGroup			= str_replace("<REPLACE_WITH_REPLACED_COLUMN_NAMES/>",$sReplacedNames,$sGroup);
 				$sGroup			= str_replace("<REPLACE_WITH_COLUMN_NAMES/>",$sNames,$sGroup);
 				$sFileContents = str_replace("<REPLACE_WITH_GROUP_INFO/>",$sGroup,$sFileContents);
+
+				// if no document info is set, make one
+				if(!$oDocument)
+					$oDocument = "<DOCUMENT>\n\t<FOOTER>\n\t\t<ROW>\n$sTotals\t\t</ROW>\t</FOOTER>\n</DOCUMENT>";
 			}else{
 				$sGroups = null;
 				if(is_object($oGroups))	$sGroups	= $oGroups->write();
 				if(is_string($oGroups))	$sGroups = $oGroups;
 				if($sGroups)
 					$sFileContents = str_replace("<REPLACE_WITH_GROUP_INFO/>",$sGroups,$sFileContents);
+			}
+
+			// check if there is some document info
+			if($oDocument){
+				$sDocument = null;
+				if(is_object($oDocument))	$sDocument = $oDocument->write();
+				if(is_string($oDocument))	$sDocument = $oDocument;
+				if($sDocument)
+					$sFileContents = str_replace("<REPLACE_WITH_DOCUMENT_INFO/>",$sDocument,$sFileContents);
 			}
 
 			// replace the report title
@@ -225,7 +239,7 @@
 			$aParm["sql"      ]	= $this->sSQL;				// set the sql query
 			$aParm["nodatamsg"]	= $this->_sNoDataMsg;	// no data msg
 			$aParm["nodatafunc"] = $this->_sNoDataFunc;	// no data function
-			$aParm["pagesize"]	= $this->_iPageSize>0?$this->_iPageSize:"";
+			$aParm["pagesize"]	= $this->_iPageSize>0?$this->_iPageSize:"";							
 			$aParm["language"]	= $this->_sLang;
 
 			// create the parameters keys array - with element numbers or element keys
@@ -236,25 +250,25 @@
 				for($i=0; $i<$iSize; $i++){
 					$sOkey = $aKeys[$i];	// original key
 					$sKey	 = $sOkey;		// reference key
-
+				
 					// check if its a numeric key - if so, add 1 to
 					// it to keep the parameters based on 1 and not on 0
-					if(is_numeric($sOkey))
+					if(is_numeric($sOkey)) 
 						$sKey = intval($sOkey)+1;
-
+			
 					$aParm["parameter".($i+1)] = $this->_oParm[$sOkey];
 					$aParm["reference".($i+1)] = $sKey;
 				}
-			}
+			}		
 
 			// if there is not a file to create the code,
-			// create it on the memory (faster, use file just for
+			// create it on the memory (faster, use file just for 
 			// debugging stuff)
 			if(is_null($this->sCodeOut)) {
 				$sOut = null;
 				$aParm["output_format"]="memory";
 			}else{
-				$sOut = $this->sCodeOut;
+				$sOut = $this->sCodeOut;		
 				$aParm["output_format"]="file";
 			}
 
@@ -275,17 +289,21 @@
 			// include the generated classes, if it was created
 				if(!file_exists($sOut))
 					$this->_oError->showMsg("NOCODE",array($sOut));
-				require_once($sOut);
-			}
+				require_once($sOut);	
+			}	
 			$this->_aBench["code_eval_end"] = time();
 
-			// include the generated class
+			// include the generated class	
 			$oReport = new $this->_sClassName;
-
+			
 			// set the database connection handle, if there is one
 			$oReport->setDatabaseConnection($this->_oCon);
 			$oReport->setInputFilters($this->_oInput);
 			$oReport->setQuery($this->_oQuery);
+
+         // set the separators, if any
+         $oReport->setDecimalsSeparator($this->getDecimalsSeparator());
+         $oReport->setThousandsSeparator($this->getThousandsSeparator());
 
 			// run the generated class
 			$this->_sXMLOutputFile = $oReport->run($this->_sXMLOutputFile,$this->_aEnv);
@@ -298,7 +316,7 @@
 			/*
 				Now we have a XML file with the report contents ... what to to with it???
 				Let's call the output plugin!
-			*/
+			*/	
 
 			//	if there is no one, create a new default plugin
 			$oOut = null;
@@ -320,11 +338,11 @@
 			if(!is_null($this->_sSaveTo))
 				$this->save();
 
-			// run
+			// run 	
 			$oOut->run();
 			$this->_aBench["output_end"] = time();
 			$this->_aBench["report_start"] = $iReportStart;
-			$this->_aBench["report_end"] = time();
+			$this->_aBench["report_end"] = time();		
 
 			// if needs to delete the XML file
 			if($this->_bDeleteXML)
@@ -340,7 +358,7 @@
 				return $this->_aBench;
 			return $this->_aBench[$sId];
 		}
-
+		
 		/******************************************************************************
 		*	Set the page size (overrides XML value)												*
 		******************************************************************************/
@@ -356,7 +374,7 @@
 		*	Set the XML file path																		*
 		*	@param String file path																		*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setXML($sXML_) {
 			if(!file_exists($sXML_))
 				$this->_oError->showMsg("NOXMLSET",array($sXML_));
@@ -368,17 +386,17 @@
 		*	Returns the XML file path																	*
 		*	@return String file path																	*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getXML() {
 			return $this->sXML;
 		}
-
+		
 		/******************************************************************************
 		*																										*
 		*	Sets the XSLT file path																		*
 		*	@param String file path																		*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setXSLT($sXSLT_) {
 			if(!file_exists($sXSLT_))
 				$this->_oError->showMsg("NOXSLTSET",array($sXSLT_));
@@ -390,17 +408,17 @@
 		*	Returns the XSLT file path																	*
 		*	@return String file path																	*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getXSLT() {
 			return $this->sXSLT;
 		}
-
+		
 		/******************************************************************************
 		*																										*
 		*	Set the user name																				*
 		*	@param String user name																		*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setUser($sUser_) {
 			$this->sUser = $sUser_;
 		}
@@ -410,7 +428,7 @@
 		*	Returns the user name																		*
 		*	@return String user name																	*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getUser() {
 			return $this->sUser;
 		}
@@ -419,7 +437,7 @@
 		*																										*
 		*	Sets the password																				*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setPassword($sPass_) {
 			$this->sPass = $sPass_;
 		}
@@ -428,7 +446,7 @@
 		*																										*
 		*	Returns the password																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getPassword() {
 			return $this->sPass;
 		}
@@ -437,7 +455,7 @@
 		*																										*
 		*	Sets the database connection																*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setConnection($sCon_) {
 			$this->sCon = $sCon_;
 		}
@@ -446,7 +464,7 @@
 		*																										*
 		*	Returns the password																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getConnection() {
 			return $this->sCon;
 		}
@@ -455,7 +473,7 @@
 		*																										*
 		*	Sets the database interface																*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setDatabaseInterface($sData_) {
 			$this->sDataI = $sData_;
 		}
@@ -464,7 +482,7 @@
 		*																										*
 		*	Returns the database interface															*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getDatabaseInterface() {
 			return $this->sDataI;
 		}
@@ -473,7 +491,7 @@
 		*																										*
 		*	Sets the SQL query																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setSQL($sSQL_) {
 			$this->sSQL = $sSQL_;
 		}
@@ -482,7 +500,7 @@
 		*																										*
 		*	Returns the SQL query																		*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getSQL() {
 			return $this->sSQL;
 		}
@@ -491,7 +509,7 @@
 		*																										*
 		*	Sets the parameters																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setParameters($oParm_) {
 			$this->_oParm = $oParm_;
 		}
@@ -500,7 +518,7 @@
 		*																										*
 		*	Returns the parameters																		*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getParameters() {
 			return $this->_oParm;
 		}
@@ -509,7 +527,7 @@
 		*																										*
 		*	Sets the database																				*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setDatabase($sData_) {
 			$this->sDatabase = $sData_;
 		}
@@ -518,7 +536,7 @@
 		*																										*
 		*	Returns the database																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getDatabase() {
 			return $this->sDatabase;
 		}
@@ -527,7 +545,7 @@
 		*																										*
 		*	Sets the code output file																	*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setCodeOutput($sFile_) {
 			$this->sCodeOut = $sFile_;
 		}
@@ -536,7 +554,7 @@
 		*																										*
 		*	Returns the database																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getCodeOutput() {
 			return $this->sCodeOut;
 		}
@@ -545,7 +563,7 @@
 		*																										*
 		*	Sets the output path																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setOutput($sOut_) {
 			$this->sOut = $sOut_;
 		}
@@ -554,7 +572,7 @@
 		*																										*
 		*	Returns output path																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getOutput() {
 			return $this->sOut;
 		}
@@ -563,7 +581,7 @@
 		*																										*
 		*	Sets if the report will generate debug info after it runs						*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setDebug($bDesc) {
 			$this->bDebug = $bDesc;
 		}
@@ -572,7 +590,7 @@
 		*																										*
 		*	Returns if will debug																		*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getDebug() {
 			return $this->bDebug;
 		}
@@ -582,7 +600,7 @@
 		*	Sets message to be shown when no data returns from the query					*
 		*	@param String message																		*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setNoDataMsg($sMsg_="") {
 			$this->_sNoDataMsg=$sMsg_;
 		}
@@ -592,7 +610,7 @@
 		*	Returns the no data message																*
 		*	@return String message																		*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getNoDataMsg() {
 			return $this->_sNoDataMsg;
 		}
@@ -610,15 +628,15 @@
 		*	Create the output plugin																	*
 		*	@param name																						*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function createOutputPlugin($sName_) {
 			$sFullPath = $this->_sPath."/output/$sName_/PHPReportOutput.php";
-
+			
 			// check if the required plugin exists
 			if(!file_exists($sFullPath))
 				$this->_oError->showMsg("NOPLUGIN",array($sName_,$sFullPath));
-			include $sFullPath;
-
+			include $sFullPath; 
+			
 			$oOut = new PHPReportOutput($this->sXML);
 			return $oOut;
 		}
@@ -627,11 +645,11 @@
 			$sName  = ucwords(strtolower($sName_));
 			$sClass = "PHPReportInput$sName";
 			$sFullPath = $this->_sPath."/input/PHPReportInput$sName.php";
-
+			
 			// check if the required plugin exists
 			if(!file_exists($sFullPath))
 				$this->_oError->showMsg("NOPLUGIN",array($sName_,$sFullPath));
-			include $sFullPath;
+			include $sFullPath; 
 
 			$oIn = new $sClass($oGroupDesc_,$sGroupKey_,$oOptions_);
 			array_push($this->_oInput,$oIn);
@@ -642,7 +660,7 @@
 		*	Output plugin for the final format														*
 		*	@param plugin																					*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setOutputPlugin($oPlugin_) {
 			$this->_oOutputPlugin=$oPlugin_;
 		}
@@ -652,7 +670,7 @@
 		*	Returns the output plugin																	*
 		*	@return plugin																					*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getOutputPlugin() {
 			return $this->_oOutputPlugin;
 		}
@@ -661,7 +679,7 @@
 		*																										*
 		*	Set the XML output/data file																*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setXMLOutputFile($sFile_=null){
 			$this->_sXMLOutputFile=$sFile_;
 		}
@@ -670,7 +688,7 @@
 		*																										*
 		*	Returns the XML output/data file															*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getXMLOutputFile(){
 			return $this->_sXMLOutputFile;
 		}
@@ -680,51 +698,51 @@
 		*	File path to save the report																*
 		*	Please remember to use a writable path!												*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function saveTo($sFile_=null){
 			if(is_null($sFile_))
 				return;
-			$this->_sSaveTo=$sFile_;
+			$this->_sSaveTo=$sFile_;	
 		}
 
 		/******************************************************************************
 		*																										*
 		*	Save report																						*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function save(){
 			if(is_null($this->_sSaveTo))
 				return;
-			$sIn  = $this->_sXMLOutputFile;
+			$sIn  = $this->_sXMLOutputFile;	
 			$sMD5 = md5_file($sIn);		// calculate the md5 checksum
 			$sMD5	= str_pad($sMD5,50);	// padding
 			$sOut = "compress.zlib://".$this->_sSaveTo;
 			$fIn	= fopen($sIn,"r");
 			$fOut = fopen($sOut,"w");
-
-			// write the md5sum
+			
+			// write the md5sum 
 			fwrite($fOut,$sMD5);
-
+			
 			while($sStr=fread($fIn,1024))
 				fwrite($fOut,$sStr);
 			fclose($fOut);
-			fclose($fIn);
+			fclose($fIn);				
 		}
 
 		/******************************************************************************
 		*																										*
 		*	Preview report																					*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function preview($sXML_=null){
 			if(is_null($sXML_))
 				return;
-
+				
 			if(!file_exists($sXML_)){
 				print "<b>The file $sXML_ doesn't exists.</b><br>";
 				return;
 			}
-
+			
 			$sPath  = getPHPReportsFilePath();
 			$sXSLT  = "$sPath/xslt/PHPReportPreview.xsl";
 
@@ -743,19 +761,19 @@
 		*	<COL>$this->getEnv("id")->myFunction()</COL>											*
 		*	you'll need PHP5.																				*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function putEnvObj($sKey_=null,$oObj_=null){
 			if(is_null($sKey_) ||
 				is_null($oObj_))
 				return;
-			$this->_aEnv[$sKey_]=$oObj_;
+			$this->_aEnv[$sKey_]=$oObj_;	
 		}
 
 		/******************************************************************************
 		*																										*
 		*	Returns an object from the environment array.										*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getEnvObj($sKey_){
 			return $this->_aEnv[$sKey_];
 		}
@@ -766,7 +784,7 @@
 		*	to run the report.																			*
 		*	To see where this name is used, please check xslt/PHPReport.xsl				*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function setClassName($sClassName_="PHPReport"){
 			$this->_sClassName=$sClassName_;
 		}
@@ -776,7 +794,7 @@
 		*	Returns the name of the class that will be created									*
 		*	to run the report.																			*
 		*																										*
-		******************************************************************************/
+		******************************************************************************/		
 		function getClassName(){
 			return is_null($this->_sClassName)?"PHPReport":$this->_sClassName;
 		}
@@ -787,7 +805,16 @@
 		*																										*
 		******************************************************************************/
 		function setDatabaseConnection(&$_oCon){
-			$this->_oCon =& $_oCon;
+			$this->_oCon = $_oCon;
+		}		
+
+		/******************************************************************************
+		*																										*
+		*	Set a valid query	made before																* 
+		*																										*
+		******************************************************************************/
+		function setQuery($oQuery_){
+			$this->_oQuery=$oQuery_;
 		}
 
 		/******************************************************************************
@@ -817,6 +844,26 @@
 		function getBody(){
 			return $this->_bBody;
 		}
+
+      function setDecimalsSeparator($str=null) {
+         if($str==null)
+            return;
+         $this->_sDecSep=$str;
+      }
+
+      function getDecimalsSeparator() {
+         return $this->_sDecSep;
+      }
+
+      function setThousandsSeparator($str=null) {
+         if($str==null)
+            return;
+         $this->_sThoSep=$str;
+      }
+
+      function getThousandsSeparator() {
+         return $this->_sThoSep;
+      }
 	}
 
 	class PHPReportTemplateElement {

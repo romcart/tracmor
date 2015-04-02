@@ -1,3 +1,35 @@
+------------------------------
+0.5.1 - February 2012 (wow 2!)
+
+Some bugs fixed with recent versions of PHP (nobody still using the 4.x series,
+right?)
+
+-------------------------
+0.5.0 - January 2010 (wow!)
+
+Disclaimer: I was using this version for a long time but didn't released it
+because I was involved more with Ruby/Rails than PHP, so I was not so sure
+it was ready for production, even with my daily use. But everything seems
+ok, so, good luck!
+
+This code is already on Github: http://github.com/taq/phpreports
+
+I thank SourceForge for all the years of good service, but since they
+"renewed" the site I think its time to move, so all the development will
+be moved to Github.
+
+New features:
+
+- There's a new method on PHPReportMaker: setQuery($result), where you can
+send a result made without phpReports database connecting/querying. Just be
+sure to send a valid result there!
+
+- To make sure everything runs fine on a lot of environments, I put some
+quotes on the parameters and avoided PHP see constants as Strings. Thanks,
+Lev.
+
+- Fixed another bug on db_array.php. Should work ok now.
+
 -------------------------
 0.4.9 - Nov 21 2006
 
