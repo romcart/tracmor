@@ -18,6 +18,10 @@ if ($arrRecord['version'] == '0.4.2') {
 try {
 	$objDatabase->TransactionBegin();
 
+	// Add user_account.owner_flag
+	$strQuery = "ALTER TABLE `user_account` ADD COLUMN `owner_flag` BIT(1) NOT NULL DEFAULT b'0' AFTER `admin_flag`;";
+	$objDatabase->NonQuery($strQuery);
+
 	// Make user_account.email_address unique
 	$strQuery = "ALTER TABLE `user_account` ADD UNIQUE(`email_address`);";
 	$objDatabase->NonQuery($strQuery);
