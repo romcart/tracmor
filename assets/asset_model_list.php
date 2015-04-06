@@ -375,7 +375,6 @@
 				// First check that the user is authorized to edit this model
 				$objAssetModel = AssetModel::Load($item);
 				if (!QApplication::AuthorizeEntityBoolean($objAssetModel, 3)) {
-					$blnError = true;
 					$this->lblWarning->Text = 'You are not authorized to delete one or more of the selected models.';
 					$this->dlgMassDelete->HideDialogBox();
 					return;

@@ -131,13 +131,13 @@
 			$this->dtgShipment_Create();
 
 			// Mass Actions controls create
-			$this->lblWarning_Create();
+			/*$this->lblWarning_Create();
 			$this->dlgMassEdit_Create();
 			$this->dlgMassDelete_Create();
             $this->btnMassDeleteCancel_Create();
             $this->btnMassDeleteConfirm_Create();
 			$this->btnMassDelete_Create();
-			$this->btnMassEdit_Create();
+			$this->btnMassEdit_Create();*/
 
 		}
 		
@@ -317,7 +317,7 @@
       $this->dtgShipment->Paginator = $objPaginator;
       $this->dtgShipment->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 
-	  $this->dtgShipment->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ShipmentId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+	  /*$this->dtgShipment->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ShipmentId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));*/
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Shipment Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="shipment_number * 1 ASC"', 'ReverseSortByCommand="shipment_number * 1 DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgShipment->AddColumn(new QDataGridColumnExt('Ship Date', '<?= $_ITEM->ShipDate->__toString(); ?>', 'SortByCommand="ship_date ASC"', 'ReverseSortByCommand="ship_date DESC"', 'CssClass="dtg_column"'));
@@ -343,7 +343,7 @@
       	}
       }
       
-      $this->dtgShipment->SortColumnIndex = 2;
+      $this->dtgShipment->SortColumnIndex = 1;
     	$this->dtgShipment->SortDirection = 1;
       
       $objStyle = $this->dtgShipment->RowStyle;

@@ -104,13 +104,13 @@
 			$this->dtgCompany_Create();
 
 			// Mass Action
-			$this->btnMassDelete_Create();
+			/*$this->btnMassDelete_Create();
 			$this->btnMassEdit_Create();
 			$this->lblMassActionError_Create();
 			$this->dlgDelete_Create();
 			$this->dlgMassEdit_Create();
 			$this->btnMassDeleteConfirm_Create();
-			$this->btnMassDeleteCancel_Create();
+			$this->btnMassDeleteCancel_Create();*/
 		}
 
 		protected function dtgCompany_Bind() {
@@ -260,7 +260,7 @@
 			$this->dtgCompany->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 
 			// Add Checkbox Column
-			$this->dtgCompany->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->CompanyId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+			/*$this->dtgCompany->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->CompanyId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));*/
 
 			$this->dtgCompany->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->CompanyId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Company()->CompanyId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			$this->dtgCompany->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
@@ -279,7 +279,7 @@
 				}
 			}
 
-			$this->dtgCompany->SortColumnIndex = 3;
+			$this->dtgCompany->SortColumnIndex = 2;
 			$this->dtgCompany->SortDirection = 0;
 
 			$objStyle = $this->dtgCompany->RowStyle;

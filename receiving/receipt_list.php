@@ -127,13 +127,13 @@
 			$this->dtgReceipt_Create();
 
 			// Mass Actions controls create
-			$this->lblWarning_Create();
+			/*$this->lblWarning_Create();
 			$this->dlgMassEdit_Create();
 			$this->dlgMassDelete_Create();
 			$this->btnMassDelete_Create();
             $this->btnMassDeleteCancel_Create();
             $this->btnMassDeleteConfirm_Create();
-			$this->btnMassEdit_Create();
+			$this->btnMassEdit_Create();*/
 
 		}
 		
@@ -304,7 +304,7 @@
       $this->dtgReceipt->Paginator = $objPaginator;
       $this->dtgReceipt->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 	  // Add column with checkBoxes to perform MassActions
-	  $this->dtgReceipt->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ReceiptId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+	 /* $this->dtgReceipt->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ReceiptId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));*/
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Receipt Number', '<?= $_ITEM->__toStringWithLink("bluelink") ?> <?= $_ITEM->__toStringHoverTips($_CONTROL) ?>', 'SortByCommand="receipt_number * 1 ASC"', 'ReverseSortByCommand="receipt_number * 1 DESC"', 'CssClass="dtg_column"', 'HtmlEntities=false'));
       $this->dtgReceipt->AddColumn(new QDataGridColumnExt('Sender Company', '<?= $_ITEM->FromCompany->__toString() ?>', 'Width=200', 'SortByCommand="receipt__from_company_id__short_description ASC"', 'ReverseSortByCommand="receipt__from_company_id__short_description DESC"', 'CssClass="dtg_column"'));
@@ -327,7 +327,7 @@
       	}
       }
            
-      $this->dtgReceipt->SortColumnIndex = 2;
+      $this->dtgReceipt->SortColumnIndex = 1;
     	$this->dtgReceipt->SortDirection = 1;
       
       $objStyle = $this->dtgReceipt->RowStyle;

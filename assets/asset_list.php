@@ -182,6 +182,8 @@
 			// Get an instance of the database
 			$objDatabase = QApplication::$Database[1];
 
+			$blnError = false;
+
 			foreach ($items as $item) {
 				// First check that the user is authorized to delete this asset
 				$objAsset = Asset::LoadByAssetId($item);

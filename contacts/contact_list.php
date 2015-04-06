@@ -105,16 +105,13 @@
 			$this->dtgContact_Create();
 
 			// Mass Actions Controls
-			$this->dlgDelete_Create();
+			/*$this->dlgDelete_Create();
 			$this->dlgMassEdit_Create();
 			$this->btnCancel_Create();
 			$this->btnConfirm_Create();
-	//		$this->btnEditConfirm_Create();
-	//		$this->btnEditCancel_Create();
-
 			$this->btnEdit_Create();
 			$this->btnDelete_Create();
-			$this->lblWarning_Create();
+			$this->lblWarning_Create();*/
 		}
 
 		protected function dtgContact_Bind() {
@@ -321,7 +318,7 @@
 			$this->dtgContact->Paginator = $objPaginator;
 			$this->dtgContact->ItemsPerPage = QApplication::$TracmorSettings->SearchResultsPerPage;
 			// Add Check boxes
-			$this->dtgContact->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ContactId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));
+			/*$this->dtgContact->AddColumn(new QDataGridColumnExt('<?= $_CONTROL->chkSelectAll_Render() ?>', '<?=$_CONTROL->chkSelected_Render($_ITEM->ContactId) ?>', 'CssClass="dtg_column"', 'HtmlEntities=false'));*/
 
 			$this->dtgContact->AddColumn(new QDataGridColumnExt('ID', '<?= $_ITEM->ContactId ?>', array('OrderByClause' => QQ::OrderBy(QQN::Contact()->ContactId), 'ReverseOrderByClause' => QQ::OrderBy(QQN::Contact()->ContactId, false), 'CssClass' => "dtg_column", 'HtmlEntities' => false)));
 			$this->dtgContact->AddColumn(new QDataGridColumnExt('<img src=../images/icons/attachment_gray.gif border=0 title=Attachments alt=Attachments>', '<?= Attachment::toStringIcon($_ITEM->GetVirtualAttribute(\'attachment_count\')); ?>', 'SortByCommand="__attachment_count ASC"', 'ReverseSortByCommand="__attachment_count DESC"', 'CssClass="dtg_column"', 'HtmlEntities="false"'));
@@ -342,7 +339,7 @@
 				}
 			}
 
-			$this->dtgContact->SortColumnIndex = 3;
+			$this->dtgContact->SortColumnIndex = 2;
 			$this->dtgContact->SortDirection = 0;
 
 			$objStyle = $this->dtgContact->RowStyle;

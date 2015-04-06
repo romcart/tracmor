@@ -274,8 +274,10 @@ class InventoryMassEditPanel extends QPanel {
 		$this->lstCategory->Warning = '';
 		$this->lstManufacturer->Warning = '';
 
-		foreach ($this->arrCustomFields as $field) {
-			$field['input']->Warning = '';
+		if ($this->arrCustomFields) {
+			foreach ($this->arrCustomFields as $field) {
+				$field['input']->Warning = '';
+			}
 		}
 	}
 
@@ -284,8 +286,10 @@ class InventoryMassEditPanel extends QPanel {
 		$this->lstManufacturer->Enabled = $this->chkManufacturer->Checked;
 		$this->txtLongDescription->Enabled = $this->chkLongDescription->Checked;
 
-		foreach ($this->arrCustomFields as $field) {
-			$field['input']->Enabled = $this->arrCheckboxes[$field['input']->strControlId]->Checked;
+		if ($this->arrCustomFields) {
+			foreach ($this->arrCustomFields as $field) {
+				$field['input']->Enabled = $this->arrCheckboxes[$field['input']->strControlId]->Checked;
+			}
 		}
 	}
 }
