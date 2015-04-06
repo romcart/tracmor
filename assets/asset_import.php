@@ -732,7 +732,7 @@
 										$intLocationId = false;
 									}
 								}
-								$strKeyArray = array_keys($intAssetModelArray, strtolower(trim($strRowArray[$intAssetModelDescriptionKey])));
+								$strKeyArray = array_keys($intAssetModelArray, (isset($strRowArray[$intAssetModelDescriptionKey])) ? strtolower(trim($strRowArray[$intAssetModelDescriptionKey])) : array());
 								if (count($strKeyArray)) {
 									$intAssetModelId = $strKeyArray[0];
 								} else {
