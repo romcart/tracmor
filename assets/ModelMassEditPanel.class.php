@@ -349,8 +349,10 @@ class ModelMassEditPanel extends AssetModelEditPanelBase {
 		$this->lstManufacturer->Enabled = $this->chkManufacturer->Checked;
 		$this->txtLongDescription->Enabled = $this->chkLongDescription->Checked;
 
-		foreach ($this->arrCustomFields as $field) {
-			$field['input']->Enabled = $this->arrCheckboxes[$field['input']->strControlId]->Checked;
+		if ($this->arrCustomFields) {
+			foreach ($this->arrCustomFields as $field) {
+				$field['input']->Enabled = $this->arrCheckboxes[$field['input']->strControlId]->Checked;
+			}
 		}
 	}
 }
