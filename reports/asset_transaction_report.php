@@ -401,19 +401,21 @@
           $oRpt->setNoDataMsg("No data was found, check your query");
           $oRpt->setPageSize(200000000);
 
+          $strTempPath = substr(__TRACMOR_TMP__, strlen(__DOCROOT__.__SUBDIRECTORY__));
+
           if ($this->lstGenerateOptions->SelectedValue == "print") {
           	// Start the output buffer
           	ob_start();
           	$this->lblReport->Text = "";
             $oDocs = "<CSS>../css/tracmor.css</CSS>";
-            $fOut = fopen("../tmp/" . $_SESSION['intUserAccountId'] . "_asset_transaction_report.htm", "w");
+            $fOut = fopen(sprintf("..%s/%s_asset_transaction_report.htm", $strTempPath, $_SESSION['intUserAccountId']), "w");
             $oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,$oDocs,$oGroups);
             $oRpt->run();
             fwrite($fOut, ob_get_contents());
             ob_end_clean();
             fclose($fOut);
             // Open generated Report in new window
-    		    QApplication::ExecuteJavaScript("window.open('../tmp/" . $_SESSION['intUserAccountId']."_asset_transaction_report.htm','AssetTransactionReport','resizeable=yes,menubar=yes,scrollbars=yes,left=0,top=0,width=800,height=600');history.go(-1);");
+    		    QApplication::ExecuteJavaScript(sprintf("window.open('..%s/%s_asset_transaction_report.htm','AssetTransactionReport','resizeable=yes,menubar=yes,scrollbars=yes,left=0,top=0,width=800,height=600');history.go(-1);", $strTempPath, $_SESSION['intUserAccountId']));
     		    exit();
           }
           else if ($this->lstGenerateOptions->SelectedValue == "csv") {

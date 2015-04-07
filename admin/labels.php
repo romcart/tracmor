@@ -270,7 +270,7 @@
 
       // Delete temporary images
       for ($i = 1; $i <= $this->intCurrentBarCodeLabel; $i++) {
-        @unlink("../tmp/".$_SESSION['intUserAccountId']."_".$i.".png");
+        @unlink(sprintf('%s/%s_%s.png', __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $i));
       }
       // Reset variables
       $this->intCurrentBarCodeLabel = 0;
@@ -347,7 +347,7 @@
 		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../includes/php/tcpdf/images/_blank.png\" height=\"%s\" /></td>", $intCellWidth, $intImageHeight);
 		      }
 		      elseif ($this->intCurrentBarCodeLabel < $intBarCodeArrayCount) {
-		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../tmp/%s_%s.png\" height=\"%s\" border=\"0\" align=\"center\" /></td>", $intCellWidth, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
+		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"%s/%s_%s.png\" height=\"%s\" border=\"0\" align=\"center\" /></td>", $intCellWidth, __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel+1, $intImageHeight);
  		        $image = QApplication::DrawBarcode($this->strBarCodeArray[$this->intCurrentBarCodeLabel++]);
 
  		        if ($this->lstLabelStock->SelectedValue != 1 ) {
@@ -373,17 +373,17 @@
   		          // Add some blank to the top and bottom
   		          imagecopyresampled($new_image, $image, 0, ceil(($intImageHeight - $intImageSy * $intRatio)/2), 0, 0, $intCellWidth - 2, ceil($intImageSy * $intRatio), $intImageSx, $intImageSy);
   		        }
-   		        ImagePNG($new_image, sprintf("../tmp/%s_%s.png", $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+   		        ImagePNG($new_image, sprintf("%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
    		        imagedestroy($new_image);
  		        }
  		        else {
- 		          ImagePNG($image, sprintf("../tmp/%s_%s.png", $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+ 		          ImagePNG($image, sprintf("%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
  		        }
 		        imagedestroy($image);
 		      }
 		      else {
 		        if (!isset($arrImageSize)) {
-		          $arrImageSize = getimagesize(sprintf("../tmp/%s_%s.png", $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
+		          $arrImageSize = getimagesize(sprintf("%s/%s_%s.png", __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $this->intCurrentBarCodeLabel));
 		          $arrImageSize[0] = ceil($arrImageSize[0]*($intImageHeight/$arrImageSize[1]));
 		        }
 		        $arrTD[] = sprintf("<td width=\"%spx\" style=\"text-align:center\"><img src=\"../includes/php/tcpdf/images/_blank.png\" width=\"%s\" height=\"%s\" /></td>", $intCellWidth, $arrImageSize[0], $intImageHeight);
@@ -489,7 +489,7 @@
               }
 
               // Close and save PDF document
-              $pdf->Output("../tmp/" . $_SESSION['intUserAccountId']."_BarCodes.pdf", "F");
+              $pdf->Output(sprintf('%s/%s_BarCodes.pdf', __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "F");
               // Cleaning up
               $this->btnCancel_Click();
 
@@ -504,7 +504,8 @@
               $this->ctlSearchMenu->$arrDataGridObjectNameId[0]->chkSelectAll->Checked = false;
 
               // Open generated PDF in new window
-    		      QApplication::ExecuteJavaScript("window.open('../tmp/" . $_SESSION['intUserAccountId']."_BarCodes.pdf','Barcodes','resizeable,menubar=1,scrollbar=1,left=0,top=0,width=800,height=600');");
+              $strTempPath = substr(__TRACMOR_TMP__, strlen(__DOCROOT__.__SUBDIRECTORY__));
+    		      QApplication::ExecuteJavaScript(sprintf("window.open('..%s/%s_BarCodes.pdf','Barcodes','resizeable,menubar=1,scrollbar=1,left=0,top=0,width=800,height=600');", $strTempPath, $_SESSION['intUserAccountId']));
             }
           }
           else {
