@@ -406,14 +406,14 @@
           	ob_start();
           	$this->lblReport->Text = "";
             $oDocs = "<CSS>../css/tracmor.css</CSS>";
-            $fOut = fopen(".." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId'] . "_asset_transaction_report.htm", "w");
+            $fOut = fopen("../tmp/" . $_SESSION['intUserAccountId'] . "_asset_transaction_report.htm", "w");
             $oRpt->createFromTemplate('Asset Transaction Report', __DOCROOT__ . __SUBDIRECTORY__ . '/reports/asset_transaction_report.xml',null,$oDocs,$oGroups);
             $oRpt->run();
             fwrite($fOut, ob_get_contents());
             ob_end_clean();
             fclose($fOut);
             // Open generated Report in new window
-    		    QApplication::ExecuteJavaScript("window.open('.." . __TRACMOR_TMP__ . "/" . $_SESSION['intUserAccountId']."_asset_transaction_report.htm','AssetTransactionReport','resizeable=yes,menubar=yes,scrollbars=yes,left=0,top=0,width=800,height=600');history.go(-1);");
+    		    QApplication::ExecuteJavaScript("window.open('../tmp/" . $_SESSION['intUserAccountId']."_asset_transaction_report.htm','AssetTransactionReport','resizeable=yes,menubar=yes,scrollbars=yes,left=0,top=0,width=800,height=600');history.go(-1);");
     		    exit();
           }
           else if ($this->lstGenerateOptions->SelectedValue == "csv") {

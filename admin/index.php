@@ -64,7 +64,7 @@
 		// Create and Setup the CompanyLogo QFileAsset control
 		protected function flaCompanyLogo_Create() {
 			$this->flaCompanyLogo = new QFileAsset($this);
-			$this->flaCompanyLogo->TemporaryUploadPath = __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__;
+			$this->flaCompanyLogo->TemporaryUploadPath = __TRACMOR_TMP__;
 			$this->flaCompanyLogo->FileAssetType = QFileAssetType::Image;
 			$this->flaCompanyLogo->CssClass = 'file_asset';
             $this->flaCompanyLogo->imgFileIcon->CssClass = 'file_asset_icon';

@@ -98,7 +98,7 @@
         header('Content-Type: text/csv');
   			header('Content-Disposition: csv; filename=skipped_records.csv');
 
-        $file = fopen(sprintf("%s%s/%s_location_skipped.csv", __DOCROOT__ . __SUBDIRECTORY__, __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "r");
+        $file = fopen(sprintf("%s/%s_location_skipped.csv", __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "r");
         ob_end_clean();
         while ($row = fgets($file, 1000)) {
           print $row;
@@ -329,7 +329,7 @@
             // The uploaded file splits up in order to avoid out of memory
             while ($row = fgets($file, 1000)) {
               if ($j == 1) {
-                $strFilePath = sprintf('%s/%s_loc_%s.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $i);
+                $strFilePath = sprintf('%s/%s_loc_%s.csv', __TRACMOR_TMP__, $_SESSION['intUserAccountId'], $i);
                 $this->strFilePathArray[] = $strFilePath;
                 $file_part = fopen($strFilePath, "w+");
                 if ($i == 1) {
@@ -360,7 +360,7 @@
               $this->arrTracmorField = array();
               // Load first file
               $this->FileCsvData->load($this->strFilePathArray[0]);
-              $file_skipped = fopen($this->strFilePath = sprintf('%s/%s_location_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "w+");
+              $file_skipped = fopen($this->strFilePath = sprintf('%s/%s_location_skipped.csv', __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "w+");
               // Get Headers
               if ($this->blnHeaderRow) {
                 $this->arrCsvHeader = $this->FileCsvData->getHeaders();
@@ -555,7 +555,7 @@
 		  else {
 		    // Step 3 complete
 		    set_time_limit(0);
-		    $file_skipped = fopen($strFilePath = sprintf('%s/%s_location_skipped.csv', __DOCROOT__ . __SUBDIRECTORY__ . __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "a");
+		    $file_skipped = fopen($strFilePath = sprintf('%s/%s_location_skipped.csv', __TRACMOR_TMP__, $_SESSION['intUserAccountId']), "a");
 		    if (!$this->blnImportEnd) {
 		      if ($this->intImportStep == 2) {
             $strLocationArray = array();

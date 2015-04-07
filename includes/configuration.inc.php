@@ -83,7 +83,7 @@
 	DEFINE('AWS_PATH', ''); 	// Path in AWS_BUCKET to store Tracmor files, including leading slash. Example: /tracmor/files
 	
 	// Location of tmp directory
-	DEFINE('__TRACMOR_TMP__', '/tmp');
+	DEFINE('__TRACMOR_TMP__', __DOCROOT__ . __SUBDIRECTORY__ . '/tmp');
 
 	// SMTP configuration
 	define('SMTP_SERVER', '');
