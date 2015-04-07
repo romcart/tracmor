@@ -774,7 +774,7 @@
                 //$strShortDescription = (trim($strRowArray[$intModelShortDescriptionKey])) ? trim($strRowArray[$intModelShortDescriptionKey]) : false;
                 $strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? addslashes(trim($strRowArray[$intModelCodeKey])) : addslashes(trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text));
                 //$strAssetModelCode = trim($strRowArray[$intModelCodeKey]) ? trim($strRowArray[$intModelCodeKey]) : trim($this->txtMapDefaultValueArray[$intModelCodeKey]->Text);
-                $strKeyArray = array_keys($intCategoryArray, strtolower(trim($strRowArray[$this->intCategoryKey])));
+                $strKeyArray = array_keys($intCategoryArray, (isset($strRowArray[$this->intCategoryKey])) ? strtolower(trim($strRowArray[$this->intCategoryKey])) : array());
                 if (count($strKeyArray)) {
                   $intCategoryId = $strKeyArray[0];
                 }
@@ -787,7 +787,7 @@
                     $intCategoryId = false;
                   }
                 }
-                $strKeyArray = array_keys($intManufacturerArray, strtolower(trim($strRowArray[$this->intManufacturerKey])));
+                $strKeyArray = array_keys($intManufacturerArray, (isset($strRowArray[$this->intManufacturerKey])) ? strtolower(trim($strRowArray[$this->intManufacturerKey])) : array());
                 if (count($strKeyArray)) {
                   $intManufacturerId = $strKeyArray[0];
                 }
