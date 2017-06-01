@@ -16,7 +16,7 @@
 		case 'test':
 		case 'stage':
 		case 'prod':
-			define ('__DOCROOT__', '/var/www/tracmor');
+			define ('__DOCROOT__', '/var/www/html');
 			define ('__VIRTUAL_DIRECTORY__', '');
 			define ('__SUBDIRECTORY__', '');
 
@@ -25,8 +25,8 @@
 				'server' => 'localhost',
 				'port' => null,
 				'database' => 'tracmor',
-				'username' => '',
-				'password' => '',
+				'username' => 'tracmor'
+				'password' => 'tracmor'
 				'profiling' => false,
 				'encoding' => 'utf8')));
 			break;
@@ -73,7 +73,7 @@
 
 	// It is highly recommended to change this to false if all your servers are running PHP 5.3 or above.
 	// See http://www.openwall.com/phpass/ for more information.
-	define('PORTABLE_PASSWORDS', true);
+	define('PORTABLE_PASSWORDS', false);
 
 	// If using Amazon S3 for storage, change AWS_S3 to true and enter AWS info.
 	DEFINE('AWS_S3', false);
