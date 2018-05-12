@@ -15,7 +15,7 @@ sudo apt-get dist-upgrade --assume-yes # reccommended if you have a clean instal
 
 # Set the password for the mysql root user so we don't get asked during the installation
 sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password $mysql_rootpw'
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password $mysqll_rootpw'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password $mysql_rootpw'
 
 # Install
 sudo apt-get --assume-yes install apache2 libapache2-mod-php5.6 mysql-server mysql-client php5.6 php5.6-mysql php5.6-gd 
