@@ -209,12 +209,14 @@ CREATE TABLE user_account (
   creation_date         DATETIME   NULL   DEFAULT NULL,
   modified_by           INTEGER UNSIGNED   NULL,
   modified_date         TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   NULL   DEFAULT NULL,
+  badge_code            VARCHAR(128) NULL,
     PRIMARY KEY ( user_account_id ),
     INDEX user_account_fkindex1 ( created_by ),
     INDEX user_account_fkindex2 ( modified_by ),
     INDEX user_account_fkindex3 ( role_id ),
     UNIQUE (username ),
-    UNIQUE (email_address))
+    UNIQUE (email_address),
+    UNIQUE (badge_code))
 COMMENT 'User accounts are stored in this table'
 ENGINE = INNODB DEFAULT CHARSET=utf8;
 

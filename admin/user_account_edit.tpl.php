@@ -76,6 +76,10 @@
 							<td class="record_field_edit"><?php $this->txtPasswordConfirm->RenderWithError(); ?></td>
 						</tr>
 						<tr>
+							<td class="record_field_name">Badge Code: </td>
+							<td class="record_field_edit"><?php $this->txtBadgeCode->RenderWithError(); ?></td>
+						</tr>
+						<tr>
 							<td class="record_field_name">Email Address: </td>
 							<td class="record_field_edit"><?php $this->txtEmailAddress->RenderWithError(); ?></td>
 						</tr>

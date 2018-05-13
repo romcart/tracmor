@@ -51,6 +51,8 @@
 		protected $lblUserAccountId;
 		protected $pnlPortableAccess;
 		protected $objOwnerAccount;
+
+		protected $txtBadgeCode;
 		
 		protected function Form_Create() {
 			// Call SetupUserAccount to either Load/Edit Existing or Create New
@@ -74,6 +76,8 @@
 			$this->txtPortableUserPin_Create();
 			$this->chkPortableAccessFlag_Create();
 			
+			$this->txtBadgeCode_Create();
+
 			$this->btnSave_Create();
 			$this->btnCancel_Create();
 			$this->btnDelete_Create();
@@ -114,6 +118,18 @@
 			$this->txtLastName->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
 			$this->txtLastName->AddAction(new QEnterKeyEvent(), new QTerminateAction());
 		}
+		// Create/Setup the password textbox
+		protected function txtBadgeCode_Create() {
+			$this->txtBadgeCode = new QTextBox($this);
+			$this->txtBadgeCode->Name = 'BadgeCode';
+			$this->txtBadgeCode->TextMode = QTextMode::Password;
+			$this->txtBadgeCode->CausesValidation = true;
+			if (!$this->blnEditMode)
+				$this->txtBadgeCode->Required = false;
+			$this->txtBadgeCode->AddAction(new QEnterKeyEvent(), new QAjaxAction('btnSave_Click'));
+			$this->txtBadgeCode->AddAction(new QEnterKeyEvent(), new QTerminateAction());
+		}
+
 
 		// Create/Setup the password textbox
 		protected function txtPassword_Create() {
@@ -279,6 +295,18 @@
 				$this->btnCancel->Warning = 'This user cannot be deactivated because they are the account owner.';
 			}
 
+			// Do not allow for duplicate badge codes
+			if ($this->txtBadgeCode->Text != ''){
+				$existingBadgeCodes = UserAccount::LoadByBadgeCode($this->txtBadgeCode->Text);
+				if ($existingBadgeCodes != null){
+					if($existingBadgeCodes[0]->UserAccountId != $this->objUserAccount->UserAccountId){
+						$blnError = true;
+						$this->btnCancel->Warning = 'Duplicate badge code!';
+					}
+				}
+			}	
+
+
 			if (!$blnError) {
 				
 				try {
@@ -339,6 +367,9 @@
 			$this->objUserAccount->PortableAccessFlag = $this->chkPortableAccessFlag->Checked;
 			$this->objUserAccount->PortableUserPin = $this->txtPortableUserPin->Text;
 			$this->objUserAccount->RoleId = $this->lstRole->SelectedValue;
+			if ($this->txtBadgeCode->Text) {
+				$this->objUserAccount->BadgeCode = $this->txtBadgeCode->Text;
+			}
 		}
 	}
 

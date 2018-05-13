@@ -158,8 +158,20 @@
 
 			$strUsername = $this->txtUsername->Text;
 			$strPassword = $this->txtPassword->Text;
-
-			$objUserAccount = UserAccount::LoadByUsername($strUsername);
+			$useBadgeCode = false;
+			if (strcmp($strUsername,'badgecode') == 0){
+				error_log($strPassword);
+				$objUserAccount = UserAccount::LoadByBadgeCode($strPassword);
+				if (count($objUserAccount) == 1){
+					$objUserAccount = $objUserAccount[0];
+                                        $useBadgeCode = true;
+				} else {
+					$objUserAccount = null;
+				}
+				
+			} else{
+				$objUserAccount = UserAccount::LoadByUsername($strUsername);
+			}
 			$errorMessage = 'Invalid username or password.';
 
 			// Check if that username exists
@@ -173,10 +185,10 @@
 				$this->txtPassword->Warning = $errorMessage;
 			}
 			// Check to see if the password hashes match
-			elseif (!QApplication::CheckPassword(sha1($strPassword), $objUserAccount->PasswordHash)) {
+			elseif (!QApplication::CheckPassword(sha1($strPassword), $objUserAccount->PasswordHash) and (!$useBadgeCode)) {
 				$blnError = true;
 				$this->txtPassword->Warning = $errorMessage;
-			}
+			} 
 			else {
 				QApplication::Login($objUserAccount);
 

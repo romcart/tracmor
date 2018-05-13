@@ -215,6 +215,24 @@
 			return $token; 
 		}
 
+		public static function LoadByBadgeCode($strBadgeCode){
+
+			// Badge code can't be > 128 characters
+			if (strlen($strBadgeCode) > 128){
+				return null;
+			}
+
+			$arrUserAccount = UserAccount::QueryArray(
+				QQ::AndCondition(
+                                        QQ::Equal(QQN::UserAccount()->ActiveFlag, 1),
+					QQ::Equal(QQN::UserAccount()->BadgeCode, $strBadgeCode)
+				)
+			);
+			return $arrUserAccount;
+
+		}
+
+
 		public static function LoadByPasswordResetCode($strPasswordResetCode) {
 			
 			// Reset code must be 32 characters

@@ -309,6 +309,8 @@
 		protected $strModifiedDate;
 		const ModifiedDateDefault = null;
 
+		protected $strBadgeCode;
+		const BadgeCodeDefault = null;
 
 		/**
 		 * Private member variable that stores a reference to a single AddressAsModifiedBy object
@@ -1618,6 +1620,7 @@
 			$objBuilder->AddSelectItem($strTableName, 'creation_date', $strAliasPrefix . 'creation_date');
 			$objBuilder->AddSelectItem($strTableName, 'modified_by', $strAliasPrefix . 'modified_by');
 			$objBuilder->AddSelectItem($strTableName, 'modified_date', $strAliasPrefix . 'modified_date');
+			$objBuilder->AddSelectItem($strTableName, 'badge_code', $strAliasPrefix . 'badge_code');
 		}
 
 
@@ -2515,6 +2518,8 @@
 			$objToReturn->intModifiedBy = $objDbRow->GetColumn($strAliasName, 'Integer');
 			$strAliasName = array_key_exists($strAliasPrefix . 'modified_date', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'modified_date'] : $strAliasPrefix . 'modified_date';
 			$objToReturn->strModifiedDate = $objDbRow->GetColumn($strAliasName, 'VarChar');
+			$strAliasName = array_key_exists($strAliasPrefix . 'badge_code', $strColumnAliasArray) ? $strColumnAliasArray[$strAliasPrefix . 'badge_code'] : $strAliasPrefix . 'badge_code';
+			$objToReturn->strBadgeCode = $objDbRow->GetColumn($strAliasName, 'VarChar');
 
 			// Instantiate Virtual Attributes
 			foreach ($objDbRow->GetColumnNameArray() as $strColumnName => $mixValue) {
@@ -3386,7 +3391,8 @@
 							`password_reset_expiry`,
 							`created_by`,
 							`creation_date`,
-							`modified_by`
+							`modified_by`,
+							`badge_code`
 						) VALUES (
 							' . $objDatabase->SqlVariable($this->strFirstName) . ',
 							' . $objDatabase->SqlVariable($this->strLastName) . ',
@@ -3403,7 +3409,8 @@
 							' . $objDatabase->SqlVariable($this->dttPasswordResetExpiry) . ',
 							' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 							' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-							' . $objDatabase->SqlVariable($this->intModifiedBy) . '
+							' . $objDatabase->SqlVariable($this->intModifiedBy) . ' ,
+							' . $objDatabase->SqlVariable($this->strBadgeCode) . '
 						)
 					');
 
@@ -3453,7 +3460,8 @@
 							`password_reset_expiry` = ' . $objDatabase->SqlVariable($this->dttPasswordResetExpiry) . ',
 							`created_by` = ' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 							`creation_date` = ' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
-							`modified_by` = ' . $objDatabase->SqlVariable($this->intModifiedBy) . '
+							`modified_by` = ' . $objDatabase->SqlVariable($this->intModifiedBy) . ' ,
+							`badge_code` = ' . $objDatabase->SqlVariable($this->strBadgeCode) . ' 
 						WHERE
 							`user_account_id` = ' . $objDatabase->SqlVariable($this->intUserAccountId) . '
 					');
@@ -3596,6 +3604,7 @@
 					`created_by`,
 					`creation_date`,
 					`modified_by`,
+					`badge_code`,
 					__sys_login_id,
 					__sys_action,
 					__sys_date
@@ -3617,6 +3626,7 @@
 					' . $objDatabase->SqlVariable($this->intCreatedBy) . ',
 					' . $objDatabase->SqlVariable($this->dttCreationDate) . ',
 					' . $objDatabase->SqlVariable($this->intModifiedBy) . ',
+					' . $objDatabase->SqlVariable($this->strBadgeCode) . ',
 					' . (($objDatabase->JournaledById) ? $objDatabase->JournaledById : 'NULL') . ',
 					' . $objDatabase->SqlVariable($strJournalCommand) . ',
 					NOW()
@@ -3671,6 +3681,11 @@
 					// Gets the value for intUserAccountId (Read-Only PK)
 					// @return integer
 					return $this->intUserAccountId;
+				case 'BadgeCode':
+					// Gets the value for intUserAccountId (Read-Only PK)
+					// @return integer
+					return $this->strBadgeCode;
+
 
 				case 'FirstName':
 					// Gets the value for strFirstName (Not Null)
@@ -4569,6 +4584,17 @@
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
+				case 'BadgeCode':
+					// Sets the value for strEmailAddress (Unique)
+					// @param string $mixValue
+					// @return string
+					try {
+						return ($this->strBadgeCode = QType::Cast($mixValue, QType::String));
+					} catch (QCallerException $objExc) {
+						$objExc->IncrementOffset();
+						throw $objExc;
+					}
+
 
 				case 'EmailAddress':
 					// Sets the value for strEmailAddress (Unique)
@@ -15596,6 +15622,7 @@
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`creation_date` AS `%s__%s__creation_date`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`modified_by` AS `%s__%s__modified_by`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`modified_date` AS `%s__%s__modified_date`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
+				$objQueryExpansion->AddSelectItem(sprintf('`%s__%s`.`badge_code` AS `%s__%s__badge_code`', $strParentAlias, $strAlias, $strParentAlias, $strAlias));
 
 				$strParentAlias = $strParentAlias . '__' . $strAlias;
 			}
@@ -15748,6 +15775,8 @@
 					return new QQNode('username', 'Username', 'string', $this);
 				case 'PasswordHash':
 					return new QQNode('password_hash', 'PasswordHash', 'string', $this);
+				case 'BadgeCode':
+					return new QQNode('badge_code', 'BadgeCode', 'string', $this);
 				case 'EmailAddress':
 					return new QQNode('email_address', 'EmailAddress', 'string', $this);
 				case 'ActiveFlag':
@@ -16008,6 +16037,8 @@
 					return new QQNode('username', 'Username', 'string', $this);
 				case 'PasswordHash':
 					return new QQNode('password_hash', 'PasswordHash', 'string', $this);
+				case 'BadgeCode':
+					return new QQNode('badge_code', 'BadgeCode', 'string', $this);
 				case 'EmailAddress':
 					return new QQNode('email_address', 'EmailAddress', 'string', $this);
 				case 'ActiveFlag':
