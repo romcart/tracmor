@@ -102,6 +102,13 @@ class QAssetTransactComposite extends QControl {
     $this->btnSave_Create();
     $this->dtgAssetTransact_Create();
     $this->ctlAssetSearchTool_Create();
+
+    if($this->intTransactionTypeId == 99) { 
+	$this->txtNote->ReadOnly =true;  
+	$this->txtNote->Text = "No note required for Mass Edit.";
+	$this->txtNote->Rows = 1;
+	$this->btnSave->Text = "Confirm Mass Edit";
+    }
 	}
 
 	// This method must be declared in all composite controls
@@ -641,20 +648,29 @@ class QAssetTransactComposite extends QControl {
 					}
 				}
 
+				//
+				if (!$blnError && ($this->intTransactionTypeId == 99)){
+					// Make sure they can edit items
+					if (!QApplication::AuthorizeEntityTypeBoolean(2)){
+						$blnError = true;
+						$this->txtNewAssetCode->Warning = "You are not authorized edit assets.";
+					}
+				}
+
 				if (!$blnError && ($this->intTransactionTypeId == 1 || $this->intTransactionTypeId == 2 || $this->intTransactionTypeId == 3 || $this->intTransactionTypeId == 8 || $this->intTransactionTypeId == 9 || $this->intTransactionTypeId == 10 || $this->intTransactionTypeId == 11)) {
 				  $objRoleTransactionTypeAuthorization = RoleTransactionTypeAuthorization::LoadByRoleIdTransactionTypeId(QApplication::$objUserAccount->RoleId, $this->intTransactionTypeId);
-          if ($objRoleTransactionTypeAuthorization) {
-            // If the user has 'None' privileges for this transaction
-            if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
-    				  $blnError = true;
-    					$this->txtNewAssetCode->Warning = "You do not have privileges for this transaction.";
-  					}
-  					// Check the user is the owner (if he has owner-only privileges)
-    				elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2 && $objNewAsset->CreatedBy != QApplication::$objUserAccount->UserAccountId) {
-    				  $blnError = true;
+			          if ($objRoleTransactionTypeAuthorization) {
+			            // If the user has 'None' privileges for this transaction
+			            if ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 3) {
+    					  $blnError = true;
+    					  $this->txtNewAssetCode->Warning = "You do not have privileges for this transaction.";
+  				    }
+  				    // Check the user is the owner (if he has owner-only privileges)
+    				    elseif ($objRoleTransactionTypeAuthorization->AuthorizationLevelId == 2 && $objNewAsset->CreatedBy != QApplication::$objUserAccount->UserAccountId) {
+    				  	$blnError = true;
     					$this->txtNewAssetCode->Warning = "You are not the owner of this asset.";
-    				}
-          }
+    			 	    }
+          			  }
 				}
 
 				if (!$blnError && $objNewAsset instanceof Asset)  {
@@ -803,12 +819,29 @@ class QAssetTransactComposite extends QControl {
 					$this->lstLocation->Warning = 'Location is required.';
 					$blnError = true;
 				}
-				elseif ($this->txtNote->Text == '' && $this->intTransactionTypeId != 3) {
+				elseif ($this->txtNote->Text == '' && $this->intTransactionTypeId != 3 && $this->intTransactionTypeId != 99) {
 					$this->txtNote->Warning = 'Note is required.';
 					$blnError = true;
 				}
 			}
 			if (!$blnError) {
+
+
+                                # If mass edit, show the box
+				if ($this->intTransactionTypeId == 99){
+
+					$assetIds = 'asset_list.php?assetsToEdit=';
+					//error_log(print_r($this->objAssetArray));
+					foreach($this->objAssetArray as $asset){
+						if ($asset instanceof Asset){
+							//error_log(print_r($asset->AssetId));	
+							$assetIds .= strval($asset->AssetId).',';
+						}
+					}
+			                $assetIds = substr($assetIds,0,-1); // Trim trailing ','	
+					error_log($assetIds);
+					QApplication::Redirect($assetIds);
+				} else {
 
 				try {
 					// Get an instance of the database
@@ -907,16 +940,16 @@ class QAssetTransactComposite extends QControl {
 							$this->objAssetTransaction->Save();
 
 							// Create the new AssetTransactionCheckout object and save it for each linked asset
-              if ($this->intTransactionTypeId == 3) {
-							  $objAssetTransactionCheckout = new AssetTransactionCheckout();
+					                if ($this->intTransactionTypeId == 3) {
+								$objAssetTransactionCheckout = new AssetTransactionCheckout();
 								$objAssetTransactionCheckout->AssetTransactionId = $this->objAssetTransaction->AssetTransactionId;
-  							$objAssetTransactionCheckout->ToContactId = $intToContact;
+  								$objAssetTransactionCheckout->ToContactId = $intToContact;
 								$objAssetTransactionCheckout->ToUserId = $intToUser;
 								if ($dttDueDate instanceof QDateTimePicker) {
 								  $objAssetTransactionCheckout->DueDate = $dttDueDate->DateTime;
 								}
 								$objAssetTransactionCheckout->Save();
-              }
+					              }
 						}
 					}
 
@@ -932,8 +965,9 @@ class QAssetTransactComposite extends QControl {
 
 					$objAsset = Asset::Load($objExc->EntityId);
 					$this->objParentObject->btnRemove_Click($this->objParentObject->FormId, 'btnRemove' . $objExc->EntityId, $objExc->EntityId);
-          // Lock Exception Thrown, Report the Error
-          $this->btnCancel->Warning = sprintf('The Asset %s has been altered by another user and removed from the transaction. You may add the asset again or save the transaction without it.', $objAsset->AssetCode);
+				        // Lock Exception Thrown, Report the Error
+                                        $this->btnCancel->Warning = sprintf('The Asset %s has been altered by another user and removed from the transaction. You may add the asset again or save the transaction without it.', $objAsset->AssetCode);
+				}
 				}
 			}
 		}
@@ -992,6 +1026,10 @@ class QAssetTransactComposite extends QControl {
 			case 11:
 				$this->lstLocation->Display = true;
 				$this->ctlAssetSearchTool->blnSearchArchived = true;
+				break;
+                        // Mass edit
+                        case 99:
+				$this->lstLocation->Display = false;
 				break;
 		}
 

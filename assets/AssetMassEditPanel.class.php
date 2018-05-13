@@ -34,8 +34,9 @@ class AssetMassEditPanel extends QPanel {
 	public $btnApply;
 	public $btnCancel;
 	public $blnEditBuiltInFields;
+	public $redirectDir;
 
-	public function __construct($objParentObject, $strClosePanelMethod , $arrayAssetId) {
+	public function __construct($objParentObject, $strClosePanelMethod , $arrayAssetId,$redirDir='') {
 
 		try {
 			parent::__construct($objParentObject);
@@ -59,6 +60,8 @@ class AssetMassEditPanel extends QPanel {
 		$this->chkModel_Create();
 		$this->chkChkLockToParent_Create();
 		$this->chkParentAssetCode_Create();
+
+		$this->redirectDir = $redirDir;
 
 		// Load Custom Fields
 		$this->objCustomFieldArray = CustomField::LoadObjCustomFieldArray(EntityQtype::Asset, false, null, false, 'all');
@@ -340,7 +343,7 @@ class AssetMassEditPanel extends QPanel {
 				//print $strQuery; exit;
 				$objDatabase->NonQuery($strQuery);
 				$objDatabase->TransactionCommit();
-				QApplication::Redirect('');
+				QApplication::Redirect($this->redirectDir);
 			} catch (QMySqliDatabaseException $objExc) {
 				$objDatabase->TransactionRollback();
 				throw new QDatabaseException();

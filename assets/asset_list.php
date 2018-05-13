@@ -61,9 +61,12 @@
 		protected $dlgMassEdit;
 		protected $dlgMassDelete;
 		protected $btnMassEdit;
+		protected $btnMassEditAggregated;
 		protected $btnMassDelete;
 		protected $btnMassDeleteConfirm;
 		protected $btnMassDeleteCancel;
+
+		public $preloadArrToEdit;
 
 		protected function Form_Create() {
 			
@@ -79,7 +82,14 @@
 			$this->btnMassDeleteConfirm_Create();
 			$this->btnMassDeleteCancel_Create();
 			$this->btnMassEdit_Create();
+			$this->btnMassEditAggregated_Create();
 			$this->AddMassButtonActions();
+
+			$this->preloadArrToEdit = QApplication::QueryString('assetsToEdit');
+			if ($this->preloadArrToEdit != NULL){
+				$this->preloadArrToEdit = array_map('intval',str_getcsv(QApplication::QueryString('assetsToEdit')));
+				$this->btnMassEdit_Click();
+                        }
 		}
 
 		// Create and Setup the Header Composite Control
@@ -162,9 +172,18 @@
 			// Actions added in AddMassButtonActions()
 		}
 
+		protected function btnMassEditAggregated_Create() {
+			$this->btnMassEditAggregated = new QButton($this);
+			$this->btnMassEditAggregated ->Name = "editAggregated";
+			$this->btnMassEditAggregated ->Text = "Aggregate Mass Edit";
+			$this->btnMassEditAggregated ->Display = QApplication::AuthorizeEntityTypeBoolean(2);
+		}
+
+
 		protected function AddMassButtonActions() {
 			$this->btnMassDelete->AddAction(new QClickEvent(), new QAjaxAction('btnMassDelete_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
 			$this->btnMassEdit->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEdit_Click', null, null, array($this->btnMassEdit, $this->btnMassDelete)));
+			$this->btnMassEditAggregated->AddAction(new QClickEvent(), new  QAjaxAction('btnMassEditAggregated_Click'));
 			$this->btnMassDeleteConfirm->AddAction(new QClickEvent(), new QAjaxAction('btnMassDeleteConfirm_Click', null, null, array($this->btnMassDeleteCancel, $this->btnMassDeleteConfirm)));
 		}
 
@@ -224,15 +243,24 @@
 		}
 
 		protected function btnMassEdit_Click() {
-			$this->arrToEdit = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
+			if ($this->preloadArrToEdit != NULL){
+				$this->arrToEdit = $this->preloadArrToEdit;
+				$redir_dir = 'asset_edit.php?intTransactionTypeId=99';
+			} else {
+				$this->arrToEdit = $this->ctlSearchMenu->dtgAsset->getSelected('AssetId');
+				$redir_dir='';
+			}
 			if (count($this->arrToEdit)>0) {
 				$this->lblWarning->Text = "";
 				$this->dlgMassEdit->RemoveChildControls(true);
-				$this->pnlAssetMassEdit = new AssetMassEditPanel($this->dlgMassEdit, 'pnlAssetMassEditCancel_Click', $this->arrToEdit);
+				$this->pnlAssetMassEdit = new AssetMassEditPanel($this->dlgMassEdit, 'pnlAssetMassEditCancel_Click', $this->arrToEdit,$redir_dir);
 				$this->dlgMassEdit->ShowDialogBox();
 			} else {
 				$this->lblWarning->Text = "You must select one or more assets to Edit" ;
 			}
+		}
+		protected function btnMassEditAggregated_Click(){
+			QApplication::Redirect('asset_edit.php?intTransactionTypeId=99');	
 		}
 
 		public function pnlAssetMassEditCancel_Click() {
