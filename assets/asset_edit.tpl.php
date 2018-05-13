@@ -38,9 +38,9 @@
 		</td>
 		<td width="100%" valign="top">
 		<?php if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
+		<?php if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) { echo('Asset Tag direct lookup: '); $this->assetFinder->Render(); }?>
 		<?php $this->ctlAssetEdit->Render(); ?>
 		<?php if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) { ?>
-		Asset Tag direct lookup: <?php $this->assetFinder->Render(); ?>
        <br class="item_divider" />
         <?php
          //$this->dtrAssetHistory->renderWithResults = true;

@@ -39,6 +39,7 @@
 		</td>
 		<td width="100%" valign="top">
 <!-- Begin Search Menu -->
+	Asset Tag direct lookup: <?php $this->assetFinder->Render(); ?>
 <?php
 	$this->ctlSearchMenu->Render();
 ?>
@@ -49,7 +50,6 @@
 	<?php $this->btnMassEdit->Render(); ?>
 	<?php $this->btnMassDelete->Render(); ?>
 	<?php $this->btnMassEditAggregated->Render(); ?>
-	Asset Tag direct lookup: <?php $this->assetFinder->Render(); ?>
 	<?php $this->RenderEnd(); ?>		
 	<?php $this->assetFinder->Focus(); ?>
 	<?php $this->assetFinder->Select(); ?>
