@@ -49,5 +49,8 @@
 	<?php $this->btnMassEdit->Render(); ?>
 	<?php $this->btnMassDelete->Render(); ?>
 	<?php $this->btnMassEditAggregated->Render(); ?>
-	<?php $this->RenderEnd() ?>		
+	Asset Tag direct lookup: <?php $this->assetFinder->Render(); ?>
+	<?php $this->RenderEnd(); ?>		
+	<?php $this->assetFinder->Focus(); ?>
+	<?php $this->assetFinder->Select(); ?>
 	<?php require_once('../includes/footer.inc.php'); ?>

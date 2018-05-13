@@ -69,6 +69,7 @@
 		protected $lblChildAssets;
 		protected $lblAssetCode;
         protected $lblAssetHistory;
+                protected $assetFinder;
 
 		// Status of Asset Search Tool
 		protected $intDlgStatus;
@@ -109,6 +110,7 @@
   			$this->btnUnlink_Create();
   			$this->AddChild_Create();
   			$this->ctlAssetSearchTool_Create();
+			$this->assetFinder_Create();
 		  }
 
 			// Create the two composite controls
@@ -131,6 +133,30 @@
 			  $this->dtgChildAssets_Create();
 			}
 		}
+
+		protected function assetFinder_Create(){
+                        $this->assetFinder = new QTextBox($this);
+                        $this->assetFinder->Name = 'Asset Finder';
+                        $this->assetFinder->TextMode = QTextMode::SingleLine;
+                        $this->assetFinder->AddAction(new QEnterKeyEvent(), new QAjaxAction('assetFinder_Enter'));
+		}
+
+               	protected function assetFinder_Enter(){
+                        //QApplication::Redirect('');
+                        // Try to lookup the asset. If only one exists then opne the page. Else,error 
+                        $foundAssets = Asset::LoadArrayBySearchHelper($this->assetFinder->Text,null,null,null,null,false,null,null,null,null,null,null,null,null,null,null,null,"2",null,true,true,true,null,null,false,null);
+
+                        if (count($foundAssets) == 1){
+                                error_log($foundAssets[0]->AssetId);
+                                QApplication::Redirect('asset_edit.php?intAssetId='.strval($foundAssets[0]->AssetId));
+                        } else if (count($foundAssets) == 0) {
+                                $this->assetFinder->Text = 'No asset with that Tag';
+                                $this->assetFinder->Select();
+                        } else {
+                                $this->assetFinder->Text = 'Unique asset not found';
+                                $this->assetFinder->Select();
+                        }
+                }
 
 		// Datagrid values must be assigned here because they are not encoded like all other controls
 		protected function Form_PreRender() {

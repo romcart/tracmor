@@ -65,7 +65,7 @@
 		protected $btnMassDelete;
 		protected $btnMassDeleteConfirm;
 		protected $btnMassDeleteCancel;
-
+		protected $assetFinder;
 		public $preloadArrToEdit;
 
 		protected function Form_Create() {
@@ -84,12 +84,37 @@
 			$this->btnMassEdit_Create();
 			$this->btnMassEditAggregated_Create();
 			$this->AddMassButtonActions();
+			$this->assetFinder_Create();
 
 			$this->preloadArrToEdit = QApplication::QueryString('assetsToEdit');
 			if ($this->preloadArrToEdit != NULL){
 				$this->preloadArrToEdit = array_map('intval',str_getcsv(QApplication::QueryString('assetsToEdit')));
 				$this->btnMassEdit_Click();
                         }
+		}
+
+		protected function assetFinder_Create(){
+			$this->assetFinder = new QTextBox($this);
+	                $this->assetFinder->Name = 'Asset Finder';
+			$this->assetFinder->TextMode = QTextMode::SingleLine;
+			$this->assetFinder->AddAction(new QEnterKeyEvent(), new QAjaxAction('assetFinder_Enter'));
+		}
+
+		protected function assetFinder_Enter(){
+			//QApplication::Redirect('');
+			// Try to lookup the asset. If only one exists then opne the page. Else,error 
+			$foundAssets = Asset::LoadArrayBySearchHelper($this->assetFinder->Text,null,null,null,null,false,null,null,null,null,null,null,null,null,null,null,null,"2",null,true,true,true,null,null,false,null);
+
+			if (count($foundAssets) == 1){
+				error_log($foundAssets[0]->AssetId);
+				QApplication::Redirect('asset_edit.php?intAssetId='.strval($foundAssets[0]->AssetId));
+			} else if (count($foundAssets) == 0) {
+				$this->assetFinder->Text = 'No asset with that Tag';
+				$this->assetFinder->Select();
+			} else {
+                                $this->assetFinder->Text = 'Unique asset not found';
+                                $this->assetFinder->Select();
+			}
 		}
 
 		// Create and Setup the Header Composite Control

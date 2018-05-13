@@ -40,7 +40,8 @@
 		<?php if ($this->ctlAssetEdit->blnEditMode || $this->intTransactionTypeId) $this->ctlAssetTransact->Render(); ?>
 		<?php $this->ctlAssetEdit->Render(); ?>
 		<?php if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) { ?>
-        <br class="item_divider" />
+		Asset Tag direct lookup: <?php $this->assetFinder->Render(); ?>
+       <br class="item_divider" />
         <?php
          //$this->dtrAssetHistory->renderWithResults = true;
          $this->lblAssetHistory->Render();
@@ -63,4 +64,5 @@
 	  ?>
     <br class="item_divider" />
 	<?php $this->RenderEnd() ?>
+	<?php if (!$this->intTransactionTypeId && QApplication::QueryString('intAssetId')) { $this->assetFinder->Select();} ?>
 	<?php require_once('../includes/footer.inc.php'); ?>
