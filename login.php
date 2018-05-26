@@ -160,12 +160,13 @@
 			$strPassword = $this->txtPassword->Text;
 			$useBadgeCode = false;
 			if (strcmp($strUsername,'badgecode') == 0){
-				error_log($strPassword);
+				//error_log($strPassword);
 				$objUserAccount = UserAccount::LoadByBadgeCode($strPassword);
 				if (count($objUserAccount) == 1){
 					$objUserAccount = $objUserAccount[0];
                                         $useBadgeCode = true;
 				} else {
+                                        $this->txtUsername->Select();
 					$objUserAccount = null;
 				}
 				
