@@ -1231,7 +1231,7 @@
 			$this->objParentNode = true;
 		}
 
-		public function GetColumnAliasHelper(QQueryBuilder $objBuilder, $strBegin, $strEnd, $blnExpandSelection) {}
+		public function GetColumnAliasHelper(QQueryBuilder $objBuilder, $strBegin, $strEnd, $blnExpandSelection, QQCondition $objJoinCondition = null) {}
 
 		public function GetColumnAlias(QQueryBuilder $objBuilder, $blnExpandSelection = false, QQCondition $objJoinCondition = null) {
 			return $this->strName;
@@ -1773,7 +1773,7 @@
 				implode("\r\n    ", $this->strJoinArray));
 
 			// Custom "FROM" Columns
-			if (count($this->strCustomFromArray))
+			if (count((is_array($this->strCustomFromArray)?$this->strCustomFromArray:[])))
 				$strSql .= ",\r\n    " . implode(",\r\n    ", $this->strCustomFromArray);
 
 			// WHERE Clause

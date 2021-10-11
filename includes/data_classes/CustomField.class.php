@@ -605,7 +605,7 @@
 
 			$arrCustomFields = array();
 			
-			for ($i=0; $i < count($objCustomFieldArray); $i++) {
+			for ($i=0; $i < count(($objCustomFieldArray instanceof Countable?$objCustomFieldArray:[])); $i++) {
 				
 				if ($blnLabels) {
 					// Create Label for each custom field
@@ -740,7 +740,7 @@
 		 * @param integer $intEntityQtypeId e.g., 1 == Asset, 2 == Inventory
 		 */
 		public static function SaveControls($objCustomFieldArray, $blnEditMode, $arrCustomFields, $intEntityId, $intEntityQtypeId) {
-			for ($i=0; $i < count($objCustomFieldArray); $i++) {
+			for ($i=0; $i < count(($objCustomFieldArray instanceof Countable?$objCustomFieldArray:[])); $i++) {
 				
 				// Text Boxes
 				// if ($arrCustomFields[$i]['input'] instanceof QTextBox) {
@@ -796,7 +796,7 @@
 		public static function UpdateControls($objCustomFieldArray, $arrCustomFields) {
 			
 			// Loop through all custom fields
-			for ($i=0; $i < count($objCustomFieldArray); $i++) {
+			for ($i=0; $i < count(($objCustomFieldArray instanceof Countable?$objCustomFieldArray:[])); $i++) {
 				// Text Boxes
 				if ($objCustomFieldArray[$i]->CustomFieldQtypeId == 1 || $objCustomFieldArray[$i]->CustomFieldQtypeId == 3) {
 					if ($objCustomFieldArray[$i]->CustomFieldSelection) {

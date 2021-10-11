@@ -1760,12 +1760,12 @@ class QAssetEditComposite extends QControl {
 	}
 
 	public function SaveChildAssets() {
-		  if (count($this->objChildAssetArray)) {
+		  if (is_array($this->objChildAssetArray) && count($this->objChildAssetArray)) {
   		  foreach ($this->objChildAssetArray as $objChildAsset) {
   		    $objChildAsset->Save();
   		  }
 		  }
-		  if (count($this->objRemovedChildAssetArray)) {
+		  if (is_array($this->objRemovedChildAssetArray) && count($this->objRemovedChildAssetArray)) {
   		  foreach ($this->objRemovedChildAssetArray as $objChildAsset) {
   		    $objChildAsset->Save();
   		  }

@@ -131,7 +131,7 @@
 
 
 
-		public static function HandleException(Exception $objException) {
+		public static function HandleException(\Throwable $objException) {
 			// If we still have access to QApplicationBase, set the error flag on the Application
 			if (class_exists('QApplicationBase'))
 				QApplicationBase::$ErrorFlag = true;

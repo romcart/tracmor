@@ -37,7 +37,7 @@
 						<table style="border:1px solid #AAAAAA;background-color:#EEE;padding:16px;border-radius:4px;" width="300">
 							<tr>
 								<td>
-									<div style="width:64px;height:64px;background-image:url(/images/key.png);"></div>
+									<div style="width:64px;height:64px;background-image:url(./images/key.png);"></div>
 								</td>
 								<td style="text-align:center;">
 									<table style="text-align:center;padding:16px">
